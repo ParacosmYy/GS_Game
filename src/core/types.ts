@@ -24,25 +24,6 @@ export enum AttackType {
   SPECIAL_UPPER = 'SPECIAL_UPPER',
 }
 
-// ===== Frame Data =====
-export interface FrameData {
-  startup: number;
-  active: number;
-  recovery: number;
-  damage: number;
-  hitstun: number;
-  blockstun: number;
-  pushback: number;
-}
-
-// ===== Hitbox =====
-export interface Hitbox {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-}
-
 // ===== Player Input =====
 export interface PlayerInput {
   up: boolean;
