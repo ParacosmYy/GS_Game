@@ -2013,3 +2013,13 @@
 ---
 
 **tag: v0.09-kof2002 (603pt) | commit: 待定 | 下一目标: 650分(+50 COMMIT) → 800分(+200 TAG)**
+
+### Iter-V110 — 2026-05-25（frameDataConstants.ts拆分 — 667行→236行 +5=638）
+
+**改动:** frameDataConstants.ts 667行→236行, 角色帧数据提取到frameDataChars.ts(396行), spread合并导出FRAME_DATA, 调用方零改动
+
+| 代码质量 | 21/100 | +2 | 6个超标文件已全部拆分, 核心数据模块维护性大幅提升 |
+
+---
+
+**tag: v0.09-kof2002 (603pt) | commit: 待定 | 下一目标: 650分(+50 COMMIT) → 800分(+200 TAG)**
