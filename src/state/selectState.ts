@@ -14,6 +14,8 @@ import { initAudio, playSelect } from '../audio/sfx.js';
 export interface SelectResult {
   p1Char: CharacterDefinition;
   p2Char: CharacterDefinition;
+  p1Team: CharacterDefinition[];  // 3 characters for P1
+  p2Team: CharacterDefinition[];  // 3 characters for P2
   p2IsAI: boolean;
   p2AI: SimpleAI | null;
 }
@@ -106,7 +108,14 @@ export class SelectState {
     this.p1.setStats(p1Char.stats);
     this.p2.setStats(p2Char.stats);
     const p2AI = this.p2IsAI ? new SimpleAI(this.p2, this.p1, p2Char, 0.6) : null;
-    return { p1Char, p2Char, p2IsAI: this.p2IsAI, p2AI };
+
+    // Build 3-member teams: selected char + next 2 in roster (wrapping)
+    const p1Team = [p1Char];
+    for (let i = 1; i < 3; i++) p1Team.push(ROSTER[(this.p1Cursor + i) % ROSTER.length]);
+    const p2Team = [p2Char];
+    for (let i = 1; i < 3; i++) p2Team.push(ROSTER[(this.p2Cursor + i) % ROSTER.length]);
+
+    return { p1Char, p2Char, p1Team, p2Team, p2IsAI: this.p2IsAI, p2AI };
   }
 
   reset(): void {

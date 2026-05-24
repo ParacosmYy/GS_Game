@@ -16,6 +16,7 @@ import { createPowerGauge, createMaxMode, tickMaxMode, tickAutoMeter } from './c
 import { Renderer } from './rendering/renderer.js';
 import { VFXSystem, ScreenShake } from './rendering/vfx.js';
 import { drawVictoryPose } from './rendering/skeletalFighter.js';
+import type { TeamDisplayInfo } from './rendering/hud.js';
 import { ROSTER } from './characters/index.js';
 import { CinematicState } from './state/cinematicState.js';
 import { SelectState } from './state/selectState.js';
@@ -23,9 +24,11 @@ import { RoundState } from './state/roundState.js';
 import { DMManager } from './combat/dmManager.js';
 import { createHitCallback } from './combat/hitCallback.js';
 import { initAudio, playKO, playVictoryFanfare } from './audio/sfx.js';
+import { createTeam, defeatActive, switchToNext, activeChar, teamOrderString, type TeamState } from './state/teamState.js';
 import { resolveSimplified } from './input/simplifiedInput.js';
 import { bgm } from './audio/bgm.js';
 import { announcer } from './audio/announcer.js';
+import { SimpleAI } from './ai/simpleAI.js';
 
 // ===== Canvas =====
 const canvas = document.getElementById('gameCanvas') as HTMLCanvasElement;
@@ -79,6 +82,9 @@ let simplifiedMode = false; // Tab to toggle
 let modeIndicatorTimer = 0;
 let p2AI: InstanceType<typeof import('./ai/simpleAI.js').SimpleAI> | null = null;
 const INTRO_DURATION = 120;
+let p1Team: TeamState | null = null;
+let p2Team: TeamState | null = null;
+let teamMode = true; // 3v3 team mode
 let p1DelayedHealth = p1.maxHealth;
 let p2DelayedHealth = p2.maxHealth;
 
@@ -125,6 +131,11 @@ function update(): void {
     const result = select.update(inputManager.getP1Input(), inputManager.getP2Input(), inputManager.isKeyDown('KeyT'));
     if (result) {
       p2AI = result.p2AI;
+      // Create teams for 3v3 mode
+      if (teamMode) {
+        p1Team = createTeam(result.p1Team);
+        p2Team = createTeam(result.p2Team);
+      }
       phase = GamePhase.INTRO;
       phaseTimer = 0;
       rounds.currentRound = 1;
@@ -147,6 +158,43 @@ function update(): void {
   if (phase === GamePhase.KO) {
     koTimer++;
     if (koTimer > KO_DISPLAY_TIME) {
+      // 3v3 team mode: switch to next team member if available
+      if (teamMode && p1Team && p2Team && winner !== null) {
+        const loserTeam = winner === 0 ? p2Team : p1Team;
+        const hasAlive = defeatActive(loserTeam);
+        if (hasAlive && switchToNext(loserTeam)) {
+          // Switch to next character — restart round with new character
+          const losingIdx = winner === 0 ? 1 : 0;
+          const newChar = activeChar(loserTeam);
+          const loser = losingIdx === 0 ? p1 : p2;
+          const loserCtrl = losingIdx === 0 ? p1Ctrl : p2Ctrl;
+          loser.charId = newChar.id;
+          loser.color = newChar.color;
+          loser.setStats(newChar.stats);
+          loserCtrl.setCharacter(newChar);
+          if (p2AI && losingIdx === 1) {
+            p2AI = new SimpleAI(p2, p1, newChar, 0.6);
+          }
+          // Restart as a new round
+          rounds.startRoundTransition();
+          phase = GamePhase.INTRO;
+          phaseTimer = 0;
+          p1DelayedHealth = p1.maxHealth;
+          p2DelayedHealth = p2.maxHealth;
+          cinematic.reset();
+          announcer.roundStart(rounds.currentRound);
+          announcer.fight();
+          return;
+        }
+        // All team members defeated — match over
+        if (!p1Team.alive || !p2Team.alive) {
+          phase = GamePhase.MATCH_END;
+          koTimer = 0;
+          announcer.winner();
+          return;
+        }
+      }
+      // Standard mode or team mode fallback
       const matchWinner = rounds.addWin(winner);
       if (matchWinner !== null) {
         phase = GamePhase.MATCH_END;
@@ -290,6 +338,12 @@ function render(): void {
   renderer.drawPowerGauges(gauges, maxModes);
   if (phase === GamePhase.INTRO) renderer.drawIntro(phaseTimer, rounds.currentRound);
   renderer.drawComboCounters([p1, p2], [combatSystem.getComboCount(0), combatSystem.getComboCount(1)], [0, 0], camera);
+  if (teamMode && p1Team && p2Team) {
+    const toDisp = (t: TeamState): TeamDisplayInfo => ({
+      members: t.members.map((m, i) => ({ name: m.charDef.nameCn, defeated: m.defeated, active: i === t.activeIndex && !m.defeated })),
+    });
+    renderer.drawTeamOrder(toDisp(p1Team), toDisp(p2Team));
+  }
   renderer.drawControlsHint(simplifiedMode, p1.charId);
 
   if (phase === GamePhase.MATCH_END) {

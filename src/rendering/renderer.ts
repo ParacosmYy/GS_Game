@@ -16,7 +16,7 @@ import { drawStage, generateStars } from './stage.js';
 import type { Star } from './stage.js';
 import { drawSkeletalFighter } from './skeletalFighter.js';
 import { drawAttackLimb } from './attackLimb.js';
-import { drawHUD, drawPowerGauges, drawComboCounters } from './hud.js';
+import { drawHUD, drawPowerGauges, drawComboCounters, drawTeamOrder, type TeamDisplayInfo } from './hud.js';
 import { drawCharacterSelect, drawIntro, drawKO, drawSuperFlash, drawMatchEnd, drawModeIndicator, drawTitle, drawContinue } from './screens.js';
 import { shiftColor, roundRect } from './utils.js';
 import { ROSTER } from '../characters/index.js';
@@ -255,6 +255,10 @@ export class Renderer {
     camera: Camera,
   ): void {
     drawComboCounters(this.ctx, fighters, comboCount, comboTimer, camera);
+  }
+
+  drawTeamOrder(p1Team: TeamDisplayInfo | null, p2Team: TeamDisplayInfo | null): void {
+    drawTeamOrder(this.ctx, p1Team, p2Team);
   }
 
   drawCharacterSelect(

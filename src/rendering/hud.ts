@@ -383,6 +383,65 @@ export function drawPowerGauges(ctx: CanvasRenderingContext2D, gauges: [PowerGau
   }
 }
 
+// ===== Team Order Display (3v3) =====
+
+export interface TeamDisplayInfo {
+  members: { name: string; defeated: boolean; active: boolean }[];
+}
+
+/** Draw 3v3 team order under each side of the health bar */
+export function drawTeamOrder(
+  ctx: CanvasRenderingContext2D,
+  p1Team: TeamDisplayInfo | null,
+  p2Team: TeamDisplayInfo | null,
+): void {
+  if (!p1Team && !p2Team) return;
+
+  const y = HUD_BAR_Y + HUD_BAR_HEIGHT + 14;
+
+  ctx.font = 'bold 9px monospace';
+  ctx.textBaseline = 'top';
+
+  if (p1Team) {
+    drawTeamSide(ctx, p1Team, HUD_MARGIN, y, 'left');
+  }
+  if (p2Team) {
+    drawTeamSide(ctx, p2Team, CANVAS_WIDTH - HUD_MARGIN, y, 'right');
+  }
+
+  ctx.textBaseline = 'alphabetic';
+  ctx.textAlign = 'left';
+}
+
+function drawTeamSide(ctx: CanvasRenderingContext2D, team: TeamDisplayInfo, baseX: number, y: number, side: 'left' | 'right'): void {
+  const spacing = 14;
+  const total = team.members.length;
+
+  for (let i = 0; i < total; i++) {
+    const m = team.members[i];
+    const x = side === 'left' ? baseX + i * spacing : baseX - (total - 1 - i) * spacing;
+
+    if (m.defeated) {
+      ctx.fillStyle = '#555';
+    } else if (m.active) {
+      ctx.fillStyle = '#ffcc00';
+    } else {
+      ctx.fillStyle = '#aaa';
+    }
+
+    ctx.textAlign = 'center';
+    const label = m.active ? `►${m.name[0]}` : m.name[0];
+    ctx.fillText(label, x, y);
+
+    // Health dot indicator
+    const dotY = y + 12;
+    ctx.beginPath();
+    ctx.arc(x, dotY, 3, 0, Math.PI * 2);
+    ctx.fillStyle = m.defeated ? '#333' : m.active ? '#22cc55' : '#666';
+    ctx.fill();
+  }
+}
+
 // ===== Combo Counters =====
 
 /** Draw floating combo counter text near fighters */

@@ -170,7 +170,7 @@ export class FighterController {
       const wasAirborne = f.state === FighterState.JUMP || f.state === FighterState.RUN_JUMP
         || f.state === FighterState.HOP || f.state === FighterState.HYPER_JUMP
         || f.state === FighterState.BACKDASH || f.state === FighterState.AIR_ATTACK
-        || f.state === FighterState.STAND_ATTACK || f.state === FighterState.AIR_BLOCK;
+        || f.state === FighterState.AIR_BLOCK;
       if (wasAirborne) {
         if (f.currentAttack) f.endAttack();
         f.y = STAGE_GROUND_Y; f.vy = 0; f.vx = 0;
