@@ -243,11 +243,14 @@ export function spawnGroundSlam(particles: Particle[], worldX: number, worldY: n
 
 export function spawnDamageText(particles: Particle[], worldX: number, worldY: number, value: number): void {
   const isCombo = value > 0 && value <= 50;
+  // KOF2002: 伤害越大数字越大 (DM/必杀技大字, 通常技小字)
+  const dmgSize = isCombo ? 18 + Math.min(value, 10) : value >= 80 ? 22 : value >= 50 ? 18 : 14;
+  const color = isCombo ? (value >= 10 ? '#ff8800' : '#ffcc00') : value >= 80 ? '#ff0000' : '#ff4444';
   particles.push({
-    x: worldX, y: worldY, vx: 0, vy: -1.5,
-    life: 40, maxLife: 40,
-    size: isCombo ? 18 : 14,
-    color: isCombo ? '#ffcc00' : '#ff4444',
+    x: worldX, y: worldY, vx: (Math.random() - 0.5) * 0.8, vy: -2,
+    life: 45, maxLife: 45,
+    size: dmgSize,
+    color,
     type: 'text',
     text: isCombo ? `${value} HITS!` : `-${value}`,
   });

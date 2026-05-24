@@ -446,7 +446,12 @@ function update(): void {
 
   if (p1.health <= 0 || p2.health <= 0) {
     if (!cinematic.koSlowMoTriggered) {
-      cinematic.triggerKOSlowMo();
+      // KOF2002: DM/SDM击杀时KO慢放更强(60帧, 每4帧跳1帧)
+      const killer = p1.health <= 0 ? p2 : p1;
+      const killerAttack = killer.currentAttack as string;
+      const isDMKill = killerAttack?.startsWith('DM_') || killerAttack?.startsWith('SDM_');
+      if (isDMKill) cinematic.triggerDMKOSlowMo();
+      else cinematic.triggerKOSlowMo();
       screenFlash.trigger('#ff2200', 0.35, 15);
       screenShake.trigger(16, 15);
       playKO();

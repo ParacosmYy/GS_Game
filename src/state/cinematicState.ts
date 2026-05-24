@@ -63,11 +63,20 @@ export class CinematicState {
     this.koSlowMoFrameCounter = 0;
   }
 
+  /** Trigger DM KO slow-motion — enhanced (60 frames, every 4th frame runs) */
+  triggerDMKOSlowMo(): void {
+    this.koSlowMoTriggered = true;
+    this.koSlowMo = 60;
+    this.koSlowMoFrameCounter = 0;
+  }
+
   /** KO slow-mo frame skip: returns true when frame should be skipped */
   shouldSkipFrame(): boolean {
     if (this.koSlowMo <= 0) return false;
+    // DM KO uses slower rate (every 4th frame), normal KO every 3rd
+    const skipRate = this.koSlowMo > 40 ? 4 : 3;
     this.koSlowMoFrameCounter++;
-    if (this.koSlowMoFrameCounter < 3) return true;
+    if (this.koSlowMoFrameCounter < skipRate) return true;
     this.koSlowMoFrameCounter = 0;
     this.koSlowMo--;
     return false;
