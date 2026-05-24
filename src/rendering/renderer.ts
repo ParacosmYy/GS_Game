@@ -298,8 +298,8 @@ export class Renderer {
 
   // ===== Screen overlays (thin wrappers) =====
 
-  drawIntro(phaseTimer: number, currentRound: number = 1): void {
-    drawIntro(this.ctx, phaseTimer, currentRound);
+  drawIntro(phaseTimer: number, currentRound: number = 1, p1Name: string = '', p2Name: string = ''): void {
+    drawIntro(this.ctx, phaseTimer, currentRound, p1Name, p2Name);
   }
 
   drawKO(winner: number | null, perfectPlayer: number | null = null): void {

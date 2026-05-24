@@ -263,7 +263,7 @@ export function drawCharacterSelect(
 
 // ===== Intro Overlay =====
 
-export function drawIntro(ctx: CanvasRenderingContext2D, phaseTimer: number, currentRound: number = 1): void {
+export function drawIntro(ctx: CanvasRenderingContext2D, phaseTimer: number, currentRound: number = 1, p1Name: string = '', p2Name: string = ''): void {
   ctx.save();
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
@@ -291,6 +291,23 @@ export function drawIntro(ctx: CanvasRenderingContext2D, phaseTimer: number, cur
     ctx.fillStyle = '#ffcc00';
     ctx.fillText(`ROUND ${currentRound}`, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 20);
     ctx.shadowBlur = 0;
+
+    // 角色名显示 — Round下方
+    if (p1Name && p2Name) {
+      ctx.globalAlpha = Math.min(1, progress * 3);
+      ctx.font = 'bold 16px "Courier New", monospace';
+      ctx.fillStyle = '#ff6644';
+      ctx.textAlign = 'right';
+      ctx.fillText(p1Name, CANVAS_WIDTH / 2 - 30, CANVAS_HEIGHT / 2 + 15);
+      ctx.fillStyle = '#4488ff';
+      ctx.textAlign = 'left';
+      ctx.fillText(p2Name, CANVAS_WIDTH / 2 + 30, CANVAS_HEIGHT / 2 + 15);
+      // VS
+      ctx.textAlign = 'center';
+      ctx.fillStyle = '#ffcc00';
+      ctx.font = 'bold 14px "Courier New", monospace';
+      ctx.fillText('VS', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 15);
+    }
   } else if (phaseTimer < 100) {
     const fp = (phaseTimer - 60) / 40;
     const scale = 1 + Math.max(0, 1 - fp * 4) * 1.5;

@@ -418,7 +418,7 @@ function render(): void {
   if (cinematic.superFlashTimer > 0)
     renderer.drawSuperFlash(ctx, cinematic.superFlashTimer, cinematic.superFlashX - camera.x, cinematic.superFlashY, maxModes[cinematic.superFlashAttacker].active ? 'SDM' : 'DM');
   renderer.drawPowerGauges(gauges, maxModes);
-  if (phase === GamePhase.INTRO) renderer.drawIntro(phaseTimer, rounds.currentRound);
+  if (phase === GamePhase.INTRO) renderer.drawIntro(phaseTimer, rounds.currentRound, p1Char.nameCn, p2Char.nameCn);
   renderer.drawComboCounters([p1, p2], [combatSystem.getComboCount(0), combatSystem.getComboCount(1)], [0, 0], camera);
   if (teamMode && p1Team && p2Team) {
     const toDisp = (t: TeamState): TeamDisplayInfo => ({
