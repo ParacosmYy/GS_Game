@@ -51,6 +51,11 @@ export function drawHUD(ctx: CanvasRenderingContext2D, fighters: Fighter[], tick
   drawHealthBar(ctx, HUD_MARGIN, HUD_BAR_Y, HUD_BAR_WIDTH, HUD_BAR_HEIGHT, p1Ratio, p1DelayedRatio, true, tick);
   drawGuardGauge(ctx, HUD_MARGIN, HUD_BAR_Y + HUD_BAR_HEIGHT + 3, HUD_BAR_WIDTH, 5, fighters[0].guardGauge, true, tick);
 
+  // KOF2002: P1 low health DANGER warning
+  if (p1Ratio <= 0.25 && p1Ratio > 0 && tick % 30 < 20) {
+    drawSNKText(ctx, '!', HUD_MARGIN + 8, HUD_BAR_Y + HUD_BAR_HEIGHT + 14, 11, '#ff2200', '#000000', 'center');
+  }
+
   // P2 label — styled
   drawSNKText(ctx, '2P', CANVAS_WIDTH - HUD_MARGIN - 18, HUD_BAR_Y - 3, 12, '#4488ff', '#000000', 'center');
 
@@ -64,6 +69,11 @@ export function drawHUD(ctx: CanvasRenderingContext2D, fighters: Fighter[], tick
   const p2DelayedRatio = Math.max(0, delayedHealth[1] / MAX_HEALTH);
   drawHealthBar(ctx, CANVAS_WIDTH - HUD_MARGIN - HUD_BAR_WIDTH, HUD_BAR_Y, HUD_BAR_WIDTH, HUD_BAR_HEIGHT, p2Ratio, p2DelayedRatio, false, tick);
   drawGuardGauge(ctx, CANVAS_WIDTH - HUD_MARGIN - HUD_BAR_WIDTH, HUD_BAR_Y + HUD_BAR_HEIGHT + 3, HUD_BAR_WIDTH, 5, fighters[1].guardGauge, false, tick);
+
+  // KOF2002: P2 low health DANGER warning
+  if (p2Ratio <= 0.25 && p2Ratio > 0 && tick % 30 < 20) {
+    drawSNKText(ctx, '!', CANVAS_WIDTH - HUD_MARGIN - 18, HUD_BAR_Y + HUD_BAR_HEIGHT + 14, 11, '#ff2200', '#000000', 'center');
+  }
 
   // Timer — decorative frame
   const timeSeconds = Math.max(0, ROUND_TIME - Math.floor(tick / 60));

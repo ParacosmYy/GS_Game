@@ -280,6 +280,23 @@ export function spawnFirstAttackText(particles: Particle[], worldX: number, worl
   });
 }
 
+export function spawnComboEndText(particles: Particle[], worldX: number, worldY: number, hits: number): void {
+  particles.push({
+    x: worldX, y: worldY, vx: 0, vy: -1.2,
+    life: 50, maxLife: 50, size: 16,
+    color: '#ff8844', type: 'text', text: `${hits} HITS`,
+  });
+}
+
+// KOF2002: 连击结束显示总伤害
+export function spawnComboDamageText(particles: Particle[], worldX: number, worldY: number, totalDmg: number): void {
+  particles.push({
+    x: worldX, y: worldY + 18, vx: 0, vy: -0.8,
+    life: 55, maxLife: 55, size: 14,
+    color: '#ffdd44', type: 'text', text: `DMG ${totalDmg}`,
+  });
+}
+
 export function spawnSuperCancelText(particles: Particle[], worldX: number, worldY: number): void {
   particles.push({
     x: worldX, y: worldY, vx: 0, vy: -2,

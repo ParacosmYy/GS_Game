@@ -113,7 +113,9 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
     const { isPunch } = classifyAttack(attackType);
     // KOF2002: 连击中火花递增 (5+hits +4, 10+hits +8)
     const comboSparkBonus = combo >= 10 ? 8 : combo >= 5 ? 4 : 0;
-    const sparks = (isSDM ? 28 : isDM ? 20 : isSpecial ? 14 : counterHit ? 12 : 8) + comboSparkBonus;
+    // KOF2002: 低血量(25%以下)时火花增强, 终局更紧张
+    const lowHpBonus = defender.health < defender.maxHealth * 0.25 ? 4 : 0;
+    const sparks = (isSDM ? 28 : isDM ? 20 : isSpecial ? 14 : counterHit ? 12 : 8) + comboSparkBonus + lowHpBonus;
     const sparkColor = isSpecial ? atkChar.specialColor : isPunch ? '#ffdd44' : '#44ddff';
     deps.vfx.spawnCharacterHitSparks(hitX, hitY, sparks, sparkColor);
     deps.vfx.spawnImpactRing(hitX, hitY);

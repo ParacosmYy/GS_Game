@@ -33,7 +33,6 @@ import { bgm } from './audio/bgm.js';
 import { announcer } from './audio/announcer.js';
 import { SimpleAI } from './ai/simpleAI.js';
 
-// ===== Canvas =====
 const canvas = document.getElementById('gameCanvas') as HTMLCanvasElement;
 const ctx = canvas.getContext('2d')!;
 canvas.width = CANVAS_WIDTH;
@@ -91,7 +90,6 @@ combatSystem.onThrowEscape = (_attacker, defender, hitX, hitY) => {
   vfx.spawnTechText(hitX, hitY - 40);
   screenShake.trigger(4, 6);
   playThrowEscape();
-  // KOF2002: 拆投双方获得少量气槽奖励
   const atkIdx = _attacker === p1 ? 0 : 1;
   const defIdx = defender === p1 ? 0 : 1;
   gauges[atkIdx].meter = Math.min(gauges[atkIdx].meter + 8, MAX_STOCKS * METER_PER_STOCK);
@@ -373,13 +371,25 @@ function update(): void {
 
   [p1, p2].forEach((f, i) => {
     const wasStun = f.prevState === FighterState.HITSTUN || f.prevState === FighterState.KNOCKDOWN;
-    if (wasStun && f.state === FighterState.IDLE) combatSystem.resetCombo(i);
+    if (wasStun && f.state === FighterState.IDLE) {
+      // KOF2002: 连击中断时如果>=3hits显示连击结束标记+总伤害
+      const lastCombo = combatSystem.getComboCount(i);
+      if (lastCombo >= 3) {
+        const lastDmg = combatSystem.getComboDamage(i);
+        vfx.spawnComboEndText(f.x, f.y - f.displayHeight - 50, lastCombo);
+        vfx.spawnComboDamageText(f.x, f.y - f.displayHeight - 50, lastDmg);
+      }
+      combatSystem.resetCombo(i);
+    }
 
     // Quick Stand检测: 从KNOCKDOWN恢复且无起身无敌(quick stand不给予无敌)
     if (f.prevState === FighterState.KNOCKDOWN && f.state === FighterState.IDLE && f.throwInvincibilityTimer === 0) {
       vfx.spawnDust(f.x, STAGE_GROUND_Y);
       vfx.spawnQuickStandText(f.x, f.y - f.displayHeight - 40);
       playQuickStand();
+      // KOF2002: Quick Stand立即重置对手的连击计数, 防止起身继续追打
+      const oppIdx = 1 - i;
+      combatSystem.resetCombo(oppIdx);
     }
 
     // Roll音效: 进入ROLL状态
@@ -447,7 +457,6 @@ function update(): void {
       break;
     }
   }
-  // Clean up again after collisions
   for (let i = projectiles.length - 1; i >= 0; i--) { if (!projectiles[i].active) projectiles.splice(i, 1); }
 
   if (p1.health <= 0 || p2.health <= 0) {
@@ -458,6 +467,8 @@ function update(): void {
       const isDMKill = killerAttack?.startsWith('DM_') || killerAttack?.startsWith('SDM_');
       if (isDMKill) cinematic.triggerDMKOSlowMo();
       else cinematic.triggerKOSlowMo();
+      // KOF2002: KO瞬间定格8帧, 增强冲击力
+      cinematic.triggerHitStop(8);
       screenFlash.trigger('#ff2200', 0.35, 15);
       screenShake.trigger(16, 15);
       playKO();
@@ -466,10 +477,13 @@ function update(): void {
     }
     // KO'd fighter落地时触发groundslam (KOF2002正版: 空中KO落地才震地)
     if (!koGroundSlamDone && cinematic.koSlowMoTriggered) {
+      // KOF2002: Double KO时双方都触发落地震地效果
+      const bothKO = p1.health <= 0 && p2.health <= 0;
       const loser = p1.health <= 0 ? p1 : p2;
       if (loser.isGrounded()) {
         koGroundSlamDone = true;
         triggerKOGroundEffect({ vfx, screenFlash, screenShake }, loser);
+        if (bothKO) triggerKOGroundEffect({ vfx, screenFlash, screenShake }, p1.health <= 0 ? p1 : p2);
       }
     }
     if (cinematic.koSlowMoTriggered && cinematic.isKOSlowMoDone()) {
@@ -497,7 +511,6 @@ function update(): void {
     announcer.timeOver();
   }
 }
-
 // ===== Render =====
 function render(): void {
   if (phase === GamePhase.TITLE) {
@@ -553,7 +566,6 @@ function render(): void {
   }
   if (debugMode) renderer.drawDebug([p1, p2], projectiles, camera, tickRef.value, renderer.getFps(), vfx.count, [p1Cmd, p2Cmd]);
 }
-
 // ===== Restart =====
 function restartGame(): void {
   bgm.stop();

@@ -18,6 +18,8 @@ import {
   spawnCounterText,
   spawnTechText,
   spawnFirstAttackText,
+  spawnComboEndText,
+  spawnComboDamageText,
   spawnSuperCancelText,
   spawnFreeCancelText,
   spawnGCCDText,
@@ -138,6 +140,14 @@ export class VFXSystem {
 
   spawnFirstAttackText(worldX: number, worldY: number): void {
     spawnFirstAttackText(this.particles, worldX, worldY);
+  }
+
+  spawnComboEndText(worldX: number, worldY: number, hits: number): void {
+    spawnComboEndText(this.particles, worldX, worldY, hits);
+  }
+
+  spawnComboDamageText(worldX: number, worldY: number, totalDmg: number): void {
+    spawnComboDamageText(this.particles, worldX, worldY, totalDmg);
   }
 
   spawnSuperCancelText(worldX: number, worldY: number): void {

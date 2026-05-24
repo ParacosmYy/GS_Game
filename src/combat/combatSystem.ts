@@ -15,6 +15,7 @@ import {
   STAGE_LEFT, STAGE_RIGHT,
   JUGGLE_POINTS_MAX, JUGGLE_COST_LIGHT, JUGGLE_COST_HEAVY, JUGGLE_COST_SPECIAL, JUGGLE_COST_DM,
   THROW_INVINCIBILITY_POST_ESCAPE,
+  PROXIMITY_GUARD_RANGE,
 } from '../core/constants.js';
 import { CLOSE_RANGE } from '../core/types.js';
 import { FighterState, AttackType, JuggleState } from '../core/types.js';
@@ -211,10 +212,11 @@ export class CombatSystem {
     return escaped;
   }
 
-  private canBlock(hitLevel: HitLevel, crouching: boolean): boolean {
+  private canBlock(hitLevel: HitLevel, crouching: boolean, dist: number): boolean {
     if (hitLevel === 'MID') return true;
     if (hitLevel === 'LOW') return crouching;
-    if (hitLevel === 'HIGH') return !crouching;
+    // KOF2002: Proximity guard — 近距离内HIGH攻击也可以站防(即使蹲着)
+    if (hitLevel === 'HIGH') return !crouching || dist < PROXIMITY_GUARD_RANGE;
     return false;
   }
 
@@ -343,7 +345,8 @@ export class CombatSystem {
     }
 
     // 地面防御
-    if (defender.canBlock() && !isAirborne && defInput.back && this.canBlock(hitLevel, crouching)) {
+    const dist = Math.abs(attacker.x - defender.x);
+    if (defender.canBlock() && !isAirborne && defInput.back && this.canBlock(hitLevel, crouching, dist)) {
       // KOF2002: 防御时防御槽减少(被攻击消耗)但成功防御获得少量气槽恢复奖励
       defender.guardGauge = Math.max(0, defender.guardGauge - guardGaugeDamage(attackType));
       defender.guardGauge = Math.min(100, defender.guardGauge + 2);

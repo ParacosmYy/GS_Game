@@ -390,6 +390,8 @@ export function handleAttack(ctx: FighterCtx, input: ResolvedInput): void {
       && f.currentAttack && NORMAL_ATTACKS.has(f.currentAttack as string)) {
     const buffered = ctx.cancelSpecialBuffer;
     ctx.cancelSpecialBuffer = null;
+    // KOF2002: 正常→必杀技取消视觉反馈 — 小蓝色冲击环
+    ctx.vfx.spawnImpactRing(f.x, f.y - f.displayHeight * 0.5);
     f.startAttack(buffered);
     return;
   }
