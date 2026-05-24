@@ -1,8 +1,6 @@
 /**
- * SFX — Web Audio 合成音效系统
- *
- * 无需音频文件，全部用 Web Audio API 实时合成。
- * 打击音、格挡音、必杀技音、KO音、选人确认音。
+ * SFX — Enhanced Web Audio synthesis
+ * Multi-layered sounds with better filtering, richer harmonics
  */
 
 let audioCtx: AudioContext | null = null;
@@ -12,138 +10,176 @@ function getCtx(): AudioContext {
   return audioCtx;
 }
 
-/** 初始化 (需要在用户交互后调用) */
 export function initAudio(): void {
   getCtx();
 }
 
-// ─── 音效合成器 ───
+// Helper: create shaped noise buffer
+function noiseBuffer(ctx: AudioContext, duration: number, decay: number): AudioBufferSourceNode {
+  const size = Math.floor(ctx.sampleRate * duration);
+  const buf = ctx.createBuffer(1, size, ctx.sampleRate);
+  const data = buf.getChannelData(0);
+  for (let i = 0; i < size; i++) data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (size * decay));
+  const src = ctx.createBufferSource();
+  src.buffer = buf;
+  return src;
+}
 
-/** 打击音: 短促的噪声+低频冲击 */
+/** Light hit (A/B) — quick snap with body */
 export function playHit(intensity: number = 1): void {
   const ctx = getCtx();
   const now = ctx.currentTime;
 
-  // 白噪声 burst
-  const bufSize = ctx.sampleRate * 0.05;
-  const buf = ctx.createBuffer(1, bufSize, ctx.sampleRate);
-  const data = buf.getChannelData(0);
-  for (let i = 0; i < bufSize; i++) {
-    data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufSize * 0.15));
-  }
-  const noise = ctx.createBufferSource();
-  noise.buffer = buf;
-
+  // Noise burst with envelope shaping
+  const noise = noiseBuffer(ctx, 0.06, 0.15);
+  const noiseFilter = ctx.createBiquadFilter();
+  noiseFilter.type = 'bandpass';
+  noiseFilter.frequency.value = 1200;
+  noiseFilter.Q.value = 0.6;
   const noiseGain = ctx.createGain();
-  noiseGain.gain.setValueAtTime(0.25 * intensity, now);
+  noiseGain.gain.setValueAtTime(0.3 * intensity, now);
   noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
 
-  // 低频冲击
+  // Low thump
   const osc = ctx.createOscillator();
   osc.type = 'sine';
   osc.frequency.setValueAtTime(150 * intensity, now);
-  osc.frequency.exponentialRampToValueAtTime(60, now + 0.05);
+  osc.frequency.exponentialRampToValueAtTime(50, now + 0.04);
   const oscGain = ctx.createGain();
-  oscGain.gain.setValueAtTime(0.3 * intensity, now);
-  oscGain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+  oscGain.gain.setValueAtTime(0.25 * intensity, now);
+  oscGain.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
 
-  noise.connect(noiseGain).connect(ctx.destination);
+  // Mid "snap" layer
+  const snap = ctx.createOscillator();
+  snap.type = 'triangle';
+  snap.frequency.setValueAtTime(800, now);
+  snap.frequency.exponentialRampToValueAtTime(200, now + 0.02);
+  const snapGain = ctx.createGain();
+  snapGain.gain.setValueAtTime(0.1 * intensity, now);
+  snapGain.gain.exponentialRampToValueAtTime(0.001, now + 0.02);
+
+  noise.connect(noiseFilter).connect(noiseGain).connect(ctx.destination);
   osc.connect(oscGain).connect(ctx.destination);
-  noise.start(now);
-  osc.start(now);
-  noise.stop(now + 0.06);
-  osc.stop(now + 0.06);
+  snap.connect(snapGain).connect(ctx.destination);
+  noise.start(now); noise.stop(now + 0.07);
+  osc.start(now); osc.stop(now + 0.05);
+  snap.start(now); snap.stop(now + 0.03);
 }
 
-/** 格挡音: 金属感的高频碰撞 */
+/** Block — metallic ring with resonance */
 export function playBlock(): void {
   const ctx = getCtx();
   const now = ctx.currentTime;
 
+  // Metallic ring
   const osc = ctx.createOscillator();
   osc.type = 'square';
-  osc.frequency.setValueAtTime(800, now);
-  osc.frequency.exponentialRampToValueAtTime(200, now + 0.04);
-
+  osc.frequency.setValueAtTime(900, now);
+  osc.frequency.exponentialRampToValueAtTime(300, now + 0.06);
   const gain = ctx.createGain();
-  gain.gain.setValueAtTime(0.15, now);
-  gain.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
+  gain.gain.setValueAtTime(0.12, now);
+  gain.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
+
+  // Impact layer
+  const noise = noiseBuffer(ctx, 0.04, 0.2);
+  const noiseGain = ctx.createGain();
+  noiseGain.gain.setValueAtTime(0.1, now);
+  noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.03);
+  const filter = ctx.createBiquadFilter();
+  filter.type = 'highpass';
+  filter.frequency.value = 2000;
 
   osc.connect(gain).connect(ctx.destination);
-  osc.start(now);
-  osc.stop(now + 0.05);
+  noise.connect(filter).connect(noiseGain).connect(ctx.destination);
+  osc.start(now); osc.stop(now + 0.07);
+  noise.start(now); noise.stop(now + 0.04);
 }
 
-/** 必杀技音: 能量蓄积+释放 */
+/** Special move — energy whoosh + impact */
 export function playSpecial(): void {
   const ctx = getCtx();
   const now = ctx.currentTime;
 
-  // 上升频率扫描
+  // Rising sweep
   const osc = ctx.createOscillator();
   osc.type = 'sawtooth';
   osc.frequency.setValueAtTime(200, now);
-  osc.frequency.exponentialRampToValueAtTime(600, now + 0.08);
+  osc.frequency.exponentialRampToValueAtTime(800, now + 0.08);
   osc.frequency.exponentialRampToValueAtTime(100, now + 0.2);
-
   const gain = ctx.createGain();
-  gain.gain.setValueAtTime(0.2, now);
-  gain.gain.setValueAtTime(0.25, now + 0.08);
-  gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+  gain.gain.setValueAtTime(0.18, now);
+  gain.gain.setValueAtTime(0.22, now + 0.08);
+  gain.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
+
+  // Whoosh noise
+  const noise = noiseBuffer(ctx, 0.15, 0.25);
+  const nFilter = ctx.createBiquadFilter();
+  nFilter.type = 'bandpass';
+  nFilter.frequency.setValueAtTime(500, now);
+  nFilter.frequency.exponentialRampToValueAtTime(3000, now + 0.1);
+  const nGain = ctx.createGain();
+  nGain.gain.setValueAtTime(0.12, now);
+  nGain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
 
   osc.connect(gain).connect(ctx.destination);
-  osc.start(now);
-  osc.stop(now + 0.25);
+  noise.connect(nFilter).connect(nGain).connect(ctx.destination);
+  osc.start(now); osc.stop(now + 0.25);
+  noise.start(now); noise.stop(now + 0.16);
 }
 
-/** DM超必杀音: 强烈能量爆发 */
+/** DM — massive energy explosion */
 export function playDM(): void {
   const ctx = getCtx();
   const now = ctx.currentTime;
 
-  // 巨大的低频轰鸣
+  // Deep rumble
   const osc1 = ctx.createOscillator();
   osc1.type = 'sawtooth';
   osc1.frequency.setValueAtTime(80, now);
-  osc1.frequency.exponentialRampToValueAtTime(40, now + 0.3);
+  osc1.frequency.exponentialRampToValueAtTime(30, now + 0.4);
+  const gain1 = ctx.createGain();
+  gain1.gain.setValueAtTime(0.3, now);
+  gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
 
-  // 高频闪烁
+  // High shimmer
   const osc2 = ctx.createOscillator();
   osc2.type = 'square';
   osc2.frequency.setValueAtTime(1200, now);
-  osc2.frequency.exponentialRampToValueAtTime(200, now + 0.15);
-
-  const gain1 = ctx.createGain();
-  gain1.gain.setValueAtTime(0.3, now);
-  gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
-
+  osc2.frequency.exponentialRampToValueAtTime(150, now + 0.2);
   const gain2 = ctx.createGain();
-  gain2.gain.setValueAtTime(0.15, now);
+  gain2.gain.setValueAtTime(0.12, now);
   gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
 
-  // 白噪声冲击
-  const bufSize = ctx.sampleRate * 0.15;
-  const buf = ctx.createBuffer(1, bufSize, ctx.sampleRate);
-  const data = buf.getChannelData(0);
-  for (let i = 0; i < bufSize; i++) {
-    data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufSize * 0.3));
-  }
-  const noise = ctx.createBufferSource();
-  noise.buffer = buf;
-  const noiseGain = ctx.createGain();
-  noiseGain.gain.setValueAtTime(0.35, now);
-  noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+  // Noise explosion
+  const noise = noiseBuffer(ctx, 0.2, 0.35);
+  const nFilter = ctx.createBiquadFilter();
+  nFilter.type = 'bandpass';
+  nFilter.frequency.value = 600;
+  nFilter.Q.value = 0.5;
+  const nGain = ctx.createGain();
+  nGain.gain.setValueAtTime(0.35, now);
+  nGain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+
+  // Sub impact
+  const sub = ctx.createOscillator();
+  sub.type = 'sine';
+  sub.frequency.setValueAtTime(60, now);
+  sub.frequency.exponentialRampToValueAtTime(20, now + 0.3);
+  const subGain = ctx.createGain();
+  subGain.gain.setValueAtTime(0.4, now);
+  subGain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
 
   osc1.connect(gain1).connect(ctx.destination);
   osc2.connect(gain2).connect(ctx.destination);
-  noise.connect(noiseGain).connect(ctx.destination);
-
-  osc1.start(now); osc1.stop(now + 0.4);
-  osc2.start(now); osc2.stop(now + 0.2);
-  noise.start(now); noise.stop(now + 0.2);
+  noise.connect(nFilter).connect(nGain).connect(ctx.destination);
+  sub.connect(subGain).connect(ctx.destination);
+  osc1.start(now); osc1.stop(now + 0.45);
+  osc2.start(now); osc2.stop(now + 0.22);
+  noise.start(now); noise.stop(now + 0.25);
+  sub.start(now); sub.stop(now + 0.4);
 }
 
-/** 投技音: 咔嚓+落地 */
+/** Throw — grab + slam */
 export function playThrow(): void {
   const ctx = getCtx();
   const now = ctx.currentTime;
@@ -152,17 +188,27 @@ export function playThrow(): void {
   osc.type = 'square';
   osc.frequency.setValueAtTime(400, now);
   osc.frequency.setValueAtTime(200, now + 0.03);
-  osc.frequency.setValueAtTime(100, now + 0.06);
-
+  osc.frequency.setValueAtTime(80, now + 0.06);
   const gain = ctx.createGain();
   gain.gain.setValueAtTime(0.2, now);
   gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
 
+  // Impact thud
+  const thud = ctx.createOscillator();
+  thud.type = 'sine';
+  thud.frequency.setValueAtTime(100, now + 0.05);
+  thud.frequency.exponentialRampToValueAtTime(30, now + 0.12);
+  const thudGain = ctx.createGain();
+  thudGain.gain.setValueAtTime(0.25, now + 0.05);
+  thudGain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+
   osc.connect(gain).connect(ctx.destination);
+  thud.connect(thudGain).connect(ctx.destination);
   osc.start(now); osc.stop(now + 0.12);
+  thud.start(now + 0.05); thud.stop(now + 0.16);
 }
 
-/** KO音: 沉重的终结音 */
+/** KO — dramatic final hit */
 export function playKO(): void {
   const ctx = getCtx();
   const now = ctx.currentTime;
@@ -170,17 +216,24 @@ export function playKO(): void {
   const osc = ctx.createOscillator();
   osc.type = 'sawtooth';
   osc.frequency.setValueAtTime(200, now);
-  osc.frequency.exponentialRampToValueAtTime(30, now + 0.5);
-
+  osc.frequency.exponentialRampToValueAtTime(25, now + 0.6);
   const gain = ctx.createGain();
   gain.gain.setValueAtTime(0.4, now);
-  gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+  gain.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
+
+  // Echo noise
+  const noise = noiseBuffer(ctx, 0.3, 0.4);
+  const nGain = ctx.createGain();
+  nGain.gain.setValueAtTime(0.2, now);
+  nGain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
 
   osc.connect(gain).connect(ctx.destination);
-  osc.start(now); osc.stop(now + 0.6);
+  noise.connect(nGain).connect(ctx.destination);
+  osc.start(now); osc.stop(now + 0.65);
+  noise.start(now); noise.stop(now + 0.4);
 }
 
-/** 选人确认音: 清脆的叮 */
+/** Select — bright confirmation chime */
 export function playSelect(): void {
   const ctx = getCtx();
   const now = ctx.currentTime;
@@ -189,16 +242,25 @@ export function playSelect(): void {
   osc.type = 'sine';
   osc.frequency.setValueAtTime(880, now);
   osc.frequency.setValueAtTime(1100, now + 0.05);
-
   const gain = ctx.createGain();
   gain.gain.setValueAtTime(0.2, now);
   gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
 
+  // Harmonic
+  const harm = ctx.createOscillator();
+  harm.type = 'sine';
+  harm.frequency.value = 1760;
+  const hGain = ctx.createGain();
+  hGain.gain.setValueAtTime(0.05, now);
+  hGain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+
   osc.connect(gain).connect(ctx.destination);
+  harm.connect(hGain).connect(ctx.destination);
   osc.start(now); osc.stop(now + 0.2);
+  harm.start(now); harm.stop(now + 0.12);
 }
 
-/** Counter Hit 音: 尖锐提示音 */
+/** Counter — sharp alert */
 export function playCounter(): void {
   const ctx = getCtx();
   const now = ctx.currentTime;
@@ -207,112 +269,142 @@ export function playCounter(): void {
   osc.type = 'square';
   osc.frequency.setValueAtTime(1500, now);
   osc.frequency.setValueAtTime(2000, now + 0.03);
-
   const gain = ctx.createGain();
   gain.gain.setValueAtTime(0.15, now);
   gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
 
+  // Second hit
+  const osc2 = ctx.createOscillator();
+  osc2.type = 'sawtooth';
+  osc2.frequency.setValueAtTime(2500, now + 0.04);
+  osc2.frequency.exponentialRampToValueAtTime(800, now + 0.1);
+  const gain2 = ctx.createGain();
+  gain2.gain.setValueAtTime(0.1, now + 0.04);
+  gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+
   osc.connect(gain).connect(ctx.destination);
+  osc2.connect(gain2).connect(ctx.destination);
   osc.start(now); osc.stop(now + 0.1);
+  osc2.start(now + 0.04); osc2.stop(now + 0.13);
 }
 
-/** 胜利号角: C-E-G-C 上行琶音 */
+/** Victory fanfare — richer arrangement */
 export function playVictoryFanfare(): void {
   const ctx = getCtx();
   const now = ctx.currentTime;
 
   const notes = [523.3, 659.3, 784, 1047]; // C5, E5, G5, C6
   const masterGain = ctx.createGain();
-  masterGain.gain.value = 0.3;
+  masterGain.gain.value = 0.25;
   masterGain.connect(ctx.destination);
 
   notes.forEach((freq, i) => {
+    // Main tone
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
     osc.type = 'square';
     osc.frequency.value = freq;
-    const startTime = now + i * 0.15;
-    gain.gain.setValueAtTime(0.3, startTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.3);
+    const t = now + i * 0.15;
+    gain.gain.setValueAtTime(0.3, t);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.35);
     osc.connect(gain).connect(masterGain);
-    osc.start(startTime);
-    osc.stop(startTime + 0.35);
+    osc.start(t); osc.stop(t + 0.4);
+
+    // Harmony (octave below)
+    const harm = ctx.createOscillator();
+    const hGain = ctx.createGain();
+    harm.type = 'triangle';
+    harm.frequency.value = freq / 2;
+    hGain.gain.setValueAtTime(0.1, t);
+    hGain.gain.exponentialRampToValueAtTime(0.001, t + 0.3);
+    harm.connect(hGain).connect(masterGain);
+    harm.start(t); harm.stop(t + 0.35);
   });
 }
 
-/** 重打击音: C/D攻击 — 更厚实的噪声+更强的低频 */
+/** Heavy hit (C/D) — thick impact with body */
 export function playHeavyHit(): void {
   const ctx = getCtx();
   const now = ctx.currentTime;
 
-  // 更长的噪声 burst
-  const bufSize = ctx.sampleRate * 0.08;
-  const buf = ctx.createBuffer(1, bufSize, ctx.sampleRate);
-  const data = buf.getChannelData(0);
-  for (let i = 0; i < bufSize; i++) {
-    data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufSize * 0.25));
-  }
-  const noise = ctx.createBufferSource();
-  noise.buffer = buf;
-
-  // 带通滤波让噪声更"肉感"
+  // Noise with body
+  const noise = noiseBuffer(ctx, 0.1, 0.25);
   const filter = ctx.createBiquadFilter();
   filter.type = 'bandpass';
   filter.frequency.value = 800;
   filter.Q.value = 0.8;
+  const nGain = ctx.createGain();
+  nGain.gain.setValueAtTime(0.35, now);
+  nGain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
 
-  const noiseGain = ctx.createGain();
-  noiseGain.gain.setValueAtTime(0.35, now);
-  noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
-
-  // 更重的低频冲击
+  // Deep thump
   const osc = ctx.createOscillator();
   osc.type = 'sine';
   osc.frequency.setValueAtTime(120, now);
-  osc.frequency.exponentialRampToValueAtTime(40, now + 0.08);
-  const oscGain = ctx.createGain();
-  oscGain.gain.setValueAtTime(0.4, now);
-  oscGain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+  osc.frequency.exponentialRampToValueAtTime(35, now + 0.1);
+  const oGain = ctx.createGain();
+  oGain.gain.setValueAtTime(0.4, now);
+  oGain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
 
-  // 中频"啪"感
-  const osc2 = ctx.createOscillator();
-  osc2.type = 'triangle';
-  osc2.frequency.setValueAtTime(400, now);
-  osc2.frequency.exponentialRampToValueAtTime(100, now + 0.04);
-  const osc2Gain = ctx.createGain();
-  osc2Gain.gain.setValueAtTime(0.2, now);
-  osc2Gain.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
+  // Mid crack
+  const crack = ctx.createOscillator();
+  crack.type = 'triangle';
+  crack.frequency.setValueAtTime(400, now);
+  crack.frequency.exponentialRampToValueAtTime(80, now + 0.04);
+  const cGain = ctx.createGain();
+  cGain.gain.setValueAtTime(0.2, now);
+  cGain.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
 
-  noise.connect(filter).connect(noiseGain).connect(ctx.destination);
-  osc.connect(oscGain).connect(ctx.destination);
-  osc2.connect(osc2Gain).connect(ctx.destination);
-  noise.start(now); noise.stop(now + 0.1);
-  osc.start(now); osc.stop(now + 0.1);
-  osc2.start(now); osc2.stop(now + 0.06);
+  // Upper harmonic
+  const harm = ctx.createOscillator();
+  harm.type = 'sawtooth';
+  harm.frequency.setValueAtTime(600, now);
+  harm.frequency.exponentialRampToValueAtTime(150, now + 0.06);
+  const hGain = ctx.createGain();
+  hGain.gain.setValueAtTime(0.08, now);
+  hGain.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
+
+  noise.connect(filter).connect(nGain).connect(ctx.destination);
+  osc.connect(oGain).connect(ctx.destination);
+  crack.connect(cGain).connect(ctx.destination);
+  harm.connect(hGain).connect(ctx.destination);
+  noise.start(now); noise.stop(now + 0.12);
+  osc.start(now); osc.stop(now + 0.12);
+  crack.start(now); crack.stop(now + 0.06);
+  harm.start(now); harm.stop(now + 0.08);
 }
 
-/** Super Flash: DM启动时的闪烁音效 */
+/** Super Flash — DM startup shimmer */
 export function playSuperFlash(): void {
   const ctx = getCtx();
   const now = ctx.currentTime;
 
-  // 上升音调
   const osc = ctx.createOscillator();
   osc.type = 'sawtooth';
   osc.frequency.setValueAtTime(300, now);
-  osc.frequency.exponentialRampToValueAtTime(1800, now + 0.15);
-  osc.frequency.exponentialRampToValueAtTime(800, now + 0.25);
-
+  osc.frequency.exponentialRampToValueAtTime(2000, now + 0.12);
+  osc.frequency.exponentialRampToValueAtTime(600, now + 0.25);
   const gain = ctx.createGain();
   gain.gain.setValueAtTime(0.15, now);
   gain.gain.setValueAtTime(0.25, now + 0.1);
   gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
 
+  // Shimmer layer
+  const shimmer = noiseBuffer(ctx, 0.15, 0.3);
+  const sFilter = ctx.createBiquadFilter();
+  sFilter.type = 'highpass';
+  sFilter.frequency.value = 4000;
+  const sGain = ctx.createGain();
+  sGain.gain.setValueAtTime(0.08, now);
+  sGain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+
   osc.connect(gain).connect(ctx.destination);
+  shimmer.connect(sFilter).connect(sGain).connect(ctx.destination);
   osc.start(now); osc.stop(now + 0.35);
+  shimmer.start(now); shimmer.stop(now + 0.16);
 }
 
-/** 翻滚/回避音 */
+/** Roll — whoosh */
 export function playRoll(): void {
   const ctx = getCtx();
   const now = ctx.currentTime;
@@ -322,54 +414,60 @@ export function playRoll(): void {
   osc.frequency.setValueAtTime(200, now);
   osc.frequency.exponentialRampToValueAtTime(400, now + 0.08);
   osc.frequency.exponentialRampToValueAtTime(150, now + 0.15);
-
   const gain = ctx.createGain();
   gain.gain.setValueAtTime(0.1, now);
   gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
 
+  const noise = noiseBuffer(ctx, 0.1, 0.3);
+  const nGain = ctx.createGain();
+  nGain.gain.setValueAtTime(0.06, now);
+  nGain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+
   osc.connect(gain).connect(ctx.destination);
+  noise.connect(nGain).connect(ctx.destination);
   osc.start(now); osc.stop(now + 0.2);
+  noise.start(now); noise.stop(now + 0.12);
 }
 
-/** Guard Crush音: 破碎感 */
+/** Guard Crush — shattering */
 export function playGuardCrush(): void {
   const ctx = getCtx();
   const now = ctx.currentTime;
 
-  // 多层破碎噪声
-  const bufSize = ctx.sampleRate * 0.15;
-  const buf = ctx.createBuffer(1, bufSize, ctx.sampleRate);
-  const data = buf.getChannelData(0);
-  for (let i = 0; i < bufSize; i++) {
-    data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufSize * 0.2));
-  }
-  const noise = ctx.createBufferSource();
-  noise.buffer = buf;
-
+  const noise = noiseBuffer(ctx, 0.15, 0.2);
   const filter = ctx.createBiquadFilter();
   filter.type = 'highpass';
   filter.frequency.value = 1500;
+  const nGain = ctx.createGain();
+  nGain.gain.setValueAtTime(0.3, now);
+  nGain.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
 
-  const noiseGain = ctx.createGain();
-  noiseGain.gain.setValueAtTime(0.3, now);
-  noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
-
-  // 破碎低频
   const osc = ctx.createOscillator();
   osc.type = 'square';
   osc.frequency.setValueAtTime(300, now);
-  osc.frequency.exponentialRampToValueAtTime(60, now + 0.1);
-  const oscGain = ctx.createGain();
-  oscGain.gain.setValueAtTime(0.3, now);
-  oscGain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+  osc.frequency.exponentialRampToValueAtTime(50, now + 0.12);
+  const oGain = ctx.createGain();
+  oGain.gain.setValueAtTime(0.3, now);
+  oGain.gain.exponentialRampToValueAtTime(0.001, now + 0.14);
 
-  noise.connect(filter).connect(noiseGain).connect(ctx.destination);
-  osc.connect(oscGain).connect(ctx.destination);
-  noise.start(now); noise.stop(now + 0.15);
+  // Glass-like high ring
+  const ring = ctx.createOscillator();
+  ring.type = 'sine';
+  ring.frequency.setValueAtTime(2000, now);
+  ring.frequency.exponentialRampToValueAtTime(800, now + 0.1);
+  const rGain = ctx.createGain();
+  rGain.gain.setValueAtTime(0.08, now);
+  rGain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+
+  noise.connect(filter).connect(nGain).connect(ctx.destination);
+  osc.connect(oGain).connect(ctx.destination);
+  ring.connect(rGain).connect(ctx.destination);
+  noise.start(now); noise.stop(now + 0.18);
   osc.start(now); osc.stop(now + 0.15);
+  ring.start(now); ring.stop(now + 0.12);
 }
 
-/** 投技逃脱音 */
+/** Throw escape */
 export function playThrowEscape(): void {
   const ctx = getCtx();
   const now = ctx.currentTime;
@@ -379,11 +477,62 @@ export function playThrowEscape(): void {
   osc.frequency.setValueAtTime(600, now);
   osc.frequency.setValueAtTime(800, now + 0.03);
   osc.frequency.setValueAtTime(500, now + 0.06);
-
   const gain = ctx.createGain();
   gain.gain.setValueAtTime(0.15, now);
   gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
 
+  // Confirm chime
+  const chime = ctx.createOscillator();
+  chime.type = 'sine';
+  chime.frequency.value = 1200;
+  const cGain = ctx.createGain();
+  cGain.gain.setValueAtTime(0.05, now + 0.04);
+  cGain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+
   osc.connect(gain).connect(ctx.destination);
+  chime.connect(cGain).connect(ctx.destination);
   osc.start(now); osc.stop(now + 0.12);
+  chime.start(now + 0.04); chime.stop(now + 0.1);
+}
+
+/** Landing — soft thud for ground impact */
+export function playLanding(): void {
+  const ctx = getCtx();
+  const now = ctx.currentTime;
+
+  const osc = ctx.createOscillator();
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(80, now);
+  osc.frequency.exponentialRampToValueAtTime(30, now + 0.06);
+  const gain = ctx.createGain();
+  gain.gain.setValueAtTime(0.1, now);
+  gain.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
+
+  const noise = noiseBuffer(ctx, 0.04, 0.3);
+  const nGain = ctx.createGain();
+  nGain.gain.setValueAtTime(0.06, now);
+  nGain.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
+
+  osc.connect(gain).connect(ctx.destination);
+  noise.connect(nGain).connect(ctx.destination);
+  osc.start(now); osc.stop(now + 0.07);
+  noise.start(now); noise.stop(now + 0.05);
+}
+
+/** Projectile launch */
+export function playProjectileLaunch(): void {
+  const ctx = getCtx();
+  const now = ctx.currentTime;
+
+  const osc = ctx.createOscillator();
+  osc.type = 'sawtooth';
+  osc.frequency.setValueAtTime(300, now);
+  osc.frequency.exponentialRampToValueAtTime(600, now + 0.05);
+  osc.frequency.exponentialRampToValueAtTime(200, now + 0.15);
+  const gain = ctx.createGain();
+  gain.gain.setValueAtTime(0.15, now);
+  gain.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
+
+  osc.connect(gain).connect(ctx.destination);
+  osc.start(now); osc.stop(now + 0.2);
 }

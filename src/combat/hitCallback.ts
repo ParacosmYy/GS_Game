@@ -3,7 +3,7 @@
 import type { HitCallback } from './combatSystem.js';
 import { CombatSystem } from './combatSystem.js';
 import type { Fighter } from '../entities/fighter.js';
-import type { VFXSystem, ScreenShake } from '../rendering/vfx.js';
+import type { VFXSystem, ScreenShake, ScreenFlash } from '../rendering/vfx.js';
 import type { PowerGauge } from '../core/types.js';
 import { AttackType } from '../core/types.js';
 import { FRAME_DATA, STAGE_WIDTH } from '../core/constants.js';
@@ -12,12 +12,12 @@ import { gainMeterOnHit, gainMeterOnBlock, gainMeterOnHitstun } from './meter.js
 import { playHit, playBlock, playSpecial, playDM, playThrow, playCounter, playHeavyHit, playSuperFlash } from '../audio/sfx.js';
 import type { CinematicState } from '../state/cinematicState.js';
 
-/** Classify attack as DM / special */
 function classifyAttack(at: AttackType) {
   const s = at as string;
   const isDM = s.startsWith('DM_');
   const isSpecial = at === AttackType.SPECIAL_PROJECTILE || at === AttackType.SPECIAL_UPPER
-    || s.startsWith('KYO_') || s.startsWith('IORI_') || s.startsWith('TERRY_') || s.startsWith('KIM_') || s.startsWith('RYO_') || s.startsWith('LEONA_');
+    || s.startsWith('KYO_') || s.startsWith('IORI_') || s.startsWith('TERRY_') || s.startsWith('KIM_')
+    || s.startsWith('RYO_') || s.startsWith('LEONA_') || s.startsWith('KDASH_') || s.startsWith('KULA_');
   const isPunch = s.endsWith('_A') || s.endsWith('_C') || s.includes('ARAGAMI') || s.includes('DOKUGAMI')
     || s.includes('ONIYAKI') || s.includes('KOTOTSUKI') || s.includes('KUZUKAZE')
     || s.includes('BURN_KNUCKLE') || s.includes('RISING_TACKLE') || s.includes('POWER_DUNK')
@@ -25,7 +25,6 @@ function classifyAttack(at: AttackType) {
   return { isDM, isSpecial, isPunch };
 }
 
-/** Hit-stop freeze frames */
 function calcHitStop(at: AttackType, isDM: boolean, isSpecial: boolean, ch: boolean): number {
   const heavy = at === AttackType.STAND_C || at === AttackType.STAND_D || at === AttackType.CLOSE_C
     || at === AttackType.CLOSE_D || at === AttackType.CROUCH_C || at === AttackType.CROUCH_D
@@ -34,7 +33,6 @@ function calcHitStop(at: AttackType, isDM: boolean, isSpecial: boolean, ch: bool
   return ch ? r + 2 : r;
 }
 
-/** Screen shake intensity */
 function calcShake(at: AttackType, ch: boolean, dmg: number): number {
   const s = at as string;
   if (s.startsWith('DM_')) return 14;
@@ -51,16 +49,25 @@ function calcShake(at: AttackType, ch: boolean, dmg: number): number {
   return 3;
 }
 
+/** 判断是否为重攻击(需要斩击线特效) */
+function isHeavyAttack(at: AttackType): boolean {
+  return at === AttackType.STAND_C || at === AttackType.STAND_D
+    || at === AttackType.CLOSE_C || at === AttackType.CLOSE_D
+    || at === AttackType.CROUCH_C || at === AttackType.CROUCH_D
+    || at === AttackType.JUMP_C || at === AttackType.JUMP_D
+    || at === AttackType.STAND_CD || at === AttackType.JUMP_CD;
+}
+
 export interface HitCallbackDeps {
   fighters: [Fighter, Fighter];
   vfx: VFXSystem;
   screenShake: ScreenShake;
+  screenFlash: ScreenFlash;
   gauges: [PowerGauge, PowerGauge];
   cinematic: CinematicState;
   combatSystem: CombatSystem;
 }
 
-/** Create the onHit callback used by CombatSystem.resolveAttacks(). */
 export function createHitCallback(deps: HitCallbackDeps): HitCallback {
   return (attacker: Fighter, defender: Fighter, attackType: AttackType, blocked: boolean, counterHit: boolean): void => {
     const data = FRAME_DATA[attackType as keyof typeof FRAME_DATA];
@@ -84,19 +91,30 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
     gainMeterOnHit(deps.gauges[atkIdx]);
     gainMeterOnHitstun(deps.gauges[defIdx]);
 
-    // VFX: differentiated hit effects by attack type
     const atkChar = atkIdx === 0
       ? ROSTER.find(c => c.id === p1.charId) || ROSTER[0]
       : ROSTER.find(c => c.id === p2.charId) || ROSTER[1];
-    const { isDM: isDM2, isSpecial: isSpecial2, isPunch } = classifyAttack(attackType);
+    const { isPunch } = classifyAttack(attackType);
     const sparks = isDM ? 20 : isSpecial ? 14 : counterHit ? 12 : 8;
-    // Punch: warm sparks (yellow/orange), Kick: cool sparks (blue/cyan), Special: purple burst
     const sparkColor = isSpecial ? atkChar.specialColor : isPunch ? '#ffdd44' : '#44ddff';
     deps.vfx.spawnCharacterHitSparks(hitX, hitY, sparks, sparkColor);
     deps.vfx.spawnImpactRing(hitX, hitY);
+
+    // 重攻击斩击线
+    if (isHeavyAttack(attackType) || isSpecial) {
+      deps.vfx.spawnSlashLine(hitX, hitY, attacker.facing, sparkColor);
+    }
+
+    // DM: 超必杀华丽爆发 + 全屏闪白
+    if (isDM) {
+      deps.vfx.spawnSuperBurst(hitX, hitY, atkChar.specialColor, atkChar.specialGlow);
+      deps.screenFlash.trigger('#ffffff', 0.35, 10);
+    }
+
+    // 伤害数字
     deps.vfx.spawnDamageText(defender.x, defender.y - defender.displayHeight - 20, data.damage);
 
-    // Rekka finisher: enhanced explosion VFX
+    // Rekka finisher增强
     const isRekkaFinisher = attackType === AttackType.KYO_NANASE
       || attackType === AttackType.KYO_KOTO_TSUKI
       || attackType === AttackType.KYO_YAKISOGI
@@ -107,29 +125,51 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       || attackType === AttackType.RYO_HIEN;
     if (isRekkaFinisher) {
       deps.vfx.spawnCharacterHitSparks(hitX, hitY, 16, atkChar.specialGlow);
+      deps.screenFlash.trigger(atkChar.specialColor, 0.15, 5);
       deps.screenShake.trigger(8, 10);
     }
 
-    // SFX — differentiated by attack type
+    // SFX
     if (isDM) { playSuperFlash(); playDM(); }
     else if (attackType === AttackType.THROW) playThrow();
     else if (isSpecial) playSpecial();
     else if (data.damage >= 70) playHeavyHit();
     else playHit(data.damage > 50 ? 1.2 : 1.0);
 
-    if (counterHit) { deps.vfx.spawnCounterText(defender.x, defender.y - defender.displayHeight - 55); playCounter(); }
+    // Counter Hit
+    if (counterHit) {
+      deps.vfx.spawnCounterText(defender.x, defender.y - defender.displayHeight - 55);
+      deps.screenFlash.trigger('#ffaa00', 0.12, 4);
+      playCounter();
+    }
     if (counterHit && (data as { counterWire?: boolean }).counterWire) {
       const wallX = defender.x <= STAGE_WIDTH / 2 ? 30 : STAGE_WIDTH - 30;
       deps.vfx.spawnCounterWireSparks(wallX, defender.y - defender.displayHeight / 2);
       deps.screenShake.trigger(10, 10);
     }
-    // Projectile impact explosion (enhanced over normal sparks)
+
+    // 飞行道具爆炸
     if (attackType === AttackType.SPECIAL_PROJECTILE) {
       deps.vfx.spawnProjectileExplosion(hitX, hitY, atkChar.specialColor, atkChar.specialGlow);
     }
+
+    // 连击数
     const combo = deps.combatSystem.getComboCount(defIdx);
     if (combo >= 2) deps.vfx.spawnDamageText(defender.x, defender.y - defender.displayHeight - 40, combo);
+
     deps.screenShake.trigger(calcShake(attackType, counterHit, data.damage), 8);
     deps.cinematic.trackDamage(defIdx, data.damage);
+
+    // KO检测 — 角色倒地时触发震撼效果
+    if (defender.health <= 0 && !defender.isGrounded()) {
+      // 延迟到落地时触发groundslam（在main.ts的KO逻辑中处理）
+    }
   };
+}
+
+/** KO落地特效触发 — 从main.ts调用 */
+export function triggerKOGroundEffect(deps: { vfx: VFXSystem; screenFlash: ScreenFlash; screenShake: ScreenShake }, defender: Fighter): void {
+  deps.vfx.spawnGroundSlam(defender.x, defender.y);
+  deps.screenFlash.trigger('#ff2200', 0.3, 12);
+  deps.screenShake.trigger(16, 15);
 }

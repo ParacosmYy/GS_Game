@@ -509,6 +509,79 @@ export const FRAME_DATA = {
     damage: 210, hitstun: 0, blockstun: 22, pushback: 10,
     hitLevel: 'MID' as const, knockdown: true, chipDamage: 16,
   },
+  // K' 必杀技
+  KDASH_EINS: {
+    startup: 12, active: 25, recovery: 18,
+    damage: 60, hitstun: 14, blockstun: 12, pushback: 4,
+    hitLevel: 'MID' as const, knockdown: false, chipDamage: 5,
+  },
+  KDASH_EINS_C: {
+    startup: 14, active: 30, recovery: 20,
+    damage: 75, hitstun: 16, blockstun: 14, pushback: 5,
+    hitLevel: 'MID' as const, knockdown: false, chipDamage: 6,
+  },
+  KDASH_CROW: {
+    startup: 5, active: 6, recovery: 22,
+    damage: 70, hitstun: 18, blockstun: 14, pushback: 5,
+    hitLevel: 'MID' as const, knockdown: true,
+  },
+  KDASH_CROW_C: {
+    startup: 6, active: 8, recovery: 26,
+    damage: 90, hitstun: 20, blockstun: 16, pushback: 6,
+    hitLevel: 'MID' as const, knockdown: true,
+  },
+  KDASH_MINUTE: {
+    startup: 10, active: 6, recovery: 18,
+    damage: 65, hitstun: 16, blockstun: 14, pushback: 4,
+    hitLevel: 'HIGH' as const, knockdown: false,
+  },
+  KDASH_NARROW: {
+    startup: 8, active: 8, recovery: 16,
+    damage: 55, hitstun: 14, blockstun: 12, pushback: 3,
+    hitLevel: 'LOW' as const, knockdown: false,
+  },
+  // 库拉必杀技
+  KULA_BREATH: {
+    startup: 14, active: 22, recovery: 18,
+    damage: 55, hitstun: 14, blockstun: 12, pushback: 4,
+    hitLevel: 'MID' as const, knockdown: false, chipDamage: 4,
+  },
+  KULA_BREATH_C: {
+    startup: 16, active: 28, recovery: 20,
+    damage: 70, hitstun: 16, blockstun: 14, pushback: 5,
+    hitLevel: 'MID' as const, knockdown: false, chipDamage: 5,
+  },
+  KULA_SHELL: {
+    startup: 5, active: 6, recovery: 20,
+    damage: 65, hitstun: 16, blockstun: 14, pushback: 5,
+    hitLevel: 'MID' as const, knockdown: true,
+  },
+  KULA_SHELL_C: {
+    startup: 6, active: 8, recovery: 24,
+    damage: 85, hitstun: 18, blockstun: 16, pushback: 6,
+    hitLevel: 'MID' as const, knockdown: true,
+  },
+  KULA_LAY: {
+    startup: 8, active: 8, recovery: 18,
+    damage: 60, hitstun: 16, blockstun: 14, pushback: 4,
+    hitLevel: 'LOW' as const, knockdown: false,
+  },
+  KULA_EDGE: {
+    startup: 10, active: 6, recovery: 16,
+    damage: 55, hitstun: 14, blockstun: 12, pushback: 3,
+    hitLevel: 'LOW' as const, knockdown: false,
+  },
+  // 新DM
+  DM_CHAIN_SHOT: {
+    startup: 8, active: 6, recovery: 38,
+    damage: 200, hitstun: 0, blockstun: 22, pushback: 10,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 15,
+  },
+  DM_FREEZE: {
+    startup: 8, active: 8, recovery: 36,
+    damage: 200, hitstun: 0, blockstun: 22, pushback: 10,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 15,
+  },
 } as const;
 
 // ===== Hitbox Offsets (relative to fighter position, facing right) =====
@@ -609,6 +682,22 @@ export const HITBOX_OFFSETS = {
   LEONA_GRAND_SABER: { offsetX: 48, offsetY: -55, width: 52, height: 35 },
   LEONA_BALTIC: { offsetX: 45, offsetY: -25, width: 50, height: 30 },
   DM_V_SLASHER: { offsetX: 35, offsetY: -65, width: 68, height: 55 },
+  // K' (K Dash)
+  KDASH_EINS: { offsetX: 55, offsetY: -55, width: 42, height: 30 },
+  KDASH_EINS_C: { offsetX: 55, offsetY: -55, width: 44, height: 32 },
+  KDASH_CROW: { offsetX: 30, offsetY: -80, width: 45, height: 55 },
+  KDASH_CROW_C: { offsetX: 30, offsetY: -80, width: 48, height: 60 },
+  KDASH_MINUTE: { offsetX: 42, offsetY: -50, width: 50, height: 40 },
+  KDASH_NARROW: { offsetX: 45, offsetY: -25, width: 50, height: 30 },
+  DM_CHAIN_SHOT: { offsetX: 35, offsetY: -65, width: 70, height: 55 },
+  // 库拉 (Kula)
+  KULA_BREATH: { offsetX: 55, offsetY: -55, width: 42, height: 30 },
+  KULA_BREATH_C: { offsetX: 55, offsetY: -55, width: 44, height: 32 },
+  KULA_SHELL: { offsetX: 30, offsetY: -80, width: 45, height: 55 },
+  KULA_SHELL_C: { offsetX: 30, offsetY: -80, width: 48, height: 60 },
+  KULA_LAY: { offsetX: 45, offsetY: -25, width: 55, height: 30 },
+  KULA_EDGE: { offsetX: 48, offsetY: -25, width: 50, height: 28 },
+  DM_FREEZE: { offsetX: 35, offsetY: -65, width: 70, height: 55 },
 } as const;
 
 // ===== Throw Constants =====

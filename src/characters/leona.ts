@@ -15,12 +15,7 @@ import type { CommandBuffer } from '../input/commandBuffer.js';
 import { FighterState, AttackType } from '../core/types.js';
 import { Projectile } from '../entities/projectile.js';
 import { FRAME_DATA } from '../core/constants.js';
-
-const leonaPortrait = {
-  width: 32, height: 32,
-  palette: { 1: '#e8b870', 2: '#4488cc', 3: '#2266aa', 4: '#88ccff' } as Record<number, string>,
-  pixels: [] as number[][],
-};
+import { leonaPortrait } from '../rendering/portraits/leonaPortrait.js';
 
 export const LeonaDef: CharacterDefinition = {
   id: 'leona',

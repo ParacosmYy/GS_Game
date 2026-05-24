@@ -15,12 +15,7 @@ import type { CommandBuffer } from '../input/commandBuffer.js';
 import { FighterState, AttackType } from '../core/types.js';
 import { Projectile } from '../entities/projectile.js';
 import { FRAME_DATA } from '../core/constants.js';
-
-const ryoPortrait = {
-  width: 32, height: 32,
-  palette: { 1: '#e8b870', 2: '#884422', 3: '#ffa500', 4: '#333' } as Record<number, string>,
-  pixels: [] as number[][],
-};
+import { ryoPortrait } from '../rendering/portraits/ryoPortrait.js';
 
 export const RyoDef: CharacterDefinition = {
   id: 'ryo',

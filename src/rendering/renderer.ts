@@ -17,7 +17,7 @@ import type { Star } from './stage.js';
 import { drawSkeletalFighter } from './skeletalFighter.js';
 import { drawAttackLimb } from './attackLimb.js';
 import { drawHUD, drawPowerGauges, drawComboCounters, drawTeamOrder, type TeamDisplayInfo } from './hud.js';
-import { drawCharacterSelect, drawIntro, drawKO, drawSuperFlash, drawMatchEnd, drawModeIndicator, drawTitle, drawContinue } from './screens.js';
+import { drawCharacterSelect, drawIntro, drawKO, drawSuperFlash, drawMatchEnd, drawModeIndicator, drawStageIndicator, drawTitle, drawContinue } from './screens.js';
 import { shiftColor, roundRect } from './utils.js';
 import { ROSTER } from '../characters/index.js';
 import { drawProjectiles as drawProjectilesImpl } from './projectileRenderer.js';
@@ -285,6 +285,10 @@ export class Renderer {
 
   drawModeIndicator(simplifiedMode: boolean, alpha: number): void {
     drawModeIndicator(this.ctx, simplifiedMode, alpha);
+  }
+
+  drawStageIndicator(stageId: string, alpha: number): void {
+    drawStageIndicator(this.ctx, stageId, alpha);
   }
 
   drawTitle(tick: number): void {

@@ -14,7 +14,8 @@ import { FighterController, resolvePushbox } from './entities/fighterController.
 import { CombatSystem } from './combat/combatSystem.js';
 import { createPowerGauge, createMaxMode, tickMaxMode, tickAutoMeter } from './combat/meter.js';
 import { Renderer } from './rendering/renderer.js';
-import { VFXSystem, ScreenShake } from './rendering/vfx.js';
+import { VFXSystem, ScreenShake, ScreenFlash } from './rendering/vfx.js';
+import { cycleStage, setStage, getStage, type StageId } from './rendering/stage.js';
 import { drawVictoryPose } from './rendering/skeletalFighter.js';
 import type { TeamDisplayInfo } from './rendering/hud.js';
 import { ROSTER } from './characters/index.js';
@@ -43,6 +44,7 @@ const combatSystem = new CombatSystem(inputManager);
 const renderer = new Renderer(ctx);
 const vfx = new VFXSystem();
 const screenShake = new ScreenShake();
+const screenFlash = new ScreenFlash();
 
 // ===== Entities =====
 const p1 = new Fighter(STAGE_WIDTH * 0.33, ROSTER[0].color, 1);
@@ -68,7 +70,7 @@ const cinematic = new CinematicState();
 const select = new SelectState(p1Ctrl, p2Ctrl, p1, p2, p2Cmd);
 const rounds = new RoundState({ p1, p2, p1Cmd, p2Cmd, combatSystem, projectiles, vfx, cinematic, gauges, maxModes, tickRef });
 const dmMgr = new DMManager({ gauges, maxModes, cinematic, vfx, screenShake, fighters: [p1, p2] });
-const onHit = createHitCallback({ fighters: [p1, p2], vfx, screenShake, gauges, cinematic, combatSystem });
+const onHit = createHitCallback({ fighters: [p1, p2], vfx, screenShake, screenFlash, gauges, cinematic, combatSystem });
 
 // ===== Game state =====
 let phase: GamePhase = GamePhase.TITLE;
@@ -80,6 +82,7 @@ const CONTINUE_DURATION = 600; // 10秒倒计时
 let debugMode = false;
 let simplifiedMode = false; // Tab to toggle
 let modeIndicatorTimer = 0;
+let stageIndicatorTimer = 0;
 let p2AI: InstanceType<typeof import('./ai/simpleAI.js').SimpleAI> | null = null;
 const INTRO_DURATION = 120;
 let p1Team: TeamState | null = null;
@@ -93,6 +96,7 @@ let firstHitTracked = false;
 function update(): void {
   vfx.update();
   screenShake.update();
+  screenFlash.update();
 
   if (phase === GamePhase.TITLE) {
     tickRef.value++;
@@ -293,8 +297,9 @@ function update(): void {
   if (p1.health <= 0 || p2.health <= 0) {
     if (!cinematic.koSlowMoTriggered) {
       cinematic.triggerKOSlowMo();
-      vfx.spawnHitSparks((p1.x + p2.x) / 2, STAGE_GROUND_Y - 100, 20);
-      screenShake.trigger(12, 15);
+      vfx.spawnGroundSlam((p1.x + p2.x) / 2, STAGE_GROUND_Y);
+      screenFlash.trigger('#ff2200', 0.35, 15);
+      screenShake.trigger(16, 15);
       playKO();
       bgm.stop();
       announcer.knockOut();
@@ -359,10 +364,15 @@ function render(): void {
     renderer.drawMatchEnd(winner, rounds.p1Wins, rounds.p2Wins);
   }
   if (rounds.fadeAlpha > 0) { ctx.fillStyle = `rgba(0,0,0,${rounds.fadeAlpha})`; ctx.fillRect(0, 0, canvas.width, canvas.height); }
+  screenFlash.render(ctx, canvas.width, canvas.height);
   // Control mode indicator badge
   if (modeIndicatorTimer > 0) {
     renderer.drawModeIndicator(simplifiedMode, Math.min(1, modeIndicatorTimer / 60));
     modeIndicatorTimer--;
+  }
+  if (stageIndicatorTimer > 0) {
+    renderer.drawStageIndicator(getStage(), Math.min(1, stageIndicatorTimer / 60));
+    stageIndicatorTimer--;
   }
   if (debugMode) renderer.drawDebug([p1, p2], projectiles, camera, tickRef.value, renderer.getFps(), vfx.count, [p1Cmd, p2Cmd]);
 }
@@ -391,6 +401,7 @@ window.addEventListener('keydown', e => {
   if (e.code === 'KeyM') announcer.toggle();
   if (e.code === 'KeyB') bgm.toggle();
   if (e.code === 'Tab') { e.preventDefault(); simplifiedMode = !simplifiedMode; modeIndicatorTimer = 120; }
+  if (e.code === 'KeyN') { const s = cycleStage(); console.log('Stage:', s); stageIndicatorTimer = 120; }
 });
 window.addEventListener('keyup', e => { if (e.code === 'F1') f1Down = false; });
 

@@ -24,6 +24,8 @@ const VISUALS: Record<string, ProjectileVisuals> = {
   kim:   { baseRadius: 10, stretch: 1.0, groundHug: false, trailCount: 3, trailSpacing: 14, pulseSpeed: 7, pulseAmount: 0.2 },
   ryo:   { baseRadius: 13, stretch: 1.5, groundHug: false, trailCount: 4, trailSpacing: 15, pulseSpeed: 9, pulseAmount: 0.22 },
   leona: { baseRadius: 11, stretch: 1.4, groundHug: false, trailCount: 4, trailSpacing: 14, pulseSpeed: 8, pulseAmount: 0.2 },
+  kdash: { baseRadius: 12, stretch: 1.5, groundHug: false, trailCount: 4, trailSpacing: 15, pulseSpeed: 9, pulseAmount: 0.2 },
+  kula:  { baseRadius: 11, stretch: 1.3, groundHug: false, trailCount: 3, trailSpacing: 14, pulseSpeed: 7, pulseAmount: 0.22 },
 };
 
 const DEFAULT_VIS: ProjectileVisuals = { baseRadius: 10, stretch: 1.0, groundHug: false, trailCount: 3, trailSpacing: 14, pulseSpeed: 7, pulseAmount: 0.2 };

@@ -1,8 +1,7 @@
 /**
- * BGM — Web Audio Chiptune 战斗背景音乐
- *
- * 140BPM 热血格斗 BGM，使用振荡器 + 噪声合成。
- * 零依赖，程序化生成。A 小调五声音阶。
+ * BGM — Enhanced chiptune battle music
+ * Two tracks: Title theme + Battle theme
+ * Richer synthesis with pads, arps, and better drums
  */
 
 export class BGMPlayer {
@@ -10,15 +9,21 @@ export class BGMPlayer {
   private masterGain: GainNode | null = null;
   private isPlaying: boolean = false;
   private loopTimer: ReturnType<typeof setInterval> | null = null;
-  private volume: number = 0.3;
+  private volume: number = 0.25;
   private beat: number = 0;
+  private track: 'title' | 'battle' = 'battle';
 
-  start(): void {
-    if (this.isPlaying) return;
+  start(track: 'title' | 'battle' = 'battle'): void {
+    if (this.isPlaying) this.stop();
+    this.track = track;
     this.ctx = new AudioContext();
     this.masterGain = this.ctx.createGain();
     this.masterGain.gain.value = this.volume;
-    this.masterGain.connect(this.ctx.destination);
+    // Compressor for cleaner mix
+    const comp = this.ctx.createDynamicsCompressor();
+    comp.threshold.value = -20;
+    comp.ratio.value = 4;
+    this.masterGain.connect(comp).connect(this.ctx.destination);
     this.isPlaying = true;
     this.beat = 0;
     this.scheduleLoop();
@@ -32,7 +37,7 @@ export class BGMPlayer {
   }
 
   toggle(): boolean {
-    if (this.isPlaying) this.stop(); else this.start();
+    if (this.isPlaying) this.stop(); else this.start(this.track);
     return this.isPlaying;
   }
 
@@ -44,150 +49,211 @@ export class BGMPlayer {
   get playing(): boolean { return this.isPlaying; }
 
   private scheduleLoop(): void {
-    const BPM = 140;
+    const BPM = this.track === 'battle' ? 150 : 110;
     const beatMs = 60000 / BPM;
 
     const play = (): void => {
-      if (!this.isPlaying || !this.ctx) return;
+      if (!this.isPlaying || !this.ctx || !this.masterGain) return;
       const now = this.ctx.currentTime;
 
-      // Drum pattern: kick on 1,3; snare on 2,4; hihat every 8th
-      if (this.beat % 4 === 0 || this.beat % 4 === 2) this.playKick(now);
-      if (this.beat % 4 === 1 || this.beat % 4 === 3) this.playSnare(now);
-      if (this.beat % 2 === 0) this.playHihat(now);
+      if (this.track === 'battle') this.playBattleBeat(now);
+      else this.playTitleBeat(now);
 
-      // Bass line (4-bar loop, 16 beats)
-      const bassNote = this.getBassNote(this.beat % 16);
-      this.playBass(now, bassNote);
-
-      // Melody (8-bar loop, 32 beats, plays on odd 8th notes)
-      if (this.beat % 2 === 1) {
-        const melodyNote = this.getMelodyNote(this.beat % 32);
-        this.playMelody(now, melodyNote);
-      }
-
-      // Arpeggio accent every 4 bars (beat 0 of bar 4)
-      if (this.beat % 32 === 28) this.playArpAccent(now);
-
-      this.beat = (this.beat + 1) % 32;
+      this.beat = (this.beat + 1) % (this.track === 'battle' ? 64 : 32);
     };
 
     play();
     this.loopTimer = setInterval(play, beatMs / 2);
   }
 
-  // ─── Note patterns ───
+  // ─── Battle Theme (150 BPM, 64 beats = 8 bars) ───
 
-  /** A minor pentatonic bass line (4 bars × 4 beats = 16 positions) */
-  private getBassNote(pos: number): number {
-    const bassLine = [
-      82.4, 82.4, 110, 110,   // E2 E2 A2 A2
-      130.8, 110, 82.4, 82.4,  // C3 A2 E2 E2
-      146.8, 146.8, 130.8, 130.8, // D3 D3 C3 C3
-      110, 82.4, 110, 82.4,   // A2 E2 A2 E2
+  private playBattleBeat(now: number): void {
+    if (!this.ctx || !this.masterGain) return;
+
+    // Drums
+    if (this.beat % 4 === 0) this.playKick(now, 0.6);
+    if (this.beat % 4 === 2) this.playKick(now, 0.3); // lighter second kick
+    if (this.beat % 4 === 1 || this.beat % 4 === 3) this.playSnare(now);
+    this.playHihat(now, this.beat % 2 === 0 ? 0.08 : 0.04);
+
+    // Bass line (16 positions)
+    const bassNotes = [
+      82.4, 82.4, 110, 82.4,
+      130.8, 110, 82.4, 98,
+      73.4, 73.4, 98, 73.4,
+      130.8, 110, 98, 82.4,
     ];
-    return bassLine[pos % bassLine.length];
+    if (this.beat % 4 === 0) this.playBass(now, bassNotes[(this.beat / 4) % 16]);
+
+    // Lead melody (every other 8th note, 32 positions)
+    if (this.beat % 2 === 1) {
+      const melody: number[] = [
+        659.3, 0, 784, 659.3, 523.3, 587.3, 659.3, 0,
+        440, 523.3, 587.3, 659.3, 0, 784, 880, 0,
+        659.3, 784, 880, 784, 659.3, 587.3, 523.3, 0,
+        440, 0, 523.3, 587.3, 659.3, 0, 880, 0,
+      ];
+      const note = melody[Math.floor(this.beat / 2) % melody.length];
+      if (note > 0) this.playLead(now, note);
+    }
+
+    // Pad chord (every 8 beats)
+    if (this.beat % 8 === 0) {
+      const chords: number[][] = [
+        [220, 261.6, 329.6], // Am
+        [220, 277.2, 329.6], // Am7
+        [196, 246.9, 293.7], // G
+        [174.6, 220, 261.6], // F
+        [220, 261.6, 329.6], // Am
+        [164.8, 196, 246.9], // Em
+        [196, 246.9, 293.7], // G
+        [220, 261.6, 329.6], // Am
+      ];
+      this.playPad(now, chords[(this.beat / 8) % 8]);
+    }
+
+    // Arp accent at phrase end
+    if (this.beat === 60) this.playArpAccent(now);
   }
 
-  /** Energetic melody in A minor (8 bars × 4 beats = 32 positions) */
-  private getMelodyNote(pos: number): number {
-    const melody = [
-      659.3, 0, 784, 659.3,       // E5 - G5 E5
-      523.3, 587.3, 659.3, 0,       // C5 D5 E5 -
-      440, 523.3, 587.3, 659.3,     // A4 C5 D5 E5
-      0, 784, 880, 0,               // - G5 A5 -
-      659.3, 784, 880, 784,         // E5 G5 A5 G5
-      659.3, 587.3, 523.3, 0,       // E5 D5 C5 -
-      440, 0, 523.3, 587.3,         // A4 - C5 D5
-      659.3, 0, 440, 0,             // E5 - A4 -
-    ];
-    return melody[pos % melody.length];
+  // ─── Title Theme (110 BPM, 32 beats = 4 bars, calmer) ───
+
+  private playTitleBeat(now: number): void {
+    if (!this.ctx || !this.masterGain) return;
+
+    // Sparse drums
+    if (this.beat % 8 === 0) this.playKick(now, 0.3);
+    if (this.beat % 8 === 4) this.playSnare(now);
+    if (this.beat % 4 === 0) this.playHihat(now, 0.03);
+
+    // Slow bass (8 positions)
+    const bassNotes = [110, 110, 98, 98, 130.8, 130.8, 82.4, 82.4];
+    if (this.beat % 4 === 0) this.playBass(now, bassNotes[(this.beat / 4) % 8], 0.3);
+
+    // Gentle melody (every 4th beat)
+    if (this.beat % 4 === 2) {
+      const melody = [523.3, 587.3, 659.3, 784, 659.3, 587.3, 523.3, 440];
+      this.playLead(now, melody[(this.beat / 4) % 8], 0.06);
+    }
+
+    // Pad every 8 beats
+    if (this.beat % 8 === 0) {
+      const chords = [
+        [261.6, 329.6, 392], // C
+        [220, 277.2, 329.6], // Am (no 3rd implied)
+        [246.9, 311.1, 370], // B dim-ish
+        [261.6, 329.6, 392], // C
+      ];
+      this.playPad(now, chords[(this.beat / 8) % 4], 0.4);
+    }
   }
 
   // ─── Synthesis ───
 
-  private playKick(time: number): void {
+  private playKick(time: number, vol: number): void {
     if (!this.ctx || !this.masterGain) return;
     const osc = this.ctx.createOscillator();
     const gain = this.ctx.createGain();
     osc.type = 'sine';
-    osc.frequency.setValueAtTime(150, time);
-    osc.frequency.exponentialRampToValueAtTime(30, time + 0.1);
-    gain.gain.setValueAtTime(0.6, time);
-    gain.gain.exponentialRampToValueAtTime(0.001, time + 0.15);
+    osc.frequency.setValueAtTime(160, time);
+    osc.frequency.exponentialRampToValueAtTime(28, time + 0.12);
+    gain.gain.setValueAtTime(vol, time);
+    gain.gain.exponentialRampToValueAtTime(0.001, time + 0.18);
     osc.connect(gain).connect(this.masterGain);
-    osc.start(time);
-    osc.stop(time + 0.15);
+    osc.start(time); osc.stop(time + 0.2);
   }
 
   private playSnare(time: number): void {
     if (!this.ctx || !this.masterGain) return;
-    const bufferSize = Math.floor(this.ctx.sampleRate * 0.08);
-    const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
-    const data = buffer.getChannelData(0);
-    for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+    const size = Math.floor(this.ctx.sampleRate * 0.08);
+    const buf = this.ctx.createBuffer(1, size, this.ctx.sampleRate);
+    const data = buf.getChannelData(0);
+    for (let i = 0; i < size; i++) data[i] = Math.random() * 2 - 1;
     const noise = this.ctx.createBufferSource();
-    noise.buffer = buffer;
+    noise.buffer = buf;
     const gain = this.ctx.createGain();
-    gain.gain.setValueAtTime(0.3, time);
-    gain.gain.exponentialRampToValueAtTime(0.001, time + 0.08);
+    gain.gain.setValueAtTime(0.25, time);
+    gain.gain.exponentialRampToValueAtTime(0.001, time + 0.1);
     const filter = this.ctx.createBiquadFilter();
     filter.type = 'bandpass';
     filter.frequency.value = 3000;
+    filter.Q.value = 0.8;
     noise.connect(filter).connect(gain).connect(this.masterGain);
-    noise.start(time);
-    noise.stop(time + 0.08);
+    noise.start(time); noise.stop(time + 0.1);
   }
 
-  private playHihat(time: number): void {
+  private playHihat(time: number, vol: number): void {
     if (!this.ctx || !this.masterGain) return;
-    const bufferSize = Math.floor(this.ctx.sampleRate * 0.03);
-    const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
-    const data = buffer.getChannelData(0);
-    for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+    const size = Math.floor(this.ctx.sampleRate * 0.03);
+    const buf = this.ctx.createBuffer(1, size, this.ctx.sampleRate);
+    const data = buf.getChannelData(0);
+    for (let i = 0; i < size; i++) data[i] = Math.random() * 2 - 1;
     const noise = this.ctx.createBufferSource();
-    noise.buffer = buffer;
+    noise.buffer = buf;
     const gain = this.ctx.createGain();
-    gain.gain.setValueAtTime(0.1, time);
+    gain.gain.setValueAtTime(vol, time);
     gain.gain.exponentialRampToValueAtTime(0.001, time + 0.03);
     const filter = this.ctx.createBiquadFilter();
     filter.type = 'highpass';
-    filter.frequency.value = 8000;
+    filter.frequency.value = 9000;
     noise.connect(filter).connect(gain).connect(this.masterGain);
-    noise.start(time);
-    noise.stop(time + 0.03);
+    noise.start(time); noise.stop(time + 0.04);
   }
 
-  private playBass(time: number, freq: number): void {
+  private playBass(time: number, freq: number, vol: number = 0.12): void {
     if (!this.ctx || !this.masterGain || freq === 0) return;
     const osc = this.ctx.createOscillator();
     const gain = this.ctx.createGain();
     osc.type = 'sawtooth';
     osc.frequency.value = freq;
-    gain.gain.setValueAtTime(0.15, time);
-    gain.gain.exponentialRampToValueAtTime(0.001, time + 0.18);
+    gain.gain.setValueAtTime(vol, time);
+    gain.gain.exponentialRampToValueAtTime(0.001, time + 0.25);
     const filter = this.ctx.createBiquadFilter();
     filter.type = 'lowpass';
-    filter.frequency.value = 400;
+    filter.frequency.value = 350;
     osc.connect(filter).connect(gain).connect(this.masterGain);
-    osc.start(time);
-    osc.stop(time + 0.2);
+    osc.start(time); osc.stop(time + 0.28);
   }
 
-  private playMelody(time: number, freq: number): void {
+  private playLead(time: number, freq: number, vol: number = 0.07): void {
     if (!this.ctx || !this.masterGain || freq === 0) return;
     const osc = this.ctx.createOscillator();
     const gain = this.ctx.createGain();
     osc.type = 'square';
     osc.frequency.value = freq;
-    gain.gain.setValueAtTime(0.08, time);
-    gain.gain.exponentialRampToValueAtTime(0.001, time + 0.15);
+    // Slight vibrato
+    const lfo = this.ctx.createOscillator();
+    lfo.type = 'sine';
+    lfo.frequency.value = 5;
+    const lfoGain = this.ctx.createGain();
+    lfoGain.gain.value = 3;
+    lfo.connect(lfoGain).connect(osc.frequency);
+    lfo.start(time); lfo.stop(time + 0.22);
+
+    gain.gain.setValueAtTime(vol, time);
+    gain.gain.setValueAtTime(vol * 0.8, time + 0.05);
+    gain.gain.exponentialRampToValueAtTime(0.001, time + 0.18);
     osc.connect(gain).connect(this.masterGain);
-    osc.start(time);
-    osc.stop(time + 0.18);
+    osc.start(time); osc.stop(time + 0.2);
   }
 
-  /** Arpeggio accent at phrase boundary for energy */
+  private playPad(time: number, freqs: number[], duration: number = 0.5): void {
+    if (!this.ctx || !this.masterGain) return;
+    for (const freq of freqs) {
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.value = freq;
+      gain.gain.setValueAtTime(0, time);
+      gain.gain.linearRampToValueAtTime(0.04, time + 0.2);
+      gain.gain.setValueAtTime(0.04, time + duration * 0.7);
+      gain.gain.linearRampToValueAtTime(0, time + duration);
+      osc.connect(gain).connect(this.masterGain);
+      osc.start(time); osc.stop(time + duration + 0.05);
+    }
+  }
+
   private playArpAccent(time: number): void {
     if (!this.ctx || !this.masterGain) return;
     const notes = [659.3, 784, 880, 1046.5]; // E5 G5 A5 C6
@@ -198,10 +264,9 @@ export class BGMPlayer {
       osc.frequency.value = freq;
       const t = time + i * 0.04;
       gain.gain.setValueAtTime(0.06, t);
-      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.08);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.1);
       osc.connect(gain).connect(this.masterGain!);
-      osc.start(t);
-      osc.stop(t + 0.1);
+      osc.start(t); osc.stop(t + 0.12);
     });
   }
 }

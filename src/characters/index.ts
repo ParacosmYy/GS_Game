@@ -11,6 +11,8 @@ import { TerryDef } from './terry.js';
 import { KimDef } from './kim.js';
 import { RyoDef } from './ryo.js';
 import { LeonaDef } from './leona.js';
+import { KulaDef } from './kula.js';
+import { KdashDef } from './kdash.js';
 
 export type { CharacterDefinition } from './types.js';
 
@@ -22,4 +24,6 @@ export const ROSTER: CharacterDefinition[] = [
   KimDef,
   RyoDef,
   LeonaDef,
+  KulaDef,
+  KdashDef,
 ];
