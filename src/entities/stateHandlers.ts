@@ -360,6 +360,7 @@ export function handleAttack(ctx: FighterCtx, input: ResolvedInput): void {
         ctx.maxMode.timer -= Math.round(ctx.maxMode.maxDuration * FREE_CANCEL_TIMER_COST);
         if (ctx.maxMode.timer <= 0) ctx.maxMode.timer = 0;
         f.cancelEvent = 'free_cancel';
+        ctx.vfx.spawnFreeCancelText(f.x, f.y - f.displayHeight - 30);
         f.startAttack(specialAttack);
         return;
       }

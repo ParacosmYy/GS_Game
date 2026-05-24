@@ -430,6 +430,8 @@ export class CombatSystem {
     this.lastHitFrame[defIdx] = this.currentFrame;
 
     defender.health = Math.max(0, defender.health - damage);
+    // KOF2002: 被命中时防御槽也减少(比防御时少30%), 连段越久防御崩坏风险越高
+    defender.guardGauge = Math.max(0, defender.guardGauge - guardGaugeDamage(attackType) * 0.3);
 
     // KOF2002: air counter hit → jugglable state (full juggle budget)
     if (counterHit && !defender.isGrounded()) {

@@ -150,7 +150,7 @@ export const COMMAND_NORMALS: ReadonlySet<string> = new Set([
 ]);
 
 // ===== Throw Invincibility (KOF 2002 authentic) =====
-export const THROW_INVINCIBILITY_POST_STUN = 9;    // Frames after blockstun/hitstun
+export const THROW_INVINCIBILITY_POST_STUN = 7;    // Frames after blockstun/hitstun (KOF2002: 7F)
 export const THROW_INVINCIBILITY_WAKEUP = 9;        // Frames on wakeup from knockdown (KOF2002: 9F)
 export const THROW_INVINCIBILITY_JUMP_STARTUP = 4;  // Frames during jump startup
 export const THROW_INVINCIBILITY_LANDING = 2;       // Frames on landing
