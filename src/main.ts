@@ -292,14 +292,16 @@ function update(): void {
   combatSystem.updateEdgeTracking(rawP1, rawP2);
   dmMgr.checkMaxActivation(p1Input, 0);
   dmMgr.checkMaxActivation(p2Input, 1);
-  // MAX activation sound + screen flash
+  // MAX activation sound + screen flash + startup invincibility
   if (maxModes[0].active && maxModes[0].timer === maxModes[0].maxDuration - 1) {
     playMAXActivation();
     screenFlash.trigger('#44ff88', 0.3, 8);
+    p1.invincible = true; p1.throwInvulnFrames = 5; // KOF2002: MAX激活5帧无敌
   }
   if (maxModes[1].active && maxModes[1].timer === maxModes[1].maxDuration - 1) {
     playMAXActivation();
     screenFlash.trigger('#44ff88', 0.3, 8);
+    p2.invincible = true; p2.throwInvulnFrames = 5;
   }
   p1Cmd.record(getDirectionInput(p1Input), tickRef.value);
   p2Cmd.record(getDirectionInput(p2Input), tickRef.value);
@@ -416,6 +418,30 @@ function update(): void {
     f.savePrevState();
   });
 
+  for (let i = projectiles.length - 1; i >= 0; i--) { if (!projectiles[i].active) projectiles.splice(i, 1); }
+
+  // Projectile vs projectile collision (KOF2002: 飞行道具相撞互相抵消)
+  for (let i = 0; i < projectiles.length; i++) {
+    const a = projectiles[i];
+    if (!a.active) continue;
+    for (let j = i + 1; j < projectiles.length; j++) {
+      const b = projectiles[j];
+      if (!b.active) continue;
+      if (a.ownerId === b.ownerId) continue;
+      const aBox = a.getHitbox();
+      const bBox = b.getHitbox();
+      if (!aBox || !bBox) continue;
+      const overlap = Math.min(aBox.x + aBox.width, bBox.x + bBox.width) - Math.max(aBox.x, bBox.x);
+      if (overlap <= 0) continue;
+      const vOverlap = Math.min(aBox.y + aBox.height, bBox.y + bBox.height) - Math.max(aBox.y, bBox.y);
+      if (vOverlap <= 0) continue;
+      a.active = false;
+      b.active = false;
+      vfx.spawnCharacterHitSparks((a.x + b.x) / 2, (a.y + b.y) / 2, 10, '#ffffff');
+      break;
+    }
+  }
+  // Clean up again after collisions
   for (let i = projectiles.length - 1; i >= 0; i--) { if (!projectiles[i].active) projectiles.splice(i, 1); }
 
   if (p1.health <= 0 || p2.health <= 0) {

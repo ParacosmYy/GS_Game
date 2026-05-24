@@ -57,8 +57,11 @@ export const THROW_DISTANCE = 130;
 // ===== Projectile Constants =====
 export const PROJECTILE_SPEED = 8;
 
-// ===== Landing Recovery =====
-export const LANDING_RECOVERY = 2;
+// ===== Landing Recovery (KOF2002 authentic: hop < jump < air attack) =====
+export const LANDING_RECOVERY = 2;           // 通用默认(后撤步等)
+export const HOP_LANDING_RECOVERY = 1;       // 小跳着陆1F (正版≈0-1F)
+export const JUMP_LANDING_RECOVERY = 4;      // 普通跳/跑跳/大跳着陆4F
+export const AIR_ATTACK_LANDING_RECOVERY = 5; // 空中攻击后着陆5F (正版≈5-6F)
 
 // ===== KO Constants =====
 export const KO_DISPLAY_TIME = 120;

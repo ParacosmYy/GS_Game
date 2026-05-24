@@ -11,7 +11,7 @@ import {
   DOUBLE_TAP_WINDOW, HYPER_CHARGE_WINDOW,
   HOP_THRESHOLD,
   ROLL_SPEED, ROLL_DURATION, ROLL_RECOVERY,
-  LANDING_RECOVERY,
+  LANDING_RECOVERY, HOP_LANDING_RECOVERY, JUMP_LANDING_RECOVERY, AIR_ATTACK_LANDING_RECOVERY,
   DM_STOCK_COST,
   PROXIMITY_GUARD_RANGE,
   SUPER_CANCEL_STOCK_COST,
@@ -178,10 +178,22 @@ export class FighterController {
         || f.state === FighterState.AIR_BLOCK;
       const wasAirHitstun = f.state === FighterState.HITSTUN && f.vy >= 0 && f.y >= STAGE_GROUND_Y - 1;
       if (wasAirborne) {
+        const wasAirAttack = f.currentAttack !== null;
+        const wasHop = f.state === FighterState.HOP;
+        const wasAirBlock = f.state === FighterState.AIR_BLOCK;
+        const remainingBlockstun = f.blockstunTimer;
         if (f.currentAttack) f.endAttack();
         f.y = STAGE_GROUND_Y; f.vy = 0; f.vx = 0;
-        f.state = FighterState.IDLE;
-        f.landingRecovery = LANDING_RECOVERY;
+        // KOF2002: 空中防御着陆后如果有剩余blockstun → 转为地面防御
+        if (wasAirBlock && remainingBlockstun > 0) {
+          f.state = FighterState.BLOCK;
+          f.blockstunTimer = remainingBlockstun;
+        } else {
+          f.state = FighterState.IDLE;
+          if (wasAirAttack) f.landingRecovery = AIR_ATTACK_LANDING_RECOVERY;
+          else if (wasHop) f.landingRecovery = HOP_LANDING_RECOVERY;
+          else f.landingRecovery = JUMP_LANDING_RECOVERY;
+        }
         f.throwInvincibilityTimer = THROW_INVINCIBILITY_LANDING;
         f.juggleState = JuggleState.NONE;
         f.airHitCount = 0;
@@ -339,7 +351,11 @@ export class FighterController {
 }
 
 export function resolvePushbox(a: Fighter, b: Fighter): void {
+  // KOF2002: pushbox disabled during roll, knockdown, and throw
   if (a.isRolling() || b.isRolling()) return;
+  if (a.isKnockedDown || b.isKnockedDown) return;
+  if (a.isBeingThrown || b.isBeingThrown) return;
+  if (a.isThrowing || b.isThrowing) return;
 
   const aBox = a.getPushbox();
   const bBox = b.getPushbox();

@@ -156,7 +156,9 @@ export class Fighter {
 
   /** Update auto-facing toward opponent */
   updateFacing(opponent: Fighter): void {
+    // KOF2002: facing locked during hitstun, knockdown, and attack active phase
     if (this.state === FighterState.HITSTUN || this.state === FighterState.KNOCKDOWN) return;
+    if (this.attackPhase === 'active' || this.attackPhase === 'startup') return;
     this.facing = opponent.x > this.x ? 1 : -1;
   }
 
@@ -437,9 +439,22 @@ export class Fighter {
     if (this.throwInvincibilityTimer > 0) this.throwInvincibilityTimer--;
     if (this.hitFlashFrames > 0) this.hitFlashFrames--;
     if (this.throwBufferTimer > 0) this.throwBufferTimer--;
-    // Guard gauge recovery: +0.25/frame when NOT blocking (KOF2002正版恢复速率)
-    if (this.state !== FighterState.BLOCK && this.guardGauge < 100) {
-      this.guardGauge = Math.min(100, this.guardGauge + 0.25);
+    // MAX activation invincibility countdown
+    if (this.throwInvulnFrames > 0) {
+      this.throwInvulnFrames--;
+      if (this.throwInvulnFrames <= 0 && this.invincible) this.invincible = false;
+    }
+    // Guard gauge recovery: varies by state (KOF2002正版)
+    // IDLE/WALK: 0.25/F, RUN: 0.15/F (跑步恢复慢), HITSTUN: 不恢复, BLOCK: 不恢复
+    if (this.guardGauge < 100) {
+      if (this.state === FighterState.BLOCK || this.state === FighterState.HITSTUN
+        || this.state === FighterState.KNOCKDOWN || this.state === FighterState.GUARD_CRUSH) {
+        // 被打/防御中不恢复
+      } else if (this.state === FighterState.RUN) {
+        this.guardGauge = Math.min(100, this.guardGauge + 0.15);
+      } else {
+        this.guardGauge = Math.min(100, this.guardGauge + 0.25);
+      }
     }
   }
 

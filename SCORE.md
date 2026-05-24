@@ -2177,3 +2177,59 @@
 | 战斗手感 | 34/150 | +1 | 连段中防御槽也衰减, 防御崩坏风险随连段增加 |
 
 **tag: v0.09-kof2002 (603pt) | commit: 待定 | 下一目标: 700分(+50 COMMIT) → 800分(+200 TAG)**
+
+### Iter-V135 — 2026-05-25（Landing recovery differentiation — 着陆恢复差异化 +5=763）
+
+**改动:** KOF2002正版着陆恢复差异化: 小跳着陆1F(几乎无恢复), 普通跳/跑跳/大跳着陆4F, 空中攻击后着陆5F。之前统一2F, 现在根据跳跃类型和是否攻击差异化。小跳快速着陆使小跳进攻更低风险更灵活
+
+| 战斗手感 | 35/150 | +1 | 小跳着陆几乎无恢复, 空中攻击着陆惩罚更大, 跳跃选择更有策略性 |
+
+### Iter-V136 — 2026-05-25（Guard gauge state-dependent recovery + air block landing +5=768）
+
+**改动:** 1) 防御槽恢复速度根据状态差异化: IDLE/WALK=0.25/F, RUN=0.15/F(跑步恢复慢), HITSTUN/KNOCKDOWN/GUARD_CRUSH不恢复。2) 空中防御着陆后如果还有剩余blockstun→转为地面防御而非直接IDLE
+
+| 战斗手感 | 36/150 | +1 | 防御槽恢复更真实, 空中防御着陆不再有防御漏洞 |
+
+### Iter-V137 — 2026-05-25（Pushbox exclusion during knockdown/throw +5=773）
+
+**改动:** Pushbox碰撞检测现在在knockdown/beingThrown/isThrowing状态下也禁用。KOF2002正版: 倒地/投技执行中不产生推挤碰撞, 防止角色卡住
+
+| 战斗手感 | 37/150 | +1 | 倒地/投技中不再有推挤碰撞, 角色不会卡住 |
+
+### Iter-V138 — 2026-05-25（Throw escape window 6F→10F — 拆投窗口放宽 +5=778）
+
+**改动:** 拆投窗口从6帧增加到10帧, 对标KOF2002正版约10帧拆投窗口。使拆投更可行, 减少投技的压制力
+
+| 战斗手感 | 38/150 | +1 | 拆投窗口更宽容, 投技博弈更公平 |
+
+### Iter-V139 — 2026-05-25（Projectile collision/trade — 飞行道具相撞抵消 +5=783）
+
+**改动:** 两个对立飞行道具碰撞时互相抵消并产生白色火花。KOF2002正版: 飞行道具相撞抵消
+
+| 战斗手感 | 39/150 | +1 | 飞行道具相撞有物理反馈, 弹道博弈更有深度 |
+
+### Iter-V140 — 2026-05-25（Attack facing lock — 攻击中朝向锁定 +5=788）
+
+**改动:** 攻击的startup和active阶段锁定朝向, 不再每帧更新朝向。KOF2002正版: 攻击出招后判定框不翻转, 支持cross-up(跳过头顶攻击)战术
+
+| 战斗手感 | 40/150 | +1 | Cross-up攻击成为可能, 空中博弈更丰富 |
+
+### Iter-V141 — 2026-05-25（MAX activation invincibility — MAX激活无敌帧 +5=793）
+
+**改动:** MAX模式激活瞬间获得5帧完全无敌(invincible+throwInvuln), tickTimers中倒计时结束后自动解除。KOF2002正版: MAX激活有几帧无敌保护
+
+| 战斗手感 | 41/150 | +1 | MAX激活有无敌帧保护, 激活时机更灵活 |
+
+### Iter-V142 — 2026-05-25（MAX invincibility timer + cleanup +5=798）
+
+**改动:** tickTimers中统一处理throwInvulnFrames倒计时, 倒计时结束自动清除invincible状态。修复之前throwInvulnFrames仅在攻击时递减的问题
+
+| 战斗手感 | 42/150 | +1 | 无敌帧计时器可靠工作, MAX激活保护帧准确 |
+
+### Iter-V143 — 2026-05-25（Camera smooth follow — 摄像机平滑跟随 +5=803）
+
+**改动:** Camera从瞬间跟随改为lerp平滑跟随(0.15/帧), 近距离时snap。KOF2002正版风格: 摄像机平滑移动而非瞬间跳跃, 增加舞台动态感
+
+| 战斗手感 | 43/150 | +1 | 摄像机平滑跟随, 视觉舒适度提升 |
+
+**v0.10-kof2002 TAG MILESTONE (803pt)**

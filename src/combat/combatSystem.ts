@@ -21,7 +21,7 @@ import { FighterState, AttackType, JuggleState } from '../core/types.js';
 import type { HitLevel } from '../core/types.js';
 
 /** Throw escape window in frames (KOF2002: 6 frames, strict) */
-const THROW_ESCAPE_WINDOW = 6;
+const THROW_ESCAPE_WINDOW = 10; // KOF2002正版: 拆投窗口≈10F (比之前6F更宽松)
 /** Push-apart distance on successful throw escape */
 const THROW_ESCAPE_PUSH = 60;
 export type HitCallback = (
