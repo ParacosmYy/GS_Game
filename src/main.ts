@@ -317,6 +317,16 @@ function update(): void {
     screenShake.trigger(12, 15);
   }
 
+  // Timer KO: when timer hits 0, whoever has more health wins
+  if (tick >= 99 * 60) {
+    phase = GamePhase.KO;
+    koTimer = 0;
+    if (p1.health > p2.health) winner = 0;
+    else if (p2.health > p1.health) winner = 1;
+    else winner = null;
+    screenShake.trigger(8, 10);
+  }
+
   window.__gameState = {
     players: [p1, p2].map(f => ({
       x: f.x, y: f.y, health: f.health, state: f.state,

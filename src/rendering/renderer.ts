@@ -8,9 +8,19 @@ export class Renderer {
   private fpsTime = 0;
   private currentFps = 0;
   private globalTick = 0;
+  private stars: { x: number; y: number; brightness: number; speed: number }[] = [];
 
   constructor(ctx: CanvasRenderingContext2D) {
     this.ctx = ctx;
+    // Generate static star field
+    for (let i = 0; i < 60; i++) {
+      this.stars.push({
+        x: Math.random() * 800,
+        y: Math.random() * 300,
+        brightness: 0.2 + Math.random() * 0.6,
+        speed: 0.3 + Math.random() * 0.7,
+      });
+    }
   }
 
   render(fighters: Fighter[], cameraX: number, tick: number, ko: boolean, winner: number | null, shakeX: number, shakeY: number): void {
@@ -53,6 +63,13 @@ export class Renderer {
     skyGrad.addColorStop(1, '#1a1a40');
     ctx.fillStyle = skyGrad;
     ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+    // Stars (twinkling)
+    for (const star of this.stars) {
+      const twinkle = star.brightness * (0.6 + 0.4 * Math.sin(this.globalTick * 0.02 * star.speed + star.x));
+      ctx.fillStyle = `rgba(255,255,255,${twinkle})`;
+      ctx.fillRect(star.x, star.y, 1.5, 1.5);
+    }
 
     // Distant city silhouette parallax
     ctx.fillStyle = '#0d0d20';
