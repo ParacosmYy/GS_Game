@@ -9,7 +9,7 @@ import { AttackType } from '../core/types.js';
 import { FRAME_DATA, STAGE_WIDTH } from '../core/constants.js';
 import { ROSTER } from '../characters/index.js';
 import { gainMeterOnHit, gainMeterOnBlock, gainMeterOnHitstun } from './meter.js';
-import { playHit, playBlock, playSpecial, playDM, playThrow, playCounter, playHeavyHit, playSuperFlash } from '../audio/sfx.js';
+import { playHit, playBlock, playSpecial, playDM, playThrow, playCounter, playHeavyHit, playSuperFlash, playWire, playJuggleHit } from '../audio/sfx.js';
 import type { CinematicState } from '../state/cinematicState.js';
 
 function classifyAttack(at: AttackType) {
@@ -142,6 +142,7 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
     else if (attackType === AttackType.THROW) playThrow();
     else if (isSpecial) playSpecial();
     else if (data.damage >= 70) playHeavyHit();
+    else if (!defender.isGrounded()) playJuggleHit();
     else playHit(data.damage > 50 ? 1.2 : 1.0);
 
     // Counter Hit
@@ -151,9 +152,9 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       playCounter();
     }
     if (counterHit && (data as { counterWire?: boolean }).counterWire) {
-      // Counter Wire launch flash — wall impact VFX handled in fighterController on bounce
       deps.screenFlash.trigger('#ff6600', 0.2, 6);
       deps.screenShake.trigger(10, 10);
+      playWire();
     }
 
     // 飞行道具爆炸
