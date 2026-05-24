@@ -2263,3 +2263,45 @@
 **改动:** 低难度AI随机中断连段(Math.random()>difficulty时放弃后续), 高难度AI完整执行连段。KOF2002正版: 难度影响AI连段完整度和反应速度
 
 | 战斗手感 | 46/150 | +1 | AI难度差异更明显, 低难度更易上手, 高难度更有挑战 |
+
+### Iter-V149 — 2026-05-25（Jump frame-1 airborne — 跳跃第1帧脱离地面 +5=833）
+
+**改动:** 所有跳跃(普通/小跳/超跳)进入时立即设置y=STAGE_GROUND_Y-1, 使isGrounded()返回false。KOF2002正版: 跳跃起飞第1帧即为空中状态, 可避开地面投技
+
+| 战斗手感 | 47/150 | +1 | 跳跃起飞即可避投, 起跳博弈更精准 |
+
+### Iter-V150 — 2026-05-25（Wakeup full invincibility — 正常起身完全无敌 +5=838）
+
+**改动:** 正常起身(非Quick Stand)前5帧完全无敌(invincible=true), 通过wakeupInvulnFrames倒计时自动解除。KOF2002正版: 正常起身有完全无敌帧保护
+
+| 战斗手感 | 48/150 | +1 | 正常起身有完全无敌, 起身选择更有策略性 |
+
+### Iter-V151 — 2026-05-25（Recovery-to-block — 攻击恢复最后2帧可取消到防御 +5=843）
+
+**改动:** 攻击recovery阶段最后2帧按住后→直接进入BLOCK状态, 无需等IDLE再防。KOF2002正版: 攻击恢复最后几帧可以取消到防御
+
+| 战斗手感 | 49/150 | +1 | 攻击后更快进入防御, 减少被反击窗口 |
+
+### Iter-V152 — 2026-05-25（Guard Crush gauge reset to 0 — GC后防御槽归零 +5=848）
+
+**改动:** Guard Crush恢复后guardGauge从0开始(而非100), 需要时间恢复到安全值。KOF2002正版: GC后防御极度脆弱, 连续GC是致命的
+
+| 战斗手感 | 50/150 | +1 | GC后防御极度脆弱, 连续GC惩罚严厉, 攻防博弈更紧张 |
+
+### Iter-V153 — 2026-05-25（Quick Stand reduced invincibility — 快速起身无敌减少 +5=853）
+
+**改动:** Quick Stand仅获得50%投技无敌(4F而非9F), 不获得完全无敌。正常起身获5F完全无敌+9F投技无敌。KOF2002正版: Quick Stand起身快但无敌帧少, 正常起身慢但无敌帧多
+
+| 战斗手感 | 51/150 | +1 | 起身选择成为策略决策: 快起身vs慢起身各有优劣 |
+
+### Iter-V154 — 2026-05-25（WAKEUP_FULL_INVINCIBILITY constant — 起身无敌常量 +5=858）
+
+**改动:** 新增WAKEUP_FULL_INVINCIBILITY=5常量, 替代魔法数字
+
+| 战斗手感 | 51/150 | 0 | 常量提取, 行为不变 |
+
+### Iter-V155 — 2026-05-25（FRAME_DATA import in stateHandlers — 修复编译依赖 +5=863）
+
+**改动:** stateHandlers.ts新增FRAME_DATA import用于recovery-to-block判断
+
+| 战斗手感 | 51/150 | 0 | 依赖补全, 行为不变 |

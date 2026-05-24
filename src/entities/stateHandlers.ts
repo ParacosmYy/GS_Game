@@ -19,6 +19,8 @@ import {
   THROW_INVINCIBILITY_JUMP_STARTUP,
   THROW_INVINCIBILITY_LANDING,
   WAKEUP_BUFFER_WINDOW,
+  WAKEUP_FULL_INVINCIBILITY,
+  FRAME_DATA,
 } from '../core/constants.js';
 import { FighterState, AttackType, CLOSE_RANGE } from '../core/types.js';
 import { spendStocks, gainMeterOnWhiff } from '../combat/meter.js';
@@ -170,6 +172,8 @@ export function handleIdleWalk(ctx: FighterCtx, input: ResolvedInput): void {
   }
   if (upReleased(ctx, input) && f.isGrounded() && ctx.upHoldFrames > 0) {
     f.throwInvincibilityTimer = THROW_INVINCIBILITY_JUMP_STARTUP;
+    // KOF2002: 跳跃第1帧即脱离地面(isGrounded=false), 可避开地面投技
+    f.y = STAGE_GROUND_Y - 1;
     if (ctx.upHoldFrames <= HOP_THRESHOLD) {
       f.vy = ctx.stats.hopVelocity;
       f.vx = ctx.stats.jumpForwardSpeed * 0.7 * (input.forward ? 1 : input.back ? -1 : 0) * f.facing;
@@ -463,6 +467,17 @@ export function handleAttack(ctx: FighterCtx, input: ResolvedInput): void {
   if (!f.currentAttack && lastAttack && !lastHit && ctx.gauge) {
     gainMeterOnWhiff(ctx.gauge, lastAttack);
   }
+  // KOF2002: 攻击恢复最后几帧按住后→直接进入防御(而不是恢复IDLE再防)
+  if (f.currentAttack && f.attackPhase === 'recovery' && input.back && f.isGrounded()) {
+    const data = FRAME_DATA[f.currentAttack as keyof typeof FRAME_DATA];
+    const totalFrames = (data?.startup ?? 0) + (data?.active ?? 0) + (data?.recovery ?? 0);
+    if (totalFrames > 0 && f.attackFrame >= totalFrames - 2) {
+      f.resetAttackState();
+      f.state = FighterState.BLOCK;
+      f.blockstunTimer = 0;
+      f.vx = 0;
+    }
+  }
   if (!f.currentAttack && !f.isGrounded()) { f.state = FighterState.JUMP; }
 }
 
@@ -506,7 +521,11 @@ export function handleAirBlock(ctx: FighterCtx): void {
 export function handleGuardCrush(ctx: FighterCtx): void {
   const f = ctx.fighter;
   f.guardCrushTimer--;
-  if (f.guardCrushTimer <= 0) { f.state = FighterState.IDLE; f.vx = 0; }
+  if (f.guardCrushTimer <= 0) {
+    f.state = FighterState.IDLE; f.vx = 0;
+    // KOF2002: Guard Crush恢复后防御槽从0开始(而非100), 连续GC风险极高
+    f.guardGauge = 0;
+  }
 }
 
 /** COUNTER_STANCE state handler */
@@ -555,7 +574,15 @@ export function handleKnockdown(ctx: FighterCtx, input: ResolvedInput): void {
   }
   if (f.knockdownTimer <= 0) {
     f.state = FighterState.IDLE; f.isKnockedDown = false; f.isHardKnockdown = false; f.displayHeight = 100; f.vx = 0;
-    if (!f.usedQuickStand) f.throwInvincibilityTimer = THROW_INVINCIBILITY_WAKEUP;
+    if (!f.usedQuickStand) {
+      f.throwInvincibilityTimer = THROW_INVINCIBILITY_WAKEUP;
+      // KOF2002: 正常起身前5帧完全无敌(可避开所有攻击), Quick Stand无此优势
+      f.invincible = true;
+      f.wakeupInvulnFrames = WAKEUP_FULL_INVINCIBILITY;
+    } else {
+      // Quick Stand: 仅获得投技无敌, 不获得完全无敌 (起身快的代价)
+      f.throwInvincibilityTimer = Math.round(THROW_INVINCIBILITY_WAKEUP * 0.5);
+    }
     f.usedQuickStand = false;
     // Execute buffered reversal
     if (ctx.wakeupBuffer) {

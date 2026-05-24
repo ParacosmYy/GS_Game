@@ -96,6 +96,7 @@ export class Fighter {
   throwInvulnFrames: number = 0;  // 投技无敌帧计数器
   // Hurtbox invincibility
   invincible: boolean = false;    // 完全无敌(受击框消失)
+  wakeupInvulnFrames = 0;          // 起身完全无敌帧(正常起身, 非Quick Stand)
 
   // Throw escape state (defender side)
   isBeingThrown = false;
@@ -443,6 +444,11 @@ export class Fighter {
     if (this.throwInvulnFrames > 0) {
       this.throwInvulnFrames--;
       if (this.throwInvulnFrames <= 0 && this.invincible) this.invincible = false;
+    }
+    // 起身完全无敌倒计时
+    if (this.wakeupInvulnFrames > 0) {
+      this.wakeupInvulnFrames--;
+      if (this.wakeupInvulnFrames <= 0) this.invincible = false;
     }
     // Guard gauge recovery: varies by state (KOF2002正版)
     // IDLE/WALK: 0.25/F, RUN: 0.15/F (跑步恢复慢), HITSTUN: 不恢复, BLOCK: 不恢复

@@ -162,6 +162,7 @@ export const THROW_INVINCIBILITY_POST_ESCAPE = 6;  // Frames after throw escape 
 // ===== Wake-up Reversal Window =====
 export const WAKEUP_REVERSAL_WINDOW = 5;  // KOF2002: ~5帧起身反转窗口
 export const WAKEUP_BUFFER_WINDOW = 5;    // 起身前5帧可缓冲输入
+export const WAKEUP_FULL_INVINCIBILITY = 5; // KOF2002: 正常起身(非Quick Stand)前5帧完全无敌
 
 // ===== HUD Layout =====
 export const HUD_BAR_WIDTH = 300;
