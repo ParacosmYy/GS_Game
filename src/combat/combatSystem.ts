@@ -145,6 +145,7 @@ export class CombatSystem {
 
         // Reset both fighters to IDLE
         attacker.isThrowing = false;
+        attacker.invincible = false;
         attacker.throwVictim = null;
         attacker.endAttack();
         defender.isBeingThrown = false;
@@ -185,6 +186,7 @@ export class CombatSystem {
         defender.isBeingThrown = false;
 
         attacker.isThrowing = false;
+        attacker.invincible = false;
         attacker.throwVictim = null;
 
         this.comboHits[defIdx]++;
@@ -256,6 +258,7 @@ export class CombatSystem {
       // 普通投(可拆投): 进入拆投窗口
       const throwDir: 1 | -1 = attackType === AttackType.THROW_BACK ? (-attacker.facing as 1 | -1) : attacker.facing;
       attacker.isThrowing = true;
+      attacker.invincible = true; // KOF2002: 投技执行中攻击者无敌
       attacker.throwVictim = defender;
       defender.isBeingThrown = true;
       defender.throwEscapeTimer = THROW_ESCAPE_WINDOW;
@@ -404,6 +407,10 @@ export class CombatSystem {
       if (defender.isGrounded() && !LIGHT_NORMALS.has(attackType as string)) {
         const isSpecial = !NORMAL_ATTACKS.has(attackType as string) && !COMMAND_NORMALS.has(attackType as string);
         hitstunFrames += isSpecial ? 5 : 3;
+      }
+      // KOF2002: CH空中命中给予额外浮空值, 使CH对空更 rewarding
+      if (!defender.isGrounded()) {
+        defender.jugglePoints = Math.min(JUGGLE_POINTS_MAX, defender.jugglePoints + 15);
       }
     }
 
