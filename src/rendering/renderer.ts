@@ -182,6 +182,7 @@ export class Renderer {
         glowColor = '#ffaa0030';
         break;
       case FighterState.BLOCK:
+      case FighterState.AIR_BLOCK:
         bodyColor = '#6688aa';
         outlineColor = '#88aaff60';
         glowColor = '#4466ff20';
@@ -192,8 +193,13 @@ export class Renderer {
         glowColor = '#ff220040';
         break;
       case FighterState.HITSTUN:
-        bodyColor = this.globalTick % 6 < 3 ? '#ffffff' : f.color;
-        outlineColor = '#ff505070';
+        if (f.hitFlashFrames > 0) {
+          bodyColor = '#ffffff';
+          outlineColor = '#ffffffcc';
+        } else {
+          bodyColor = this.globalTick % 8 < 2 ? '#ffffff' : f.color;
+          outlineColor = '#ff505070';
+        }
         break;
       case FighterState.KNOCKDOWN:
         bodyColor = shiftColor(f.color, -50);

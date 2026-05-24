@@ -103,6 +103,9 @@ export class Fighter {
   // Counter Wire: currently bouncing off wall from counter wire
   isCounterWire = false;
 
+  // Hit flash: bright white overlay on hit for visual feedback (counts down from 4)
+  hitFlashFrames = 0;
+
   // Previous frame state tracking (for combo reset detection)
   private _prevState: FighterState = FighterState.IDLE;
   get prevState(): FighterState { return this._prevState; }
@@ -309,6 +312,7 @@ export class Fighter {
   applyHitstun(frames: number, pushback: number): void {
     this.state = FighterState.HITSTUN;
     this.hitstunTimer = frames;
+    this.hitFlashFrames = 4;
     this.vx = pushback * (this.facing === 1 ? -1 : 1);
     this.resetAttackState();
     this.resetCancelFlags();
@@ -348,6 +352,7 @@ export class Fighter {
     if (this.landingRecovery > 0) this.landingRecovery--;
     if (this.runStopTimer > 0) this.runStopTimer--;
     if (this.throwInvincibilityTimer > 0) this.throwInvincibilityTimer--;
+    if (this.hitFlashFrames > 0) this.hitFlashFrames--;
     // Guard gauge recovery: +0.5/frame when NOT blocking
     if (this.state !== FighterState.BLOCK && this.guardGauge < 100) {
       this.guardGauge = Math.min(100, this.guardGauge + 0.5);

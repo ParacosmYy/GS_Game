@@ -147,6 +147,34 @@ export const KyoDef: CharacterDefinition = {
       legFront: bone(6, 4, 0.18),
       legBack: bone(-6, 3, -0.22),
     }),
+    [FighterState.HYPER_JUMP]: pose({
+      body: bone(0, -8, -0.08),
+      armFront: bone(12, 12, 0.5),
+      armBack: bone(-10, 10, -0.4),
+      legFront: bone(8, -8, 0.4),
+      legBack: bone(-8, -5, -0.5),
+    }),
+    [FighterState.RUN_JUMP]: pose({
+      body: bone(3, -5, -0.04),
+      armFront: bone(12, 8, 0.35),
+      armBack: bone(-10, 6, -0.3),
+      legFront: bone(6, -4, 0.25),
+      legBack: bone(-6, -2, -0.35),
+    }),
+    [FighterState.BACK_ROLL]: pose({
+      body: bone(0, 20, -0.6),
+      head: bone(-5, 23, -0.5),
+      armFront: bone(5, 28, 0.3),
+      armBack: bone(-8, 25, -0.4),
+      legFront: bone(6, 22, -0.2),
+      legBack: bone(-5, 24, 0.3),
+    }),
+    [FighterState.AIR_BLOCK]: pose({
+      armFront: bone(2, 8, -0.5),
+      armBack: bone(-2, 6, -0.65),
+      legFront: bone(3, -2, 0.1),
+      legBack: bone(-4, 0, -0.15),
+    }),
   },
 
   routeSpecial(input, cmdBuf, tick, _hasChargeRelease = false) {
