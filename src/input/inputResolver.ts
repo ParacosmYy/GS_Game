@@ -19,6 +19,10 @@ export interface ResolvedInput {
   punchPressed: boolean;
   /** Any kick button just pressed (B or D) */
   kickPressed: boolean;
+  /** A+B just pressed (Roll紧急回避) */
+  rollPressed: boolean;
+  /** C+D just pressed (Blowback Attack) */
+  blowbackPressed: boolean;
 }
 
 export interface RawInput {
@@ -68,6 +72,9 @@ export function resolveInput(raw: RawInput, facing: Direction, prev: PrevAttack)
     throwAttackPressed: raw.throwAttack && !prev.throwAtk,
     punchPressed: aPressed || cPressed,
     kickPressed: bPressed || dPressed,
+    // Simultaneous buttons: both held + at least one just pressed
+    rollPressed: raw.buttonA && raw.buttonB && (aPressed || bPressed),
+    blowbackPressed: raw.buttonC && raw.buttonD && (cPressed || dPressed),
   };
 }
 

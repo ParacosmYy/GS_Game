@@ -37,6 +37,7 @@ export class Fighter {
   blockstunTimer = 0;
   knockdownTimer = 0;
   landingRecovery = 0;
+  rollTimer = 0;
   blockType: BlockType = 'HIGH';
 
   // Visual height (for crouch)
@@ -193,6 +194,12 @@ export class Fighter {
       this.state === FighterState.CROUCH ||
       this.state === FighterState.RUN
     );
+  }
+
+  /** Is the fighter in a rolling state (invincible to attacks but not throws)? */
+  isRolling(): boolean {
+    return (this.state === FighterState.ROLL || this.state === FighterState.BACK_ROLL)
+      && this.rollTimer > 0;
   }
 
   /** Is the fighter on the ground? */

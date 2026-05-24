@@ -19,6 +19,15 @@ export const BACKDASH_DURATION = 18;
 export const DOUBLE_TAP_WINDOW = 12;
 export const RUN_JUMP_VX = 8;
 export const RUN_JUMP_VY = -13;
+export const HOP_THRESHOLD = 6;       // 短按↑ <=6帧 = 小跳
+export const HOP_VELOCITY = -10;      // 小跳垂直速度 (低于普通跳)
+export const HYPER_JUMP_VY = -17;     // 大跳垂直速度 (高于普通跳)
+export const HYPER_JUMP_VX = 7;       // 大跳水平速度
+export const HYPER_CHARGE_WINDOW = 10; // ↓→↑ 窗口帧数
+export const ROLL_SPEED = 6;
+export const ROLL_DURATION = 20;      // 滚动持续帧
+export const ROLL_INVINCIBLE_END = 15; // 无敌结束帧 (0~15帧无敌)
+export const ROLL_RECOVERY = 3;       // 滚动结束恢复帧
 export const PUSH_BOX_WIDTH = 60;
 export const MAX_HEALTH = 1000;
 
@@ -113,6 +122,17 @@ export const FRAME_DATA = {
     damage: 120, hitstun: 20, blockstun: 14, pushback: 8,
     hitLevel: 'MID' as const, knockdown: false, chipDamage: 12,
   },
+  // ── CD击飞攻击 ──
+  STAND_CD: {
+    startup: 14, active: 4, recovery: 18,
+    damage: 70, hitstun: 0, blockstun: 12, pushback: 8,
+    hitLevel: 'MID' as const, knockdown: true,
+  },
+  JUMP_CD: {
+    startup: 12, active: 5, recovery: 8,
+    damage: 60, hitstun: 0, blockstun: 10, pushback: 6,
+    hitLevel: 'HIGH' as const, knockdown: true,
+  },
 } as const;
 
 // ===== Hitbox Offsets (relative to fighter position, facing right) =====
@@ -136,6 +156,9 @@ export const HITBOX_OFFSETS = {
   THROW: { offsetX: 10, offsetY: -60, width: 70, height: 60 },
   SPECIAL_PROJECTILE: { offsetX: 50, offsetY: -60, width: 40, height: 30 },
   SPECIAL_UPPER: { offsetX: 30, offsetY: -80, width: 45, height: 50 },
+  // CD击飞攻击
+  STAND_CD: { offsetX: 45, offsetY: -50, width: 60, height: 45 },
+  JUMP_CD: { offsetX: 40, offsetY: -35, width: 55, height: 40 },
 } as const;
 
 // ===== Throw Constants =====
@@ -153,3 +176,11 @@ export const KO_DISPLAY_TIME = 120;
 
 // ===== Chip Damage Multiplier (blocked specials deal X% of damage) =====
 export const CHIP_DAMAGE_RATIO = 0.1;
+
+// ===== Counter Hit =====
+export const CH_HITSTUN_BONUS = 1.5;   // Counter Hit 硬直x1.5
+export const CH_DAMAGE_BONUS = 1.25;   // Counter Hit 伤害x1.25
+
+// ===== Damage Scaling =====
+export const DAMAGE_SCALE_STEP = 0.10;  // 每连击递减10%
+export const DAMAGE_SCALE_MIN = 0.50;   // 最低50%伤害

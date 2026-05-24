@@ -7,6 +7,8 @@ import {
   WALK_SPEED, RUN_SPEED, GRAVITY, JUMP_VELOCITY,
   BACKDASH_VX, BACKDASH_VY, BACKDASH_DURATION,
   DOUBLE_TAP_WINDOW, RUN_JUMP_VX, RUN_JUMP_VY,
+  HOP_THRESHOLD, HOP_VELOCITY, HYPER_JUMP_VY, HYPER_JUMP_VX, HYPER_CHARGE_WINDOW,
+  ROLL_SPEED, ROLL_DURATION, ROLL_INVINCIBLE_END, ROLL_RECOVERY,
   FRAME_DATA, LANDING_RECOVERY,
 } from '../core/constants.js';
 import { FighterState, AttackType } from '../core/types.js';
@@ -30,6 +32,12 @@ export class FighterController {
   private lastBackTick = -999;
   private prevForward = false;
   private prevBack = false;
+  private prevDown = false;
+
+  // Hop detection: track how long UP has been held
+  private upHoldFrames = 0;
+  private upWasPressed = false;
+  private lastDownTick = -999; // for hyper jump detection
 
   constructor(
     fighter: Fighter,
@@ -53,6 +61,13 @@ export class FighterController {
     this.tickStateMachine(input);
     this.prevForward = input.forward;
     this.prevBack = input.back;
+    this.prevDown = input.down;
+    // Track UP hold for hop detection
+    if (input.up) {
+      if (!this.upWasPressed) this.upHoldFrames = 0;
+      this.upHoldFrames++;
+    }
+    this.upWasPressed = input.up;
   }
 
   applyPhysics(): void {
@@ -63,6 +78,8 @@ export class FighterController {
     if (f.y >= STAGE_GROUND_Y) {
       const wasAirborne = f.state === FighterState.JUMP
         || f.state === FighterState.RUN_JUMP
+        || f.state === FighterState.HOP
+        || f.state === FighterState.HYPER_JUMP
         || f.state === FighterState.BACKDASH
         || f.state === FighterState.AIR_ATTACK;
       if (wasAirborne) {
@@ -106,6 +123,17 @@ export class FighterController {
       return gap > 0 && gap <= DOUBLE_TAP_WINDOW;
     }
     return false;
+  }
+
+  /** Check if UP was just released this frame (for hop) */
+  private upJustReleased(input: ResolvedInput): boolean {
+    return !input.up && this.upWasPressed;
+  }
+
+  /** Check hyper jump: ↓ was pressed within HYPER_CHARGE_WINDOW frames before ↑ */
+  private checkHyperJump(): boolean {
+    const gap = this.tickRef.value - this.lastDownTick;
+    return gap > 0 && gap <= HYPER_CHARGE_WINDOW;
   }
 
   /** Determine AttackType based on stance + button */
@@ -155,6 +183,26 @@ export class FighterController {
         f.displayHeight = 100;
         f.vx = 0;
 
+        // Priority 0: Roll紧急回避 (A+B)
+        if (input.rollPressed && f.canAct() && f.isGrounded()) {
+          if (input.back) {
+            f.state = FighterState.BACK_ROLL;
+          } else {
+            f.state = FighterState.ROLL;
+          }
+          f.rollTimer = ROLL_DURATION;
+          f.vx = (f.state === FighterState.ROLL ? ROLL_SPEED : -ROLL_SPEED) * f.facing;
+          f.displayHeight = 60;
+          this.vfx.spawnDust(f.x, STAGE_GROUND_Y);
+          return;
+        }
+
+        // Priority 0.5: CD Blowback (C+D)
+        if (input.blowbackPressed && f.canAct()) {
+          f.startAttack(AttackType.STAND_CD);
+          return;
+        }
+
         // Priority 1: Double-tap back → backdash
         if (this.checkDoubleBack(input) && f.canAct() && f.isGrounded()) {
           f.state = FighterState.BACKDASH;
@@ -172,11 +220,29 @@ export class FighterController {
           return;
         }
 
-        // Priority 3: Jump
-        if (input.up && f.isGrounded()) {
-          f.vy = JUMP_VELOCITY;
-          f.state = FighterState.JUMP;
+        // Priority 3: Jump / Hop / Hyper Jump
+        if (this.upJustReleased(input) && f.isGrounded() && this.upHoldFrames > 0) {
+          if (this.upHoldFrames <= HOP_THRESHOLD) {
+            // 小跳 (短按↑)
+            f.vy = HOP_VELOCITY;
+            f.state = FighterState.HOP;
+          } else if (this.checkHyperJump()) {
+            // 大跳 (↓→↑)
+            f.vy = HYPER_JUMP_VY;
+            f.vx = HYPER_JUMP_VX * (input.forward ? 1 : input.back ? -1 : 0) * f.facing;
+            f.state = FighterState.HYPER_JUMP;
+            this.vfx.spawnDust(f.x, STAGE_GROUND_Y);
+          } else {
+            // 普通跳 (长按↑松开)
+            f.vy = JUMP_VELOCITY;
+            f.state = FighterState.JUMP;
+          }
           return;
+        }
+
+        // Track ↓ press for hyper jump
+        if (input.down && !this.prevDown) {
+          this.lastDownTick = this.tickRef.value;
         }
 
         // Priority 4: Crouch
@@ -271,9 +337,44 @@ export class FighterController {
         break;
       }
 
+      case FighterState.ROLL:
+      case FighterState.BACK_ROLL: {
+        f.rollTimer--;
+        f.displayHeight = 60;
+        if (f.rollTimer <= 0) {
+          f.state = FighterState.IDLE;
+          f.vx = 0;
+          f.displayHeight = 100;
+          f.landingRecovery = ROLL_RECOVERY;
+        }
+        break;
+      }
+
+      case FighterState.HOP: {
+        // 小跳: 短弧线, 可以空中攻击
+        if ((input.punchPressed || input.kickPressed) && !f.currentAttack) {
+          const atk = this.routeAttack(input);
+          if (atk) f.startAttack(atk);
+        }
+        f.vy += GRAVITY;
+        break;
+      }
+
+      case FighterState.HYPER_JUMP: {
+        if ((input.punchPressed || input.kickPressed) && !f.currentAttack) {
+          const atk = this.routeAttack(input);
+          if (atk) f.startAttack(atk);
+        }
+        f.vy += GRAVITY;
+        break;
+      }
+
       case FighterState.JUMP:
       case FighterState.RUN_JUMP: {
-        if ((input.punchPressed || input.kickPressed) && !f.currentAttack) {
+        // Air CD blowback
+        if (input.blowbackPressed && !f.currentAttack) {
+          f.startAttack(AttackType.JUMP_CD);
+        } else if ((input.punchPressed || input.kickPressed) && !f.currentAttack) {
           const atk = this.routeAttack(input);
           if (atk) f.startAttack(atk);
         }

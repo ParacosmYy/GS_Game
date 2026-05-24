@@ -3,7 +3,7 @@ import { GameLoop } from './core/gameLoop.js';
 import { STAGE_WIDTH, KO_DISPLAY_TIME, FRAME_DATA } from './core/constants.js';
 import { AttackType, GameState, GamePhase } from './core/types.js';
 import { InputManager, CommandBuffer, resolveInput, getDirectionInput } from './input/index.js';
-import type { ResolvedInput, RawInput } from './input/index.js';
+import type { ResolvedInput } from './input/index.js';
 import { Fighter } from './entities/fighter.js';
 import { Projectile } from './entities/projectile.js';
 import { FighterController, resolvePushbox } from './entities/fighterController.js';
@@ -44,9 +44,6 @@ const INTRO_DURATION = 120;
 let koTimer = 0;
 let winner: number | null = null;
 let debugMode = false;
-let comboCount = [0, 0];
-let comboTimer = [0, 0];
-const COMBO_TIMEOUT = 60;
 
 // ===== Window API =====
 declare global {
@@ -60,8 +57,8 @@ window.__fighters = [p1, p2];
 window.__restart = restartGame;
 
 // ===== Hit callback =====
-function onHit(attacker: Fighter, defender: Fighter, attackType: AttackType, blocked: boolean): void {
-  const data = FRAME_DATA[attackType];
+function onHit(attacker: Fighter, defender: Fighter, attackType: AttackType, blocked: boolean, counterHit: boolean): void {
+  const data = FRAME_DATA[attackType as keyof typeof FRAME_DATA];
   const hitX = (attacker.x + defender.x) / 2;
   const hitY = defender.y - defender.displayHeight / 2;
   const defIdx = defender === p1 ? 0 : 1;
@@ -69,18 +66,20 @@ function onHit(attacker: Fighter, defender: Fighter, attackType: AttackType, blo
   if (blocked) {
     vfx.spawnBlockFlash(hitX, hitY);
     screenShake.trigger(3, 4);
-    comboCount[defIdx] = 0;
   } else {
-    comboCount[defIdx]++;
-    comboTimer[defIdx] = 0;
-    vfx.spawnHitSparks(hitX, hitY, attackType === AttackType.SPECIAL_UPPER ? 14 : 8);
+    const comboCount = combatSystem.getComboCount(defIdx);
+    vfx.spawnHitSparks(hitX, hitY, attackType === AttackType.SPECIAL_UPPER ? 14 : counterHit ? 12 : 8);
     vfx.spawnImpactRing(hitX, hitY);
     vfx.spawnDamageText(defender.x, defender.y - defender.displayHeight - 20, data.damage);
-    if (comboCount[defIdx] >= 2) {
-      vfx.spawnDamageText(defender.x, defender.y - defender.displayHeight - 40, comboCount[defIdx]);
+    if (counterHit) {
+      vfx.spawnCounterText(defender.x, defender.y - defender.displayHeight - 55);
+    }
+    if (comboCount >= 2) {
+      vfx.spawnDamageText(defender.x, defender.y - defender.displayHeight - 40, comboCount);
     }
     const shake = attackType === AttackType.SPECIAL_UPPER ? 8
       : attackType === AttackType.THROW ? 6
+      : counterHit ? 7
       : attackType === AttackType.STAND_C || attackType === AttackType.STAND_D ? 5
       : data.damage > 50 ? 4 : 3;
     screenShake.trigger(shake, 8);
@@ -104,11 +103,6 @@ function update(): void {
   }
 
   tickRef.value++;
-
-  // Combo timeout
-  for (let i = 0; i < 2; i++) {
-    if (comboCount[i] > 0 && ++comboTimer[i] >= COMBO_TIMEOUT) comboCount[i] = 0;
-  }
 
   const rawP1 = inputManager.getP1Input();
   const rawP2 = inputManager.getP2Input();
@@ -166,7 +160,7 @@ function render(): void {
   vfx.render(ctx, camera.x);
 
   if (phase === GamePhase.INTRO) renderer.drawIntro(phaseTimer);
-  renderer.drawComboCounters([p1, p2], comboCount, comboTimer, camera);
+  renderer.drawComboCounters([p1, p2], [combatSystem.getComboCount(0), combatSystem.getComboCount(1)], [0, 0], camera);
   renderer.drawControlsHint();
   if (debugMode) renderer.drawDebug([p1, p2], projectiles, camera, tickRef.value, renderer.getFps(), vfx.count, [p1Cmd, p2Cmd]);
 }
@@ -177,8 +171,6 @@ function restartGame(): void {
   koTimer = 0;
   winner = null;
   tickRef.value = 0;
-  comboCount = [0, 0];
-  comboTimer = [0, 0];
   p1.reset(STAGE_WIDTH * 0.33);
   p2.reset(STAGE_WIDTH * 0.67);
   p1Cmd.reset();

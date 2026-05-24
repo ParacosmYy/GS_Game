@@ -2,11 +2,15 @@
 export enum FighterState {
   IDLE = 'IDLE',
   WALK = 'WALK',
-  RUN = 'RUN',           // 前冲跑步 (双击→)
-  BACKDASH = 'BACKDASH', // 后撤跳 (双击←)
+  RUN = 'RUN',
+  BACKDASH = 'BACKDASH',
   JUMP = 'JUMP',
-  RUN_JUMP = 'RUN_JUMP', // 跑跳 (跑步中跳)
+  RUN_JUMP = 'RUN_JUMP',
+  HOP = 'HOP',             // 小跳 (短按↑)
+  HYPER_JUMP = 'HYPER_JUMP', // 大跳 (↓→↑)
   CROUCH = 'CROUCH',
+  ROLL = 'ROLL',           // 前滚紧急回避
+  BACK_ROLL = 'BACK_ROLL', // 后滚紧急回避
   STAND_ATTACK = 'STAND_ATTACK',
   CROUCH_ATTACK = 'CROUCH_ATTACK',
   AIR_ATTACK = 'AIR_ATTACK',
@@ -29,10 +33,13 @@ export enum AttackType {
   CROUCH_C = 'CROUCH_C', // 蹲重拳 (对空)
   CROUCH_D = 'CROUCH_D', // 蹲重脚 (扫堂腿 KD)
   // 跳跃 (Jump)
-  JUMP_A = 'JUMP_A',     // 空轻拳
-  JUMP_B = 'JUMP_B',     // 空轻脚
-  JUMP_C = 'JUMP_C',     // 空重拳 (跳入主力)
-  JUMP_D = 'JUMP_D',     // 空重脚 (逆向)
+  JUMP_A = 'JUMP_A',
+  JUMP_B = 'JUMP_B',
+  JUMP_C = 'JUMP_C',
+  JUMP_D = 'JUMP_D',
+  // Blowback Attack (CD攻击)
+  STAND_CD = 'STAND_CD',   // 地面CD击飞
+  JUMP_CD = 'JUMP_CD',     // 空中CD击飞
   // 投技 & 必杀技
   THROW = 'THROW',
   SPECIAL_PROJECTILE = 'SPECIAL_PROJECTILE',

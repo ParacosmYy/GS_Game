@@ -169,6 +169,20 @@ export class Renderer {
           outlineColor = '#88ccff60';
           glowColor = '#4488ff20';
           break;
+        case FighterState.ROLL:
+        case FighterState.BACK_ROLL:
+          bodyColor = this.shiftColor(f.color, 40);
+          outlineColor = '#44ff8860';
+          glowColor = '#22ff4420';
+          break;
+        case FighterState.HOP:
+          bodyColor = this.shiftColor(f.color, 15);
+          break;
+        case FighterState.HYPER_JUMP:
+          bodyColor = this.shiftColor(f.color, 30);
+          outlineColor = '#ff44ff50';
+          glowColor = '#ff22ff25';
+          break;
         case FighterState.JUMP:
         case FighterState.RUN_JUMP:
           bodyColor = this.shiftColor(f.color, 25);
@@ -214,11 +228,14 @@ export class Renderer {
         leanAngle = -0.08 * f.facing; // slight backward tilt
       }
 
-      // Afterimage trail for RUN/BACKDASH
-      if (f.state === FighterState.RUN || f.state === FighterState.BACKDASH) {
+      // Afterimage trail for RUN/BACKDASH/ROLL
+      if (f.state === FighterState.RUN || f.state === FighterState.BACKDASH
+        || f.state === FighterState.ROLL || f.state === FighterState.BACK_ROLL) {
         const trailColor = f.state === FighterState.RUN
           ? `rgba(255, 140, 0, ${0.15})`
-          : `rgba(100, 180, 255, ${0.18})`;
+          : f.state === FighterState.BACKDASH
+          ? `rgba(100, 180, 255, ${0.18})`
+          : `rgba(80, 255, 140, ${0.18})`;
         for (let i = 1; i <= 3; i++) {
           ctx.globalAlpha = 0.3 / i;
           ctx.fillStyle = trailColor;
@@ -363,6 +380,16 @@ export class Renderer {
       ctx.beginPath();
       ctx.moveTo(sx + 10 * f.facing, sy - f.displayHeight * 0.55);
       ctx.lineTo(sx + (FIGHTER_WIDTH / 2 + reach) * f.facing, sy - f.displayHeight * 0.55);
+      ctx.stroke();
+    } else if (f.currentAttack === AttackType.STAND_CD || f.currentAttack === AttackType.JUMP_CD) {
+      // CD blowback: big sweeping hit
+      ctx.strokeStyle = '#ff4444';
+      ctx.shadowColor = '#ff2222';
+      ctx.lineWidth = 12;
+      const reach = limbLen * 1.1;
+      ctx.beginPath();
+      ctx.moveTo(sx + 5 * f.facing, sy - f.displayHeight * 0.45);
+      ctx.lineTo(sx + (FIGHTER_WIDTH / 2 + reach) * f.facing, sy - f.displayHeight * 0.35);
       ctx.stroke();
     } else if (f.currentAttack === AttackType.THROW) {
       ctx.strokeStyle = '#ff8844';
