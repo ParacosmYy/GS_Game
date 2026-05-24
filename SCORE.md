@@ -287,3 +287,49 @@
 3. 3v3团队模式（正版KOF核心）
 4. 打击帧视觉效果增强
 5. 更多动画精细度（JUMP/BACKDASH）
+
+---
+
+### Iteration 8 — 2024-05-25（新角色莉安娜 + 音效品质提升）
+
+**本次改动：**
+- **第6个角色：莉安娜·哈迪兰 (Leona Heidern)** — 哈迪兰佣兵
+  - 必杀技：月光(qcf+A/C, 弱强projectile), 威光(dp+A/C, 弱强upper), 手刀(qcb+P, rush), X标(qcf+K, low)
+  - DM：V字金锯(qcf×2+P)
+  - 完整骨骼动画 + 专属攻击肢体渲染 + 弹幕视觉
+  - 全系统LEONA_前缀支持
+- **音效品质大幅提升** (7种新音效 → 总计14种):
+  - 重打击音(playHeavyHit): C/D攻击使用，带通滤波+多层冲击
+  - Super Flash(playSuperFlash): DM启动闪烁音效
+  - 翻滚音(playRoll): 回避动作音效
+  - Guard Crush音(playGuardCrush): 高通滤波破碎感
+  - 投技逃脱音(playThrowEscape): 确认音
+  - DM音效增强：先播放SuperFlash再播放DM爆发音
+  - SFX分派改进：重攻击(≥70dmg)用重打击音，DM叠加双重音效
+- 新增7个AttackType: LEONA_MOON_SLASH, LEONA_MOON_SLASH_C, LEONA_EAR_RING, LEONA_EAR_RING_C, LEONA_GRAND_SABER, LEONA_BALTIC, DM_V_SLASHER
+- TypeScript类型检查通过 + 25测试通过
+
+| 维度 | 得分 | 变化 | 备注 |
+|------|------|------|------|
+| 帧数据精度 | 12/15 | → | Leona帧数据参照正版 |
+| 判定系统 | 12/15 | → | Leona必杀技全部有逐帧攻击框 |
+| 战斗机制 | 17/20 | → | Leona加入完整战斗系统 |
+| 动画品质 | 12/15 | → | Leona多帧动画一致 |
+| 音效品质 | 4/5 | +2 | 14种音效，重打击/DM闪烁/GuardCrush等新音效，差异化SFX分派 |
+| 角色内容 | 10/10 | → | 6角色已达标 |
+| 游戏流程 | 9/10 | → | 未改动 |
+| 视觉打磨 | 4/5 | → | Leona专属攻击肢体渲染 |
+| 代码质量 | 4/5 | → | 架构稳定 |
+| **总分** | **84/100** | **+2** | |
+
+**与基线对比：+63.5 分（20.5 → 84）**
+**是否触发 tag：否（+2 < 5）**
+
+**下一迭代目标：>= 89 分（+5 触发 v0.07-kof2002）**
+
+**主要提升空间：**
+1. 3v3团队模式 — 正版KOF核心特性
+2. 更多动画精细度 — JUMP上升/下降差异，BACKDASH/ROLL动画
+3. 新角色继续扩充
+4. 打击帧视觉效果增强（闪白、冲击线）
+5. 训练模式

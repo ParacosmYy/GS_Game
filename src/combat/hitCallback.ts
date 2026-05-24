@@ -9,7 +9,7 @@ import { AttackType } from '../core/types.js';
 import { FRAME_DATA, STAGE_WIDTH } from '../core/constants.js';
 import { ROSTER } from '../characters/index.js';
 import { gainMeterOnHit, gainMeterOnBlock, gainMeterOnHitstun } from './meter.js';
-import { playHit, playBlock, playSpecial, playDM, playThrow, playCounter } from '../audio/sfx.js';
+import { playHit, playBlock, playSpecial, playDM, playThrow, playCounter, playHeavyHit, playSuperFlash } from '../audio/sfx.js';
 import type { CinematicState } from '../state/cinematicState.js';
 
 /** Classify attack as DM / special */
@@ -17,7 +17,7 @@ function classifyAttack(at: AttackType) {
   const s = at as string;
   const isDM = s.startsWith('DM_');
   const isSpecial = at === AttackType.SPECIAL_PROJECTILE || at === AttackType.SPECIAL_UPPER
-    || s.startsWith('KYO_') || s.startsWith('IORI_') || s.startsWith('TERRY_') || s.startsWith('KIM_') || s.startsWith('RYO_');
+    || s.startsWith('KYO_') || s.startsWith('IORI_') || s.startsWith('TERRY_') || s.startsWith('KIM_') || s.startsWith('RYO_') || s.startsWith('LEONA_');
   const isPunch = s.endsWith('_A') || s.endsWith('_C') || s.includes('ARAGAMI') || s.includes('DOKUGAMI')
     || s.includes('ONIYAKI') || s.includes('KOTOTSUKI') || s.includes('KUZUKAZE')
     || s.includes('BURN_KNUCKLE') || s.includes('RISING_TACKLE') || s.includes('POWER_DUNK')
@@ -40,7 +40,7 @@ function calcShake(at: AttackType, ch: boolean, dmg: number): number {
   if (s.startsWith('DM_')) return 14;
   if (s.startsWith('KYO_ONIYAKI') || s.startsWith('IORI_ONIYAKI')
     || s.startsWith('TERRY_POWER_DUNK') || s.startsWith('TERRY_RISING_TACKLE')
-    || s.startsWith('KIM_HIENZAN') || s.startsWith('RYO_KO_HOU')) return 8;
+    || s.startsWith('KIM_HIENZAN') || s.startsWith('RYO_KO_HOU') || s.startsWith('LEONA_EAR_RING')) return 8;
   if (at === AttackType.SPECIAL_UPPER) return 8;
   if (at === AttackType.THROW || s.includes('KOTOTSUKI') || s.includes('KUZUKAZE')) return 6;
   if (ch) return 7;
@@ -110,11 +110,12 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       deps.screenShake.trigger(8, 10);
     }
 
-    // SFX
-    if (isDM) playDM();
+    // SFX — differentiated by attack type
+    if (isDM) { playSuperFlash(); playDM(); }
     else if (attackType === AttackType.THROW) playThrow();
     else if (isSpecial) playSpecial();
-    else playHit(data.damage > 60 ? 1.3 : 1.0);
+    else if (data.damage >= 70) playHeavyHit();
+    else playHit(data.damage > 50 ? 1.2 : 1.0);
 
     if (counterHit) { deps.vfx.spawnCounterText(defender.x, defender.y - defender.displayHeight - 55); playCounter(); }
     if (counterHit && (data as { counterWire?: boolean }).counterWire) {

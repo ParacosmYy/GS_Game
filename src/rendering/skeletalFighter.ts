@@ -53,6 +53,12 @@ function drawCharacterHead(
     ctx.fillStyle = '#884422';
     for (let i = -1; i <= 1; i++) { const sx = i * 5; ctx.beginPath(); ctx.moveTo(sx - 3, -r + 2); ctx.lineTo(sx, -r - 8); ctx.lineTo(sx + 3, -r + 2); ctx.closePath(); ctx.fill(); }
     ctx.fillStyle = '#663311'; ctx.fillRect(-r + 1, -r + 5, headW - 2, 2);
+  } else if (charId === 'leona') {
+    // Leona: short blonde hair, blue outfit
+    ctx.fillStyle = '#ddcc44';
+    ctx.beginPath();
+    ctx.moveTo(-r + 2, -r + 2); ctx.lineTo(-r, -r - 6); ctx.lineTo(0, -r - 4); ctx.lineTo(r, -r - 6); ctx.lineTo(r - 2, -r + 2); ctx.closePath();
+    ctx.fill();
   }
 }
 

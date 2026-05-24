@@ -38,13 +38,16 @@ export function drawAttackLimb(
     || f.currentAttack === AttackType.TERRY_RISING_TACKLE
     || f.currentAttack === AttackType.RYO_KO_HOU
     || f.currentAttack === AttackType.RYO_KO_HOU_C
-    || f.currentAttack === AttackType.RYO_HAOU;
+    || f.currentAttack === AttackType.RYO_HAOU
+    || f.currentAttack === AttackType.LEONA_EAR_RING
+    || f.currentAttack === AttackType.LEONA_EAR_RING_C
+    || f.currentAttack === AttackType.LEONA_GRAND_SABER;
   const isHeavy = name.endsWith('_C') || name.endsWith('_D')
     || f.currentAttack === AttackType.STAND_CD
     || f.currentAttack === AttackType.KYO_RED_KICK;
 
   const isSpecialMove = name.startsWith('KYO_') || name.startsWith('IORI_')
-    || name.startsWith('TERRY_') || name.startsWith('KIM_') || name.startsWith('RYO_')
+    || name.startsWith('TERRY_') || name.startsWith('KIM_') || name.startsWith('RYO_') || name.startsWith('LEONA_')
     || f.currentAttack === AttackType.SPECIAL_PROJECTILE
     || f.currentAttack === AttackType.SPECIAL_UPPER
     || name.startsWith('DM_');
@@ -386,6 +389,54 @@ export function drawAttackLimb(
     ctx.beginPath();
     ctx.moveTo(sx + 10 * f.facing, sy - f.displayHeight * 0.55);
     ctx.lineTo(sx + (FIGHTER_WIDTH / 2 + reach) * f.facing, sy - f.displayHeight * 0.5);
+    ctx.stroke();
+
+  // ── 莉安娜 (Leona) ──
+  } else if (f.currentAttack === AttackType.LEONA_EAR_RING || f.currentAttack === AttackType.LEONA_EAR_RING_C) {
+    const isStrong = f.currentAttack === AttackType.LEONA_EAR_RING_C;
+    const reach = limbLen * (isStrong ? 1.5 : 1.3);
+    ctx.strokeStyle = '#44aaff';
+    ctx.shadowColor = '#2266dd';
+    ctx.shadowBlur = isStrong ? 28 : 20;
+    ctx.lineWidth = isStrong ? 18 : 14;
+    ctx.beginPath();
+    ctx.moveTo(sx + 5 * f.facing, sy - f.displayHeight * 0.5);
+    ctx.lineTo(sx + 10 * f.facing, sy - f.displayHeight * 0.5 - reach);
+    ctx.stroke();
+    ctx.fillStyle = '#88ccff66';
+    ctx.beginPath();
+    ctx.arc(sx + 10 * f.facing, sy - f.displayHeight * 0.5 - reach,
+      (isStrong ? 16 : 12) + progress * (isStrong ? 12 : 8), 0, Math.PI * 2);
+    ctx.fill();
+  } else if (f.currentAttack === AttackType.LEONA_MOON_SLASH || f.currentAttack === AttackType.LEONA_MOON_SLASH_C) {
+    const reach = limbLen * 0.7;
+    ctx.strokeStyle = '#44aaff';
+    ctx.shadowColor = '#2266dd';
+    ctx.shadowBlur = 14;
+    ctx.lineWidth = 10;
+    ctx.beginPath();
+    ctx.moveTo(sx + 10 * f.facing, sy - f.displayHeight * 0.55);
+    ctx.lineTo(sx + (FIGHTER_WIDTH / 2 + reach) * f.facing, sy - f.displayHeight * 0.55);
+    ctx.stroke();
+  } else if (f.currentAttack === AttackType.LEONA_GRAND_SABER) {
+    const reach = limbLen * 1.2;
+    ctx.strokeStyle = '#44aaff';
+    ctx.shadowColor = '#2266dd';
+    ctx.shadowBlur = 16;
+    ctx.lineWidth = 14;
+    ctx.beginPath();
+    ctx.moveTo(sx + 10 * f.facing, sy - f.displayHeight * 0.55);
+    ctx.lineTo(sx + (FIGHTER_WIDTH / 2 + reach) * f.facing, sy - f.displayHeight * 0.5);
+    ctx.stroke();
+  } else if (f.currentAttack === AttackType.LEONA_BALTIC) {
+    const reach = limbLen * 1.0;
+    ctx.strokeStyle = '#44aaff';
+    ctx.shadowColor = '#2266dd';
+    ctx.shadowBlur = 14;
+    ctx.lineWidth = 12;
+    ctx.beginPath();
+    ctx.moveTo(sx + 8 * f.facing, sy - f.displayHeight * 0.3);
+    ctx.lineTo(sx + (FIGHTER_WIDTH / 2 + reach) * f.facing, sy - f.displayHeight * 0.25);
     ctx.stroke();
 
   // ── DM 超必杀 visuals ──

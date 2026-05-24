@@ -107,6 +107,13 @@ export enum AttackType {
   RYO_KO_HOU_C = 'RYO_KO_HOU_C',     // 虎咆 →↓↘+C (strong upper, invincible)
   RYO_HIEN = 'RYO_HIEN',             // 飛燕疾風脚 ←↙↓+K (overhead kick)
   RYO_HAOU = 'RYO_HAOU',             // 霸王翔吼拳 ↓↘→+K (counter)
+  // 莉安娜必杀技 (Leona Specials)
+  LEONA_MOON_SLASH = 'LEONA_MOON_SLASH',     // 月光 ↓↘→+A (weak projectile)
+  LEONA_MOON_SLASH_C = 'LEONA_MOON_SLASH_C', // 月光 ↓↘→+C (strong projectile)
+  LEONA_EAR_RING = 'LEONA_EAR_RING',         // 威光 →↓↘+A (weak upper)
+  LEONA_EAR_RING_C = 'LEONA_EAR_RING_C',     // 威光 →↓↘+C (strong upper)
+  LEONA_GRAND_SABER = 'LEONA_GRAND_SABER',   // 手刀 ←↙↓+P (rush)
+  LEONA_BALTIC = 'LEONA_BALTIC',             // X标 ↓↘→+K (low)
   // 超必杀技 (DM)
   DM_OROCHINAGI = 'DM_OROCHINAGI',           // 大蛇薙 (Kyo)
   DM_YATAGARASU = 'DM_YATAGARASU',           // 八稚女 (Iori)
@@ -115,6 +122,7 @@ export enum AttackType {
   DM_PHOENIX_KICK = 'DM_PHOENIX_KICK',       // 鳳凰脚 (Kim)
   DM_PHOENIX_HITEN = 'DM_PHOENIX_HITEN',     // 鳳凰天舞脚 (Kim)
   DM_TEN_HA_OU = 'DM_TEN_HA_OU',             // 天地霸煌拳 (Ryo)
+  DM_V_SLASHER = 'DM_V_SLASHER',             // V字金锯 (Leona)
 }
 
 // ===== Hit Level (防御判定) =====

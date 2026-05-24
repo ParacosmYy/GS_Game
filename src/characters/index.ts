@@ -10,6 +10,7 @@ import { IoriDef } from './iori.js';
 import { TerryDef } from './terry.js';
 import { KimDef } from './kim.js';
 import { RyoDef } from './ryo.js';
+import { LeonaDef } from './leona.js';
 
 export type { CharacterDefinition } from './types.js';
 
@@ -20,4 +21,5 @@ export const ROSTER: CharacterDefinition[] = [
   TerryDef,
   KimDef,
   RyoDef,
+  LeonaDef,
 ];

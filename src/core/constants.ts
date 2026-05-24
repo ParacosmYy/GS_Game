@@ -473,6 +473,42 @@ export const FRAME_DATA = {
     damage: 200, hitstun: 0, blockstun: 22, pushback: 10,
     hitLevel: 'MID' as const, knockdown: true, chipDamage: 18,
   },
+  // ── 莉安娜必杀技 (Leona Heidern) ── SuperCombo KOF2002/Leona
+  LEONA_MOON_SLASH: {
+    startup: 13, active: 16, recovery: 30,
+    damage: 70, hitstun: 26, blockstun: 24, pushback: 4,
+    hitLevel: 'MID' as const, knockdown: false, chipDamage: 8,
+  },
+  LEONA_MOON_SLASH_C: {
+    startup: 14, active: 18, recovery: 28,
+    damage: 100, hitstun: 28, blockstun: 26, pushback: 5,
+    hitLevel: 'MID' as const, knockdown: false, chipDamage: 10,
+  },
+  LEONA_EAR_RING: {
+    startup: 5, active: 5, recovery: 25,
+    damage: 80, hitstun: 22, blockstun: 18, pushback: 6,
+    hitLevel: 'MID' as const, knockdown: false, chipDamage: 10,
+  },
+  LEONA_EAR_RING_C: {
+    startup: 7, active: 10, recovery: 30,
+    damage: 140, hitstun: 28, blockstun: 22, pushback: 10,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 14,
+  },
+  LEONA_GRAND_SABER: {
+    startup: 8, active: 8, recovery: 22,
+    damage: 90, hitstun: 22, blockstun: 18, pushback: 6,
+    hitLevel: 'MID' as const, knockdown: true,
+  },
+  LEONA_BALTIC: {
+    startup: 10, active: 6, recovery: 24,
+    damage: 75, hitstun: 20, blockstun: 16, pushback: 5,
+    hitLevel: 'LOW' as const, knockdown: false,
+  },
+  DM_V_SLASHER: {
+    startup: 8, active: 6, recovery: 38,
+    damage: 210, hitstun: 0, blockstun: 22, pushback: 10,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 16,
+  },
 } as const;
 
 // ===== Hitbox Offsets (relative to fighter position, facing right) =====
@@ -565,6 +601,14 @@ export const HITBOX_OFFSETS = {
   RYO_HIEN: { offsetX: 42, offsetY: -55, width: 50, height: 38 },
   RYO_HAOU: { offsetX: 45, offsetY: -60, width: 48, height: 40 },
   DM_TEN_HA_OU: { offsetX: 35, offsetY: -65, width: 70, height: 55 },
+  // 莉安娜 (Leona)
+  LEONA_MOON_SLASH: { offsetX: 55, offsetY: -55, width: 40, height: 30 },
+  LEONA_MOON_SLASH_C: { offsetX: 55, offsetY: -55, width: 42, height: 32 },
+  LEONA_EAR_RING: { offsetX: 30, offsetY: -80, width: 45, height: 55 },
+  LEONA_EAR_RING_C: { offsetX: 30, offsetY: -80, width: 48, height: 60 },
+  LEONA_GRAND_SABER: { offsetX: 48, offsetY: -55, width: 52, height: 35 },
+  LEONA_BALTIC: { offsetX: 45, offsetY: -25, width: 50, height: 30 },
+  DM_V_SLASHER: { offsetX: 35, offsetY: -65, width: 68, height: 55 },
 } as const;
 
 // ===== Throw Constants =====

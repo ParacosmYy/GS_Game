@@ -557,6 +557,71 @@ const DM_TEN_HA_OU_FRAMES: AttackFrame[] = [
   ),
 ];
 
+// ===== 莉安娜 =====
+
+// 月光 qcf+A (weak projectile)
+const LEONA_MOON_SLASH_FRAMES: AttackFrame[] = [
+  F([{ ox: 48, oy: -58, w: 36, h: 28 }]),
+];
+
+// 月光 qcf+C (strong projectile)
+const LEONA_MOON_SLASH_C_FRAMES: AttackFrame[] = [
+  F([{ ox: 48, oy: -58, w: 38, h: 30 }]),
+];
+
+// 威光 dp+A (weak upper)
+const LEONA_EAR_RING_FRAMES: AttackFrame[] = [
+  F([{ ox: 28, oy: -78, w: 42, h: 44 }], { ox: 5, oy: -10, w: -15, h: -28 }),
+  F([{ ox: 34, oy: -85, w: 46, h: 48 }], { ox: 5, oy: -10, w: -15, h: -28 }),
+  F([{ ox: 36, oy: -88, w: 48, h: 50 }]),
+  F([{ ox: 34, oy: -80, w: 44, h: 45 }]),
+  F([{ ox: 30, oy: -70, w: 40, h: 40 }]),
+];
+
+// 威光 dp+C (strong upper, fully invincible)
+const LEONA_EAR_RING_C_FRAMES: AttackFrame[] = [
+  F([{ ox: 28, oy: -78, w: 42, h: 44 }], { ox: 5, oy: -10, w: -15, h: -28 }),
+  F([{ ox: 34, oy: -85, w: 46, h: 48 }], { ox: 5, oy: -10, w: -15, h: -28 }),
+  F([{ ox: 36, oy: -88, w: 48, h: 50 }], { ox: 5, oy: -10, w: -15, h: -28 }),
+  F([{ ox: 36, oy: -88, w: 48, h: 50 }]),
+  F([{ ox: 34, oy: -85, w: 46, h: 48 }]),
+  F([{ ox: 34, oy: -80, w: 44, h: 45 }]),
+  F([{ ox: 30, oy: -70, w: 40, h: 40 }]),
+  F([{ ox: 26, oy: -58, w: 36, h: 35 }]),
+  F([{ ox: 24, oy: -48, w: 32, h: 30 }]),
+  F([{ ox: 22, oy: -40, w: 28, h: 28 }]),
+];
+
+// 手刀 qcb+P (rush slash)
+const LEONA_GRAND_SABER_FRAMES: AttackFrame[] = [
+  F([{ ox: 40, oy: -58, w: 48, h: 32 }]),
+  F([{ ox: 48, oy: -55, w: 55, h: 36 }]),
+  F([{ ox: 52, oy: -52, w: 58, h: 38 }]),
+  F([{ ox: 48, oy: -55, w: 55, h: 36 }]),
+  F([{ ox: 44, oy: -58, w: 50, h: 34 }]),
+];
+
+// X标 qcf+K (low)
+const LEONA_BALTIC_FRAMES: AttackFrame[] = [
+  F([{ ox: 38, oy: -22, w: 48, h: 28 }]),
+  F([{ ox: 45, oy: -20, w: 54, h: 30 }]),
+  F([{ ox: 48, oy: -18, w: 56, h: 32 }]),
+  F([{ ox: 45, oy: -20, w: 54, h: 30 }]),
+];
+
+// DM: V字金锯
+const DM_V_SLASHER_FRAMES: AttackFrame[] = [
+  F([{ ox: 30, oy: -68, w: 58, h: 48 }]),
+  F([{ ox: 36, oy: -65, w: 68, h: 52 }]),
+  F([{ ox: 40, oy: -62, w: 75, h: 55 }]),
+  F([{ ox: 40, oy: -62, w: 78, h: 58 }]),
+  F([{ ox: 40, oy: -62, w: 78, h: 58 }]),
+  F([{ ox: 38, oy: -64, w: 72, h: 52 }]),
+  ...Array.from({ length: 16 }, (_, i) =>
+    F([{ ox: 28 - i * 0.3, oy: -68 + i * 0.5, w: 58 - i * 1.5, h: 46 - i }])
+  ),
+];
+
 // ===== DM 超必杀技 =====
 const DM_OROCHINAGI_FRAMES: AttackFrame[] = [
   F([{ ox: 30, oy: -70, w: 60, h: 50 }]),
@@ -675,4 +740,12 @@ export const ATTACK_FRAMES: AttackFrameTable = {
   [AttackType.RYO_HIEN]: RYO_HIEN_FRAMES,
   [AttackType.RYO_HAOU]: RYO_HAOU_FRAMES,
   [AttackType.DM_TEN_HA_OU]: DM_TEN_HA_OU_FRAMES,
+  // 莉安娜
+  [AttackType.LEONA_MOON_SLASH]: LEONA_MOON_SLASH_FRAMES,
+  [AttackType.LEONA_MOON_SLASH_C]: LEONA_MOON_SLASH_C_FRAMES,
+  [AttackType.LEONA_EAR_RING]: LEONA_EAR_RING_FRAMES,
+  [AttackType.LEONA_EAR_RING_C]: LEONA_EAR_RING_C_FRAMES,
+  [AttackType.LEONA_GRAND_SABER]: LEONA_GRAND_SABER_FRAMES,
+  [AttackType.LEONA_BALTIC]: LEONA_BALTIC_FRAMES,
+  [AttackType.DM_V_SLASHER]: DM_V_SLASHER_FRAMES,
 };
