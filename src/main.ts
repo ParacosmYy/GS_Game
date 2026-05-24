@@ -12,7 +12,7 @@ import { Fighter } from './entities/fighter.js';
 import { Projectile } from './entities/projectile.js';
 import { FighterController, resolvePushbox } from './entities/fighterController.js';
 import { CombatSystem } from './combat/combatSystem.js';
-import { createPowerGauge, createMaxMode, tickMaxMode, tickAutoMeter } from './combat/meter.js';
+import { createPowerGauge, createMaxMode, tickMaxMode, tickAutoMeter, gainMeterOnHit } from './combat/meter.js';
 import { Renderer } from './rendering/renderer.js';
 import { VFXSystem, ScreenShake, ScreenFlash } from './rendering/vfx.js';
 import { cycleStage, setStage, getStage, type StageId } from './rendering/stage.js';
@@ -340,11 +340,16 @@ function update(): void {
   combatSystem.tickComboTimeout(tickRef.value);
   combatSystem.tickThrowState(p1, p2, onHit);
 
-  // First Attack detection
+  // First Attack detection — KOF2002: first hit bonus meter
   if (!firstHitTracked && (combatSystem.getComboCount(0) > 0 || combatSystem.getComboCount(1) > 0)) {
     firstHitTracked = true;
-    const hitter = combatSystem.getComboCount(0) > 0 ? p1 : p2;
+    const hitterIdx = combatSystem.getComboCount(0) > 0 ? 0 : 1;
+    const hitter = hitterIdx === 0 ? p1 : p2;
     vfx.spawnFirstAttackText(hitter.x, hitter.y - hitter.displayHeight - 40);
+    // First hit bonus: extra meter for the attacker
+    if (gauges[hitterIdx]) {
+      gainMeterOnHit(gauges[hitterIdx]);
+    }
   }
 
   const healthDecay = Math.max(p1.maxHealth, p2.maxHealth) * 0.005;
@@ -362,6 +367,7 @@ function update(): void {
     // Quick Stand检测: 从KNOCKDOWN恢复且无起身无敌(quick stand不给予无敌)
     if (f.prevState === FighterState.KNOCKDOWN && f.state === FighterState.IDLE && f.throwInvincibilityTimer === 0) {
       vfx.spawnDust(f.x, STAGE_GROUND_Y);
+      vfx.spawnQuickStandText(f.x, f.y - f.displayHeight - 40);
       playQuickStand();
     }
 

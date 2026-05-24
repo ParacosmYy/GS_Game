@@ -149,6 +149,14 @@ export class VFXSystem {
     });
   }
 
+  spawnQuickStandText(worldX: number, worldY: number): void {
+    this.particles.push({
+      x: worldX, y: worldY, vx: 0, vy: -0.4,
+      life: 30, maxLife: 30, size: 16,
+      color: '#88ccff', type: 'text', text: 'RECOVERY',
+    });
+  }
+
   spawnThrowEscapeSparks(worldX: number, worldY: number): void {
     for (let i = 0; i < 10; i++) {
       const angle = Math.random() * Math.PI * 2;
