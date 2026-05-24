@@ -70,16 +70,15 @@ export const IoriDef: CharacterDefinition = {
       armFront: bone(2, 8, -0.5),
       armBack: bone(-1, 6, -0.7),
     }),
-    [FighterState.HITSTUN]: pose({
-      body: bone(-6, 0, -0.2),
-      head: bone(-4, 3, -0.25),
-    }),
-    [FighterState.KNOCKDOWN]: pose({
-      body: bone(0, 30, 1.4),
-      head: bone(10, 35, 1.2),
-      legFront: bone(-10, 30, -0.3),
-      legBack: bone(8, 32, 0.4),
-    }),
+    [FighterState.HITSTUN]: [
+      pose({ body: bone(-6, 0, -0.2), head: bone(-4, 3, -0.25), armFront: bone(-2, 22, 0.5), armBack: bone(-12, 18, 0.7) }),
+      pose({ body: bone(-9, 2, -0.3), head: bone(-6, 4, -0.35), armFront: bone(0, 25, 0.65), armBack: bone(-14, 20, 0.85) }),
+      pose({ body: bone(-4, -1, -0.1), head: bone(-3, 2, -0.15), armFront: bone(-4, 20, 0.4), armBack: bone(-10, 16, 0.6) }),
+    ],
+    [FighterState.KNOCKDOWN]: [
+      pose({ body: bone(0, 15, 0.8), head: bone(8, 20, 0.9), armFront: bone(-5, 20, 0.6), armBack: bone(12, 18, -0.4), legFront: bone(-8, 15, -0.2), legBack: bone(6, 18, 0.3) }),
+      pose({ body: bone(0, 30, 1.4), head: bone(10, 35, 1.2), legFront: bone(-10, 30, -0.3), legBack: bone(8, 32, 0.4) }),
+    ],
     [FighterState.JUMP]: pose({
       armFront: bone(8, 8, 0.5),
       armBack: bone(-10, 6, -0.4),
@@ -213,6 +212,6 @@ export const IoriDef: CharacterDefinition = {
     return null;
   },
 
-  isCommandThrow(_attackType) { return false; },
+  isCommandThrow(attackType) { return attackType === AttackType.IORI_KUZUKAZE; },
   getCounterConfig() { return null; },
 };

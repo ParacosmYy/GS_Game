@@ -68,16 +68,15 @@ export const TerryDef: CharacterDefinition = {
       armFront: bone(4, 10, -0.35),
       armBack: bone(1, 8, -0.55),
     }),
-    [FighterState.HITSTUN]: pose({
-      body: bone(-4, 0, -0.12),
-      head: bone(-2, 2, -0.18),
-    }),
-    [FighterState.KNOCKDOWN]: pose({
-      body: bone(0, 30, 1.4),
-      head: bone(10, 35, 1.2),
-      legFront: bone(-10, 30, -0.3),
-      legBack: bone(8, 32, 0.4),
-    }),
+    [FighterState.HITSTUN]: [
+      pose({ body: bone(-4, 0, -0.12), head: bone(-2, 2, -0.18), armFront: bone(-3, 20, 0.5), armBack: bone(-8, 18, 0.6) }),
+      pose({ body: bone(-7, 2, -0.2), head: bone(-4, 3, -0.28), armFront: bone(-1, 23, 0.6), armBack: bone(-10, 20, 0.75) }),
+      pose({ body: bone(-3, -1, -0.06), head: bone(-1, 1, -0.1), armFront: bone(-5, 18, 0.4), armBack: bone(-6, 16, 0.5) }),
+    ],
+    [FighterState.KNOCKDOWN]: [
+      pose({ body: bone(0, 15, 0.8), head: bone(8, 20, 0.9), armFront: bone(-5, 20, 0.6), armBack: bone(12, 18, -0.4), legFront: bone(-8, 15, -0.2), legBack: bone(6, 18, 0.3) }),
+      pose({ body: bone(0, 30, 1.4), head: bone(10, 35, 1.2), legFront: bone(-10, 30, -0.3), legBack: bone(8, 32, 0.4) }),
+    ],
     [FighterState.JUMP]: pose({
       armFront: bone(12, 10, 0.3),
       armBack: bone(-7, 8, -0.25),

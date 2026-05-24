@@ -66,16 +66,15 @@ export const KimDef: CharacterDefinition = {
       armBack: bone(0, 6, -0.65),
       legFront: bone(2, 0, 0.0),
     }),
-    [FighterState.HITSTUN]: pose({
-      body: bone(-5, 0, -0.18),
-      head: bone(-3, 3, -0.22),
-    }),
-    [FighterState.KNOCKDOWN]: pose({
-      body: bone(0, 30, 1.4),
-      head: bone(10, 35, 1.2),
-      legFront: bone(-10, 30, -0.3),
-      legBack: bone(8, 32, 0.4),
-    }),
+    [FighterState.HITSTUN]: [
+      pose({ body: bone(-5, 0, -0.18), head: bone(-3, 3, -0.22), armFront: bone(-2, 20, 0.5), armBack: bone(-8, 18, 0.65) }),
+      pose({ body: bone(-8, 2, -0.28), head: bone(-5, 4, -0.32), armFront: bone(0, 23, 0.6), armBack: bone(-10, 20, 0.8) }),
+      pose({ body: bone(-3, -1, -0.1), head: bone(-2, 2, -0.14), armFront: bone(-4, 18, 0.4), armBack: bone(-6, 16, 0.55) }),
+    ],
+    [FighterState.KNOCKDOWN]: [
+      pose({ body: bone(0, 15, 0.8), head: bone(8, 20, 0.9), armFront: bone(-5, 20, 0.6), armBack: bone(12, 18, -0.4), legFront: bone(-8, 15, -0.2), legBack: bone(6, 18, 0.3) }),
+      pose({ body: bone(0, 30, 1.4), head: bone(10, 35, 1.2), legFront: bone(-10, 30, -0.3), legBack: bone(8, 32, 0.4) }),
+    ],
     [FighterState.JUMP]: pose({
       armFront: bone(6, 5, 0.35),
       armBack: bone(-6, 3, -0.2),

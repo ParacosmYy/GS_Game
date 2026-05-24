@@ -68,10 +68,12 @@ const dmMgr = new DMManager({ gauges, maxModes, cinematic, vfx, screenShake, fig
 const onHit = createHitCallback({ fighters: [p1, p2], vfx, screenShake, gauges, cinematic, combatSystem });
 
 // ===== Game state =====
-let phase: GamePhase = GamePhase.SELECT;
+let phase: GamePhase = GamePhase.TITLE;
 let phaseTimer = 0;
 let koTimer = 0;
 let winner: number | null = null;
+let continueCountdown = 0;
+const CONTINUE_DURATION = 600; // 10秒倒计时
 let debugMode = false;
 let simplifiedMode = false; // Tab to toggle
 let modeIndicatorTimer = 0;
@@ -84,6 +86,39 @@ let p2DelayedHealth = p2.maxHealth;
 function update(): void {
   vfx.update();
   screenShake.update();
+
+  if (phase === GamePhase.TITLE) {
+    tickRef.value++;
+    if (inputManager.isKeyDown('Enter') || inputManager.isKeyDown('KeyJ') || inputManager.isKeyDown('KeyR')) {
+      phase = GamePhase.SELECT;
+      initAudio();
+    }
+    return;
+  }
+
+  if (phase === GamePhase.CONTINUE) {
+    tickRef.value++;
+    continueCountdown--;
+    if (inputManager.isKeyDown('KeyJ') || inputManager.isKeyDown('Enter')) {
+      // Continue: restart match with same characters
+      phase = GamePhase.INTRO;
+      phaseTimer = 0;
+      rounds.currentRound = 1;
+      rounds.fullReset();
+      cinematic.reset();
+      p1DelayedHealth = p1.maxHealth;
+      p2DelayedHealth = p2.maxHealth;
+      p1.savePrevState();
+      p2.savePrevState();
+      announcer.roundStart(1);
+      announcer.fight();
+    }
+    if (continueCountdown <= 0) {
+      // Time out → Game Over → back to title
+      phase = GamePhase.TITLE;
+    }
+    return;
+  }
 
   if (phase === GamePhase.SELECT) {
     tickRef.value++;
@@ -128,8 +163,10 @@ function update(): void {
   if (phase === GamePhase.MATCH_END) {
     koTimer++;
     if (!cinematic.victoryFanfarePlayed) { cinematic.victoryFanfarePlayed = true; playVictoryFanfare(); }
-    if (koTimer > 180 || (koTimer > 60 && (inputManager.isKeyDown('KeyR') || inputManager.isKeyDown('KeyJ') || inputManager.isKeyDown('Enter'))))
-      restartGame();
+    if (koTimer > 180 || (koTimer > 60 && (inputManager.isKeyDown('KeyR') || inputManager.isKeyDown('KeyJ') || inputManager.isKeyDown('Enter')))) {
+      phase = GamePhase.CONTINUE;
+      continueCountdown = CONTINUE_DURATION;
+    }
     return;
   }
 
@@ -225,6 +262,14 @@ function update(): void {
 
 // ===== Render =====
 function render(): void {
+  if (phase === GamePhase.TITLE) {
+    renderer.drawTitle(tickRef.value);
+    return;
+  }
+  if (phase === GamePhase.CONTINUE) {
+    renderer.drawContinue(Math.ceil(continueCountdown / 60));
+    return;
+  }
   if (phase === GamePhase.SELECT) {
     renderer.drawCharacterSelect(select.p1Cursor, select.p2Cursor, select.p1Ready, select.p2Ready, tickRef.value, select.p2IsAI, simplifiedMode);
     return;
@@ -263,7 +308,7 @@ function render(): void {
 // ===== Restart =====
 function restartGame(): void {
   bgm.stop();
-  phase = GamePhase.SELECT;
+  phase = GamePhase.TITLE;
   phaseTimer = 0;
   koTimer = 0;
   winner = null;

@@ -497,3 +497,108 @@ export function drawModeIndicator(ctx: CanvasRenderingContext2D, simplifiedMode:
   ctx.globalAlpha = 1;
   ctx.restore();
 }
+
+// ===== Title Screen =====
+
+export function drawTitle(ctx: CanvasRenderingContext2D, tick: number): void {
+  ctx.save();
+
+  // Dark gradient background
+  const grad = ctx.createLinearGradient(0, 0, 0, CANVAS_HEIGHT);
+  grad.addColorStop(0, '#0a0a1a');
+  grad.addColorStop(0.5, '#0f0f2a');
+  grad.addColorStop(1, '#050510');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+  // Animated star particles
+  ctx.fillStyle = 'rgba(255,255,255,0.5)';
+  for (let i = 0; i < 40; i++) {
+    const x = ((i * 137 + tick * 0.3) % CANVAS_WIDTH);
+    const y = ((i * 97 + tick * 0.15) % CANVAS_HEIGHT);
+    const s = 1 + Math.sin(tick * 0.05 + i) * 0.5;
+    ctx.fillRect(x, y, s, s);
+  }
+
+  // Logo glow
+  const glowAlpha = 0.15 + Math.sin(tick * 0.03) * 0.08;
+  ctx.shadowColor = '#ff4400';
+  ctx.shadowBlur = 40;
+  ctx.fillStyle = `rgba(255,68,0,${glowAlpha})`;
+  ctx.fillRect(CANVAS_WIDTH / 2 - 200, 120, 400, 60);
+
+  // Title text
+  ctx.shadowColor = '#ff6600';
+  ctx.shadowBlur = 20;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.font = 'bold 42px monospace';
+  ctx.fillStyle = '#ff6600';
+  ctx.fillText('KOF 2002', CANVAS_WIDTH / 2, 155);
+
+  // Subtitle
+  ctx.shadowBlur = 0;
+  ctx.font = 'bold 18px monospace';
+  ctx.fillStyle = '#cc8844';
+  ctx.fillText('风云再起', CANVAS_WIDTH / 2, 195);
+
+  // Decorative line
+  ctx.strokeStyle = '#ff440066';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(CANVAS_WIDTH / 2 - 120, 215);
+  ctx.lineTo(CANVAS_WIDTH / 2 + 120, 215);
+  ctx.stroke();
+
+  // PRESS START blinking
+  if (Math.floor(tick / 30) % 2 === 0) {
+    ctx.shadowColor = '#ffcc00';
+    ctx.shadowBlur = 12;
+    ctx.font = 'bold 22px monospace';
+    ctx.fillStyle = '#ffcc00';
+    ctx.fillText('PRESS START', CANVAS_WIDTH / 2, 320);
+  }
+
+  // Credits
+  ctx.shadowBlur = 0;
+  ctx.font = '12px monospace';
+  ctx.fillStyle = '#555566';
+  ctx.fillText('HTML5 Canvas + TypeScript', CANVAS_WIDTH / 2, 540);
+  ctx.fillText('Tab: 简化模式  F1: 调试  R: 重置', CANVAS_WIDTH / 2, 560);
+
+  ctx.restore();
+}
+
+// ===== Continue Screen =====
+
+export function drawContinue(ctx: CanvasRenderingContext2D, secondsLeft: number): void {
+  ctx.save();
+
+  // Dark overlay
+  ctx.fillStyle = 'rgba(0,0,0,0.85)';
+  ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+
+  // CONTINUE? text
+  ctx.shadowColor = '#ff2222';
+  ctx.shadowBlur = 20;
+  ctx.font = 'bold 48px monospace';
+  ctx.fillStyle = '#ff4444';
+  ctx.fillText('CONTINUE?', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 60);
+
+  // Countdown
+  ctx.shadowBlur = 10;
+  ctx.font = 'bold 72px monospace';
+  ctx.fillStyle = secondsLeft <= 3 ? '#ff2222' : '#ffcc00';
+  ctx.fillText(`${secondsLeft}`, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 30);
+
+  // Instruction
+  ctx.shadowBlur = 0;
+  ctx.font = '16px monospace';
+  ctx.fillStyle = '#888899';
+  ctx.fillText('Press J / Enter to continue', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 100);
+
+  ctx.restore();
+}

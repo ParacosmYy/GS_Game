@@ -17,7 +17,7 @@ import type { Star } from './stage.js';
 import { drawSkeletalFighter } from './skeletalFighter.js';
 import { drawAttackLimb } from './attackLimb.js';
 import { drawHUD, drawPowerGauges, drawComboCounters } from './hud.js';
-import { drawCharacterSelect, drawIntro, drawKO, drawSuperFlash, drawMatchEnd, drawModeIndicator } from './screens.js';
+import { drawCharacterSelect, drawIntro, drawKO, drawSuperFlash, drawMatchEnd, drawModeIndicator, drawTitle, drawContinue } from './screens.js';
 import { shiftColor, roundRect } from './utils.js';
 import { ROSTER } from '../characters/index.js';
 import { drawProjectiles as drawProjectilesImpl } from './projectileRenderer.js';
@@ -275,6 +275,14 @@ export class Renderer {
 
   drawModeIndicator(simplifiedMode: boolean, alpha: number): void {
     drawModeIndicator(this.ctx, simplifiedMode, alpha);
+  }
+
+  drawTitle(tick: number): void {
+    drawTitle(this.ctx, tick);
+  }
+
+  drawContinue(secondsLeft: number): void {
+    drawContinue(this.ctx, secondsLeft);
   }
 
   // ===== Debug overlay =====

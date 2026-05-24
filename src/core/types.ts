@@ -215,11 +215,13 @@ export interface CounterConfig {
 
 // ===== Game Phase =====
 export enum GamePhase {
+  TITLE = 'TITLE',     // Title screen (KOF2002 logo + PRESS START)
   SELECT = 'SELECT',   // Character select
   INTRO = 'INTRO',     // "ROUND 1... FIGHT!" text
   FIGHTING = 'FIGHTING', // Active gameplay
   KO = 'KO',           // KO state
   MATCH_END = 'MATCH_END', // Match complete (best of 3)
+  CONTINUE = 'CONTINUE', // Continue? countdown
 }
 
 // ===== Game State (for window.__gameState) =====

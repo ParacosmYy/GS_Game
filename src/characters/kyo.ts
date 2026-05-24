@@ -87,20 +87,15 @@ export const KyoDef: CharacterDefinition = {
       legFront: bone(3, 0, 0.05),
       legBack: bone(-3, 0, -0.05),
     }),
-    [FighterState.HITSTUN]: pose({
-      body: bone(-5, 0, -0.15),
-      head: bone(-3, 2, -0.2),
-      armFront: bone(0, 25, 0.6),
-      armBack: bone(-10, 20, 0.8),
-    }),
-    [FighterState.KNOCKDOWN]: pose({
-      body: bone(0, 30, 1.4),
-      head: bone(10, 35, 1.2),
-      armFront: bone(-5, 35, 0.8),
-      armBack: bone(15, 30, -0.6),
-      legFront: bone(-10, 30, -0.3),
-      legBack: bone(8, 32, 0.4),
-    }),
+    [FighterState.HITSTUN]: [
+      pose({ body: bone(-5, 0, -0.15), head: bone(-3, 2, -0.2), armFront: bone(0, 25, 0.6), armBack: bone(-10, 20, 0.8) }),
+      pose({ body: bone(-8, 2, -0.25), head: bone(-5, 3, -0.3), armFront: bone(2, 28, 0.7), armBack: bone(-12, 22, 0.9) }),
+      pose({ body: bone(-3, -1, -0.08), head: bone(-2, 1, -0.12), armFront: bone(-2, 23, 0.5), armBack: bone(-8, 18, 0.7) }),
+    ],
+    [FighterState.KNOCKDOWN]: [
+      pose({ body: bone(0, 15, 0.8), head: bone(8, 20, 0.9), armFront: bone(-5, 20, 0.6), armBack: bone(12, 18, -0.4), legFront: bone(-8, 15, -0.2), legBack: bone(6, 18, 0.3) }),
+      pose({ body: bone(0, 30, 1.4), head: bone(10, 35, 1.2), armFront: bone(-5, 35, 0.8), armBack: bone(15, 30, -0.6), legFront: bone(-10, 30, -0.3), legBack: bone(8, 32, 0.4) }),
+    ],
     [FighterState.JUMP]: pose({
       body: bone(0, -5, -0.05),
       armFront: bone(10, 10, 0.4),

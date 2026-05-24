@@ -200,6 +200,35 @@ export class CombatSystem {
       return;
     }
 
+    // Command throw handling — character-specific throws that bypass escape window
+    const attackerCtrl = this.defenderControllers?.[this.fighters?.[0] === attacker ? 0 : 1];
+    if (attackerCtrl?.charDef?.isCommandThrow?.(attackType)) {
+      const dist = Math.abs(attacker.x - defender.x);
+      if (dist > THROW_RANGE * 1.2 || !defender.isGrounded()) return;
+      if (defender.throwInvincibilityTimer > 0) return;
+      // Command throw: no escape window, instant effect
+      attacker.hasHit = true;
+      const data = FRAME_DATA[attackType as keyof typeof FRAME_DATA];
+      const defIdx = this.fighters ? (this.fighters[0] === defender ? 0 : 1) : 0;
+      const damage = this.scaledDamage(data.damage, defIdx);
+      defender.health = Math.max(0, defender.health - damage);
+      this.comboHits[defIdx]++;
+      // Kuzukaze special: swap positions
+      if (attackType === AttackType.IORI_KUZUKAZE) {
+        const tempX = attacker.x;
+        attacker.x = defender.x;
+        defender.x = tempX;
+        // Attacker faces the same direction, defender is now behind
+        defender.state = FighterState.HITSTUN;
+        defender.hitstunTimer = 16; // +16f advantage for attacker
+        defender.vx = 0;
+      } else {
+        defender.applyKnockdown(25);
+      }
+      onHit?.(attacker, defender, attackType, false, false);
+      return;
+    }
+
     // Roll invincibility check (attacks pass through, throws don't)
     if (defender.isRolling()) return;
 
