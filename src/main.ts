@@ -11,13 +11,12 @@ import {
   WALK_SPEED,
   GRAVITY,
   JUMP_VELOCITY,
-  PUSH_BOX_WIDTH,
-  LANDING_RECOVERY,
   MAX_HEALTH,
   KO_DISPLAY_TIME,
   FRAME_DATA,
   THROW_RANGE,
   THROW_DISTANCE,
+  LANDING_RECOVERY,
 } from './core/constants.js';
 import { FighterState, AttackType, GameState, DirectionInput, Direction } from './core/types.js';
 
@@ -47,6 +46,10 @@ let winner: number | null = null;
 let tick = 0;
 let debugMode = false;
 
+// ===== Input edge tracking (prevent held-key repeat) =====
+const prevP1Attack = { light: false, heavy: false, throwAtk: false };
+const prevP2Attack = { light: false, heavy: false, throwAtk: false };
+
 // ===== Expose game state for testing =====
 declare global {
   interface Window {
@@ -63,16 +66,20 @@ window.__restart = restartGame;
 interface ResolvedInput {
   up: boolean;
   down: boolean;
-  forward: boolean; // relative to facing
+  forward: boolean;
   back: boolean;
   lightAttack: boolean;
   heavyAttack: boolean;
   throwAttack: boolean;
+  lightAttackPressed: boolean;  // edge: just pressed this frame
+  heavyAttackPressed: boolean;
+  throwAttackPressed: boolean;
 }
 
 function resolveInput(
   raw: { up: boolean; down: boolean; left: boolean; right: boolean; lightAttack: boolean; heavyAttack: boolean; throwAttack: boolean },
   facing: Direction,
+  prev: { light: boolean; heavy: boolean; throwAtk: boolean },
 ): ResolvedInput {
   return {
     up: raw.up,
@@ -82,6 +89,10 @@ function resolveInput(
     lightAttack: raw.lightAttack,
     heavyAttack: raw.heavyAttack,
     throwAttack: raw.throwAttack,
+    // Edge detection: pressed this frame but not last frame
+    lightAttackPressed: raw.lightAttack && !prev.light,
+    heavyAttackPressed: raw.heavyAttack && !prev.heavy,
+    throwAttackPressed: raw.throwAttack && !prev.throwAtk,
   };
 }
 
@@ -114,12 +125,21 @@ function update(): void {
   const rawP1 = inputManager.getP1Input();
   const rawP2 = inputManager.getP2Input();
 
-  // Update facing
+  // Update facing BEFORE resolving input (so forward/back is correct)
   p1.updateFacing(p2);
   p2.updateFacing(p1);
 
-  const p1Input = resolveInput(rawP1, p1.facing);
-  const p2Input = resolveInput(rawP2, p2.facing);
+  // Resolve inputs with edge detection
+  const p1Input = resolveInput(rawP1, p1.facing, prevP1Attack);
+  const p2Input = resolveInput(rawP2, p2.facing, prevP2Attack);
+
+  // Save attack state for next frame edge detection
+  prevP1Attack.light = rawP1.lightAttack;
+  prevP1Attack.heavy = rawP1.heavyAttack;
+  prevP1Attack.throwAtk = rawP1.throwAttack;
+  prevP2Attack.light = rawP2.lightAttack;
+  prevP2Attack.heavy = rawP2.heavyAttack;
+  prevP2Attack.throwAtk = rawP2.throwAttack;
 
   // Record directions for command buffer
   p1CommandBuffer.record(getDirectionInput(p1Input), tick);
@@ -160,11 +180,6 @@ function update(): void {
     }
   }
 
-  // Debug toggle
-  if (inputManager.isKeyDown('F1')) {
-    debugMode = !debugMode;
-  }
-
   // Update game state for testing
   window.__gameState = {
     players: fighters.map((f) => ({
@@ -194,8 +209,9 @@ function updateFighter(
     case FighterState.IDLE:
     case FighterState.WALK: {
       fighter.displayHeight = 100;
+      fighter.vx = 0; // Reset velocity each frame when grounded
 
-      // Jump
+      // Jump (on press, not hold)
       if (input.up && fighter.isGrounded()) {
         fighter.vy = JUMP_VELOCITY;
         fighter.state = FighterState.JUMP;
@@ -209,19 +225,18 @@ function updateFighter(
         break;
       }
 
-      // Throw
-      if (input.throwAttack && fighter.canAct()) {
+      // Throw (edge-triggered)
+      if (input.throwAttackPressed && fighter.canAct()) {
         fighter.startAttack(AttackType.THROW);
         break;
       }
 
-      // Check for special moves first (priority over normals)
-      const attackPressed = input.lightAttack || input.heavyAttack;
-      if (attackPressed && fighter.canAct()) {
+      // Check for special moves first (priority over normals, edge-triggered)
+      const attackJustPressed = input.lightAttackPressed || input.heavyAttackPressed;
+      if (attackJustPressed && fighter.canAct()) {
         const special = commandBuffer.checkSpecial(tick, true);
         if (special === AttackType.SPECIAL_PROJECTILE) {
           fighter.startAttack(AttackType.SPECIAL_PROJECTILE);
-          // Spawn projectile at end of startup
           break;
         }
         if (special === AttackType.SPECIAL_UPPER) {
@@ -229,32 +244,33 @@ function updateFighter(
           break;
         }
 
-        // Normal attacks
-        if (input.heavyAttack) {
+        // Normal attacks (edge-triggered)
+        if (input.heavyAttackPressed) {
           fighter.startAttack(AttackType.STAND_HEAVY);
           break;
         }
-        if (input.lightAttack) {
+        if (input.lightAttackPressed) {
           fighter.startAttack(AttackType.STAND_LIGHT);
           break;
         }
       }
 
-      // Movement
-      if (input.forward || input.back) {
-        const moveDir = input.forward ? fighter.facing : -fighter.facing;
-        fighter.vx = WALK_SPEED * (input.forward ? 1 : -1) * fighter.facing;
+      // Movement — forward/back relative to facing
+      if (input.forward) {
+        fighter.vx = WALK_SPEED * fighter.facing;
+        fighter.state = FighterState.WALK;
+      } else if (input.back) {
+        fighter.vx = -WALK_SPEED * fighter.facing;
         fighter.state = FighterState.WALK;
       } else {
-        fighter.vx = 0;
         fighter.state = FighterState.IDLE;
       }
       break;
     }
 
     case FighterState.JUMP: {
-      // Air attack
-      if ((input.lightAttack || input.heavyAttack) && fighter.currentAttack === null) {
+      // Air attack (edge-triggered)
+      if ((input.lightAttackPressed || input.heavyAttackPressed) && fighter.currentAttack === null) {
         fighter.startAttack(AttackType.AIR_ATTACK);
       }
       fighter.vy += GRAVITY;
@@ -263,6 +279,7 @@ function updateFighter(
 
     case FighterState.CROUCH: {
       fighter.displayHeight = 50;
+      fighter.vx = 0;
 
       if (!input.down) {
         fighter.state = FighterState.IDLE;
@@ -270,19 +287,17 @@ function updateFighter(
         break;
       }
 
-      // Crouch attack
-      if ((input.lightAttack || input.heavyAttack) && fighter.canAct()) {
+      // Crouch attack (edge-triggered)
+      if ((input.lightAttackPressed || input.heavyAttackPressed) && fighter.canAct()) {
         fighter.startAttack(AttackType.CROUCH_ATTACK);
         break;
       }
 
-      // Throw
-      if (input.throwAttack && fighter.canAct()) {
+      // Throw (edge-triggered)
+      if (input.throwAttackPressed && fighter.canAct()) {
         fighter.startAttack(AttackType.THROW);
         break;
       }
-
-      fighter.vx = 0;
       break;
     }
 
@@ -290,9 +305,8 @@ function updateFighter(
     case FighterState.CROUCH_ATTACK:
     case FighterState.AIR_ATTACK:
     case FighterState.THROW: {
-      // Special move handling during active frames
+      // Special: spawn projectile once at start of active phase
       if (fighter.currentAttack === AttackType.SPECIAL_PROJECTILE && fighter.attackPhase === 'active' && fighter.attackFrame === 0) {
-        // Spawn projectile once at start of active phase
         projectiles.push(new Projectile(
           fighter.x + 50 * fighter.facing,
           fighter.y - 50,
@@ -301,11 +315,9 @@ function updateFighter(
         ));
       }
 
-      if (fighter.currentAttack === AttackType.SPECIAL_UPPER) {
-        // Rise during active frames
-        if (fighter.attackPhase === 'active') {
-          fighter.vy = -6;
-        }
+      // Special: rise during dragon punch active frames
+      if (fighter.currentAttack === AttackType.SPECIAL_UPPER && fighter.attackPhase === 'active') {
+        fighter.vy = -6;
       }
 
       fighter.tickAttack();
@@ -360,7 +372,7 @@ function updateFighter(
       fighter.landingRecovery = LANDING_RECOVERY;
     } else {
       fighter.y = STAGE_GROUND_Y;
-      fighter.vy = 0;
+      if (fighter.vy > 0) fighter.vy = 0;
     }
   }
 
@@ -400,7 +412,6 @@ function aabbCheck(
 }
 
 function processCombat(): void {
-  // Fighter vs Fighter
   resolveAttack(p1, p2);
   resolveAttack(p2, p1);
 
@@ -409,16 +420,15 @@ function processCombat(): void {
     const hitbox = proj.getHitbox();
     if (!hitbox) continue;
 
-    // Check against both fighters (skip the owner based on facing)
     for (const defender of fighters) {
       const hurtbox = defender.getHurtbox();
       if (aabbCheck(hitbox, hurtbox)) {
         const attackData = FRAME_DATA.SPECIAL_PROJECTILE;
 
-        // Block check
-        const defInput = defender === p1
-          ? resolveInput(inputManager.getP1Input(), defender.facing)
-          : resolveInput(inputManager.getP2Input(), defender.facing);
+        const defRaw = defender === p1
+          ? inputManager.getP1Input()
+          : inputManager.getP2Input();
+        const defInput = resolveInput(defRaw, defender.facing, defender === p1 ? prevP1Attack : prevP2Attack);
         const isHoldingBack = defInput.back;
 
         if (defender.canBlock() && isHoldingBack) {
@@ -461,11 +471,11 @@ function resolveAttack(attacker: Fighter, defender: Fighter): void {
     return;
   }
 
-  // Block check
+  // Block check — defender holding back relative to their facing
   const defRaw = defender === p1
     ? inputManager.getP1Input()
     : inputManager.getP2Input();
-  const defInput = resolveInput(defRaw, defender.facing);
+  const defInput = resolveInput(defRaw, defender.facing, defender === p1 ? prevP1Attack : prevP2Attack);
   const isHoldingBack = defInput.back;
 
   if (defender.canBlock() && isHoldingBack) {
@@ -499,19 +509,26 @@ function restartGame(): void {
   p1CommandBuffer.reset();
   p2CommandBuffer.reset();
   projectiles.length = 0;
+  prevP1Attack.light = false;
+  prevP1Attack.heavy = false;
+  prevP1Attack.throwAtk = false;
+  prevP2Attack.light = false;
+  prevP2Attack.heavy = false;
+  prevP2Attack.throwAtk = false;
 }
 
 // ===== Render =====
 function render(): void {
   renderer.render(fighters, tick, koState, winner);
 
-  // Draw projectiles
-  const cameraX = (p1.x + p2.x) / 2 - 400;
-  const clampedCameraX = Math.max(0, Math.min(cameraX, STAGE_WIDTH - 800));
+  // Camera calculation (consistent with renderer)
+  const midX = (p1.x + p2.x) / 2;
+  const cameraX = Math.max(0, Math.min(midX - 400, STAGE_WIDTH - 800));
 
+  // Draw projectiles
   for (const proj of projectiles) {
     if (!proj.active) continue;
-    const sx = proj.x - clampedCameraX;
+    const sx = proj.x - cameraX;
     const sy = proj.y;
     ctx.fillStyle = '#ff8800';
     ctx.beginPath();
@@ -522,17 +539,25 @@ function render(): void {
     ctx.stroke();
   }
 
+  // Draw controls hint
+  ctx.save();
+  ctx.fillStyle = 'rgba(255,255,255,0.4)';
+  ctx.font = '10px monospace';
+  ctx.textAlign = 'center';
+  ctx.fillText('P1: WASD + J/K/L | P2: Arrows + 4/5/6 | R: Restart | F1: Debug', 400, 595);
+  ctx.restore();
+
   // Debug overlay
   if (debugMode) {
-    drawDebug(clampedCameraX);
+    drawDebug(cameraX);
   }
 }
 
 function drawDebug(cameraX: number): void {
   ctx.save();
-  ctx.globalAlpha = 0.8;
+  ctx.globalAlpha = 0.85;
   ctx.fillStyle = '#000';
-  ctx.fillRect(0, 0, 250, 180);
+  ctx.fillRect(0, 0, 300, 200);
   ctx.globalAlpha = 1;
   ctx.fillStyle = '#0f0';
   ctx.font = '11px monospace';
@@ -540,46 +565,39 @@ function drawDebug(cameraX: number): void {
   let y = 15;
   for (let i = 0; i < fighters.length; i++) {
     const f = fighters[i];
-    ctx.fillText(`P${i + 1}: ${f.state} hp=${f.health} x=${Math.round(f.x)} facing=${f.facing}`, 5, y);
+    ctx.fillText(`P${i + 1}: state=${f.state} hp=${f.health} x=${Math.round(f.x)} facing=${f.facing}`, 5, y);
     y += 14;
     if (f.currentAttack) {
-      ctx.fillText(`  ATK: ${f.currentAttack} ${f.attackPhase} frame=${f.attackFrame}`, 5, y);
+      ctx.fillText(`  ATK: ${f.currentAttack} phase=${f.attackPhase} frame=${f.attackFrame}`, 5, y);
       y += 14;
     }
 
-    // Draw hitbox
+    // Draw hitbox (red)
     const hitbox = f.getActiveHitbox();
     if (hitbox) {
       ctx.strokeStyle = 'rgba(255, 0, 0, 0.7)';
       ctx.lineWidth = 2;
-      ctx.strokeRect(
-        hitbox.x - cameraX,
-        hitbox.y,
-        hitbox.width,
-        hitbox.height,
-      );
+      ctx.strokeRect(hitbox.x - cameraX, hitbox.y, hitbox.width, hitbox.height);
     }
 
-    // Draw hurtbox
+    // Draw hurtbox (blue)
     const hurtbox = f.getHurtbox();
     ctx.strokeStyle = 'rgba(0, 100, 255, 0.5)';
     ctx.lineWidth = 1;
-    ctx.strokeRect(
-      hurtbox.x - cameraX,
-      hurtbox.y,
-      hurtbox.width,
-      hurtbox.height,
-    );
+    ctx.strokeRect(hurtbox.x - cameraX, hurtbox.y, hurtbox.width, hurtbox.height);
+
+    // Draw pushbox (green)
+    const pushbox = f.getPushbox();
+    ctx.strokeStyle = 'rgba(0, 255, 0, 0.3)';
+    ctx.strokeRect(pushbox.x - cameraX, pushbox.y, pushbox.width, pushbox.height);
   }
 
-  ctx.fillText(`tick: ${tick}  fps: ${renderer.getFps()}`, 5, y);
-  y += 14;
-  ctx.fillText(`projectiles: ${projectiles.length}`, 5, y);
+  ctx.fillText(`tick: ${tick}  fps: ${renderer.getFps()}  projectiles: ${projectiles.length}`, 5, y);
 
   ctx.restore();
 }
 
-// ===== F1 toggle (debounced) =====
+// ===== F1 toggle (debounced via events only, NOT in game loop) =====
 let f1Pressed = false;
 window.addEventListener('keydown', (e) => {
   if (e.code === 'F1') {
