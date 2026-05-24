@@ -18,6 +18,8 @@ export const KimDef: CharacterDefinition = {
   nameCn: '金',
   color: '#2288cc',
   accentColor: '#44aadd',
+  specialColor: '#44ddff',
+  specialGlow: '#88ccff',
   portrait: '🦵',
 
   routeSpecial(input, cmdBuf, tick) {

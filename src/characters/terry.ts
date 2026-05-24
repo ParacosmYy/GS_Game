@@ -21,6 +21,8 @@ export const TerryDef: CharacterDefinition = {
   nameCn: '特瑞',
   color: '#cc8800',
   accentColor: '#ddaa22',
+  specialColor: '#ffcc00',
+  specialGlow: '#ffaa00',
   portrait: '🎩',
 
   routeSpecial(input, cmdBuf, tick) {

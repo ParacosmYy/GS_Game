@@ -13,6 +13,8 @@ import { FighterController, resolvePushbox } from './entities/fighterController.
 import { CombatSystem } from './combat/combatSystem.js';
 import { Renderer } from './rendering/renderer.js';
 import { VFXSystem, ScreenShake } from './rendering/vfx.js';
+import { SimpleAI } from './ai/simpleAI.js';
+import { initAudio, playHit, playBlock, playSpecial, playDM, playThrow, playKO, playSelect, playCounter } from './audio/sfx.js';
 import {
   createPowerGauge, createMaxMode,
   gainMeterOnHit, gainMeterOnBlock, gainMeterOnHitstun,
@@ -66,6 +68,10 @@ let p1Ready = false;
 let p2Ready = false;
 let selectCountdown = -1;
 
+// AI system
+let p2IsAI = true; // Default: P2 is AI
+let p2AI: SimpleAI | null = null;
+
 // ===== Window API =====
 declare global {
   interface Window {
@@ -76,6 +82,7 @@ declare global {
     __prevP1Right: boolean;
     __prevP2Left: boolean;
     __prevP2Right: boolean;
+    __prevToggleAI: boolean;
   }
 }
 window.__fighters = [p1, p2];
@@ -84,6 +91,7 @@ window.__restart = restartGame;
 // ===== Hit callback =====
 function onHit(attacker: Fighter, defender: Fighter, attackType: AttackType, blocked: boolean, counterHit: boolean): void {
   const data = FRAME_DATA[attackType as keyof typeof FRAME_DATA];
+  const name = attackType as string;
   const hitX = (attacker.x + defender.x) / 2;
   const hitY = defender.y - defender.displayHeight / 2;
   const atkIdx = attacker === p1 ? 0 : 1;
@@ -94,17 +102,29 @@ function onHit(attacker: Fighter, defender: Fighter, attackType: AttackType, blo
     screenShake.trigger(3, 4);
     gainMeterOnBlock(gauges[atkIdx]);
     gainMeterOnHitstun(gauges[defIdx]);
+    playBlock();
   } else {
     const comboCount = combatSystem.getComboCount(defIdx);
     gainMeterOnHit(gauges[atkIdx]);
     gainMeterOnHitstun(gauges[defIdx]);
     vfx.spawnHitSparks(hitX, hitY, attackType === AttackType.SPECIAL_UPPER ? 14
-      : attackType === AttackType.DM_OROCHINAGI ? 20
+      : attackType === AttackType.DM_OROCHINAGI || attackType === AttackType.DM_YATAGARASU
+        || attackType === AttackType.DM_POWER_GEYSER || attackType === AttackType.DM_PHOENIX_KICK ? 20
       : counterHit ? 12 : 8);
     vfx.spawnImpactRing(hitX, hitY);
     vfx.spawnDamageText(defender.x, defender.y - defender.displayHeight - 20, data.damage);
+    // Sound effects
+    const isDM = attackType === AttackType.DM_OROCHINAGI || attackType === AttackType.DM_YATAGARASU
+      || attackType === AttackType.DM_POWER_GEYSER || attackType === AttackType.DM_PHOENIX_KICK;
+    const isSpecial = attackType === AttackType.SPECIAL_PROJECTILE || attackType === AttackType.SPECIAL_UPPER
+      || name.startsWith('KYO_') || name.startsWith('IORI_') || name.startsWith('TERRY_') || name.startsWith('KIM_');
+    if (isDM) playDM();
+    else if (attackType === AttackType.THROW) playThrow();
+    else if (isSpecial) playSpecial();
+    else playHit(data.damage > 60 ? 1.3 : 1.0);
     if (counterHit) {
       vfx.spawnCounterText(defender.x, defender.y - defender.displayHeight - 55);
+      playCounter();
     }
     if (comboCount >= 2) {
       vfx.spawnDamageText(defender.x, defender.y - defender.displayHeight - 40, comboCount);
@@ -168,21 +188,35 @@ function update(): void {
       }
       if (rawP1.buttonA) {  // J = buttonA for P1
         p1Ready = true;
+        initAudio();
+        playSelect();
       }
     }
 
-    // P2 select: ←=left, →=right, Numpad1=confirm
-    if (!p2Ready) {
+    // P2 select: ←=left, →=right, Numpad1=confirm (or AI auto-confirm)
+    if (p2IsAI) {
+      // AI auto-selects a character after P1 confirms
+      if (p1Ready && !p2Ready) {
+        p2SelectCursor = (p1SelectCursor + 1 + Math.floor(Math.random() * (ROSTER.length - 1))) % ROSTER.length;
+        p2Ready = true;
+      }
+    } else if (!p2Ready) {
       if (rawP2.left && !window.__prevP2Left) {
         p2SelectCursor = (p2SelectCursor - 1 + ROSTER.length) % ROSTER.length;
       }
       if (rawP2.right && !window.__prevP2Right) {
         p2SelectCursor = (p2SelectCursor + 1) % ROSTER.length;
       }
-      if (rawP2.buttonA) {  // Numpad1 = buttonA for P2
+      if (rawP2.buttonA) {
         p2Ready = true;
       }
     }
+
+    // Toggle AI: press T during select
+    if (inputManager.isKeyDown('KeyT') && !window.__prevToggleAI) {
+      p2IsAI = !p2IsAI;
+    }
+    window.__prevToggleAI = inputManager.isKeyDown('KeyT');
 
     // Track prev inputs for edge detection
     window.__prevP1Left = rawP1.left;
@@ -198,6 +232,10 @@ function update(): void {
         // Apply selected characters
         p1Ctrl.setCharacter(ROSTER[p1SelectCursor]);
         p2Ctrl.setCharacter(ROSTER[p2SelectCursor]);
+        // Initialize AI for P2
+        if (p2IsAI) {
+          p2AI = new SimpleAI(p2, p1, ROSTER[p2SelectCursor], 0.6);
+        }
         phase = GamePhase.INTRO;
         phaseTimer = 0;
       }
@@ -236,7 +274,19 @@ function update(): void {
   p2Cmd.record(getDirectionInput(p2Input), tickRef.value);
 
   p1Ctrl.update(p1Input);
-  p2Ctrl.update(p2Input);
+
+  // P2: AI or human input
+  if (p2IsAI && p2AI) {
+    const aiInput = p2AI.getInput();
+    p2Ctrl.update(aiInput);
+    // AI special move direct trigger (bypass command buffer)
+    if (p2.canAct() && Math.random() < 0.02) {
+      const special = p2AI.triggerSpecial();
+      if (special) p2.startAttack(special);
+    }
+  } else {
+    p2Ctrl.update(p2Input);
+  }
   resolvePushbox(p1, p2);
 
   for (const proj of projectiles) proj.update();
@@ -270,6 +320,7 @@ function update(): void {
     winner = p1.health <= 0 && p2.health <= 0 ? null : p1.health <= 0 ? 1 : 0;
     vfx.spawnHitSparks((p1.x + p2.x) / 2, 380, 20);
     screenShake.trigger(12, 15);
+    playKO();
   }
   if (tickRef.value >= 99 * 60) {
     phase = GamePhase.KO; koTimer = 0;
@@ -289,7 +340,7 @@ function update(): void {
 
 function render(): void {
   if (phase === GamePhase.SELECT) {
-    renderer.drawCharacterSelect(p1SelectCursor, p2SelectCursor, p1Ready, p2Ready, tickRef.value);
+    renderer.drawCharacterSelect(p1SelectCursor, p2SelectCursor, p1Ready, p2Ready, tickRef.value, p2IsAI);
     return;
   }
 
@@ -319,6 +370,7 @@ function restartGame(): void {
   p1Ready = false;
   p2Ready = false;
   selectCountdown = -1;
+  p2AI = null;
   p1.reset(STAGE_WIDTH * 0.33);
   p2.reset(STAGE_WIDTH * 0.67);
   p1Cmd.reset();
@@ -332,7 +384,10 @@ function restartGame(): void {
 
 // ===== F1 Toggle =====
 let f1Down = false;
-window.addEventListener('keydown', e => { if (e.code === 'F1') { e.preventDefault(); if (!f1Down) { f1Down = true; debugMode = !debugMode; } } });
+window.addEventListener('keydown', e => {
+  initAudio(); // Initialize audio on first user interaction
+  if (e.code === 'F1') { e.preventDefault(); if (!f1Down) { f1Down = true; debugMode = !debugMode; } }
+});
 window.addEventListener('keyup', e => { if (e.code === 'F1') f1Down = false; });
 
 // ===== Start =====

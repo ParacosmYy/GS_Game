@@ -65,6 +65,7 @@ export class FighterController {
   setCharacter(char: CharacterDefinition): void {
     this.character = char;
     this.fighter.color = char.color;
+    this.fighter.charId = char.id;
   }
 
   update(input: ResolvedInput): void {

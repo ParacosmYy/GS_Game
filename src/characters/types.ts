@@ -21,6 +21,8 @@ export interface CharacterDefinition {
   nameCn: string;
   color: string;        // 角色主色
   accentColor: string;  // 辅色
+  specialColor: string;  // 必杀技特效色 (火/气/光)
+  specialGlow: string;   // 必杀技光晕色
   portrait: string;     // 选人界面图标
 
   // ── 招式路由 ──

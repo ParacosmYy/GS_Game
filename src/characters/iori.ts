@@ -23,6 +23,8 @@ export const IoriDef: CharacterDefinition = {
   nameCn: '八神庵',
   color: '#aa1133',
   accentColor: '#cc3355',
+  specialColor: '#8800cc',
+  specialGlow: '#aa22ff',
   portrait: '🌙',
 
   routeSpecial(input, cmdBuf, tick) {

@@ -36,6 +36,8 @@ export const KyoDef: CharacterDefinition = {
   nameCn: '草薙京',
   color: '#ff6600',
   accentColor: '#ffaa00',
+  specialColor: '#ff4400',
+  specialGlow: '#ff6600',
   portrait: '🔥',
 
   routeSpecial(input, cmdBuf, tick) {

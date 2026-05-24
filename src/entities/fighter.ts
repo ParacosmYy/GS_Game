@@ -29,6 +29,7 @@ export class Fighter {
   facing: Direction;
   state: FighterState = FighterState.IDLE;
   color: string;
+  charId: string = 'kyo'; // character ID for visual lookup
 
   // Attack state
   currentAttack: AttackType | null = null;

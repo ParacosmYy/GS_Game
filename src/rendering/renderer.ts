@@ -328,18 +328,28 @@ export class Renderer {
       || f.currentAttack === AttackType.STAND_CD
       || f.currentAttack === AttackType.KYO_RED_KICK;
 
-    const isFireMove = name.startsWith('KYO_') || f.currentAttack === AttackType.DM_OROCHINAGI;
+    const isSpecialMove = name.startsWith('KYO_') || name.startsWith('IORI_')
+      || name.startsWith('TERRY_') || name.startsWith('KIM_')
+      || f.currentAttack === AttackType.DM_OROCHINAGI
+      || f.currentAttack === AttackType.DM_YATAGARASU
+      || f.currentAttack === AttackType.DM_POWER_GEYSER
+      || f.currentAttack === AttackType.DM_PHOENIX_KICK;
+
+    // Get character-specific colors
+    const charDef = ROSTER.find(c => c.id === f.charId);
+    const specialColor = charDef?.specialColor || '#ff4400';
+    const specialGlow = charDef?.specialGlow || '#ff6600';
 
     const limbLen = isHeavy ? 42 : 35;
     const limbWidth = isHeavy ? 10 : 8;
 
     ctx.save();
-    if (isFireMove) {
-      // Fire-themed limbs for Kyo specials
-      ctx.strokeStyle = isPunch ? '#ff6622' : '#ff4400';
+    if (isSpecialMove) {
+      // Character-themed special move limbs
+      ctx.strokeStyle = isPunch ? specialColor : specialGlow;
       ctx.lineWidth = limbWidth + 4;
       ctx.lineCap = 'round';
-      ctx.shadowColor = '#ff4400';
+      ctx.shadowColor = specialGlow;
       ctx.shadowBlur = 18;
     } else {
       ctx.strokeStyle = isPunch ? '#ffdd44' : '#44ddff';
@@ -436,6 +446,147 @@ export class Renderer {
       ctx.moveTo(sx + 5 * f.facing, sy - 8);
       ctx.lineTo(sx + (FIGHTER_WIDTH / 2 + reach) * f.facing, sy - 2);
       ctx.stroke();
+    // ── 八神庵 specials ──
+    } else if (f.currentAttack === AttackType.IORI_AOIHANA
+      || f.currentAttack === AttackType.IORI_AOIHANA_2
+      || f.currentAttack === AttackType.IORI_AOIHANA_3) {
+      // 葵花: purple flame rekka series
+      const reach = limbLen * (f.currentAttack === AttackType.IORI_AOIHANA_3 ? 1.3 : 1.0);
+      ctx.strokeStyle = specialColor;
+      ctx.shadowColor = specialGlow;
+      ctx.shadowBlur = 16;
+      ctx.lineWidth = f.currentAttack === AttackType.IORI_AOIHANA_3 ? 14 : 10;
+      // Low sweep for 2nd hit, upper for 3rd
+      if (f.currentAttack === AttackType.IORI_AOIHANA_2) {
+        ctx.beginPath();
+        ctx.moveTo(sx + 5 * f.facing, sy - 10);
+        ctx.lineTo(sx + (FIGHTER_WIDTH / 2 + reach) * f.facing, sy - 5);
+        ctx.stroke();
+      } else {
+        ctx.beginPath();
+        ctx.moveTo(sx + 10 * f.facing, sy - f.displayHeight * 0.55);
+        ctx.lineTo(sx + (FIGHTER_WIDTH / 2 + reach) * f.facing, sy - f.displayHeight * 0.5);
+        ctx.stroke();
+      }
+      // Dark flame burst
+      ctx.fillStyle = `${specialGlow}66`;
+      ctx.beginPath();
+      ctx.arc(sx + (FIGHTER_WIDTH / 2 + reach * 0.7) * f.facing, sy - f.displayHeight * 0.5,
+        8 + progress * 6, 0, Math.PI * 2);
+      ctx.fill();
+
+    // ── 特瑞 specials ──
+    } else if (f.currentAttack === AttackType.TERRY_BURN_KNUCKLE) {
+      // Burn Knuckle: yellow energy dashing punch
+      const reach = limbLen * 1.2;
+      ctx.strokeStyle = specialColor;
+      ctx.shadowColor = specialGlow;
+      ctx.shadowBlur = 18;
+      ctx.lineWidth = 14;
+      ctx.beginPath();
+      ctx.moveTo(sx + 10 * f.facing, sy - f.displayHeight * 0.5);
+      ctx.lineTo(sx + (FIGHTER_WIDTH / 2 + reach) * f.facing, sy - f.displayHeight * 0.5);
+      ctx.stroke();
+      // Energy knuckle burst
+      ctx.fillStyle = `${specialColor}88`;
+      ctx.beginPath();
+      ctx.arc(sx + (FIGHTER_WIDTH / 2 + reach) * f.facing, sy - f.displayHeight * 0.5,
+        10 + progress * 8, 0, Math.PI * 2);
+      ctx.fill();
+    } else if (f.currentAttack === AttackType.TERRY_CRACK_SHOT) {
+      // Crack Shot: blue spinning kick
+      ctx.strokeStyle = '#4488ff';
+      ctx.shadowColor = '#2266ff';
+      ctx.shadowBlur = 16;
+      ctx.lineWidth = 12;
+      const reach = limbLen * 1.2;
+      ctx.beginPath();
+      ctx.moveTo(sx + 5 * f.facing, sy - f.displayHeight * 0.35);
+      ctx.lineTo(sx + (FIGHTER_WIDTH / 2 + reach) * f.facing, sy - f.displayHeight * 0.6);
+      ctx.stroke();
+
+    // ── 金 specials ──
+    } else if (f.currentAttack === AttackType.KIM_HIENSEN) {
+      // 飛燕斬: rising blue kick
+      const reach = limbLen * 1.4;
+      ctx.strokeStyle = specialColor;
+      ctx.shadowColor = specialGlow;
+      ctx.shadowBlur = 18;
+      ctx.lineWidth = 12;
+      ctx.beginPath();
+      ctx.moveTo(sx + 5 * f.facing, sy - f.displayHeight * 0.35);
+      ctx.lineTo(sx + 10 * f.facing, sy - f.displayHeight * 0.35 - reach);
+      ctx.stroke();
+      // Speed lines
+      ctx.strokeStyle = `${specialGlow}44`;
+      ctx.lineWidth = 3;
+      for (let i = 0; i < 3; i++) {
+        ctx.beginPath();
+        ctx.moveTo(sx + (i * 4 - 4) * f.facing, sy - f.displayHeight * 0.3);
+        ctx.lineTo(sx + (i * 4 - 2) * f.facing, sy - f.displayHeight * 0.3 - reach * 0.8);
+        ctx.stroke();
+      }
+
+    // ── DM 超必杀 visuals ──
+    } else if (f.currentAttack === AttackType.DM_YATAGARASU) {
+      // 八稚女: dark rushing flame combo
+      ctx.strokeStyle = '#aa22ff';
+      ctx.shadowColor = '#8800cc';
+      ctx.shadowBlur = 25;
+      ctx.lineWidth = 16;
+      const reach = limbLen * 1.5;
+      ctx.beginPath();
+      ctx.moveTo(sx + 5 * f.facing, sy - f.displayHeight * 0.5);
+      ctx.lineTo(sx + (FIGHTER_WIDTH / 2 + reach) * f.facing, sy - f.displayHeight * 0.4);
+      ctx.stroke();
+      // Dark aura
+      ctx.fillStyle = '#aa22ff44';
+      ctx.beginPath();
+      ctx.arc(sx + (FIGHTER_WIDTH / 2 + reach * 0.5) * f.facing, sy - f.displayHeight * 0.45,
+        20 + progress * 15, 0, Math.PI * 2);
+      ctx.fill();
+    } else if (f.currentAttack === AttackType.DM_POWER_GEYSER) {
+      // Power Geyser: ground explosion
+      ctx.strokeStyle = '#ffcc00';
+      ctx.shadowColor = '#ff8800';
+      ctx.shadowBlur = 25;
+      ctx.lineWidth = 18;
+      const reach = limbLen * 1.0;
+      // Downward slam
+      ctx.beginPath();
+      ctx.moveTo(sx + 5 * f.facing, sy - f.displayHeight * 0.3);
+      ctx.lineTo(sx + (FIGHTER_WIDTH / 2 + reach) * f.facing, sy - 5);
+      ctx.stroke();
+      // Ground eruption
+      ctx.fillStyle = '#ffcc0066';
+      for (let i = 0; i < 3; i++) {
+        const ex = sx + (FIGHTER_WIDTH / 2 + reach * (0.3 + i * 0.3)) * f.facing;
+        ctx.beginPath();
+        ctx.moveTo(ex, sy);
+        ctx.lineTo(ex - 8, sy - 30 - progress * 20 - i * 10);
+        ctx.lineTo(ex + 8, sy);
+        ctx.fill();
+      }
+    } else if (f.currentAttack === AttackType.DM_PHOENIX_KICK) {
+      // 鳳凰脚: flying kick aura
+      ctx.strokeStyle = '#44ddff';
+      ctx.shadowColor = '#22aaff';
+      ctx.shadowBlur = 25;
+      ctx.lineWidth = 16;
+      const reach = limbLen * 1.5;
+      ctx.beginPath();
+      ctx.moveTo(sx + 5 * f.facing, sy - f.displayHeight * 0.4);
+      ctx.lineTo(sx + (FIGHTER_WIDTH / 2 + reach) * f.facing, sy - f.displayHeight * 0.3);
+      ctx.stroke();
+      // Phoenix aura arc
+      ctx.strokeStyle = '#88ccff44';
+      ctx.lineWidth = 10;
+      ctx.beginPath();
+      ctx.arc(sx + (FIGHTER_WIDTH / 2 + reach * 0.6) * f.facing, sy - f.displayHeight * 0.35,
+        25 + progress * 15, -Math.PI * 0.8, Math.PI * 0.3);
+      ctx.stroke();
+
+    // ── 京 specials (existing) ──
     } else if (f.currentAttack === AttackType.KYO_75KAI || f.currentAttack === AttackType.KYO_75KAI_2) {
       // 75式改: forward kick combo
       const reach = limbLen * (f.currentAttack === AttackType.KYO_75KAI_2 ? 1.2 : 1.0);
@@ -1008,6 +1159,7 @@ export class Renderer {
     p1Ready: boolean,
     p2Ready: boolean,
     tick: number,
+    p2IsAI: boolean,
   ): void {
     const ctx = this.ctx;
     ctx.save();
@@ -1154,7 +1306,16 @@ export class Renderer {
     ctx.fillText(p2Char.nameCn, 750, bottomY + 28);
     ctx.fillStyle = p2Ready ? '#ffcc00' : '#888';
     ctx.font = '13px monospace';
-    ctx.fillText(p2Ready ? 'READY!' : 'Numpad1 to confirm', 750, bottomY + 52);
+    ctx.fillText(p2Ready ? 'READY!' : p2IsAI ? '[AI] Auto-pick' : 'Numpad1 to confirm', 750, bottomY + 52);
+
+    // AI toggle indicator
+    ctx.textAlign = 'center';
+    ctx.fillStyle = p2IsAI ? '#44ff88' : '#ff6644';
+    ctx.font = 'bold 14px monospace';
+    ctx.fillText(p2IsAI ? '🤖 AI ON' : '👤 P2 Human', 400, bottomY + 85);
+    ctx.fillStyle = '#666';
+    ctx.font = '11px monospace';
+    ctx.fillText('Press T to toggle AI', 400, bottomY + 102);
 
     // VS in center
     ctx.textAlign = 'center';
