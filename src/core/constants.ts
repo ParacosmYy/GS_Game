@@ -213,17 +213,29 @@ export const FRAME_DATA = {
     damage: 70, hitstun: 19, blockstun: 17, pushback: 5,
     hitLevel: 'HIGH' as const, knockdown: true,
   },
-  // 鬼焼き dp+A/C (正版: 5f startup, invincible first active)
+  // 鬼焼き dp+A (正版: 5f startup, single hit)
   KYO_ONIYAKI: {
-    startup: 5, active: 8, recovery: 27,
-    damage: 110, hitstun: 25, blockstun: 20, pushback: 8,
-    hitLevel: 'MID' as const, knockdown: true, chipDamage: 12,
+    startup: 5, active: 5, recovery: 25,
+    damage: 80, hitstun: 22, blockstun: 18, pushback: 6,
+    hitLevel: 'MID' as const, knockdown: false, chipDamage: 10,
   },
-  // 闇払い qcf+A (正版: 10f startup, projectile)
+  // 鬼焼き dp+C (正版: 7f startup, multi-hit, fully invincible)
+  KYO_ONIYAKI_C: {
+    startup: 7, active: 10, recovery: 30,
+    damage: 140, hitstun: 28, blockstun: 22, pushback: 10,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 14,
+  },
+  // 闇払い qcf+A (正版: 10f startup, slow projectile)
   KYO_YAMIBARAI: {
     startup: 10, active: 20, recovery: 30,
-    damage: 85, hitstun: 31, blockstun: 29, pushback: 5,
+    damage: 70, hitstun: 28, blockstun: 26, pushback: 4,
     hitLevel: 'MID' as const, knockdown: false, chipDamage: 8,
+  },
+  // 闇払い qcf+C (正版: 11f startup, fast projectile)
+  KYO_YAMIBARAI_C: {
+    startup: 11, active: 22, recovery: 28,
+    damage: 100, hitstun: 30, blockstun: 28, pushback: 5,
+    hitLevel: 'MID' as const, knockdown: false, chipDamage: 10,
   },
   // 荒咬み qcf+A (正版: 11f startup, guard point frame 10-11)
   KYO_ARAGAMI: {
@@ -292,14 +304,26 @@ export const FRAME_DATA = {
   // 闇払い qcf+A/C (正版: A=10f, C=9f startup)
   IORI_YAMIBARAI: {
     startup: 10, active: 20, recovery: 39,
-    damage: 80, hitstun: 31, blockstun: 29, pushback: 5,
+    damage: 70, hitstun: 28, blockstun: 26, pushback: 4,
     hitLevel: 'MID' as const, knockdown: false, chipDamage: 8,
   },
-  // 鬼焼き dp+A/C (正版: 5f startup, invincible)
+  // 闇払い qcf+C (fast projectile)
+  IORI_YAMIBARAI_C: {
+    startup: 11, active: 22, recovery: 37,
+    damage: 100, hitstun: 30, blockstun: 28, pushback: 5,
+    hitLevel: 'MID' as const, knockdown: false, chipDamage: 10,
+  },
+  // 鬼焼き dp+A (weak upper, single hit)
   IORI_ONIYAKI: {
-    startup: 5, active: 8, recovery: 27,
-    damage: 110, hitstun: 25, blockstun: 20, pushback: 8,
-    hitLevel: 'MID' as const, knockdown: true, chipDamage: 12,
+    startup: 5, active: 5, recovery: 25,
+    damage: 80, hitstun: 22, blockstun: 18, pushback: 6,
+    hitLevel: 'MID' as const, knockdown: false, chipDamage: 10,
+  },
+  // 鬼焼き dp+C (strong upper, multi-hit, invincible)
+  IORI_ONIYAKI_C: {
+    startup: 7, active: 10, recovery: 30,
+    damage: 140, hitstun: 28, blockstun: 22, pushback: 10,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 14,
   },
   // 琴月陰 hcb+B/D (正版: 6f startup, half/full screen dash)
   IORI_KOTOTSUKI: {
@@ -450,7 +474,9 @@ export const HITBOX_OFFSETS = {
   KYO_75KAI_2: { offsetX: 45, offsetY: -45, width: 55, height: 35 },
   KYO_RED_KICK: { offsetX: 40, offsetY: -50, width: 55, height: 40 },
   KYO_ONIYAKI: { offsetX: 30, offsetY: -80, width: 45, height: 55 },
+  KYO_ONIYAKI_C: { offsetX: 30, offsetY: -80, width: 48, height: 60 },
   KYO_YAMIBARAI: { offsetX: 55, offsetY: -55, width: 40, height: 30 },
+  KYO_YAMIBARAI_C: { offsetX: 55, offsetY: -55, width: 42, height: 32 },
   KYO_ARAGAMI: { offsetX: 48, offsetY: -65, width: 50, height: 35 },
   KYO_ARAGAMI_KONOKIZU: { offsetX: 45, offsetY: -55, width: 50, height: 30 },
   KYO_ARAGAMI_YANOSABI: { offsetX: 40, offsetY: -75, width: 45, height: 50 },
@@ -465,7 +491,9 @@ export const HITBOX_OFFSETS = {
   IORI_AOIHANA_2: { offsetX: 45, offsetY: -20, width: 50, height: 25 },
   IORI_AOIHANA_3: { offsetX: 42, offsetY: -65, width: 50, height: 50 },
   IORI_YAMIBARAI: { offsetX: 55, offsetY: -55, width: 40, height: 30 },
+  IORI_YAMIBARAI_C: { offsetX: 55, offsetY: -55, width: 42, height: 32 },
   IORI_ONIYAKI: { offsetX: 30, offsetY: -80, width: 45, height: 55 },
+  IORI_ONIYAKI_C: { offsetX: 30, offsetY: -80, width: 48, height: 60 },
   IORI_KOTOTSUKI: { offsetX: 50, offsetY: -50, width: 55, height: 40 },
   IORI_KUZUKAZE: { offsetX: 10, offsetY: -60, width: 70, height: 60 },
   // 特瑞 (Terry)

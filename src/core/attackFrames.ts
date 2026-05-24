@@ -298,7 +298,42 @@ const KYO_BATSUYOMI_FRAMES: AttackFrame[] = [
   F([{ ox: 45, oy: -70, w: 48, h: 35 }]),
 ];
 
-// ===== 八神庵：葵花三段 =====
+// 京：鬼焼き dp+A (weak upper, single hit)
+const KYO_ONIYAKI_FRAMES: AttackFrame[] = [
+  F([{ ox: 28, oy: -78, w: 42, h: 44 }], { ox: 5, oy: -10, w: -15, h: -28 }),
+  F([{ ox: 34, oy: -85, w: 46, h: 48 }], { ox: 5, oy: -10, w: -15, h: -28 }),
+  F([{ ox: 36, oy: -88, w: 48, h: 50 }]),
+  F([{ ox: 34, oy: -80, w: 44, h: 45 }]),
+  F([{ ox: 30, oy: -70, w: 40, h: 40 }]),
+];
+
+// 京：鬼焼き dp+C (strong upper, multi-hit, full invincible)
+const KYO_ONIYAKI_C_FRAMES: AttackFrame[] = [
+  F([{ ox: 28, oy: -78, w: 42, h: 44 }], { ox: 5, oy: -10, w: -15, h: -28 }),
+  F([{ ox: 34, oy: -85, w: 46, h: 48 }], { ox: 5, oy: -10, w: -15, h: -28 }),
+  F([{ ox: 36, oy: -88, w: 48, h: 50 }], { ox: 5, oy: -10, w: -15, h: -28 }),
+  F([{ ox: 36, oy: -88, w: 48, h: 50 }]),
+  F([{ ox: 34, oy: -85, w: 46, h: 48 }]),
+  F([{ ox: 34, oy: -80, w: 44, h: 45 }]),
+  F([{ ox: 30, oy: -70, w: 40, h: 40 }]),
+  F([{ ox: 26, oy: -58, w: 36, h: 35 }]),
+  F([{ ox: 24, oy: -48, w: 32, h: 30 }]),
+  F([{ ox: 22, oy: -40, w: 28, h: 28 }]),
+];
+
+// 京：闇払い qcf+A (weak projectile)
+const KYO_YAMIBARAI_FRAMES: AttackFrame[] = [
+  F([{ ox: 48, oy: -58, w: 36, h: 28 }]),
+];
+
+// 京：闇払い qcf+C (strong projectile)
+const KYO_YAMIBARAI_C_FRAMES: AttackFrame[] = [
+  F([{ ox: 48, oy: -58, w: 36, h: 28 }]),
+];
+
+// ===== 八神庵 =====
+
+// 葵花三段
 const IORI_AOIHANA_FRAMES: AttackFrame[] = [
   F([{ ox: 42, oy: -55, w: 45, h: 32 }]),
   F([{ ox: 48, oy: -52, w: 50, h: 34 }]),
@@ -322,6 +357,55 @@ const IORI_AOIHANA_3_FRAMES: AttackFrame[] = [
   F([{ ox: 40, oy: -65, w: 45, h: 40 }]),
 ];
 
+// 八神：闇払い qcf+A (weak projectile)
+const IORI_YAMIBARAI_FRAMES: AttackFrame[] = [
+  F([{ ox: 48, oy: -58, w: 36, h: 28 }]),
+];
+
+// 八神：闇払い qcf+C (strong projectile)
+const IORI_YAMIBARAI_C_FRAMES: AttackFrame[] = [
+  F([{ ox: 48, oy: -58, w: 36, h: 28 }]),
+];
+
+// 八神：鬼焼き dp+A (weak upper)
+const IORI_ONIYAKI_FRAMES: AttackFrame[] = [
+  F([{ ox: 26, oy: -78, w: 42, h: 44 }], { ox: 5, oy: -10, w: -15, h: -28 }),
+  F([{ ox: 32, oy: -85, w: 46, h: 48 }], { ox: 5, oy: -10, w: -15, h: -28 }),
+  F([{ ox: 34, oy: -88, w: 48, h: 50 }]),
+  F([{ ox: 32, oy: -80, w: 44, h: 45 }]),
+  F([{ ox: 28, oy: -70, w: 40, h: 40 }]),
+];
+
+// 八神：鬼焼き dp+C (strong upper, fully invincible)
+const IORI_ONIYAKI_C_FRAMES: AttackFrame[] = [
+  F([{ ox: 26, oy: -78, w: 42, h: 44 }], { ox: 5, oy: -10, w: -15, h: -28 }),
+  F([{ ox: 32, oy: -85, w: 46, h: 48 }], { ox: 5, oy: -10, w: -15, h: -28 }),
+  F([{ ox: 34, oy: -88, w: 48, h: 50 }], { ox: 5, oy: -10, w: -15, h: -28 }),
+  F([{ ox: 34, oy: -88, w: 48, h: 50 }]),
+  F([{ ox: 32, oy: -85, w: 46, h: 48 }]),
+  F([{ ox: 32, oy: -80, w: 44, h: 45 }]),
+  F([{ ox: 28, oy: -70, w: 40, h: 40 }]),
+  F([{ ox: 24, oy: -58, w: 36, h: 35 }]),
+  F([{ ox: 22, oy: -48, w: 32, h: 30 }]),
+  F([{ ox: 20, oy: -40, w: 28, h: 28 }]),
+];
+
+// 八神：琴月陰 (dash grab)
+const IORI_KOTOTSUKI_FRAMES: AttackFrame[] = [
+  F([{ ox: 50, oy: -55, w: 42, h: 38 }]),
+  F([{ ox: 55, oy: -52, w: 48, h: 42 }]),
+  F([{ ox: 58, oy: -50, w: 52, h: 44 }]),
+  F([{ ox: 55, oy: -52, w: 48, h: 42 }]),
+];
+
+// 八神：屑風 (command throw)
+const IORI_KUZUKAZE_FRAMES: AttackFrame[] = [
+  F([{ ox: 45, oy: -55, w: 40, h: 50 }]),
+  F([{ ox: 50, oy: -52, w: 44, h: 52 }]),
+  F([{ ox: 50, oy: -52, w: 44, h: 52 }]),
+  F([{ ox: 48, oy: -55, w: 42, h: 50 }]),
+];
+
 // ===== 特瑞 =====
 const TERRY_BURN_KNUCKLE_FRAMES: AttackFrame[] = [
   F([{ ox: 45, oy: -55, w: 48, h: 30 }]),
@@ -340,6 +424,30 @@ const TERRY_CRACK_SHOT_FRAMES: AttackFrame[] = [
   F([{ ox: 45, oy: -45, w: 48, h: 35 }]),
 ];
 
+const TERRY_POWER_WAVE_FRAMES: AttackFrame[] = [
+  // Power Wave: ground projectile, hand strike frame
+  F([{ ox: 50, oy: -40, w: 38, h: 28 }]),
+];
+
+const TERRY_POWER_DUNK_FRAMES: AttackFrame[] = [
+  // Power Dunk: rising dunk, body shrinks during ascent
+  F([{ ox: 30, oy: -70, w: 40, h: 40 }], { ox: 5, oy: -8, w: -12, h: -25 }),
+  F([{ ox: 35, oy: -78, w: 45, h: 44 }], { ox: 5, oy: -8, w: -12, h: -25 }),
+  F([{ ox: 38, oy: -82, w: 48, h: 46 }]),
+  F([{ ox: 35, oy: -75, w: 44, h: 42 }]),
+  F([{ ox: 30, oy: -65, w: 40, h: 38 }]),
+];
+
+const TERRY_RISING_TACKLE_FRAMES: AttackFrame[] = [
+  // Rising Tackle: charge upper, multi-hit vertical spin
+  F([{ ox: 25, oy: -72, w: 38, h: 42 }], { ox: 3, oy: -10, w: -10, h: -28 }),
+  F([{ ox: 30, oy: -80, w: 42, h: 45 }], { ox: 3, oy: -10, w: -10, h: -28 }),
+  F([{ ox: 32, oy: -85, w: 44, h: 48 }], { ox: 3, oy: -10, w: -10, h: -28 }),
+  F([{ ox: 30, oy: -80, w: 42, h: 45 }]),
+  F([{ ox: 28, oy: -72, w: 40, h: 42 }]),
+  F([{ ox: 25, oy: -62, w: 36, h: 38 }]),
+];
+
 // ===== 金 =====
 const KIM_HIENZAN_FRAMES: AttackFrame[] = [
   // 飛燕斬：上升踢，受击框缩小
@@ -348,6 +456,39 @@ const KIM_HIENZAN_FRAMES: AttackFrame[] = [
   F([{ ox: 40, oy: -82, w: 48, h: 48 }]),
   F([{ ox: 38, oy: -78, w: 45, h: 45 }]),
   F([{ ox: 35, oy: -72, w: 42, h: 42 }]),
+];
+
+// 金：半月斬 (spinning kick)
+const KIM_HANGETSU_FRAMES: AttackFrame[] = [
+  F([{ ox: 35, oy: -55, w: 45, h: 38 }]),
+  F([{ ox: 42, oy: -50, w: 50, h: 42 }]),
+  F([{ ox: 45, oy: -48, w: 52, h: 44 }]),
+  F([{ ox: 42, oy: -50, w: 50, h: 42 }]),
+  F([{ ox: 38, oy: -55, w: 45, h: 38 }]),
+];
+
+// 金：覇気脚 (low sweep)
+const KIM_HAKI_FRAMES: AttackFrame[] = [
+  F([{ ox: 40, oy: -20, w: 50, h: 28 }]),
+  F([{ ox: 48, oy: -18, w: 55, h: 30 }]),
+  F([{ ox: 50, oy: -18, w: 55, h: 30 }]),
+  F([{ ox: 48, oy: -20, w: 50, h: 28 }]),
+];
+
+// 金：飛翔脚 (air dive kick)
+const KIM_HISHOU_FRAMES: AttackFrame[] = [
+  F([{ ox: 38, oy: -40, w: 48, h: 42 }]),
+  F([{ ox: 45, oy: -35, w: 55, h: 45 }]),
+  F([{ ox: 48, oy: -32, w: 58, h: 48 }]),
+  F([{ ox: 45, oy: -35, w: 55, h: 45 }]),
+];
+
+// 金：三連撃 (rekka punch chain)
+const KIM_SANREN_FRAMES: AttackFrame[] = [
+  F([{ ox: 40, oy: -60, w: 42, h: 30 }]),
+  F([{ ox: 48, oy: -58, w: 48, h: 32 }]),
+  F([{ ox: 48, oy: -58, w: 48, h: 32 }]),
+  F([{ ox: 44, oy: -60, w: 44, h: 30 }]),
 ];
 
 // ===== DM 超必杀技 =====
@@ -433,12 +574,29 @@ export const ATTACK_FRAMES: AttackFrameTable = {
   [AttackType.KYO_DOKUGAMI]: KYO_DOKUGAMI_FRAMES,
   [AttackType.KYO_TSUMIYOMI]: KYO_TSUMIYOMI_FRAMES,
   [AttackType.KYO_BATSUYOMI]: KYO_BATSUYOMI_FRAMES,
+  [AttackType.KYO_ONIYAKI]: KYO_ONIYAKI_FRAMES,
+  [AttackType.KYO_ONIYAKI_C]: KYO_ONIYAKI_C_FRAMES,
+  [AttackType.KYO_YAMIBARAI]: KYO_YAMIBARAI_FRAMES,
+  [AttackType.KYO_YAMIBARAI_C]: KYO_YAMIBARAI_C_FRAMES,
   [AttackType.IORI_AOIHANA]: IORI_AOIHANA_FRAMES,
   [AttackType.IORI_AOIHANA_2]: IORI_AOIHANA_2_FRAMES,
   [AttackType.IORI_AOIHANA_3]: IORI_AOIHANA_3_FRAMES,
+  [AttackType.IORI_YAMIBARAI]: IORI_YAMIBARAI_FRAMES,
+  [AttackType.IORI_YAMIBARAI_C]: IORI_YAMIBARAI_C_FRAMES,
+  [AttackType.IORI_ONIYAKI]: IORI_ONIYAKI_FRAMES,
+  [AttackType.IORI_ONIYAKI_C]: IORI_ONIYAKI_C_FRAMES,
+  [AttackType.IORI_KOTOTSUKI]: IORI_KOTOTSUKI_FRAMES,
+  [AttackType.IORI_KUZUKAZE]: IORI_KUZUKAZE_FRAMES,
   [AttackType.TERRY_BURN_KNUCKLE]: TERRY_BURN_KNUCKLE_FRAMES,
   [AttackType.TERRY_CRACK_SHOT]: TERRY_CRACK_SHOT_FRAMES,
+  [AttackType.TERRY_POWER_WAVE]: TERRY_POWER_WAVE_FRAMES,
+  [AttackType.TERRY_POWER_DUNK]: TERRY_POWER_DUNK_FRAMES,
+  [AttackType.TERRY_RISING_TACKLE]: TERRY_RISING_TACKLE_FRAMES,
   [AttackType.KIM_HIENZAN]: KIM_HIENZAN_FRAMES,
+  [AttackType.KIM_HANGETSU]: KIM_HANGETSU_FRAMES,
+  [AttackType.KIM_HAKI]: KIM_HAKI_FRAMES,
+  [AttackType.KIM_HISHOU]: KIM_HISHOU_FRAMES,
+  [AttackType.KIM_SANREN]: KIM_SANREN_FRAMES,
   [AttackType.DM_OROCHINAGI]: DM_OROCHINAGI_FRAMES,
   [AttackType.DM_YATAGARASU]: DM_YATAGARASU_FRAMES,
   [AttackType.DM_POWER_GEYSER]: DM_POWER_GEYSER_FRAMES,

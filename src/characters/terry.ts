@@ -40,12 +40,10 @@ export const TerryDef: CharacterDefinition = {
   },
 
   poses: {
-    [FighterState.IDLE]: pose({
-      armFront: bone(12, 18, 0.15),
-      armBack: bone(-6, 16, -0.35),
-      legFront: bone(5, 0, 0.08),
-      legBack: bone(-5, 0, -0.08),
-    }),
+    [FighterState.IDLE]: [
+      pose({ armFront: bone(12, 18, 0.15), armBack: bone(-6, 16, -0.35), legFront: bone(5, 0, 0.08), legBack: bone(-5, 0, -0.08) }),
+      pose({ armFront: bone(12, 16, 0.13), armBack: bone(-6, 14, -0.33), legFront: bone(5, 0, 0.08), legBack: bone(-5, 0, -0.08), body: bone(0, -1) }),
+    ],
     [FighterState.WALK]: [
       pose({ legFront: bone(10, -2, 0.2), legBack: bone(-3, 2, -0.15), armFront: bone(10, 22, 0.08), armBack: bone(-5, 20, -0.28) }),
       pose({ legFront: bone(8, 0, 0.12), legBack: bone(-4, 0, -0.08), armFront: bone(11, 19, 0.12), armBack: bone(-6, 17, -0.32) }),
@@ -64,10 +62,10 @@ export const TerryDef: CharacterDefinition = {
       legFront: bone(10, 0, 0.5),
       legBack: bone(-8, 0, -0.4),
     }),
-    [FighterState.BLOCK]: pose({
-      armFront: bone(4, 10, -0.35),
-      armBack: bone(1, 8, -0.55),
-    }),
+    [FighterState.BLOCK]: [
+      pose({ armFront: bone(4, 10, -0.35), armBack: bone(1, 8, -0.55) }),
+      pose({ armFront: bone(3, 12, -0.4), armBack: bone(0, 10, -0.6), body: bone(-2, 0, -0.05) }),
+    ],
     [FighterState.HITSTUN]: [
       pose({ body: bone(-4, 0, -0.12), head: bone(-2, 2, -0.18), armFront: bone(-3, 20, 0.5), armBack: bone(-8, 18, 0.6) }),
       pose({ body: bone(-7, 2, -0.2), head: bone(-4, 3, -0.28), armFront: bone(-1, 23, 0.6), armBack: bone(-10, 20, 0.75) }),

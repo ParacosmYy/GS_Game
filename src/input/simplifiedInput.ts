@@ -20,8 +20,8 @@ const SPECIAL1: Record<string, AttackType> = {
 };
 
 const SPECIAL2: Record<string, AttackType> = {
-  kyo: AttackType.KYO_ONIYAKI,
-  iori: AttackType.IORI_ONIYAKI,
+  kyo: AttackType.KYO_ONIYAKI_C,
+  iori: AttackType.IORI_ONIYAKI_C,
   terry: AttackType.TERRY_BURN_KNUCKLE,
   kim: AttackType.KIM_HIENZAN,
 };

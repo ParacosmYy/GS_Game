@@ -202,3 +202,47 @@
 3. 更多非攻击状态多帧动画（BLOCK/JUMP/BACKDASH）
 4. 新角色（K'/Kula/Ryo/Robert）
 5. 音效品质提升
+
+---
+
+### Iteration 6 — 2024-05-25（12必杀技逐帧攻击框 + 弱P/强P变体 + IDLE/BLOCK动画）
+
+**本次改动：**
+- **12个必杀技逐帧攻击框**：补全所有角色必杀技的 ATTACK_FRAMES 数据
+  - Kyo: 鬼焼き(KYO_ONIYAKI), 闇払い(KYO_YAMIBARAI)
+  - Iori: 闇払い(IORI_YAMIBARAI), 鬼焼き(IORI_ONIYAKI), 琴月陰(IORI_KOTOTSUKI), 屑風(IORI_KUZUKAZE)
+  - Terry: Power Wave(TERRY_POWER_WAVE), Power Dunk(TERRY_POWER_DUNK), Rising Tackle(TERRY_RISING_TACKLE)
+  - Kim: 半月斬(KIM_HANGETSU), 覇気脚(KIM_HAKI), 飛翔脚(KIM_HISHOU), 三連撃(KIM_SANREN)
+- **弱P/强P必杀技变体**：
+  - 鬼焼き dp+A(5f startup, 单段, 80dmg) vs dp+C(7f startup, 多段无敌, 140dmg)
+  - 闇払い qcf+A(慢速, 70dmg) vs qcf+C(快速, 100dmg)
+  - Kyo和Iori均支持弱/强版本，routeSpecial按buttonAPressed/buttonCPressed区分
+- **4角色IDLE呼吸动画(2帧)**：微妙的身体上下移动
+- **4角色BLOCK反馈动画(2帧)**：防御时身体后退反馈
+- 新增4个AttackType: KYO_ONIYAKI_C, KYO_YAMIBARAI_C, IORI_ONIYAKI_C, IORI_YAMIBARAI_C
+- TypeScript类型检查通过 + 25测试通过
+
+| 维度 | 得分 | 变化 | 备注 |
+|------|------|------|------|
+| 帧数据精度 | 12/15 | +1 | 弱P/强P变体帧数据符合正版差异 |
+| 判定系统 | 12/15 | +2 | 全部必杀技有逐帧攻击框数据，无HITBOX_OFFSETS降级 |
+| 战斗机制 | 17/20 | → | 弱/强变体属帧数据维度 |
+| 动画品质 | 12/15 | +2 | IDLE呼吸(2帧)+BLOCK反馈(2帧)，所有关键状态多帧 |
+| 音效品质 | 2/5 | → | 未改动 |
+| 角色内容 | 8/10 | +1 | 弱/强必杀技变体增加招式深度 |
+| 游戏流程 | 9/10 | → | 未改动 |
+| 视觉打磨 | 4/5 | → | 未改动 |
+| 代码质量 | 4/5 | → | 架构稳定 |
+| **总分** | **80/100** | **+6** | |
+
+**与基线对比：+59.5 分（20.5 → 80）**
+**是否触发 tag：是（+6 >= 5）→ v0.06-kof2002**
+
+**下一迭代目标：>= 85 分（+5 触发 v0.07-kof2002）**
+
+**主要提升空间：**
+1. 新角色（K'/Kula/Ryo/Robert）— 角色内容仍有空间
+2. 音效品质提升 — 合成音→更好的合成参数/采样
+3. 打击帧视觉效果增强 — 闪白/冲击线
+4. 更多动画状态 — JUMP上升/下降差异
+5. 3v3团队模式

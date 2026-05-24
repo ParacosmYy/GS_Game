@@ -55,12 +55,10 @@ export const KyoDef: CharacterDefinition = {
   },
 
   poses: {
-    [FighterState.IDLE]: pose({
-      armFront: bone(10, 20, 0.3),
-      armBack: bone(-8, 15, -0.5),
-      legFront: bone(6, 0, 0.1),
-      legBack: bone(-6, 0, -0.1),
-    }),
+    [FighterState.IDLE]: [
+      pose({ armFront: bone(10, 20, 0.3), armBack: bone(-8, 15, -0.5), legFront: bone(6, 0, 0.1), legBack: bone(-6, 0, -0.1) }),
+      pose({ armFront: bone(10, 18, 0.28), armBack: bone(-8, 13, -0.48), legFront: bone(6, 0, 0.1), legBack: bone(-6, 0, -0.1), body: bone(0, -1) }),
+    ],
     [FighterState.WALK]: [
       // 4帧走步循环 — 腿交替前后摆动
       pose({ legFront: bone(8, -3, 0.25), legBack: bone(-5, 3, -0.2), armFront: bone(8, 22, 0.2), armBack: bone(-6, 18, -0.4) }),
@@ -81,12 +79,10 @@ export const KyoDef: CharacterDefinition = {
       legFront: bone(10, 0, 0.5),
       legBack: bone(-8, 0, -0.4),
     }),
-    [FighterState.BLOCK]: pose({
-      armFront: bone(3, 10, -0.4),
-      armBack: bone(0, 8, -0.6),
-      legFront: bone(3, 0, 0.05),
-      legBack: bone(-3, 0, -0.05),
-    }),
+    [FighterState.BLOCK]: [
+      pose({ armFront: bone(3, 10, -0.4), armBack: bone(0, 8, -0.6), legFront: bone(3, 0, 0.05), legBack: bone(-3, 0, -0.05) }),
+      pose({ armFront: bone(2, 12, -0.45), armBack: bone(-1, 10, -0.65), body: bone(-2, 0, -0.05) }),
+    ],
     [FighterState.HITSTUN]: [
       pose({ body: bone(-5, 0, -0.15), head: bone(-3, 2, -0.2), armFront: bone(0, 25, 0.6), armBack: bone(-10, 20, 0.8) }),
       pose({ body: bone(-8, 2, -0.25), head: bone(-5, 3, -0.3), armFront: bone(2, 28, 0.7), armBack: bone(-12, 22, 0.9) }),
@@ -158,9 +154,11 @@ export const KyoDef: CharacterDefinition = {
     const dmMotion = cmdBuf.checkDMMotion(tick, input.punchPressed, input.kickPressed);
     if (dmMotion === 'QCFx2_P') return AttackType.DM_OROCHINAGI;
 
-    // Dragon Punch →↓↘+P → 鬼焼き (Kyo-specific)
+    // Dragon Punch →↓↘+P → 鬼焼き (弱P/强P区分)
     const special = cmdBuf.checkSpecial(tick, input.punchPressed || input.kickPressed);
-    if (special === AttackType.SPECIAL_UPPER) return AttackType.KYO_ONIYAKI;
+    if (special === AttackType.SPECIAL_UPPER) {
+      return input.buttonCPressed ? AttackType.KYO_ONIYAKI_C : AttackType.KYO_ONIYAKI;
+    }
 
     // 荒咬み: QCF+A
     if (cmdBuf.hasQCF(tick) && input.buttonAPressed) return AttackType.KYO_ARAGAMI;
@@ -172,8 +170,10 @@ export const KyoDef: CharacterDefinition = {
       return cmdBuf.checkKickSpecial(tick, input.kickPressed);
     }
 
-    // Fireball fallback: QCF+P → 闇払い (Kyo-specific)
-    if (special === AttackType.SPECIAL_PROJECTILE) return AttackType.KYO_YAMIBARAI;
+    // Fireball fallback: QCF+P → 闇払い (弱P/强P区分)
+    if (special === AttackType.SPECIAL_PROJECTILE) {
+      return input.buttonCPressed ? AttackType.KYO_YAMIBARAI_C : AttackType.KYO_YAMIBARAI;
+    }
 
     return null;
   },
@@ -246,9 +246,9 @@ export const KyoDef: CharacterDefinition = {
   },
 
   onAttackActive(fighter, attackType, projectiles, playerIndex) {
-    // 闇払い: spawn projectile
-    if (attackType === AttackType.KYO_YAMIBARAI && fighter.attackFrame === 0) {
-      const data = FRAME_DATA.KYO_YAMIBARAI;
+    // 闇払い: spawn projectile (weak/strong share same logic)
+    if ((attackType === AttackType.KYO_YAMIBARAI || attackType === AttackType.KYO_YAMIBARAI_C) && fighter.attackFrame === 0) {
+      const data = FRAME_DATA[attackType as keyof typeof FRAME_DATA];
       projectiles.push(new Projectile(
         fighter.x + 50 * fighter.facing, fighter.y - 50, fighter.facing,
         data.active, playerIndex, fighter.charId,
@@ -258,6 +258,10 @@ export const KyoDef: CharacterDefinition = {
     // 鬼焼き: rise (invincible startup)
     if (attackType === AttackType.KYO_ONIYAKI) {
       fighter.vy = -6;
+      return true;
+    }
+    if (attackType === AttackType.KYO_ONIYAKI_C) {
+      fighter.vy = -8;
       return true;
     }
     // R.E.D. Kick: rise + forward

@@ -42,12 +42,10 @@ export const IoriDef: CharacterDefinition = {
   },
 
   poses: {
-    [FighterState.IDLE]: pose({
-      armFront: bone(6, 18, 0.5),
-      armBack: bone(-10, 12, -0.7),
-      legFront: bone(5, 0, 0.05),
-      legBack: bone(-5, 0, -0.15),
-    }),
+    [FighterState.IDLE]: [
+      pose({ armFront: bone(6, 18, 0.5), armBack: bone(-10, 12, -0.7), legFront: bone(5, 0, 0.05), legBack: bone(-5, 0, -0.15) }),
+      pose({ armFront: bone(6, 16, 0.48), armBack: bone(-10, 10, -0.68), legFront: bone(5, 0, 0.05), legBack: bone(-5, 0, -0.15), body: bone(0, -1) }),
+    ],
     [FighterState.WALK]: [
       pose({ legFront: bone(9, -3, 0.25), legBack: bone(-4, 3, -0.2), armFront: bone(5, 22, 0.3), armBack: bone(-6, 18, -0.5) }),
       pose({ legFront: bone(7, 0, 0.15), legBack: bone(-5, 0, -0.1), armFront: bone(6, 20, 0.35), armBack: bone(-8, 17, -0.55) }),
@@ -66,10 +64,10 @@ export const IoriDef: CharacterDefinition = {
       legFront: bone(9, 0, 0.45),
       legBack: bone(-7, 0, -0.35),
     }),
-    [FighterState.BLOCK]: pose({
-      armFront: bone(2, 8, -0.5),
-      armBack: bone(-1, 6, -0.7),
-    }),
+    [FighterState.BLOCK]: [
+      pose({ armFront: bone(2, 8, -0.5), armBack: bone(-1, 6, -0.7) }),
+      pose({ armFront: bone(1, 10, -0.55), armBack: bone(-2, 8, -0.75), body: bone(-2, 0, -0.05) }),
+    ],
     [FighterState.HITSTUN]: [
       pose({ body: bone(-6, 0, -0.2), head: bone(-4, 3, -0.25), armFront: bone(-2, 22, 0.5), armBack: bone(-12, 18, 0.7) }),
       pose({ body: bone(-9, 2, -0.3), head: bone(-6, 4, -0.35), armFront: bone(0, 25, 0.65), armBack: bone(-14, 20, 0.85) }),
@@ -125,9 +123,11 @@ export const IoriDef: CharacterDefinition = {
     const dmMotion = cmdBuf.checkDMMotion(tick, input.punchPressed, input.kickPressed);
     if (dmMotion === 'QCFx2_P') return AttackType.DM_YATAGARASU;
 
-    // DP+P → 鬼焼き (Iori-specific)
+    // DP+P → 鬼焼き (弱P/强P区分)
     const special = cmdBuf.checkSpecial(tick, input.punchPressed || input.kickPressed);
-    if (special === AttackType.SPECIAL_UPPER) return AttackType.IORI_ONIYAKI;
+    if (special === AttackType.SPECIAL_UPPER) {
+      return input.buttonCPressed ? AttackType.IORI_ONIYAKI_C : AttackType.IORI_ONIYAKI;
+    }
 
     // HCB+K → 琴月陰 (dash attack)
     if (input.kickPressed && cmdBuf.hasHCB(tick)) {
@@ -139,8 +139,10 @@ export const IoriDef: CharacterDefinition = {
       return AttackType.IORI_AOIHANA;
     }
 
-    // QCF+P → 闇払い (Iori-specific fireball)
-    if (special === AttackType.SPECIAL_PROJECTILE) return AttackType.IORI_YAMIBARAI;
+    // QCF+P → 闇払い (弱P/强P区分)
+    if (special === AttackType.SPECIAL_PROJECTILE) {
+      return input.buttonCPressed ? AttackType.IORI_YAMIBARAI_C : AttackType.IORI_YAMIBARAI;
+    }
 
     return null;
   },
@@ -169,9 +171,9 @@ export const IoriDef: CharacterDefinition = {
   },
 
   onAttackActive(fighter, attackType, projectiles, playerIndex) {
-    // 闇払い: spawn projectile
-    if (attackType === AttackType.IORI_YAMIBARAI && fighter.attackFrame === 0) {
-      const data = FRAME_DATA.IORI_YAMIBARAI;
+    // 闇払い: spawn projectile (weak/strong share same logic)
+    if ((attackType === AttackType.IORI_YAMIBARAI || attackType === AttackType.IORI_YAMIBARAI_C) && fighter.attackFrame === 0) {
+      const data = FRAME_DATA[attackType as keyof typeof FRAME_DATA];
       projectiles.push(new Projectile(
         fighter.x + 50 * fighter.facing, fighter.y - 50, fighter.facing,
         data.active, playerIndex, fighter.charId,
@@ -181,6 +183,10 @@ export const IoriDef: CharacterDefinition = {
     // 鬼焼き: rise
     if (attackType === AttackType.IORI_ONIYAKI) {
       fighter.vy = -7;
+      return true;
+    }
+    if (attackType === AttackType.IORI_ONIYAKI_C) {
+      fighter.vy = -9;
       return true;
     }
     // 琴月陰: dash forward

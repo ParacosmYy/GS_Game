@@ -24,6 +24,7 @@ export function drawAttackLimb(
     || f.currentAttack === AttackType.SPECIAL_PROJECTILE
     || f.currentAttack === AttackType.SPECIAL_UPPER
     || f.currentAttack === AttackType.KYO_ONIYAKI
+    || f.currentAttack === AttackType.KYO_ONIYAKI_C
     || f.currentAttack === AttackType.KYO_ARAGAMI
     || f.currentAttack === AttackType.KYO_ARAGAMI_KONOKIZU
     || f.currentAttack === AttackType.KYO_ARAGAMI_YANOSABI
@@ -31,6 +32,7 @@ export function drawAttackLimb(
     || f.currentAttack === AttackType.KYO_TSUMIYOMI
     || f.currentAttack === AttackType.KYO_BATSUYOMI
     || f.currentAttack === AttackType.IORI_ONIYAKI
+    || f.currentAttack === AttackType.IORI_ONIYAKI_C
     || f.currentAttack === AttackType.IORI_KOTOTSUKI
     || f.currentAttack === AttackType.TERRY_POWER_DUNK
     || f.currentAttack === AttackType.TERRY_RISING_TACKLE;
@@ -172,12 +174,13 @@ export function drawAttackLimb(
     ctx.arc(sx + (FIGHTER_WIDTH / 2 + reach * 0.7) * f.facing, sy - f.displayHeight * 0.5,
       8 + progress * 6, 0, Math.PI * 2);
     ctx.fill();
-  } else if (f.currentAttack === AttackType.IORI_ONIYAKI) {
-    const reach = limbLen * 1.3;
+  } else if (f.currentAttack === AttackType.IORI_ONIYAKI || f.currentAttack === AttackType.IORI_ONIYAKI_C) {
+    const isStrong = f.currentAttack === AttackType.IORI_ONIYAKI_C;
+    const reach = limbLen * (isStrong ? 1.5 : 1.3);
     ctx.strokeStyle = specialColor;
     ctx.shadowColor = specialGlow;
-    ctx.shadowBlur = 20;
-    ctx.lineWidth = 14;
+    ctx.shadowBlur = isStrong ? 28 : 20;
+    ctx.lineWidth = isStrong ? 18 : 14;
     ctx.beginPath();
     ctx.moveTo(sx + 8 * f.facing, sy - f.displayHeight * 0.5);
     ctx.lineTo(sx + 12 * f.facing, sy - f.displayHeight * 0.5 - reach);
@@ -466,12 +469,13 @@ export function drawAttackLimb(
     ctx.arc(sx + 10 * f.facing, sy - f.displayHeight * 0.5 - reach,
       12 + progress * 8, 0, Math.PI * 2);
     ctx.fill();
-  } else if (f.currentAttack === AttackType.KYO_ONIYAKI) {
-    const reach = limbLen * 1.3;
+  } else if (f.currentAttack === AttackType.KYO_ONIYAKI || f.currentAttack === AttackType.KYO_ONIYAKI_C) {
+    const isStrong = f.currentAttack === AttackType.KYO_ONIYAKI_C;
+    const reach = limbLen * (isStrong ? 1.5 : 1.3);
     ctx.strokeStyle = '#ff6622';
     ctx.shadowColor = '#ff4400';
-    ctx.shadowBlur = 20;
-    ctx.lineWidth = 14;
+    ctx.shadowBlur = isStrong ? 28 : 20;
+    ctx.lineWidth = isStrong ? 18 : 14;
     ctx.beginPath();
     ctx.moveTo(sx + 5 * f.facing, sy - f.displayHeight * 0.5);
     ctx.lineTo(sx + 10 * f.facing, sy - f.displayHeight * 0.5 - reach);
@@ -479,9 +483,9 @@ export function drawAttackLimb(
     ctx.fillStyle = '#ffaa0066';
     ctx.beginPath();
     ctx.arc(sx + 10 * f.facing, sy - f.displayHeight * 0.5 - reach,
-      12 + progress * 8, 0, Math.PI * 2);
+      (isStrong ? 16 : 12) + progress * (isStrong ? 12 : 8), 0, Math.PI * 2);
     ctx.fill();
-  } else if (f.currentAttack === AttackType.KYO_YAMIBARAI) {
+  } else if (f.currentAttack === AttackType.KYO_YAMIBARAI || f.currentAttack === AttackType.KYO_YAMIBARAI_C) {
     const reach = limbLen * 0.7;
     ctx.strokeStyle = '#ff6622';
     ctx.shadowColor = '#ff4400';
@@ -491,7 +495,7 @@ export function drawAttackLimb(
     ctx.moveTo(sx + 10 * f.facing, sy - f.displayHeight * 0.55);
     ctx.lineTo(sx + (FIGHTER_WIDTH / 2 + reach) * f.facing, sy - f.displayHeight * 0.55);
     ctx.stroke();
-  } else if (f.currentAttack === AttackType.IORI_YAMIBARAI) {
+  } else if (f.currentAttack === AttackType.IORI_YAMIBARAI || f.currentAttack === AttackType.IORI_YAMIBARAI_C) {
     const reach = limbLen * 0.7;
     ctx.strokeStyle = '#aa1133';
     ctx.shadowColor = '#8800cc';
