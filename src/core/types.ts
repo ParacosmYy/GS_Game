@@ -75,6 +75,13 @@ export type BlockType = 'HIGH' | 'LOW';
 // ===== Attack Phase =====
 export type AttackPhase = 'startup' | 'active' | 'recovery' | 'none';
 
+// ===== Game Phase =====
+export enum GamePhase {
+  INTRO = 'INTRO',     // "ROUND 1... FIGHT!" text
+  FIGHTING = 'FIGHTING', // Active gameplay
+  KO = 'KO',           // KO state
+}
+
 // ===== Game State (for window.__gameState) =====
 export interface PlayerState {
   x: number;

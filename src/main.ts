@@ -12,7 +12,7 @@ import {
   MAX_HEALTH, KO_DISPLAY_TIME, FRAME_DATA,
   LANDING_RECOVERY,
 } from './core/constants.js';
-import { FighterState, AttackType, GameState } from './core/types.js';
+import { FighterState, AttackType, GameState, GamePhase } from './core/types.js';
 
 // ===== Canvas =====
 const canvas = document.getElementById('gameCanvas') as HTMLCanvasElement;
@@ -36,7 +36,9 @@ const p2 = new Fighter(STAGE_WIDTH * 0.67, '#2244cc', -1);
 const projectiles: Projectile[] = [];
 
 // ===== State =====
-let koState = false;
+let phase: GamePhase = GamePhase.INTRO;
+let phaseTimer = 0;
+const INTRO_DURATION = 120; // 2 seconds: ROUND 1... FIGHT!
 let koTimer = 0;
 let winner: number | null = null;
 let tick = 0;
@@ -217,17 +219,29 @@ function onHit(attacker: Fighter, defender: Fighter, attackType: AttackType, blo
 
 // ===== Main Loop =====
 function update(): void {
-  if (koState) {
-    koTimer++;
-    vfx.update();
-    screenShake.update();
-    if (koTimer > KO_DISPLAY_TIME && inputManager.isKeyDown('KeyR')) restartGame();
-    return;
+  vfx.update();
+  screenShake.update();
+
+  switch (phase) {
+    case GamePhase.INTRO: {
+      phaseTimer++;
+      if (phaseTimer >= INTRO_DURATION) {
+        phase = GamePhase.FIGHTING;
+        tick = 0;
+      }
+      return;
+    }
+    case GamePhase.KO: {
+      koTimer++;
+      if (koTimer > KO_DISPLAY_TIME && inputManager.isKeyDown('KeyR')) restartGame();
+      return;
+    }
+    case GamePhase.FIGHTING: {
+      break; // Continue to normal update below
+    }
   }
 
   tick++;
-  vfx.update();
-  screenShake.update();
 
   const rawP1 = inputManager.getP1Input();
   const rawP2 = inputManager.getP2Input();
@@ -261,10 +275,9 @@ function update(): void {
   }
 
   if (p1.health <= 0 || p2.health <= 0) {
-    koState = true;
+    phase = GamePhase.KO;
     koTimer = 0;
     winner = p1.health <= 0 && p2.health <= 0 ? null : p1.health <= 0 ? 1 : 0;
-    // Big KO hit effect
     vfx.spawnHitSparks((p1.x + p2.x) / 2, STAGE_GROUND_Y - 100, 20);
     screenShake.trigger(12, 15);
   }
@@ -275,15 +288,16 @@ function update(): void {
       facing: f.facing, currentAttack: f.currentAttack,
       attackPhase: f.attackPhase, attackFrame: f.attackFrame,
     })),
-    tick, fps: renderer.getFps(), ko: koState, winner,
+    tick, fps: renderer.getFps(), ko: phase === GamePhase.KO, winner,
   };
 }
 
 function render(): void {
   camera.update(p1, p2);
-  renderer.render([p1, p2], camera.x, tick, koState, winner, screenShake.offsetX, screenShake.offsetY);
+  const isKO = phase === GamePhase.KO;
+  renderer.render([p1, p2], camera.x, tick, isKO, winner, screenShake.offsetX, screenShake.offsetY);
 
-  // VFX (world-space, need camera offset)
+  // VFX
   vfx.render(ctx, camera.x);
 
   // Projectiles
@@ -302,12 +316,16 @@ function render(): void {
     ctx.beginPath();
     ctx.arc(sx, proj.y, 5, 0, Math.PI * 2);
     ctx.fill();
-    // Trail
     ctx.fillStyle = 'rgba(255,170,0,0.3)';
     ctx.beginPath();
     ctx.arc(sx - proj.facing * 12, proj.y, 7, 0, Math.PI * 2);
     ctx.fill();
     ctx.restore();
+  }
+
+  // Intro overlay
+  if (phase === GamePhase.INTRO) {
+    drawIntro();
   }
 
   // Controls hint
@@ -318,6 +336,36 @@ function render(): void {
   ctx.textAlign = 'left';
 
   if (debugMode) drawDebug();
+}
+
+function drawIntro(): void {
+  ctx.save();
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+
+  if (phaseTimer < 60) {
+    // "ROUND 1" phase
+    const progress = phaseTimer / 60;
+    const scale = 1 + Math.max(0, 1 - progress * 3) * 0.5;
+    const alpha = Math.min(1, progress * 4);
+    ctx.globalAlpha = alpha;
+    ctx.fillStyle = '#ffffff';
+    ctx.font = `bold ${Math.round(40 * scale)}px monospace`;
+    ctx.fillText('ROUND 1', 400, 260);
+  } else if (phaseTimer < 100) {
+    // "FIGHT!" phase
+    const fightProgress = (phaseTimer - 60) / 40;
+    const scale = 1 + Math.max(0, 1 - fightProgress * 4) * 1.5;
+    const alpha = fightProgress < 0.1 ? fightProgress * 10 : Math.max(0, 1 - (fightProgress - 0.5) * 2);
+    ctx.globalAlpha = Math.min(1, Math.max(0, alpha));
+    ctx.shadowColor = '#ff4400';
+    ctx.shadowBlur = 20;
+    ctx.fillStyle = '#ff4400';
+    ctx.font = `bold ${Math.round(60 * scale)}px monospace`;
+    ctx.fillText('FIGHT!', 400, 300);
+  }
+
+  ctx.restore();
 }
 
 function drawDebug(): void {
@@ -396,7 +444,8 @@ function drawDebug(): void {
 }
 
 function restartGame(): void {
-  koState = false;
+  phase = GamePhase.INTRO;
+  phaseTimer = 0;
   koTimer = 0;
   winner = null;
   tick = 0;
