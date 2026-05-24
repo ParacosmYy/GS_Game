@@ -330,5 +330,12 @@ export const KyoDef: CharacterDefinition = {
   },
 
   isCommandThrow(_attackType) { return false; },
-  getCounterConfig() { return null; },
+  getCounterConfig() {
+    return {
+      activeFrames: 16,
+      counterAttack: AttackType.KYO_ONIYAKI,
+      counterDamage: 40,
+      failureStun: 20,
+    };
+  },
 };

@@ -242,5 +242,12 @@ export const LeonaDef: CharacterDefinition = {
   },
 
   isCommandThrow(_attackType) { return false; },
-  getCounterConfig() { return null; },
+  getCounterConfig() {
+    return {
+      activeFrames: 18,
+      counterAttack: AttackType.LEONA_EAR_RING,
+      counterDamage: 45,
+      failureStun: 22,
+    };
+  },
 };
