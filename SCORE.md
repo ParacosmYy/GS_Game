@@ -2305,3 +2305,9 @@
 **改动:** stateHandlers.ts新增FRAME_DATA import用于recovery-to-block判断
 
 | 战斗手感 | 51/150 | 0 | 依赖补全, 行为不变 |
+
+### Iter-V156 — 2026-05-25（stateHandlers.ts split — 防御/硬直状态拆分 +5=868）
+
+**改动:** stateHandlers.ts从611行拆分为stateHandlers.ts(484行)+stunStateHandlers.ts(142行), 防御/硬直/倒地状态独立模块
+
+| 战斗手感 | 51/150 | 0 | 纯架构重构, 行为不变 |
