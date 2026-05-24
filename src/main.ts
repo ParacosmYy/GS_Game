@@ -1,6 +1,8 @@
 import { GameLoop } from './core/gameLoop.js';
 import { InputManager } from './input/inputManager.js';
+import { CommandBuffer } from './input/commandBuffer.js';
 import { Fighter } from './entities/fighter.js';
+import { Projectile } from './entities/projectile.js';
 import { Renderer } from './rendering/renderer.js';
 import {
   STAGE_WIDTH,
@@ -14,8 +16,10 @@ import {
   MAX_HEALTH,
   KO_DISPLAY_TIME,
   FRAME_DATA,
+  THROW_RANGE,
+  THROW_DISTANCE,
 } from './core/constants.js';
-import { FighterState, AttackType, GameState } from './core/types.js';
+import { FighterState, AttackType, GameState, DirectionInput, Direction } from './core/types.js';
 
 // ===== Canvas Setup =====
 const canvas = document.getElementById('gameCanvas') as HTMLCanvasElement;
@@ -29,13 +33,19 @@ const p2 = new Fighter(STAGE_WIDTH * 0.67, '#2244cc', -1);
 const fighters = [p1, p2];
 
 const inputManager = new InputManager();
+const p1CommandBuffer = new CommandBuffer();
+const p2CommandBuffer = new CommandBuffer();
 const renderer = new Renderer(ctx);
+
+// Projectiles
+const projectiles: Projectile[] = [];
 
 // ===== Game State =====
 let koState = false;
 let koTimer = 0;
 let winner: number | null = null;
 let tick = 0;
+let debugMode = false;
 
 // ===== Expose game state for testing =====
 declare global {
@@ -49,16 +59,49 @@ declare global {
 window.__fighters = fighters;
 window.__restart = restartGame;
 
-// ===== P1 & P2 direction histories =====
-const p1DirHistory: { direction: string; frame: number }[] = [];
-const p2DirHistory: { direction: string; frame: number }[] = [];
+// ===== Input helper =====
+interface ResolvedInput {
+  up: boolean;
+  down: boolean;
+  forward: boolean; // relative to facing
+  back: boolean;
+  lightAttack: boolean;
+  heavyAttack: boolean;
+  throwAttack: boolean;
+}
+
+function resolveInput(
+  raw: { up: boolean; down: boolean; left: boolean; right: boolean; lightAttack: boolean; heavyAttack: boolean; throwAttack: boolean },
+  facing: Direction,
+): ResolvedInput {
+  return {
+    up: raw.up,
+    down: raw.down,
+    forward: facing === 1 ? raw.right : raw.left,
+    back: facing === 1 ? raw.left : raw.right,
+    lightAttack: raw.lightAttack,
+    heavyAttack: raw.heavyAttack,
+    throwAttack: raw.throwAttack,
+  };
+}
+
+function getDirectionInput(input: ResolvedInput): DirectionInput {
+  if (input.up && input.forward) return 'upforward';
+  if (input.up && input.back) return 'upback';
+  if (input.down && input.forward) return 'downforward';
+  if (input.down && input.back) return 'downback';
+  if (input.up) return 'up';
+  if (input.down) return 'down';
+  if (input.forward) return 'forward';
+  if (input.back) return 'back';
+  return 'neutral';
+}
 
 // ===== Main Update =====
 function update(): void {
   if (koState) {
     koTimer++;
     if (koTimer > KO_DISPLAY_TIME) {
-      // Allow restart with R key
       if (inputManager.isKeyDown('KeyR')) {
         restartGame();
       }
@@ -68,29 +111,48 @@ function update(): void {
 
   tick++;
 
-  const p1Input = inputManager.getP1Input();
-  const p2Input = inputManager.getP2Input();
+  const rawP1 = inputManager.getP1Input();
+  const rawP2 = inputManager.getP2Input();
 
   // Update facing
   p1.updateFacing(p2);
   p2.updateFacing(p1);
 
-  // Process each fighter
-  updateFighter(p1, p1Input, p2);
-  updateFighter(p2, p2Input, p1);
+  const p1Input = resolveInput(rawP1, p1.facing);
+  const p2Input = resolveInput(rawP2, p2.facing);
 
-  // Pushbox collision (prevent overlap)
+  // Record directions for command buffer
+  p1CommandBuffer.record(getDirectionInput(p1Input), tick);
+  p2CommandBuffer.record(getDirectionInput(p2Input), tick);
+
+  // Process each fighter
+  updateFighter(p1, p1Input, p2, p1CommandBuffer);
+  updateFighter(p2, p2Input, p1, p2CommandBuffer);
+
+  // Pushbox collision
   resolvePushbox(p1, p2);
+
+  // Update projectiles
+  for (const proj of projectiles) {
+    proj.update();
+  }
 
   // Combat resolution
   processCombat();
+
+  // Clean up dead projectiles
+  for (let i = projectiles.length - 1; i >= 0; i--) {
+    if (!projectiles[i].active) {
+      projectiles.splice(i, 1);
+    }
+  }
 
   // Check KO
   if (p1.health <= 0 || p2.health <= 0) {
     koState = true;
     koTimer = 0;
     if (p1.health <= 0 && p2.health <= 0) {
-      winner = null; // Draw
+      winner = null;
     } else if (p1.health <= 0) {
       winner = 1;
     } else {
@@ -98,23 +160,40 @@ function update(): void {
     }
   }
 
+  // Debug toggle
+  if (inputManager.isKeyDown('F1')) {
+    debugMode = !debugMode;
+  }
+
   // Update game state for testing
-  window.__gameState = renderer.getGameState(fighters, tick);
-  window.__gameState.ko = koState;
-  window.__gameState.winner = winner;
+  window.__gameState = {
+    players: fighters.map((f) => ({
+      x: f.x,
+      y: f.y,
+      health: f.health,
+      state: f.state,
+      facing: f.facing,
+      currentAttack: f.currentAttack,
+      attackPhase: f.attackPhase,
+      attackFrame: f.attackFrame,
+    })),
+    tick,
+    fps: renderer.getFps(),
+    ko: koState,
+    winner,
+  };
 }
 
-function updateFighter(fighter: Fighter, input: ReturnType<typeof inputManager.getP1Input>, opponent: Fighter): void {
+function updateFighter(
+  fighter: Fighter,
+  input: ResolvedInput,
+  opponent: Fighter,
+  commandBuffer: CommandBuffer,
+): void {
   switch (fighter.state) {
     case FighterState.IDLE:
     case FighterState.WALK: {
-      fighter.displayHeight = 100; // Reset height
-
-      // Check for block (holding back direction)
-      const isBack = fighter.facing === 1 ? input.left : input.right;
-      if (isBack && opponent.state === FighterState.STAND_ATTACK || isBack && opponent.state === FighterState.CROUCH_ATTACK || isBack && opponent.state === FighterState.AIR_ATTACK) {
-        // Will enter block on hit (handled in combat)
-      }
+      fighter.displayHeight = 100;
 
       // Jump
       if (input.up && fighter.isGrounded()) {
@@ -131,25 +210,40 @@ function updateFighter(fighter: Fighter, input: ReturnType<typeof inputManager.g
       }
 
       // Throw
-      if (input.throwAttack) {
+      if (input.throwAttack && fighter.canAct()) {
         fighter.startAttack(AttackType.THROW);
         break;
       }
 
-      // Attacks
-      if (input.heavyAttack) {
-        fighter.startAttack(AttackType.STAND_HEAVY);
-        break;
-      }
-      if (input.lightAttack) {
-        fighter.startAttack(AttackType.STAND_LIGHT);
-        break;
+      // Check for special moves first (priority over normals)
+      const attackPressed = input.lightAttack || input.heavyAttack;
+      if (attackPressed && fighter.canAct()) {
+        const special = commandBuffer.checkSpecial(tick, true);
+        if (special === AttackType.SPECIAL_PROJECTILE) {
+          fighter.startAttack(AttackType.SPECIAL_PROJECTILE);
+          // Spawn projectile at end of startup
+          break;
+        }
+        if (special === AttackType.SPECIAL_UPPER) {
+          fighter.startAttack(AttackType.SPECIAL_UPPER);
+          break;
+        }
+
+        // Normal attacks
+        if (input.heavyAttack) {
+          fighter.startAttack(AttackType.STAND_HEAVY);
+          break;
+        }
+        if (input.lightAttack) {
+          fighter.startAttack(AttackType.STAND_LIGHT);
+          break;
+        }
       }
 
       // Movement
-      if (input.left || input.right) {
-        const moveDir = input.right ? 1 : -1;
-        fighter.vx = WALK_SPEED * moveDir;
+      if (input.forward || input.back) {
+        const moveDir = input.forward ? fighter.facing : -fighter.facing;
+        fighter.vx = WALK_SPEED * (input.forward ? 1 : -1) * fighter.facing;
         fighter.state = FighterState.WALK;
       } else {
         fighter.vx = 0;
@@ -163,8 +257,6 @@ function updateFighter(fighter: Fighter, input: ReturnType<typeof inputManager.g
       if ((input.lightAttack || input.heavyAttack) && fighter.currentAttack === null) {
         fighter.startAttack(AttackType.AIR_ATTACK);
       }
-
-      // Apply gravity
       fighter.vy += GRAVITY;
       break;
     }
@@ -172,7 +264,6 @@ function updateFighter(fighter: Fighter, input: ReturnType<typeof inputManager.g
     case FighterState.CROUCH: {
       fighter.displayHeight = 50;
 
-      // Stand up
       if (!input.down) {
         fighter.state = FighterState.IDLE;
         fighter.displayHeight = 100;
@@ -180,13 +271,13 @@ function updateFighter(fighter: Fighter, input: ReturnType<typeof inputManager.g
       }
 
       // Crouch attack
-      if (input.lightAttack || input.heavyAttack) {
+      if ((input.lightAttack || input.heavyAttack) && fighter.canAct()) {
         fighter.startAttack(AttackType.CROUCH_ATTACK);
         break;
       }
 
       // Throw
-      if (input.throwAttack) {
+      if (input.throwAttack && fighter.canAct()) {
         fighter.startAttack(AttackType.THROW);
         break;
       }
@@ -199,13 +290,31 @@ function updateFighter(fighter: Fighter, input: ReturnType<typeof inputManager.g
     case FighterState.CROUCH_ATTACK:
     case FighterState.AIR_ATTACK:
     case FighterState.THROW: {
+      // Special move handling during active frames
+      if (fighter.currentAttack === AttackType.SPECIAL_PROJECTILE && fighter.attackPhase === 'active' && fighter.attackFrame === 0) {
+        // Spawn projectile once at start of active phase
+        projectiles.push(new Projectile(
+          fighter.x + 50 * fighter.facing,
+          fighter.y - 50,
+          fighter.facing,
+          FRAME_DATA.SPECIAL_PROJECTILE.active,
+        ));
+      }
+
+      if (fighter.currentAttack === AttackType.SPECIAL_UPPER) {
+        // Rise during active frames
+        if (fighter.attackPhase === 'active') {
+          fighter.vy = -6;
+        }
+      }
+
       fighter.tickAttack();
       break;
     }
 
     case FighterState.BLOCK: {
       fighter.blockstunTimer--;
-      fighter.vx *= 0.8; // Friction on pushback
+      fighter.vx *= 0.8;
       if (fighter.blockstunTimer <= 0) {
         fighter.state = FighterState.IDLE;
         fighter.vx = 0;
@@ -215,7 +324,7 @@ function updateFighter(fighter: Fighter, input: ReturnType<typeof inputManager.g
 
     case FighterState.HITSTUN: {
       fighter.hitstunTimer--;
-      fighter.vx *= 0.85; // Friction
+      fighter.vx *= 0.85;
       if (fighter.hitstunTimer <= 0) {
         fighter.state = FighterState.IDLE;
         fighter.vx = 0;
@@ -243,10 +352,7 @@ function updateFighter(fighter: Fighter, input: ReturnType<typeof inputManager.g
   // Ground check
   if (fighter.y >= STAGE_GROUND_Y) {
     if (fighter.state === FighterState.JUMP || fighter.state === FighterState.AIR_ATTACK) {
-      // Landing
-      if (fighter.state === FighterState.AIR_ATTACK) {
-        fighter.endAttack();
-      }
+      if (fighter.currentAttack) fighter.endAttack();
       fighter.y = STAGE_GROUND_Y;
       fighter.vy = 0;
       fighter.vx = 0;
@@ -280,7 +386,7 @@ function resolvePushbox(a: Fighter, b: Fighter): void {
   }
 }
 
-// ===== Simple AABB check =====
+// ===== AABB check =====
 function aabbCheck(
   a: { x: number; y: number; width: number; height: number },
   b: { x: number; y: number; width: number; height: number },
@@ -294,8 +400,39 @@ function aabbCheck(
 }
 
 function processCombat(): void {
+  // Fighter vs Fighter
   resolveAttack(p1, p2);
   resolveAttack(p2, p1);
+
+  // Projectile vs Fighter
+  for (const proj of projectiles) {
+    const hitbox = proj.getHitbox();
+    if (!hitbox) continue;
+
+    // Check against both fighters (skip the owner based on facing)
+    for (const defender of fighters) {
+      const hurtbox = defender.getHurtbox();
+      if (aabbCheck(hitbox, hurtbox)) {
+        const attackData = FRAME_DATA.SPECIAL_PROJECTILE;
+
+        // Block check
+        const defInput = defender === p1
+          ? resolveInput(inputManager.getP1Input(), defender.facing)
+          : resolveInput(inputManager.getP2Input(), defender.facing);
+        const isHoldingBack = defInput.back;
+
+        if (defender.canBlock() && isHoldingBack) {
+          defender.applyBlockstun(attackData.blockstun, attackData.pushback);
+        } else {
+          defender.health -= attackData.damage;
+          defender.health = Math.max(0, defender.health);
+          defender.applyHitstun(attackData.hitstun, attackData.pushback);
+        }
+        proj.active = false;
+        break;
+      }
+    }
+  }
 }
 
 function resolveAttack(attacker: Fighter, defender: Fighter): void {
@@ -305,50 +442,40 @@ function resolveAttack(attacker: Fighter, defender: Fighter): void {
   const hurtbox = defender.getHurtbox();
   if (!aabbCheck(hitbox, hurtbox)) return;
 
-  const attackData = attacker.currentAttack
-    ? { ...FRAME_DATA[attacker.currentAttack] }
-    : null;
-  if (!attackData) return;
+  const attackType = attacker.currentAttack;
+  if (!attackType) return;
+  const attackData = FRAME_DATA[attackType];
 
   attacker.hasHit = true;
 
   // Throw handling
-  if (attacker.currentAttack === AttackType.THROW) {
+  if (attackType === AttackType.THROW) {
     const dist = Math.abs(attacker.x - defender.x);
-    if (dist > 80 || !defender.isGrounded()) {
-      return; // Throw misses
+    if (dist > THROW_RANGE || !defender.isGrounded()) {
+      return;
     }
-    // Throw always hits (unblockable)
     defender.health -= attackData.damage;
+    defender.health = Math.max(0, defender.health);
     defender.applyKnockdown(30);
-    // Move defender behind attacker
-    defender.x = attacker.x + attacker.facing * -100;
+    defender.x = attacker.x - THROW_DISTANCE * attacker.facing;
     return;
   }
 
   // Block check
-  const isHoldingBack = defender.facing === 1
-    ? (inputManager.getP1Input().left || inputManager.getP2Input().left)
-    : (inputManager.getP1Input().right || inputManager.getP2Input().right);
+  const defRaw = defender === p1
+    ? inputManager.getP1Input()
+    : inputManager.getP2Input();
+  const defInput = resolveInput(defRaw, defender.facing);
+  const isHoldingBack = defInput.back;
 
   if (defender.canBlock() && isHoldingBack) {
-    // Check high/low
-    const isLowAttack =
-      attacker.currentAttack === AttackType.CROUCH_ATTACK;
-    const isOverheadAttack =
-      attacker.currentAttack === AttackType.AIR_ATTACK;
-    const defenderIsCrouching = defender.state === FighterState.CROUCH;
+    const isLowAttack = attackType === AttackType.CROUCH_ATTACK;
+    const isOverhead = attackType === AttackType.AIR_ATTACK;
+    const defenderCrouching = defender.state === FighterState.CROUCH;
 
-    let blocked = false;
-    if (isLowAttack && !defenderIsCrouching) {
-      // Low attack beats stand block
-      blocked = false;
-    } else if (isOverheadAttack && defenderIsCrouching) {
-      // Overhead beats crouch block
-      blocked = false;
-    } else {
-      blocked = true;
-    }
+    let blocked = true;
+    if (isLowAttack && !defenderCrouching) blocked = false;
+    if (isOverhead && defenderCrouching) blocked = false;
 
     if (blocked) {
       defender.applyBlockstun(attackData.blockstun, attackData.pushback);
@@ -356,12 +483,10 @@ function resolveAttack(attacker: Fighter, defender: Fighter): void {
     }
   }
 
-  // Hit!
+  // Hit
   defender.health -= attackData.damage;
-  defender.applyHitstun(attackData.hitstun, attackData.pushback);
-
-  // Prevent health going below 0
   defender.health = Math.max(0, defender.health);
+  defender.applyHitstun(attackData.hitstun, attackData.pushback);
 }
 
 function restartGame(): void {
@@ -371,12 +496,103 @@ function restartGame(): void {
   tick = 0;
   p1.reset(STAGE_WIDTH * 0.33);
   p2.reset(STAGE_WIDTH * 0.67);
+  p1CommandBuffer.reset();
+  p2CommandBuffer.reset();
+  projectiles.length = 0;
 }
 
 // ===== Render =====
 function render(): void {
   renderer.render(fighters, tick, koState, winner);
+
+  // Draw projectiles
+  const cameraX = (p1.x + p2.x) / 2 - 400;
+  const clampedCameraX = Math.max(0, Math.min(cameraX, STAGE_WIDTH - 800));
+
+  for (const proj of projectiles) {
+    if (!proj.active) continue;
+    const sx = proj.x - clampedCameraX;
+    const sy = proj.y;
+    ctx.fillStyle = '#ff8800';
+    ctx.beginPath();
+    ctx.arc(sx, sy, 12, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#ffcc00';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+  }
+
+  // Debug overlay
+  if (debugMode) {
+    drawDebug(clampedCameraX);
+  }
 }
+
+function drawDebug(cameraX: number): void {
+  ctx.save();
+  ctx.globalAlpha = 0.8;
+  ctx.fillStyle = '#000';
+  ctx.fillRect(0, 0, 250, 180);
+  ctx.globalAlpha = 1;
+  ctx.fillStyle = '#0f0';
+  ctx.font = '11px monospace';
+
+  let y = 15;
+  for (let i = 0; i < fighters.length; i++) {
+    const f = fighters[i];
+    ctx.fillText(`P${i + 1}: ${f.state} hp=${f.health} x=${Math.round(f.x)} facing=${f.facing}`, 5, y);
+    y += 14;
+    if (f.currentAttack) {
+      ctx.fillText(`  ATK: ${f.currentAttack} ${f.attackPhase} frame=${f.attackFrame}`, 5, y);
+      y += 14;
+    }
+
+    // Draw hitbox
+    const hitbox = f.getActiveHitbox();
+    if (hitbox) {
+      ctx.strokeStyle = 'rgba(255, 0, 0, 0.7)';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(
+        hitbox.x - cameraX,
+        hitbox.y,
+        hitbox.width,
+        hitbox.height,
+      );
+    }
+
+    // Draw hurtbox
+    const hurtbox = f.getHurtbox();
+    ctx.strokeStyle = 'rgba(0, 100, 255, 0.5)';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(
+      hurtbox.x - cameraX,
+      hurtbox.y,
+      hurtbox.width,
+      hurtbox.height,
+    );
+  }
+
+  ctx.fillText(`tick: ${tick}  fps: ${renderer.getFps()}`, 5, y);
+  y += 14;
+  ctx.fillText(`projectiles: ${projectiles.length}`, 5, y);
+
+  ctx.restore();
+}
+
+// ===== F1 toggle (debounced) =====
+let f1Pressed = false;
+window.addEventListener('keydown', (e) => {
+  if (e.code === 'F1') {
+    e.preventDefault();
+    if (!f1Pressed) {
+      f1Pressed = true;
+      debugMode = !debugMode;
+    }
+  }
+});
+window.addEventListener('keyup', (e) => {
+  if (e.code === 'F1') f1Pressed = false;
+});
 
 // ===== Start =====
 const gameLoop = new GameLoop(update, render);
