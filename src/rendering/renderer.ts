@@ -177,15 +177,14 @@ export class Renderer {
     const tick = this.globalTick;
     switch (f.state) {
       case FighterState.IDLE:
-        return Math.floor(tick / 12) % 4;
+        return Math.floor(tick / 8) % 8;
       case FighterState.WALK:
       case FighterState.RUN:
-        return Math.floor(tick / 6) % 4;
+        return Math.floor(tick / 6) % 6;
       case FighterState.STAND_ATTACK:
       case FighterState.CROUCH_ATTACK:
       case FighterState.AIR_ATTACK:
       case FighterState.THROW:
-        // 攻击阶段映射: startup→0, active→1-2, recovery→3
         if (f.attackPhase === 'startup') return 0;
         if (f.attackPhase === 'active') return 1;
         return 3;

@@ -315,15 +315,21 @@ interface Pose {
 
 const IDLE_POSES: Pose[] = [
   { headOff: 0, bodyLean: 0, armL: 0.3, armR: -0.3, legL: -1, legR: 1, crouch: false },
+  { headOff: 0, bodyLean: 0, armL: 0.32, armR: -0.28, legL: -1, legR: 1, crouch: false },
   { headOff: 0, bodyLean: 0, armL: 0.35, armR: -0.25, legL: -1, legR: 1, crouch: false },
-  { headOff: 0, bodyLean: 0, armL: 0.3, armR: -0.3, legL: -1, legR: 1, crouch: false },
+  { headOff: 0, bodyLean: 0, armL: 0.36, armR: -0.24, legL: -1, legR: 1, crouch: false },
+  { headOff: 0, bodyLean: 0, armL: 0.35, armR: -0.25, legL: -1, legR: 1, crouch: false },
+  { headOff: 0, bodyLean: 0, armL: 0.32, armR: -0.28, legL: -1, legR: 1, crouch: false },
+  { headOff: 0, bodyLean: 0, armL: 0.28, armR: -0.32, legL: -1, legR: 1, crouch: false },
   { headOff: 0, bodyLean: 0, armL: 0.25, armR: -0.35, legL: -1, legR: 1, crouch: false },
 ];
 const WALK_POSES: Pose[] = [
   { headOff: 0, bodyLean: 1, armL: 0.5, armR: -0.1, legL: -2, legR: 2, crouch: false },
+  { headOff: 0, bodyLean: 0.5, armL: 0.4, armR: -0.2, legL: -1, legR: 1, crouch: false },
   { headOff: 0, bodyLean: 0, armL: 0.3, armR: -0.3, legL: 0, legR: 0, crouch: false },
+  { headOff: 0, bodyLean: -0.5, armL: 0.2, armR: -0.4, legL: 1, legR: -1, crouch: false },
   { headOff: 0, bodyLean: -1, armL: 0.1, armR: -0.5, legL: 2, legR: -2, crouch: false },
-  { headOff: 0, bodyLean: 0, armL: 0.3, armR: -0.3, legL: 0, legR: 0, crouch: false },
+  { headOff: 0, bodyLean: -0.5, armL: 0.2, armR: -0.4, legL: 1, legR: -1, crouch: false },
 ];
 const ATTACK_POSES: Pose[] = [
   // startup: 拳收回准备
@@ -439,53 +445,61 @@ const POSE_MAP: Record<PoseSet, Pose[]> = {
   crouch: CROUCH_POSES, jump: JUMP_POSES, hit: HIT_POSES, block: BLOCK_POSES,
 };
 
-/** 生成角色精灵图集 — 返回Image + AnimationMap */
+/** 生成角色精灵图集 — 返回Image + AnimationMap
+ * 图集布局: 每行一个PoseSet, 每行帧数可变
+ * 最后一行是KO帧
+ */
 export function generatePlaceholderSpritesheet(color: string, charId: string): {
   image: HTMLImageElement;
   animations: SpriteAnimationMap;
 } {
   const v = CHAR_VISUALS[charId] ?? getDefaultVisual();
-  // 用角色配色覆盖
   v.shirtColor = color;
 
   const poseSets: PoseSet[] = ['idle', 'walk', 'attack', 'crouch_attack', 'air_attack', 'throw', 'crouch', 'jump', 'hit', 'block'];
-  const framesPerSet = 4;
-  const cols = poseSets.length;
-  const atlasW = PW * cols;
-  const atlasH = PH * 2; // 上半部正常帧, 下半部KO帧
+
+  // 计算图集尺寸
+  let maxFrames = 0;
+  for (const set of poseSets) {
+    maxFrames = Math.max(maxFrames, POSE_MAP[set].length);
+  }
+  const atlasW = PW * maxFrames;
+  const atlasH = PH * (poseSets.length + 1); // 每个PoseSet一行 + KO行
 
   const atlas = document.createElement('canvas');
   atlas.width = atlasW;
   atlas.height = atlasH;
   const actx = atlas.getContext('2d')!;
 
-  // 绘制各姿态帧
-  poseSets.forEach((set, col) => {
+  // 绘制各姿态帧 — 每行一个PoseSet
+  const rowMap = new Map<PoseSet, number>();
+  poseSets.forEach((set, row) => {
+    rowMap.set(set, row);
     const poses = POSE_MAP[set];
     poses.forEach((pose, f) => {
       const frame = document.createElement('canvas');
       frame.width = PW;
       frame.height = PH;
       const fc = frame.getContext('2d')!;
-      // 关闭抗锯齿保持像素感
       fc.imageSmoothingEnabled = false;
       drawPixelChar(fc, { ...v }, pose.headOff, pose.bodyLean, pose.armL, pose.armR, pose.legL, pose.legR, pose.crouch);
-      actx.drawImage(frame, col * PW + (f % 2), 0);
+      actx.drawImage(frame, f * PW, row * PH);
     });
   });
 
-  // KO帧在下半部
+  // KO帧在最后一行
+  const koRow = poseSets.length;
   const koFrame = document.createElement('canvas');
   koFrame.width = PW;
   koFrame.height = PH;
   const kc = koFrame.getContext('2d')!;
   drawKO(kc, v);
-  actx.drawImage(koFrame, 0, PH);
+  actx.drawImage(koFrame, 0, koRow * PH);
 
   const image = new Image();
   image.src = atlas.toDataURL();
 
-  // 构建动画映射
+  // 构建动画映射 — 使用每行的实际帧数
   const allStates: FighterState[] = [
     FighterState.IDLE, FighterState.WALK, FighterState.RUN,
     FighterState.JUMP, FighterState.HOP, FighterState.RUN_JUMP, FighterState.HYPER_JUMP,
@@ -499,12 +513,13 @@ export function generatePlaceholderSpritesheet(color: string, charId: string): {
   const animations: SpriteAnimationMap = {};
   for (const state of allStates) {
     const set = stateToPoseSet(state);
-    const col = poseSets.indexOf(set);
+    const row = rowMap.get(set)!;
+    const poseCount = POSE_MAP[set].length;
     const frames: SpriteFrame[] = [];
-    for (let f = 0; f < framesPerSet; f++) {
+    for (let f = 0; f < poseCount; f++) {
       frames.push({
-        sx: col * PW + (f % 2),
-        sy: 0,
+        sx: f * PW,
+        sy: row * PH,
         sw: PW,
         sh: PH,
         ox: -PW / 2,
@@ -515,7 +530,7 @@ export function generatePlaceholderSpritesheet(color: string, charId: string): {
   }
   // KO特殊帧
   animations[FighterState.KNOCKDOWN] = [{
-    sx: 0, sy: PH, sw: PW, sh: PH, ox: -PW / 2, oy: -PH,
+    sx: 0, sy: koRow * PH, sw: PW, sh: PH, ox: -PW / 2, oy: -PH,
   }];
 
   return { image, animations };
