@@ -215,9 +215,10 @@ export class Fighter {
     return null;
   }
 
-  /** 是否可被投(防御中/被击中/倒地时不可被投) */
+  /** 是否可被投(防御中/被击中/倒地时/空中不可被投) */
   isThrowVulnerable(): boolean {
     if (this.throwInvulnFrames > 0) return false;
+    if (!this.isGrounded()) return false; // KOF2002: 空中不可被地面投技
     if (this.state === FighterState.HITSTUN) return false;
     if (this.state === FighterState.KNOCKDOWN) return false;
     if (this.state === FighterState.BLOCK) return false;

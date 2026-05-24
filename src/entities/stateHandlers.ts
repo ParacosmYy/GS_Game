@@ -342,6 +342,7 @@ export function handleAttack(ctx: FighterCtx, input: ResolvedInput): void {
         && ctx.gauge.stocks >= DM_STOCK_COST + SUPER_CANCEL_STOCK_COST) {
       spendStocks(ctx.gauge, DM_STOCK_COST + SUPER_CANCEL_STOCK_COST);
       f.cancelEvent = 'super_cancel';
+      ctx.vfx.spawnSuperCancelText(f.x, f.y - f.displayHeight - 30);
       f.startAttack(dmAttack);
       return;
     }
