@@ -57,8 +57,8 @@ export function drawAttackLimb(
   const specialColor = charDef?.specialColor || '#ff4400';
   const specialGlow = charDef?.specialGlow || '#ff6600';
 
-  const limbLen = isHeavy ? 42 : 35;
-  const limbWidth = isHeavy ? 10 : 8;
+  const limbLen = isHeavy ? 68 : 55;
+  const limbWidth = isHeavy ? 16 : 12;
 
   ctx.save();
   if (isSpecialMove) {

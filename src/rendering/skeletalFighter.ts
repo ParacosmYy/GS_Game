@@ -48,9 +48,9 @@ function drawCharacterHead(
   ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI * 2); ctx.stroke();
 
   // Eyes — white sclera + colored iris + black pupil
-  const eyeSpacing = 5;
-  const eyeY = -1;
-  const eyeR = 3.5;
+  const eyeSpacing = 8;
+  const eyeY = -2;
+  const eyeR = 5.5;
   for (const side of [-1, 1]) {
     const ex = side * eyeSpacing;
     // Sclera
@@ -61,34 +61,34 @@ function drawCharacterHead(
     ctx.stroke();
     // Iris
     ctx.fillStyle = getEyeColor(charId);
-    ctx.beginPath(); ctx.arc(ex + facing * 1, eyeY, 2, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(ex + facing * 1.5, eyeY, 3.2, 0, Math.PI * 2); ctx.fill();
     // Pupil
     ctx.fillStyle = '#111';
-    ctx.beginPath(); ctx.arc(ex + facing * 1.5, eyeY, 1, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(ex + facing * 2, eyeY, 1.6, 0, Math.PI * 2); ctx.fill();
     // Eye shine
     ctx.fillStyle = 'rgba(255,255,255,0.6)';
-    ctx.beginPath(); ctx.arc(ex + facing * 0.5, eyeY - 1, 0.8, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(ex + facing * 0.8, eyeY - 1.5, 1.2, 0, Math.PI * 2); ctx.fill();
   }
 
   // Eyebrows
   ctx.strokeStyle = getHairColor(charId);
-  ctx.lineWidth = 2;
+  ctx.lineWidth = 3;
   for (const side of [-1, 1]) {
     ctx.beginPath();
-    ctx.moveTo(side * (eyeSpacing - 3.5), eyeY - 5);
-    ctx.lineTo(side * (eyeSpacing + 3.5), eyeY - 5.5);
+    ctx.moveTo(side * (eyeSpacing - 5), eyeY - 8);
+    ctx.lineTo(side * (eyeSpacing + 5), eyeY - 8.5);
     ctx.stroke();
   }
 
   // Mouth — simple line, character-specific expression
   ctx.strokeStyle = shiftColor(skinColor, -30);
-  ctx.lineWidth = 1;
+  ctx.lineWidth = 1.5;
   ctx.beginPath();
-  ctx.moveTo(-3, r * 0.45);
+  ctx.moveTo(-5, r * 0.45);
   if (charId === 'iori') {
-    ctx.lineTo(3, r * 0.5); // slight smirk
+    ctx.lineTo(5, r * 0.5); // slight smirk
   } else {
-    ctx.lineTo(3, r * 0.42); // neutral
+    ctx.lineTo(5, r * 0.42); // neutral
   }
   ctx.stroke();
 
@@ -124,18 +124,18 @@ function drawHair(ctx: CanvasRenderingContext2D, charId: string, facing: number,
   if (charId === 'kyo') {
     // Kyo: brown spiky hair sticking up
     ctx.fillStyle = '#8B4513';
-    const spikes = [[-8, -14], [-4, -18], [0, -16], [4, -18], [8, -14]];
+    const spikes = [[-12, -22], [-6, -28], [0, -25], [6, -28], [12, -22]];
     for (const [sx, sy] of spikes) {
       ctx.beginPath();
-      ctx.moveTo(sx - 3, -r + 2);
+      ctx.moveTo(sx - 5, -r + 3);
       ctx.lineTo(sx, -r + sy);
-      ctx.lineTo(sx + 3, -r + 2);
+      ctx.lineTo(sx + 5, -r + 3);
       ctx.closePath();
       ctx.fill();
     }
     // Hair band
     ctx.fillStyle = '#cc2200';
-    ctx.fillRect(-r + 1, -r + 5, headW - 2, 3);
+    ctx.fillRect(-r + 1, -r + 7, headW - 2, 5);
   } else if (charId === 'iori') {
     // Iori: long crimson hair flowing down
     ctx.fillStyle = '#8B0000';
@@ -390,11 +390,11 @@ export function drawSkeletalFighter(
   const isRolling = f.state === FighterState.ROLL || f.state === FighterState.BACK_ROLL;
   const heightFactor = (isCrouching || isRolling) ? 0.6 : 1.0;
 
-  // === Enhanced body dimensions (larger, more proportional) ===
-  const headW = 24, headH = 24;
-  const torsoW = 32, torsoH = 38;
-  const armW = 14, armH = 26;
-  const legW = 16, legH = 34;
+  // === Enhanced body dimensions (larger, KOF-proportional) ===
+  const headW = 44, headH = 44;
+  const torsoW = 56, torsoH = 68;
+  const armW = 22, armH = 48;
+  const legW = 26, legH = 60;
 
   // Reference point
   const refX = sx;
@@ -447,7 +447,7 @@ export function drawSkeletalFighter(
 
   // Draw shadow on ground
   const shadowY = sy + 2;
-  const shadowW = 40;
+  const shadowW = 60;
   ctx.save();
   ctx.globalAlpha = 0.25;
   ctx.fillStyle = '#000';
@@ -467,8 +467,8 @@ export function drawSkeletalFighter(
   const effSkinColor = flashOverride ?? skinColor;
   const effOutline = flashOutline ?? shiftColor(outfit.shirt, -50);
 
-  const shoulderY = refY + 10 * heightFactor;
-  const hipY = refY + 36 * heightFactor;
+  const shoulderY = refY + 16 * heightFactor;
+  const hipY = refY + 60 * heightFactor;
 
   // === Layer order: shadow → back → body → front ===
 
@@ -495,7 +495,7 @@ export function drawSkeletalFighter(
   }
 
   // 3. Torso (body) — shirt color with collar detail
-  const torsoCenterY = refY + 20 * heightFactor + p.body.oy * heightFactor;
+  const torsoCenterY = refY + 34 * heightFactor + p.body.oy * heightFactor;
   const torsoX = refX + p.body.ox * f.facing;
   drawBone(
     torsoX, torsoCenterY,
@@ -524,7 +524,7 @@ export function drawSkeletalFighter(
 
   // 4. Head
   const headPos = boneScreen(p.head);
-  const headCenterY = refY + 5 * heightFactor + p.head.oy * heightFactor;
+  const headCenterY = refY + 8 * heightFactor + p.head.oy * heightFactor;
   ctx.save();
   ctx.translate(headPos.x, headCenterY);
   ctx.rotate(p.head.rot * f.facing);
