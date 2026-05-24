@@ -7,7 +7,7 @@ import {
   WALK_SPEED, GRAVITY, JUMP_VELOCITY,
   FRAME_DATA, LANDING_RECOVERY,
 } from '../core/constants.js';
-import { FighterState, AttackType, Direction } from '../core/types.js';
+import { FighterState, AttackType } from '../core/types.js';
 import type { VFXSystem } from '../rendering/vfx.js';
 
 /**
@@ -71,6 +71,7 @@ export class FighterController {
 
   private tickStateMachine(input: ResolvedInput): void {
     const f = this.fighter;
+    f.tickTimers();
     switch (f.state) {
       case FighterState.IDLE:
       case FighterState.WALK: {

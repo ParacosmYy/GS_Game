@@ -1,5 +1,5 @@
 import { Direction } from '../core/types.js';
-import { PROJECTILE_SPEED, HITBOX_OFFSETS } from '../core/constants.js';
+import { PROJECTILE_SPEED } from '../core/constants.js';
 
 export class Projectile {
   x: number;
@@ -37,8 +37,6 @@ export class Projectile {
 
   getHitbox(): { x: number; y: number; width: number; height: number } | null {
     if (!this.active) return null;
-
-    const offset = HITBOX_OFFSETS.SPECIAL_PROJECTILE;
     return {
       x: this.x - 15,
       y: this.y - 15,

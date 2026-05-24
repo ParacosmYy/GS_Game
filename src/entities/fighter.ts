@@ -169,11 +169,17 @@ export class Fighter {
 
   /** Can the fighter act (accept input) right now? */
   canAct(): boolean {
+    if (this.landingRecovery > 0) return false;
     return (
       this.state === FighterState.IDLE ||
       this.state === FighterState.WALK ||
       this.state === FighterState.CROUCH
     );
+  }
+
+  /** Decrement per-frame timers (call once per logic frame) */
+  tickTimers(): void {
+    if (this.landingRecovery > 0) this.landingRecovery--;
   }
 
   /** Is the fighter in a state where blocking is possible? */

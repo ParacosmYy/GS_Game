@@ -1,4 +1,4 @@
-import { AttackType, DirectionInput, PlayerInput, Direction } from '../core/types.js';
+import { AttackType, DirectionInput } from '../core/types.js';
 import { COMMAND_WINDOW } from '../core/constants.js';
 
 interface DirectionRecord {

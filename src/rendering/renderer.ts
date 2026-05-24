@@ -2,7 +2,7 @@ import { Fighter } from '../entities/fighter.js';
 import { Projectile } from '../entities/projectile.js';
 import { CommandBuffer } from '../input/commandBuffer.js';
 import { Camera } from '../core/camera.js';
-import { FighterState, AttackType, GamePhase } from '../core/types.js';
+import { FighterState, AttackType } from '../core/types.js';
 import { CANVAS_WIDTH, CANVAS_HEIGHT, STAGE_GROUND_Y, FIGHTER_WIDTH, MAX_HEALTH, FRAME_DATA } from '../core/constants.js';
 
 export class Renderer {
