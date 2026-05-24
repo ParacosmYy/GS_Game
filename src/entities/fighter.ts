@@ -7,18 +7,13 @@ import {
   BlockType,
 } from '../core/types.js';
 import {
-  STAGE_WIDTH,
   STAGE_GROUND_Y,
   FIGHTER_WIDTH,
   FIGHTER_HEIGHT,
-  WALK_SPEED,
-  GRAVITY,
-  JUMP_VELOCITY,
   MAX_HEALTH,
   PUSH_BOX_WIDTH,
   FRAME_DATA,
   HITBOX_OFFSETS,
-  LANDING_RECOVERY,
 } from '../core/constants.js';
 
 export class Fighter {
