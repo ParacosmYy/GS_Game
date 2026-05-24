@@ -152,4 +152,10 @@ export interface CharacterDefinition {
 
   /** 获取该角色的连段类型 (用于跟踪连段状态) */
   getRekkaChain(attackType: AttackType): 'aragami' | 'dokugami' | 'aoihana' | null;
+
+  /** 该攻击是否为指令投（不可被普通拆投） */
+  isCommandThrow?(attackType: AttackType): boolean;
+
+  /** 该角色的当身技配置，没有当身技返回 null */
+  getCounterConfig?(): import('../core/types.js').CounterConfig | null;
 }

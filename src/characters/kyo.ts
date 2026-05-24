@@ -294,4 +294,7 @@ export const KyoDef: CharacterDefinition = {
     if (attackType === AttackType.KYO_DOKUGAMI) return 'dokugami';
     return null;
   },
+
+  isCommandThrow(_attackType) { return false; },
+  getCounterConfig() { return null; },
 };

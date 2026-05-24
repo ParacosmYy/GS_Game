@@ -52,6 +52,7 @@ const p1Ctrl = new FighterController(p1, 0, p1Cmd, vfx, projectiles, tickRef, RO
 const p2Ctrl = new FighterController(p2, 1, p2Cmd, vfx, projectiles, tickRef, ROSTER[1]);
 p1Ctrl.setOpponent(p2);
 p2Ctrl.setOpponent(p1);
+combatSystem.defenderControllers = [p1Ctrl, p2Ctrl];
 const gauges: [PowerGauge, PowerGauge] = [createPowerGauge(), createPowerGauge()];
 const maxModes: [MaxModeState, MaxModeState] = [createMaxMode(), createMaxMode()];
 p1Ctrl.setGauge(gauges[0]);

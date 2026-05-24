@@ -1,5 +1,6 @@
 import { Fighter } from '../entities/fighter.js';
 import { Projectile } from '../entities/projectile.js';
+import type { FighterController } from '../entities/fighterController.js';
 import { InputManager } from '../input/inputManager.js';
 import { resolveInput } from '../input/inputResolver.js';
 import type { PrevAttack, RawInput } from '../input/inputResolver.js';
@@ -30,6 +31,7 @@ export class CombatSystem {
   private inputManager: InputManager;
   private prev: [PrevAttack, PrevAttack] = [createPrevAttack(), createPrevAttack()];
   private fighters: [Fighter, Fighter] | null = null;
+  defenderControllers: [FighterController, FighterController] | null = null;
   // Damage scaling combo tracking (per defender: [comboCount, scaledDamageTotal])
   private comboHits = [0, 0];
 
@@ -257,6 +259,26 @@ export class CombatSystem {
       || defender.state === FighterState.CROUCH_ATTACK
       || defender.state === FighterState.AIR_ATTACK;
     const counterHit = isDefenderAttacking;
+
+    // 当身技检测：如果防御方处于 COUNTER_STANCE 状态，触发反击
+    if (defender.state === FighterState.COUNTER_STANCE) {
+      const defCtrl = this.defenderControllers?.[defIdx];
+      if (defCtrl) {
+        const charDef = defCtrl.charDef;
+        const counterConfig = charDef.getCounterConfig?.();
+        if (counterConfig) {
+          // 当身成功！攻击者受到反击伤害
+          attacker.health = Math.max(0, attacker.health - counterConfig.counterDamage);
+          attacker.applyHitstun(25, 8);
+          // 防御方恢复
+          defender.state = FighterState.IDLE;
+          defender.vx = 0;
+          onHit?.(defender, attacker, counterConfig.counterAttack, false, true);
+          this.comboHits[defIdx]++;
+          return;
+        }
+      }
+    }
 
     // Damage
     let damage = this.scaledDamage(data.damage, defIdx);

@@ -186,4 +186,7 @@ export const TerryDef: CharacterDefinition = {
   getRekkaChain() {
     return null;
   },
+
+  isCommandThrow(_attackType) { return false; },
+  getCounterConfig() { return null; },
 };

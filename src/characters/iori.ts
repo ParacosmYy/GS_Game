@@ -202,4 +202,7 @@ export const IoriDef: CharacterDefinition = {
     if (attackType === AttackType.IORI_AOIHANA) return 'aoihana';
     return null;
   },
+
+  isCommandThrow(_attackType) { return false; },
+  getCounterConfig() { return null; },
 };

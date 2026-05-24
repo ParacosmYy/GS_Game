@@ -44,7 +44,9 @@ export class CommandBuffer {
     }
 
     // Quarter-Circle Forward: down → downforward → forward + attack
-    if (this.matchSequence(recent, ['down', 'downforward', 'forward'])) {
+    // 宽容模式：接受 down→forward 跳过 downforward
+    if (this.matchSequence(recent, ['down', 'downforward', 'forward'])
+      || this.matchSequence(recent, ['down', 'forward'])) {
       return AttackType.SPECIAL_PROJECTILE;
     }
 
@@ -62,16 +64,21 @@ export class CommandBuffer {
       (r) => currentFrame - r.frame <= DOUBLE_QCF_WINDOW,
     );
 
-    // QCF×2 (↓↘→↓↘→): down→forward pattern repeated
+    // QCF×2 (↓↘→↓↘→): multiple shortcut patterns
     const hasDoubleQCF = this.matchSequence(wideRecent, ['down', 'downforward', 'forward', 'down', 'downforward', 'forward'])
-      || this.matchSequence(wideRecent, ['down', 'forward', 'down', 'forward']);
+      || this.matchSequence(wideRecent, ['down', 'forward', 'down', 'forward'])
+      || this.matchSequence(wideRecent, ['down', 'downforward', 'forward', 'down', 'forward'])
+      || this.matchSequence(wideRecent, ['down', 'forward', 'down', 'downforward', 'forward'])
+      || this.matchSequence(wideRecent, ['downforward', 'forward', 'downforward', 'forward']);
 
     if (hasDoubleQCF && punchPressed) return 'QCFx2_P';
     if (hasDoubleQCF && kickPressed) return 'QCFx2_K';
 
-    // QCB×2 (↓↙←↓↙←): down→back pattern repeated
+    // QCB×2 (↓↙←↓↙←): multiple shortcut patterns
     const hasDoubleQCB = this.matchSequence(wideRecent, ['down', 'downback', 'back', 'down', 'downback', 'back'])
-      || this.matchSequence(wideRecent, ['down', 'back', 'down', 'back']);
+      || this.matchSequence(wideRecent, ['down', 'back', 'down', 'back'])
+      || this.matchSequence(wideRecent, ['down', 'downback', 'back', 'down', 'back'])
+      || this.matchSequence(wideRecent, ['down', 'back', 'down', 'downback', 'back']);
 
     if (hasDoubleQCB && kickPressed) return 'QCBx2_K';
 

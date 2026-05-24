@@ -82,18 +82,13 @@ export class CinematicState {
     else this.p2DamageTaken += damage;
   }
 
-  /** Which player achieved PERFECT? winner=0→p1 won→check p1 took 0 damage. Returns null if none. */
+  /** Which player achieved PERFECT? Returns winner index if winner took 0 damage. */
   getPerfectPlayer(winner: number | null): number | null {
     if (winner === null) return null;
-    // Winner took no damage from opponent → winner had PERFECT
-    const winnerTookNoDamage = winner === 0
-      ? this.p2DamageTaken === 0  // P1 won: check if P2 (opponent) took 0 damage? No — check if WINNER took 0
-      : this.p1DamageTaken === 0;
-    // Actually: PERFECT = winner took zero damage
-    // p1DamageTaken = damage P1 received. If P1 won (winner=0) and p1DamageTaken===0 → PERFECT for P1
-    // But original code checks: winner === 0 ? p2DamageTaken === 0 : p1DamageTaken === 0
-    // That checks if the LOSER dealt any damage. If loser dealt 0 → winner is PERFECT.
-    return winnerTookNoDamage ? winner : null;
+    // PERFECT = winner received zero damage
+    // p1DamageTaken = total damage P1 received. If P1 won (winner=0), check p1DamageTaken
+    const winnerDamage = winner === 0 ? this.p1DamageTaken : this.p2DamageTaken;
+    return winnerDamage === 0 ? winner : null;
   }
 
   /** Full reset: back to match-select / character-select state */

@@ -23,7 +23,7 @@ import {
   THROW_INVINCIBILITY_LANDING,
 } from '../core/constants.js';
 import { FighterState, AttackType, CLOSE_RANGE, JuggleState } from '../core/types.js';
-import type { PowerGauge, MaxModeState } from '../core/types.js';
+import type { PowerGauge, MaxModeState, CounterConfig } from '../core/types.js';
 import { spendStocks } from '../combat/meter.js';
 import type { VFXSystem } from '../rendering/vfx.js';
 
@@ -53,6 +53,7 @@ export class FighterController {
   private upWasPressed = false;
   private lastDownTick = -999;
   private rekkaWindow = 0;
+  private counterStanceTimer = 0;
 
   constructor(
     fighter: Fighter,
@@ -278,11 +279,14 @@ export class FighterController {
     const f = this.fighter;
     const opp = this.opponent;
 
-    // Opponent must be attacking (startup or active phase)
-    if (!opp.currentAttack || opp.attackPhase === 'none' || opp.attackPhase === 'recovery') return false;
+    // Opponent must be in active phase (not just startup — 正版KOF只在攻击判定生效时触发)
+    if (!opp.currentAttack || opp.attackPhase !== 'active') return false;
 
     // Player must be in a blockable state
     if (!f.canBlock()) return false;
+
+    // 如果玩家在按攻击键，不触发proximity guard — 允许玩家选择攻击而非防御
+    if (input.punchPressed || input.kickPressed || input.blowbackPressed) return false;
 
     const dist = Math.abs(f.x - opp.x);
     const oppAtkName = opp.currentAttack as string;
@@ -576,8 +580,17 @@ export class FighterController {
 
       case FighterState.GUARD_CRUSH: {
         f.guardCrushTimer--;
-        // Visual: flicker like hitstun
         if (f.guardCrushTimer <= 0) { f.state = FighterState.IDLE; f.vx = 0; }
+        break;
+      }
+
+      case FighterState.COUNTER_STANCE: {
+        // 当身技：等待被攻击，超时则失败
+        this.counterStanceTimer--;
+        if (this.counterStanceTimer <= 0) {
+          // 当身失败 — 进入硬直
+          f.applyHitstun(20, 3);
+        }
         break;
       }
 

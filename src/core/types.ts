@@ -14,6 +14,7 @@ export enum FighterState {
   STAND_ATTACK = 'STAND_ATTACK',
   CROUCH_ATTACK = 'CROUCH_ATTACK',
   AIR_ATTACK = 'AIR_ATTACK',
+  COUNTER_STANCE = 'COUNTER_STANCE',
   THROW = 'THROW',
   BLOCK = 'BLOCK',
   AIR_BLOCK = 'AIR_BLOCK',
@@ -178,6 +179,24 @@ export interface AttackFrame {
 
 /** Map of attack type to per-active-frame hitbox data */
 export type AttackFrameTable = Partial<Record<AttackType, AttackFrame[]>>;
+
+// ===== Command Throw Marking =====
+// 指令投：不可被普通拆投，在投技判定时走特殊路径
+export const COMMAND_THROWS: ReadonlySet<string> = new Set([
+  // 角色专属指令投将在角色定义中通过 CharacterDefinition.isCommandThrow() 标记
+]);
+
+// ===== Counter (当身技) Configuration =====
+export interface CounterConfig {
+  /** 当身架招持续帧数 */
+  activeFrames: number;
+  /** 成功当身后触发的攻击 */
+  counterAttack: AttackType;
+  /** 当身成功时的伤害 */
+  counterDamage: number;
+  /** 当身失败（超时/被下段打中）的硬直帧 */
+  failureStun: number;
+}
 
 // ===== Game Phase =====
 export enum GamePhase {

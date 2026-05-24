@@ -37,9 +37,9 @@ export const PUSH_BOX_WIDTH = 60;
 export const MAX_HEALTH = 1000;
 
 // ===== Input Constants =====
-export const COMMAND_WINDOW = 15;
-export const HCF_WINDOW = 25;         // 半圆指令窗口 (↓↙←↙↓↘→)
-export const DOUBLE_QCF_WINDOW = 25;  // 双QCF指令窗口 (↓↘→↓↘→)
+export const COMMAND_WINDOW = 18;          // 单个搓招窗口（正版KOF ≈ 16-20帧）
+export const HCF_WINDOW = 28;              // 半圆指令窗口（↓↙←↙↓↘→）
+export const DOUBLE_QCF_WINDOW = 30;       // 双QCF指令窗口（正版KOF UM DM窗口 ≈ 28-32帧）
 
 // ===== Game Loop Constants =====
 export const TICK_RATE = 1000 / 60;
@@ -416,7 +416,7 @@ export const MAX_MODE_STOCK_COST = 1;
 export const MAX_MODE_DMG_REDUCTION = 0.75;
 
 // ===== Advanced Cancel Mechanics =====
-export const PROXIMITY_GUARD_RANGE = 500;        // ~85% of visible screen width
+export const PROXIMITY_GUARD_RANGE = 120;        // 仅近距离触发proximity guard (正版KOF ≈ close range)
 export const SUPER_CANCEL_STOCK_COST = 1;         // Extra stock for super cancel
 export const FREE_CANCEL_TIMER_COST = 0.20;       // 20% of MAX mode timer per free cancel
 
