@@ -105,8 +105,8 @@ export class RoundState {
 
   /** Reset fighters + subsystems for a new round (keeps power gauge — authentic KOF) */
   private resetForNewRound(): void {
-    this.p1.reset(STAGE_WIDTH * 0.33);
-    this.p2.reset(STAGE_WIDTH * 0.67);
+    this.p1.reset(STAGE_WIDTH * 0.30);
+    this.p2.reset(STAGE_WIDTH * 0.70);
     this.tickRef.value = 0;
     this.p1Cmd.reset();
     this.p2Cmd.reset();
@@ -118,8 +118,8 @@ export class RoundState {
 
   /** Full match restart (back to select screen) */
   fullReset(): void {
-    this.p1.reset(STAGE_WIDTH * 0.33);
-    this.p2.reset(STAGE_WIDTH * 0.67);
+    this.p1.reset(STAGE_WIDTH * 0.30);
+    this.p2.reset(STAGE_WIDTH * 0.70);
     this.p1Wins = 0;
     this.p2Wins = 0;
     this.currentRound = 1;

@@ -19,24 +19,17 @@ import {
 import { CLOSE_RANGE } from '../core/types.js';
 import { FighterState, AttackType, JuggleState } from '../core/types.js';
 import type { HitLevel } from '../core/types.js';
+import { resolveProjectileHits } from './projectileResolver.js';
+import type { ProjectileResolverContext, HitCallback, GuardCrushCallback } from './projectileResolver.js';
+export type { HitCallback, GuardCrushCallback } from './projectileResolver.js';
 
 /** Throw escape window in frames (KOF2002: 6 frames, strict) */
 const THROW_ESCAPE_WINDOW = 10; // KOF2002正版: 拆投窗口≈10F (比之前6F更宽松)
 /** Push-apart distance on successful throw escape */
 const THROW_ESCAPE_PUSH = 60;
-export type HitCallback = (
-  attacker: Fighter, defender: Fighter,
-  attackType: AttackType, blocked: boolean,
-  counterHit: boolean,
-) => void;
 
 export type ThrowEscapeCallback = (
   attacker: Fighter, defender: Fighter,
-  hitX: number, hitY: number,
-) => void;
-
-export type GuardCrushCallback = (
-  fighter: Fighter,
   hitX: number, hitY: number,
 ) => void;
 
@@ -53,6 +46,8 @@ export class CombatSystem {
   // 连击超时: 最后一次命中帧数, 超过COMBO_TIMEOUT帧未命中则重置
   private lastHitFrame = [0, 0];
   private currentFrame = 0;
+  // 风云再起特色: 第一次命中奖励 (每回合每个对手一次)
+  private firstHitAwarded = [false, false];
   // MAX mode state per player (true = active, -33% damage penalty)
   private maxModes: [boolean, boolean] = [false, false];
 
@@ -66,7 +61,17 @@ export class CombatSystem {
     this.currentFrame = currentFrame;
     this.resolveHit(p1, p2, onHit);
     this.resolveHit(p2, p1, onHit);
-    this.resolveProjectileHits(p1, p2, projectiles, onHit);
+    const ctx: ProjectileResolverContext = {
+      inputManager: this.inputManager,
+      prev: this.prev,
+      comboHits: this.comboHits,
+      lastHitFrame: this.lastHitFrame,
+      currentFrame: this.currentFrame,
+      maxModes: this.maxModes,
+      onGuardCrush: this.onGuardCrush,
+      scaledDamage: this.scaledDamage.bind(this),
+    };
+    resolveProjectileHits(p1, p2, projectiles, onHit, ctx);
   }
 
   updateEdgeTracking(rawP1: RawInput, rawP2: RawInput): void {
@@ -94,6 +99,13 @@ export class CombatSystem {
     return this.comboDamage[playerIndex];
   }
 
+  /** 风云再起: 检查是否首次命中并标记 (每回合每对手一次) */
+  wasFirstHitAwarded(defIdx: number): boolean {
+    if (this.firstHitAwarded[defIdx]) return true;
+    this.firstHitAwarded[defIdx] = true;
+    return false;
+  }
+
   /** 每帧调用: 检查连击超时, 超过COMBO_TIMEOUT帧未命中则重置连击 */
   tickComboTimeout(currentFrame: number): void {
     for (let i = 0; i < 2; i++) {
@@ -109,6 +121,7 @@ export class CombatSystem {
     this.comboHits = [0, 0];
     this.comboDamage = [0, 0];
     this.lastHitFrame = [0, 0];
+    this.firstHitAwarded = [false, false];
   }
 
   /**
@@ -450,7 +463,8 @@ export class CombatSystem {
       defender.vx = COUNTER_WIRE_BOUNCE_VX * flyDir * -1;
       defender.vy = COUNTER_WIRE_BOUNCE_VY;
       defender.juggleState = JuggleState.FULL;
-      defender.jugglePoints = JUGGLE_POINTS_MAX; // full budget on wire launch
+      // KOF2002: CD wire gives full juggle, counter wire gives reduced (3 pts)
+      defender.jugglePoints = isCDAttack ? JUGGLE_POINTS_MAX : 3;
       defender.state = FighterState.HITSTUN;
       defender.hitstunTimer = 30;
       defender.isKnockedDown = false;
@@ -495,60 +509,6 @@ export class CombatSystem {
     }
 
     onHit?.(attacker, defender, attackType, false, counterHit);
-  }
-
-  private resolveProjectileHits(p1: Fighter, p2: Fighter, projectiles: Projectile[], onHit?: HitCallback): void {    const fighters = [p1, p2];
-    for (const proj of projectiles) {
-      const hitbox = proj.getHitbox();
-      if (!hitbox) continue;
-      for (let i = 0; i < fighters.length; i++) {
-        if (i === proj.ownerId) continue;
-        const defender = fighters[i];
-        const attacker = fighters[1 - i];
-        if (!aabbCheck(hitbox, defender.getEffectiveHurtbox() ?? defender.getHurtbox())) continue;
-
-        // Roll invincibility — only first portion
-        if (defender.isRollInvincible()) { proj.active = false; break; }
-
-        const data = FRAME_DATA.SPECIAL_PROJECTILE;
-        const raw = i === 0 ? this.inputManager.getP1Input() : this.inputManager.getP2Input();
-        const defInput = resolveInput(raw, defender.facing, this.prev[i]);
-        const crouching = defender.state === FighterState.CROUCH;
-
-        if (defender.canBlock() && defInput.back && this.canBlock(data.hitLevel as HitLevel, crouching)) {
-          // Guard gauge depletion for projectile
-          defender.guardGauge = Math.max(0, defender.guardGauge - guardGaugeDamage(AttackType.SPECIAL_PROJECTILE));
-
-          if (defender.guardGauge <= 0) {
-            defender.state = FighterState.GUARD_CRUSH;
-            defender.guardCrushTimer = GUARD_CRUSH_DURATION;
-            defender.vx = data.pushback * (defender.facing === 1 ? -1 : 1) * 1.5;
-            defender.resetAttackState();
-            const hitX = (attacker.x + defender.x) / 2;
-            const hitY = defender.y - defender.displayHeight / 2;
-            this.onGuardCrush?.(defender, hitX, hitY);
-          } else {
-            defender.applyBlockstun(data.blockstun, data.pushback);
-          }
-          const chip = data.chipDamage ?? Math.round(data.damage * CHIP_DAMAGE_RATIO);
-          // A6: Chip damage cannot kill
-          defender.health = Math.max(1, defender.health - chip);
-          this.comboHits[i] = 0;
-          onHit?.(attacker, defender, AttackType.SPECIAL_PROJECTILE, true, false);
-        } else {
-          const damage = this.scaledDamage(data.damage, i, AttackType.SPECIAL_PROJECTILE);
-          const projAtkIdx = 1 - i;
-          const projDamage = this.maxModes[projAtkIdx] ? Math.round(damage * 0.67) : damage;
-          this.comboHits[i]++;
-          this.lastHitFrame[i] = this.currentFrame;
-          defender.health = Math.max(0, defender.health - projDamage);
-          defender.applyHitstun(data.hitstun, data.pushback);
-          onHit?.(attacker, defender, AttackType.SPECIAL_PROJECTILE, false, false);
-        }
-        proj.active = false;
-        break;
-      }
-    }
   }
 }
 

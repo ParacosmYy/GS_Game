@@ -310,14 +310,20 @@ export class SimpleAI {
 
         // If in an active combo, continue the route
         if (this.inCombo && this.comboStep < route.length && this.comboDelay <= 0) {
-          this.doApplyComboStep(route[this.comboStep], base);
-          this.comboStep++;
-          if (this.comboStep < route.length) {
-            this.comboDelay = route[this.comboStep].delay;
-          } else {
-            // Combo finished
+          // KOF2002: low difficulty AI drops combos sometimes (difficulty < 0.7: 30% drop rate per step)
+          const dropCombo = this.difficulty < 0.7 && Math.random() > this.difficulty;
+          if (dropCombo) {
             this.inCombo = false;
             this.comboStep = 0;
+          } else {
+            this.doApplyComboStep(route[this.comboStep], base);
+            this.comboStep++;
+            if (this.comboStep < route.length) {
+              this.comboDelay = route[this.comboStep].delay;
+            } else {
+              this.inCombo = false;
+              this.comboStep = 0;
+            }
           }
         } else if (!this.inCombo) {
           // Start new combo

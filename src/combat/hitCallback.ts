@@ -6,7 +6,7 @@ import type { Fighter } from '../entities/fighter.js';
 import type { VFXSystem, ScreenShake, ScreenFlash } from '../rendering/vfx.js';
 import type { PowerGauge } from '../core/types.js';
 import { AttackType } from '../core/types.js';
-import { FRAME_DATA, STAGE_WIDTH } from '../core/constants.js';
+import { FRAME_DATA, STAGE_WIDTH, MAX_STOCKS, METER_PER_STOCK } from '../core/constants.js';
 import { ROSTER } from '../characters/index.js';
 import { gainMeterOnHit, gainMeterOnBlock, gainMeterOnHitstun } from './meter.js';
 import { playHit, playBlock, playSpecial, playDM, playThrow, playCounter, playHeavyHit, playSuperFlash, playWire, playJuggleHit } from '../audio/sfx.js';
@@ -99,6 +99,10 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
     deps.cinematic.triggerHitStop(calcHitStop(attackType, isDM, isSpecial, counterHit));
     gainMeterOnHit(deps.gauges[atkIdx], attackType);
     gainMeterOnHitstun(deps.gauges[defIdx], attackType);
+    // 风云再起特色: 第一次命中奖励 — 每回合首次命中额外+30气槽
+    if (!deps.combatSystem.wasFirstHitAwarded(defIdx)) {
+      deps.gauges[atkIdx].meter = Math.min(deps.gauges[atkIdx].meter + 30, MAX_STOCKS * METER_PER_STOCK);
+    }
 
     const atkChar = atkIdx === 0
       ? ROSTER.find(c => c.id === p1.charId) || ROSTER[0]

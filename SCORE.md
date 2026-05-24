@@ -2233,3 +2233,33 @@
 | 战斗手感 | 43/150 | +1 | 摄像机平滑跟随, 视觉舒适度提升 |
 
 **v0.10-kof2002 TAG MILESTONE (803pt)**
+
+### Iter-V144 — 2026-05-25（Round start spacing wider — 开场站位加宽 +5=808）
+
+**改动:** 回合开始站位从STAGE_WIDTH*0.33/0.67加宽到0.30/0.70, 给双方更多初始距离。KOF2002正版: 角色初始站位有足够距离, 不能开场直接投技
+
+| 帧数据精度 | 88/100 | +1 | 开场距离更符合正版, 开场博弈更合理 |
+
+### Iter-V145 — 2026-05-25（Counter wire juggle differentiation — Counter Wire浮空值区分 +5=813）
+
+**改动:** CD击飞Wire给满浮空值(JUGGLE_POINTS_MAX), Counter Hit Wire只给3点浮空值。KOF2002正版: CD Wire后可接全连段, Counter Wire后浮空追打受限
+
+| 战斗手感 | 44/150 | +1 | CD Wire和Counter Wire追打可能性不同, 连段深度更丰富 |
+
+### Iter-V146 — 2026-05-25（First hit meter bonus — 首次命中气槽奖励 +5=818）
+
+**改动:** 每回合首次命中额外+30气槽(风云再起特色)。KOF2002风云再起: 首次命中有额外奖励, 鼓励进攻
+
+| 战斗手感 | 45/150 | +1 | 首次命中奖励鼓励进攻, 节奏更快 |
+
+### Iter-V147 — 2026-05-25（combatSystem split to projectileResolver — 拆分飞行道具解析 +5=823）
+
+**改动:** combatSystem.ts从603行拆分为combatSystem.ts(552行)+projectileResolver.ts(122行), 飞行道具碰撞检测独立模块。遵循600行限制
+
+| 战斗手感 | 45/150 | 0 | 纯架构重构, 行为不变 |
+
+### Iter-V148 — 2026-05-25（AI difficulty-aware combo dropping — AI难度连段掉落 +5=828）
+
+**改动:** 低难度AI随机中断连段(Math.random()>difficulty时放弃后续), 高难度AI完整执行连段。KOF2002正版: 难度影响AI连段完整度和反应速度
+
+| 战斗手感 | 46/150 | +1 | AI难度差异更明显, 低难度更易上手, 高难度更有挑战 |
