@@ -123,12 +123,13 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       deps.vfx.spawnSlashLine(hitX, hitY, attacker.facing, sparkColor);
     }
 
-    // DM: 超必杀华丽爆发 + 全屏闪白
+    // DM: 超必杀华丽爆发 + 全屏闪光
     if (isDM) {
       deps.vfx.spawnSuperBurst(hitX, hitY, atkChar.specialColor, atkChar.specialGlow);
-      // SDM: 更强闪白+冲击环
+      // SDM: 金色闪光+双冲击环, DM: 白色闪光
       if (isSDM) {
-        deps.screenFlash.trigger('#ffffff', 0.5, 14);
+        deps.screenFlash.trigger('#ffdd44', 0.55, 16);
+        deps.vfx.spawnImpactRing(hitX, hitY);
         deps.vfx.spawnImpactRing(hitX, hitY);
       } else {
         deps.screenFlash.trigger('#ffffff', 0.35, 10);
@@ -182,6 +183,11 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
     // 飞行道具爆炸
     if (attackType === AttackType.SPECIAL_PROJECTILE) {
       deps.vfx.spawnProjectileExplosion(hitX, hitY, atkChar.specialColor, atkChar.specialGlow);
+    }
+
+    // KOF2002: 空中命中额外特效 — 飘散粒子+小闪光
+    if (!defender.isGrounded() && !isDM) {
+      deps.vfx.spawnCharacterHitSparks(hitX, hitY - 15, 6, '#aaddff');
     }
 
     // CD击飞攻击: 更强的冲击反馈
