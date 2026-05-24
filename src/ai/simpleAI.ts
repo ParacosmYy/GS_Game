@@ -164,12 +164,15 @@ export class SimpleAI {
       return base;
     }
 
-    // ── Guard cancel: while blocking with low guard gauge ──
-    if (f.state === FighterState.BLOCK && f.guardGauge < 30
-      && this.gauge && this.gauge.stocks >= 1
-      && Math.random() < this.difficulty * 0.4) {
-      this.action = 'guardCancel';
-      this.actionFrames = 6;
+    // ── Guard cancel: while blocking (low gauge or sustained pressure) ──
+    if (f.state === FighterState.BLOCK && this.gauge && this.gauge.stocks >= 1) {
+      const lowGauge = f.guardGauge < 30;
+      const sustainedBlock = f.blockstunTimer > 8;
+      const gcProb = lowGauge ? this.difficulty * 0.5 : sustainedBlock ? this.difficulty * 0.25 : 0;
+      if (Math.random() < gcProb) {
+        this.action = 'guardCancel';
+        this.actionFrames = 6;
+      }
     }
 
     // ── Oki detection: opponent knocked down and close ──

@@ -85,13 +85,16 @@ export function drawHUD(ctx: CanvasRenderingContext2D, fighters: Fighter[], tick
   roundRect(ctx, timerX - 27, timerY - 14, 54, 26, 6);
   ctx.stroke();
 
-  // Timer text — SNK style
+  // Timer text — SNK style with blink when low
   const timerColor = timeSeconds <= 10 ? '#ff4444' : timeSeconds <= 30 ? '#ffcc44' : '#eeeeee';
   if (timeSeconds <= 10) {
     ctx.save();
     ctx.shadowColor = '#ff0000';
     ctx.shadowBlur = 8;
-    drawSNKText(ctx, timeStr, timerX, timerY, 24, timerColor);
+    // Blink faster as time runs out: 10s = slow blink, 5s = fast blink
+    const blinkSpeed = timeSeconds <= 5 ? 0.4 : 0.15;
+    const blink = Math.sin(tick * blinkSpeed) > -0.3;
+    if (blink) drawSNKText(ctx, timeStr, timerX, timerY, 24, timerColor);
     ctx.restore();
   } else {
     drawSNKText(ctx, timeStr, timerX, timerY, 24, timerColor);

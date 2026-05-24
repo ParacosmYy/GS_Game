@@ -8,7 +8,7 @@ import { createPrevAttack, updatePrevAttack } from '../input/inputResolver.js';
 import {
   FRAME_DATA, THROW_RANGE, THROW_DISTANCE,
   CHIP_DAMAGE_RATIO,
-  CH_HITSTUN_BONUS, CH_DAMAGE_BONUS,
+  CH_DAMAGE_BONUS,
   DAMAGE_SCALE_STEP, DAMAGE_SCALE_MIN_NORMAL, DAMAGE_SCALE_MIN_SPECIAL, DAMAGE_SCALE_MIN_DM, COMBO_TIMEOUT,
   COUNTER_WIRE_BOUNCE_VX, COUNTER_WIRE_BOUNCE_VY,
   LIGHT_NORMALS, NORMAL_ATTACKS, COMMAND_NORMALS,
@@ -394,7 +394,8 @@ export class CombatSystem {
 
     if (counterHit) {
       damage = Math.round(damage * CH_DAMAGE_BONUS);
-      hitstunFrames = Math.round(hitstunFrames * CH_HITSTUN_BONUS);
+      // KOF2002: ground CH = damage only, no extra hitstun
+      // KOF2002: air CH = puts into jugglable state (handled below)
     }
 
     // MAX mode damage penalty: attacker in MAX mode deals -33% damage (KOF2002)
@@ -408,6 +409,12 @@ export class CombatSystem {
     this.lastHitFrame[defIdx] = this.currentFrame;
 
     defender.health = Math.max(0, defender.health - damage);
+
+    // KOF2002: air counter hit → jugglable state (full juggle budget)
+    if (counterHit && !defender.isGrounded()) {
+      defender.juggleState = JuggleState.FULL;
+      defender.jugglePoints = JUGGLE_POINTS_MAX;
+    }
 
     // Counter Wire: counter hit + counterWire move → wall bounce instead of knockdown
     // CD attacks always cause wall bounce on hit (not just counter)
