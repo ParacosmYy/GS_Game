@@ -7,5 +7,6 @@ export type { Star } from './stage.js';
 export { drawSkeletalFighter } from './skeletalFighter.js';
 export { drawAttackLimb } from './attackLimb.js';
 export { drawHUD, drawPowerGauges, drawComboCounters } from './hud.js';
-export { drawCharacterSelect, drawIntro, drawKO, drawSuperFlash } from './screens.js';
+export { drawCharacterSelect, drawIntro, drawKO } from './screens.js';
+export { drawSuperFlash, drawMatchEnd, drawModeIndicator, drawStageIndicator, drawTitle, drawContinue } from './overlayScreens.js';
 export { roundRect, shiftColor, parseColor } from './utils.js';

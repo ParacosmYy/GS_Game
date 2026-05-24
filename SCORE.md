@@ -1830,6 +1830,12 @@
 
 | 战斗手感 | 138/150 | +1 | GC输入时机更正版 |
 
+### Iter-V83 — 2026-05-25（fighterController.ts拆分 800行→3模块 +5=503）
+
+**改动:** fighterController.ts(800行)拆为fighterController.ts(354行)+stateHandlers.ts(503行)+stateContext.ts(38行), 状态处理函数提取
+
+| 可维护性 | 70/80 | +2 | 核心引擎文件大小合规, 状态机逻辑独立可测 |
+
 ---
 
 **tag: v0.04-kof2002 (458pt) | commit: 待定 | 下一目标: 550分(+50)**
