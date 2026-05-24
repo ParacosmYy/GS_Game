@@ -38,6 +38,7 @@ export const LeonaDef: CharacterDefinition = {
     maxHealth: 950,
     pushWidth: 58,
     jumpForwardSpeed: 5.5,
+    closeRange: 72,
   },
 
   poses: {

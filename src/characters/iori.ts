@@ -40,6 +40,7 @@ export const IoriDef: CharacterDefinition = {
     maxHealth: 950,
     pushWidth: 58,
     jumpForwardSpeed: 5.5,
+    closeRange: 90,
   },
 
   poses: {

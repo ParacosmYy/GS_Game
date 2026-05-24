@@ -37,7 +37,10 @@ export function dblBack(ctx: FighterCtx, i: ResolvedInput): boolean {
 }
 export function upReleased(ctx: FighterCtx, i: ResolvedInput): boolean { return !i.up && ctx.upWasPressed; }
 export function hyperJump(ctx: FighterCtx): boolean { const g = ctx.tickRef.value - ctx.lastDownTick; return g > 0 && g <= HYPER_CHARGE_WINDOW; }
-export function closeRange(ctx: FighterCtx): boolean { return ctx.opponent ? Math.abs(ctx.fighter.x - ctx.opponent.x) < CLOSE_RANGE : false; }
+export function closeRange(ctx: FighterCtx): boolean {
+  const range = ctx.character.stats.closeRange ?? CLOSE_RANGE;
+  return ctx.opponent ? Math.abs(ctx.fighter.x - ctx.opponent.x) < range : false;
+}
 
 // ─── Attack routing helpers ───
 

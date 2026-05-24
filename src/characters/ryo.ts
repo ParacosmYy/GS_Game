@@ -38,6 +38,7 @@ export const RyoDef: CharacterDefinition = {
     maxHealth: 1000,
     pushWidth: 60,
     jumpForwardSpeed: 5,
+    closeRange: 88,
   },
 
   poses: {

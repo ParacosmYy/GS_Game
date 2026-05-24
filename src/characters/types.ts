@@ -110,6 +110,7 @@ export interface CharacterStats {
   maxHealth: number;         // 最大生命值 (default: 1000)
   pushWidth: number;         // 推挤碰撞宽度 (default: 60)
   jumpForwardSpeed: number;  // 跳跃水平速度 (default: 5)
+  closeRange?: number;       // 近距离攻击触发距离 (default: CLOSE_RANGE=80, 格斗家更大)
 }
 
 // ===== 角色定义接口 =====
