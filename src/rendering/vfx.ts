@@ -298,6 +298,22 @@ export class VFXSystem {
     });
   }
 
+  spawnSuperCancelText(worldX: number, worldY: number): void {
+    this.particles.push({
+      x: worldX, y: worldY, vx: 0, vy: -2,
+      life: 50, maxLife: 50, size: 20,
+      color: '#4488ff', type: 'text', text: 'S.CANCEL!',
+    });
+  }
+
+  spawnFreeCancelText(worldX: number, worldY: number): void {
+    this.particles.push({
+      x: worldX, y: worldY, vx: 0, vy: -2,
+      life: 50, maxLife: 50, size: 20,
+      color: '#44ff88', type: 'text', text: 'F.CANCEL!',
+    });
+  }
+
   spawnDust(worldX: number, worldY: number): void {
     for (let i = 0; i < 6; i++) {
       const dir = (i - 3) * 1.2;

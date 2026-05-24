@@ -95,6 +95,9 @@ export class Fighter {
   // Super cancel tracking (P9-F)
   superCancelReady = false;
 
+  // Cancel event — set when a cancel occurs, cleared by main.ts after VFX trigger
+  cancelEvent: 'super_cancel' | 'free_cancel' | 'rapid_cancel' | 'command_cancel' | null = null;
+
   // Rapid cancel (轻攻击链): set true when a light normal hits, allows chaining into next light normal
   rapidCancelReady = false;
 
@@ -290,6 +293,7 @@ export class Fighter {
     this.rapidCancelReady = false;
     this.normalCancelReady = false;
     this.cancelledIntoNormal = false;
+    this.cancelEvent = null;
   }
 
   /** Reset attack state — called from endAttack, applyHitstun, applyBlockstun, applyKnockdown */

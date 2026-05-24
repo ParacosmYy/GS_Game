@@ -972,6 +972,38 @@
 
 ---
 
+### Iter-V32 — 2026-05-25（取消系统视觉反馈 — Super/Free/Rapid Cancel特效）
+
+**改动:**
+- Fighter新增cancelEvent字段: 'super_cancel'|'free_cancel'|'rapid_cancel'|'command_cancel'
+- fighterController.ts: 4种取消(Super/Free/Rapid/CommandNormal)触发时设置cancelEvent
+- main.ts: 检测cancelEvent触发对应VFX+音效+闪光
+  - Super Cancel: 蓝色"S.CANCEL!"文字+蓝色屏幕闪光
+  - Free Cancel: 绿色"F.CANCEL!"文字+绿色屏幕闪光
+  - Rapid Cancel/Command Cancel: 取消音效
+- vfx.ts: 新增spawnSuperCancelText/spawnFreeCancelText方法
+- TypeScript零错误 + 452测试通过
+
+| 维度 | 得分 | 变化 | 备注 |
+|------|------|------|------|
+| 角色美术 | 63/200 | = | 未改 |
+| 舞台美术 | 5/100 | = | 未改 |
+| 音频品质 | 13/150 | +1 | 取消系统有完整音效反馈 |
+| 角色内容 | 8/150 | = | 未改 |
+| 战斗手感 | 69/150 | +3 | Super/Free Cancel有视觉确认(文字+闪光), 玩家能清楚感知取消时机 |
+| 帧数据精度 | 36/100 | = | 未改 |
+| 游戏流程 | 12/100 | = | 未改 |
+| UI/HUD品质 | 9/50 | = | 未改 |
+| **总分** | **215/1000** | **+5** | |
+
+**tag: 无 | commit: 待定 | 下一目标: 220分(+5, 方向校正)**
+
+**双视角评审:**
+- 用户视角: "Super Cancel的时候屏幕闪蓝光还出现'S.CANCEL!'字, Free Cancel是绿色的! 现在清楚知道取消是否成功了。"
+- 产品视角: "取消视觉反馈是KOF核心系统的重要UI。下一步: 方向校正(web search)确认后续方向"
+
+---
+
 ### Iter-V3 — 2026-05-25（新增K'/库拉 + 多场景 + VFX升级）
 
 **改动:**

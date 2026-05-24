@@ -503,6 +503,7 @@ export class FighterController {
           if (dmAttack && FighterController.isDM(dmAttack as string)
               && this.gauge.stocks >= DM_STOCK_COST + SUPER_CANCEL_STOCK_COST) {
             spendStocks(this.gauge, DM_STOCK_COST + SUPER_CANCEL_STOCK_COST);
+            f.cancelEvent = 'super_cancel';
             f.startAttack(dmAttack);
             return;
           }
@@ -524,6 +525,7 @@ export class FighterController {
               // Deduct MAX mode timer
               this.maxMode.timer -= Math.round(this.maxMode.maxDuration * FREE_CANCEL_TIMER_COST);
               if (this.maxMode.timer <= 0) this.maxMode.timer = 0;
+              f.cancelEvent = 'free_cancel';
               f.startAttack(specialAttack);
               return;
             }
@@ -535,6 +537,7 @@ export class FighterController {
             && LIGHT_NORMALS.has(f.currentAttack as string)) {
           const nextAtk = this.routeRapidCancelLight(input);
           if (nextAtk) {
+            f.cancelEvent = 'rapid_cancel';
             f.startAttack(nextAtk);
             return;
           }
@@ -546,6 +549,7 @@ export class FighterController {
             && NORMAL_ATTACKS.has(f.currentAttack as string)) {
           const cmdNormal = this.tryCommandNormalCancel(input);
           if (cmdNormal) {
+            f.cancelEvent = 'command_cancel';
             f.startAttack(cmdNormal);
             f.cancelledIntoNormal = true;
             f.normalCancelReady = false;

@@ -350,6 +350,24 @@ function update(): void {
       playCancel();
     }
 
+    // Cancel VFX: 检测取消事件并触发视觉反馈
+    if (f.cancelEvent) {
+      const cx = f.x;
+      const cy = f.y - f.displayHeight - 30;
+      if (f.cancelEvent === 'super_cancel') {
+        vfx.spawnSuperCancelText(cx, cy);
+        screenFlash.trigger('#4488ff', 0.15, 4);
+        playCancel();
+      } else if (f.cancelEvent === 'free_cancel') {
+        vfx.spawnFreeCancelText(cx, cy);
+        screenFlash.trigger('#44ff88', 0.12, 3);
+        playCancel();
+      } else if (f.cancelEvent === 'rapid_cancel' || f.cancelEvent === 'command_cancel') {
+        playCancel();
+      }
+      f.cancelEvent = null;
+    }
+
     f.savePrevState();
   });
 
