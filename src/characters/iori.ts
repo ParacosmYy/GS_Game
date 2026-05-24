@@ -86,38 +86,22 @@ export const IoriDef: CharacterDefinition = {
       legBack: bone(-6, 0, -0.5),
     }),
     // — Attack poses (claw-like hands, hunched, extreme arm rotations) —
-    [FighterState.STAND_ATTACK]: pose({
-      head: bone(4, -2, 0.1),
-      body: bone(5, 0, 0.15),
-      armFront: bone(28, 0, -0.3, 1.4),    // claw swipe - wider rotation
-      armBack: bone(-12, 5, -1.0, 0.9),     // extreme back rotation
-      legFront: bone(5, 0, 0.1),
-      legBack: bone(-6, 0, -0.15),
-    }),
-    [FighterState.CROUCH_ATTACK]: pose({
-      head: bone(5, 10, 0.15),
-      body: bone(5, 14, 0.2),               // hunched forward
-      armFront: bone(26, 14, -0.35, 1.35),  // claw extended low
-      armBack: bone(-10, 18, -0.8, 0.9),
-      legFront: bone(16, 6, 0.35, 1.1),
-      legBack: bone(-10, 10, -0.25),
-    }),
-    [FighterState.AIR_ATTACK]: pose({
-      head: bone(2, -3, -0.12),
-      body: bone(3, -1, 0.18),
-      armFront: bone(24, -5, -0.4, 1.35),   // claw swipe aerial
-      armBack: bone(-15, 2, -0.7, 0.9),
-      legFront: bone(16, 5, 0.4, 1.15),
-      legBack: bone(-10, -4, -0.4),
-    }),
-    [FighterState.THROW]: pose({
-      head: bone(5, -1, 0.08),
-      body: bone(7, 0, 0.2),
-      armFront: bone(30, 4, -0.2, 1.4),     // both claws reaching
-      armBack: bone(22, 6, -0.35, 1.2),
-      legFront: bone(5, 0, 0.1),
-      legBack: bone(-5, 0, -0.12),
-    }),
+    [FighterState.STAND_ATTACK]: [
+      pose({ head: bone(3, -1, 0.05), body: bone(3, 0, 0.1), armFront: bone(20, 2, 0.1, 1.2), armBack: bone(-12, 5, -1.0, 0.9), legFront: bone(4, 0, 0.08), legBack: bone(-5, 0, -0.12) }),
+      pose({ head: bone(4, -2, 0.1), body: bone(5, 0, 0.15), armFront: bone(28, 0, -0.3, 1.4), armBack: bone(-12, 5, -1.0, 0.9), legFront: bone(5, 0, 0.1), legBack: bone(-6, 0, -0.15) }),
+    ],
+    [FighterState.CROUCH_ATTACK]: [
+      pose({ head: bone(4, 8, 0.1), body: bone(4, 11, 0.15), armFront: bone(20, 11, -0.2, 1.2), armBack: bone(-10, 18, -0.8, 0.9), legFront: bone(13, 4, 0.3, 1.0), legBack: bone(-10, 10, -0.25) }),
+      pose({ head: bone(5, 10, 0.15), body: bone(5, 14, 0.2), armFront: bone(26, 14, -0.35, 1.35), armBack: bone(-10, 18, -0.8, 0.9), legFront: bone(16, 6, 0.35, 1.1), legBack: bone(-10, 10, -0.25) }),
+    ],
+    [FighterState.AIR_ATTACK]: [
+      pose({ head: bone(1, -2, -0.08), body: bone(2, 0, 0.12), armFront: bone(18, -3, -0.25, 1.2), armBack: bone(-15, 2, -0.7, 0.9), legFront: bone(13, 4, 0.3, 1.1), legBack: bone(-10, -4, -0.35) }),
+      pose({ head: bone(2, -3, -0.12), body: bone(3, -1, 0.18), armFront: bone(24, -5, -0.4, 1.35), armBack: bone(-15, 2, -0.7, 0.9), legFront: bone(16, 5, 0.4, 1.15), legBack: bone(-10, -4, -0.4) }),
+    ],
+    [FighterState.THROW]: [
+      pose({ head: bone(4, 0, 0.05), body: bone(5, 0, 0.14), armFront: bone(24, 3, 0.0, 1.3), armBack: bone(18, 5, -0.25, 1.1), legFront: bone(4, 0, 0.08), legBack: bone(-4, 0, -0.1) }),
+      pose({ head: bone(5, -1, 0.08), body: bone(7, 0, 0.2), armFront: bone(30, 4, -0.2, 1.4), armBack: bone(22, 6, -0.35, 1.2), legFront: bone(5, 0, 0.1), legBack: bone(-5, 0, -0.12) }),
+    ],
     [FighterState.GUARD_CRUSH]: pose({
       head: bone(-4, 4, -0.25),
       body: bone(-3, 3, -0.12),
@@ -136,7 +120,7 @@ export const IoriDef: CharacterDefinition = {
     }),
   },
 
-  routeSpecial(input, cmdBuf, tick) {
+  routeSpecial(input, cmdBuf, tick, _hasChargeRelease = false) {
     // DM: QCF×2+P → 八稚女
     const dmMotion = cmdBuf.checkDMMotion(tick, input.punchPressed, input.kickPressed);
     if (dmMotion === 'QCFx2_P') return AttackType.DM_YATAGARASU;

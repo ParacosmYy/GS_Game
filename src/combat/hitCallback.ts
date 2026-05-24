@@ -15,11 +15,14 @@ import type { CinematicState } from '../state/cinematicState.js';
 /** Classify attack as DM / special */
 function classifyAttack(at: AttackType) {
   const s = at as string;
-  const isDM = at === AttackType.DM_OROCHINAGI || at === AttackType.DM_YATAGARASU
-    || at === AttackType.DM_POWER_GEYSER || at === AttackType.DM_PHOENIX_KICK;
+  const isDM = s.startsWith('DM_');
   const isSpecial = at === AttackType.SPECIAL_PROJECTILE || at === AttackType.SPECIAL_UPPER
     || s.startsWith('KYO_') || s.startsWith('IORI_') || s.startsWith('TERRY_') || s.startsWith('KIM_');
-  return { isDM, isSpecial };
+  const isPunch = s.endsWith('_A') || s.endsWith('_C') || s.includes('ARAGAMI') || s.includes('DOKUGAMI')
+    || s.includes('ONIYAKI') || s.includes('KOTOTSUKI') || s.includes('KUZUKAZE')
+    || s.includes('BURN_KNUCKLE') || s.includes('RISING_TACKLE') || s.includes('POWER_DUNK')
+    || s.includes('SANREN') || s.includes('TSUMIYOMI') || s.includes('BATSUYOMI');
+  return { isDM, isSpecial, isPunch };
 }
 
 /** Hit-stop freeze frames */
@@ -33,9 +36,19 @@ function calcHitStop(at: AttackType, isDM: boolean, isSpecial: boolean, ch: bool
 
 /** Screen shake intensity */
 function calcShake(at: AttackType, ch: boolean, dmg: number): number {
-  return at === AttackType.DM_OROCHINAGI ? 14 : at === AttackType.SPECIAL_UPPER ? 8
-    : at === AttackType.THROW ? 6 : ch ? 7
-    : at === AttackType.STAND_C || at === AttackType.STAND_D ? 5 : dmg > 50 ? 4 : 3;
+  const s = at as string;
+  if (s.startsWith('DM_')) return 14;
+  if (s.startsWith('KYO_ONIYAKI') || s.startsWith('IORI_ONIYAKI')
+    || s.startsWith('TERRY_POWER_DUNK') || s.startsWith('TERRY_RISING_TACKLE')
+    || s.startsWith('KIM_HIENZAN')) return 8;
+  if (at === AttackType.SPECIAL_UPPER) return 8;
+  if (at === AttackType.THROW || s.includes('KOTOTSUKI') || s.includes('KUZUKAZE')) return 6;
+  if (ch) return 7;
+  if (at === AttackType.STAND_C || at === AttackType.STAND_D
+    || at === AttackType.CLOSE_C || at === AttackType.CLOSE_D
+    || at === AttackType.CROUCH_C || at === AttackType.CROUCH_D) return 5;
+  if (dmg > 50) return 4;
+  return 3;
 }
 
 export interface HitCallbackDeps {
@@ -71,12 +84,15 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
     gainMeterOnHit(deps.gauges[atkIdx]);
     gainMeterOnHitstun(deps.gauges[defIdx]);
 
-    // VFX: character-specific hit sparks + impact ring + damage number
+    // VFX: differentiated hit effects by attack type
     const atkChar = atkIdx === 0
       ? ROSTER.find(c => c.id === p1.charId) || ROSTER[0]
       : ROSTER.find(c => c.id === p2.charId) || ROSTER[1];
-    const sparks = attackType === AttackType.SPECIAL_UPPER ? 14 : isDM ? 20 : counterHit ? 12 : 8;
-    deps.vfx.spawnCharacterHitSparks(hitX, hitY, sparks, atkChar.specialColor);
+    const { isDM: isDM2, isSpecial: isSpecial2, isPunch } = classifyAttack(attackType);
+    const sparks = isDM ? 20 : isSpecial ? 14 : counterHit ? 12 : 8;
+    // Punch: warm sparks (yellow/orange), Kick: cool sparks (blue/cyan), Special: purple burst
+    const sparkColor = isSpecial ? atkChar.specialColor : isPunch ? '#ffdd44' : '#44ddff';
+    deps.vfx.spawnCharacterHitSparks(hitX, hitY, sparks, sparkColor);
     deps.vfx.spawnImpactRing(hitX, hitY);
     deps.vfx.spawnDamageText(defender.x, defender.y - defender.displayHeight - 20, data.damage);
 
@@ -84,7 +100,10 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
     const isRekkaFinisher = attackType === AttackType.KYO_NANASE
       || attackType === AttackType.KYO_KOTO_TSUKI
       || attackType === AttackType.KYO_YAKISOGI
-      || attackType === AttackType.KYO_BATSUYOMI;
+      || attackType === AttackType.KYO_BATSUYOMI
+      || attackType === AttackType.IORI_AOIHANA_3
+      || attackType === AttackType.TERRY_POWER_DUNK
+      || attackType === AttackType.KIM_HIENZAN;
     if (isRekkaFinisher) {
       deps.vfx.spawnCharacterHitSparks(hitX, hitY, 16, atkChar.specialGlow);
       deps.screenShake.trigger(8, 10);

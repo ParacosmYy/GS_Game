@@ -357,6 +357,14 @@ export class CombatSystem {
       attacker.normalCancelReady = true;
     }
 
+    // Super Cancel: special moves on hit enable cancel into DM (costs extra stock)
+    const atkName = attackType as string;
+    if (atkName.startsWith('KYO_') || atkName.startsWith('IORI_') || atkName.startsWith('TERRY_')
+      || atkName.startsWith('KIM_') || atkName === AttackType.SPECIAL_UPPER
+      || atkName === AttackType.SPECIAL_PROJECTILE) {
+      attacker.superCancelReady = true;
+    }
+
     onHit?.(attacker, defender, attackType, false, counterHit);
   }
 

@@ -115,6 +115,7 @@ export interface CharacterDefinition {
     input: ResolvedInput,
     cmdBuf: CommandBuffer,
     tick: number,
+    hasChargeRelease?: boolean,
   ): AttackType | null;
 
   /**

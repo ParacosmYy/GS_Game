@@ -119,38 +119,22 @@ export const KyoDef: CharacterDefinition = {
       legBack: bone(5, 27, 0.5),
     }),
     // — Attack poses (aggressive forward lean, wider arm swings) —
-    [FighterState.STAND_ATTACK]: pose({
-      head: bone(4, 2, 0.08),
-      body: bone(6, 0, 0.18),
-      armFront: bone(28, 8, -0.15, 1.3),  // extended forward punch
-      armBack: bone(-12, 10, -0.9, 0.85),  // pulled back wide
-      legFront: bone(8, 0, 0.12),
-      legBack: bone(-8, 0, -0.15),
-    }),
-    [FighterState.CROUCH_ATTACK]: pose({
-      head: bone(4, 10, 0.12),
-      body: bone(4, 14, 0.2),              // leaning forward + down
-      armFront: bone(24, 12, -0.25, 1.2),  // extended forward low
-      armBack: bone(-10, 18, -0.7, 0.85),
-      legFront: bone(18, 5, 0.35, 1.1),    // front leg sweep
-      legBack: bone(-10, 10, -0.25),
-    }),
-    [FighterState.AIR_ATTACK]: pose({
-      head: bone(2, -3, -0.1),
-      body: bone(4, 0, 0.2),
-      armFront: bone(22, -6, -0.35, 1.25),
-      armBack: bone(-14, 2, -0.6, 0.85),
-      legFront: bone(18, 6, 0.45, 1.2),    // kick forward-down
-      legBack: bone(-10, -3, -0.35),
-    }),
-    [FighterState.THROW]: pose({
-      head: bone(4, 2, 0.06),
-      body: bone(8, 0, 0.2),               // aggressive forward lean
-      armFront: bone(30, 5, -0.1, 1.4),    // both arms reaching
-      armBack: bone(22, 8, -0.25, 1.2),
-      legFront: bone(6, 0, 0.12),
-      legBack: bone(-6, 0, -0.18),
-    }),
+    [FighterState.STAND_ATTACK]: [
+      pose({ head: bone(3, 1, 0.05), body: bone(4, 0, 0.12), armFront: bone(18, 6, 0.2, 1.0), armBack: bone(-12, 10, -0.9, 0.85), legFront: bone(6, 0, 0.08), legBack: bone(-6, 0, -0.12) }),
+      pose({ head: bone(4, 2, 0.08), body: bone(6, 0, 0.18), armFront: bone(28, 8, -0.15, 1.3), armBack: bone(-12, 10, -0.9, 0.85), legFront: bone(8, 0, 0.12), legBack: bone(-8, 0, -0.15) }),
+    ],
+    [FighterState.CROUCH_ATTACK]: [
+      pose({ head: bone(3, 9, 0.08), body: bone(3, 12, 0.15), armFront: bone(18, 10, 0.1, 1.0), armBack: bone(-10, 18, -0.7, 0.85), legFront: bone(14, 3, 0.3, 1.0), legBack: bone(-10, 10, -0.25) }),
+      pose({ head: bone(4, 10, 0.12), body: bone(4, 14, 0.2), armFront: bone(24, 12, -0.25, 1.2), armBack: bone(-10, 18, -0.7, 0.85), legFront: bone(18, 5, 0.35, 1.1), legBack: bone(-10, 10, -0.25) }),
+    ],
+    [FighterState.AIR_ATTACK]: [
+      pose({ head: bone(1, -2, -0.05), body: bone(2, 0, 0.1), armFront: bone(16, -4, -0.2, 1.1), armBack: bone(-14, 2, -0.6, 0.85), legFront: bone(14, 4, 0.35, 1.1), legBack: bone(-10, -3, -0.35) }),
+      pose({ head: bone(2, -3, -0.1), body: bone(4, 0, 0.2), armFront: bone(22, -6, -0.35, 1.25), armBack: bone(-14, 2, -0.6, 0.85), legFront: bone(18, 6, 0.45, 1.2), legBack: bone(-10, -3, -0.35) }),
+    ],
+    [FighterState.THROW]: [
+      pose({ head: bone(3, 1, 0.04), body: bone(5, 0, 0.14), armFront: bone(22, 4, 0.1, 1.2), armBack: bone(18, 6, -0.2, 1.1), legFront: bone(5, 0, 0.1), legBack: bone(-5, 0, -0.14) }),
+      pose({ head: bone(4, 2, 0.06), body: bone(8, 0, 0.2), armFront: bone(30, 5, -0.1, 1.4), armBack: bone(22, 8, -0.25, 1.2), legFront: bone(6, 0, 0.12), legBack: bone(-6, 0, -0.18) }),
+    ],
     [FighterState.GUARD_CRUSH]: pose({
       head: bone(-4, 4, -0.22),
       body: bone(-3, 3, -0.12),
@@ -169,7 +153,7 @@ export const KyoDef: CharacterDefinition = {
     }),
   },
 
-  routeSpecial(input, cmdBuf, tick) {
+  routeSpecial(input, cmdBuf, tick, _hasChargeRelease = false) {
     // DM: QCF×2+P → 大蛇薙
     const dmMotion = cmdBuf.checkDMMotion(tick, input.punchPressed, input.kickPressed);
     if (dmMotion === 'QCFx2_P') return AttackType.DM_OROCHINAGI;

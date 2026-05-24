@@ -54,6 +54,8 @@ export class FighterController {
   private lastDownTick = -999;
   private rekkaWindow = 0;
   private counterStanceTimer = 0;
+  private chargeDownFrames = 0; // frames holding ↓ for charge moves
+  private wasChargingDown = false;
 
   constructor(
     fighter: Fighter,
@@ -91,6 +93,19 @@ export class FighterController {
   }
 
   update(input: ResolvedInput): void {
+    // ── Charge tracking (↓蓄 for charge moves) ──
+    if (input.down && !input.up) {
+      this.chargeDownFrames++;
+      this.wasChargingDown = true;
+    } else if (this.wasChargingDown && input.up && this.chargeDownFrames >= 20) {
+      // Charge release detected: ↓ held >= 20 frames then ↑ pressed
+      this.wasChargingDown = false;
+      // The charge release will be picked up by routeSpecial via checkCharge
+    } else if (!input.down) {
+      if (this.chargeDownFrames < 20) this.wasChargingDown = false;
+      this.chargeDownFrames = 0;
+    }
+
     // ── Proximity Guard (P9-E) ──
     if (this.checkProximityGuard(input)) return;
 
@@ -103,6 +118,16 @@ export class FighterController {
       this.upHoldFrames++;
     }
     this.upWasPressed = input.up;
+  }
+
+  /** Check if a charge release (↓蓄↑) is available and consume it */
+  consumeChargeRelease(): boolean {
+    if (this.chargeDownFrames >= 20) {
+      this.chargeDownFrames = 0;
+      this.wasChargingDown = false;
+      return true;
+    }
+    return false;
   }
 
   applyPhysics(): void {
@@ -208,7 +233,7 @@ export class FighterController {
   private tryAttack(input: ResolvedInput): AttackType | null {
     const tick = this.tickRef.value;
     // Character specials (includes DM routing via checkDMMotion)
-    const special = this.character.routeSpecial(input, this.cmdBuf, tick);
+    const special = this.character.routeSpecial(input, this.cmdBuf, tick, this.wasChargingDown);
     if (special) return special;
     // Character command normals
     const charN = this.character.routeNormal(input, this.fighter.state, this.closeRange());
@@ -463,7 +488,7 @@ export class FighterController {
         // ── Super Cancel (P9-F) ──
         if (f.superCancelReady && this.gauge && f.currentAttack) {
           const tick = this.tickRef.value;
-          const dmAttack = this.character.routeSpecial(input, this.cmdBuf, tick);
+          const dmAttack = this.character.routeSpecial(input, this.cmdBuf, tick, this.wasChargingDown);
           if (dmAttack && FighterController.isDM(dmAttack as string)
               && this.gauge.stocks >= DM_STOCK_COST + SUPER_CANCEL_STOCK_COST) {
             spendStocks(this.gauge, DM_STOCK_COST + SUPER_CANCEL_STOCK_COST);
@@ -483,7 +508,7 @@ export class FighterController {
           if (canFreeCancel) {
             const tick = this.tickRef.value;
             // Try special move input (not DM)
-            const specialAttack = this.character.routeSpecial(input, this.cmdBuf, tick);
+            const specialAttack = this.character.routeSpecial(input, this.cmdBuf, tick, this.wasChargingDown);
             if (specialAttack && !FighterController.isDM(specialAttack as string)) {
               // Deduct MAX mode timer
               this.maxMode.timer -= Math.round(this.maxMode.maxDuration * FREE_CANCEL_TIMER_COST);
@@ -521,7 +546,7 @@ export class FighterController {
         if (f.cancelledIntoNormal && f.hasHit && f.attackPhase === 'recovery' && f.currentAttack
             && COMMAND_NORMALS.has(f.currentAttack as string)) {
           const tick = this.tickRef.value;
-          const special = this.character.routeSpecial(input, this.cmdBuf, tick);
+          const special = this.character.routeSpecial(input, this.cmdBuf, tick, this.wasChargingDown);
           if (special && !FighterController.isDM(special as string)) {
             f.startAttack(special);
             f.cancelledIntoNormal = false;

@@ -82,38 +82,22 @@ export const KimDef: CharacterDefinition = {
       legBack: bone(-4, -2, -0.55),
     }),
     // — Attack poses (upright martial arts stance, higher kicks, more leg extension) —
-    [FighterState.STAND_ATTACK]: pose({
-      head: bone(2, 0, 0.05),
-      body: bone(3, 0, 0.08),
-      armFront: bone(24, 5, -0.1, 1.2),     // precise straight punch
-      armBack: bone(-8, 8, -0.6, 0.85),
-      legFront: bone(6, 0, 0.08),
-      legBack: bone(-7, 0, -0.12),
-    }),
-    [FighterState.CROUCH_ATTACK]: pose({
-      head: bone(2, 8, 0.05),
-      body: bone(2, 12, 0.1),
-      armFront: bone(15, 12, -0.1, 1.0),
-      armBack: bone(-8, 15, -0.4, 0.8),
-      legFront: bone(22, 3, 0.5, 1.35),      // HIGH kick extension!
-      legBack: bone(-8, 8, -0.3),
-    }),
-    [FighterState.AIR_ATTACK]: pose({
-      head: bone(0, -2, -0.08),
-      body: bone(1, 0, 0.1),
-      armFront: bone(18, -3, -0.2, 1.1),
-      armBack: bone(-8, 0, -0.35, 0.85),
-      legFront: bone(20, 4, 0.5, 1.3),       // high aerial kick
-      legBack: bone(-6, -2, -0.3),
-    }),
-    [FighterState.THROW]: pose({
-      head: bone(2, 0, 0.05),
-      body: bone(4, 0, 0.12),
-      armFront: bone(26, 3, -0.08, 1.3),     // reaching grab
-      armBack: bone(16, 5, -0.15, 1.1),
-      legFront: bone(5, 0, 0.08),
-      legBack: bone(-6, 0, -0.1),
-    }),
+    [FighterState.STAND_ATTACK]: [
+      pose({ head: bone(1, 0, 0.03), body: bone(2, 0, 0.05), armFront: bone(18, 4, 0.0, 1.0), armBack: bone(-8, 8, -0.6, 0.85), legFront: bone(5, 0, 0.05), legBack: bone(-6, 0, -0.1) }),
+      pose({ head: bone(2, 0, 0.05), body: bone(3, 0, 0.08), armFront: bone(24, 5, -0.1, 1.2), armBack: bone(-8, 8, -0.6, 0.85), legFront: bone(6, 0, 0.08), legBack: bone(-7, 0, -0.12) }),
+    ],
+    [FighterState.CROUCH_ATTACK]: [
+      pose({ head: bone(1, 6, 0.03), body: bone(1, 10, 0.06), armFront: bone(12, 10, 0.0, 0.9), armBack: bone(-8, 15, -0.4, 0.8), legFront: bone(18, 2, 0.4, 1.2), legBack: bone(-8, 8, -0.25) }),
+      pose({ head: bone(2, 8, 0.05), body: bone(2, 12, 0.1), armFront: bone(15, 12, -0.1, 1.0), armBack: bone(-8, 15, -0.4, 0.8), legFront: bone(22, 3, 0.5, 1.35), legBack: bone(-8, 8, -0.3) }),
+    ],
+    [FighterState.AIR_ATTACK]: [
+      pose({ head: bone(0, -1, -0.04), body: bone(0, 0, 0.05), armFront: bone(14, -2, -0.1, 1.0), armBack: bone(-8, 0, -0.35, 0.85), legFront: bone(16, 3, 0.4, 1.2), legBack: bone(-6, -2, -0.25) }),
+      pose({ head: bone(0, -2, -0.08), body: bone(1, 0, 0.1), armFront: bone(18, -3, -0.2, 1.1), armBack: bone(-8, 0, -0.35, 0.85), legFront: bone(20, 4, 0.5, 1.3), legBack: bone(-6, -2, -0.3) }),
+    ],
+    [FighterState.THROW]: [
+      pose({ head: bone(1, 0, 0.03), body: bone(3, 0, 0.08), armFront: bone(20, 2, 0.0, 1.15), armBack: bone(12, 4, -0.1, 1.0), legFront: bone(4, 0, 0.06), legBack: bone(-5, 0, -0.08) }),
+      pose({ head: bone(2, 0, 0.05), body: bone(4, 0, 0.12), armFront: bone(26, 3, -0.08, 1.3), armBack: bone(16, 5, -0.15, 1.1), legFront: bone(5, 0, 0.08), legBack: bone(-6, 0, -0.1) }),
+    ],
     [FighterState.GUARD_CRUSH]: pose({
       head: bone(-3, 3, -0.18),
       body: bone(-2, 2, -0.08),
@@ -132,14 +116,17 @@ export const KimDef: CharacterDefinition = {
     }),
   },
 
-  routeSpecial(input, cmdBuf, tick) {
+  routeSpecial(input, cmdBuf, tick, hasChargeRelease = false) {
     // DM: QCB×2+K → 鳳凰脚
     const dmMotion = cmdBuf.checkDMMotion(tick, input.punchPressed, input.kickPressed);
     if (dmMotion === 'QCBx2_K') return AttackType.DM_PHOENIX_KICK;
     // DM: QCF×2+K → 鳳凰天舞脚
     if (dmMotion === 'QCFx2_K') return AttackType.DM_PHOENIX_HITEN;
 
-    // DP+K → 飛燕斬 (Kim-specific anti-air)
+    // ↓蓄↑+K → 飛燕斬 (charge move)
+    if (hasChargeRelease && input.up && input.kickPressed) return AttackType.KIM_HIENZAN;
+
+    // DP+K → 飛燕斬 (shortcut)
     const special = cmdBuf.checkSpecial(tick, input.punchPressed || input.kickPressed);
     if (special === AttackType.SPECIAL_UPPER && input.kickPressed) return AttackType.KIM_HIENZAN;
 
