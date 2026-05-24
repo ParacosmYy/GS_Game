@@ -26,7 +26,7 @@ import { SelectState } from './state/selectState.js';
 import { RoundState } from './state/roundState.js';
 import { DMManager } from './combat/dmManager.js';
 import { createHitCallback } from './combat/hitCallback.js';
-import { initAudio, playKO, playVictoryFanfare, playMAXActivation, playPerfect, playThrowEscape, playFight } from './audio/sfx.js';
+import { initAudio, playKO, playVictoryFanfare, playMAXActivation, playPerfect, playThrowEscape, playFight, playRoll, playCancel, playQuickStand } from './audio/sfx.js';
 import { createTeam, defeatActive, switchToNext, activeChar, teamOrderString, type TeamState } from './state/teamState.js';
 import { resolveSimplified } from './input/simplifiedInput.js';
 import { bgm } from './audio/bgm.js';
@@ -330,6 +330,26 @@ function update(): void {
   [p1, p2].forEach((f, i) => {
     const wasStun = f.prevState === FighterState.HITSTUN || f.prevState === FighterState.KNOCKDOWN;
     if (wasStun && f.state === FighterState.IDLE) combatSystem.resetCombo(i);
+
+    // Quick Stand检测: 从KNOCKDOWN恢复且无起身无敌(quick stand不给予无敌)
+    if (f.prevState === FighterState.KNOCKDOWN && f.state === FighterState.IDLE && f.throwInvincibilityTimer === 0) {
+      vfx.spawnDust(f.x, STAGE_GROUND_Y);
+      playQuickStand();
+    }
+
+    // Roll音效: 进入ROLL状态
+    if (f.prevState !== FighterState.ROLL && f.state === FighterState.ROLL) {
+      playRoll();
+      // Guard Cancel Roll: 从BLOCK进入ROLL时播放Cancel音效
+      if (f.prevState === FighterState.BLOCK) playCancel();
+    }
+
+    // Guard Cancel CD: 从BLOCK直接进入攻击时播放Cancel音效
+    if (f.prevState === FighterState.BLOCK
+      && (f.state === FighterState.STAND_ATTACK || f.state === FighterState.CROUCH_ATTACK)) {
+      playCancel();
+    }
+
     f.savePrevState();
   });
 
