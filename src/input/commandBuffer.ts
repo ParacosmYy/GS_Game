@@ -59,6 +59,11 @@ export class CommandBuffer {
     this.history = [];
   }
 
+  /** Get recent N direction records for debug visualization */
+  getRecentHistory(count: number): DirectionRecord[] {
+    return this.history.slice(-count);
+  }
+
   private matchSequence(
     recent: DirectionRecord[],
     sequence: DirectionInput[],

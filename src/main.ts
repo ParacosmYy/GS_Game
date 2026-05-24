@@ -323,6 +323,11 @@ function updateFighter(
       }
 
       fighter.tickAttack();
+
+      // After attack ends: if still airborne, transition to JUMP for gravity
+      if (fighter.currentAttack === null && !fighter.isGrounded()) {
+        fighter.state = FighterState.JUMP;
+      }
       break;
     }
 
@@ -373,9 +378,18 @@ function updateFighter(
       fighter.state = FighterState.IDLE;
       fighter.landingRecovery = LANDING_RECOVERY;
     } else if (fighter.vy > 0) {
-      // Only zero downward velocity on ground contact
+      // Any state with downward velocity lands
       fighter.y = STAGE_GROUND_Y;
       fighter.vy = 0;
+      if (fighter.state !== FighterState.IDLE &&
+          fighter.state !== FighterState.WALK &&
+          fighter.state !== FighterState.CROUCH &&
+          fighter.state !== FighterState.BLOCK &&
+          fighter.state !== FighterState.HITSTUN &&
+          fighter.state !== FighterState.KNOCKDOWN) {
+        fighter.state = FighterState.IDLE;
+        fighter.vx = 0;
+      }
     }
   }
 
@@ -562,44 +576,190 @@ function render(): void {
 
 function drawDebug(cameraX: number): void {
   ctx.save();
-  ctx.globalAlpha = 0.85;
-  ctx.fillStyle = '#000';
-  ctx.fillRect(0, 0, 300, 200);
+
+  // ===== Left panel: Player states =====
+  ctx.globalAlpha = 0.88;
+  ctx.fillStyle = '#111';
+  ctx.fillRect(0, 0, 320, 230);
   ctx.globalAlpha = 1;
-  ctx.fillStyle = '#0f0';
+
+  let y = 14;
   ctx.font = '11px monospace';
 
-  let y = 15;
   for (let i = 0; i < fighters.length; i++) {
     const f = fighters[i];
-    ctx.fillText(`P${i + 1}: state=${f.state} hp=${f.health} x=${Math.round(f.x)} facing=${f.facing}`, 5, y);
+    const label = `P${i + 1}`;
+    const labelColor = i === 0 ? '#ff4444' : '#4488ff';
+
+    // Player header
+    ctx.fillStyle = labelColor;
+    ctx.fillText(`${label} ─────────────────────────`, 5, y);
     y += 14;
+
+    ctx.fillStyle = '#ddd';
+    ctx.fillText(` state: ${f.state}`, 5, y);
+    y += 14;
+
+    ctx.fillText(` hp: ${f.health}/${MAX_HEALTH}  x: ${Math.round(f.x)}  y: ${Math.round(f.y)}  face: ${f.facing === 1 ? '→' : '←'}`, 5, y);
+    y += 14;
+
+    ctx.fillText(` vx: ${f.vx.toFixed(1)}  vy: ${f.vy.toFixed(1)}  grounded: ${f.isGrounded()}`, 5, y);
+    y += 14;
+
+    // Attack info
     if (f.currentAttack) {
-      ctx.fillText(`  ATK: ${f.currentAttack} phase=${f.attackPhase} frame=${f.attackFrame}`, 5, y);
+      ctx.fillStyle = '#ffcc00';
+      const data = FRAME_DATA[f.currentAttack];
+      let totalFrames = data.startup + data.active + data.recovery;
+      let progress = 0;
+      if (f.attackPhase === 'startup') progress = f.attackFrame / totalFrames;
+      else if (f.attackPhase === 'active') progress = (data.startup + f.attackFrame) / totalFrames;
+      else progress = (data.startup + data.active + f.attackFrame) / totalFrames;
+
+      ctx.fillText(` ATK: ${f.currentAttack} [${f.attackPhase}] ${f.attackFrame}f`, 5, y);
+      y += 14;
+
+      // Frame data progress bar
+      const barX = 10;
+      const barW = 200;
+      const barH = 6;
+      ctx.fillStyle = '#333';
+      ctx.fillRect(barX, y, barW, barH);
+      // Startup (yellow)
+      const sw = barW * (data.startup / totalFrames);
+      ctx.fillStyle = '#ccaa00';
+      ctx.fillRect(barX, y, sw, barH);
+      // Active (red)
+      const aw = barW * (data.active / totalFrames);
+      ctx.fillStyle = '#cc2200';
+      ctx.fillRect(barX + sw, y, aw, barH);
+      // Recovery (blue)
+      const rw = barW * (data.recovery / totalFrames);
+      ctx.fillStyle = '#2244aa';
+      ctx.fillRect(barX + sw + aw, y, rw, barH);
+      // Current position marker
+      const markerX = barX + barW * progress;
+      ctx.fillStyle = '#fff';
+      ctx.fillRect(markerX - 1, y - 2, 3, barH + 4);
+      y += 12;
+
+      ctx.fillStyle = '#888';
+      ctx.fillText(` dmg:${data.damage} hit:${data.hitstun}f blk:${data.blockstun}f push:${data.pushback}`, 5, y);
       y += 14;
     }
 
-    // Draw hitbox (red)
+    // State timers
+    if (f.hitstunTimer > 0) {
+      ctx.fillStyle = '#ff8888';
+      ctx.fillText(` hitstun: ${f.hitstunTimer}f remaining`, 5, y);
+      y += 14;
+    }
+    if (f.blockstunTimer > 0) {
+      ctx.fillStyle = '#8888ff';
+      ctx.fillText(` blockstun: ${f.blockstunTimer}f remaining`, 5, y);
+      y += 14;
+    }
+    if (f.knockdownTimer > 0) {
+      ctx.fillStyle = '#ff88ff';
+      ctx.fillText(` knockdown: ${f.knockdownTimer}f remaining`, 5, y);
+      y += 14;
+    }
+  }
+
+  // Global info
+  ctx.fillStyle = '#0f0';
+  ctx.fillText(`tick:${tick}  fps:${renderer.getFps()}  proj:${projectiles.length}`, 5, y);
+
+  // ===== Hitbox / Hurtbox / Pushbox overlays =====
+  for (let i = 0; i < fighters.length; i++) {
+    const f = fighters[i];
+
+    // Hitbox (red, filled semi-transparent)
     const hitbox = f.getActiveHitbox();
     if (hitbox) {
-      ctx.strokeStyle = 'rgba(255, 0, 0, 0.7)';
+      ctx.fillStyle = 'rgba(255, 0, 0, 0.25)';
+      ctx.fillRect(hitbox.x - cameraX, hitbox.y, hitbox.width, hitbox.height);
+      ctx.strokeStyle = 'rgba(255, 0, 0, 0.8)';
       ctx.lineWidth = 2;
       ctx.strokeRect(hitbox.x - cameraX, hitbox.y, hitbox.width, hitbox.height);
     }
 
-    // Draw hurtbox (blue)
+    // Hurtbox (blue outline)
     const hurtbox = f.getHurtbox();
-    ctx.strokeStyle = 'rgba(0, 100, 255, 0.5)';
+    ctx.strokeStyle = `rgba(0, 100, 255, 0.6)`;
     ctx.lineWidth = 1;
     ctx.strokeRect(hurtbox.x - cameraX, hurtbox.y, hurtbox.width, hurtbox.height);
 
-    // Draw pushbox (green)
+    // Pushbox (green outline)
     const pushbox = f.getPushbox();
-    ctx.strokeStyle = 'rgba(0, 255, 0, 0.3)';
+    ctx.strokeStyle = 'rgba(0, 255, 0, 0.35)';
+    ctx.setLineDash([3, 3]);
     ctx.strokeRect(pushbox.x - cameraX, pushbox.y, pushbox.width, pushbox.height);
+    ctx.setLineDash([]);
+
+    // State name above character
+    const screenX = f.x - cameraX;
+    const screenY = f.y - f.displayHeight - 8;
+    ctx.fillStyle = '#fff';
+    ctx.font = '10px monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText(f.state, screenX, screenY);
+    if (f.currentAttack) {
+      ctx.fillStyle = '#ffcc00';
+      ctx.fillText(`${f.currentAttack} [${f.attackPhase}]`, screenX, screenY - 12);
+    }
+    ctx.textAlign = 'left';
   }
 
-  ctx.fillText(`tick: ${tick}  fps: ${renderer.getFps()}  projectiles: ${projectiles.length}`, 5, y);
+  // Projectile hitboxes
+  for (const proj of projectiles) {
+    if (!proj.active) continue;
+    const hitbox = proj.getHitbox();
+    if (hitbox) {
+      ctx.fillStyle = 'rgba(255, 136, 0, 0.3)';
+      ctx.fillRect(hitbox.x - cameraX, hitbox.y, hitbox.width, hitbox.height);
+      ctx.strokeStyle = 'rgba(255, 136, 0, 0.8)';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(hitbox.x - cameraX, hitbox.y, hitbox.width, hitbox.height);
+    }
+  }
+
+  // ===== Right panel: Input buffer visualization =====
+  ctx.globalAlpha = 0.88;
+  ctx.fillStyle = '#111';
+  ctx.fillRect(560, 0, 240, 130);
+  ctx.globalAlpha = 1;
+  ctx.font = '10px monospace';
+
+  const inputBufY = 14;
+  for (let i = 0; i < fighters.length; i++) {
+    const f = fighters[i];
+    const buf = i === 0 ? p1CommandBuffer : p2CommandBuffer;
+    const labelColor = i === 0 ? '#ff4444' : '#4488ff';
+    const panelY = inputBufY + i * 60;
+
+    ctx.fillStyle = labelColor;
+    ctx.fillText(`P${i + 1} Input Buffer:`, 565, panelY);
+
+    // Show recent direction history
+    const history = buf.getRecentHistory(8);
+    ctx.fillStyle = '#aaa';
+    const dirStr = history.map(h => {
+      const symbols: Record<string, string> = {
+        'neutral': '·', 'up': '↑', 'down': '↓', 'forward': '→',
+        'back': '←', 'upforward': '↗', 'upback': '↖',
+        'downforward': '↘', 'downback': '↙',
+      };
+      return symbols[h.direction] || '?';
+    }).join(' ');
+    ctx.fillText(` ${dirStr}`, 565, panelY + 14);
+    ctx.fillStyle = '#666';
+    ctx.fillText(` (${history.map(h => `${tick - h.frame}`).join(',')})`, 565, panelY + 26);
+  }
+
+  // Current raw key state
+  ctx.fillStyle = '#666';
+  ctx.fillText(`Raw keys held:`, 565, inputBufY + 120);
 
   ctx.restore();
 }
