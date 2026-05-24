@@ -10,7 +10,7 @@ import {
   HUD_TIMER_SIZE, HUD_GAUGE_Y, HUD_GAUGE_WIDTH, HUD_GAUGE_HEIGHT,
   HUD_GAUGE_SEGMENT_GAP, HUD_WIN_MARKER_SIZE,
 } from '../core/constants.js';
-import { shiftColor, roundRect } from './utils.js';
+import { shiftColor, roundRect, drawSNKText } from './utils.js';
 
 // ===== Main HUD =====
 
@@ -38,14 +38,11 @@ export function drawHUD(ctx: CanvasRenderingContext2D, fighters: Fighter[], tick
   ctx.beginPath(); ctx.moveTo(0, 58); ctx.lineTo(CANVAS_WIDTH, 58); ctx.stroke();
 
   // P1 label — styled
-  drawPlayerLabel(ctx, '1P', HUD_MARGIN - 2, HUD_BAR_Y - 10, '#ff4444', '#ffcc00');
+  drawSNKText(ctx, '1P', HUD_MARGIN + 8, HUD_BAR_Y - 3, 12, '#ff4444', '#000000', 'center');
 
-  // P1 character name
+  // P1 character name — SNK style
   if (p1Name) {
-    ctx.font = 'bold 10px "Courier New", monospace';
-    ctx.fillStyle = '#ccc';
-    ctx.textAlign = 'left';
-    ctx.fillText(p1Name, HUD_MARGIN + 22, HUD_BAR_Y - 8);
+    drawSNKText(ctx, p1Name, HUD_MARGIN + 22, HUD_BAR_Y - 8, 10, '#cccccc', '#000000', 'left');
   }
 
   // P1 health bar
@@ -54,15 +51,12 @@ export function drawHUD(ctx: CanvasRenderingContext2D, fighters: Fighter[], tick
   drawHealthBar(ctx, HUD_MARGIN, HUD_BAR_Y, HUD_BAR_WIDTH, HUD_BAR_HEIGHT, p1Ratio, p1DelayedRatio, true, tick);
   drawGuardGauge(ctx, HUD_MARGIN, HUD_BAR_Y + HUD_BAR_HEIGHT + 3, HUD_BAR_WIDTH, 5, fighters[0].guardGauge, true);
 
-  // P2 label
-  drawPlayerLabel(ctx, '2P', CANVAS_WIDTH - HUD_MARGIN - 18, HUD_BAR_Y - 10, '#4488ff', '#ffcc00');
+  // P2 label — styled
+  drawSNKText(ctx, '2P', CANVAS_WIDTH - HUD_MARGIN - 18, HUD_BAR_Y - 3, 12, '#4488ff', '#000000', 'center');
 
-  // P2 character name
+  // P2 character name — SNK style
   if (p2Name) {
-    ctx.font = 'bold 10px "Courier New", monospace';
-    ctx.fillStyle = '#ccc';
-    ctx.textAlign = 'right';
-    ctx.fillText(p2Name, CANVAS_WIDTH - HUD_MARGIN - 22, HUD_BAR_Y - 8);
+    drawSNKText(ctx, p2Name, CANVAS_WIDTH - HUD_MARGIN - 22, HUD_BAR_Y - 8, 10, '#cccccc', '#000000', 'right');
   }
 
   // P2 health bar
@@ -91,27 +85,20 @@ export function drawHUD(ctx: CanvasRenderingContext2D, fighters: Fighter[], tick
   roundRect(ctx, timerX - 27, timerY - 14, 54, 26, 6);
   ctx.stroke();
 
-  // Timer text — SNK style large bold
-  ctx.fillStyle = timeSeconds <= 10 ? '#ff4444' : timeSeconds <= 30 ? '#ffcc44' : '#eeeeee';
+  // Timer text — SNK style
+  const timerColor = timeSeconds <= 10 ? '#ff4444' : timeSeconds <= 30 ? '#ffcc44' : '#eeeeee';
   if (timeSeconds <= 10) {
     ctx.save();
     ctx.shadowColor = '#ff0000';
     ctx.shadowBlur = 8;
+    drawSNKText(ctx, timeStr, timerX, timerY, 24, timerColor);
+    ctx.restore();
+  } else {
+    drawSNKText(ctx, timeStr, timerX, timerY, 24, timerColor);
   }
-  ctx.font = `bold 24px "Courier New", monospace`;
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText(timeStr, timerX, timerY);
-  // Timer描边增强可读性
-  ctx.strokeStyle = timeSeconds <= 10 ? 'rgba(100,0,0,0.5)' : 'rgba(0,0,0,0.4)';
-  ctx.lineWidth = 1;
-  ctx.strokeText(timeStr, timerX, timerY);
-  if (timeSeconds <= 10) ctx.restore();
 
-  // "TIME" 小标签在计时器上方
-  ctx.font = 'bold 8px "Courier New", monospace';
-  ctx.fillStyle = 'rgba(200, 168, 50, 0.6)';
-  ctx.fillText('TIME', timerX, timerY - 14);
+  // "TIME" 标签在计时器上方 — SNK style
+  drawSNKText(ctx, 'TIME', timerX, timerY - 14, 8, 'rgba(200, 168, 50, 0.7)', '#000000', 'center');
 
   // Round指示器 — 圆点(最多3局)
   const maxRounds = 3;
@@ -148,20 +135,6 @@ export function drawHUD(ctx: CanvasRenderingContext2D, fighters: Fighter[], tick
 
   ctx.textBaseline = 'alphabetic';
   ctx.textAlign = 'left';
-}
-
-/** Draw a styled player label */
-function drawPlayerLabel(ctx: CanvasRenderingContext2D, text: string, x: number, y: number, color: string, accent: string): void {
-  ctx.save();
-  ctx.font = 'bold 12px "Courier New", monospace';
-  // Background glow
-  ctx.fillStyle = color + '22';
-  ctx.fillRect(x - 2, y - 10, 24, 14);
-  // Text
-  ctx.fillStyle = color;
-  ctx.textAlign = 'left';
-  ctx.fillText(text, x, y);
-  ctx.restore();
 }
 
 function drawDiamond(ctx: CanvasRenderingContext2D, x: number, y: number, size: number, color: string): void {
@@ -381,18 +354,16 @@ export function drawPowerGauges(ctx: CanvasRenderingContext2D, gauges: [PowerGau
       ctx.strokeRect(segX, gaugeY, segW, gaugeH);
     }
 
-    // MAX text when full
+    // MAX text when full — SNK style
     if (!maxMode.active && gauge.stocks >= MAX_STOCKS) {
       const pulseAlpha = 0.7 + 0.3 * Math.sin(Date.now() / 120);
       ctx.save();
-      ctx.fillStyle = `rgba(255, 204, 0, ${pulseAlpha})`;
+      ctx.globalAlpha = pulseAlpha;
       ctx.shadowColor = '#ff8800';
       ctx.shadowBlur = 12 + 4 * Math.sin(Date.now() / 80);
-      ctx.font = 'bold 13px "Courier New", monospace';
-      ctx.textAlign = isP1 ? 'left' : 'right';
-      ctx.textBaseline = 'top';
-      ctx.fillText('MAX', isP1 ? baseX + gaugeW + 8 : baseX - 8, gaugeY - 2);
+      drawSNKText(ctx, 'MAX', isP1 ? baseX + gaugeW + 14 : baseX - 14, gaugeY + 6, 13, '#ffcc00', '#000000', isP1 ? 'left' : 'right');
       ctx.shadowBlur = 0;
+      ctx.globalAlpha = 1;
       ctx.restore();
     }
 
@@ -402,14 +373,12 @@ export function drawPowerGauges(ctx: CanvasRenderingContext2D, gauges: [PowerGau
       const pulseAlpha = 0.7 + Math.sin(Date.now() / 100) * 0.3;
 
       ctx.save();
-      ctx.fillStyle = `rgba(100, 255, 100, ${pulseAlpha})`;
+      ctx.globalAlpha = pulseAlpha;
       ctx.shadowColor = '#00ff44';
       ctx.shadowBlur = 8;
-      ctx.font = 'bold 12px "Courier New", monospace';
-      ctx.textAlign = isP1 ? 'left' : 'right';
-      ctx.textBaseline = 'top';
-      ctx.fillText('MAX', isP1 ? baseX + gaugeW + 8 : baseX - 8, gaugeY - 2);
+      drawSNKText(ctx, 'MAX', isP1 ? baseX + gaugeW + 14 : baseX - 14, gaugeY + 6, 12, '#66ff88', '#000000', isP1 ? 'left' : 'right');
       ctx.shadowBlur = 0;
+      ctx.globalAlpha = 1;
       ctx.restore();
 
       const timerBarY = gaugeY + gaugeH + 4;

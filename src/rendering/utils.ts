@@ -41,3 +41,32 @@ export function parseColor(color: string): { r: number; g: number; b: number } {
   }
   return { r: 128, g: 128, b: 128 };
 }
+
+/** SNK风格文字: 粗描边+渐变填充+顶部高光 (KOF2002经典文字风格) */
+export function drawSNKText(
+  ctx: CanvasRenderingContext2D,
+  text: string, x: number, y: number,
+  fontSize: number, fillColor: string, strokeColor: string = '#000000',
+  align: CanvasTextAlign = 'center', baseline: CanvasTextBaseline = 'middle',
+): void {
+  ctx.save();
+  ctx.font = `bold ${fontSize}px "Courier New", monospace`;
+  ctx.textAlign = align;
+  ctx.textBaseline = baseline;
+  // 外描边 (黑色粗边, SNK经典风格)
+  ctx.strokeStyle = strokeColor;
+  ctx.lineWidth = Math.max(2, Math.round(fontSize / 8));
+  ctx.lineJoin = 'round';
+  ctx.strokeText(text, x, y);
+  // 渐变填充 (从亮到暗, SNK金属感)
+  const grad = ctx.createLinearGradient(x, y - fontSize * 0.5, x, y + fontSize * 0.5);
+  grad.addColorStop(0, shiftColor(fillColor, 40));
+  grad.addColorStop(0.3, fillColor);
+  grad.addColorStop(1, shiftColor(fillColor, -40));
+  ctx.fillStyle = grad;
+  ctx.fillText(text, x, y);
+  // 顶部高光线
+  ctx.fillStyle = `rgba(255, 255, 255, 0.25)`;
+  ctx.fillText(text, x, y - 0.5);
+  ctx.restore();
+}
