@@ -289,62 +289,87 @@ export class Renderer {
   private drawAttackLimb(ctx: CanvasRenderingContext2D, f: Fighter, sx: number, sy: number, cameraX: number): void {
     if (f.attackPhase !== 'active' || !f.currentAttack) return;
 
-    const limbLen = 35;
-    const limbWidth = 8;
-    const progress = f.attackFrame / (FRAME_DATA[f.currentAttack]?.active || 5);
+    const data = FRAME_DATA[f.currentAttack as keyof typeof FRAME_DATA];
+    const progress = f.attackFrame / (data?.active || 5);
+    const name = f.currentAttack as string;
+
+    // Determine punch (A/C) vs kick (B/D) for limb color and style
+    const isPunch = name.endsWith('_A') || name.endsWith('_C') || f.currentAttack === AttackType.SPECIAL_PROJECTILE || f.currentAttack === AttackType.SPECIAL_UPPER;
+    const isHeavy = name.endsWith('_C') || name.endsWith('_D') || f.currentAttack === AttackType.STAND_C || f.currentAttack === AttackType.STAND_D;
+
+    const limbLen = isHeavy ? 42 : 35;
+    const limbWidth = isHeavy ? 10 : 8;
 
     ctx.save();
-    ctx.strokeStyle = '#ffdd44';
+    ctx.strokeStyle = isPunch ? '#ffdd44' : '#44ddff';
     ctx.lineWidth = limbWidth;
     ctx.lineCap = 'round';
-    ctx.shadowColor = '#ffaa00';
+    ctx.shadowColor = isPunch ? '#ffaa00' : '#00aaff';
     ctx.shadowBlur = 8;
 
-    switch (f.currentAttack) {
-      case AttackType.STAND_LIGHT:
-      case AttackType.STAND_HEAVY: {
-        // Punch extension
+    if (name.startsWith('STAND')) {
+      // Standing attack
+      if (isPunch) {
         const reach = limbLen * (0.5 + progress * 0.5);
         ctx.beginPath();
         ctx.moveTo(sx + 10 * f.facing, sy - f.displayHeight * 0.6);
         ctx.lineTo(sx + (FIGHTER_WIDTH / 2 + reach) * f.facing, sy - f.displayHeight * 0.6);
         ctx.stroke();
-        break;
+      } else {
+        // Kick: extends from hip, angles slightly down
+        const reach = limbLen * (0.5 + progress * 0.5);
+        ctx.beginPath();
+        ctx.moveTo(sx + 5 * f.facing, sy - f.displayHeight * 0.35);
+        ctx.lineTo(sx + (FIGHTER_WIDTH / 2 + reach) * f.facing, sy - f.displayHeight * 0.25);
+        ctx.stroke();
       }
-      case AttackType.CROUCH_ATTACK: {
+    } else if (name.startsWith('CROUCH')) {
+      if (isPunch) {
         const reach = limbLen * 0.8;
         ctx.beginPath();
         ctx.moveTo(sx + 5 * f.facing, sy - 10);
         ctx.lineTo(sx + (FIGHTER_WIDTH / 2 + reach) * f.facing, sy - 5);
         ctx.stroke();
-        break;
+      } else {
+        // Low kick: sweeps low
+        const reach = limbLen * 0.9;
+        ctx.beginPath();
+        ctx.moveTo(sx + 5 * f.facing, sy - 8);
+        ctx.lineTo(sx + (FIGHTER_WIDTH / 2 + reach) * f.facing, sy - 3);
+        ctx.stroke();
       }
-      case AttackType.AIR_ATTACK: {
-        const reach = limbLen * 0.7;
+    } else if (name.startsWith('JUMP')) {
+      const reach = limbLen * 0.7;
+      if (isPunch) {
         ctx.beginPath();
         ctx.moveTo(sx + 5 * f.facing, sy - f.displayHeight * 0.3);
         ctx.lineTo(sx + (FIGHTER_WIDTH / 2 + reach) * f.facing, sy - f.displayHeight * 0.4);
         ctx.stroke();
-        break;
-      }
-      case AttackType.SPECIAL_UPPER: {
-        // Rising uppercut
-        const reach = limbLen * 1.2;
+      } else {
+        // Air kick: angles down
         ctx.beginPath();
-        ctx.moveTo(sx + 5 * f.facing, sy - f.displayHeight * 0.5);
-        ctx.lineTo(sx + 10 * f.facing, sy - f.displayHeight * 0.5 - reach);
+        ctx.moveTo(sx + 5 * f.facing, sy - f.displayHeight * 0.25);
+        ctx.lineTo(sx + (FIGHTER_WIDTH / 2 + reach) * f.facing, sy - f.displayHeight * 0.1);
         ctx.stroke();
-        break;
       }
-      case AttackType.THROW: {
-        // Grab
-        ctx.strokeStyle = '#ff8844';
-        ctx.beginPath();
-        ctx.moveTo(sx + 10 * f.facing, sy - f.displayHeight * 0.5);
-        ctx.lineTo(sx + (FIGHTER_WIDTH / 2 + 20) * f.facing, sy - f.displayHeight * 0.5);
-        ctx.stroke();
-        break;
-      }
+    } else if (f.currentAttack === AttackType.SPECIAL_UPPER) {
+      const reach = limbLen * 1.2;
+      ctx.beginPath();
+      ctx.moveTo(sx + 5 * f.facing, sy - f.displayHeight * 0.5);
+      ctx.lineTo(sx + 10 * f.facing, sy - f.displayHeight * 0.5 - reach);
+      ctx.stroke();
+    } else if (f.currentAttack === AttackType.SPECIAL_PROJECTILE) {
+      const reach = limbLen * 0.6;
+      ctx.beginPath();
+      ctx.moveTo(sx + 10 * f.facing, sy - f.displayHeight * 0.55);
+      ctx.lineTo(sx + (FIGHTER_WIDTH / 2 + reach) * f.facing, sy - f.displayHeight * 0.55);
+      ctx.stroke();
+    } else if (f.currentAttack === AttackType.THROW) {
+      ctx.strokeStyle = '#ff8844';
+      ctx.beginPath();
+      ctx.moveTo(sx + 10 * f.facing, sy - f.displayHeight * 0.5);
+      ctx.lineTo(sx + (FIGHTER_WIDTH / 2 + 20) * f.facing, sy - f.displayHeight * 0.5);
+      ctx.stroke();
     }
     ctx.restore();
   }
@@ -709,7 +734,7 @@ export class Renderer {
     ctx.fillStyle = 'rgba(255,255,255,0.25)';
     ctx.font = '9px monospace';
     ctx.textAlign = 'center';
-    ctx.fillText('P1: WASD+JKL  P2: Arrows+456  >>Run  <<Backdash  R:Restart  F1:Debug', 400, 596);
+    ctx.fillText('P1: WASD+J(A)K(B)U(C)I(D)L(投)  P2: Arrows+Np1(A)2(B)3(C)0(D).(投)  R:Restart  F1:Debug', 400, 596);
     ctx.textAlign = 'left';
   }
 }

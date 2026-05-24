@@ -14,8 +14,8 @@ import type { VFXSystem } from '../rendering/vfx.js';
 
 /**
  * Per-frame fighter state controller.
- * Handles input → state transitions, double-tap dash detection,
- * attack spawning, physics, pushbox.
+ * Routes A/B/C/D buttons to correct AttackType per stance,
+ * handles double-tap dash, special moves, physics, pushbox.
  */
 export class FighterController {
   private fighter: Fighter;
@@ -49,15 +49,12 @@ export class FighterController {
 
   get fighterRef(): Fighter { return this.fighter; }
 
-  /** Process input and update fighter state */
   update(input: ResolvedInput): void {
     this.tickStateMachine(input);
-    // Update edge tracking AFTER state machine consumes it
     this.prevForward = input.forward;
     this.prevBack = input.back;
   }
 
-  /** Apply gravity and clamping */
   applyPhysics(): void {
     const f = this.fighter;
     f.x += f.vx;
@@ -85,17 +82,14 @@ export class FighterController {
     f.x = Math.max(FIGHTER_WIDTH / 2, Math.min(f.x, STAGE_WIDTH - FIGHTER_WIDTH / 2));
   }
 
-  /** Detect forward edge press (just pressed this frame) */
   private forwardJustPressed(input: ResolvedInput): boolean {
     return input.forward && !this.prevForward;
   }
 
-  /** Detect back edge press (just pressed this frame) */
   private backJustPressed(input: ResolvedInput): boolean {
     return input.back && !this.prevBack;
   }
 
-  /** Check if double-tap forward detected */
   private checkDoubleForward(input: ResolvedInput): boolean {
     if (this.forwardJustPressed(input)) {
       const gap = this.tickRef.value - this.lastForwardTick;
@@ -105,7 +99,6 @@ export class FighterController {
     return false;
   }
 
-  /** Check if double-tap back detected */
   private checkDoubleBack(input: ResolvedInput): boolean {
     if (this.backJustPressed(input)) {
       const gap = this.tickRef.value - this.lastBackTick;
@@ -113,6 +106,43 @@ export class FighterController {
       return gap > 0 && gap <= DOUBLE_TAP_WINDOW;
     }
     return false;
+  }
+
+  /** Determine AttackType based on stance + button */
+  private routeAttack(input: ResolvedInput): AttackType | null {
+    const f = this.fighter;
+
+    if (f.state === FighterState.JUMP || f.state === FighterState.RUN_JUMP) {
+      if (input.buttonAPressed) return AttackType.JUMP_A;
+      if (input.buttonBPressed) return AttackType.JUMP_B;
+      if (input.buttonCPressed) return AttackType.JUMP_C;
+      if (input.buttonDPressed) return AttackType.JUMP_D;
+      return null;
+    }
+
+    if (f.state === FighterState.CROUCH) {
+      if (input.buttonAPressed) return AttackType.CROUCH_A;
+      if (input.buttonBPressed) return AttackType.CROUCH_B;
+      if (input.buttonCPressed) return AttackType.CROUCH_C;
+      if (input.buttonDPressed) return AttackType.CROUCH_D;
+      return null;
+    }
+
+    // Stand / Walk / Run
+    if (input.buttonAPressed) return AttackType.STAND_A;
+    if (input.buttonBPressed) return AttackType.STAND_B;
+    if (input.buttonCPressed) return AttackType.STAND_C;
+    if (input.buttonDPressed) return AttackType.STAND_D;
+    return null;
+  }
+
+  /** Try special move (punch buttons only: A or C) */
+  private trySpecialMove(input: ResolvedInput): AttackType | null {
+    if (!input.punchPressed) return null;
+    const special = this.cmdBuf.checkSpecial(this.tickRef.value, true);
+    if (special === AttackType.SPECIAL_PROJECTILE) return special;
+    if (special === AttackType.SPECIAL_UPPER) return special;
+    return null;
   }
 
   private tickStateMachine(input: ResolvedInput): void {
@@ -162,14 +192,16 @@ export class FighterController {
           return;
         }
 
-        // Priority 6: Attack (with special move check)
-        const atkJustPressed = input.lightAttackPressed || input.heavyAttackPressed;
-        if (atkJustPressed && f.canAct()) {
-          const special = this.cmdBuf.checkSpecial(this.tickRef.value, true);
-          if (special === AttackType.SPECIAL_PROJECTILE) { f.startAttack(special); return; }
-          if (special === AttackType.SPECIAL_UPPER) { f.startAttack(special); return; }
-          if (input.heavyAttackPressed) { f.startAttack(AttackType.STAND_HEAVY); return; }
-          if (input.lightAttackPressed) { f.startAttack(AttackType.STAND_LIGHT); return; }
+        // Priority 6: Special move (punch buttons + motion)
+        if (input.punchPressed && f.canAct()) {
+          const special = this.trySpecialMove(input);
+          if (special) { f.startAttack(special); return; }
+        }
+
+        // Priority 7: Normal attack (route by stance + button)
+        if ((input.punchPressed || input.kickPressed) && f.canAct()) {
+          const atk = this.routeAttack(input);
+          if (atk) { f.startAttack(atk); return; }
         }
 
         // Walk / idle
@@ -189,7 +221,6 @@ export class FighterController {
         f.displayHeight = 100;
         f.vx = RUN_SPEED * f.facing;
 
-        // Run → Run Jump (longer, faster jump)
         if (input.up && f.isGrounded()) {
           f.state = FighterState.RUN_JUMP;
           f.vy = RUN_JUMP_VY;
@@ -198,7 +229,6 @@ export class FighterController {
           return;
         }
 
-        // Run → Crouch slide
         if (input.down && f.isGrounded()) {
           f.state = FighterState.CROUCH;
           f.displayHeight = 50;
@@ -206,23 +236,21 @@ export class FighterController {
           return;
         }
 
-        // Run → Attack
-        const atkJustPressed = input.lightAttackPressed || input.heavyAttackPressed;
-        if (atkJustPressed && f.canAct()) {
-          const special = this.cmdBuf.checkSpecial(this.tickRef.value, true);
-          if (special === AttackType.SPECIAL_PROJECTILE) { f.startAttack(special); return; }
-          if (special === AttackType.SPECIAL_UPPER) { f.startAttack(special); return; }
-          if (input.heavyAttackPressed) { f.startAttack(AttackType.STAND_HEAVY); return; }
-          if (input.lightAttackPressed) { f.startAttack(AttackType.STAND_LIGHT); return; }
-        }
-
-        // Run → Throw
         if (input.throwAttackPressed && f.canAct()) {
           f.startAttack(AttackType.THROW);
           return;
         }
 
-        // Release forward → stop running
+        if (input.punchPressed && f.canAct()) {
+          const special = this.trySpecialMove(input);
+          if (special) { f.startAttack(special); return; }
+        }
+
+        if ((input.punchPressed || input.kickPressed) && f.canAct()) {
+          const atk = this.routeAttack(input);
+          if (atk) { f.startAttack(atk); return; }
+        }
+
         if (!input.forward) {
           f.vx = 0;
           f.state = FighterState.IDLE;
@@ -231,9 +259,7 @@ export class FighterController {
       }
 
       case FighterState.BACKDASH: {
-        // Fixed trajectory hop — no input control
         f.vy += GRAVITY;
-        // Timer-based end (in case physics doesn't land cleanly)
         if (f.isGrounded() && f.vy >= 0) {
           f.state = FighterState.IDLE;
           f.vx = 0;
@@ -245,21 +271,13 @@ export class FighterController {
         break;
       }
 
-      case FighterState.JUMP: {
-        if ((input.lightAttackPressed || input.heavyAttackPressed) && !f.currentAttack) {
-          f.startAttack(AttackType.AIR_ATTACK);
-        }
-        f.vy += GRAVITY;
-        break;
-      }
-
+      case FighterState.JUMP:
       case FighterState.RUN_JUMP: {
-        // Running jump — faster horizontal, can air attack
-        if ((input.lightAttackPressed || input.heavyAttackPressed) && !f.currentAttack) {
-          f.startAttack(AttackType.AIR_ATTACK);
+        if ((input.punchPressed || input.kickPressed) && !f.currentAttack) {
+          const atk = this.routeAttack(input);
+          if (atk) f.startAttack(atk);
         }
         f.vy += GRAVITY;
-        // Maintain horizontal speed (no air control for run jump)
         break;
       }
 
@@ -267,13 +285,15 @@ export class FighterController {
         f.displayHeight = 50;
         f.vx = 0;
         if (!input.down) { f.state = FighterState.IDLE; f.displayHeight = 100; return; }
-        if ((input.lightAttackPressed || input.heavyAttackPressed) && f.canAct()) {
-          f.startAttack(AttackType.CROUCH_ATTACK);
-          return;
-        }
+
         if (input.throwAttackPressed && f.canAct()) {
           f.startAttack(AttackType.THROW);
           return;
+        }
+
+        if ((input.punchPressed || input.kickPressed) && f.canAct()) {
+          const atk = this.routeAttack(input);
+          if (atk) { f.startAttack(atk); return; }
         }
         break;
       }

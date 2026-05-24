@@ -1,49 +1,82 @@
 import { Direction, DirectionInput } from '../core/types.js';
 
-interface ResolvedInput {
+export interface ResolvedInput {
   up: boolean;
   down: boolean;
   forward: boolean;
   back: boolean;
-  lightAttack: boolean;
-  heavyAttack: boolean;
+  buttonA: boolean;
+  buttonB: boolean;
+  buttonC: boolean;
+  buttonD: boolean;
   throwAttack: boolean;
-  lightAttackPressed: boolean;
-  heavyAttackPressed: boolean;
+  buttonAPressed: boolean;
+  buttonBPressed: boolean;
+  buttonCPressed: boolean;
+  buttonDPressed: boolean;
   throwAttackPressed: boolean;
+  /** Any punch button just pressed (A or C) */
+  punchPressed: boolean;
+  /** Any kick button just pressed (B or D) */
+  kickPressed: boolean;
 }
 
-interface RawInput {
+export interface RawInput {
   up: boolean;
   down: boolean;
   left: boolean;
   right: boolean;
-  lightAttack: boolean;
-  heavyAttack: boolean;
+  buttonA: boolean;
+  buttonB: boolean;
+  buttonC: boolean;
+  buttonD: boolean;
   throwAttack: boolean;
 }
 
-interface PrevAttack {
-  light: boolean;
-  heavy: boolean;
+export interface PrevAttack {
+  a: boolean;
+  b: boolean;
+  c: boolean;
+  d: boolean;
   throwAtk: boolean;
 }
 
-export type { ResolvedInput, RawInput, PrevAttack };
+export function createPrevAttack(): PrevAttack {
+  return { a: false, b: false, c: false, d: false, throwAtk: false };
+}
 
 export function resolveInput(raw: RawInput, facing: Direction, prev: PrevAttack): ResolvedInput {
+  const aPressed = raw.buttonA && !prev.a;
+  const cPressed = raw.buttonC && !prev.c;
+  const bPressed = raw.buttonB && !prev.b;
+  const dPressed = raw.buttonD && !prev.d;
+
   return {
     up: raw.up,
     down: raw.down,
     forward: facing === 1 ? raw.right : raw.left,
     back: facing === 1 ? raw.left : raw.right,
-    lightAttack: raw.lightAttack,
-    heavyAttack: raw.heavyAttack,
+    buttonA: raw.buttonA,
+    buttonB: raw.buttonB,
+    buttonC: raw.buttonC,
+    buttonD: raw.buttonD,
     throwAttack: raw.throwAttack,
-    lightAttackPressed: raw.lightAttack && !prev.light,
-    heavyAttackPressed: raw.heavyAttack && !prev.heavy,
+    buttonAPressed: aPressed,
+    buttonBPressed: bPressed,
+    buttonCPressed: cPressed,
+    buttonDPressed: dPressed,
     throwAttackPressed: raw.throwAttack && !prev.throwAtk,
+    punchPressed: aPressed || cPressed,
+    kickPressed: bPressed || dPressed,
   };
+}
+
+export function updatePrevAttack(prev: PrevAttack, raw: RawInput): void {
+  prev.a = raw.buttonA;
+  prev.b = raw.buttonB;
+  prev.c = raw.buttonC;
+  prev.d = raw.buttonD;
+  prev.throwAtk = raw.throwAttack;
 }
 
 export function getDirectionInput(input: ResolvedInput): DirectionInput {

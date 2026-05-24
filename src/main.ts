@@ -3,7 +3,7 @@ import { GameLoop } from './core/gameLoop.js';
 import { STAGE_WIDTH, KO_DISPLAY_TIME, FRAME_DATA } from './core/constants.js';
 import { AttackType, GameState, GamePhase } from './core/types.js';
 import { InputManager, CommandBuffer, resolveInput, getDirectionInput } from './input/index.js';
-import type { ResolvedInput } from './input/index.js';
+import type { ResolvedInput, RawInput } from './input/index.js';
 import { Fighter } from './entities/fighter.js';
 import { Projectile } from './entities/projectile.js';
 import { FighterController, resolvePushbox } from './entities/fighterController.js';
@@ -79,7 +79,10 @@ function onHit(attacker: Fighter, defender: Fighter, attackType: AttackType, blo
     if (comboCount[defIdx] >= 2) {
       vfx.spawnDamageText(defender.x, defender.y - defender.displayHeight - 40, comboCount[defIdx]);
     }
-    const shake = attackType === AttackType.SPECIAL_UPPER ? 8 : attackType === AttackType.THROW ? 6 : data.damage > 60 ? 5 : 3;
+    const shake = attackType === AttackType.SPECIAL_UPPER ? 8
+      : attackType === AttackType.THROW ? 6
+      : attackType === AttackType.STAND_C || attackType === AttackType.STAND_D ? 5
+      : data.damage > 50 ? 4 : 3;
     screenShake.trigger(shake, 8);
   }
 }

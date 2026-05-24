@@ -7,15 +7,17 @@ interface KeyState {
 export class InputManager {
   private keys: KeyState = {};
 
-  // P1: WASD + JKL
-  // P2: Arrow keys + 456 (number row)
+  // P1: WASD + J(A) K(B) U(C) I(D) L(投)
+  // P2: Arrows + Numpad1(A) 2(B) 3(C) 0(D) Decimal(投)
   private static readonly P1_MAP = {
     up: 'KeyW',
     down: 'KeyS',
     left: 'KeyA',
     right: 'KeyD',
-    lightAttack: 'KeyJ',
-    heavyAttack: 'KeyK',
+    buttonA: 'KeyJ',
+    buttonB: 'KeyK',
+    buttonC: 'KeyU',
+    buttonD: 'KeyI',
     throwAttack: 'KeyL',
   };
 
@@ -24,15 +26,16 @@ export class InputManager {
     down: 'ArrowDown',
     left: 'ArrowLeft',
     right: 'ArrowRight',
-    lightAttack: 'Digit4',
-    heavyAttack: 'Digit5',
-    throwAttack: 'Digit6',
+    buttonA: 'Numpad1',
+    buttonB: 'Numpad2',
+    buttonC: 'Numpad3',
+    buttonD: 'Numpad0',
+    throwAttack: 'NumpadDecimal',
   };
 
   constructor() {
     window.addEventListener('keydown', (e) => {
       this.keys[e.code] = true;
-      // Prevent default for game keys to stop scrolling
       if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space'].includes(e.code)) {
         e.preventDefault();
       }
@@ -42,7 +45,6 @@ export class InputManager {
       this.keys[e.code] = false;
     });
 
-    // Reset all keys when window loses focus (prevents stuck keys)
     window.addEventListener('blur', () => {
       this.keys = {};
     });
@@ -66,8 +68,10 @@ export class InputManager {
       down: this.keys[keyMap.down] === true,
       left: this.keys[keyMap.left] === true,
       right: this.keys[keyMap.right] === true,
-      lightAttack: this.keys[keyMap.lightAttack] === true,
-      heavyAttack: this.keys[keyMap.heavyAttack] === true,
+      buttonA: this.keys[keyMap.buttonA] === true,
+      buttonB: this.keys[keyMap.buttonB] === true,
+      buttonC: this.keys[keyMap.buttonC] === true,
+      buttonD: this.keys[keyMap.buttonD] === true,
       throwAttack: this.keys[keyMap.throwAttack] === true,
     };
   }

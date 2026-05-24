@@ -102,9 +102,11 @@ export class Fighter {
     this.attackPhase = 'startup';
     this.hasHit = false;
 
-    if (attackType === AttackType.CROUCH_ATTACK) {
+    // Determine state from attack type
+    const name = attackType as string;
+    if (name.startsWith('CROUCH')) {
       this.state = FighterState.CROUCH_ATTACK;
-    } else if (attackType === AttackType.AIR_ATTACK) {
+    } else if (name.startsWith('JUMP')) {
       this.state = FighterState.AIR_ATTACK;
     } else if (attackType === AttackType.THROW) {
       this.state = FighterState.THROW;
@@ -188,7 +190,8 @@ export class Fighter {
     return (
       this.state === FighterState.IDLE ||
       this.state === FighterState.WALK ||
-      this.state === FighterState.CROUCH
+      this.state === FighterState.CROUCH ||
+      this.state === FighterState.RUN
     );
   }
 
