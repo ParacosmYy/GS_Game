@@ -112,4 +112,3 @@ export const LANDING_RECOVERY = 2;
 
 // ===== KO Constants =====
 export const KO_DISPLAY_TIME = 120; // 2 seconds at 60fps
-export const KO_RESTART_DELAY = 120; // frames before R key works

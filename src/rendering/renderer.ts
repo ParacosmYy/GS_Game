@@ -1,5 +1,8 @@
 import { Fighter } from '../entities/fighter.js';
-import { FighterState, AttackType } from '../core/types.js';
+import { Projectile } from '../entities/projectile.js';
+import { CommandBuffer } from '../input/commandBuffer.js';
+import { Camera } from '../core/camera.js';
+import { FighterState, AttackType, GamePhase } from '../core/types.js';
 import { CANVAS_WIDTH, CANVAS_HEIGHT, STAGE_GROUND_Y, FIGHTER_WIDTH, MAX_HEALTH, FRAME_DATA } from '../core/constants.js';
 
 export class Renderer {
@@ -478,7 +481,189 @@ export class Renderer {
         b: parseInt(color.slice(5, 7), 16),
       };
     }
-    const m = color.match(/(\d+)/g);
-    return m ? { r: +m[0], g: +m[1], b: +m[2] } : { r: 128, g: 128, b: 128 };
+    if (color.startsWith('rgba(') || color.startsWith('rgb(')) {
+      const m = color.match(/(\d+)/g);
+      return m ? { r: +m[0], g: +m[1], b: +m[2] } : { r: 128, g: 128, b: 128 };
+    }
+    return { r: 128, g: 128, b: 128 };
+  }
+
+  // ===== Projectile Rendering =====
+  drawProjectiles(projectiles: Projectile[], camera: Camera): void {
+    const ctx = this.ctx;
+    for (const proj of projectiles) {
+      if (!proj.active) continue;
+      const sx = camera.worldToScreen(proj.x);
+      ctx.save();
+      ctx.shadowColor = '#ff8800';
+      ctx.shadowBlur = 15;
+      ctx.fillStyle = '#ffaa22';
+      ctx.beginPath();
+      ctx.arc(sx, proj.y, 10, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.shadowBlur = 0;
+      ctx.fillStyle = '#fff8e0';
+      ctx.beginPath();
+      ctx.arc(sx, proj.y, 5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = 'rgba(255,170,0,0.3)';
+      ctx.beginPath();
+      ctx.arc(sx - proj.facing * 12, proj.y, 7, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+  }
+
+  // ===== Intro Overlay =====
+  drawIntro(phaseTimer: number): void {
+    const ctx = this.ctx;
+    ctx.save();
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+
+    if (phaseTimer < 60) {
+      const progress = phaseTimer / 60;
+      const scale = 1 + Math.max(0, 1 - progress * 3) * 0.5;
+      ctx.globalAlpha = Math.min(1, progress * 4);
+      ctx.fillStyle = '#ffffff';
+      ctx.font = `bold ${Math.round(40 * scale)}px monospace`;
+      ctx.fillText('ROUND 1', 400, 260);
+    } else if (phaseTimer < 100) {
+      const fp = (phaseTimer - 60) / 40;
+      const scale = 1 + Math.max(0, 1 - fp * 4) * 1.5;
+      const alpha = fp < 0.1 ? fp * 10 : Math.max(0, 1 - (fp - 0.5) * 2);
+      ctx.globalAlpha = Math.min(1, Math.max(0, alpha));
+      ctx.shadowColor = '#ff4400';
+      ctx.shadowBlur = 20;
+      ctx.fillStyle = '#ff4400';
+      ctx.font = `bold ${Math.round(60 * scale)}px monospace`;
+      ctx.fillText('FIGHT!', 400, 300);
+    }
+
+    ctx.restore();
+  }
+
+  // ===== Combo Counters =====
+  drawComboCounters(
+    fighters: Fighter[],
+    comboCount: number[],
+    comboTimer: number[],
+    camera: Camera,
+  ): void {
+    const ctx = this.ctx;
+    ctx.save();
+    for (let i = 0; i < 2; i++) {
+      if (comboCount[i] < 2) continue;
+      const f = fighters[i];
+      const sx = camera.worldToScreen(f.x);
+      const sy = f.y - f.displayHeight - 30;
+      const alpha = Math.min(1, comboTimer[i] < 30 ? 1 : 1 - (comboTimer[i] - 30) / 30);
+      if (alpha <= 0) continue;
+
+      ctx.globalAlpha = alpha;
+      ctx.textAlign = 'center';
+      ctx.fillStyle = '#ffcc00';
+      ctx.shadowColor = '#ff8800';
+      ctx.shadowBlur = 8;
+      ctx.font = `bold ${16 + Math.min(comboCount[i], 10)}px monospace`;
+      ctx.fillText(`${comboCount[i]} COMBO`, sx, sy);
+      ctx.shadowBlur = 0;
+    }
+    ctx.restore();
+  }
+
+  // ===== Debug Overlay =====
+  drawDebug(
+    fighters: Fighter[],
+    projectiles: Projectile[],
+    camera: Camera,
+    tick: number,
+    fps: number,
+    vfxCount: number,
+    cmdBufs: CommandBuffer[],
+  ): void {
+    const ctx = this.ctx;
+    ctx.save();
+    ctx.globalAlpha = 0.88;
+    ctx.fillStyle = '#0a0a0a';
+    ctx.fillRect(0, 0, 310, 220);
+    ctx.globalAlpha = 1;
+    ctx.font = '10px monospace';
+
+    let y = 13;
+    for (let i = 0; i < 2; i++) {
+      const f = fighters[i];
+      ctx.fillStyle = i === 0 ? '#ff5555' : '#5599ff';
+      ctx.fillText(`P${i + 1} ────────────────────────`, 4, y); y += 13;
+      ctx.fillStyle = '#ccc';
+      ctx.fillText(` ${f.state}  hp:${f.health}  (${Math.round(f.x)},${Math.round(f.y)}) ${f.facing === 1 ? '→' : '←'}`, 4, y); y += 13;
+      ctx.fillText(` vx:${f.vx.toFixed(1)} vy:${f.vy.toFixed(1)} gnd:${f.isGrounded()}`, 4, y); y += 13;
+      if (f.currentAttack) {
+        ctx.fillStyle = '#ffcc00';
+        const d = FRAME_DATA[f.currentAttack];
+        ctx.fillText(` ${f.currentAttack} [${f.attackPhase}] ${f.attackFrame}f dmg:${d.damage}`, 4, y); y += 13;
+        const total = d.startup + d.active + d.recovery;
+        const prog = f.attackPhase === 'startup' ? f.attackFrame / total
+          : f.attackPhase === 'active' ? (d.startup + f.attackFrame) / total
+          : (d.startup + d.active + f.attackFrame) / total;
+        ctx.fillStyle = '#333'; ctx.fillRect(8, y, 200, 5);
+        ctx.fillStyle = '#ccaa00'; ctx.fillRect(8, y, 200 * d.startup / total, 5);
+        ctx.fillStyle = '#cc2200'; ctx.fillRect(8 + 200 * d.startup / total, y, 200 * d.active / total, 5);
+        ctx.fillStyle = '#2244aa'; ctx.fillRect(8 + 200 * (d.startup + d.active) / total, y, 200 * d.recovery / total, 5);
+        ctx.fillStyle = '#fff'; ctx.fillRect(8 + 200 * prog - 1, y - 1, 3, 7);
+        y += 10;
+      }
+      if (f.hitstunTimer > 0) { ctx.fillStyle = '#ff8888'; ctx.fillText(` hitstun:${f.hitstunTimer}`, 4, y); y += 13; }
+      if (f.blockstunTimer > 0) { ctx.fillStyle = '#8888ff'; ctx.fillText(` blockstun:${f.blockstunTimer}`, 4, y); y += 13; }
+    }
+    ctx.fillStyle = '#0f0';
+    ctx.fillText(`tick:${tick} fps:${fps} proj:${projectiles.length} vfx:${vfxCount}`, 4, y);
+
+    // Collision boxes
+    for (const f of fighters) {
+      const hitbox = f.getActiveHitbox();
+      if (hitbox) {
+        ctx.fillStyle = 'rgba(255,0,0,0.2)'; ctx.fillRect(hitbox.x - camera.x, hitbox.y, hitbox.width, hitbox.height);
+        ctx.strokeStyle = 'rgba(255,0,0,0.7)'; ctx.lineWidth = 2; ctx.strokeRect(hitbox.x - camera.x, hitbox.y, hitbox.width, hitbox.height);
+      }
+      const hb = f.getHurtbox();
+      ctx.strokeStyle = 'rgba(0,100,255,0.5)'; ctx.lineWidth = 1; ctx.strokeRect(hb.x - camera.x, hb.y, hb.width, hb.height);
+      const pb = f.getPushbox();
+      ctx.strokeStyle = 'rgba(0,255,0,0.3)'; ctx.setLineDash([3, 3]); ctx.strokeRect(pb.x - camera.x, pb.y, pb.width, pb.height); ctx.setLineDash([]);
+      const sx = camera.worldToScreen(f.x);
+      ctx.fillStyle = '#fff'; ctx.font = '9px monospace'; ctx.textAlign = 'center';
+      ctx.fillText(f.state, sx, f.y - f.displayHeight - 18);
+      ctx.textAlign = 'left';
+    }
+
+    // Input buffer
+    ctx.globalAlpha = 0.88;
+    ctx.fillStyle = '#0a0a0a';
+    ctx.fillRect(560, 0, 240, 110);
+    ctx.globalAlpha = 1;
+    ctx.font = '9px monospace';
+    const symbols: Record<string, string> = { 'neutral': '·', 'up': '↑', 'down': '↓', 'forward': '→', 'back': '←', 'upforward': '↗', 'upback': '↖', 'downforward': '↘', 'downback': '↙' };
+    for (let i = 0; i < 2; i++) {
+      const buf = cmdBufs[i];
+      const py = 13 + i * 48;
+      ctx.fillStyle = i === 0 ? '#ff5555' : '#5599ff';
+      ctx.fillText(`P${i + 1} Buffer:`, 564, py);
+      const hist = buf.getRecentHistory(10);
+      ctx.fillStyle = '#aaa';
+      ctx.fillText(' ' + hist.map(h => symbols[h.direction] || '?').join(' '), 564, py + 12);
+      ctx.fillStyle = '#555';
+      ctx.fillText(' ages:' + hist.map(h => tick - h.frame).join(','), 564, py + 24);
+    }
+    ctx.restore();
+  }
+
+  // ===== Controls Hint =====
+  drawControlsHint(): void {
+    const ctx = this.ctx;
+    ctx.fillStyle = 'rgba(255,255,255,0.25)';
+    ctx.font = '9px monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText('P1: WASD+JKL  P2: Arrows+456  R: Restart  F1: Debug', 400, 596);
+    ctx.textAlign = 'left';
   }
 }

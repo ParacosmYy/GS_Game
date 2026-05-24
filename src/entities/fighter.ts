@@ -2,7 +2,6 @@ import {
   FighterState,
   AttackType,
   AttackPhase,
-  PlayerInput,
   Direction,
   BlockType,
 } from '../core/types.js';
@@ -39,9 +38,6 @@ export class Fighter {
   knockdownTimer = 0;
   landingRecovery = 0;
   blockType: BlockType = 'HIGH';
-
-  // Buffered input
-  bufferedInput: PlayerInput | null = null;
 
   // Visual height (for crouch)
   displayHeight = FIGHTER_HEIGHT;
@@ -210,7 +206,6 @@ export class Fighter {
     this.blockstunTimer = 0;
     this.knockdownTimer = 0;
     this.landingRecovery = 0;
-    this.bufferedInput = null;
     this.displayHeight = FIGHTER_HEIGHT;
     this.isKnockedDown = false;
   }
