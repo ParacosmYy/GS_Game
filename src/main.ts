@@ -307,11 +307,13 @@ function updateFighter(
     case FighterState.THROW: {
       // Special: spawn projectile once at start of active phase
       if (fighter.currentAttack === AttackType.SPECIAL_PROJECTILE && fighter.attackPhase === 'active' && fighter.attackFrame === 0) {
+        const ownerId = fighter === p1 ? 0 : 1;
         projectiles.push(new Projectile(
           fighter.x + 50 * fighter.facing,
           fighter.y - 50,
           fighter.facing,
           FRAME_DATA.SPECIAL_PROJECTILE.active,
+          ownerId,
         ));
       }
 
@@ -421,7 +423,11 @@ function processCombat(): void {
     const hitbox = proj.getHitbox();
     if (!hitbox) continue;
 
-    for (const defender of fighters) {
+    for (let i = 0; i < fighters.length; i++) {
+      const defender = fighters[i];
+      // Skip owner — projectile can't hit the fighter who fired it
+      if (i === proj.ownerId) continue;
+
       const hurtbox = defender.getHurtbox();
       if (aabbCheck(hitbox, hurtbox)) {
         const attackData = FRAME_DATA.SPECIAL_PROJECTILE;

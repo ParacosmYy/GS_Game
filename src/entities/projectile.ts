@@ -9,13 +9,15 @@ export class Projectile {
   active = true;
   activeFrames: number;
   currentFrame = 0;
+  ownerId: number; // 0=P1, 1=P2 — prevents hitting owner
 
-  constructor(x: number, y: number, facing: Direction, activeFrames: number) {
+  constructor(x: number, y: number, facing: Direction, activeFrames: number, ownerId: number) {
     this.x = x;
     this.y = y;
     this.facing = facing;
     this.vx = PROJECTILE_SPEED * facing;
     this.activeFrames = activeFrames;
+    this.ownerId = ownerId;
   }
 
   update(): void {
