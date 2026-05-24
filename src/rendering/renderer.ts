@@ -129,11 +129,29 @@ export class Renderer {
       // 优先使用精灵图渲染, 降级到骨骼渲染
       let usedSprite = false;
       if (this.spriteRenderer) {
-        const frameIdx = f.state === FighterState.IDLE ? Math.floor(this.globalTick / 12) % 4 : 0;
+        const frameIdx = this.calcSpriteFrame(f);
         usedSprite = this.spriteRenderer.render(
           ctx, f.charId, f.state, frameIdx,
           sx + leanOffsetX, sy, f.facing, bodyColor,
         );
+        // 受击闪白: 在精灵上方叠加白色
+        if (usedSprite && f.hitFlashFrames > 0) {
+          ctx.save();
+          ctx.globalCompositeOperation = 'source-atop';
+          ctx.globalAlpha = 0.6;
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(sx + leanOffsetX - 60, sy - 200, 120, 200);
+          ctx.restore();
+        }
+        // MAX模式发光
+        if (usedSprite && maxModeActive) {
+          ctx.save();
+          ctx.globalCompositeOperation = 'screen';
+          ctx.globalAlpha = 0.15 + Math.sin(this.globalTick * 0.15) * 0.1;
+          ctx.fillStyle = '#44ff88';
+          ctx.fillRect(sx + leanOffsetX - 60, sy - 200, 120, 200);
+          ctx.restore();
+        }
       }
       if (!usedSprite) {
         drawSkeletalFighter(ctx, f, sx + leanOffsetX, sy, bodyColor, outlineColor, this.globalTick, maxModeActive);
@@ -153,6 +171,32 @@ export class Renderer {
   }
 
   // ===== Color resolution =====
+
+  /** 计算精灵帧索引 — 不同状态使用不同的帧动画节奏 */
+  private calcSpriteFrame(f: Fighter): number {
+    const tick = this.globalTick;
+    switch (f.state) {
+      case FighterState.IDLE:
+        return Math.floor(tick / 12) % 4;
+      case FighterState.WALK:
+      case FighterState.RUN:
+        return Math.floor(tick / 6) % 4;
+      case FighterState.STAND_ATTACK:
+      case FighterState.CROUCH_ATTACK:
+      case FighterState.AIR_ATTACK:
+      case FighterState.THROW:
+        // 攻击阶段映射: startup→0, active→1-2, recovery→3
+        if (f.attackPhase === 'startup') return 0;
+        if (f.attackPhase === 'active') return 1;
+        return 3;
+      case FighterState.HITSTUN:
+        return Math.min(3, Math.floor(f.hitstunTimer / 5));
+      case FighterState.KNOCKDOWN:
+        return 0;
+      default:
+        return Math.floor(tick / 10) % 4;
+    }
+  }
 
   private resolveFighterColors(f: Fighter): { bodyColor: string; outlineColor: string; glowColor: string | null } {
     let bodyColor = f.color;
