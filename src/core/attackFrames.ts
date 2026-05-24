@@ -1,16 +1,29 @@
 /**
  * Per-Frame Hitbox Data (逐帧判定框)
  *
- * 设计原则（参照 SNK KOF2002）:
- * 1. 出招帧(active)的攻击框随帧变化，模拟"挥拳轨迹"
- * 2. 出招时受击框(bodyOverride)可缩小，模拟"低姿"/"侧身"
- * 3. 重攻击有多帧判定，每帧框不同
- * 4. 必杀技可以有多段判定框（如升龙拳的上升段和下降段）
- *
- * 未在此表中定义的攻击会自动降级到 HITBOX_OFFSETS 的单框判定
+ * Generic normals + export table. Character specials in attackFramesSpecials.ts.
  */
 import type { AttackFrame, AttackFrameTable } from './types.js';
 import { AttackType } from './types.js';
+import {
+  KYO_75KAI_FRAMES, KYO_75KAI_2_FRAMES, KYO_RED_KICK_FRAMES,
+  KYO_ARAGAMI_FRAMES, KYO_ARAGAMI_KONOKIZU_FRAMES, KYO_ARAGAMI_YANOSABI_FRAMES,
+  KYO_NANASE_FRAMES, KYO_KOTO_TSUKI_FRAMES, KYO_YAKISOGI_FRAMES,
+  KYO_DOKUGAMI_FRAMES, KYO_TSUMIYOMI_FRAMES, KYO_BATSUYOMI_FRAMES,
+  KYO_ONIYAKI_FRAMES, KYO_ONIYAKI_C_FRAMES, KYO_YAMIBARAI_FRAMES, KYO_YAMIBARAI_C_FRAMES,
+  IORI_AOIHANA_FRAMES, IORI_AOIHANA_2_FRAMES, IORI_AOIHANA_3_FRAMES,
+  IORI_YAMIBARAI_FRAMES, IORI_YAMIBARAI_C_FRAMES,
+  IORI_ONIYAKI_FRAMES, IORI_ONIYAKI_C_FRAMES, IORI_KOTOTSUKI_FRAMES, IORI_KUZUKAZE_FRAMES,
+  TERRY_BURN_KNUCKLE_FRAMES, TERRY_CRACK_SHOT_FRAMES, TERRY_POWER_WAVE_FRAMES,
+  TERRY_POWER_DUNK_FRAMES, TERRY_RISING_TACKLE_FRAMES,
+  KIM_HIENZAN_FRAMES, KIM_HANGETSU_FRAMES, KIM_HAKI_FRAMES, KIM_HISHOU_FRAMES, KIM_SANREN_FRAMES,
+  RYO_KOOU_FRAMES, RYO_KOOU_C_FRAMES, RYO_KO_HOU_FRAMES, RYO_KO_HOU_C_FRAMES,
+  RYO_HIEN_FRAMES, RYO_HAOU_FRAMES, DM_TEN_HA_OU_FRAMES,
+  LEONA_MOON_SLASH_FRAMES, LEONA_MOON_SLASH_C_FRAMES,
+  LEONA_EAR_RING_FRAMES, LEONA_EAR_RING_C_FRAMES,
+  LEONA_GRAND_SABER_FRAMES, LEONA_BALTIC_FRAMES, DM_V_SLASHER_FRAMES,
+  DM_OROCHINAGI_FRAMES, DM_YATAGARASU_FRAMES, DM_POWER_GEYSER_FRAMES, DM_PHOENIX_KICK_FRAMES,
+} from './attackFramesSpecials.js';
 
 const F: (
   attack: Array<{ ox: number; oy: number; w: number; h: number }>,
@@ -24,11 +37,10 @@ const F: (
   };
 
 // ===== 站立远距离攻击 (Far Stand) =====
-// 出招时身体前倾，攻击框随帧前移
 const FAR_STAND_A_FRAMES: AttackFrame[] = [
-  F([{ ox: 40, oy: -75, w: 35, h: 22 }]),  // frame 0: 手刚伸出
-  F([{ ox: 48, oy: -73, w: 40, h: 22 }]),  // frame 1: 完全伸展
-  F([{ ox: 48, oy: -73, w: 40, h: 22 }]),  // frame 2: 保持
+  F([{ ox: 40, oy: -75, w: 35, h: 22 }]),
+  F([{ ox: 48, oy: -73, w: 40, h: 22 }]),
+  F([{ ox: 48, oy: -73, w: 40, h: 22 }]),
 ];
 
 const FAR_STAND_B_FRAMES: AttackFrame[] = [
@@ -38,13 +50,9 @@ const FAR_STAND_B_FRAMES: AttackFrame[] = [
 ];
 
 const FAR_STAND_C_FRAMES: AttackFrame[] = [
-  // 蓄力帧：身体后仰，受击框缩小（侧身）
   F([{ ox: 30, oy: -70, w: 30, h: 30 }], { ox: 5, oy: 0, w: -10, h: 0 }),
-  // 出拳帧：攻击框快速前伸
   F([{ ox: 55, oy: -68, w: 50, h: 35 }]),
-  // 完全伸展
   F([{ ox: 58, oy: -65, w: 55, h: 35 }]),
-  // 收回
   F([{ ox: 50, oy: -70, w: 45, h: 30 }]),
 ];
 
@@ -57,263 +65,219 @@ const FAR_STAND_D_FRAMES: AttackFrame[] = [
 ];
 
 // ===== 站立近距离攻击 (Close Stand) =====
-// 近距离攻击出招快，框更近更小
 const CLOSE_A_FRAMES: AttackFrame[] = [
-  F([{ ox: 35, oy: -72, w: 30, h: 22 }]),
-  F([{ ox: 40, oy: -70, w: 32, h: 22 }]),
-  F([{ ox: 40, oy: -70, w: 32, h: 22 }]),
+  F([{ ox: 32, oy: -68, w: 30, h: 22 }]),
+  F([{ ox: 36, oy: -66, w: 34, h: 24 }]),
 ];
 
 const CLOSE_B_FRAMES: AttackFrame[] = [
-  F([{ ox: 32, oy: -25, w: 35, h: 22 }]),
-  F([{ ox: 38, oy: -23, w: 38, h: 22 }]),
-  F([{ ox: 38, oy: -23, w: 38, h: 22 }]),
+  F([{ ox: 30, oy: -35, w: 32, h: 26 }]),
+  F([{ ox: 34, oy: -33, w: 36, h: 28 }]),
 ];
 
 const CLOSE_C_FRAMES: AttackFrame[] = [
-  // 快速出拳，出招帧受击框缩小
-  F([{ ox: 40, oy: -65, w: 42, h: 32 }], { ox: 3, oy: 0, w: -10, h: 0 }),
-  F([{ ox: 45, oy: -63, w: 48, h: 35 }]),
-  F([{ ox: 45, oy: -63, w: 48, h: 35 }]),
+  F([{ ox: 34, oy: -65, w: 38, h: 28 }], { ox: 3, oy: 0, w: -8, h: 0 }),
+  F([{ ox: 42, oy: -62, w: 45, h: 32 }]),
+  F([{ ox: 42, oy: -62, w: 45, h: 32 }]),
+  F([{ ox: 38, oy: -65, w: 40, h: 30 }]),
 ];
 
 const CLOSE_D_FRAMES: AttackFrame[] = [
-  F([{ ox: 35, oy: -25, w: 40, h: 30 }]),
-  F([{ ox: 42, oy: -23, w: 48, h: 35 }]),
-  F([{ ox: 42, oy: -23, w: 48, h: 35 }]),
-  F([{ ox: 40, oy: -25, w: 45, h: 30 }]),
+  F([{ ox: 32, oy: -30, w: 36, h: 30 }]),
+  F([{ ox: 40, oy: -28, w: 45, h: 34 }]),
+  F([{ ox: 40, oy: -28, w: 45, h: 34 }]),
+  F([{ ox: 36, oy: -30, w: 40, h: 32 }]),
 ];
 
 // ===== 命令通常技 =====
 const CMD_GOFUYOU_FRAMES: AttackFrame[] = [
-  F([{ ox: 38, oy: -55, w: 40, h: 30 }]),
-  F([{ ox: 45, oy: -52, w: 48, h: 35 }]),
-  F([{ ox: 48, oy: -50, w: 50, h: 35 }]),
-  F([{ ox: 45, oy: -55, w: 45, h: 30 }]),
+  F([{ ox: 38, oy: -45, w: 42, h: 32 }]),
+  F([{ ox: 45, oy: -42, w: 48, h: 35 }]),
+  F([{ ox: 45, oy: -42, w: 48, h: 35 }]),
 ];
 
 const CMD_88SHIKI_FRAMES: AttackFrame[] = [
-  F([{ ox: 42, oy: -8, w: 45, h: 16 }]),
-  F([{ ox: 50, oy: -6, w: 55, h: 18 }]),
-  F([{ ox: 50, oy: -6, w: 55, h: 18 }]),
+  F([{ ox: 35, oy: -22, w: 45, h: 28 }]),
+  F([{ ox: 42, oy: -20, w: 52, h: 30 }]),
+  F([{ ox: 42, oy: -20, w: 52, h: 30 }]),
 ];
 
 const CMD_NARAKU_FRAMES: AttackFrame[] = [
-  F([{ ox: 25, oy: -35, w: 40, h: 35 }]),
-  F([{ ox: 30, oy: -30, w: 45, h: 40 }]),
-  F([{ ox: 30, oy: -25, w: 45, h: 45 }]),
-  F([{ ox: 28, oy: -20, w: 42, h: 40 }]),
-  F([{ ox: 25, oy: -15, w: 40, h: 35 }]),
+  F([{ ox: 32, oy: -30, w: 38, h: 32 }]),
+  F([{ ox: 38, oy: -28, w: 44, h: 35 }]),
 ];
 
 // ===== 命令通常技 (Character-specific Command Normals) =====
-// Iori
 const IORI_YUMEYUMI_FRAMES: AttackFrame[] = [
-  F([{ ox: 35, oy: -55, w: 38, h: 25 }]),
-  F([{ ox: 42, oy: -52, w: 45, h: 30 }]),
-  F([{ ox: 48, oy: -50, w: 48, h: 32 }]),
-  F([{ ox: 42, oy: -55, w: 40, h: 28 }]),
+  F([{ ox: 40, oy: -68, w: 38, h: 24 }]),
+  F([{ ox: 48, oy: -66, w: 44, h: 26 }]),
+  F([{ ox: 48, oy: -66, w: 44, h: 26 }]),
 ];
+
 const IORI_KATANUGI_FRAMES: AttackFrame[] = [
-  F([{ ox: 45, oy: -10, w: 48, h: 16 }]),
-  F([{ ox: 52, oy: -8, w: 55, h: 18 }]),
-  F([{ ox: 52, oy: -8, w: 55, h: 18 }]),
-  F([{ ox: 48, oy: -10, w: 50, h: 16 }]),
+  F([{ ox: 35, oy: -25, w: 42, h: 28 }]),
+  F([{ ox: 42, oy: -22, w: 50, h: 30 }]),
+  F([{ ox: 42, oy: -22, w: 50, h: 30 }]),
 ];
+
 const IORI_YUKIWARUI_FRAMES: AttackFrame[] = [
-  F([{ ox: 22, oy: -38, w: 40, h: 35 }]),
-  F([{ ox: 28, oy: -32, w: 45, h: 40 }]),
-  F([{ ox: 28, oy: -28, w: 45, h: 42 }]),
-  F([{ ox: 25, oy: -22, w: 42, h: 38 }]),
-  F([{ ox: 22, oy: -18, w: 38, h: 35 }]),
-  F([{ ox: 20, oy: -14, w: 35, h: 32 }]),
+  F([{ ox: 30, oy: -45, w: 40, h: 35 }]),
+  F([{ ox: 38, oy: -42, w: 48, h: 38 }]),
 ];
-// Terry
+
 const TERRY_BACK_KNCKLE_FRAMES: AttackFrame[] = [
-  F([{ ox: 35, oy: -52, w: 40, h: 28 }]),
-  F([{ ox: 42, oy: -50, w: 48, h: 32 }]),
-  F([{ ox: 48, oy: -48, w: 50, h: 35 }]),
-  F([{ ox: 45, oy: -52, w: 42, h: 30 }]),
+  F([{ ox: 38, oy: -65, w: 36, h: 24 }]),
+  F([{ ox: 46, oy: -63, w: 42, h: 26 }]),
+  F([{ ox: 46, oy: -63, w: 42, h: 26 }]),
 ];
+
 const TERRY_COMBO_BLOW_FRAMES: AttackFrame[] = [
-  F([{ ox: 45, oy: -12, w: 48, h: 16 }]),
-  F([{ ox: 52, oy: -8, w: 55, h: 18 }]),
-  F([{ ox: 55, oy: -8, w: 55, h: 18 }]),
-  F([{ ox: 50, oy: -10, w: 50, h: 16 }]),
+  F([{ ox: 35, oy: -22, w: 42, h: 28 }]),
+  F([{ ox: 42, oy: -20, w: 50, h: 30 }]),
 ];
-// Kim
+
 const KIM_HISHOU_KICK_FRAMES: AttackFrame[] = [
-  F([{ ox: 38, oy: -58, w: 42, h: 28 }]),
-  F([{ ox: 45, oy: -55, w: 50, h: 32 }]),
-  F([{ ox: 50, oy: -52, w: 55, h: 35 }]),
-  F([{ ox: 48, oy: -58, w: 45, h: 30 }]),
+  F([{ ox: 38, oy: -40, w: 44, h: 30 }]),
+  F([{ ox: 45, oy: -38, w: 50, h: 32 }]),
+  F([{ ox: 45, oy: -38, w: 50, h: 32 }]),
 ];
+
 const KIM_HANSEN_FRAMES: AttackFrame[] = [
-  F([{ ox: 48, oy: -15, w: 52, h: 18 }]),
-  F([{ ox: 55, oy: -12, w: 60, h: 22 }]),
-  F([{ ox: 60, oy: -10, w: 62, h: 25 }]),
-  F([{ ox: 55, oy: -15, w: 55, h: 20 }]),
-  F([{ ox: 50, oy: -18, w: 50, h: 18 }]),
+  F([{ ox: 35, oy: -20, w: 48, h: 28 }]),
+  F([{ ox: 42, oy: -18, w: 54, h: 30 }]),
+  F([{ ox: 42, oy: -18, w: 54, h: 30 }]),
 ];
-// Ryo
+
 const RYO_TSURIZAO_FRAMES: AttackFrame[] = [
-  F([{ ox: 35, oy: -52, w: 38, h: 28 }]),
-  F([{ ox: 42, oy: -50, w: 45, h: 32 }]),
-  F([{ ox: 45, oy: -48, w: 48, h: 35 }]),
-  F([{ ox: 42, oy: -52, w: 40, h: 30 }]),
+  F([{ ox: 40, oy: -68, w: 38, h: 24 }]),
+  F([{ ox: 48, oy: -66, w: 44, h: 26 }]),
+  F([{ ox: 48, oy: -66, w: 44, h: 26 }]),
 ];
+
 const RYO_ORISHI_FRAMES: AttackFrame[] = [
-  F([{ ox: 45, oy: -12, w: 48, h: 16 }]),
-  F([{ ox: 52, oy: -8, w: 55, h: 18 }]),
-  F([{ ox: 55, oy: -8, w: 55, h: 18 }]),
-  F([{ ox: 50, oy: -10, w: 50, h: 16 }]),
+  F([{ ox: 35, oy: -25, w: 42, h: 28 }]),
+  F([{ ox: 42, oy: -22, w: 50, h: 30 }]),
+  F([{ ox: 42, oy: -22, w: 50, h: 30 }]),
 ];
-// K'
+
 const KDASH_ONE_INCH_FRAMES: AttackFrame[] = [
-  F([{ ox: 32, oy: -50, w: 38, h: 25 }]),
-  F([{ ox: 38, oy: -48, w: 42, h: 28 }]),
-  F([{ ox: 40, oy: -48, w: 42, h: 28 }]),
+  F([{ ox: 38, oy: -62, w: 40, h: 26 }]),
+  F([{ ox: 48, oy: -60, w: 48, h: 28 }]),
+  F([{ ox: 48, oy: -60, w: 48, h: 28 }]),
 ];
+
 const KDASH_TRIGGER_FRAMES: AttackFrame[] = [
-  F([{ ox: 48, oy: -10, w: 50, h: 18 }]),
-  F([{ ox: 55, oy: -8, w: 58, h: 20 }]),
-  F([{ ox: 58, oy: -8, w: 58, h: 20 }]),
-  F([{ ox: 52, oy: -10, w: 52, h: 18 }]),
+  F([{ ox: 35, oy: -20, w: 46, h: 28 }]),
+  F([{ ox: 42, oy: -18, w: 52, h: 30 }]),
+  F([{ ox: 42, oy: -18, w: 52, h: 30 }]),
 ];
-// Kula
+
 const KULA_ONE_MORE_FRAMES: AttackFrame[] = [
-  F([{ ox: 35, oy: -52, w: 40, h: 28 }]),
-  F([{ ox: 42, oy: -50, w: 48, h: 32 }]),
-  F([{ ox: 45, oy: -48, w: 50, h: 35 }]),
-  F([{ ox: 42, oy: -52, w: 42, h: 30 }]),
+  F([{ ox: 38, oy: -40, w: 44, h: 30 }]),
+  F([{ ox: 45, oy: -38, w: 50, h: 32 }]),
+  F([{ ox: 45, oy: -38, w: 50, h: 32 }]),
 ];
+
 const KULA_SLIDER_FRAMES: AttackFrame[] = [
-  F([{ ox: 50, oy: -8, w: 55, h: 16 }]),
-  F([{ ox: 58, oy: -5, w: 62, h: 18 }]),
-  F([{ ox: 62, oy: -5, w: 62, h: 18 }]),
-  F([{ ox: 58, oy: -8, w: 55, h: 16 }]),
-  F([{ ox: 52, oy: -10, w: 50, h: 15 }]),
+  F([{ ox: 35, oy: -18, w: 50, h: 28 }]),
+  F([{ ox: 42, oy: -16, w: 56, h: 30 }]),
+  F([{ ox: 42, oy: -16, w: 56, h: 30 }]),
 ];
-// Leona
+
 const LEONA_STRIKE_ARC_FRAMES: AttackFrame[] = [
-  F([{ ox: 35, oy: -55, w: 42, h: 28 }]),
-  F([{ ox: 42, oy: -52, w: 50, h: 32 }]),
-  F([{ ox: 48, oy: -50, w: 52, h: 35 }]),
-  F([{ ox: 45, oy: -55, w: 45, h: 30 }]),
+  F([{ ox: 38, oy: -40, w: 44, h: 30 }]),
+  F([{ ox: 45, oy: -38, w: 50, h: 32 }]),
+  F([{ ox: 45, oy: -38, w: 50, h: 32 }]),
 ];
+
 const LEONA_STRIKE_DASH_FRAMES: AttackFrame[] = [
-  F([{ ox: 25, oy: -40, w: 42, h: 35 }]),
-  F([{ ox: 30, oy: -35, w: 48, h: 40 }]),
-  F([{ ox: 35, oy: -28, w: 50, h: 42 }]),
-  F([{ ox: 32, oy: -22, w: 48, h: 38 }]),
-  F([{ ox: 28, oy: -18, w: 42, h: 35 }]),
+  F([{ ox: 30, oy: -45, w: 40, h: 35 }]),
+  F([{ ox: 38, oy: -42, w: 48, h: 38 }]),
 ];
 
 // ===== 蹲下攻击 =====
 const CROUCH_A_FRAMES: AttackFrame[] = [
-  F([{ ox: 45, oy: -35, w: 35, h: 18 }]),
-  F([{ ox: 50, oy: -33, w: 38, h: 18 }]),
-  F([{ ox: 50, oy: -33, w: 38, h: 18 }]),
+  F([{ ox: 35, oy: -30, w: 32, h: 20 }]),
+  F([{ ox: 40, oy: -28, w: 36, h: 22 }]),
 ];
 
 const CROUCH_B_FRAMES: AttackFrame[] = [
-  F([{ ox: 45, oy: -15, w: 42, h: 18 }]),
-  F([{ ox: 50, oy: -13, w: 48, h: 18 }]),
-  F([{ ox: 50, oy: -13, w: 48, h: 18 }]),
+  F([{ ox: 35, oy: -15, w: 38, h: 18 }]),
+  F([{ ox: 42, oy: -14, w: 44, h: 20 }]),
 ];
 
 const CROUCH_C_FRAMES: AttackFrame[] = [
-  // 蹲重拳：从下往上挥，受击框降低
-  F([{ ox: 30, oy: -60, w: 40, h: 35 }], { ox: 0, oy: 10, w: 0, h: -20 }),
-  F([{ ox: 42, oy: -55, w: 50, h: 38 }]),
-  F([{ ox: 45, oy: -50, w: 52, h: 40 }]),
-  F([{ ox: 40, oy: -55, w: 48, h: 38 }]),
+  F([{ ox: 38, oy: -28, w: 45, h: 25 }]),
+  F([{ ox: 48, oy: -25, w: 55, h: 28 }]),
+  F([{ ox: 48, oy: -25, w: 55, h: 28 }]),
+  F([{ ox: 45, oy: -28, w: 50, h: 26 }]),
 ];
 
 const CROUCH_D_FRAMES: AttackFrame[] = [
-  // 扫堂腿：低姿，受击框大幅缩小
-  F([{ ox: 40, oy: -10, w: 45, h: 15 }], { ox: 0, oy: 15, w: 0, h: -35 }),
-  F([{ ox: 50, oy: -8, w: 55, h: 18 }], { ox: 0, oy: 15, w: 0, h: -35 }),
-  F([{ ox: 52, oy: -8, w: 58, h: 18 }], { ox: 0, oy: 15, w: 0, h: -35 }),
-  F([{ ox: 50, oy: -10, w: 52, h: 16 }], { ox: 0, oy: 10, w: 0, h: -25 }),
+  F([{ ox: 35, oy: -12, w: 45, h: 22 }]),
+  F([{ ox: 45, oy: -10, w: 58, h: 24 }]),
+  F([{ ox: 48, oy: -10, w: 62, h: 25 }]),
+  F([{ ox: 45, oy: -12, w: 55, h: 22 }]),
+  F([{ ox: 40, oy: -12, w: 50, h: 22 }]),
 ];
 
 // ===== 跳跃攻击 =====
 const JUMP_A_FRAMES: AttackFrame[] = [
-  F([{ ox: 30, oy: -45, w: 35, h: 28 }]),
-  F([{ ox: 35, oy: -42, w: 38, h: 28 }]),
-  F([{ ox: 35, oy: -42, w: 38, h: 28 }]),
-  F([{ ox: 33, oy: -45, w: 35, h: 28 }]),
-  F([{ ox: 33, oy: -45, w: 35, h: 28 }]),
+  F([{ ox: 30, oy: -40, w: 30, h: 28 }]),
+  F([{ ox: 35, oy: -38, w: 34, h: 30 }]),
 ];
 
 const JUMP_B_FRAMES: AttackFrame[] = [
-  F([{ ox: 30, oy: -30, w: 40, h: 32 }]),
-  F([{ ox: 35, oy: -28, w: 45, h: 35 }]),
-  F([{ ox: 35, oy: -28, w: 45, h: 35 }]),
-  F([{ ox: 33, oy: -30, w: 42, h: 32 }]),
-  F([{ ox: 33, oy: -30, w: 42, h: 32 }]),
+  F([{ ox: 32, oy: -20, w: 35, h: 26 }]),
+  F([{ ox: 38, oy: -18, w: 40, h: 28 }]),
 ];
 
 const JUMP_C_FRAMES: AttackFrame[] = [
-  F([{ ox: 25, oy: -50, w: 42, h: 35 }]),
-  F([{ ox: 30, oy: -48, w: 48, h: 38 }]),
-  F([{ ox: 32, oy: -45, w: 50, h: 40 }]),
-  F([{ ox: 30, oy: -48, w: 48, h: 38 }]),
-  F([{ ox: 28, oy: -50, w: 45, h: 36 }]),
-  F([{ ox: 28, oy: -50, w: 45, h: 36 }]),
+  F([{ ox: 32, oy: -50, w: 38, h: 32 }]),
+  F([{ ox: 40, oy: -48, w: 48, h: 35 }]),
+  F([{ ox: 42, oy: -48, w: 50, h: 35 }]),
+  F([{ ox: 40, oy: -50, w: 45, h: 32 }]),
 ];
 
 const JUMP_D_FRAMES: AttackFrame[] = [
-  F([{ ox: 25, oy: -35, w: 42, h: 35 }]),
-  F([{ ox: 30, oy: -32, w: 48, h: 38 }]),
-  F([{ ox: 32, oy: -30, w: 50, h: 40 }]),
-  F([{ ox: 30, oy: -32, w: 48, h: 38 }]),
-  F([{ ox: 28, oy: -35, w: 45, h: 36 }]),
-  F([{ ox: 28, oy: -35, w: 45, h: 36 }]),
+  F([{ ox: 30, oy: -25, w: 40, h: 30 }]),
+  F([{ ox: 38, oy: -22, w: 50, h: 32 }]),
+  F([{ ox: 40, oy: -22, w: 52, h: 34 }]),
+  F([{ ox: 38, oy: -25, w: 48, h: 32 }]),
 ];
 
 // ===== 投技 =====
-// 通用投：throw detection box 覆盖前方近距离
 const THROW_FRAMES: AttackFrame[] = [
-  F([], null, [{ ox: 40, oy: -60, w: 50, h: 80 }]),
-  F([], null, [{ ox: 40, oy: -60, w: 50, h: 80 }]),
+  F([], null, [{ ox: 35, oy: -50, w: 35, h: 70 }]),
 ];
 
-// 前投：throw box 偏向前方
 const THROW_FORWARD_FRAMES: AttackFrame[] = [
-  F([], null, [{ ox: 40, oy: -60, w: 50, h: 80 }]),
-  F([], null, [{ ox: 40, oy: -60, w: 50, h: 80 }]),
+  F([], null, [{ ox: 38, oy: -52, w: 38, h: 72 }]),
 ];
 
-// 后投：throw box 偏向后方
 const THROW_BACK_FRAMES: AttackFrame[] = [
-  F([], null, [{ ox: -40, oy: -60, w: 50, h: 80 }]),
-  F([], null, [{ ox: -40, oy: -60, w: 50, h: 80 }]),
+  F([], null, [{ ox: 38, oy: -52, w: 38, h: 72 }]),
 ];
 
 // ===== CD 击飞攻击 =====
 const STAND_CD_FRAMES: AttackFrame[] = [
-  F([{ ox: 35, oy: -50, w: 50, h: 40 }]),
-  F([{ ox: 45, oy: -48, w: 58, h: 42 }]),
-  F([{ ox: 48, oy: -45, w: 62, h: 45 }]),
-  F([{ ox: 45, oy: -50, w: 55, h: 40 }]),
+  F([{ ox: 35, oy: -55, w: 45, h: 38 }]),
+  F([{ ox: 45, oy: -52, w: 55, h: 42 }]),
+  F([{ ox: 48, oy: -50, w: 58, h: 45 }]),
+  F([{ ox: 45, oy: -52, w: 55, h: 42 }]),
 ];
 
 const JUMP_CD_FRAMES: AttackFrame[] = [
-  F([{ ox: 32, oy: -35, w: 48, h: 38 }]),
-  F([{ ox: 40, oy: -32, w: 55, h: 40 }]),
-  F([{ ox: 42, oy: -30, w: 58, h: 42 }]),
-  F([{ ox: 40, oy: -33, w: 52, h: 38 }]),
-  F([{ ox: 38, oy: -35, w: 48, h: 36 }]),
+  F([{ ox: 35, oy: -35, w: 42, h: 35 }]),
+  F([{ ox: 42, oy: -32, w: 50, h: 38 }]),
+  F([{ ox: 45, oy: -30, w: 52, h: 40 }]),
+  F([{ ox: 42, oy: -32, w: 48, h: 38 }]),
 ];
 
-// ===== 必杀技 =====
+// ===== 通用必杀技 =====
 const SPECIAL_UPPER_FRAMES: AttackFrame[] = [
-  // 升龙拳：上升段，受击框大幅缩小（无敌感）
   F([{ ox: 25, oy: -80, w: 40, h: 45 }], { ox: 5, oy: -10, w: -15, h: -30 }),
   F([{ ox: 30, oy: -85, w: 42, h: 48 }], { ox: 5, oy: -10, w: -15, h: -30 }),
-  // 下降段，受击框恢复，攻击框变小
   F([{ ox: 28, oy: -75, w: 38, h: 40 }]),
   F([{ ox: 25, oy: -65, w: 35, h: 35 }]),
   F([{ ox: 22, oy: -55, w: 30, h: 30 }]),
@@ -321,475 +285,7 @@ const SPECIAL_UPPER_FRAMES: AttackFrame[] = [
 ];
 
 const SPECIAL_PROJECTILE_FRAMES: AttackFrame[] = [
-  // 发波：只在第一帧有手部攻击判定
   F([{ ox: 50, oy: -60, w: 35, h: 28 }]),
-];
-
-// ===== 角色专属必杀技 =====
-
-// 京：75式·改（两段踢）
-const KYO_75KAI_FRAMES: AttackFrame[] = [
-  F([{ ox: 40, oy: -30, w: 45, h: 28 }]),
-  F([{ ox: 45, oy: -28, w: 48, h: 30 }]),
-  F([{ ox: 45, oy: -28, w: 48, h: 30 }]),
-  F([{ ox: 42, oy: -30, w: 45, h: 28 }]),
-];
-
-const KYO_75KAI_2_FRAMES: AttackFrame[] = [
-  F([{ ox: 42, oy: -35, w: 48, h: 30 }]),
-  F([{ ox: 48, oy: -32, w: 52, h: 32 }]),
-  F([{ ox: 48, oy: -32, w: 52, h: 32 }]),
-  F([{ ox: 45, oy: -35, w: 48, h: 30 }]),
-];
-
-// 京：R.E.D. Kick（空中旋转踢）
-const KYO_RED_KICK_FRAMES: AttackFrame[] = [
-  F([{ ox: 35, oy: -50, w: 45, h: 35 }]),
-  F([{ ox: 40, oy: -45, w: 50, h: 38 }]),
-  F([{ ox: 42, oy: -42, w: 55, h: 40 }]),
-  F([{ ox: 40, oy: -45, w: 52, h: 38 }]),
-  F([{ ox: 38, oy: -50, w: 48, h: 35 }]),
-];
-
-// 京：荒咬み系
-const KYO_ARAGAMI_FRAMES: AttackFrame[] = [
-  F([{ ox: 40, oy: -65, w: 42, h: 30 }]),
-  F([{ ox: 48, oy: -62, w: 48, h: 32 }]),
-  F([{ ox: 48, oy: -62, w: 48, h: 32 }]),
-  F([{ ox: 45, oy: -65, w: 45, h: 30 }]),
-];
-
-const KYO_ARAGAMI_KONOKIZU_FRAMES: AttackFrame[] = [
-  F([{ ox: 42, oy: -55, w: 44, h: 28 }]),
-  F([{ ox: 48, oy: -52, w: 48, h: 30 }]),
-  F([{ ox: 48, oy: -52, w: 48, h: 30 }]),
-  F([{ ox: 45, oy: -55, w: 44, h: 28 }]),
-];
-
-const KYO_ARAGAMI_YANOSABI_FRAMES: AttackFrame[] = [
-  // 对空升拳：受击框缩小
-  F([{ ox: 35, oy: -75, w: 42, h: 40 }], { ox: 3, oy: -5, w: -10, h: -20 }),
-  F([{ ox: 40, oy: -78, w: 45, h: 42 }], { ox: 3, oy: -5, w: -10, h: -20 }),
-  F([{ ox: 42, oy: -80, w: 45, h: 45 }]),
-  F([{ ox: 40, oy: -75, w: 42, h: 42 }]),
-  F([{ ox: 38, oy: -70, w: 40, h: 40 }]),
-];
-
-const KYO_NANASE_FRAMES: AttackFrame[] = [
-  F([{ ox: 42, oy: -32, w: 48, h: 35 }]),
-  F([{ ox: 48, oy: -30, w: 52, h: 38 }]),
-  F([{ ox: 50, oy: -28, w: 55, h: 40 }]),
-  F([{ ox: 48, oy: -32, w: 50, h: 36 }]),
-  F([{ ox: 45, oy: -35, w: 48, h: 35 }]),
-];
-
-const KYO_KOTO_TSUKI_FRAMES: AttackFrame[] = [
-  F([{ ox: 48, oy: -55, w: 52, h: 35 }]),
-  F([{ ox: 55, oy: -52, w: 58, h: 38 }]),
-  F([{ ox: 58, oy: -50, w: 62, h: 40 }]),
-  F([{ ox: 55, oy: -52, w: 58, h: 38 }]),
-  F([{ ox: 52, oy: -55, w: 55, h: 35 }]),
-  F([{ ox: 48, oy: -58, w: 52, h: 35 }]),
-];
-
-const KYO_YAKISOGI_FRAMES: AttackFrame[] = [
-  F([{ ox: 35, oy: -70, w: 42, h: 38 }]),
-  F([{ ox: 40, oy: -68, w: 45, h: 42 }]),
-  F([{ ox: 42, oy: -65, w: 48, h: 45 }]),
-  F([{ ox: 40, oy: -68, w: 45, h: 42 }]),
-];
-
-// 京：毒咬み系
-const KYO_DOKUGAMI_FRAMES: AttackFrame[] = [
-  F([{ ox: 42, oy: -60, w: 45, h: 32 }]),
-  F([{ ox: 48, oy: -58, w: 50, h: 34 }]),
-  F([{ ox: 48, oy: -58, w: 50, h: 34 }]),
-  F([{ ox: 45, oy: -60, w: 48, h: 32 }]),
-];
-
-const KYO_TSUMIYOMI_FRAMES: AttackFrame[] = [
-  F([{ ox: 40, oy: -55, w: 44, h: 28 }]),
-  F([{ ox: 45, oy: -52, w: 48, h: 30 }]),
-  F([{ ox: 45, oy: -52, w: 48, h: 30 }]),
-  F([{ ox: 42, oy: -55, w: 45, h: 28 }]),
-];
-
-const KYO_BATSUYOMI_FRAMES: AttackFrame[] = [
-  F([{ ox: 42, oy: -70, w: 48, h: 35 }]),
-  F([{ ox: 48, oy: -68, w: 52, h: 38 }]),
-  F([{ ox: 50, oy: -65, w: 55, h: 40 }]),
-  F([{ ox: 48, oy: -68, w: 52, h: 38 }]),
-  F([{ ox: 45, oy: -70, w: 48, h: 35 }]),
-];
-
-// 京：鬼焼き dp+A (weak upper, single hit)
-const KYO_ONIYAKI_FRAMES: AttackFrame[] = [
-  F([{ ox: 28, oy: -78, w: 42, h: 44 }], { ox: 5, oy: -10, w: -15, h: -28 }),
-  F([{ ox: 34, oy: -85, w: 46, h: 48 }], { ox: 5, oy: -10, w: -15, h: -28 }),
-  F([{ ox: 36, oy: -88, w: 48, h: 50 }]),
-  F([{ ox: 34, oy: -80, w: 44, h: 45 }]),
-  F([{ ox: 30, oy: -70, w: 40, h: 40 }]),
-];
-
-// 京：鬼焼き dp+C (strong upper, multi-hit, full invincible)
-const KYO_ONIYAKI_C_FRAMES: AttackFrame[] = [
-  F([{ ox: 28, oy: -78, w: 42, h: 44 }], { ox: 5, oy: -10, w: -15, h: -28 }),
-  F([{ ox: 34, oy: -85, w: 46, h: 48 }], { ox: 5, oy: -10, w: -15, h: -28 }),
-  F([{ ox: 36, oy: -88, w: 48, h: 50 }], { ox: 5, oy: -10, w: -15, h: -28 }),
-  F([{ ox: 36, oy: -88, w: 48, h: 50 }]),
-  F([{ ox: 34, oy: -85, w: 46, h: 48 }]),
-  F([{ ox: 34, oy: -80, w: 44, h: 45 }]),
-  F([{ ox: 30, oy: -70, w: 40, h: 40 }]),
-  F([{ ox: 26, oy: -58, w: 36, h: 35 }]),
-  F([{ ox: 24, oy: -48, w: 32, h: 30 }]),
-  F([{ ox: 22, oy: -40, w: 28, h: 28 }]),
-];
-
-// 京：闇払い qcf+A (weak projectile)
-const KYO_YAMIBARAI_FRAMES: AttackFrame[] = [
-  F([{ ox: 48, oy: -58, w: 36, h: 28 }]),
-];
-
-// 京：闇払い qcf+C (strong projectile)
-const KYO_YAMIBARAI_C_FRAMES: AttackFrame[] = [
-  F([{ ox: 48, oy: -58, w: 36, h: 28 }]),
-];
-
-// ===== 八神庵 =====
-
-// 葵花三段
-const IORI_AOIHANA_FRAMES: AttackFrame[] = [
-  F([{ ox: 42, oy: -55, w: 45, h: 32 }]),
-  F([{ ox: 48, oy: -52, w: 50, h: 34 }]),
-  F([{ ox: 48, oy: -52, w: 50, h: 34 }]),
-  F([{ ox: 45, oy: -55, w: 48, h: 32 }]),
-];
-
-const IORI_AOIHANA_2_FRAMES: AttackFrame[] = [
-  F([{ ox: 42, oy: -18, w: 48, h: 22 }]),
-  F([{ ox: 48, oy: -16, w: 52, h: 24 }]),
-  F([{ ox: 48, oy: -16, w: 52, h: 24 }]),
-  F([{ ox: 45, oy: -18, w: 48, h: 22 }]),
-];
-
-const IORI_AOIHANA_3_FRAMES: AttackFrame[] = [
-  // 最终段升拳：受击框缩小
-  F([{ ox: 38, oy: -65, w: 45, h: 38 }], { ox: 3, oy: -5, w: -10, h: -20 }),
-  F([{ ox: 42, oy: -70, w: 48, h: 42 }], { ox: 3, oy: -5, w: -10, h: -20 }),
-  F([{ ox: 45, oy: -72, w: 50, h: 45 }]),
-  F([{ ox: 42, oy: -68, w: 48, h: 42 }]),
-  F([{ ox: 40, oy: -65, w: 45, h: 40 }]),
-];
-
-// 八神：闇払い qcf+A (weak projectile)
-const IORI_YAMIBARAI_FRAMES: AttackFrame[] = [
-  F([{ ox: 48, oy: -58, w: 36, h: 28 }]),
-];
-
-// 八神：闇払い qcf+C (strong projectile)
-const IORI_YAMIBARAI_C_FRAMES: AttackFrame[] = [
-  F([{ ox: 48, oy: -58, w: 36, h: 28 }]),
-];
-
-// 八神：鬼焼き dp+A (weak upper)
-const IORI_ONIYAKI_FRAMES: AttackFrame[] = [
-  F([{ ox: 26, oy: -78, w: 42, h: 44 }], { ox: 5, oy: -10, w: -15, h: -28 }),
-  F([{ ox: 32, oy: -85, w: 46, h: 48 }], { ox: 5, oy: -10, w: -15, h: -28 }),
-  F([{ ox: 34, oy: -88, w: 48, h: 50 }]),
-  F([{ ox: 32, oy: -80, w: 44, h: 45 }]),
-  F([{ ox: 28, oy: -70, w: 40, h: 40 }]),
-];
-
-// 八神：鬼焼き dp+C (strong upper, fully invincible)
-const IORI_ONIYAKI_C_FRAMES: AttackFrame[] = [
-  F([{ ox: 26, oy: -78, w: 42, h: 44 }], { ox: 5, oy: -10, w: -15, h: -28 }),
-  F([{ ox: 32, oy: -85, w: 46, h: 48 }], { ox: 5, oy: -10, w: -15, h: -28 }),
-  F([{ ox: 34, oy: -88, w: 48, h: 50 }], { ox: 5, oy: -10, w: -15, h: -28 }),
-  F([{ ox: 34, oy: -88, w: 48, h: 50 }]),
-  F([{ ox: 32, oy: -85, w: 46, h: 48 }]),
-  F([{ ox: 32, oy: -80, w: 44, h: 45 }]),
-  F([{ ox: 28, oy: -70, w: 40, h: 40 }]),
-  F([{ ox: 24, oy: -58, w: 36, h: 35 }]),
-  F([{ ox: 22, oy: -48, w: 32, h: 30 }]),
-  F([{ ox: 20, oy: -40, w: 28, h: 28 }]),
-];
-
-// 八神：琴月陰 (dash grab)
-const IORI_KOTOTSUKI_FRAMES: AttackFrame[] = [
-  F([{ ox: 50, oy: -55, w: 42, h: 38 }]),
-  F([{ ox: 55, oy: -52, w: 48, h: 42 }]),
-  F([{ ox: 58, oy: -50, w: 52, h: 44 }]),
-  F([{ ox: 55, oy: -52, w: 48, h: 42 }]),
-];
-
-// 八神：屑風 (command throw)
-// 指令投：throw detection box 覆盖更大范围
-const IORI_KUZUKAZE_FRAMES: AttackFrame[] = [
-  F([], null, [{ ox: 45, oy: -55, w: 45, h: 85 }]),
-  F([], null, [{ ox: 50, oy: -52, w: 48, h: 88 }]),
-  F([], null, [{ ox: 50, oy: -52, w: 48, h: 88 }]),
-  F([], null, [{ ox: 48, oy: -55, w: 45, h: 85 }]),
-];
-
-// ===== 特瑞 =====
-const TERRY_BURN_KNUCKLE_FRAMES: AttackFrame[] = [
-  F([{ ox: 45, oy: -55, w: 48, h: 30 }]),
-  F([{ ox: 52, oy: -52, w: 55, h: 34 }]),
-  F([{ ox: 55, oy: -50, w: 58, h: 36 }]),
-  F([{ ox: 52, oy: -52, w: 55, h: 34 }]),
-  F([{ ox: 48, oy: -55, w: 50, h: 32 }]),
-  F([{ ox: 45, oy: -55, w: 48, h: 30 }]),
-];
-
-const TERRY_CRACK_SHOT_FRAMES: AttackFrame[] = [
-  F([{ ox: 40, oy: -45, w: 45, h: 35 }]),
-  F([{ ox: 48, oy: -42, w: 52, h: 38 }]),
-  F([{ ox: 52, oy: -40, w: 55, h: 40 }]),
-  F([{ ox: 48, oy: -42, w: 52, h: 38 }]),
-  F([{ ox: 45, oy: -45, w: 48, h: 35 }]),
-];
-
-const TERRY_POWER_WAVE_FRAMES: AttackFrame[] = [
-  // Power Wave: ground projectile, hand strike frame
-  F([{ ox: 50, oy: -40, w: 38, h: 28 }]),
-];
-
-const TERRY_POWER_DUNK_FRAMES: AttackFrame[] = [
-  // Power Dunk: rising dunk, body shrinks during ascent
-  F([{ ox: 30, oy: -70, w: 40, h: 40 }], { ox: 5, oy: -8, w: -12, h: -25 }),
-  F([{ ox: 35, oy: -78, w: 45, h: 44 }], { ox: 5, oy: -8, w: -12, h: -25 }),
-  F([{ ox: 38, oy: -82, w: 48, h: 46 }]),
-  F([{ ox: 35, oy: -75, w: 44, h: 42 }]),
-  F([{ ox: 30, oy: -65, w: 40, h: 38 }]),
-];
-
-const TERRY_RISING_TACKLE_FRAMES: AttackFrame[] = [
-  // Rising Tackle: charge upper, multi-hit vertical spin
-  F([{ ox: 25, oy: -72, w: 38, h: 42 }], { ox: 3, oy: -10, w: -10, h: -28 }),
-  F([{ ox: 30, oy: -80, w: 42, h: 45 }], { ox: 3, oy: -10, w: -10, h: -28 }),
-  F([{ ox: 32, oy: -85, w: 44, h: 48 }], { ox: 3, oy: -10, w: -10, h: -28 }),
-  F([{ ox: 30, oy: -80, w: 42, h: 45 }]),
-  F([{ ox: 28, oy: -72, w: 40, h: 42 }]),
-  F([{ ox: 25, oy: -62, w: 36, h: 38 }]),
-];
-
-// ===== 金 =====
-const KIM_HIENZAN_FRAMES: AttackFrame[] = [
-  // 飛燕斬：上升踢，受击框缩小
-  F([{ ox: 32, oy: -75, w: 40, h: 42 }], { ox: 3, oy: -5, w: -10, h: -25 }),
-  F([{ ox: 38, oy: -80, w: 45, h: 45 }], { ox: 3, oy: -5, w: -10, h: -25 }),
-  F([{ ox: 40, oy: -82, w: 48, h: 48 }]),
-  F([{ ox: 38, oy: -78, w: 45, h: 45 }]),
-  F([{ ox: 35, oy: -72, w: 42, h: 42 }]),
-];
-
-// 金：半月斬 (spinning kick)
-const KIM_HANGETSU_FRAMES: AttackFrame[] = [
-  F([{ ox: 35, oy: -55, w: 45, h: 38 }]),
-  F([{ ox: 42, oy: -50, w: 50, h: 42 }]),
-  F([{ ox: 45, oy: -48, w: 52, h: 44 }]),
-  F([{ ox: 42, oy: -50, w: 50, h: 42 }]),
-  F([{ ox: 38, oy: -55, w: 45, h: 38 }]),
-];
-
-// 金：覇気脚 (low sweep)
-const KIM_HAKI_FRAMES: AttackFrame[] = [
-  F([{ ox: 40, oy: -20, w: 50, h: 28 }]),
-  F([{ ox: 48, oy: -18, w: 55, h: 30 }]),
-  F([{ ox: 50, oy: -18, w: 55, h: 30 }]),
-  F([{ ox: 48, oy: -20, w: 50, h: 28 }]),
-];
-
-// 金：飛翔脚 (air dive kick)
-const KIM_HISHOU_FRAMES: AttackFrame[] = [
-  F([{ ox: 38, oy: -40, w: 48, h: 42 }]),
-  F([{ ox: 45, oy: -35, w: 55, h: 45 }]),
-  F([{ ox: 48, oy: -32, w: 58, h: 48 }]),
-  F([{ ox: 45, oy: -35, w: 55, h: 45 }]),
-];
-
-// 金：三連撃 (rekka punch chain)
-const KIM_SANREN_FRAMES: AttackFrame[] = [
-  F([{ ox: 40, oy: -60, w: 42, h: 30 }]),
-  F([{ ox: 48, oy: -58, w: 48, h: 32 }]),
-  F([{ ox: 48, oy: -58, w: 48, h: 32 }]),
-  F([{ ox: 44, oy: -60, w: 44, h: 30 }]),
-];
-
-// ===== 坂崎亮 =====
-
-// 虎煌 qcf+A (weak projectile)
-const RYO_KOOU_FRAMES: AttackFrame[] = [
-  F([{ ox: 48, oy: -58, w: 36, h: 28 }]),
-];
-
-// 虎煌 qcf+C (strong projectile)
-const RYO_KOOU_C_FRAMES: AttackFrame[] = [
-  F([{ ox: 48, oy: -58, w: 38, h: 30 }]),
-];
-
-// 虎咆 dp+A (weak upper)
-const RYO_KO_HOU_FRAMES: AttackFrame[] = [
-  F([{ ox: 28, oy: -78, w: 42, h: 44 }], { ox: 5, oy: -10, w: -15, h: -28 }),
-  F([{ ox: 34, oy: -85, w: 46, h: 48 }], { ox: 5, oy: -10, w: -15, h: -28 }),
-  F([{ ox: 36, oy: -88, w: 48, h: 50 }]),
-  F([{ ox: 34, oy: -80, w: 44, h: 45 }]),
-  F([{ ox: 30, oy: -70, w: 40, h: 40 }]),
-];
-
-// 虎咆 dp+C (strong upper, fully invincible)
-const RYO_KO_HOU_C_FRAMES: AttackFrame[] = [
-  F([{ ox: 28, oy: -78, w: 42, h: 44 }], { ox: 5, oy: -10, w: -15, h: -28 }),
-  F([{ ox: 34, oy: -85, w: 46, h: 48 }], { ox: 5, oy: -10, w: -15, h: -28 }),
-  F([{ ox: 36, oy: -88, w: 48, h: 50 }], { ox: 5, oy: -10, w: -15, h: -28 }),
-  F([{ ox: 36, oy: -88, w: 48, h: 50 }]),
-  F([{ ox: 34, oy: -85, w: 46, h: 48 }]),
-  F([{ ox: 34, oy: -80, w: 44, h: 45 }]),
-  F([{ ox: 30, oy: -70, w: 40, h: 40 }]),
-  F([{ ox: 26, oy: -58, w: 36, h: 35 }]),
-  F([{ ox: 24, oy: -48, w: 32, h: 30 }]),
-  F([{ ox: 22, oy: -40, w: 28, h: 28 }]),
-];
-
-// 飛燕疾風脚 qcb+K (overhead kick)
-const RYO_HIEN_FRAMES: AttackFrame[] = [
-  F([{ ox: 35, oy: -60, w: 45, h: 35 }]),
-  F([{ ox: 42, oy: -55, w: 52, h: 38 }]),
-  F([{ ox: 45, oy: -52, w: 55, h: 40 }]),
-  F([{ ox: 42, oy: -55, w: 52, h: 38 }]),
-  F([{ ox: 38, oy: -58, w: 48, h: 35 }]),
-];
-
-// 霸王翔吼拳 qcf+K (counter stance)
-const RYO_HAOU_FRAMES: AttackFrame[] = [
-  F([{ ox: 35, oy: -60, w: 42, h: 35 }]),
-  F([{ ox: 42, oy: -58, w: 48, h: 38 }]),
-  F([{ ox: 45, oy: -55, w: 50, h: 40 }]),
-  F([{ ox: 42, oy: -58, w: 48, h: 38 }]),
-  F([{ ox: 38, oy: -60, w: 44, h: 35 }]),
-];
-
-// DM: 天地霸煌拳
-const DM_TEN_HA_OU_FRAMES: AttackFrame[] = [
-  F([{ ox: 30, oy: -68, w: 58, h: 48 }]),
-  F([{ ox: 36, oy: -65, w: 68, h: 52 }]),
-  F([{ ox: 40, oy: -62, w: 75, h: 55 }]),
-  F([{ ox: 40, oy: -62, w: 78, h: 58 }]),
-  F([{ ox: 40, oy: -62, w: 78, h: 58 }]),
-  F([{ ox: 38, oy: -64, w: 72, h: 52 }]),
-  ...Array.from({ length: 18 }, (_, i) =>
-    F([{ ox: 28 - i * 0.3, oy: -68 + i * 0.5, w: 58 - i * 1.5, h: 46 - i }])
-  ),
-];
-
-// ===== 莉安娜 =====
-
-// 月光 qcf+A (weak projectile)
-const LEONA_MOON_SLASH_FRAMES: AttackFrame[] = [
-  F([{ ox: 48, oy: -58, w: 36, h: 28 }]),
-];
-
-// 月光 qcf+C (strong projectile)
-const LEONA_MOON_SLASH_C_FRAMES: AttackFrame[] = [
-  F([{ ox: 48, oy: -58, w: 38, h: 30 }]),
-];
-
-// 威光 dp+A (weak upper)
-const LEONA_EAR_RING_FRAMES: AttackFrame[] = [
-  F([{ ox: 28, oy: -78, w: 42, h: 44 }], { ox: 5, oy: -10, w: -15, h: -28 }),
-  F([{ ox: 34, oy: -85, w: 46, h: 48 }], { ox: 5, oy: -10, w: -15, h: -28 }),
-  F([{ ox: 36, oy: -88, w: 48, h: 50 }]),
-  F([{ ox: 34, oy: -80, w: 44, h: 45 }]),
-  F([{ ox: 30, oy: -70, w: 40, h: 40 }]),
-];
-
-// 威光 dp+C (strong upper, fully invincible)
-const LEONA_EAR_RING_C_FRAMES: AttackFrame[] = [
-  F([{ ox: 28, oy: -78, w: 42, h: 44 }], { ox: 5, oy: -10, w: -15, h: -28 }),
-  F([{ ox: 34, oy: -85, w: 46, h: 48 }], { ox: 5, oy: -10, w: -15, h: -28 }),
-  F([{ ox: 36, oy: -88, w: 48, h: 50 }], { ox: 5, oy: -10, w: -15, h: -28 }),
-  F([{ ox: 36, oy: -88, w: 48, h: 50 }]),
-  F([{ ox: 34, oy: -85, w: 46, h: 48 }]),
-  F([{ ox: 34, oy: -80, w: 44, h: 45 }]),
-  F([{ ox: 30, oy: -70, w: 40, h: 40 }]),
-  F([{ ox: 26, oy: -58, w: 36, h: 35 }]),
-  F([{ ox: 24, oy: -48, w: 32, h: 30 }]),
-  F([{ ox: 22, oy: -40, w: 28, h: 28 }]),
-];
-
-// 手刀 qcb+P (rush slash)
-const LEONA_GRAND_SABER_FRAMES: AttackFrame[] = [
-  F([{ ox: 40, oy: -58, w: 48, h: 32 }]),
-  F([{ ox: 48, oy: -55, w: 55, h: 36 }]),
-  F([{ ox: 52, oy: -52, w: 58, h: 38 }]),
-  F([{ ox: 48, oy: -55, w: 55, h: 36 }]),
-  F([{ ox: 44, oy: -58, w: 50, h: 34 }]),
-];
-
-// X标 qcf+K (low)
-const LEONA_BALTIC_FRAMES: AttackFrame[] = [
-  F([{ ox: 38, oy: -22, w: 48, h: 28 }]),
-  F([{ ox: 45, oy: -20, w: 54, h: 30 }]),
-  F([{ ox: 48, oy: -18, w: 56, h: 32 }]),
-  F([{ ox: 45, oy: -20, w: 54, h: 30 }]),
-];
-
-// DM: V字金锯
-const DM_V_SLASHER_FRAMES: AttackFrame[] = [
-  F([{ ox: 30, oy: -68, w: 58, h: 48 }]),
-  F([{ ox: 36, oy: -65, w: 68, h: 52 }]),
-  F([{ ox: 40, oy: -62, w: 75, h: 55 }]),
-  F([{ ox: 40, oy: -62, w: 78, h: 58 }]),
-  F([{ ox: 40, oy: -62, w: 78, h: 58 }]),
-  F([{ ox: 38, oy: -64, w: 72, h: 52 }]),
-  ...Array.from({ length: 16 }, (_, i) =>
-    F([{ ox: 28 - i * 0.3, oy: -68 + i * 0.5, w: 58 - i * 1.5, h: 46 - i }])
-  ),
-];
-
-// ===== DM 超必杀技 =====
-const DM_OROCHINAGI_FRAMES: AttackFrame[] = [
-  F([{ ox: 30, oy: -70, w: 60, h: 50 }]),
-  F([{ ox: 38, oy: -68, w: 70, h: 55 }]),
-  F([{ ox: 42, oy: -65, w: 78, h: 58 }]),
-  F([{ ox: 42, oy: -65, w: 80, h: 60 }]),
-  F([{ ox: 42, oy: -65, w: 80, h: 60 }]),
-  F([{ ox: 40, oy: -67, w: 75, h: 55 }]),
-  F([{ ox: 38, oy: -68, w: 70, h: 52 }]),
-  F([{ ox: 35, oy: -70, w: 65, h: 50 }]),
-  // 后续帧逐渐缩小
-  ...Array.from({ length: 22 }, (_, i) =>
-    F([{ ox: 30 - i * 0.3, oy: -70 + i * 0.5, w: 60 - i * 1.5, h: 48 - i }])
-  ),
-];
-
-const DM_YATAGARASU_FRAMES: AttackFrame[] = [
-  F([{ ox: 28, oy: -62, w: 55, h: 48 }]),
-  F([{ ox: 34, oy: -60, w: 65, h: 52 }]),
-  F([{ ox: 38, oy: -58, w: 72, h: 55 }]),
-  F([{ ox: 38, oy: -58, w: 72, h: 55 }]),
-  F([{ ox: 36, oy: -60, w: 68, h: 52 }]),
-  ...Array.from({ length: 15 }, (_, i) =>
-    F([{ ox: 32 - i * 0.2, oy: -62 + i * 0.3, w: 60 - i, h: 48 - i * 0.5 }])
-  ),
-];
-
-const DM_POWER_GEYSER_FRAMES: AttackFrame[] = [
-  F([{ ox: 35, oy: -55, w: 60, h: 45 }]),
-  F([{ ox: 40, oy: -52, w: 72, h: 50 }]),
-  F([{ ox: 42, oy: -50, w: 78, h: 52 }]),
-  ...Array.from({ length: 12 }, (_, i) =>
-    F([{ ox: 38 + i * 0.5, oy: -52 + i * 0.3, w: 68 - i * 1.5, h: 48 - i * 0.5 }])
-  ),
-];
-
-const DM_PHOENIX_KICK_FRAMES: AttackFrame[] = [
-  F([{ ox: 35, oy: -52, w: 58, h: 45 }]),
-  F([{ ox: 42, oy: -48, w: 68, h: 52 }]),
-  F([{ ox: 45, oy: -45, w: 72, h: 55 }]),
-  ...Array.from({ length: 15 }, (_, i) =>
-    F([{ ox: 40 + i * 0.3, oy: -48 + i * 0.3, w: 65 - i, h: 50 - i * 0.5 }])
-  ),
 ];
 
 // ===== 导出完整的逐帧判定表 =====
@@ -874,7 +370,6 @@ export const ATTACK_FRAMES: AttackFrameTable = {
   [AttackType.DM_YATAGARASU]: DM_YATAGARASU_FRAMES,
   [AttackType.DM_POWER_GEYSER]: DM_POWER_GEYSER_FRAMES,
   [AttackType.DM_PHOENIX_KICK]: DM_PHOENIX_KICK_FRAMES,
-  // 坂崎亮
   [AttackType.RYO_KOOU]: RYO_KOOU_FRAMES,
   [AttackType.RYO_KOOU_C]: RYO_KOOU_C_FRAMES,
   [AttackType.RYO_KO_HOU]: RYO_KO_HOU_FRAMES,
@@ -882,7 +377,6 @@ export const ATTACK_FRAMES: AttackFrameTable = {
   [AttackType.RYO_HIEN]: RYO_HIEN_FRAMES,
   [AttackType.RYO_HAOU]: RYO_HAOU_FRAMES,
   [AttackType.DM_TEN_HA_OU]: DM_TEN_HA_OU_FRAMES,
-  // 莉安娜
   [AttackType.LEONA_MOON_SLASH]: LEONA_MOON_SLASH_FRAMES,
   [AttackType.LEONA_MOON_SLASH_C]: LEONA_MOON_SLASH_C_FRAMES,
   [AttackType.LEONA_EAR_RING]: LEONA_EAR_RING_FRAMES,
