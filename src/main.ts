@@ -1,7 +1,7 @@
 import { Camera } from './core/camera.js';
 import { GameLoop } from './core/gameLoop.js';
 import { STAGE_WIDTH, KO_DISPLAY_TIME, FRAME_DATA, DM_STOCK_COST, MAX_MODE_STOCK_COST, MAX_MODE_DMG_REDUCTION } from './core/constants.js';
-import { AttackType, GameState, GamePhase } from './core/types.js';
+import { AttackType, GameState, GamePhase, FighterState } from './core/types.js';
 import type { PowerGauge, MaxModeState } from './core/types.js';
 import { ROSTER } from './characters/index.js';
 import type { CharacterDefinition } from './characters/types.js';
@@ -53,6 +53,10 @@ p2Ctrl.setOpponent(p1);
 const gauges: [PowerGauge, PowerGauge] = [createPowerGauge(), createPowerGauge()];
 const maxModes: [MaxModeState, MaxModeState] = [createMaxMode(), createMaxMode()];
 
+// Link gauges to controllers for Guard Cancel stock consumption
+p1Ctrl.setGauge(gauges[0]);
+p2Ctrl.setGauge(gauges[1]);
+
 // ===== State =====
 let phase: GamePhase = GamePhase.SELECT;
 let phaseTimer = 0;
@@ -71,6 +75,15 @@ let selectCountdown = -1;
 // AI system
 let p2IsAI = true; // Default: P2 is AI
 let p2AI: SimpleAI | null = null;
+
+// ===== Cinematic Effects State =====
+let hitStop = 0;         // Hit-stop frame freeze counter
+let superFlashTimer = 0; // Super flash (DM dark screen) timer
+let superFlashX = 0;     // Super flash center X (world)
+let superFlashY = 0;     // Super flash center Y (world)
+let koSlowMo = 0;        // KO slow-motion remaining frames
+let koSlowMoTriggered = false; // Only trigger once per round
+let koSlowMoFrameCounter = 0; // For 3-frame skip pattern
 
 // ===== Window API =====
 declare global {
@@ -104,6 +117,24 @@ function onHit(attacker: Fighter, defender: Fighter, attackType: AttackType, blo
     gainMeterOnHitstun(gauges[defIdx]);
     playBlock();
   } else {
+    // ── Hit Stop: freeze game for cinematic impact ──
+    const isDM = attackType === AttackType.DM_OROCHINAGI || attackType === AttackType.DM_YATAGARASU
+      || attackType === AttackType.DM_POWER_GEYSER || attackType === AttackType.DM_PHOENIX_KICK;
+    const isSpecial = attackType === AttackType.SPECIAL_PROJECTILE || attackType === AttackType.SPECIAL_UPPER
+      || name.startsWith('KYO_') || name.startsWith('IORI_') || name.startsWith('TERRY_') || name.startsWith('KIM_');
+    if (isDM) {
+      hitStop = 8;
+    } else if (isSpecial) {
+      hitStop = 6;
+    } else if (attackType === AttackType.STAND_C || attackType === AttackType.STAND_D
+      || attackType === AttackType.CLOSE_C || attackType === AttackType.CLOSE_D
+      || attackType === AttackType.CROUCH_C || attackType === AttackType.CROUCH_D
+      || attackType === AttackType.JUMP_C || attackType === AttackType.JUMP_D) {
+      hitStop = 5;
+    } else {
+      hitStop = 3;
+    }
+    if (counterHit) hitStop += 2;
     const comboCount = combatSystem.getComboCount(defIdx);
     gainMeterOnHit(gauges[atkIdx]);
     gainMeterOnHitstun(gauges[defIdx]);
@@ -113,11 +144,7 @@ function onHit(attacker: Fighter, defender: Fighter, attackType: AttackType, blo
       : counterHit ? 12 : 8);
     vfx.spawnImpactRing(hitX, hitY);
     vfx.spawnDamageText(defender.x, defender.y - defender.displayHeight - 20, data.damage);
-    // Sound effects
-    const isDM = attackType === AttackType.DM_OROCHINAGI || attackType === AttackType.DM_YATAGARASU
-      || attackType === AttackType.DM_POWER_GEYSER || attackType === AttackType.DM_PHOENIX_KICK;
-    const isSpecial = attackType === AttackType.SPECIAL_PROJECTILE || attackType === AttackType.SPECIAL_UPPER
-      || name.startsWith('KYO_') || name.startsWith('IORI_') || name.startsWith('TERRY_') || name.startsWith('KIM_');
+    // Sound effects (reuse isDM/isSpecial from hit-stop above)
     if (isDM) playDM();
     else if (attackType === AttackType.THROW) playThrow();
     else if (isSpecial) playSpecial();
@@ -165,6 +192,18 @@ function checkMaxActivation(input: ResolvedInput, playerIndex: number): void {
 
 // ===== Main Loop =====
 function update(): void {
+  // ── Hit Stop: skip all game logic while active (still render) ──
+  if (hitStop > 0) {
+    hitStop--;
+    // Still update VFX/screenShake so particles don't freeze
+    vfx.update();
+    screenShake.update();
+    tickMaxMode(maxModes[0]);
+    tickMaxMode(maxModes[1]);
+    if (superFlashTimer > 0) superFlashTimer--;
+    return;
+  }
+
   vfx.update();
   screenShake.update();
 
@@ -172,9 +211,24 @@ function update(): void {
   tickMaxMode(maxModes[0]);
   tickMaxMode(maxModes[1]);
 
+  // ── Super Flash timer tick ──
+  if (superFlashTimer > 0) superFlashTimer--;
+
   // ── CHARACTER SELECT PHASE ──
   if (phase === GamePhase.SELECT) {
-    tickRef.value++;
+  tickRef.value++;
+
+  // ── KO Slow Motion: run update only every 3rd frame ──
+  if (koSlowMo > 0) {
+    koSlowMoFrameCounter++;
+    if (koSlowMoFrameCounter < 3) return;
+    koSlowMoFrameCounter = 0;
+    koSlowMo--;
+    if (koSlowMo <= 0) {
+      // Slow-mo ended — proceed to KO phase normally
+      koSlowMoTriggered = true;
+    }
+  }
     const rawP1 = inputManager.getP1Input();
     const rawP2 = inputManager.getP2Input();
 
@@ -238,6 +292,7 @@ function update(): void {
         }
         phase = GamePhase.INTRO;
         phaseTimer = 0;
+        p1.savePrevState(); p2.savePrevState();
       }
     }
 
@@ -292,12 +347,23 @@ function update(): void {
   for (const proj of projectiles) proj.update();
   combatSystem.resolveAttacks(p1, p2, projectiles, onHit);
 
+  // Tick throw escape window — returns true if throw escaped
+  const throwEscaped = combatSystem.tickThrowState(p1, p2, onHit);
+  if (throwEscaped) {
+    playBlock(); // block sound for throw escape
+  }
+
   // Check if DM was started and consume stock
   for (let i = 0; i < 2; i++) {
     const f = i === 0 ? p1 : p2;
     if (f.currentAttack === AttackType.DM_OROCHINAGI && f.attackFrame === 0 && f.attackPhase === 'startup') {
       if (canUseDM(i)) {
         useDM(i);
+        // ── Super Flash: trigger dark screen on DM startup ──
+        superFlashTimer = 20;
+        superFlashX = f.x;
+        superFlashY = f.y - f.displayHeight / 2;
+        hitStop = 20; // Freeze during flash
       } else {
         // Not enough meter → cancel the DM, do nothing
         f.endAttack();
@@ -305,8 +371,30 @@ function update(): void {
     }
   }
 
+  // ── Super Flash for other DMs (non-OROCHINAGI) ──
+  for (let i = 0; i < 2; i++) {
+    const f = i === 0 ? p1 : p2;
+    const atk = f.currentAttack;
+    if ((atk === AttackType.DM_YATAGARASU || atk === AttackType.DM_POWER_GEYSER || atk === AttackType.DM_PHOENIX_KICK)
+      && f.attackFrame === 0 && f.attackPhase === 'startup') {
+      superFlashTimer = 20;
+      superFlashX = f.x;
+      superFlashY = f.y - f.displayHeight / 2;
+      hitStop = 20;
+    }
+  }
+
   p1Ctrl.applyPhysics();
   p2Ctrl.applyPhysics();
+
+  // A1: Combo reset when hitstun/knockdown ends (state transitions to IDLE)
+  [p1, p2].forEach((f, i) => {
+    const wasInHitstun = f.prevState === FighterState.HITSTUN || f.prevState === FighterState.KNOCKDOWN;
+    if (wasInHitstun && f.state === FighterState.IDLE) {
+      combatSystem.resetCombo(i);
+    }
+    f.savePrevState();
+  });
 
   for (let i = projectiles.length - 1; i >= 0; i--) {
     if (!projectiles[i].active) projectiles.splice(i, 1);
@@ -316,11 +404,19 @@ function update(): void {
   // (applied inside combatSystem would be cleaner, but keeping it simple here)
 
   if (p1.health <= 0 || p2.health <= 0) {
-    phase = GamePhase.KO; koTimer = 0;
-    winner = p1.health <= 0 && p2.health <= 0 ? null : p1.health <= 0 ? 1 : 0;
-    vfx.spawnHitSparks((p1.x + p2.x) / 2, 380, 20);
-    screenShake.trigger(12, 15);
-    playKO();
+    if (!koSlowMoTriggered) {
+      // Trigger KO slow-mo first time
+      koSlowMoTriggered = true;
+      koSlowMo = 40;
+      koSlowMoFrameCounter = 0;
+      vfx.spawnHitSparks((p1.x + p2.x) / 2, 380, 20);
+      screenShake.trigger(12, 15);
+      playKO();
+    } else if (koSlowMo <= 0) {
+      // Slow-mo finished — transition to KO phase
+      phase = GamePhase.KO; koTimer = 0;
+      winner = p1.health <= 0 && p2.health <= 0 ? null : p1.health <= 0 ? 1 : 0;
+    }
   }
   if (tickRef.value >= 99 * 60) {
     phase = GamePhase.KO; koTimer = 0;
@@ -350,6 +446,11 @@ function render(): void {
   renderer.drawProjectiles(projectiles, camera);
   vfx.render(ctx, camera.x);
 
+  // ── Super Flash dark overlay ──
+  if (superFlashTimer > 0) {
+    renderer.drawSuperFlash(ctx, superFlashTimer, superFlashX - camera.x, superFlashY);
+  }
+
   // Power gauge UI
   renderer.drawPowerGauges(gauges, maxModes);
 
@@ -371,6 +472,11 @@ function restartGame(): void {
   p2Ready = false;
   selectCountdown = -1;
   p2AI = null;
+  hitStop = 0;
+  superFlashTimer = 0;
+  koSlowMo = 0;
+  koSlowMoTriggered = false;
+  koSlowMoFrameCounter = 0;
   p1.reset(STAGE_WIDTH * 0.33);
   p2.reset(STAGE_WIDTH * 0.67);
   p1Cmd.reset();

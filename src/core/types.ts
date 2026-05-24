@@ -16,6 +16,7 @@ export enum FighterState {
   AIR_ATTACK = 'AIR_ATTACK',
   THROW = 'THROW',
   BLOCK = 'BLOCK',
+  GUARD_CRUSH = 'GUARD_CRUSH',
   HITSTUN = 'HITSTUN',
   KNOCKDOWN = 'KNOCKDOWN',
   MAX_MODE = 'MAX_MODE',  // MAX模式激活动画 (短暂)
@@ -135,6 +136,13 @@ export interface MaxModeState {
 
 // ===== Rekka Chain State (荒咬み/毒咬み连段) =====
 export type RekkaChain = 'aragami' | 'dokugami' | 'aoihana' | null;
+
+// ===== Juggle State (浮空状态) =====
+export enum JuggleState {
+  NONE = 'NONE',       // 不可追打 (普通通常技命中后)
+  HALF = 'HALF',       // 半追打 (落下前期可打)
+  FULL = 'FULL',       // 全追打 (落地前都可打 — 大多数必杀技/升龙)
+}
 
 // ===== Close Range Distance =====
 export const CLOSE_RANGE = 80;

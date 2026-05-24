@@ -5,7 +5,7 @@ import { Camera } from '../core/camera.js';
 import { FighterState, AttackType } from '../core/types.js';
 import type { PowerGauge, MaxModeState } from '../core/types.js';
 import { ROSTER } from '../characters/index.js';
-import type { CharacterDefinition } from '../characters/types.js';
+import { bone, pose } from '../characters/types.js';
 import { MAX_STOCKS, MAX_MODE_DURATION } from '../core/constants.js';
 import { CANVAS_WIDTH, CANVAS_HEIGHT, STAGE_GROUND_Y, FIGHTER_WIDTH, MAX_HEALTH, FRAME_DATA } from '../core/constants.js';
 
@@ -203,6 +203,11 @@ export class Renderer {
           outlineColor = '#88aaff60';
           glowColor = '#4466ff20';
           break;
+        case FighterState.GUARD_CRUSH:
+          bodyColor = this.globalTick % 6 < 3 ? '#ff4444' : '#ffffff';
+          outlineColor = '#ff000080';
+          glowColor = '#ff220040';
+          break;
         case FighterState.HITSTUN:
           bodyColor = this.globalTick % 6 < 3 ? '#ffffff' : f.color;
           outlineColor = '#ff505070';
@@ -257,40 +262,8 @@ export class Renderer {
       ctx.rotate(leanAngle);
       ctx.translate(-(sx + leanOffsetX), -sy);
 
-      // Body with gradient
-      const bodyGrad = ctx.createLinearGradient(sx + leanOffsetX - hw, sy - f.displayHeight, sx + leanOffsetX + hw, sy);
-      bodyGrad.addColorStop(0, this.shiftColor(bodyColor, 25));
-      bodyGrad.addColorStop(0.5, bodyColor);
-      bodyGrad.addColorStop(1, this.shiftColor(bodyColor, -10));
-      ctx.fillStyle = bodyGrad;
-      this.roundRect(ctx, sx + leanOffsetX - hw, sy - f.displayHeight, FIGHTER_WIDTH, f.displayHeight, 5);
-      ctx.fill();
-
-      // Outline
-      ctx.strokeStyle = outlineColor;
-      ctx.lineWidth = 2;
-      this.roundRect(ctx, sx + leanOffsetX - hw, sy - f.displayHeight, FIGHTER_WIDTH, f.displayHeight, 5);
-      ctx.stroke();
-
-      // Head section (top 30% of body)
-      const headY = sy - f.displayHeight;
-      const headH = f.displayHeight * 0.3;
-      const headGrad = ctx.createLinearGradient(sx + leanOffsetX - hw, headY, sx + leanOffsetX + hw, headY + headH);
-      headGrad.addColorStop(0, this.shiftColor(bodyColor, 35));
-      headGrad.addColorStop(1, this.shiftColor(bodyColor, 10));
-      ctx.fillStyle = headGrad;
-      this.roundRect(ctx, sx + leanOffsetX - hw, headY, FIGHTER_WIDTH, headH, 5);
-      ctx.fill();
-
-      // Eyes (facing indicator)
-      const eyeBaseX = sx + leanOffsetX + 8 * f.facing;
-      const eyeY = headY + headH * 0.55;
-      ctx.fillStyle = '#fff';
-      ctx.beginPath(); ctx.arc(eyeBaseX, eyeY, 3.5, 0, Math.PI * 2); ctx.fill();
-      ctx.beginPath(); ctx.arc(eyeBaseX - 10 * f.facing, eyeY, 3.5, 0, Math.PI * 2); ctx.fill();
-      ctx.fillStyle = '#111';
-      ctx.beginPath(); ctx.arc(eyeBaseX + 1.5 * f.facing, eyeY, 2, 0, Math.PI * 2); ctx.fill();
-      ctx.beginPath(); ctx.arc(eyeBaseX - 10 * f.facing + 1.5 * f.facing, eyeY, 2, 0, Math.PI * 2); ctx.fill();
+      // Skeletal body drawing
+      this.drawSkeletalFighter(ctx, f, sx + leanOffsetX, sy, bodyColor, outlineColor);
 
       ctx.restore();
 
@@ -304,6 +277,172 @@ export class Renderer {
       ctx.fillText(isP1 ? 'P1' : 'P2', sx, sy - f.displayHeight - 8);
       ctx.textAlign = 'left';
     }
+  }
+
+  /** Draw skeletal body using 6-bone pose system */
+  private drawSkeletalFighter(
+    ctx: CanvasRenderingContext2D,
+    f: Fighter,
+    sx: number,
+    sy: number,
+    bodyColor: string,
+    outlineColor: string,
+  ): void {
+    const charDef = ROSTER.find(c => c.id === f.charId);
+    const poseSet = charDef?.poses;
+
+    // Get pose for current state, fallback to IDLE default
+    let currentPose = poseSet?.[f.state] ?? poseSet?.[FighterState.IDLE] ?? pose({
+      armFront: bone(10, 20, 0.3),
+      armBack: bone(-8, 15, -0.5),
+    });
+
+    // Clone pose so we can mutate for animations
+    const p = {
+      head: { ...currentPose.head },
+      body: { ...currentPose.body },
+      armFront: { ...currentPose.armFront },
+      armBack: { ...currentPose.armBack },
+      legFront: { ...currentPose.legFront },
+      legBack: { ...currentPose.legBack },
+    };
+
+    // Idle breathing: subtle sinusoidal Y oscillation on body
+    if (f.state === FighterState.IDLE) {
+      const breathe = Math.sin(this.globalTick / 30) * 2;
+      p.body.oy += breathe;
+      p.head.oy += breathe;
+    }
+
+    // Walk cycle: alternating leg motion
+    if (f.state === FighterState.WALK) {
+      const walkCycle = Math.sin(this.globalTick / 8) * 5;
+      p.legFront.oy += walkCycle;
+      p.legBack.oy -= walkCycle;
+    }
+
+    // Crouch/roll height factor — squash all Y offsets
+    const isCrouching = f.state === FighterState.CROUCH;
+    const isRolling = f.state === FighterState.ROLL || f.state === FighterState.BACK_ROLL;
+    const heightFactor = (isCrouching || isRolling) ? 0.6 : 1.0;
+
+    // Body dimensions
+    const headW = 16, headH = 16;
+    const torsoW = 24, torsoH = 30;
+    const armW = 6, armH = 22;
+    const legW = 8, legH = 28;
+
+    // Reference point: top-center of the full body bounding box
+    const refX = sx;
+    const refY = sy - f.displayHeight;
+
+    // Helper: compute screen position of a bone's anchor
+    const boneScreen = (bp: typeof p.head) => ({
+      x: refX + bp.ox * f.facing,
+      y: refY + bp.oy * heightFactor,
+      rot: bp.rot * f.facing,
+      scale: bp.scale,
+    });
+
+    // Colors
+    const armColor = this.shiftColor(bodyColor, 15);
+    const legColor = this.shiftColor(bodyColor, -15);
+    const headColor = this.shiftColor(bodyColor, 25);
+
+    // Draw a single bone as a rounded rectangle with gradient + outline
+    const drawBone = (
+      cx: number, cy: number, w: number, h: number, rot: number,
+      fillTop: string, fillBot: string, outline: string,
+    ) => {
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.rotate(rot);
+      const grad = ctx.createLinearGradient(0, -h / 2, 0, h / 2);
+      grad.addColorStop(0, fillTop);
+      grad.addColorStop(1, fillBot);
+      ctx.fillStyle = grad;
+      this.roundRect(ctx, -w / 2, -h / 2, w, h, 3);
+      ctx.fill();
+      ctx.strokeStyle = outline;
+      ctx.lineWidth = 1.5;
+      this.roundRect(ctx, -w / 2, -h / 2, w, h, 3);
+      ctx.stroke();
+      ctx.restore();
+    };
+
+    // === Layer order: back → body → front ===
+
+    // 1. Back arm (behind body)
+    const backArm = boneScreen(p.armBack);
+    // Position: shoulder area → offset down by arm anchor
+    const shoulderY = refY + 8 * heightFactor; // top of torso area
+    drawBone(
+      backArm.x, shoulderY + p.armBack.oy * heightFactor,
+      armW * p.armBack.scale, armH * p.armBack.scale, backArm.rot,
+      this.shiftColor(armColor, 10), armColor, outlineColor,
+    );
+
+    // 2. Back leg (behind body)
+    const backLeg = boneScreen(p.legBack);
+    const hipY = refY + 32 * heightFactor; // bottom of torso
+    drawBone(
+      backLeg.x, hipY + p.legBack.oy * heightFactor,
+      legW * p.legBack.scale, legH * p.legBack.scale, backLeg.rot,
+      this.shiftColor(legColor, 10), legColor, outlineColor,
+    );
+
+    // 3. Torso (body)
+    const torsoCenterY = refY + 18 * heightFactor + p.body.oy * heightFactor;
+    const torsoX = refX + p.body.ox * f.facing;
+    drawBone(
+      torsoX, torsoCenterY,
+      torsoW, torsoH * heightFactor, p.body.rot * f.facing,
+      this.shiftColor(bodyColor, 25), this.shiftColor(bodyColor, -10), outlineColor,
+    );
+
+    // 4. Head
+    const headPos = boneScreen(p.head);
+    const headCenterY = refY + 4 * heightFactor + p.head.oy * heightFactor;
+    ctx.save();
+    ctx.translate(headPos.x, headCenterY);
+    ctx.rotate(p.head.rot * f.facing);
+    // Head gradient
+    const hGrad = ctx.createLinearGradient(-headW / 2, -headH / 2, headW / 2, headH / 2);
+    hGrad.addColorStop(0, this.shiftColor(headColor, 20));
+    hGrad.addColorStop(1, headColor);
+    ctx.fillStyle = hGrad;
+    ctx.beginPath();
+    ctx.arc(0, 0, headW / 2, 0, Math.PI * 2);
+    ctx.fill();
+    // Head outline
+    ctx.strokeStyle = outlineColor;
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+    // Eyes
+    const eyeShift = 3 * f.facing;
+    ctx.fillStyle = '#fff';
+    ctx.beginPath(); ctx.arc(eyeShift, -1, 3, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(eyeShift - 7 * f.facing, -1, 3, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#111';
+    ctx.beginPath(); ctx.arc(eyeShift + 1.2 * f.facing, -1, 1.8, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(eyeShift - 7 * f.facing + 1.2 * f.facing, -1, 1.8, 0, Math.PI * 2); ctx.fill();
+    ctx.restore();
+
+    // 5. Front leg (in front of body)
+    const frontLeg = boneScreen(p.legFront);
+    drawBone(
+      frontLeg.x, hipY + p.legFront.oy * heightFactor,
+      legW * p.legFront.scale, legH * p.legFront.scale, frontLeg.rot,
+      this.shiftColor(legColor, 15), legColor, outlineColor,
+    );
+
+    // 6. Front arm (in front of body)
+    const frontArm = boneScreen(p.armFront);
+    drawBone(
+      frontArm.x, shoulderY + p.armFront.oy * heightFactor,
+      armW * p.armFront.scale, armH * p.armFront.scale, frontArm.rot,
+      this.shiftColor(armColor, 15), armColor, outlineColor,
+    );
   }
 
   /** Draw extended arm/leg during attack active phase */
@@ -758,6 +897,8 @@ export class Renderer {
     // P1 health bar
     const p1Ratio = Math.max(0, fighters[0].health / MAX_HEALTH);
     this.drawHealthBar(ctx, margin, barY, barWidth, barHeight, p1Ratio, true);
+    // P1 guard gauge bar
+    this.drawGuardGauge(ctx, margin, barY + barHeight + 3, barWidth, 5, fighters[0].guardGauge, true);
 
     // P2 label
     ctx.fillStyle = '#4488ff';
@@ -767,6 +908,8 @@ export class Renderer {
     // P2 health bar
     const p2Ratio = Math.max(0, fighters[1].health / MAX_HEALTH);
     this.drawHealthBar(ctx, CANVAS_WIDTH - margin - barWidth, barY, barWidth, barHeight, p2Ratio, false);
+    // P2 guard gauge bar
+    this.drawGuardGauge(ctx, CANVAS_WIDTH - margin - barWidth, barY + barHeight + 3, barWidth, 5, fighters[1].guardGauge, false);
 
     // Timer in center
     const timeSeconds = Math.max(0, 99 - Math.floor(tick / 60));
@@ -837,6 +980,47 @@ export class Renderer {
   }
 
   // ===== KO Text =====
+
+  /** Draw guard gauge bar (thin bar under health bar, blue→yellow→red gradient) */
+  private drawGuardGauge(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, gauge: number, leftAligned: boolean): void {
+    const ratio = Math.max(0, Math.min(1, gauge / 100));
+    const fillW = w * ratio;
+
+    // Background
+    ctx.fillStyle = '#0a0a0f';
+    ctx.fillRect(x - 1, y - 1, w + 2, h + 2);
+    ctx.fillStyle = '#1a1a22';
+    ctx.fillRect(x, y, w, h);
+
+    if (fillW > 0) {
+      // Color gradient: blue (>60%) → yellow (30-60%) → red (<30%)
+      let gaugeColor: string;
+      if (ratio > 0.6) {
+        gaugeColor = '#4488ff'; // Blue — healthy
+      } else if (ratio > 0.3) {
+        gaugeColor = '#ccaa22'; // Yellow — warning
+      } else {
+        gaugeColor = '#cc2233'; // Red — critical
+      }
+      const grad = ctx.createLinearGradient(x, y, x, y + h);
+      grad.addColorStop(0, this.shiftColor(gaugeColor, 40));
+      grad.addColorStop(0.5, gaugeColor);
+      grad.addColorStop(1, this.shiftColor(gaugeColor, -20));
+      ctx.fillStyle = grad;
+      if (leftAligned) {
+        ctx.fillRect(x, y, fillW, h);
+      } else {
+        ctx.fillRect(x + w - fillW, y, fillW, h);
+      }
+    }
+
+    // Border
+    ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(x, y, w, h);
+  }
+
+  // ===== KO Text =====
   private drawKO(ctx: CanvasRenderingContext2D, winner: number | null): void {
     ctx.save();
 
@@ -868,6 +1052,39 @@ export class Renderer {
     ctx.fillStyle = 'rgba(255,255,255,0.6)';
     ctx.font = '14px monospace';
     ctx.fillText('Press R to restart', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 90);
+
+    ctx.restore();
+  }
+
+  // ===== Super Flash (DM dark screen overlay) =====
+  drawSuperFlash(ctx: CanvasRenderingContext2D, timer: number, flashScreenX: number, flashScreenY: number): void {
+    ctx.save();
+    const progress = timer / 20; // 1.0 → 0.0
+    // Dark blue overlay — strongest at start, fading out
+    const alpha = 0.6 * progress;
+    ctx.fillStyle = `rgba(0, 0, 80, ${alpha})`;
+    ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+    // Yellow/white flash burst on character position
+    if (timer > 14) {
+      // Initial bright flash (first 6 frames)
+      const flashAlpha = (timer - 14) / 6 * 0.8;
+      const flashGrad = ctx.createRadialGradient(flashScreenX, flashScreenY, 0, flashScreenX, flashScreenY, 150);
+      flashGrad.addColorStop(0, `rgba(255, 255, 200, ${flashAlpha})`);
+      flashGrad.addColorStop(0.3, `rgba(255, 220, 100, ${flashAlpha * 0.6})`);
+      flashGrad.addColorStop(1, `rgba(255, 200, 50, 0)`);
+      ctx.fillStyle = flashGrad;
+      ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+    }
+
+    // Lingering glow around character
+    const glowAlpha = progress * 0.5;
+    const glowGrad = ctx.createRadialGradient(flashScreenX, flashScreenY, 0, flashScreenX, flashScreenY, 80 + (1 - progress) * 40);
+    glowGrad.addColorStop(0, `rgba(255, 255, 100, ${glowAlpha})`);
+    glowGrad.addColorStop(0.5, `rgba(255, 200, 50, ${glowAlpha * 0.4})`);
+    glowGrad.addColorStop(1, 'rgba(255, 200, 50, 0)');
+    ctx.fillStyle = glowGrad;
+    ctx.fillRect(flashScreenX - 200, flashScreenY - 200, 400, 400);
 
     ctx.restore();
   }

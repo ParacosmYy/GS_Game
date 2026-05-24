@@ -11,8 +11,11 @@ import {
   HOP_THRESHOLD, HOP_VELOCITY, HYPER_JUMP_VY, HYPER_JUMP_VX, HYPER_CHARGE_WINDOW,
   ROLL_SPEED, ROLL_DURATION, ROLL_RECOVERY,
   LANDING_RECOVERY,
+  DM_STOCK_COST,
 } from '../core/constants.js';
-import { FighterState, AttackType, CLOSE_RANGE } from '../core/types.js';
+import { FighterState, AttackType, CLOSE_RANGE, JuggleState } from '../core/types.js';
+import type { PowerGauge } from '../core/types.js';
+import { spendStocks } from '../combat/meter.js';
 import type { VFXSystem } from '../rendering/vfx.js';
 
 /**
@@ -28,6 +31,7 @@ export class FighterController {
   private tickRef: { value: number };
   private opponent: Fighter | null = null;
   private character: CharacterDefinition;
+  private gauge: PowerGauge | null = null;
 
   private lastForwardTick = -999;
   private lastBackTick = -999;
@@ -62,6 +66,8 @@ export class FighterController {
 
   setOpponent(opp: Fighter): void { this.opponent = opp; }
 
+  setGauge(gauge: PowerGauge): void { this.gauge = gauge; }
+
   setCharacter(char: CharacterDefinition): void {
     this.character = char;
     this.fighter.color = char.color;
@@ -93,6 +99,8 @@ export class FighterController {
         f.y = STAGE_GROUND_Y; f.vy = 0; f.vx = 0;
         f.state = FighterState.IDLE;
         f.landingRecovery = LANDING_RECOVERY;
+        f.juggleState = JuggleState.NONE;
+        f.airHitCount = 0;
         this.vfx.spawnDust(f.x, STAGE_GROUND_Y);
       } else if (f.vy > 0) { f.y = STAGE_GROUND_Y; f.vy = 0; }
     }
@@ -166,6 +174,15 @@ export class FighterController {
     f.tickTimers();
     if (this.rekkaWindow > 0) this.rekkaWindow--;
 
+    // If being thrown, skip normal state machine — frozen until throw resolves
+    if (f.isBeingThrown) return;
+
+    // If throwing, tick the throw attack animation but skip normal transitions
+    if (f.isThrowing) {
+      f.tickAttack();
+      return;
+    }
+
     switch (f.state) {
       case FighterState.IDLE:
       case FighterState.WALK: {
@@ -214,7 +231,7 @@ export class FighterController {
         if (input.down && f.isGrounded()) { f.state = FighterState.CROUCH; f.displayHeight = 50; f.vx = 0; return; }
         if (input.throwAttackPressed && f.canAct()) { f.startAttack(AttackType.THROW); return; }
         if (f.canAct()) { const atk = this.tryAttack(input); if (atk) { f.startAttack(atk); return; } }
-        if (!input.forward) { f.vx = 0; f.state = FighterState.IDLE; }
+        if (!input.forward) { f.vx = 0; f.state = FighterState.IDLE; f.runStopTimer = 3; }
         break;
       }
 
@@ -296,10 +313,34 @@ export class FighterController {
         break;
       }
 
-      case FighterState.BLOCK:
+      case FighterState.BLOCK: {
         f.blockstunTimer--; f.vx *= 0.8;
+        // Guard Cancel Roll (A+B during blockstun, costs 1 stock)
+        if (f.blockstunTimer > 0 && input.rollPressed && this.gauge && spendStocks(this.gauge, DM_STOCK_COST)) {
+          f.state = FighterState.ROLL;
+          f.rollTimer = ROLL_DURATION;
+          f.vx = ROLL_SPEED * f.facing;
+          f.displayHeight = 60;
+          f.blockstunTimer = 0;
+          this.vfx.spawnDust(f.x, STAGE_GROUND_Y);
+          break;
+        }
+        // Guard Cancel CD (C+D during blockstun, costs 1 stock)
+        if (f.blockstunTimer > 0 && input.blowbackPressed && this.gauge && spendStocks(this.gauge, DM_STOCK_COST)) {
+          f.blockstunTimer = 0;
+          f.startAttack(AttackType.STAND_CD);
+          break;
+        }
         if (f.blockstunTimer <= 0) { f.state = FighterState.IDLE; f.vx = 0; }
         break;
+      }
+
+      case FighterState.GUARD_CRUSH: {
+        f.guardCrushTimer--; f.vx *= 0.85;
+        // Visual: flicker like hitstun
+        if (f.guardCrushTimer <= 0) { f.state = FighterState.IDLE; f.vx = 0; }
+        break;
+      }
 
       case FighterState.HITSTUN:
         f.hitstunTimer--; f.vx *= 0.85;
@@ -308,7 +349,11 @@ export class FighterController {
 
       case FighterState.KNOCKDOWN:
         f.knockdownTimer--; f.vx *= 0.9;
-        if (f.knockdownTimer <= 0) { f.state = FighterState.IDLE; f.isKnockedDown = false; f.displayHeight = 100; f.vx = 0; }
+        // Quick stand: A+B during soft knockdown reduces timer to 3 frames
+        if (!f.isHardKnockdown && input.rollPressed && f.knockdownTimer > 3) {
+          f.knockdownTimer = 3;
+        }
+        if (f.knockdownTimer <= 0) { f.state = FighterState.IDLE; f.isKnockedDown = false; f.isHardKnockdown = false; f.displayHeight = 100; f.vx = 0; }
         break;
     }
   }

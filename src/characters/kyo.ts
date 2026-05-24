@@ -18,6 +18,7 @@
  *   air↓+C → 奈落落とし (KD)
  */
 import type { CharacterDefinition } from './types.js';
+import { pose, bone } from './types.js';
 import type { ResolvedInput } from '../input/inputResolver.js';
 import type { CommandBuffer } from '../input/commandBuffer.js';
 import type { Fighter } from '../entities/fighter.js';
@@ -39,6 +40,78 @@ export const KyoDef: CharacterDefinition = {
   specialColor: '#ff4400',
   specialGlow: '#ff6600',
   portrait: '🔥',
+
+  poses: {
+    [FighterState.IDLE]: pose({
+      armFront: bone(10, 20, 0.3),
+      armBack: bone(-8, 15, -0.5),
+      legFront: bone(6, 0, 0.1),
+      legBack: bone(-6, 0, -0.1),
+    }),
+    [FighterState.WALK]: pose({
+      armFront: bone(8, 22, 0.2),
+      armBack: bone(-6, 18, -0.4),
+      legFront: bone(8, 0, 0.2),
+      legBack: bone(-3, 0, -0.15),
+    }),
+    [FighterState.RUN]: pose({
+      body: bone(6, 0, 0.15),
+      armFront: bone(-5, 20, -0.8),
+      armBack: bone(12, 25, 0.5),
+      legFront: bone(12, 0, 0.4),
+      legBack: bone(-8, 0, -0.3),
+    }),
+    [FighterState.CROUCH]: pose({
+      body: bone(0, 20, 0.1),
+      head: bone(0, 15),
+      armFront: bone(8, 25, 0.1),
+      armBack: bone(-6, 22, -0.2),
+      legFront: bone(10, 0, 0.5),
+      legBack: bone(-8, 0, -0.4),
+    }),
+    [FighterState.BLOCK]: pose({
+      armFront: bone(3, 10, -0.4),
+      armBack: bone(0, 8, -0.6),
+      legFront: bone(3, 0, 0.05),
+      legBack: bone(-3, 0, -0.05),
+    }),
+    [FighterState.HITSTUN]: pose({
+      body: bone(-5, 0, -0.15),
+      head: bone(-3, 2, -0.2),
+      armFront: bone(0, 25, 0.6),
+      armBack: bone(-10, 20, 0.8),
+    }),
+    [FighterState.KNOCKDOWN]: pose({
+      body: bone(0, 30, 1.4),
+      head: bone(10, 35, 1.2),
+      armFront: bone(-5, 35, 0.8),
+      armBack: bone(15, 30, -0.6),
+      legFront: bone(-10, 30, -0.3),
+      legBack: bone(8, 32, 0.4),
+    }),
+    [FighterState.JUMP]: pose({
+      body: bone(0, -5, -0.05),
+      armFront: bone(10, 10, 0.4),
+      armBack: bone(-8, 8, -0.3),
+      legFront: bone(5, -5, 0.3),
+      legBack: bone(-5, 0, -0.4),
+    }),
+    [FighterState.BACKDASH]: pose({
+      body: bone(-5, -8, -0.1),
+      armFront: bone(5, 5, 0.6),
+      armBack: bone(-12, 3, -0.2),
+      legFront: bone(-2, -8, 0.5),
+      legBack: bone(8, -3, -0.6),
+    }),
+    [FighterState.ROLL]: pose({
+      body: bone(0, 25, 0.8),
+      head: bone(5, 28, 0.6),
+      armFront: bone(-3, 30, 0.4),
+      armBack: bone(8, 25, -0.5),
+      legFront: bone(-8, 28, -0.3),
+      legBack: bone(5, 27, 0.5),
+    }),
+  },
 
   routeSpecial(input, cmdBuf, tick) {
     // Dragon Punch →↓↘+P (shared)

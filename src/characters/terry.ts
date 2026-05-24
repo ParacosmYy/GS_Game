@@ -9,9 +9,10 @@
  * DM: QCF×2+P → Power Geyser
  */
 import type { CharacterDefinition } from './types.js';
+import { pose, bone } from './types.js';
 import type { ResolvedInput } from '../input/inputResolver.js';
 import type { CommandBuffer } from '../input/commandBuffer.js';
-import { AttackType } from '../core/types.js';
+import { AttackType, FighterState } from '../core/types.js';
 import { Projectile } from '../entities/projectile.js';
 import { FRAME_DATA } from '../core/constants.js';
 
@@ -24,6 +25,56 @@ export const TerryDef: CharacterDefinition = {
   specialColor: '#ffcc00',
   specialGlow: '#ffaa00',
   portrait: '🎩',
+
+  poses: {
+    [FighterState.IDLE]: pose({
+      armFront: bone(12, 18, 0.15),
+      armBack: bone(-6, 16, -0.35),
+      legFront: bone(5, 0, 0.08),
+      legBack: bone(-5, 0, -0.08),
+    }),
+    [FighterState.WALK]: pose({
+      armFront: bone(10, 20, 0.1),
+      armBack: bone(-5, 18, -0.3),
+      legFront: bone(8, 0, 0.18),
+      legBack: bone(-3, 0, -0.12),
+    }),
+    [FighterState.RUN]: pose({
+      body: bone(7, 0, 0.18),
+      armFront: bone(-6, 22, -0.9),
+      armBack: bone(14, 26, 0.6),
+      legFront: bone(13, 0, 0.45),
+      legBack: bone(-9, 0, -0.35),
+    }),
+    [FighterState.CROUCH]: pose({
+      body: bone(0, 18, 0.05),
+      head: bone(0, 14),
+      armFront: bone(10, 22, 0.05),
+      armBack: bone(-7, 20, -0.15),
+      legFront: bone(10, 0, 0.5),
+      legBack: bone(-8, 0, -0.4),
+    }),
+    [FighterState.BLOCK]: pose({
+      armFront: bone(4, 10, -0.35),
+      armBack: bone(1, 8, -0.55),
+    }),
+    [FighterState.HITSTUN]: pose({
+      body: bone(-4, 0, -0.12),
+      head: bone(-2, 2, -0.18),
+    }),
+    [FighterState.KNOCKDOWN]: pose({
+      body: bone(0, 30, 1.4),
+      head: bone(10, 35, 1.2),
+      legFront: bone(-10, 30, -0.3),
+      legBack: bone(8, 32, 0.4),
+    }),
+    [FighterState.JUMP]: pose({
+      armFront: bone(12, 10, 0.3),
+      armBack: bone(-7, 8, -0.25),
+      legFront: bone(4, -3, 0.2),
+      legBack: bone(-5, 0, -0.35),
+    }),
+  },
 
   routeSpecial(input, cmdBuf, tick) {
     const special = cmdBuf.checkSpecial(tick, true);

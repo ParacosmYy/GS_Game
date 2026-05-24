@@ -359,7 +359,7 @@ export const CH_DAMAGE_BONUS = 1.25;   // Counter Hit 伤害x1.25
 
 // ===== Damage Scaling =====
 export const DAMAGE_SCALE_STEP = 0.10;  // 每连击递减10%
-export const DAMAGE_SCALE_MIN = 0.50;   // 最低50%伤害
+export const DAMAGE_SCALE_MIN = 0.10;   // 最低10%伤害 (KOF 2002标准)
 
 // ===== Power Gauge (能量槽) =====
 export const MAX_STOCKS = 3;

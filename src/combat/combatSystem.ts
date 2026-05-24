@@ -10,9 +10,13 @@ import {
   CH_HITSTUN_BONUS, CH_DAMAGE_BONUS,
   DAMAGE_SCALE_STEP, DAMAGE_SCALE_MIN,
 } from '../core/constants.js';
-import { FighterState, AttackType } from '../core/types.js';
+import { FighterState, AttackType, JuggleState } from '../core/types.js';
 import type { HitLevel } from '../core/types.js';
 
+/** Throw escape window in frames */
+const THROW_ESCAPE_WINDOW = 8;
+/** Push-apart distance on successful throw escape */
+const THROW_ESCAPE_PUSH = 60;
 export type HitCallback = (
   attacker: Fighter, defender: Fighter,
   attackType: AttackType, blocked: boolean,
@@ -61,6 +65,71 @@ export class CombatSystem {
     this.comboHits = [0, 0];
   }
 
+  /**
+   * Tick throw escape window for both fighters.
+   * Called every frame from the main loop AFTER resolveAttacks.
+   * Returns true if a throw escape occurred this frame.
+   */
+  tickThrowState(p1: Fighter, p2: Fighter, onHit?: HitCallback): boolean {
+    let escaped = false;
+    const fighters: [Fighter, Fighter] = [p1, p2];
+
+    for (let i = 0; i < 2; i++) {
+      const defender = fighters[i];
+      if (!defender.isBeingThrown || defender.throwEscapeTimer <= 0) continue;
+
+      // Get defender input to check for throw escape
+      const raw = i === 0 ? this.inputManager.getP1Input() : this.inputManager.getP2Input();
+      const defInput = resolveInput(raw, defender.facing, this.prev[i]);
+
+      defender.throwEscapeTimer--;
+
+      // Check for throw escape: defender presses throw during escape window
+      if (defInput.throwAttackPressed && defender.throwEscapeTimer >= 0) {
+        // Successful throw escape!
+        const attacker = fighters[1 - i];
+
+        // Push both apart
+        const pushDir = attacker.facing;
+        attacker.x -= THROW_ESCAPE_PUSH * pushDir * 0.5;
+        defender.x += THROW_ESCAPE_PUSH * pushDir * 0.5;
+
+        // Reset both fighters to IDLE
+        attacker.isThrowing = false;
+        attacker.throwVictim = null;
+        attacker.endAttack();
+        defender.isBeingThrown = false;
+        defender.throwEscapeTimer = 0;
+        defender.state = FighterState.IDLE;
+        defender.isKnockedDown = false;
+
+        escaped = true;
+        break;
+      }
+
+      // Timer expired — resolve throw as damage + hard knockdown
+      if (defender.throwEscapeTimer <= 0) {
+        const attacker = fighters[1 - i];
+        const data = FRAME_DATA[AttackType.THROW];
+        const defIdx = i;
+        const damage = this.scaledDamage(data.damage, defIdx);
+
+        defender.health = Math.max(0, defender.health - damage);
+        defender.applyKnockdown(30, true); // hard knockdown from throw
+        defender.x = attacker.x + THROW_DISTANCE * attacker.facing;
+        defender.isBeingThrown = false;
+
+        attacker.isThrowing = false;
+        attacker.throwVictim = null;
+
+        this.comboHits[defIdx]++;
+        onHit?.(attacker, defender, AttackType.THROW, false, false);
+      }
+    }
+
+    return escaped;
+  }
+
   private canBlock(hitLevel: HitLevel, crouching: boolean): boolean {
     if (hitLevel === 'MID') return true;
     if (hitLevel === 'LOW') return crouching;
@@ -89,23 +158,31 @@ export class CombatSystem {
 
     attacker.hasHit = true;
 
-    // Throw handling
+    // Throw handling — Phase 1: setup throw with escape window
     if (attackType === AttackType.THROW) {
       const dist = Math.abs(attacker.x - defender.x);
       if (dist > THROW_RANGE || !defender.isGrounded()) return;
-      // Throws beat roll (not invincible to throws)
-      const defIdx = this.fighters ? (this.fighters[0] === defender ? 0 : 1) : 0;
-      const damage = this.scaledDamage(data.damage, defIdx);
-      defender.health = Math.max(0, defender.health - damage);
-      defender.applyKnockdown(30);
+      // Phase 1: freeze both, start escape window
+      attacker.isThrowing = true;
+      attacker.throwVictim = defender;
+      attacker.hasHit = true;
+      defender.isBeingThrown = true;
+      defender.throwEscapeTimer = THROW_ESCAPE_WINDOW;
+      // Position defender at throw point
       defender.x = attacker.x + THROW_DISTANCE * attacker.facing;
-      this.comboHits[defIdx]++;
-      onHit?.(attacker, defender, attackType, false, false);
       return;
     }
 
     // Roll invincibility check (attacks pass through, throws don't)
     if (defender.isRolling()) return;
+
+    // B7: Juggle check — if defender is airborne, check juggle state
+    if (!defender.isGrounded()) {
+      if (defender.juggleState === JuggleState.NONE) return; // Can't hit airborne
+      // HALF: can only juggle in upper portion of arc
+      // FULL: can juggle until near ground
+      if (defender.juggleState === JuggleState.HALF && defender.vy > 0) return; // Only while rising
+    }
 
     const defIdx = this.fighters ? (this.fighters[0] === defender ? 0 : 1) : 0;
     const raw = defIdx === 0 ? this.inputManager.getP1Input() : this.inputManager.getP2Input();
@@ -115,12 +192,23 @@ export class CombatSystem {
     const hitLevel = data.hitLevel as HitLevel;
 
     if (defender.canBlock() && defInput.back && this.canBlock(hitLevel, crouching)) {
-      // Blocked
-      defender.applyBlockstun(data.blockstun, data.pushback);
-      const chip = (data as { chipDamage?: number }).chipDamage;
-      if (chip) {
-        defender.health = Math.max(0, defender.health - chip);
+      // Guard gauge depletion
+      defender.guardGauge = Math.max(0, defender.guardGauge - guardGaugeDamage(attackType));
+
+      if (defender.guardGauge <= 0) {
+        // Guard Crush — stunned instead of normal blockstun
+        defender.state = FighterState.GUARD_CRUSH;
+        defender.guardCrushTimer = GUARD_CRUSH_DURATION;
+        defender.vx = data.pushback * (defender.facing === 1 ? -1 : 1) * 1.5;
+        defender.currentAttack = null;
+        defender.attackPhase = 'none';
+      } else {
+        defender.applyBlockstun(data.blockstun, data.pushback);
       }
+      const chipData = data as { chipDamage?: number };
+      const chip = chipData.chipDamage ?? Math.round(data.damage * CHIP_DAMAGE_RATIO);
+      // A6: Chip damage cannot kill (leave at least 1 HP)
+      defender.health = Math.max(1, defender.health - chip);
       this.comboHits[defIdx] = 0; // Block resets combo
       onHit?.(attacker, defender, attackType, true, false);
       return;
@@ -152,8 +240,7 @@ export class CombatSystem {
     onHit?.(attacker, defender, attackType, false, counterHit);
   }
 
-  private resolveProjectileHits(p1: Fighter, p2: Fighter, projectiles: Projectile[], onHit?: HitCallback): void {
-    const fighters = [p1, p2];
+  private resolveProjectileHits(p1: Fighter, p2: Fighter, projectiles: Projectile[], onHit?: HitCallback): void {    const fighters = [p1, p2];
     for (const proj of projectiles) {
       const hitbox = proj.getHitbox();
       if (!hitbox) continue;
@@ -172,9 +259,21 @@ export class CombatSystem {
         const crouching = defender.state === FighterState.CROUCH;
 
         if (defender.canBlock() && defInput.back && this.canBlock(data.hitLevel as HitLevel, crouching)) {
-          defender.applyBlockstun(data.blockstun, data.pushback);
+          // Guard gauge depletion for projectile
+          defender.guardGauge = Math.max(0, defender.guardGauge - guardGaugeDamage(AttackType.SPECIAL_PROJECTILE));
+
+          if (defender.guardGauge <= 0) {
+            defender.state = FighterState.GUARD_CRUSH;
+            defender.guardCrushTimer = GUARD_CRUSH_DURATION;
+            defender.vx = data.pushback * (defender.facing === 1 ? -1 : 1) * 1.5;
+            defender.currentAttack = null;
+            defender.attackPhase = 'none';
+          } else {
+            defender.applyBlockstun(data.blockstun, data.pushback);
+          }
           const chip = data.chipDamage ?? Math.round(data.damage * CHIP_DAMAGE_RATIO);
-          defender.health = Math.max(0, defender.health - chip);
+          // A6: Chip damage cannot kill
+          defender.health = Math.max(1, defender.health - chip);
           this.comboHits[i] = 0;
           onHit?.(attacker, defender, AttackType.SPECIAL_PROJECTILE, true, false);
         } else {
@@ -190,6 +289,27 @@ export class CombatSystem {
     }
   }
 }
+
+/** Guard gauge depletion based on attack type */
+function guardGaugeDamage(attackType: AttackType): number {
+  const name = attackType as string;
+  // DMs
+  if (name.startsWith('DM_')) return 25;
+  // Character specials (KYO_, IORI_, TERRY_, KIM_, SPECIAL_)
+  if (name.startsWith('KYO_') || name.startsWith('IORI_') || name.startsWith('TERRY_')
+    || name.startsWith('KIM_') || name.startsWith('SPECIAL_')) return 15;
+  // Command normals
+  if (name.startsWith('CMD_')) return 12;
+  // CD blowback
+  if (attackType === AttackType.STAND_CD || attackType === AttackType.JUMP_CD) return 12;
+  // Heavy normals (C/D, CLOSE_C/D)
+  if (name.endsWith('_C') || name.endsWith('_D')) return 10;
+  // Light normals (A/B)
+  return 5;
+}
+
+/** Guard Crush constant — stun duration in frames */
+const GUARD_CRUSH_DURATION = 60;
 
 function aabbCheck(
   a: { x: number; y: number; width: number; height: number },

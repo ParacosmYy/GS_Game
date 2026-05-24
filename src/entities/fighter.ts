@@ -3,6 +3,7 @@ import {
   Direction,
   BlockType,
   RekkaChain,
+  JuggleState,
 } from '../core/types.js';
 import { CLOSE_RANGE } from '../core/types.js';
 import {
@@ -37,6 +38,10 @@ export class Fighter {
   attackPhase: AttackPhase = 'none';
   hasHit = false; // Prevent multi-hit in one active phase
 
+  // Guard gauge (0–100, depleted by blocking attacks)
+  guardGauge = 100;
+  guardCrushTimer = 0;
+
   // State timers
   hitstunTimer = 0;
   blockstunTimer = 0;
@@ -49,11 +54,32 @@ export class Fighter {
   rekkaChain: RekkaChain = null;
   rekkaWindow = 0;  // frames remaining to input followup
 
+  // Run stop delay (A5: can't instantly block out of run)
+  runStopTimer = 0;
+
+  // Juggle state (B7: floating/juggle tracking)
+  juggleState: JuggleState = JuggleState.NONE;
+  airHitCount = 0; // how many air hits in current combo
+
   // Visual height (for crouch)
   displayHeight = FIGHTER_HEIGHT;
 
   // Knockdown state
   isKnockedDown = false;
+  isHardKnockdown = false;
+
+  // Throw escape state (defender side)
+  isBeingThrown = false;
+  throwEscapeTimer = 0;
+
+  // Throw execution state (attacker side)
+  isThrowing = false;
+  throwVictim: Fighter | null = null;
+
+  // Previous frame state tracking (for combo reset detection)
+  private _prevState: FighterState = FighterState.IDLE;
+  get prevState(): FighterState { return this._prevState; }
+  savePrevState(): void { this._prevState = this.state; }
 
   constructor(x: number, color: string, facing: Direction) {
     this.x = x;
@@ -181,10 +207,11 @@ export class Fighter {
   }
 
   /** Apply knockdown */
-  applyKnockdown(frames: number): void {
+  applyKnockdown(frames: number, hard: boolean = false): void {
     this.state = FighterState.KNOCKDOWN;
     this.knockdownTimer = frames;
     this.isKnockedDown = true;
+    this.isHardKnockdown = hard;
     this.currentAttack = null;
     this.attackPhase = 'none';
   }
@@ -203,15 +230,22 @@ export class Fighter {
   /** Decrement per-frame timers (call once per logic frame) */
   tickTimers(): void {
     if (this.landingRecovery > 0) this.landingRecovery--;
+    if (this.runStopTimer > 0) this.runStopTimer--;
+    // Guard gauge recovery: +0.5/frame when NOT blocking
+    if (this.state !== FighterState.BLOCK && this.guardGauge < 100) {
+      this.guardGauge = Math.min(100, this.guardGauge + 0.5);
+    }
   }
 
   /** Is the fighter in a state where blocking is possible? */
   canBlock(): boolean {
+    if (this.runStopTimer > 0) return false; // A5: run stop delay
     return (
       this.state === FighterState.IDLE ||
       this.state === FighterState.WALK ||
       this.state === FighterState.CROUCH ||
-      this.state === FighterState.RUN
+      this.state === FighterState.BLOCK
+      // RUN intentionally excluded — must wait for runStopTimer
     );
   }
 
@@ -244,8 +278,18 @@ export class Fighter {
     this.landingRecovery = 0;
     this.displayHeight = FIGHTER_HEIGHT;
     this.isKnockedDown = false;
+    this.isHardKnockdown = false;
+    this.isBeingThrown = false;
+    this.throwEscapeTimer = 0;
+    this.isThrowing = false;
+    this.throwVictim = null;
     this.rollTimer = 0;
     this.rekkaChain = null;
     this.rekkaWindow = 0;
+    this.runStopTimer = 0;
+    this.guardGauge = 100;
+    this.guardCrushTimer = 0;
+    this.juggleState = JuggleState.NONE;
+    this.airHitCount = 0;
   }
 }

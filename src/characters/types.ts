@@ -13,6 +13,62 @@ import {
   AttackType,
 } from '../core/types.js';
 
+// ===== 骨骼动画系统 (Skeletal Pose System) =====
+
+/** 单个骨骼部位的位置偏移和旋转 */
+export interface BonePose {
+  /** 相对于身体中心的 X 偏移 (正=前) */
+  ox: number;
+  /** 相对于身体顶部的 Y 偏移 (正=下) */
+  oy: number;
+  /** 旋转角度 (弧度, 正=顺时针) */
+  rot: number;
+  /** 缩放 (1.0 = 正常) */
+  scale: number;
+}
+
+/** 一个完整的角色姿态 — 6个骨骼部位 */
+export interface Pose {
+  /** 头部 */
+  head: BonePose;
+  /** 身体/躯干 */
+  body: BonePose;
+  /** 前臂 (面朝方向的手) */
+  armFront: BonePose;
+  /** 后臂 */
+  armBack: BonePose;
+  /** 前腿 */
+  legFront: BonePose;
+  /** 后腿 */
+  legBack: BonePose;
+}
+
+/** 骨骼部位名称 */
+export type BoneName = keyof Pose;
+
+/** 完整的角色姿态库 — 每个 FighterState 对应一个 Pose */
+export type PoseSet = Partial<Record<FighterState, Pose>>;
+
+/** 创建 BonePose 的辅助函数 */
+export function bone(ox: number, oy: number, rot: number = 0, scale: number = 1): BonePose {
+  return { ox, oy, rot, scale };
+}
+
+/** 创建 Pose 的辅助函数 — 只指定与默认不同的部位 */
+export function pose(overrides: Partial<Pose> = {}): Pose {
+  const defaults: Pose = {
+    head: bone(0, 0),
+    body: bone(0, 0),
+    armFront: bone(8, 15, 0.2),
+    armBack: bone(-5, 15, -0.3),
+    legFront: bone(4, 0, 0),
+    legBack: bone(-4, 0, 0),
+  };
+  return { ...defaults, ...overrides };
+}
+
+// ===== 角色定义接口 =====
+
 /** 角色定义 — 所有招式路由逻辑都在这里 */
 export interface CharacterDefinition {
   // ── 元信息 ──
@@ -24,6 +80,10 @@ export interface CharacterDefinition {
   specialColor: string;  // 必杀技特效色 (火/气/光)
   specialGlow: string;   // 必杀技光晕色
   portrait: string;     // 选人界面图标
+
+  // ── 骨骼动画 ──
+  /** 角色姿态库: FighterState → Pose 映射 */
+  poses: PoseSet;
 
   // ── 招式路由 ──
 

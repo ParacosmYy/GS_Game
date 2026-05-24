@@ -8,6 +8,7 @@
  * DM: HCB×2+P → 八稚女
  */
 import type { CharacterDefinition } from './types.js';
+import { pose, bone } from './types.js';
 import type { ResolvedInput } from '../input/inputResolver.js';
 import type { CommandBuffer } from '../input/commandBuffer.js';
 import {
@@ -26,6 +27,56 @@ export const IoriDef: CharacterDefinition = {
   specialColor: '#8800cc',
   specialGlow: '#aa22ff',
   portrait: '🌙',
+
+  poses: {
+    [FighterState.IDLE]: pose({
+      armFront: bone(6, 18, 0.5),
+      armBack: bone(-10, 12, -0.7),
+      legFront: bone(5, 0, 0.05),
+      legBack: bone(-5, 0, -0.15),
+    }),
+    [FighterState.WALK]: pose({
+      armFront: bone(5, 20, 0.4),
+      armBack: bone(-8, 15, -0.6),
+      legFront: bone(7, 0, 0.15),
+      legBack: bone(-4, 0, -0.1),
+    }),
+    [FighterState.RUN]: pose({
+      body: bone(5, 0, 0.12),
+      armFront: bone(-3, 18, -0.7),
+      armBack: bone(10, 22, 0.4),
+      legFront: bone(10, 0, 0.35),
+      legBack: bone(-7, 0, -0.25),
+    }),
+    [FighterState.CROUCH]: pose({
+      body: bone(0, 20, 0.08),
+      head: bone(0, 15),
+      armFront: bone(6, 24, 0.3),
+      armBack: bone(-5, 20, -0.5),
+      legFront: bone(9, 0, 0.45),
+      legBack: bone(-7, 0, -0.35),
+    }),
+    [FighterState.BLOCK]: pose({
+      armFront: bone(2, 8, -0.5),
+      armBack: bone(-1, 6, -0.7),
+    }),
+    [FighterState.HITSTUN]: pose({
+      body: bone(-6, 0, -0.2),
+      head: bone(-4, 3, -0.25),
+    }),
+    [FighterState.KNOCKDOWN]: pose({
+      body: bone(0, 30, 1.4),
+      head: bone(10, 35, 1.2),
+      legFront: bone(-10, 30, -0.3),
+      legBack: bone(8, 32, 0.4),
+    }),
+    [FighterState.JUMP]: pose({
+      armFront: bone(8, 8, 0.5),
+      armBack: bone(-10, 6, -0.4),
+      legFront: bone(3, -5, 0.25),
+      legBack: bone(-6, 0, -0.5),
+    }),
+  },
 
   routeSpecial(input, cmdBuf, tick) {
     // DP+P → upper
