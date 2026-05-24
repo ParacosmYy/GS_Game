@@ -198,8 +198,9 @@ export class Renderer {
       case FighterState.IDLE:
         return Math.floor(tick / 8) % 8;
       case FighterState.WALK:
-      case FighterState.RUN:
         return Math.floor(tick / 6) % 6;
+      case FighterState.RUN:
+        return Math.floor(tick / 4) % 6;
       case FighterState.JUMP:
       case FighterState.HOP:
       case FighterState.RUN_JUMP:

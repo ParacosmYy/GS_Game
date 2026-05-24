@@ -384,6 +384,64 @@ const WALK_POSES: Pose[] = [
   { headOff: 0, bodyLean: -1, armL: 0.1, armR: -0.5, legL: 2, legR: -2, crouch: false },
   { headOff: 0, bodyLean: -0.5, armL: 0.2, armR: -0.4, legL: 1, legR: -1, crouch: false },
 ];
+
+/** 通用跑步基础帧 — 前倾+大步+手臂大幅摆动 */
+const RUN_BASE: Pose[] = [
+  { headOff: 1, bodyLean: 3, armL: 0.8, armR: -0.6, legL: -3, legR: 3, crouch: false },
+  { headOff: 1, bodyLean: 2, armL: 0.6, armR: -0.3, legL: -1, legR: 1, crouch: false },
+  { headOff: 1, bodyLean: 3, armL: 0.3, armR: -0.8, legL: 2, legR: -2, crouch: false },
+  { headOff: 1, bodyLean: 2, armL: 0.4, armR: -0.5, legL: 1, legR: -1, crouch: false },
+  { headOff: 1, bodyLean: 3, armL: 0.7, armR: -0.7, legL: -2, legR: 3, crouch: false },
+  { headOff: 1, bodyLean: 2, armL: 0.5, armR: -0.4, legL: -1, legR: 1, crouch: false },
+];
+
+/** 根据idleStyle生成差异化跑步姿态 */
+function getRunPoses(style: string): Pose[] {
+  switch (style) {
+    case 'confident': // Kyo — 前倾冲锋, 单拳前指
+      return RUN_BASE.map((p, i) => ({
+        ...p, bodyLean: 4, armR: -1.0 + Math.sin(i * 1.2) * 0.15,
+        legL: p.legL - 1, legR: p.legR + 1,
+      }));
+    case 'lazy': // Iori — 低身潜行, 手臂下垂
+      return RUN_BASE.map((p, i) => ({
+        ...p, bodyLean: 2, headOff: 0, armL: 0.2 + Math.sin(i * 0.8) * 0.1,
+        armR: -0.2 + Math.sin(i * 0.8 + 1) * 0.1,
+      }));
+    case 'fighter': // Terry — 运动冲刺, 拳架保持
+      return RUN_BASE.map((p, i) => ({
+        ...p, bodyLean: 3.5, armL: 0.6, armR: -0.9 + Math.sin(i * 1.0) * 0.1,
+        legL: p.legL * 1.2, legR: p.legR * 1.2,
+      }));
+    case 'martial': // Kim — 踢拳道跑姿, 高抬腿
+      return RUN_BASE.map((p, i) => ({
+        ...p, bodyLean: 2.5, armL: -0.3, armR: -0.5 + Math.sin(i * 1.1) * 0.1,
+        legL: p.legL - 2, legR: p.legR + 2,
+      }));
+    case 'tense': // Ryo — 力量型前冲
+      return RUN_BASE.map((p, i) => ({
+        ...p, bodyLean: 4.5, armL: 0.5, armR: -0.7,
+        legL: p.legL * 1.1, legR: p.legR * 1.1,
+      }));
+    case 'alert': // Leona — 军事高效跑, 低身
+      return RUN_BASE.map((p, i) => ({
+        ...p, bodyLean: 3, headOff: 0, armL: 0.7, armR: -0.7,
+        legL: Math.round(p.legL * 0.9), legR: Math.round(p.legR * 0.9),
+      }));
+    case 'rebel': // K' — 慵懒慢跑, 不紧不慢
+      return RUN_BASE.map((p, i) => ({
+        ...p, bodyLean: 1.5, headOff: 0, armL: 0.1, armR: 0.1,
+        legL: Math.round(p.legL * 0.8), legR: Math.round(p.legR * 0.8),
+      }));
+    case 'cute': // Kula — 活泼蹦跳跑
+      return RUN_BASE.map((p, i) => ({
+        ...p, bodyLean: 2, headOff: Math.sin(i * 1.2) * 0.8,
+        armL: 0.6 + Math.sin(i * 1.3) * 0.15, armR: -0.6 + Math.sin(i * 1.3 + 1) * 0.15,
+      }));
+    default:
+      return RUN_BASE;
+  }
+}
 const ATTACK_POSES: Pose[] = [
   // startup: 拳收回准备
   { headOff: 0, bodyLean: -1, armL: 0.3, armR: 0.5, legL: -1, legR: 1, crouch: false },
@@ -474,11 +532,12 @@ function drawKO(c: CanvasRenderingContext2D, v: CharVisual): void {
   px(c, cx + 11, cy + 1, darken(v.shoeColor, 0.3));
 }
 
-type PoseSet = 'idle' | 'walk' | 'attack' | 'crouch_attack' | 'air_attack' | 'throw' | 'crouch' | 'jump' | 'hit' | 'block';
+type PoseSet = 'idle' | 'walk' | 'run' | 'attack' | 'crouch_attack' | 'air_attack' | 'throw' | 'crouch' | 'jump' | 'hit' | 'block';
 
 function stateToPoseSet(state: FighterState): PoseSet {
   switch (state) {
-    case FighterState.WALK: case FighterState.RUN: return 'walk';
+    case FighterState.WALK: return 'walk';
+    case FighterState.RUN: return 'run';
     case FighterState.CROUCH_ATTACK: return 'crouch_attack';
     case FighterState.AIR_ATTACK: return 'air_attack';
     case FighterState.THROW: return 'throw';
@@ -505,15 +564,16 @@ export function generatePlaceholderSpritesheet(color: string, charId: string): {
   const v = CHAR_VISUALS[charId] ?? getDefaultVisual();
   v.shirtColor = color;
 
-  // 使用角色专属待机姿态
+  // 使用角色专属待机和跑步姿态
   const idlePoses = getIdlePoses(v.idleStyle);
+  const runPoses = getRunPoses(v.idleStyle);
   const POSE_MAP_LOCAL: Record<PoseSet, Pose[]> = {
-    idle: idlePoses, walk: WALK_POSES, attack: ATTACK_POSES,
+    idle: idlePoses, walk: WALK_POSES, run: runPoses, attack: ATTACK_POSES,
     crouch_attack: CROUCH_ATTACK_POSES, air_attack: AIR_ATTACK_POSES, throw: THROW_POSES,
     crouch: CROUCH_POSES, jump: JUMP_POSES, hit: HIT_POSES, block: BLOCK_POSES,
   };
 
-  const poseSets: PoseSet[] = ['idle', 'walk', 'attack', 'crouch_attack', 'air_attack', 'throw', 'crouch', 'jump', 'hit', 'block'];
+  const poseSets: PoseSet[] = ['idle', 'walk', 'run', 'attack', 'crouch_attack', 'air_attack', 'throw', 'crouch', 'jump', 'hit', 'block'];
 
   // 计算图集尺寸
   let maxFrames = 0;
