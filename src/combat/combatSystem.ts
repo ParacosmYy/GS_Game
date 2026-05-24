@@ -360,7 +360,7 @@ export class CombatSystem {
     // Super Cancel: special moves on hit enable cancel into DM (costs extra stock)
     const atkName = attackType as string;
     if (atkName.startsWith('KYO_') || atkName.startsWith('IORI_') || atkName.startsWith('TERRY_')
-      || atkName.startsWith('KIM_') || atkName === AttackType.SPECIAL_UPPER
+      || atkName.startsWith('KIM_') || atkName.startsWith('RYO_') || atkName === AttackType.SPECIAL_UPPER
       || atkName === AttackType.SPECIAL_PROJECTILE) {
       attacker.superCancelReady = true;
     }
@@ -424,7 +424,7 @@ function guardGaugeDamage(attackType: AttackType): number {
   if (name.startsWith('DM_')) return 25;
   // Character specials (KYO_, IORI_, TERRY_, KIM_, SPECIAL_)
   if (name.startsWith('KYO_') || name.startsWith('IORI_') || name.startsWith('TERRY_')
-    || name.startsWith('KIM_') || name.startsWith('SPECIAL_')) return 15;
+    || name.startsWith('KIM_') || name.startsWith('RYO_') || name.startsWith('SPECIAL_')) return 15;
   // Command normals
   if (name.startsWith('CMD_')) return 12;
   // CD blowback
@@ -443,7 +443,7 @@ function getJuggleCost(attackType: AttackType): number {
   const name = attackType as string;
   if (name.startsWith('DM_')) return JUGGLE_COST_DM;
   if (name.startsWith('KYO_') || name.startsWith('IORI_') || name.startsWith('TERRY_')
-    || name.startsWith('KIM_') || name.startsWith('SPECIAL_')) return JUGGLE_COST_SPECIAL;
+    || name.startsWith('KIM_') || name.startsWith('RYO_') || name.startsWith('SPECIAL_')) return JUGGLE_COST_SPECIAL;
   if (name.endsWith('_C') || name.endsWith('_D') || name.startsWith('CMD_')
     || name.startsWith('CLOSE_C') || name.startsWith('CLOSE_D')) return JUGGLE_COST_HEAVY;
   return JUGGLE_COST_LIGHT;

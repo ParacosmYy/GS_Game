@@ -22,6 +22,7 @@ const VISUALS: Record<string, ProjectileVisuals> = {
   iori:  { baseRadius: 11, stretch: 1.3, groundHug: false, trailCount: 3, trailSpacing: 14, pulseSpeed: 6, pulseAmount: 0.2 },
   terry: { baseRadius: 10, stretch: 2.0, groundHug: true,  trailCount: 5, trailSpacing: 12, pulseSpeed: 10, pulseAmount: 0.15 },
   kim:   { baseRadius: 10, stretch: 1.0, groundHug: false, trailCount: 3, trailSpacing: 14, pulseSpeed: 7, pulseAmount: 0.2 },
+  ryo:   { baseRadius: 13, stretch: 1.5, groundHug: false, trailCount: 4, trailSpacing: 15, pulseSpeed: 9, pulseAmount: 0.22 },
 };
 
 const DEFAULT_VIS: ProjectileVisuals = { baseRadius: 10, stretch: 1.0, groundHug: false, trailCount: 3, trailSpacing: 14, pulseSpeed: 7, pulseAmount: 0.2 };

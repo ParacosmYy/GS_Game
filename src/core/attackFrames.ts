@@ -491,6 +491,72 @@ const KIM_SANREN_FRAMES: AttackFrame[] = [
   F([{ ox: 44, oy: -60, w: 44, h: 30 }]),
 ];
 
+// ===== 坂崎亮 =====
+
+// 虎煌 qcf+A (weak projectile)
+const RYO_KOOU_FRAMES: AttackFrame[] = [
+  F([{ ox: 48, oy: -58, w: 36, h: 28 }]),
+];
+
+// 虎煌 qcf+C (strong projectile)
+const RYO_KOOU_C_FRAMES: AttackFrame[] = [
+  F([{ ox: 48, oy: -58, w: 38, h: 30 }]),
+];
+
+// 虎咆 dp+A (weak upper)
+const RYO_KO_HOU_FRAMES: AttackFrame[] = [
+  F([{ ox: 28, oy: -78, w: 42, h: 44 }], { ox: 5, oy: -10, w: -15, h: -28 }),
+  F([{ ox: 34, oy: -85, w: 46, h: 48 }], { ox: 5, oy: -10, w: -15, h: -28 }),
+  F([{ ox: 36, oy: -88, w: 48, h: 50 }]),
+  F([{ ox: 34, oy: -80, w: 44, h: 45 }]),
+  F([{ ox: 30, oy: -70, w: 40, h: 40 }]),
+];
+
+// 虎咆 dp+C (strong upper, fully invincible)
+const RYO_KO_HOU_C_FRAMES: AttackFrame[] = [
+  F([{ ox: 28, oy: -78, w: 42, h: 44 }], { ox: 5, oy: -10, w: -15, h: -28 }),
+  F([{ ox: 34, oy: -85, w: 46, h: 48 }], { ox: 5, oy: -10, w: -15, h: -28 }),
+  F([{ ox: 36, oy: -88, w: 48, h: 50 }], { ox: 5, oy: -10, w: -15, h: -28 }),
+  F([{ ox: 36, oy: -88, w: 48, h: 50 }]),
+  F([{ ox: 34, oy: -85, w: 46, h: 48 }]),
+  F([{ ox: 34, oy: -80, w: 44, h: 45 }]),
+  F([{ ox: 30, oy: -70, w: 40, h: 40 }]),
+  F([{ ox: 26, oy: -58, w: 36, h: 35 }]),
+  F([{ ox: 24, oy: -48, w: 32, h: 30 }]),
+  F([{ ox: 22, oy: -40, w: 28, h: 28 }]),
+];
+
+// 飛燕疾風脚 qcb+K (overhead kick)
+const RYO_HIEN_FRAMES: AttackFrame[] = [
+  F([{ ox: 35, oy: -60, w: 45, h: 35 }]),
+  F([{ ox: 42, oy: -55, w: 52, h: 38 }]),
+  F([{ ox: 45, oy: -52, w: 55, h: 40 }]),
+  F([{ ox: 42, oy: -55, w: 52, h: 38 }]),
+  F([{ ox: 38, oy: -58, w: 48, h: 35 }]),
+];
+
+// 霸王翔吼拳 qcf+K (counter stance)
+const RYO_HAOU_FRAMES: AttackFrame[] = [
+  F([{ ox: 35, oy: -60, w: 42, h: 35 }]),
+  F([{ ox: 42, oy: -58, w: 48, h: 38 }]),
+  F([{ ox: 45, oy: -55, w: 50, h: 40 }]),
+  F([{ ox: 42, oy: -58, w: 48, h: 38 }]),
+  F([{ ox: 38, oy: -60, w: 44, h: 35 }]),
+];
+
+// DM: 天地霸煌拳
+const DM_TEN_HA_OU_FRAMES: AttackFrame[] = [
+  F([{ ox: 30, oy: -68, w: 58, h: 48 }]),
+  F([{ ox: 36, oy: -65, w: 68, h: 52 }]),
+  F([{ ox: 40, oy: -62, w: 75, h: 55 }]),
+  F([{ ox: 40, oy: -62, w: 78, h: 58 }]),
+  F([{ ox: 40, oy: -62, w: 78, h: 58 }]),
+  F([{ ox: 38, oy: -64, w: 72, h: 52 }]),
+  ...Array.from({ length: 18 }, (_, i) =>
+    F([{ ox: 28 - i * 0.3, oy: -68 + i * 0.5, w: 58 - i * 1.5, h: 46 - i }])
+  ),
+];
+
 // ===== DM 超必杀技 =====
 const DM_OROCHINAGI_FRAMES: AttackFrame[] = [
   F([{ ox: 30, oy: -70, w: 60, h: 50 }]),
@@ -601,4 +667,12 @@ export const ATTACK_FRAMES: AttackFrameTable = {
   [AttackType.DM_YATAGARASU]: DM_YATAGARASU_FRAMES,
   [AttackType.DM_POWER_GEYSER]: DM_POWER_GEYSER_FRAMES,
   [AttackType.DM_PHOENIX_KICK]: DM_PHOENIX_KICK_FRAMES,
+  // 坂崎亮
+  [AttackType.RYO_KOOU]: RYO_KOOU_FRAMES,
+  [AttackType.RYO_KOOU_C]: RYO_KOOU_C_FRAMES,
+  [AttackType.RYO_KO_HOU]: RYO_KO_HOU_FRAMES,
+  [AttackType.RYO_KO_HOU_C]: RYO_KO_HOU_C_FRAMES,
+  [AttackType.RYO_HIEN]: RYO_HIEN_FRAMES,
+  [AttackType.RYO_HAOU]: RYO_HAOU_FRAMES,
+  [AttackType.DM_TEN_HA_OU]: DM_TEN_HA_OU_FRAMES,
 };

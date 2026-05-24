@@ -17,6 +17,7 @@ const SPECIAL1: Record<string, AttackType> = {
   iori: AttackType.IORI_YAMIBARAI,
   terry: AttackType.TERRY_POWER_WAVE,
   kim: AttackType.KIM_HANGETSU,
+  ryo: AttackType.RYO_KOOU_C,
 };
 
 const SPECIAL2: Record<string, AttackType> = {
@@ -24,6 +25,7 @@ const SPECIAL2: Record<string, AttackType> = {
   iori: AttackType.IORI_ONIYAKI_C,
   terry: AttackType.TERRY_BURN_KNUCKLE,
   kim: AttackType.KIM_HIENZAN,
+  ryo: AttackType.RYO_KO_HOU_C,
 };
 
 /** Resolve simplified U/I/O input to a character-specific action */

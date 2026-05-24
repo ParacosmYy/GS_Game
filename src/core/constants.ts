@@ -430,6 +430,49 @@ export const FRAME_DATA = {
     damage: 180, hitstun: 0, blockstun: 21, pushback: 8,
     hitLevel: 'MID' as const, knockdown: true, chipDamage: 14,
   },
+  // ── 坂崎亮必杀技 (Ryo Sakazaki) ── SuperCombo KOF2002/Ryo
+  // 虎煌 qcf+A (weak projectile)
+  RYO_KOOU: {
+    startup: 12, active: 18, recovery: 34,
+    damage: 75, hitstun: 28, blockstun: 26, pushback: 4,
+    hitLevel: 'MID' as const, knockdown: false, chipDamage: 8,
+  },
+  // 虎煌 qcf+C (strong projectile, faster)
+  RYO_KOOU_C: {
+    startup: 13, active: 20, recovery: 32,
+    damage: 105, hitstun: 30, blockstun: 28, pushback: 5,
+    hitLevel: 'MID' as const, knockdown: false, chipDamage: 10,
+  },
+  // 虎咆 dp+A (weak upper, single hit)
+  RYO_KO_HOU: {
+    startup: 5, active: 5, recovery: 25,
+    damage: 80, hitstun: 22, blockstun: 18, pushback: 6,
+    hitLevel: 'MID' as const, knockdown: false, chipDamage: 10,
+  },
+  // 虎咆 dp+C (strong upper, multi-hit, invincible)
+  RYO_KO_HOU_C: {
+    startup: 7, active: 10, recovery: 30,
+    damage: 140, hitstun: 28, blockstun: 22, pushback: 10,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 14,
+  },
+  // 飛燕疾風脚 qcb+K (overhead kick)
+  RYO_HIEN: {
+    startup: 10, active: 8, recovery: 22,
+    damage: 95, hitstun: 24, blockstun: 20, pushback: 6,
+    hitLevel: 'HIGH' as const, knockdown: true,
+  },
+  // 霸王翔吼拳 qcf+K (counter stance)
+  RYO_HAOU: {
+    startup: 6, active: 12, recovery: 18,
+    damage: 60, hitstun: 20, blockstun: 16, pushback: 4,
+    hitLevel: 'MID' as const, knockdown: false,
+  },
+  // DM: 天地霸煌拳
+  DM_TEN_HA_OU: {
+    startup: 10, active: 6, recovery: 35,
+    damage: 200, hitstun: 0, blockstun: 22, pushback: 10,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 18,
+  },
 } as const;
 
 // ===== Hitbox Offsets (relative to fighter position, facing right) =====
@@ -514,6 +557,14 @@ export const HITBOX_OFFSETS = {
   DM_PHOENIX_KICK: { offsetX: 40, offsetY: -50, width: 70, height: 55 },
   DM_HIGH_ANGLE_GEYSER: { offsetX: 35, offsetY: -65, width: 70, height: 50 },
   DM_PHOENIX_HITEN: { offsetX: 40, offsetY: -65, width: 65, height: 50 },
+  // 坂崎亮 (Ryo)
+  RYO_KOOU: { offsetX: 55, offsetY: -55, width: 40, height: 30 },
+  RYO_KOOU_C: { offsetX: 55, offsetY: -55, width: 42, height: 32 },
+  RYO_KO_HOU: { offsetX: 30, offsetY: -80, width: 45, height: 55 },
+  RYO_KO_HOU_C: { offsetX: 30, offsetY: -80, width: 48, height: 60 },
+  RYO_HIEN: { offsetX: 42, offsetY: -55, width: 50, height: 38 },
+  RYO_HAOU: { offsetX: 45, offsetY: -60, width: 48, height: 40 },
+  DM_TEN_HA_OU: { offsetX: 35, offsetY: -65, width: 70, height: 55 },
 } as const;
 
 // ===== Throw Constants =====

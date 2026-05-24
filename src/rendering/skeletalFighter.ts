@@ -48,6 +48,11 @@ function drawCharacterHead(
     ctx.strokeStyle = '#1a3388'; ctx.lineWidth = 1;
     ctx.beginPath(); ctx.moveTo(-r + 4, -r + 1); ctx.lineTo(-r + 3, -r - 3); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(r - 4, -r + 1); ctx.lineTo(r - 3, -r - 3); ctx.stroke();
+  } else if (charId === 'ryo') {
+    // Ryo: spiked brown hair (similar to Kyo but shorter), orange gi
+    ctx.fillStyle = '#884422';
+    for (let i = -1; i <= 1; i++) { const sx = i * 5; ctx.beginPath(); ctx.moveTo(sx - 3, -r + 2); ctx.lineTo(sx, -r - 8); ctx.lineTo(sx + 3, -r + 2); ctx.closePath(); ctx.fill(); }
+    ctx.fillStyle = '#663311'; ctx.fillRect(-r + 1, -r + 5, headW - 2, 2);
   }
 }
 

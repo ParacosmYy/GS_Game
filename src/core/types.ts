@@ -100,6 +100,13 @@ export enum AttackType {
   KIM_HAKI = 'KIM_HAKI',               // 覇気脚 ↓↓+K (low)
   KIM_HISHOU = 'KIM_HISHOU',           // 飛翔脚 空中↓↘→+K (air dive)
   KIM_SANREN = 'KIM_SANREN',           // 三連撃 ←↙↓+P chain
+  // 坂崎亮必杀技 (Ryo Specials)
+  RYO_KOOU = 'RYO_KOOU',             // 虎煌 ↓↘→+A (weak projectile)
+  RYO_KOOU_C = 'RYO_KOOU_C',         // 虎煌 ↓↘→+C (strong projectile)
+  RYO_KO_HOU = 'RYO_KO_HOU',         // 虎咆 →↓↘+A (weak upper)
+  RYO_KO_HOU_C = 'RYO_KO_HOU_C',     // 虎咆 →↓↘+C (strong upper, invincible)
+  RYO_HIEN = 'RYO_HIEN',             // 飛燕疾風脚 ←↙↓+K (overhead kick)
+  RYO_HAOU = 'RYO_HAOU',             // 霸王翔吼拳 ↓↘→+K (counter)
   // 超必杀技 (DM)
   DM_OROCHINAGI = 'DM_OROCHINAGI',           // 大蛇薙 (Kyo)
   DM_YATAGARASU = 'DM_YATAGARASU',           // 八稚女 (Iori)
@@ -107,6 +114,7 @@ export enum AttackType {
   DM_HIGH_ANGLE_GEYSER = 'DM_HIGH_ANGLE_GEYSER', // High Angle Geyser (Terry)
   DM_PHOENIX_KICK = 'DM_PHOENIX_KICK',       // 鳳凰脚 (Kim)
   DM_PHOENIX_HITEN = 'DM_PHOENIX_HITEN',     // 鳳凰天舞脚 (Kim)
+  DM_TEN_HA_OU = 'DM_TEN_HA_OU',             // 天地霸煌拳 (Ryo)
 }
 
 // ===== Hit Level (防御判定) =====

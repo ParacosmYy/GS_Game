@@ -282,7 +282,7 @@ export class FighterController {
   /** Check if an attack type is a special move (not DM, not normal) */
   private static isSpecialMove(name: string): boolean {
     return name.startsWith('KYO_') || name.startsWith('IORI_')
-      || name.startsWith('TERRY_') || name.startsWith('KIM_')
+      || name.startsWith('TERRY_') || name.startsWith('KIM_') || name.startsWith('RYO_')
       || name.startsWith('SPECIAL_');
   }
 

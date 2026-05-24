@@ -17,7 +17,7 @@ function classifyAttack(at: AttackType) {
   const s = at as string;
   const isDM = s.startsWith('DM_');
   const isSpecial = at === AttackType.SPECIAL_PROJECTILE || at === AttackType.SPECIAL_UPPER
-    || s.startsWith('KYO_') || s.startsWith('IORI_') || s.startsWith('TERRY_') || s.startsWith('KIM_');
+    || s.startsWith('KYO_') || s.startsWith('IORI_') || s.startsWith('TERRY_') || s.startsWith('KIM_') || s.startsWith('RYO_');
   const isPunch = s.endsWith('_A') || s.endsWith('_C') || s.includes('ARAGAMI') || s.includes('DOKUGAMI')
     || s.includes('ONIYAKI') || s.includes('KOTOTSUKI') || s.includes('KUZUKAZE')
     || s.includes('BURN_KNUCKLE') || s.includes('RISING_TACKLE') || s.includes('POWER_DUNK')
@@ -40,7 +40,7 @@ function calcShake(at: AttackType, ch: boolean, dmg: number): number {
   if (s.startsWith('DM_')) return 14;
   if (s.startsWith('KYO_ONIYAKI') || s.startsWith('IORI_ONIYAKI')
     || s.startsWith('TERRY_POWER_DUNK') || s.startsWith('TERRY_RISING_TACKLE')
-    || s.startsWith('KIM_HIENZAN')) return 8;
+    || s.startsWith('KIM_HIENZAN') || s.startsWith('RYO_KO_HOU')) return 8;
   if (at === AttackType.SPECIAL_UPPER) return 8;
   if (at === AttackType.THROW || s.includes('KOTOTSUKI') || s.includes('KUZUKAZE')) return 6;
   if (ch) return 7;
@@ -103,7 +103,8 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       || attackType === AttackType.KYO_BATSUYOMI
       || attackType === AttackType.IORI_AOIHANA_3
       || attackType === AttackType.TERRY_POWER_DUNK
-      || attackType === AttackType.KIM_HIENZAN;
+      || attackType === AttackType.KIM_HIENZAN
+      || attackType === AttackType.RYO_HIEN;
     if (isRekkaFinisher) {
       deps.vfx.spawnCharacterHitSparks(hitX, hitY, 16, atkChar.specialGlow);
       deps.screenShake.trigger(8, 10);

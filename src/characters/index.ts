@@ -9,6 +9,7 @@ import { KyoDef } from './kyo.js';
 import { IoriDef } from './iori.js';
 import { TerryDef } from './terry.js';
 import { KimDef } from './kim.js';
+import { RyoDef } from './ryo.js';
 
 export type { CharacterDefinition } from './types.js';
 
@@ -18,4 +19,5 @@ export const ROSTER: CharacterDefinition[] = [
   IoriDef,
   TerryDef,
   KimDef,
+  RyoDef,
 ];
