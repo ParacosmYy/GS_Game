@@ -5,7 +5,7 @@ import { Fighter } from '../entities/fighter.js';
 import { Camera } from '../core/camera.js';
 import type { PowerGauge, MaxModeState } from '../core/types.js';
 import {
-  CANVAS_WIDTH, MAX_HEALTH, MAX_STOCKS, ROUND_TIME,
+  CANVAS_WIDTH, CANVAS_HEIGHT, MAX_HEALTH, MAX_STOCKS, ROUND_TIME,
   HUD_BAR_WIDTH, HUD_BAR_HEIGHT, HUD_BAR_Y, HUD_MARGIN,
   HUD_TIMER_SIZE, HUD_GAUGE_Y, HUD_GAUGE_WIDTH, HUD_GAUGE_HEIGHT,
   HUD_GAUGE_SEGMENT_GAP, HUD_WIN_MARKER_SIZE,
@@ -92,8 +92,10 @@ export function drawHUD(ctx: CanvasRenderingContext2D, fighters: Fighter[], tick
   const timerX = CANVAS_WIDTH / 2;
   const timerY = HUD_BAR_Y + 8;
 
-  // Timer background — rounded with gold border
-  ctx.fillStyle = 'rgba(10, 10, 20, 0.9)';
+  // Timer background — rounded with gold border, red pulse when low
+  const urgentPulse = timeSeconds <= 10 ? (Math.sin(tick * 0.2) * 0.3 + 0.4) : 0;
+  const bgR = Math.round(10 + urgentPulse * 180);
+  ctx.fillStyle = `rgba(${bgR}, 10, 20, 0.9)`;
   roundRect(ctx, timerX - 30, timerY - 17, 60, 32, 8);
   ctx.fill();
   ctx.strokeStyle = '#c8a832';
@@ -159,6 +161,16 @@ export function drawHUD(ctx: CanvasRenderingContext2D, fighters: Fighter[], tick
 
   ctx.textBaseline = 'alphabetic';
   ctx.textAlign = 'left';
+
+  // KOF2002: 计时器<5秒屏幕边缘红色脉冲警告
+  if (timeSeconds <= 5) {
+    const vPulse = Math.sin(tick * 0.25) * 0.15 + 0.15;
+    const vGrad = ctx.createRadialGradient(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, CANVAS_WIDTH * 0.35, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, CANVAS_WIDTH * 0.7);
+    vGrad.addColorStop(0, 'rgba(255, 0, 0, 0)');
+    vGrad.addColorStop(1, `rgba(255, 0, 0, ${vPulse})`);
+    ctx.fillStyle = vGrad;
+    ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+  }
 }
 
 function drawDiamond(ctx: CanvasRenderingContext2D, x: number, y: number, size: number, color: string): void {
@@ -187,12 +199,14 @@ function drawDiamond(ctx: CanvasRenderingContext2D, x: number, y: number, size: 
 // ===== Health Bar =====
 
 function drawHealthBar(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, ratio: number, delayedRatio: number, leftAligned: boolean, frameCount: number): void {
-  // Outer frame — darker with gold border
+  // Outer frame — darker with gold border, red pulse when low HP
   ctx.fillStyle = '#05050a';
   roundRect(ctx, x - 3, y - 3, w + 6, h + 6, 5);
   ctx.fill();
-  ctx.strokeStyle = 'rgba(200, 168, 50, 0.4)';
-  ctx.lineWidth = 1;
+  const borderPulse = ratio <= 0.25 ? (Math.sin(frameCount * 0.2) * 0.3 + 0.5) : 0.4;
+  const borderCol = ratio <= 0.25 ? `rgba(255, 60, 0, ${borderPulse})` : 'rgba(200, 168, 50, 0.4)';
+  ctx.strokeStyle = borderCol;
+  ctx.lineWidth = ratio <= 0.25 ? 2 : 1;
   roundRect(ctx, x - 3, y - 3, w + 6, h + 6, 5);
   ctx.stroke();
 

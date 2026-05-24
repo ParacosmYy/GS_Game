@@ -122,6 +122,16 @@ export class Renderer {
         ctx.stroke();
       }
 
+      // Ground shadow — ellipse under fighter
+      const shadowAlpha = f.isGrounded() ? 0.25 : 0.1;
+      ctx.save();
+      ctx.globalAlpha = shadowAlpha;
+      ctx.fillStyle = '#000000';
+      ctx.beginPath();
+      ctx.ellipse(sx, STAGE_GROUND_Y + 2, hw + 4, 4, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+
       // Lean offset for RUN/BACKDASH
       let leanOffsetX = 0;
       let leanAngle = 0;
@@ -421,8 +431,8 @@ export class Renderer {
     drawCharacterSelect(this.ctx, p1Cursor, p2Cursor, p1Ready, p2Ready, tick, p2IsAI, simplifiedMode);
   }
 
-  drawMatchEnd(winner: number | null, p1Wins: number, p2Wins: number, winQuote?: string, winnerColor?: string): void {
-    drawMatchEnd(this.ctx, winner, p1Wins, p2Wins, winQuote, winnerColor);
+  drawMatchEnd(winner: number | null, p1Wins: number, p2Wins: number, winQuote?: string, winnerColor?: string, tick?: number): void {
+    drawMatchEnd(this.ctx, winner, p1Wins, p2Wins, winQuote, winnerColor, tick);
   }
 
   drawModeIndicator(simplifiedMode: boolean, alpha: number): void {

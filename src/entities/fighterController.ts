@@ -191,6 +191,7 @@ export class FighterController {
         } else {
           f.state = FighterState.IDLE;
           if (wasAirAttack) f.landingRecovery = AIR_ATTACK_LANDING_RECOVERY;
+          else if (wasAirBlock) f.landingRecovery = JUMP_LANDING_RECOVERY + 3;
           else if (wasHop) f.landingRecovery = HOP_LANDING_RECOVERY;
           else f.landingRecovery = JUMP_LANDING_RECOVERY;
         }

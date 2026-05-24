@@ -27,6 +27,7 @@ import {
   spawnReversalText,
   spawnRecoverySpark,
   spawnDust,
+  spawnHeavyDust,
   spawnCounterWireSparks,
   spawnMAXAura,
   spawnMAXActivationFlash,
@@ -177,6 +178,10 @@ export class VFXSystem {
 
   spawnDust(worldX: number, worldY: number): void {
     spawnDust(this.particles, worldX, worldY);
+  }
+
+  spawnHeavyDust(worldX: number, worldY: number, count?: number): void {
+    spawnHeavyDust(this.particles, worldX, worldY, count);
   }
 
   spawnCounterWireSparks(worldX: number, worldY: number): void {

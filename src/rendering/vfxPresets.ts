@@ -364,6 +364,20 @@ export function spawnDust(particles: Particle[], worldX: number, worldY: number)
   }
 }
 
+export function spawnHeavyDust(particles: Particle[], worldX: number, worldY: number, count: number = 12): void {
+  for (let i = 0; i < count; i++) {
+    const dir = (i - count / 2) * 1.5;
+    particles.push({
+      x: worldX + dir * 2, y: worldY - 2,
+      vx: dir * 1.2, vy: -Math.random() * 2.5 - 1,
+      life: 20 + Math.floor(Math.random() * 10),
+      maxLife: 30,
+      size: 5 + Math.random() * 6,
+      color: '#998877', type: 'spark', gravity: 0.08, friction: 0.93,
+    });
+  }
+}
+
 export function spawnCounterWireSparks(particles: Particle[], worldX: number, worldY: number): void {
   for (let i = 0; i < 16; i++) {
     const angle = Math.random() * Math.PI * 2;

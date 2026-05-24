@@ -1,8 +1,4 @@
-/**
- * SimpleAI — 升级版格斗AI
- * 策略: 远距离跳入/发波, 中距离poke, 近距离连段/投技, 智能防御+GC, 角色专属对空/起身
- * AI直接生成 ResolvedInput, 必杀技通过 CharacterDefinition 路由直接触发
- */
+/** SimpleAI — 升级版格斗AI: 远跳入/中poke/近连段/投/智能防御/GC/对空/起身 */
 import type { Fighter } from '../entities/fighter.js';
 import type { CharacterDefinition } from '../characters/types.js';
 import type { ResolvedInput, PrevAttack } from '../input/inputResolver.js';
@@ -85,6 +81,18 @@ export class SimpleAI {
       return base;
     }
 
+    // ── Wakeup reversal: 快起身时如果对手贴身, 用必杀技/DM反击
+    if (f.state === FighterState.KNOCKDOWN && f.knockdownTimer <= 5 && dist < 100
+        && Math.random() < this.difficulty * 0.6) {
+      const base = this.emptyInput();
+      if (this.gauge && this.gauge.stocks >= 1) {
+        base.forward = true; base.down = true;
+        base.buttonC = true; base.buttonCPressed = true;
+        this.action = 'special'; this.thinkCooldown = 8;
+        return base;
+      }
+    }
+
     // ── MAX activation during combo (BC cancel) ──
     if (this.inCombo && f.hasHit && canAct && this.gauge && this.gauge.stocks >= 2
       && !f.currentAttack?.toString().startsWith('DM_')
@@ -158,8 +166,6 @@ export class SimpleAI {
     this.okiTimer = 0;
     this.prev = createPrevAttack();
   }
-
-  // ─── Decision making ───
 
   private decide(dist: number, oppAttacking: boolean, oppAirborne: boolean, isClose: boolean): AIAction {
     const lowHp = this.fighter.health < this.fighter.maxHealth * 0.25;
@@ -246,7 +252,6 @@ export class SimpleAI {
     return 'approach';
   }
 
-  // ─── Input generation ───
   private emptyInput(): ResolvedInput {
     return {
       up: false, down: false, forward: false, back: false,

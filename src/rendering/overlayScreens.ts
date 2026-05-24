@@ -121,6 +121,7 @@ export function drawMatchEnd(
   p2Wins: number,
   winQuote?: string,
   winnerColor?: string,
+  tick?: number,
 ): void {
   ctx.save();
 
@@ -145,7 +146,10 @@ export function drawMatchEnd(
   if (winQuote && winnerColor) {
     ctx.shadowColor = winnerColor;
     ctx.shadowBlur = 8;
-    drawSNKText(ctx, `"${winQuote}"`, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 25, 16, winnerColor);
+    // KOF2002: 打字机效果 — 每3tick显示一个字符
+    const chars = Math.min(winQuote.length, Math.floor((tick || 0) / 3));
+    const visible = winQuote.substring(0, chars);
+    drawSNKText(ctx, `"${visible}"`, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 25, 16, winnerColor);
     ctx.shadowBlur = 0;
   }
 

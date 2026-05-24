@@ -52,7 +52,6 @@ const spriteRenderer = new SpriteRenderer(spriteManager);
 for (const char of ROSTER) {
   const sheet = generatePlaceholderSpritesheet(char.color, char.id);
   spriteManager.register(char.id, '', sheet.animations);
-  // 直接设置已生成的Image (占位精灵不需要从URL加载)
   const asset = spriteManager.get(char.id);
   if (asset) { asset.image = sheet.image; asset.loaded = true; }
 }
@@ -98,6 +97,7 @@ combatSystem.onThrowEscape = (_attacker, defender, hitX, hitY) => {
 combatSystem.onGuardCrush = (fighter, hitX, hitY) => {
   vfx.spawnGuardCrushSparks(hitX, hitY);
   vfx.spawnGuardCrushText(hitX, hitY - 60);
+  vfx.spawnHeavyDust(fighter.x, fighter.y, 14);
   screenFlash.trigger('#ff4444', 0.3, 12);
   screenShake.trigger(12, 15);
 };
@@ -382,8 +382,8 @@ function update(): void {
       }
       combatSystem.resetCombo(i);
     }
-
-    // Quick Stand检测: 从KNOCKDOWN恢复且无起身无敌(quick stand不给予无敌)
+    // 防御恢复尘埃
+    if (f.prevState === FighterState.BLOCK && f.state === FighterState.IDLE) vfx.spawnDust(f.x, STAGE_GROUND_Y);
     if (f.prevState === FighterState.KNOCKDOWN && f.state === FighterState.IDLE && f.throwInvincibilityTimer === 0) {
       vfx.spawnDust(f.x, STAGE_GROUND_Y);
       vfx.spawnQuickStandText(f.x, f.y - f.displayHeight - 40);
@@ -393,7 +393,7 @@ function update(): void {
       combatSystem.resetCombo(oppIdx);
     }
 
-    // Roll音效: 进入ROLL状态
+    // Roll音效
     if (f.prevState !== FighterState.ROLL && f.state === FighterState.ROLL) {
       playRoll();
       // Guard Cancel Roll: 从BLOCK进入ROLL时播放Cancel音效+VFX
@@ -553,7 +553,7 @@ function render(): void {
 
   if (phase === GamePhase.MATCH_END) {
     if (winner !== null) { const w = winner === 0 ? p1 : p2; drawVictoryPose(ctx, w.x - camera.x, w.y, w.facing, w.color, '#ffffff30', tickRef.value, w.charId); }
-    renderer.drawMatchEnd(winner, rounds.p1Wins, rounds.p2Wins, currentWinQuote || undefined, winner !== null ? (winner === 0 ? '#ff6644' : '#4488ff') : undefined);
+    renderer.drawMatchEnd(winner, rounds.p1Wins, rounds.p2Wins, currentWinQuote || undefined, winner !== null ? (winner === 0 ? '#ff6644' : '#4488ff') : undefined, phaseTimer);
   }
   if (rounds.fadeAlpha > 0) { ctx.fillStyle = `rgba(0,0,0,${rounds.fadeAlpha})`; ctx.fillRect(0, 0, canvas.width, canvas.height); }
   screenFlash.render(ctx, canvas.width, canvas.height);

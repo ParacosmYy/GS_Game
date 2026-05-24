@@ -93,6 +93,11 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       deps.screenShake.trigger(blkSpecial ? 5 : blkHeavy ? 4 : 2, 6);
       gainMeterOnBlock(deps.gauges[atkIdx], attackType);
       gainMeterOnHitstun(deps.gauges[defIdx], attackType);
+      // Chip伤害数字: 必杀技/DM防御时显示灰色小数字
+      if (blkSpecial || blkDM) {
+        const chip = Math.round(data.damage * 0.07);
+        deps.vfx.spawnDamageText(defender.x, defender.y - defender.displayHeight - 15, chip);
+      }
       playBlock();
       return;
     }
@@ -225,6 +230,7 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
 /** KO落地特效触发 — 从main.ts调用 */
 export function triggerKOGroundEffect(deps: { vfx: VFXSystem; screenFlash: ScreenFlash; screenShake: ScreenShake }, defender: Fighter): void {
   deps.vfx.spawnGroundSlam(defender.x, defender.y);
+  deps.vfx.spawnHeavyDust(defender.x, defender.y, 16);
   deps.screenFlash.trigger('#ff2200', 0.3, 12);
   deps.screenShake.trigger(16, 15);
 }
