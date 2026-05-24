@@ -254,19 +254,7 @@ function update(): void {
 
   // ── CHARACTER SELECT PHASE ──
   if (phase === GamePhase.SELECT) {
-  tickRef.value++;
-
-  // ── KO Slow Motion: run update only every 3rd frame ──
-  if (koSlowMo > 0) {
-    koSlowMoFrameCounter++;
-    if (koSlowMoFrameCounter < 3) return;
-    koSlowMoFrameCounter = 0;
-    koSlowMo--;
-    if (koSlowMo <= 0) {
-      // Slow-mo ended — proceed to KO phase normally
-      koSlowMoTriggered = true;
-    }
-  }
+    tickRef.value++;
     const rawP1 = inputManager.getP1Input();
     const rawP2 = inputManager.getP2Input();
 
@@ -397,6 +385,17 @@ function update(): void {
   }
 
   tickRef.value++;
+
+  // ── KO Slow Motion: run update only every 3rd frame during slow-mo ──
+  if (koSlowMo > 0) {
+    koSlowMoFrameCounter++;
+    if (koSlowMoFrameCounter < 3) return;
+    koSlowMoFrameCounter = 0;
+    koSlowMo--;
+    if (koSlowMo <= 0) {
+      koSlowMoTriggered = true;
+    }
+  }
 
   const rawP1 = inputManager.getP1Input();
   const rawP2 = inputManager.getP2Input();
