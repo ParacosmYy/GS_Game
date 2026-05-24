@@ -394,8 +394,11 @@ export class CombatSystem {
 
     if (counterHit) {
       damage = Math.round(damage * CH_DAMAGE_BONUS);
-      // KOF2002: ground CH = damage only, no extra hitstun
-      // KOF2002: air CH = puts into jugglable state (handled below)
+      // KOF2002: ground heavy/special CH = extra hitstun (+3-5F) for combo punishment
+      if (defender.isGrounded() && !LIGHT_NORMALS.has(attackType as string)) {
+        const isSpecial = !NORMAL_ATTACKS.has(attackType as string) && !COMMAND_NORMALS.has(attackType as string);
+        hitstunFrames += isSpecial ? 5 : 3;
+      }
     }
 
     // MAX mode damage penalty: attacker in MAX mode deals -33% damage (KOF2002)

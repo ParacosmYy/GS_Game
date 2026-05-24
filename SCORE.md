@@ -2045,3 +2045,13 @@
 **650pt COMMIT MILESTONE**
 
 **tag: v0.09-kof2002 (603pt) | commit: 待定 | 下一目标: 800分(+200 TAG)**
+
+### Iter-V114 — 2026-05-25（Ground CH hitstun加成 — 重攻击/必杀技Counter Hit额外硬直 +5=658）
+
+**改动:** 地面Counter Hit新增hitstun加成: 重攻击(C/D/command normal)CH额外+3帧, 必杀技CH额外+5帧, 轻攻击CH无额外硬直。对标正版KOF2002的CH惩罚机制, 使CH连段惩罚更有意义
+
+| 战斗手感 | 14/150 | +1 | 重攻击/必杀技CH现在有额外硬直, CH→连段惩罚更接近正版 |
+
+---
+
+**tag: v0.09-kof2002 (603pt) | commit: 待定 | 下一目标: 800分(+200 TAG)**
