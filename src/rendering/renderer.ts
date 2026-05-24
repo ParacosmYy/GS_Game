@@ -1,12 +1,11 @@
 import { Fighter } from '../entities/fighter.js';
-import { FighterState, GameState } from '../core/types.js';
+import { FighterState } from '../core/types.js';
 import {
   CANVAS_WIDTH,
   CANVAS_HEIGHT,
   STAGE_WIDTH,
   STAGE_GROUND_Y,
   FIGHTER_WIDTH,
-  FIGHTER_HEIGHT,
   MAX_HEALTH,
 } from '../core/constants.js';
 
@@ -62,25 +61,6 @@ export class Renderer {
 
   getFps(): number {
     return this.currentFps;
-  }
-
-  getGameState(fighters: Fighter[], tick: number): GameState {
-    return {
-      players: fighters.map((f) => ({
-        x: f.x,
-        y: f.y,
-        health: f.health,
-        state: f.state,
-        facing: f.facing,
-        currentAttack: f.currentAttack,
-        attackPhase: f.attackPhase,
-        attackFrame: f.attackFrame,
-      })),
-      tick,
-      fps: this.currentFps,
-      ko: false,
-      winner: null,
-    };
   }
 
   private updateCamera(fighters: Fighter[]): void {
