@@ -210,6 +210,29 @@ export class VFXSystem {
     }
   }
 
+  /** Spawn projectile impact explosion — character-colored burst */
+  spawnProjectileExplosion(worldX: number, worldY: number, charColor: string, charGlow: string): void {
+    this.particles.push({
+      x: worldX, y: worldY, vx: 0, vy: 0,
+      life: 12, maxLife: 12, size: 50,
+      color: charGlow, type: 'flash',
+    });
+    for (let i = 0; i < 14; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const speed = 3 + Math.random() * 6;
+      this.particles.push({
+        x: worldX, y: worldY,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed - 2,
+        life: 12 + Math.floor(Math.random() * 8),
+        maxLife: 20,
+        size: 3 + Math.random() * 4,
+        color: i % 3 === 0 ? '#ffffff' : charColor,
+        type: 'spark', gravity: 0.2, friction: 0.94,
+      });
+    }
+  }
+
   update(): void {
     for (let i = this.particles.length - 1; i >= 0; i--) {
       const p = this.particles[i];

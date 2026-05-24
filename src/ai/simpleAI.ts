@@ -555,31 +555,16 @@ export class SimpleAI {
     const input = this.getInput();
     const tick = 0; // tick doesn't matter for AI direct trigger
 
-    // Check DM first (low probability)
+    // Check DM first (low probability) — use character-specific DM map
     if (Math.random() < 0.05) {
-      const specials = [
-        AttackType.DM_OROCHINAGI,
-        AttackType.DM_YATAGARASU,
-        AttackType.DM_POWER_GEYSER,
-        AttackType.DM_PHOENIX_KICK,
-      ];
-      // Try each DM
-      for (const dm of specials) {
-        // Check if this DM belongs to current character
-        const testInput = { ...input, punchPressed: true };
-        const result = this.character.routeSpecial(testInput, {
-          checkSpecial: () => null,
-          checkDM: () => dm,
-          checkKickSpecial: () => null,
-          hasQCF: () => false,
-          hasQCB: () => false,
-          checkRekkaFollowQCF: () => null,
-          checkRekkaFollowHCB: () => null,
-          checkDokugamiFollow: () => null,
-          checkBatsuyomiInput: () => false,
-        } as any, tick);
-        if (result) return result;
-      }
+      const dmMap: Record<string, AttackType> = {
+        kyo: AttackType.DM_OROCHINAGI,
+        iori: AttackType.DM_YATAGARASU,
+        terry: AttackType.DM_POWER_GEYSER,
+        kim: AttackType.DM_PHOENIX_KICK,
+      };
+      const dm = dmMap[this.fighter.charId];
+      if (dm) return dm;
     }
 
     // Character-specific special routing based on combo context
@@ -602,7 +587,7 @@ export class SimpleAI {
         // 50% chance of fireball, 50% upper
         return Math.random() < 0.5 ? AttackType.SPECIAL_PROJECTILE : AttackType.SPECIAL_UPPER;
       },
-      checkDM: () => null,
+      checkDMMotion: () => null,
       checkKickSpecial: () => {
         const kickSpecials = [
           AttackType.KYO_75KAI,
@@ -652,7 +637,7 @@ export class SimpleAI {
         // Nine wounds followup (qcf+P after aragami)
         return this.character.routeSpecial(input, {
           checkSpecial: () => null,
-          checkDM: () => null,
+          checkDMMotion: () => null,
           checkKickSpecial: () => null,
           hasQCF: () => true,
           hasQCB: () => false,
@@ -665,7 +650,7 @@ export class SimpleAI {
         // Eight saké followup (hcb+P after aragami)
         return this.character.routeSpecial(input, {
           checkSpecial: () => null,
-          checkDM: () => null,
+          checkDMMotion: () => null,
           checkKickSpecial: () => null,
           hasQCF: () => false,
           hasQCB: () => true,

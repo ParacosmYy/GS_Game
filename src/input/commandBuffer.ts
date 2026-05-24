@@ -1,5 +1,8 @@
-import { AttackType, DirectionInput } from '../core/types.js';
+import { DirectionInput, AttackType } from '../core/types.js';
 import { COMMAND_WINDOW, HCF_WINDOW, DOUBLE_QCF_WINDOW } from '../core/constants.js';
+
+/** DM motion types detected from command buffer — characters map these to their own DM */
+export type DMMotion = 'QCFx2_P' | 'QCFx2_K' | 'QCBx2_K' | null;
 
 interface DirectionRecord {
   direction: DirectionInput;
@@ -35,19 +38,13 @@ export class CommandBuffer {
 
     // Check Dragon Punch: forward → down → downforward + attack
     // Shortcut: forward → down + attack
+    // Dragon Punch: forward → down → downforward + attack
     if (this.matchSequence(recent, ['forward', 'down', 'downforward'])) {
       return AttackType.SPECIAL_UPPER;
     }
-    if (this.matchSequence(recent, ['forward', 'down'])) {
-      return AttackType.SPECIAL_UPPER;
-    }
 
-    // Check Quarter-Circle Forward: down → downforward → forward + attack
-    // Shortcut: down → forward + attack
+    // Quarter-Circle Forward: down → downforward → forward + attack
     if (this.matchSequence(recent, ['down', 'downforward', 'forward'])) {
-      return AttackType.SPECIAL_PROJECTILE;
-    }
-    if (this.matchSequence(recent, ['down', 'forward'])) {
       return AttackType.SPECIAL_PROJECTILE;
     }
 
@@ -55,30 +52,28 @@ export class CommandBuffer {
   }
 
   /**
-   * Check for DM (Desperation Move) inputs.
-   * Uses a wider window for complex motions.
+   * Detect DM input motions. Returns motion type, not specific DM.
+   * Characters map the motion to their own DM in routeSpecial().
    */
-  checkDM(currentFrame: number, attackPressed: boolean): AttackType | null {
-    if (!attackPressed) return null;
+  checkDMMotion(currentFrame: number, punchPressed: boolean, kickPressed: boolean): DMMotion {
+    if (!punchPressed && !kickPressed) return null;
 
-    // 大蛇薙: ↓↙←↙↓↘→ (HCF-like: back→down→downforward→forward)
-    // Simplified as: back → down → forward (half-circle forward shortcut)
     const wideRecent = this.history.filter(
-      (r) => currentFrame - r.frame <= HCF_WINDOW,
-    );
-    if (this.matchSequence(wideRecent, ['back', 'down', 'downforward', 'forward'])
-      || this.matchSequence(wideRecent, ['back', 'down', 'forward'])) {
-      return AttackType.DM_OROCHINAGI;
-    }
-
-    // Also accept: down→back→down→forward (qcb→qcf pattern)
-    const dmRecent = this.history.filter(
       (r) => currentFrame - r.frame <= DOUBLE_QCF_WINDOW,
     );
-    if (this.matchSequence(dmRecent, ['down', 'downback', 'back', 'down', 'downforward', 'forward'])
-      || this.matchSequence(dmRecent, ['down', 'back', 'down', 'forward'])) {
-      return AttackType.DM_OROCHINAGI;
-    }
+
+    // QCF×2 (↓↘→↓↘→): down→forward pattern repeated
+    const hasDoubleQCF = this.matchSequence(wideRecent, ['down', 'downforward', 'forward', 'down', 'downforward', 'forward'])
+      || this.matchSequence(wideRecent, ['down', 'forward', 'down', 'forward']);
+
+    if (hasDoubleQCF && punchPressed) return 'QCFx2_P';
+    if (hasDoubleQCF && kickPressed) return 'QCFx2_K';
+
+    // QCB×2 (↓↙←↓↙←): down→back pattern repeated
+    const hasDoubleQCB = this.matchSequence(wideRecent, ['down', 'downback', 'back', 'down', 'downback', 'back'])
+      || this.matchSequence(wideRecent, ['down', 'back', 'down', 'back']);
+
+    if (hasDoubleQCB && kickPressed) return 'QCBx2_K';
 
     return null;
   }
@@ -92,14 +87,12 @@ export class CommandBuffer {
     );
 
     // QCB ↓↙←+K → R.E.D. Kick
-    if (this.matchSequence(recent, ['down', 'downback', 'back'])
-      || this.matchSequence(recent, ['down', 'back'])) {
+    if (this.matchSequence(recent, ['down', 'downback', 'back'])) {
       return AttackType.KYO_RED_KICK;
     }
 
     // QCF ↓↘→+K → 75式改
-    if (this.matchSequence(recent, ['down', 'downforward', 'forward'])
-      || this.matchSequence(recent, ['down', 'forward'])) {
+    if (this.matchSequence(recent, ['down', 'downforward', 'forward'])) {
       return AttackType.KYO_75KAI;
     }
 

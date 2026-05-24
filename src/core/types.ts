@@ -16,6 +16,7 @@ export enum FighterState {
   AIR_ATTACK = 'AIR_ATTACK',
   THROW = 'THROW',
   BLOCK = 'BLOCK',
+  AIR_BLOCK = 'AIR_BLOCK',
   GUARD_CRUSH = 'GUARD_CRUSH',
   HITSTUN = 'HITSTUN',
   KNOCKDOWN = 'KNOCKDOWN',
@@ -53,6 +54,8 @@ export enum AttackType {
   JUMP_CD = 'JUMP_CD',
   // 投技 & 通用必杀技
   THROW = 'THROW',
+  THROW_FORWARD = 'THROW_FORWARD',
+  THROW_BACK = 'THROW_BACK',
   SPECIAL_PROJECTILE = 'SPECIAL_PROJECTILE',
   SPECIAL_UPPER = 'SPECIAL_UPPER',
   // 京专属必杀技 (Kyo Specials)
@@ -63,6 +66,9 @@ export enum AttackType {
   KYO_ARAGAMI = 'KYO_ARAGAMI',             // 114式·荒咬み ↓↘→+A
   KYO_ARAGAMI_KONOKIZU = 'KYO_ARAGAMI_KONOKIZU',   // 128式·九傷 (qcf+P followup)
   KYO_ARAGAMI_YANOSABI = 'KYO_ARAGAMI_YANOSABI',   // 127式·八錆 (hcb+P followup)
+  KYO_NANASE = 'KYO_NANASE',                       // 七瀬 — QCF+K from 九傢, kick KD
+  KYO_KOTO_TSUKI = 'KYO_KOTO_TSUKI',               // 琴月陰 — rush elbow KD
+  KYO_YAKISOGI = 'KYO_YAKISOGI',                   // 破砕 — P from 八锊, uppercut finisher
   // 毒咬み连段系 (Dokugami Chain)
   KYO_DOKUGAMI = 'KYO_DOKUGAMI',         // 115式·毒咬み ↓↘→+C
   KYO_TSUMIYOMI = 'KYO_TSUMIYOMI',       // 401式·罪詠み (hcb+P followup)
@@ -149,6 +155,29 @@ export const CLOSE_RANGE = 80;
 
 // ===== Attack Phase =====
 export type AttackPhase = 'startup' | 'active' | 'recovery' | 'none';
+
+// ===== Per-Frame Hitbox System (逐帧判定框) =====
+export interface FrameBox {
+  /** X offset from fighter position (positive = forward) */
+  ox: number;
+  /** Y offset from fighter Y (negative = upward) */
+  oy: number;
+  /** Box width */
+  w: number;
+  /** Box height */
+  h: number;
+}
+
+/** Single frame of hitbox data during active phase */
+export interface AttackFrame {
+  /** Attack boxes for this frame (can have multiple) */
+  attack: FrameBox[];
+  /** Body box override relative to default (null = use default hurtbox) */
+  bodyOverride: FrameBox | null;
+}
+
+/** Map of attack type to per-active-frame hitbox data */
+export type AttackFrameTable = Partial<Record<AttackType, AttackFrame[]>>;
 
 // ===== Game Phase =====
 export enum GamePhase {

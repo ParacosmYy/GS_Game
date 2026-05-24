@@ -9,6 +9,48 @@ import { bone, pose } from '../characters/types.js';
 import type { Pose, BonePose } from '../characters/types.js';
 import { shiftColor, roundRect } from './utils.js';
 
+/** Draw base head + character-specific hair/accessory decorations */
+function drawCharacterHead(
+  ctx: CanvasRenderingContext2D, charId: string, facing: number, headColor: string, headW: number,
+): void {
+  const r = headW / 2;
+  const hg = ctx.createLinearGradient(-r, -r, r, r);
+  hg.addColorStop(0, shiftColor(headColor, 20)); hg.addColorStop(1, headColor);
+  ctx.fillStyle = hg; ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI * 2); ctx.fill();
+  ctx.strokeStyle = '#00000060'; ctx.lineWidth = 1.5; ctx.stroke();
+  // Eyes
+  const es = 3 * facing;
+  ctx.fillStyle = '#fff';
+  ctx.beginPath(); ctx.arc(es, -1, 4, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.arc(es - 7 * facing, -1, 4, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = '#111';
+  ctx.beginPath(); ctx.arc(es + 1.2 * facing, -1, 2.2, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.arc(es - 7 * facing + 1.2 * facing, -1, 2.2, 0, Math.PI * 2); ctx.fill();
+  // Character decorations
+  if (charId === 'kyo') {
+    ctx.fillStyle = '#d44000';
+    for (let i = -1; i <= 1; i++) { const sx = i * 5; ctx.beginPath(); ctx.moveTo(sx - 3, -r + 2); ctx.lineTo(sx, -r - 12); ctx.lineTo(sx + 3, -r + 2); ctx.closePath(); ctx.fill(); }
+    ctx.fillStyle = '#cc2200'; ctx.fillRect(-r + 1, -r + 5, headW - 2, 3);
+  } else if (charId === 'iori') {
+    const fx = r * facing * 0.6; ctx.fillStyle = '#8833aa'; ctx.beginPath();
+    ctx.moveTo(-3 * facing, -r); ctx.quadraticCurveTo(fx + 2 * facing, -r + 2, fx + 6 * facing, r + 6);
+    ctx.lineTo(fx + 2 * facing, r + 3); ctx.quadraticCurveTo(fx - 2 * facing, -r + 5, -1 * facing, -r); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = 'rgba(100,30,150,0.15)'; ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI * 2); ctx.fill();
+  } else if (charId === 'terry') {
+    const cw = headW + 8, ch = 10; ctx.fillStyle = '#cc2222'; ctx.beginPath();
+    ctx.moveTo(-cw / 2, -r + 1); ctx.lineTo(-cw / 2 + 2, -r - ch); ctx.lineTo(cw / 2 - 2, -r - ch); ctx.lineTo(cw / 2, -r + 1); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = '#aa1111'; ctx.fillRect(-cw / 2, -r - 2, cw, 3);
+    ctx.fillStyle = '#cc2222'; ctx.fillRect(-2 * facing, -r, cw / 2 + 2, 3);
+    ctx.fillStyle = '#e8c840'; ctx.fillRect(-r + 1, -r + 4, 4, 4);
+  } else if (charId === 'kim') {
+    ctx.fillStyle = '#2244aa'; ctx.beginPath();
+    ctx.moveTo(-r + 3, -r); ctx.lineTo(-r + 2, -r - 4); ctx.quadraticCurveTo(0, -r - 6, r - 2, -r - 4); ctx.lineTo(r - 3, -r); ctx.closePath(); ctx.fill();
+    ctx.strokeStyle = '#1a3388'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(-r + 4, -r + 1); ctx.lineTo(-r + 3, -r - 3); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(r - 4, -r + 1); ctx.lineTo(r - 3, -r - 3); ctx.stroke();
+  }
+}
+
 /** Draw skeletal body using 6-bone pose system */
 export function drawSkeletalFighter(
   ctx: CanvasRenderingContext2D,
@@ -23,11 +65,25 @@ export function drawSkeletalFighter(
   const charDef = ROSTER.find(c => c.id === f.charId);
   const poseSet = charDef?.poses;
 
-  // Get pose for current state, fallback to IDLE default
-  let currentPose = poseSet?.[f.state] ?? poseSet?.[FighterState.IDLE] ?? pose({
+  // Resolve pose — 支持单 Pose 或 Pose[] 动画序列
+  const rawPose = poseSet?.[f.state] ?? poseSet?.[FighterState.IDLE] ?? pose({
     armFront: bone(10, 20, 0.3),
     armBack: bone(-8, 15, -0.5),
   });
+
+  let currentPose: Pose;
+  if (Array.isArray(rawPose)) {
+    // 多帧动画：攻击状态按 attackFrame 选择，非攻击按 tick 循环
+    const frames = rawPose as Pose[];
+    if (f.attackPhase === 'active' || f.attackPhase === 'startup' || f.attackPhase === 'recovery') {
+      const idx = Math.min(f.attackFrame, frames.length - 1);
+      currentPose = frames[Math.max(0, idx)];
+    } else {
+      currentPose = frames[globalTick % frames.length];
+    }
+  } else {
+    currentPose = rawPose as Pose;
+  }
 
   // Clone pose so we can mutate for animations
   const p = {
@@ -59,10 +115,10 @@ export function drawSkeletalFighter(
   const heightFactor = (isCrouching || isRolling) ? 0.6 : 1.0;
 
   // Body dimensions
-  const headW = 16, headH = 16;
-  const torsoW = 24, torsoH = 30;
-  const armW = 6, armH = 22;
-  const legW = 8, legH = 28;
+  const headW = 20, headH = 20;
+  const torsoW = 28, torsoH = 34;
+  const armW = 12, armH = 22;
+  const legW = 14, legH = 30;
 
   // Reference point: top-center of the full body bounding box
   const refX = sx;
@@ -93,11 +149,11 @@ export function drawSkeletalFighter(
     grad.addColorStop(0, fillTop);
     grad.addColorStop(1, fillBot);
     ctx.fillStyle = grad;
-    roundRect(ctx, -w / 2, -h / 2, w, h, 3);
+    roundRect(ctx, -w / 2, -h / 2, w, h, 4);
     ctx.fill();
     ctx.strokeStyle = outline;
     ctx.lineWidth = 1.5;
-    roundRect(ctx, -w / 2, -h / 2, w, h, 3);
+    roundRect(ctx, -w / 2, -h / 2, w, h, 4);
     ctx.stroke();
     ctx.restore();
   };
@@ -137,26 +193,7 @@ export function drawSkeletalFighter(
   ctx.save();
   ctx.translate(headPos.x, headCenterY);
   ctx.rotate(p.head.rot * f.facing);
-  // Head gradient
-  const hGrad = ctx.createLinearGradient(-headW / 2, -headH / 2, headW / 2, headH / 2);
-  hGrad.addColorStop(0, shiftColor(headColor, 20));
-  hGrad.addColorStop(1, headColor);
-  ctx.fillStyle = hGrad;
-  ctx.beginPath();
-  ctx.arc(0, 0, headW / 2, 0, Math.PI * 2);
-  ctx.fill();
-  // Head outline
-  ctx.strokeStyle = outlineColor;
-  ctx.lineWidth = 1.5;
-  ctx.stroke();
-  // Eyes
-  const eyeShift = 3 * f.facing;
-  ctx.fillStyle = '#fff';
-  ctx.beginPath(); ctx.arc(eyeShift, -1, 3, 0, Math.PI * 2); ctx.fill();
-  ctx.beginPath(); ctx.arc(eyeShift - 7 * f.facing, -1, 3, 0, Math.PI * 2); ctx.fill();
-  ctx.fillStyle = '#111';
-  ctx.beginPath(); ctx.arc(eyeShift + 1.2 * f.facing, -1, 1.8, 0, Math.PI * 2); ctx.fill();
-  ctx.beginPath(); ctx.arc(eyeShift - 7 * f.facing + 1.2 * f.facing, -1, 1.8, 0, Math.PI * 2); ctx.fill();
+  drawCharacterHead(ctx, f.charId, f.facing, headColor, headW);
   ctx.restore();
 
   // 5. Front leg (in front of body)
@@ -199,6 +236,7 @@ export function drawVictoryPose(
   bodyColor: string,
   outlineColor: string,
   tick: number,
+  charId: string = 'kyo',
 ): void {
   const bounce = Math.sin(tick * 0.08) * 3;
   const victoryPose: Pose = {
@@ -223,10 +261,10 @@ export function drawVictoryPose(
   };
 
   // Body dimensions (same as drawSkeletalFighter)
-  const headW = 16, headH = 16;
-  const torsoW = 24, torsoH = 30;
-  const armW = 6, armH = 22;
-  const legW = 8, legH = 28;
+  const headW = 20, headH = 20;
+  const torsoW = 28, torsoH = 34;
+  const armW = 12, armH = 22;
+  const legW = 14, legH = 30;
 
   const refX = sx;
   const refY = sy - 100; // FIGHTER_HEIGHT
@@ -253,11 +291,11 @@ export function drawVictoryPose(
     grad.addColorStop(0, fillTop);
     grad.addColorStop(1, fillBot);
     ctx.fillStyle = grad;
-    roundRect(ctx, -w / 2, -h / 2, w, h, 3);
+    roundRect(ctx, -w / 2, -h / 2, w, h, 4);
     ctx.fill();
     ctx.strokeStyle = outline;
     ctx.lineWidth = 1.5;
-    roundRect(ctx, -w / 2, -h / 2, w, h, 3);
+    roundRect(ctx, -w / 2, -h / 2, w, h, 4);
     ctx.stroke();
     ctx.restore();
   };
@@ -296,24 +334,7 @@ export function drawVictoryPose(
   ctx.save();
   ctx.translate(headPos.x, headCenterY);
   ctx.rotate(p.head.rot * facing);
-  const hGrad = ctx.createLinearGradient(-headW / 2, -headH / 2, headW / 2, headH / 2);
-  hGrad.addColorStop(0, shiftColor(headColor, 20));
-  hGrad.addColorStop(1, headColor);
-  ctx.fillStyle = hGrad;
-  ctx.beginPath();
-  ctx.arc(0, 0, headW / 2, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.strokeStyle = outlineColor;
-  ctx.lineWidth = 1.5;
-  ctx.stroke();
-  // Eyes (happy/squinting for victory)
-  const eyeShift = 3 * facing;
-  ctx.fillStyle = '#fff';
-  ctx.beginPath(); ctx.arc(eyeShift, -1, 3, 0, Math.PI * 2); ctx.fill();
-  ctx.beginPath(); ctx.arc(eyeShift - 7 * facing, -1, 3, 0, Math.PI * 2); ctx.fill();
-  ctx.fillStyle = '#111';
-  ctx.beginPath(); ctx.arc(eyeShift + 1.2 * facing, -1, 1.8, 0, Math.PI * 2); ctx.fill();
-  ctx.beginPath(); ctx.arc(eyeShift - 7 * facing + 1.2 * facing, -1, 1.8, 0, Math.PI * 2); ctx.fill();
+  drawCharacterHead(ctx, charId, facing, headColor, headW);
   ctx.restore();
 
   // Front leg

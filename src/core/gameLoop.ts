@@ -39,12 +39,16 @@ export class GameLoop {
 
     this.accumulator += Math.min(delta, MAX_FRAME_DELTA);
 
-    while (this.accumulator >= TICK_RATE) {
-      this.updateFn();
-      this.accumulator -= TICK_RATE;
-    }
+    try {
+      while (this.accumulator >= TICK_RATE) {
+        this.updateFn();
+        this.accumulator -= TICK_RATE;
+      }
 
-    this.renderFn();
+      this.renderFn();
+    } catch (e: any) {
+      console.error('[GameLoop] Frame error:', e?.message || e, e?.stack || '');
+    }
 
     this.rafId = requestAnimationFrame(this.loop);
   };

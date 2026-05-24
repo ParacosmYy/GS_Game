@@ -116,13 +116,19 @@ export class CombatSystem {
       // Timer expired — resolve throw as damage + hard knockdown
       if (defender.throwEscapeTimer <= 0) {
         const attacker = fighters[1 - i];
-        const data = FRAME_DATA[AttackType.THROW];
+        // 根据投技类型选择帧数据
+        const throwType = attacker.currentAttack;
+        const data = (throwType === AttackType.THROW_FORWARD || throwType === AttackType.THROW_BACK)
+          ? FRAME_DATA[throwType as keyof typeof FRAME_DATA] ?? FRAME_DATA[AttackType.THROW]
+          : FRAME_DATA[AttackType.THROW];
         const defIdx = i;
         const damage = this.scaledDamage(data.damage, defIdx);
 
         defender.health = Math.max(0, defender.health - damage);
-        defender.applyKnockdown(30, true); // hard knockdown from throw
-        defender.x = Math.max(STAGE_LEFT, Math.min(attacker.x + THROW_DISTANCE * attacker.facing, STAGE_RIGHT));
+        defender.applyKnockdown(30, true);
+        // 使用投技方向（前投向前飞，后投向后飞）
+        const throwDir = defender.throwDirection;
+        defender.x = Math.max(STAGE_LEFT, Math.min(attacker.x + THROW_DISTANCE * throwDir, STAGE_RIGHT));
         defender.isBeingThrown = false;
 
         attacker.isThrowing = false;
@@ -152,11 +158,18 @@ export class CombatSystem {
   }
 
   private resolveHit(attacker: Fighter, defender: Fighter, onHit?: HitCallback): void {
-    const hitbox = attacker.getActiveHitbox();
-    if (!hitbox || attacker.hasHit) return;
+    // 使用多框判定：检查攻击者的所有攻击框
+    const hitboxes = attacker.getActiveHitboxes();
+    if (hitboxes.length === 0 || attacker.hasHit) return;
 
-    const hurtbox = defender.getHurtbox();
-    if (!aabbCheck(hitbox, hurtbox)) return;
+    // 使用受击框覆盖（出招时身体可能缩小）
+    const hurtbox = defender.getEffectiveHurtbox();
+
+    let hit = false;
+    for (const hitbox of hitboxes) {
+      if (aabbCheck(hitbox, hurtbox)) { hit = true; break; }
+    }
+    if (!hit) return;
 
     const attackType = attacker.currentAttack;
     if (!attackType) return;
@@ -165,19 +178,22 @@ export class CombatSystem {
     attacker.hasHit = true;
 
     // Throw handling — Phase 1: setup throw with escape window
-    if (attackType === AttackType.THROW) {
+    if (attackType === AttackType.THROW || attackType === AttackType.THROW_FORWARD || attackType === AttackType.THROW_BACK) {
       const dist = Math.abs(attacker.x - defender.x);
       if (dist > THROW_RANGE || !defender.isGrounded()) return;
       // Throw invincibility check
       if (defender.throwInvincibilityTimer > 0) return;
+      // Determine throw direction
+      const throwDir: 1 | -1 = attackType === AttackType.THROW_BACK ? (-attacker.facing as 1 | -1) : attacker.facing;
       // Phase 1: freeze both, start escape window
       attacker.isThrowing = true;
       attacker.throwVictim = defender;
       attacker.hasHit = true;
       defender.isBeingThrown = true;
       defender.throwEscapeTimer = THROW_ESCAPE_WINDOW;
-      // Position defender at throw point (clamped to stage)
-      defender.x = Math.max(STAGE_LEFT, Math.min(attacker.x + THROW_DISTANCE * attacker.facing, STAGE_RIGHT));
+      defender.throwDirection = throwDir;
+      // Position defender at throw point
+      defender.x = Math.max(STAGE_LEFT, Math.min(attacker.x + THROW_DISTANCE * throwDir, STAGE_RIGHT));
       return;
     }
 
@@ -197,11 +213,24 @@ export class CombatSystem {
     const defInput = resolveInput(raw, defender.facing, this.prev[defIdx]);
 
     const crouching = defender.state === FighterState.CROUCH;
+    const isAirborne = !defender.isGrounded();
     // Cancelled-into command normals lose special properties: MID instead of HIGH/LOW, no knockdown
     const isCancelledCmdNormal = attacker.cancelledIntoNormal && COMMAND_NORMALS.has(attackType as string);
     const hitLevel = (isCancelledCmdNormal ? 'MID' : data.hitLevel) as HitLevel;
 
-    if (defender.canBlock() && defInput.back && this.canBlock(hitLevel, crouching)) {
+    // 空中防御：空中按后可防 HIGH/MID 攻击，不能防 LOW
+    if (isAirborne && defender.canAirBlock() && defInput.back && hitLevel !== 'LOW') {
+      defender.applyAirBlockstun(data.blockstun, data.pushback);
+      const chipData = data as { chipDamage?: number };
+      const chip = chipData.chipDamage ?? Math.round(data.damage * CHIP_DAMAGE_RATIO);
+      defender.health = Math.max(1, defender.health - chip);
+      this.comboHits[defIdx] = 0;
+      onHit?.(attacker, defender, attackType, true, false);
+      return;
+    }
+
+    // 地面防御
+    if (defender.canBlock() && !isAirborne && defInput.back && this.canBlock(hitLevel, crouching)) {
       // Guard gauge depletion
       defender.guardGauge = Math.max(0, defender.guardGauge - guardGaugeDamage(attackType));
 
@@ -210,8 +239,7 @@ export class CombatSystem {
         defender.state = FighterState.GUARD_CRUSH;
         defender.guardCrushTimer = GUARD_CRUSH_DURATION;
         defender.vx = data.pushback * (defender.facing === 1 ? -1 : 1) * 1.5;
-        defender.currentAttack = null;
-        defender.attackPhase = 'none';
+        defender.resetAttackState();
       } else {
         defender.applyBlockstun(data.blockstun, data.pushback);
       }
@@ -301,8 +329,7 @@ export class CombatSystem {
             defender.state = FighterState.GUARD_CRUSH;
             defender.guardCrushTimer = GUARD_CRUSH_DURATION;
             defender.vx = data.pushback * (defender.facing === 1 ? -1 : 1) * 1.5;
-            defender.currentAttack = null;
-            defender.attackPhase = 'none';
+            defender.resetAttackState();
           } else {
             defender.applyBlockstun(data.blockstun, data.pushback);
           }

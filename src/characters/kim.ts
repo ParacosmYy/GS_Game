@@ -137,8 +137,12 @@ export const KimDef: CharacterDefinition = {
   },
 
   routeSpecial(input, cmdBuf, tick) {
+    // DM: QCB×2+K → 鳳凰脚
+    const dmMotion = cmdBuf.checkDMMotion(tick, input.punchPressed, input.kickPressed);
+    if (dmMotion === 'QCBx2_K') return AttackType.DM_PHOENIX_KICK;
+
     // DP+P → shared upper
-    const special = cmdBuf.checkSpecial(tick, true);
+    const special = cmdBuf.checkSpecial(tick, input.punchPressed || input.kickPressed);
     if (special === AttackType.SPECIAL_UPPER) return AttackType.SPECIAL_UPPER;
 
     // QCB+K → 飛燕斬

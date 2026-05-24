@@ -10,6 +10,7 @@ import {
   FighterState,
   AttackType,
 } from '../core/types.js';
+import type { FrameBox } from '../core/types.js';
 import {
   STAGE_GROUND_Y,
   FIGHTER_WIDTH,
@@ -19,6 +20,7 @@ import {
   FRAME_DATA,
   HITBOX_OFFSETS,
 } from '../core/constants.js';
+import { ATTACK_FRAMES } from '../core/attackFrames.js';
 import type { CharacterStats } from '../characters/types.js';
 
 export class Fighter {
@@ -39,6 +41,7 @@ export class Fighter {
   attackFrame = 0;
   attackPhase: AttackPhase = 'none';
   hasHit = false; // Prevent multi-hit in one active phase
+  hasAttackedInAir = false; // Per-jump air attack limit (1 per jump)
 
   // Guard gauge (0–100, depleted by blocking attacks)
   guardGauge = 100;
@@ -77,6 +80,7 @@ export class Fighter {
   // Throw escape state (defender side)
   isBeingThrown = false;
   throwEscapeTimer = 0;
+  throwDirection: Direction = 1;
 
   // Throw execution state (attacker side)
   isThrowing = false;
@@ -150,6 +154,22 @@ export class Fighter {
   getActiveHitbox(): { x: number; y: number; width: number; height: number } | null {
     if (this.attackPhase !== 'active' || !this.currentAttack) return null;
 
+    // 优先使用逐帧判定框
+    const perFrame = ATTACK_FRAMES[this.currentAttack];
+    if (perFrame && this.attackFrame < perFrame.length) {
+      const frame = perFrame[this.attackFrame];
+      if (frame.attack.length > 0) {
+        const box = frame.attack[0];
+        return {
+          x: this.x + box.ox * this.facing,
+          y: this.y + box.oy,
+          width: box.w,
+          height: box.h,
+        };
+      }
+    }
+
+    // 降级到旧的 HITBOX_OFFSETS
     const offset = HITBOX_OFFSETS[this.currentAttack];
     if (!offset) return null;
 
@@ -161,16 +181,79 @@ export class Fighter {
     };
   }
 
+  /** Get all active hitboxes for current frame (multi-box support) */
+  getActiveHitboxes(): { x: number; y: number; width: number; height: number }[] {
+    if (this.attackPhase !== 'active' || !this.currentAttack) return [];
+
+    const perFrame = ATTACK_FRAMES[this.currentAttack];
+    if (perFrame && this.attackFrame < perFrame.length) {
+      const frame = perFrame[this.attackFrame];
+      return frame.attack.map(box => ({
+        x: this.x + box.ox * this.facing,
+        y: this.y + box.oy,
+        width: box.w,
+        height: box.h,
+      }));
+    }
+
+    // 降级到旧系统
+    const single = this.getActiveHitbox();
+    return single ? [single] : [];
+  }
+
+  /** Get the hurtbox override for current attack frame, or null for default */
+  getBodyOverride(): { x: number; y: number; width: number; height: number } | null {
+    if (this.attackPhase !== 'active' || !this.currentAttack) return null;
+
+    const perFrame = ATTACK_FRAMES[this.currentAttack];
+    if (perFrame && this.attackFrame < perFrame.length) {
+      const frame = perFrame[this.attackFrame];
+      if (frame.bodyOverride) {
+        const bo = frame.bodyOverride;
+        const base = this.getHurtbox();
+        return {
+          x: base.x + bo.ox,
+          y: base.y + bo.oy,
+          width: base.width + bo.w,
+          height: base.height + bo.h,
+        };
+      }
+    }
+    return null;
+  }
+
+  /** Get the effective hurtbox (with body override if applicable) */
+  getEffectiveHurtbox(): { x: number; y: number; width: number; height: number } {
+    return this.getBodyOverride() ?? this.getHurtbox();
+  }
+
+  /** Reset cancel flags — called from multiple state transitions */
+  resetCancelFlags(): void {
+    this.superCancelReady = false;
+    this.rapidCancelReady = false;
+    this.normalCancelReady = false;
+    this.cancelledIntoNormal = false;
+  }
+
+  /** Reset attack state — called from endAttack, applyHitstun, applyBlockstun, applyKnockdown */
+  resetAttackState(): void {
+    this.currentAttack = null;
+    this.attackFrame = 0;
+    this.attackPhase = 'none';
+  }
+
   /** Start an attack */
   startAttack(attackType: AttackType): void {
     this.currentAttack = attackType;
     this.attackFrame = 0;
     this.attackPhase = 'startup';
     this.hasHit = false;
-    this.superCancelReady = false;
-    this.rapidCancelReady = false;
-    this.normalCancelReady = false;
-    this.cancelledIntoNormal = false;
+    this.resetCancelFlags();
+
+    // Mark air attack used
+    if (FighterState.JUMP === this.state || FighterState.HOP === this.state || FighterState.RUN_JUMP === this.state || FighterState.HYPER_JUMP === this.state) {
+      this.hasAttackedInAir = true;
+    }
 
     // Determine state from attack type
     const name = attackType as string;
@@ -178,7 +261,7 @@ export class Fighter {
       this.state = FighterState.CROUCH_ATTACK;
     } else if (name.startsWith('JUMP')) {
       this.state = FighterState.AIR_ATTACK;
-    } else if (attackType === AttackType.THROW) {
+    } else if (attackType === AttackType.THROW || attackType === AttackType.THROW_FORWARD || attackType === AttackType.THROW_BACK) {
       this.state = FighterState.THROW;
     } else {
       // STAND_*, CLOSE_*, CMD_*, KYO_*, SPECIAL_*, DM_*, STAND_CD
@@ -214,14 +297,9 @@ export class Fighter {
   }
 
   endAttack(): void {
-    this.currentAttack = null;
-    this.attackFrame = 0;
-    this.attackPhase = 'none';
+    this.resetAttackState();
     this.hasHit = false;
-    this.superCancelReady = false;
-    this.rapidCancelReady = false;
-    this.normalCancelReady = false;
-    this.cancelledIntoNormal = false;
+    this.resetCancelFlags();
     this.isCounterWire = false;
     this.state = FighterState.IDLE;
   }
@@ -231,13 +309,8 @@ export class Fighter {
     this.state = FighterState.HITSTUN;
     this.hitstunTimer = frames;
     this.vx = pushback * (this.facing === 1 ? -1 : 1);
-    this.currentAttack = null;
-    this.attackPhase = 'none';
-    this.attackFrame = 0;
-    this.superCancelReady = false;
-    this.rapidCancelReady = false;
-    this.normalCancelReady = false;
-    this.cancelledIntoNormal = false;
+    this.resetAttackState();
+    this.resetCancelFlags();
   }
 
   /** Apply blockstun */
@@ -245,8 +318,7 @@ export class Fighter {
     this.state = FighterState.BLOCK;
     this.blockstunTimer = frames;
     this.vx = pushback * (this.facing === 1 ? -1 : 1);
-    this.currentAttack = null;
-    this.attackPhase = 'none';
+    this.resetAttackState();
   }
 
   /** Apply knockdown */
@@ -255,12 +327,8 @@ export class Fighter {
     this.knockdownTimer = frames;
     this.isKnockedDown = true;
     this.isHardKnockdown = hard;
-    this.currentAttack = null;
-    this.attackPhase = 'none';
-    this.superCancelReady = false;
-    this.rapidCancelReady = false;
-    this.normalCancelReady = false;
-    this.cancelledIntoNormal = false;
+    this.resetAttackState();
+    this.resetCancelFlags();
   }
 
   /** Can the fighter act (accept input) right now? */
@@ -292,9 +360,29 @@ export class Fighter {
       this.state === FighterState.IDLE ||
       this.state === FighterState.WALK ||
       this.state === FighterState.CROUCH ||
-      this.state === FighterState.BLOCK
-      // RUN intentionally excluded — must wait for runStopTimer
+      this.state === FighterState.BLOCK ||
+      this.state === FighterState.AIR_BLOCK
     );
+  }
+
+  /** Is the fighter in a state where air blocking is possible? */
+  canAirBlock(): boolean {
+    return !this.isGrounded() && (
+      this.state === FighterState.JUMP ||
+      this.state === FighterState.RUN_JUMP ||
+      this.state === FighterState.HOP ||
+      this.state === FighterState.HYPER_JUMP ||
+      this.state === FighterState.AIR_ATTACK ||
+      this.state === FighterState.AIR_BLOCK
+    );
+  }
+
+  /** Apply air blockstun */
+  applyAirBlockstun(frames: number, pushback: number): void {
+    this.state = FighterState.AIR_BLOCK;
+    this.blockstunTimer = frames;
+    this.vx = pushback * (this.facing === 1 ? -1 : 1) * 0.5;
+    this.resetAttackState();
   }
 
   /** Is the fighter in a rolling state (invincible to attacks but not throws)? */
@@ -316,9 +404,7 @@ export class Fighter {
     this.vy = 0;
     this.health = this.maxHealth;
     this.state = FighterState.IDLE;
-    this.currentAttack = null;
-    this.attackFrame = 0;
-    this.attackPhase = 'none';
+    this.resetAttackState();
     this.hasHit = false;
     this.hitstunTimer = 0;
     this.blockstunTimer = 0;
@@ -341,10 +427,9 @@ export class Fighter {
     this.guardCrushTimer = 0;
     this.juggleState = JuggleState.NONE;
     this.airHitCount = 0;
-    this.superCancelReady = false;
-    this.rapidCancelReady = false;
-    this.normalCancelReady = false;
-    this.cancelledIntoNormal = false;
+    this.resetCancelFlags();
     this.isCounterWire = false;
+    this.hasAttackedInAir = false;
+    this.state = FighterState.IDLE;
   }
 }

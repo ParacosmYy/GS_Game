@@ -139,7 +139,11 @@ export const TerryDef: CharacterDefinition = {
   },
 
   routeSpecial(input, cmdBuf, tick) {
-    const special = cmdBuf.checkSpecial(tick, true);
+    // DM: QCF×2+P → Power Geyser
+    const dmMotion = cmdBuf.checkDMMotion(tick, input.punchPressed, input.kickPressed);
+    if (dmMotion === 'QCFx2_P') return AttackType.DM_POWER_GEYSER;
+
+    const special = cmdBuf.checkSpecial(tick, input.punchPressed || input.kickPressed);
     if (special === AttackType.SPECIAL_UPPER) return AttackType.SPECIAL_UPPER;
 
     // QCB+P → Burn Knuckle (before fireball)
@@ -168,7 +172,7 @@ export const TerryDef: CharacterDefinition = {
     if (attackType === AttackType.SPECIAL_PROJECTILE && fighter.attackFrame === 0) {
       projectiles.push(new Projectile(
         fighter.x + 50 * fighter.facing, fighter.y - 50, fighter.facing,
-        FRAME_DATA.SPECIAL_PROJECTILE.active, playerIndex,
+        FRAME_DATA.SPECIAL_PROJECTILE.active, playerIndex, fighter.charId,
       ));
       return true;
     }

@@ -17,8 +17,10 @@ import type { Star } from './stage.js';
 import { drawSkeletalFighter } from './skeletalFighter.js';
 import { drawAttackLimb } from './attackLimb.js';
 import { drawHUD, drawPowerGauges, drawComboCounters } from './hud.js';
-import { drawCharacterSelect, drawIntro, drawKO, drawSuperFlash, drawMatchEnd } from './screens.js';
+import { drawCharacterSelect, drawIntro, drawKO, drawSuperFlash, drawMatchEnd, drawModeIndicator } from './screens.js';
 import { shiftColor, roundRect } from './utils.js';
+import { ROSTER } from '../characters/index.js';
+import { drawProjectiles as drawProjectilesImpl } from './projectileRenderer.js';
 
 export class Renderer {
   private ctx: CanvasRenderingContext2D;
@@ -222,31 +224,10 @@ export class Renderer {
     ctx.globalAlpha = 1;
   }
 
-  // ===== Projectile rendering =====
+  // ===== Projectile rendering (delegated) =====
 
   drawProjectiles(projectiles: Projectile[], camera: Camera): void {
-    const ctx = this.ctx;
-    for (const proj of projectiles) {
-      if (!proj.active) continue;
-      const sx = camera.worldToScreen(proj.x);
-      ctx.save();
-      ctx.shadowColor = '#ff8800';
-      ctx.shadowBlur = 15;
-      ctx.fillStyle = '#ffaa22';
-      ctx.beginPath();
-      ctx.arc(sx, proj.y, 10, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.shadowBlur = 0;
-      ctx.fillStyle = '#fff8e0';
-      ctx.beginPath();
-      ctx.arc(sx, proj.y, 5, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.fillStyle = 'rgba(255,170,0,0.3)';
-      ctx.beginPath();
-      ctx.arc(sx - proj.facing * 12, proj.y, 7, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.restore();
-    }
+    drawProjectilesImpl(this.ctx, projectiles, camera);
   }
 
   // ===== Screen overlays (thin wrappers) =====
@@ -283,12 +264,17 @@ export class Renderer {
     p2Ready: boolean,
     tick: number,
     p2IsAI: boolean,
+    simplifiedMode: boolean,
   ): void {
-    drawCharacterSelect(this.ctx, p1Cursor, p2Cursor, p1Ready, p2Ready, tick, p2IsAI);
+    drawCharacterSelect(this.ctx, p1Cursor, p2Cursor, p1Ready, p2Ready, tick, p2IsAI, simplifiedMode);
   }
 
   drawMatchEnd(winner: number | null, p1Wins: number, p2Wins: number): void {
     drawMatchEnd(this.ctx, winner, p1Wins, p2Wins);
+  }
+
+  drawModeIndicator(simplifiedMode: boolean, alpha: number): void {
+    drawModeIndicator(this.ctx, simplifiedMode, alpha);
   }
 
   // ===== Debug overlay =====
@@ -379,12 +365,34 @@ export class Renderer {
 
   // ===== Controls hint =====
 
-  drawControlsHint(): void {
+  private static readonly SPECIAL_NAMES: Record<string, [string, string]> = {
+    kyo: ['荒咬み', '鬼焼き'],
+    iori: ['暗拂', '鬼焼き'],
+    terry: ['Power Wave', 'Burn Knuckle'],
+    kim: ['飛燕斬', '空斬'],
+  };
+
+  drawControlsHint(simplifiedMode: boolean, charId: string): void {
     const ctx = this.ctx;
-    ctx.fillStyle = 'rgba(255,255,255,0.25)';
-    ctx.font = '9px monospace';
+    // Semi-transparent dark bar at bottom
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.55)';
+    ctx.fillRect(0, 575, CANVAS_WIDTH, 25);
+    // Subtle top border
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.08)';
+    ctx.fillRect(0, 575, CANVAS_WIDTH, 1);
+
+    ctx.font = '11px monospace';
     ctx.textAlign = 'center';
-    ctx.fillText('P1: WASD+J/K/U/I/L  P2: Arrows+Np1/2/3/0/.  A+B:Roll  C+D:CD  B+C:MAX  R:Restart  F1:Debug', 400, 596);
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
+
+    let label: string;
+    if (simplifiedMode) {
+      const names = Renderer.SPECIAL_NAMES[charId] ?? ['技能①', '技能②'];
+      label = `[J]轻拳  [K]轻脚  [U]${names[0]}  [I]${names[1]}  [O]爆气  [L]CD`;
+    } else {
+      label = '[J]轻拳  [K]轻脚  [U]重拳  [I]重脚  [L]CD  [;]投';
+    }
+    ctx.fillText(label, CANVAS_WIDTH / 2, 592);
     ctx.textAlign = 'left';
   }
 }

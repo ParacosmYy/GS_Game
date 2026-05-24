@@ -61,19 +61,18 @@ export const KyoDef: CharacterDefinition = {
       legFront: bone(6, 0, 0.1),
       legBack: bone(-6, 0, -0.1),
     }),
-    [FighterState.WALK]: pose({
-      armFront: bone(8, 22, 0.2),
-      armBack: bone(-6, 18, -0.4),
-      legFront: bone(8, 0, 0.2),
-      legBack: bone(-3, 0, -0.15),
-    }),
-    [FighterState.RUN]: pose({
-      body: bone(6, 0, 0.15),
-      armFront: bone(-5, 20, -0.8),
-      armBack: bone(12, 25, 0.5),
-      legFront: bone(12, 0, 0.4),
-      legBack: bone(-8, 0, -0.3),
-    }),
+    [FighterState.WALK]: [
+      // 4帧走步循环 — 腿交替前后摆动
+      pose({ legFront: bone(8, -3, 0.25), legBack: bone(-5, 3, -0.2), armFront: bone(8, 22, 0.2), armBack: bone(-6, 18, -0.4) }),
+      pose({ legFront: bone(7, 0, 0.15), legBack: bone(-4, 0, -0.1), armFront: bone(9, 20, 0.25), armBack: bone(-7, 19, -0.45) }),
+      pose({ legFront: bone(5, 3, -0.2), legBack: bone(-8, -3, 0.25), armFront: bone(10, 18, 0.3), armBack: bone(-5, 20, -0.35) }),
+      pose({ legFront: bone(6, 0, -0.1), legBack: bone(-6, 0, 0.1), armFront: bone(9, 21, 0.22), armBack: bone(-6, 17, -0.42) }),
+    ],
+    [FighterState.RUN]: [
+      // 2帧跑步循环 — 更大幅度
+      pose({ body: bone(8, 0, 0.2), armFront: bone(-5, 22, -1.0), armBack: bone(15, 20, 0.6), legFront: bone(14, -5, 0.5), legBack: bone(-10, 5, -0.4) }),
+      pose({ body: bone(5, 0, 0.1), armFront: bone(-3, 18, -0.6), armBack: bone(10, 28, 0.3), legFront: bone(10, 5, 0.2), legBack: bone(-14, -5, 0.5) }),
+    ],
     [FighterState.CROUCH]: pose({
       body: bone(0, 20, 0.1),
       head: bone(0, 15),
@@ -176,8 +175,12 @@ export const KyoDef: CharacterDefinition = {
   },
 
   routeSpecial(input, cmdBuf, tick) {
+    // DM: QCF×2+P → 大蛇薙
+    const dmMotion = cmdBuf.checkDMMotion(tick, input.punchPressed, input.kickPressed);
+    if (dmMotion === 'QCFx2_P') return AttackType.DM_OROCHINAGI;
+
     // Dragon Punch →↓↘+P (shared)
-    const special = cmdBuf.checkSpecial(tick, true);
+    const special = cmdBuf.checkSpecial(tick, input.punchPressed || input.kickPressed);
     if (special === AttackType.SPECIAL_UPPER) return AttackType.SPECIAL_UPPER;
 
     // 荒咬み: QCF+A
@@ -187,7 +190,7 @@ export const KyoDef: CharacterDefinition = {
 
     // 75式改 / R.E.D. Kick: QCF+K / QCB+K
     if (input.kickPressed) {
-      return cmdBuf.checkKickSpecial(tick, true);
+      return cmdBuf.checkKickSpecial(tick, input.kickPressed);
     }
 
     // Fireball fallback: QCF+P (Kyo doesn't have one, but shared route)
@@ -236,6 +239,18 @@ export const KyoDef: CharacterDefinition = {
       if (hcb) return hcb;
     }
 
+    // 九傢 followups
+    if (currentAttack === AttackType.KYO_ARAGAMI_KONOKIZU) {
+      if (cmdBuf.hasQCF(tick) && input.kickPressed) return AttackType.KYO_NANASE;
+      if (input.punchPressed) return AttackType.KYO_KOTO_TSUKI;
+    }
+
+    // 八锊 followups — QCF+P takes priority over plain P
+    if (currentAttack === AttackType.KYO_ARAGAMI_YANOSABI) {
+      if (cmdBuf.hasQCF(tick) && input.punchPressed) return AttackType.KYO_KOTO_TSUKI;
+      if (input.punchPressed) return AttackType.KYO_YAKISOGI;
+    }
+
     // 毒咬み连段
     if (currentAttack === AttackType.KYO_DOKUGAMI) {
       return cmdBuf.checkDokugamiFollow(tick, true);
@@ -256,7 +271,7 @@ export const KyoDef: CharacterDefinition = {
     if (attackType === AttackType.SPECIAL_PROJECTILE && fighter.attackFrame === 0) {
       projectiles.push(new Projectile(
         fighter.x + 50 * fighter.facing, fighter.y - 50, fighter.facing,
-        FRAME_DATA.SPECIAL_PROJECTILE.active, playerIndex,
+        FRAME_DATA.SPECIAL_PROJECTILE.active, playerIndex, fighter.charId,
       ));
       return true;
     }

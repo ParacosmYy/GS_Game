@@ -141,8 +141,12 @@ export const IoriDef: CharacterDefinition = {
   },
 
   routeSpecial(input, cmdBuf, tick) {
+    // DM: QCF×2+P → 八稚女
+    const dmMotion = cmdBuf.checkDMMotion(tick, input.punchPressed, input.kickPressed);
+    if (dmMotion === 'QCFx2_P') return AttackType.DM_YATAGARASU;
+
     // DP+P → upper
-    const special = cmdBuf.checkSpecial(tick, true);
+    const special = cmdBuf.checkSpecial(tick, input.punchPressed || input.kickPressed);
     if (special === AttackType.SPECIAL_UPPER) return AttackType.SPECIAL_UPPER;
 
     // QCB+P → 葵花 (before fireball)
@@ -183,7 +187,7 @@ export const IoriDef: CharacterDefinition = {
     if (attackType === AttackType.SPECIAL_PROJECTILE && fighter.attackFrame === 0) {
       projectiles.push(new Projectile(
         fighter.x + 50 * fighter.facing, fighter.y - 50, fighter.facing,
-        FRAME_DATA.SPECIAL_PROJECTILE.active, playerIndex,
+        FRAME_DATA.SPECIAL_PROJECTILE.active, playerIndex, fighter.charId,
       ));
       return true;
     }

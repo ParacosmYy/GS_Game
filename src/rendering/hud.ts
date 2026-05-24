@@ -4,7 +4,12 @@
 import { Fighter } from '../entities/fighter.js';
 import { Camera } from '../core/camera.js';
 import type { PowerGauge, MaxModeState } from '../core/types.js';
-import { CANVAS_WIDTH, MAX_HEALTH, MAX_STOCKS } from '../core/constants.js';
+import {
+  CANVAS_WIDTH, MAX_HEALTH, MAX_STOCKS, ROUND_TIME,
+  HUD_BAR_WIDTH, HUD_BAR_HEIGHT, HUD_BAR_Y, HUD_MARGIN,
+  HUD_TIMER_SIZE, HUD_GAUGE_Y, HUD_GAUGE_WIDTH, HUD_GAUGE_HEIGHT,
+  HUD_GAUGE_SEGMENT_GAP, HUD_WIN_MARKER_SIZE,
+} from '../core/constants.js';
 import { shiftColor, roundRect } from './utils.js';
 
 // ===== Main HUD =====
@@ -12,11 +17,6 @@ import { shiftColor, roundRect } from './utils.js';
 /** Draw the complete HUD: health bars, guard gauges, timer, win markers */
 export function drawHUD(ctx: CanvasRenderingContext2D, fighters: Fighter[], tick: number, delayedHealth: [number, number], p1Wins: number = 0, p2Wins: number = 0, p1Name: string = '', p2Name: string = ''): void {
   if (fighters.length < 2) return;
-
-  const barWidth = 300;
-  const barHeight = 20;
-  const barY = 30;
-  const margin = 50;
 
   // HUD background
   ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
@@ -37,70 +37,83 @@ export function drawHUD(ctx: CanvasRenderingContext2D, fighters: Fighter[], tick
   ctx.fillStyle = '#ff4444';
   ctx.font = 'bold 12px monospace';
   ctx.textAlign = 'left';
-  ctx.fillText('P1', 10, barY - 8);
+  ctx.fillText('P1', 10, HUD_BAR_Y - 8);
 
   // P1 character name (above health bar)
   if (p1Name) {
     ctx.font = 'bold 10px monospace';
     ctx.fillStyle = '#999';
     ctx.textAlign = 'left';
-    ctx.fillText(p1Name, margin, barY - 6);
+    ctx.fillText(p1Name, HUD_MARGIN, HUD_BAR_Y - 6);
   }
 
   // P1 health bar
   const p1Ratio = Math.max(0, fighters[0].health / MAX_HEALTH);
   const p1DelayedRatio = Math.max(0, delayedHealth[0] / MAX_HEALTH);
-  drawHealthBar(ctx, margin, barY, barWidth, barHeight, p1Ratio, p1DelayedRatio, true, tick);
+  drawHealthBar(ctx, HUD_MARGIN, HUD_BAR_Y, HUD_BAR_WIDTH, HUD_BAR_HEIGHT, p1Ratio, p1DelayedRatio, true, tick);
   // P1 guard gauge bar
-  drawGuardGauge(ctx, margin, barY + barHeight + 3, barWidth, 5, fighters[0].guardGauge, true);
+  drawGuardGauge(ctx, HUD_MARGIN, HUD_BAR_Y + HUD_BAR_HEIGHT + 3, HUD_BAR_WIDTH, 5, fighters[0].guardGauge, true);
 
   // P2 label
   ctx.fillStyle = '#4488ff';
   ctx.textAlign = 'right';
-  ctx.fillText('P2', CANVAS_WIDTH - 10, barY - 8);
+  ctx.fillText('P2', CANVAS_WIDTH - 10, HUD_BAR_Y - 8);
 
   // P2 character name (above health bar)
   if (p2Name) {
     ctx.font = 'bold 10px monospace';
     ctx.fillStyle = '#999';
     ctx.textAlign = 'right';
-    ctx.fillText(p2Name, CANVAS_WIDTH - margin, barY - 6);
+    ctx.fillText(p2Name, CANVAS_WIDTH - HUD_MARGIN, HUD_BAR_Y - 6);
   }
 
   // P2 health bar
   const p2Ratio = Math.max(0, fighters[1].health / MAX_HEALTH);
   const p2DelayedRatio = Math.max(0, delayedHealth[1] / MAX_HEALTH);
-  drawHealthBar(ctx, CANVAS_WIDTH - margin - barWidth, barY, barWidth, barHeight, p2Ratio, p2DelayedRatio, false, tick);
+  drawHealthBar(ctx, CANVAS_WIDTH - HUD_MARGIN - HUD_BAR_WIDTH, HUD_BAR_Y, HUD_BAR_WIDTH, HUD_BAR_HEIGHT, p2Ratio, p2DelayedRatio, false, tick);
   // P2 guard gauge bar
-  drawGuardGauge(ctx, CANVAS_WIDTH - margin - barWidth, barY + barHeight + 3, barWidth, 5, fighters[1].guardGauge, false);
+  drawGuardGauge(ctx, CANVAS_WIDTH - HUD_MARGIN - HUD_BAR_WIDTH, HUD_BAR_Y + HUD_BAR_HEIGHT + 3, HUD_BAR_WIDTH, 5, fighters[1].guardGauge, false);
 
-  // Timer in center
-  const timeSeconds = Math.max(0, 60 - Math.floor(tick / 60));
+  // Timer in center — decorative frame + larger text
+  const timeSeconds = Math.max(0, ROUND_TIME - Math.floor(tick / 60));
   const timeStr = timeSeconds.toString().padStart(2, '0');
+  const timerX = CANVAS_WIDTH / 2;
+  const timerY = HUD_BAR_Y + 8;
+
+  // Decorative rounded rectangle frame behind timer
+  ctx.fillStyle = 'rgba(10, 10, 20, 0.85)';
+  roundRect(ctx, timerX - 28, timerY - 16, 56, 30, 6);
+  ctx.fill();
+  ctx.strokeStyle = '#c8a832';
+  ctx.lineWidth = 1.5;
+  roundRect(ctx, timerX - 28, timerY - 16, 56, 30, 6);
+  ctx.stroke();
+
   ctx.fillStyle = timeSeconds <= 10 ? '#ff4444' : '#dddddd';
-  ctx.font = 'bold 24px monospace';
+  ctx.font = `bold ${HUD_TIMER_SIZE}px monospace`;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.fillText(timeStr, CANVAS_WIDTH / 2, barY + 8);
+  ctx.fillText(timeStr, timerX, timerY);
 
-  // Win markers (small dots below timer)
-  const winDotY = barY + 22;
-  const winDotR = 4;
-  const winDotSpacing = 12;
-  // P1 wins on left of timer
+  // Win markers — diamond shapes near health bar inner edges
+  const winMarkerY = HUD_BAR_Y + HUD_BAR_HEIGHT + 16;
+  const winSpacing = HUD_WIN_MARKER_SIZE * 3;
+
+  // P1 wins (right side of P1 health bar)
+  const p1MarkerBaseX = HUD_MARGIN + HUD_BAR_WIDTH + 10;
   for (let i = 0; i < p1Wins; i++) {
-    ctx.beginPath();
-    ctx.arc(CANVAS_WIDTH / 2 - 20 - i * winDotSpacing, winDotY, winDotR, 0, Math.PI * 2);
+    drawDiamond(ctx, p1MarkerBaseX + i * winSpacing, winMarkerY, HUD_WIN_MARKER_SIZE);
     ctx.fillStyle = '#ff6644';
     ctx.fill();
     ctx.strokeStyle = '#FFD700';
     ctx.lineWidth = 1.5;
     ctx.stroke();
   }
-  // P2 wins on right of timer
+
+  // P2 wins (left side of P2 health bar)
+  const p2MarkerBaseX = CANVAS_WIDTH - HUD_MARGIN - HUD_BAR_WIDTH - 10;
   for (let i = 0; i < p2Wins; i++) {
-    ctx.beginPath();
-    ctx.arc(CANVAS_WIDTH / 2 + 20 + i * winDotSpacing, winDotY, winDotR, 0, Math.PI * 2);
+    drawDiamond(ctx, p2MarkerBaseX - i * winSpacing, winMarkerY, HUD_WIN_MARKER_SIZE);
     ctx.fillStyle = '#4488ff';
     ctx.fill();
     ctx.strokeStyle = '#FFD700';
@@ -110,6 +123,16 @@ export function drawHUD(ctx: CanvasRenderingContext2D, fighters: Fighter[], tick
 
   ctx.textBaseline = 'alphabetic';
   ctx.textAlign = 'left';
+}
+
+/** Draw a diamond shape centered at (x, y) with given half-size */
+function drawDiamond(ctx: CanvasRenderingContext2D, x: number, y: number, size: number): void {
+  ctx.beginPath();
+  ctx.moveTo(x, y - size);
+  ctx.lineTo(x + size, y);
+  ctx.lineTo(x, y + size);
+  ctx.lineTo(x - size, y);
+  ctx.closePath();
 }
 
 // ===== Health Bar =====
@@ -245,91 +268,117 @@ function drawGuardGauge(ctx: CanvasRenderingContext2D, x: number, y: number, w: 
 
 // ===== Power Gauge =====
 
-/** Draw power gauge stocks and MAX mode indicator for both players */
+/** Draw power gauge — continuous segmented bar at bottom of screen */
 export function drawPowerGauges(ctx: CanvasRenderingContext2D, gauges: [PowerGauge, PowerGauge], maxModes: [MaxModeState, MaxModeState]): void {
-  const gaugeY = 50;
-  const stockW = 30;
-  const stockH = 6;
-  const stockGap = 3;
+  const gaugeY = HUD_GAUGE_Y;
+  const gaugeW = HUD_GAUGE_WIDTH;
+  const gaugeH = HUD_GAUGE_HEIGHT;
+  const segGap = HUD_GAUGE_SEGMENT_GAP;
+  const segW = (gaugeW - (MAX_STOCKS - 1) * segGap) / MAX_STOCKS;
 
   for (let p = 0; p < 2; p++) {
     const gauge = gauges[p];
     const maxMode = maxModes[p];
     const isP1 = p === 0;
-    const baseX = isP1 ? 50 : CANVAS_WIDTH - 50 - MAX_STOCKS * (stockW + stockGap);
 
-    // Draw stocks
+    // P1 from left, P2 from right (mirrored)
+    const baseX = isP1 ? HUD_MARGIN : CANVAS_WIDTH - HUD_MARGIN - gaugeW;
+
+    // Background bar
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+    roundRect(ctx, baseX - 2, gaugeY - 2, gaugeW + 4, gaugeH + 4, 4);
+    ctx.fill();
+
+    // Draw each segment
     for (let s = 0; s < MAX_STOCKS; s++) {
-      const x = baseX + s * (stockW + stockGap);
-      const filled = s < gauge.stocks;
+      const segX = baseX + s * (segW + segGap);
+      const isFilled = s < gauge.stocks;
+      const isCharging = s === gauge.stocks && gauge.meter > 0;
 
-      ctx.fillStyle = 'rgba(0,0,0,0.5)';
-      ctx.fillRect(x, gaugeY, stockW, stockH);
+      // Segment background
+      ctx.fillStyle = '#1a1a22';
+      ctx.fillRect(segX, gaugeY, segW, gaugeH);
 
-      if (filled) {
-        const stockGrad = ctx.createLinearGradient(x, gaugeY, x + stockW, gaugeY);
-        stockGrad.addColorStop(0, '#ffaa00');
-        stockGrad.addColorStop(1, '#ff6600');
-        ctx.fillStyle = stockGrad;
-        ctx.fillRect(x, gaugeY, stockW, stockH);
-      } else if (s === gauge.stocks && gauge.meter > 0) {
-        const fillW = (gauge.meter / gauge.maxMeter) * stockW;
-        const partialGrad = ctx.createLinearGradient(x, gaugeY, x + fillW, gaugeY);
-        partialGrad.addColorStop(0, '#4488ff');
-        partialGrad.addColorStop(1, '#2266dd');
+      if (isFilled) {
+        // Filled segment — orange→gold gradient
+        const segGrad = ctx.createLinearGradient(segX, gaugeY, segX + segW, gaugeY);
+        segGrad.addColorStop(0, '#ff8800');
+        segGrad.addColorStop(1, '#ffcc00');
+        ctx.fillStyle = segGrad;
+        ctx.fillRect(segX, gaugeY, segW, gaugeH);
+      } else if (isCharging) {
+        // Partial fill — lighter orange
+        const fillW = (gauge.meter / gauge.maxMeter) * segW;
+        const partialGrad = ctx.createLinearGradient(segX, gaugeY, segX + fillW, gaugeY);
+        partialGrad.addColorStop(0, '#cc8844');
+        partialGrad.addColorStop(1, '#ffaa55');
         ctx.fillStyle = partialGrad;
-        ctx.fillRect(x, gaugeY, fillW, stockH);
+        ctx.fillRect(segX, gaugeY, fillW, gaugeH);
       }
 
-      ctx.strokeStyle = 'rgba(255,255,255,0.2)';
+      // Segment border
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
       ctx.lineWidth = 1;
-      ctx.strokeRect(x, gaugeY, stockW, stockH);
+      ctx.strokeRect(segX, gaugeY, segW, gaugeH);
     }
 
-    // MAXIMUM text when all stocks filled AND NOT in MAX mode
+    // Overall bar border
+    ctx.strokeStyle = 'rgba(255, 200, 0, 0.3)';
+    ctx.lineWidth = 1;
+    roundRect(ctx, baseX - 2, gaugeY - 2, gaugeW + 4, gaugeH + 4, 4);
+    ctx.stroke();
+
+    // "MAX" text with pulsing glow when all 3 stocks full AND NOT in MAX mode
     if (!maxMode.active && gauge.stocks >= MAX_STOCKS) {
-      ctx.fillStyle = '#ffcc00';
+      const pulseAlpha = 0.7 + 0.3 * Math.sin(Date.now() / 120);
+      ctx.save();
+      ctx.fillStyle = `rgba(255, 204, 0, ${pulseAlpha})`;
       ctx.shadowColor = '#ff8800';
-      ctx.shadowBlur = 8;
-      ctx.font = 'bold 10px monospace';
+      ctx.shadowBlur = 10 + 4 * Math.sin(Date.now() / 80);
+      ctx.font = 'bold 12px monospace';
       ctx.textAlign = isP1 ? 'left' : 'right';
-      ctx.fillText('MAXIMUM', isP1 ? baseX : baseX + MAX_STOCKS * (stockW + stockGap), gaugeY + 16);
+      ctx.textBaseline = 'top';
+      ctx.fillText('MAX', isP1 ? baseX + gaugeW + 6 : baseX - 6, gaugeY - 2);
       ctx.shadowBlur = 0;
+      ctx.restore();
     }
 
     // MAX mode timer bar (green, KOF style)
     if (maxMode.active) {
-      const maxBaseX = isP1 ? 50 : CANVAS_WIDTH - 50 - 80;
+      const maxBaseX = isP1 ? HUD_MARGIN : CANVAS_WIDTH - HUD_MARGIN - gaugeW;
       const pct = maxMode.timer / maxMode.maxDuration;
       const pulseAlpha = 0.7 + Math.sin(Date.now() / 100) * 0.3;
 
       // MAX label with glow
+      ctx.save();
       ctx.fillStyle = `rgba(100, 255, 100, ${pulseAlpha})`;
       ctx.shadowColor = '#00ff44';
       ctx.shadowBlur = 6;
       ctx.font = 'bold 11px monospace';
       ctx.textAlign = isP1 ? 'left' : 'right';
-      ctx.fillText('MAX', isP1 ? maxBaseX : maxBaseX + 80, gaugeY + 16);
+      ctx.textBaseline = 'top';
+      ctx.fillText('MAX', isP1 ? maxBaseX + gaugeW + 6 : maxBaseX - 6, gaugeY - 2);
       ctx.shadowBlur = 0;
+      ctx.restore();
 
-      // Timer bar background
-      const timerX = isP1 ? maxBaseX + 30 : maxBaseX;
+      // Timer bar
+      const timerBarW = gaugeW;
+      const timerBarY = gaugeY + gaugeH + 4;
       ctx.fillStyle = 'rgba(0,0,0,0.6)';
-      ctx.fillRect(Math.round(timerX), gaugeY + 10, 80, 5);
+      ctx.fillRect(Math.round(maxBaseX), timerBarY, timerBarW, 4);
 
-      // Timer bar fill (green, draining)
-      const greenGrad = ctx.createLinearGradient(Math.round(timerX), gaugeY + 10, Math.round(timerX + 80 * pct), gaugeY + 10);
+      const greenGrad = ctx.createLinearGradient(Math.round(maxBaseX), timerBarY, Math.round(maxBaseX + timerBarW * pct), timerBarY);
       greenGrad.addColorStop(0, '#22ff66');
       greenGrad.addColorStop(1, '#44ff88');
       ctx.fillStyle = greenGrad;
-      ctx.fillRect(Math.round(timerX), gaugeY + 10, Math.round(80 * pct), 5);
+      ctx.fillRect(Math.round(maxBaseX), timerBarY, Math.round(timerBarW * pct), 4);
 
-      // Timer bar border
       ctx.strokeStyle = 'rgba(100, 255, 100, 0.4)';
       ctx.lineWidth = 1;
-      ctx.strokeRect(Math.round(timerX), gaugeY + 10, 80, 5);
+      ctx.strokeRect(Math.round(maxBaseX), timerBarY, timerBarW, 4);
 
       ctx.textAlign = 'left';
+      ctx.textBaseline = 'alphabetic';
     }
   }
 }

@@ -135,10 +135,16 @@ export class FighterController {
       f.y += f.vy;
     }
 
+    // Universal gravity: anything airborne falls
+    if (f.y < STAGE_GROUND_Y) {
+      f.vy += GRAVITY;
+    }
+
     if (f.y >= STAGE_GROUND_Y) {
       const wasAirborne = f.state === FighterState.JUMP || f.state === FighterState.RUN_JUMP
         || f.state === FighterState.HOP || f.state === FighterState.HYPER_JUMP
-        || f.state === FighterState.BACKDASH || f.state === FighterState.AIR_ATTACK;
+        || f.state === FighterState.BACKDASH || f.state === FighterState.AIR_ATTACK
+        || f.state === FighterState.STAND_ATTACK || f.state === FighterState.AIR_BLOCK;
       if (wasAirborne) {
         if (f.currentAttack) f.endAttack();
         f.y = STAGE_GROUND_Y; f.vy = 0; f.vx = 0;
@@ -147,6 +153,7 @@ export class FighterController {
         f.throwInvincibilityTimer = THROW_INVINCIBILITY_LANDING;
         f.juggleState = JuggleState.NONE;
         f.airHitCount = 0;
+        f.hasAttackedInAir = false;
         this.vfx.spawnDust(f.x, STAGE_GROUND_Y);
       } else if (f.vy > 0) { f.y = STAGE_GROUND_Y; f.vy = 0; }
     }
@@ -196,13 +203,10 @@ export class FighterController {
     return null;
   }
 
-  /** Try attack routing: DM > char special > char normal > default normal */
+  /** Try attack routing: char special (includes DM) > char normal > default normal */
   private tryAttack(input: ResolvedInput): AttackType | null {
     const tick = this.tickRef.value;
-    // DM
-    const dm = this.cmdBuf.checkDM(tick, input.punchPressed);
-    if (dm) return dm;
-    // Character specials
+    // Character specials (includes DM routing via checkDMMotion)
     const special = this.character.routeSpecial(input, this.cmdBuf, tick);
     if (special) return special;
     // Character command normals
@@ -338,16 +342,30 @@ export class FighterController {
         }
         if (this.upReleased(input) && f.isGrounded() && this.upHoldFrames > 0) {
           f.throwInvincibilityTimer = THROW_INVINCIBILITY_JUMP_STARTUP;
-          if (this.upHoldFrames <= HOP_THRESHOLD) { f.vy = this.stats.hopVelocity; f.state = FighterState.HOP; }
+          if (this.upHoldFrames <= HOP_THRESHOLD) {
+            f.vy = this.stats.hopVelocity;
+            f.vx = this.stats.jumpForwardSpeed * 0.7 * (input.forward ? 1 : input.back ? -1 : 0) * f.facing;
+            f.state = FighterState.HOP;
+          }
           else if (this.hyperJump()) {
             f.vy = this.stats.hyperJumpVelocity; f.vx = this.stats.jumpForwardSpeed * 1.4 * (input.forward ? 1 : input.back ? -1 : 0) * f.facing;
             f.state = FighterState.HYPER_JUMP; this.vfx.spawnDust(f.x, STAGE_GROUND_Y);
-          } else { f.vy = this.stats.jumpVelocity; f.state = FighterState.JUMP; }
+          } else {
+            f.vy = this.stats.jumpVelocity;
+            f.vx = this.stats.jumpForwardSpeed * (input.forward ? 1 : input.back ? -1 : 0) * f.facing;
+            f.state = FighterState.JUMP;
+          }
           return;
         }
         if (input.down && !this.prevDown) this.lastDownTick = this.tickRef.value;
         if (input.down && f.isGrounded()) { f.state = FighterState.CROUCH; f.displayHeight = 50; return; }
-        if (input.throwAttackPressed && f.canAct()) { f.startAttack(AttackType.THROW); return; }
+        if (input.throwAttackPressed && f.canAct()) {
+          // 前投/后投区分（正版KOF：方向+投决定投掷方向）
+          if (input.forward) f.startAttack(AttackType.THROW_FORWARD);
+          else if (input.back) f.startAttack(AttackType.THROW_BACK);
+          else f.startAttack(AttackType.THROW);
+          return;
+        }
         if (f.canAct()) { const atk = this.tryAttack(input); if (atk) { f.startAttack(atk); return; } }
 
         if (input.forward) { f.vx = this.stats.walkSpeed * f.facing; f.state = FighterState.WALK; }
@@ -359,19 +377,23 @@ export class FighterController {
       case FighterState.RUN: {
         f.displayHeight = 100; f.vx = this.stats.runSpeed * f.facing;
         if (input.up && f.isGrounded()) {
-          f.state = FighterState.RUN_JUMP; f.vy = this.stats.jumpVelocity * 0.93; f.vx = this.stats.jumpForwardSpeed * 1.5 * f.facing;
+          f.state = FighterState.RUN_JUMP; f.vy = this.stats.jumpVelocity; f.vx = this.stats.jumpForwardSpeed * 1.5 * f.facing;
           f.throwInvincibilityTimer = THROW_INVINCIBILITY_JUMP_STARTUP;
           this.vfx.spawnDust(f.x, STAGE_GROUND_Y); return;
         }
         if (input.down && f.isGrounded()) { f.state = FighterState.CROUCH; f.displayHeight = 50; f.vx = 0; return; }
-        if (input.throwAttackPressed && f.canAct()) { f.startAttack(AttackType.THROW); return; }
+        if (input.throwAttackPressed && f.canAct()) {
+          if (input.forward) f.startAttack(AttackType.THROW_FORWARD);
+          else if (input.back) f.startAttack(AttackType.THROW_BACK);
+          else f.startAttack(AttackType.THROW);
+          return;
+        }
         if (f.canAct()) { const atk = this.tryAttack(input); if (atk) { f.startAttack(atk); return; } }
         if (!input.forward) { f.vx = 0; f.state = FighterState.IDLE; f.runStopTimer = 3; }
         break;
       }
 
       case FighterState.BACKDASH: {
-        f.vy += GRAVITY;
         if (f.isGrounded() && f.vy >= 0) {
           f.state = FighterState.IDLE; f.vx = 0; f.vy = 0; f.displayHeight = 100;
           f.landingRecovery = LANDING_RECOVERY; this.vfx.spawnDust(f.x, STAGE_GROUND_Y);
@@ -388,29 +410,34 @@ export class FighterController {
 
       case FighterState.HOP:
       case FighterState.HYPER_JUMP: {
-        if ((input.punchPressed || input.kickPressed) && !f.currentAttack) {
+        if ((input.punchPressed || input.kickPressed) && !f.currentAttack && !f.hasAttackedInAir) {
           const cn = this.character.routeNormal(input, f.state, false);
           const atk = cn || this.defaultAttack(input);
           if (atk) f.startAttack(atk);
         }
-        f.vy += GRAVITY; break;
+        break;
       }
 
       case FighterState.JUMP:
       case FighterState.RUN_JUMP: {
-        if (input.blowbackPressed && !f.currentAttack) { f.startAttack(AttackType.JUMP_CD); }
-        else if ((input.punchPressed || input.kickPressed) && !f.currentAttack) {
+        if (input.blowbackPressed && !f.currentAttack && !f.hasAttackedInAir) { f.startAttack(AttackType.JUMP_CD); }
+        else if ((input.punchPressed || input.kickPressed) && !f.currentAttack && !f.hasAttackedInAir) {
           const cn = this.character.routeNormal(input, f.state, false);
           const atk = cn || this.defaultAttack(input);
           if (atk) f.startAttack(atk);
         }
-        f.vy += GRAVITY; break;
+        break;
       }
 
       case FighterState.CROUCH: {
         f.displayHeight = 50; f.vx = 0;
         if (!input.down) { f.state = FighterState.IDLE; f.displayHeight = 100; return; }
-        if (input.throwAttackPressed && f.canAct()) { f.startAttack(AttackType.THROW); return; }
+        if (input.throwAttackPressed && f.canAct()) {
+          if (input.forward) f.startAttack(AttackType.THROW_FORWARD);
+          else if (input.back) f.startAttack(AttackType.THROW_BACK);
+          else f.startAttack(AttackType.THROW);
+          return;
+        }
         if ((input.punchPressed || input.kickPressed) && f.canAct()) {
           const cn = this.character.routeNormal(input, f.state, this.closeRange());
           if (cn) { f.startAttack(cn); return; }
@@ -432,8 +459,9 @@ export class FighterController {
         // ── Super Cancel (P9-F) ──
         if (f.superCancelReady && this.gauge && f.currentAttack) {
           const tick = this.tickRef.value;
-          const dmAttack = this.cmdBuf.checkDM(tick, input.punchPressed || input.kickPressed);
-          if (dmAttack && this.gauge.stocks >= DM_STOCK_COST + SUPER_CANCEL_STOCK_COST) {
+          const dmAttack = this.character.routeSpecial(input, this.cmdBuf, tick);
+          if (dmAttack && FighterController.isDM(dmAttack as string)
+              && this.gauge.stocks >= DM_STOCK_COST + SUPER_CANCEL_STOCK_COST) {
             spendStocks(this.gauge, DM_STOCK_COST + SUPER_CANCEL_STOCK_COST);
             f.startAttack(dmAttack);
             return;
@@ -539,6 +567,13 @@ export class FighterController {
         break;
       }
 
+      case FighterState.AIR_BLOCK: {
+        f.blockstunTimer--;
+        // 空中防御中继续受重力，blockstun 到期后在空中变为 JUMP 状态
+        if (f.blockstunTimer <= 0) { f.state = FighterState.JUMP; }
+        break;
+      }
+
       case FighterState.GUARD_CRUSH: {
         f.guardCrushTimer--;
         // Visual: flicker like hitstun
@@ -570,13 +605,23 @@ export class FighterController {
 }
 
 export function resolvePushbox(a: Fighter, b: Fighter): void {
-  const aBox = a.getPushbox(); const bBox = b.getPushbox();
-  const overlap = Math.min(aBox.x + aBox.width, bBox.x + bBox.width) - Math.max(aBox.x, bBox.x);
-  if (overlap > 0) {
-    const push = overlap / 2 + 0.5;
-    if (a.x < b.x) { a.x -= push; b.x += push; } else { a.x += push; b.x -= push; }
-    // Clamp both fighters to stage bounds after push-apart
-    a.x = Math.max(STAGE_LEFT, Math.min(a.x, STAGE_RIGHT));
-    b.x = Math.max(STAGE_LEFT, Math.min(b.x, STAGE_RIGHT));
-  }
+  // Roll states: no pushbox collision (characters phase through each other)
+  if (a.isRolling() || b.isRolling()) return;
+
+  const aBox = a.getPushbox();
+  const bBox = b.getPushbox();
+
+  // X-axis overlap check
+  const xOverlap = Math.min(aBox.x + aBox.width, bBox.x + bBox.width) - Math.max(aBox.x, bBox.x);
+  if (xOverlap <= 0) return;
+
+  // Y-axis overlap check — jumping fighters above grounded fighters don't collide
+  const yOverlap = Math.min(aBox.y + aBox.height, bBox.y + bBox.height) - Math.max(aBox.y, bBox.y);
+  if (yOverlap <= 0) return;
+
+  // Both checks passed: push apart
+  const push = xOverlap / 2 + 0.5;
+  if (a.x < b.x) { a.x -= push; b.x += push; } else { a.x += push; b.x -= push; }
+  a.x = Math.max(STAGE_LEFT, Math.min(a.x, STAGE_RIGHT));
+  b.x = Math.max(STAGE_LEFT, Math.min(b.x, STAGE_RIGHT));
 }

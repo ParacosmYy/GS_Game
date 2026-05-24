@@ -29,8 +29,10 @@ export function drawPixelPortrait(
   scale: number = 3,
 ): void {
   for (let row = 0; row < portrait.height; row++) {
+    const rowData = portrait.pixels[row];
+    if (!rowData) continue;
     for (let col = 0; col < portrait.width; col++) {
-      const idx = portrait.pixels[row]![col]!;
+      const idx = rowData[col] ?? 0;
       if (idx === 0) continue;
       const color = portrait.palette[idx];
       if (!color) continue;

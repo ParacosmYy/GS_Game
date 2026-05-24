@@ -63,6 +63,19 @@ export function tickMaxMode(maxMode: MaxModeState): void {
   }
 }
 
+/** 风云再起 auto meter regen — called every frame */
+export function tickAutoMeter(gauges: [PowerGauge, PowerGauge]): void {
+  for (const g of gauges) {
+    if (g.stocks < MAX_STOCKS) {
+      g.meter = Math.min(METER_PER_STOCK, g.meter + 0.5);
+      if (g.meter >= METER_PER_STOCK && g.stocks < MAX_STOCKS) {
+        g.stocks++;
+        g.meter = 0;
+      }
+    }
+  }
+}
+
 /** Reset gauge and MAX mode */
 export function resetMeterSystem(gauge: PowerGauge, maxMode: MaxModeState): void {
   gauge.meter = 0;

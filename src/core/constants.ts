@@ -1,6 +1,9 @@
 // ===== Stage Constants =====
 export const CANVAS_WIDTH = 800;
 export const CANVAS_HEIGHT = 600;
+
+// ===== Round Timer =====
+export const ROUND_TIME = 99;
 export const STAGE_WIDTH = 1400;
 export const STAGE_GROUND_Y = 480;
 
@@ -152,6 +155,16 @@ export const FRAME_DATA = {
     damage: 100, hitstun: 0, blockstun: 0, pushback: 0,
     hitLevel: 'MID' as const, knockdown: true,
   },
+  THROW_FORWARD: {
+    startup: 3, active: 2, recovery: 22,
+    damage: 110, hitstun: 0, blockstun: 0, pushback: 0,
+    hitLevel: 'MID' as const, knockdown: true,
+  },
+  THROW_BACK: {
+    startup: 3, active: 2, recovery: 22,
+    damage: 120, hitstun: 0, blockstun: 0, pushback: 0,
+    hitLevel: 'MID' as const, knockdown: true,
+  },
   // ── 必杀技 ──
   SPECIAL_PROJECTILE: {
     startup: 10, active: 20, recovery: 15,
@@ -227,6 +240,22 @@ export const FRAME_DATA = {
     startup: 4, active: 5, recovery: 14,
     damage: 65, hitstun: 19, blockstun: 17, pushback: 5,
     hitLevel: 'MID' as const, knockdown: true,
+  },
+  // 荒咬み终结技 (Aragami finishers)
+  KYO_NANASE: {
+    startup: 5, active: 5, recovery: 14,
+    damage: 65, hitstun: 19, blockstun: 17, pushback: 5,
+    hitLevel: 'MID' as const, knockdown: true,
+  },
+  KYO_KOTO_TSUKI: {
+    startup: 6, active: 6, recovery: 16,
+    damage: 75, hitstun: 19, blockstun: 17, pushback: 6,
+    hitLevel: 'MID' as const, knockdown: true,
+  },
+  KYO_YAKISOGI: {
+    startup: 4, active: 4, recovery: 12,
+    damage: 60, hitstun: 19, blockstun: 17, pushback: 4,
+    hitLevel: 'HIGH' as const, knockdown: true,
   },
   // ── 八神庵必杀技 (Iori Yagami) ──
   IORI_AOIHANA: {
@@ -307,6 +336,8 @@ export const HITBOX_OFFSETS = {
   JUMP_D: { offsetX: 30, offsetY: -35, width: 50, height: 40 },
   // 投技 & 必杀技
   THROW: { offsetX: 10, offsetY: -60, width: 70, height: 60 },
+  THROW_FORWARD: { offsetX: 10, offsetY: -60, width: 70, height: 60 },
+  THROW_BACK: { offsetX: 10, offsetY: -60, width: 70, height: 60 },
   SPECIAL_PROJECTILE: { offsetX: 50, offsetY: -60, width: 40, height: 30 },
   SPECIAL_UPPER: { offsetX: 30, offsetY: -80, width: 45, height: 50 },
   // CD击飞攻击
@@ -324,6 +355,9 @@ export const HITBOX_OFFSETS = {
   KYO_DOKUGAMI: { offsetX: 45, offsetY: -60, width: 50, height: 35 },
   KYO_TSUMIYOMI: { offsetX: 42, offsetY: -55, width: 48, height: 30 },
   KYO_BATSUYOMI: { offsetX: 45, offsetY: -70, width: 50, height: 40 },
+  KYO_NANASE: { offsetX: 45, offsetY: -35, width: 55, height: 40 },
+  KYO_KOTO_TSUKI: { offsetX: 55, offsetY: -55, width: 60, height: 40 },
+  KYO_YAKISOGI: { offsetX: 40, offsetY: -70, width: 45, height: 45 },
   // 八神庵
   IORI_AOIHANA: { offsetX: 45, offsetY: -55, width: 48, height: 35 },
   IORI_AOIHANA_2: { offsetX: 45, offsetY: -20, width: 50, height: 25 },
@@ -368,12 +402,12 @@ export const DAMAGE_SCALE_STEP = 0.10;  // 每连击递减10%
 export const DAMAGE_SCALE_MIN = 0.10;   // 最低10%伤害 (KOF 2002标准)
 
 // ===== Power Gauge (能量槽) =====
-export const MAX_STOCKS = 3;
+export const MAX_STOCKS = 5;
 export const METER_PER_STOCK = 100;
-export const METER_GAIN_HIT = 12;
-export const METER_GAIN_BLOCK = 5;
-export const METER_GAIN_WHIFF = 3;
-export const METER_GAIN_HITSTUN = 15;
+export const METER_GAIN_HIT = 100;
+export const METER_GAIN_BLOCK = 20;
+export const METER_GAIN_WHIFF = 10;
+export const METER_GAIN_HITSTUN = 50;
 export const DM_STOCK_COST = 1;
 
 // ===== MAX Mode =====
@@ -416,3 +450,15 @@ export const THROW_INVINCIBILITY_POST_STUN = 9;    // Frames after blockstun/hit
 export const THROW_INVINCIBILITY_WAKEUP = 8;        // Frames on wakeup from knockdown
 export const THROW_INVINCIBILITY_JUMP_STARTUP = 4;  // Frames during jump startup
 export const THROW_INVINCIBILITY_LANDING = 2;       // Frames on landing
+
+// ===== HUD Layout =====
+export const HUD_BAR_WIDTH = 300;
+export const HUD_BAR_HEIGHT = 20;
+export const HUD_BAR_Y = 30;
+export const HUD_MARGIN = 50;
+export const HUD_TIMER_SIZE = 32;
+export const HUD_GAUGE_Y = 570;
+export const HUD_GAUGE_WIDTH = 200;
+export const HUD_GAUGE_HEIGHT = 8;
+export const HUD_GAUGE_SEGMENT_GAP = 2;
+export const HUD_WIN_MARKER_SIZE = 5;

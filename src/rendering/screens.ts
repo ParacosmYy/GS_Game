@@ -17,6 +17,7 @@ export function drawCharacterSelect(
   p2Ready: boolean,
   tick: number,
   p2IsAI: boolean,
+  simplifiedMode: boolean,
 ): void {
   ctx.save();
 
@@ -48,7 +49,7 @@ export function drawCharacterSelect(
   // Subtitle
   ctx.fillStyle = '#888';
   ctx.font = '12px monospace';
-  ctx.fillText('P1: A/D选择  J确认  |  P2: ←/→选择  Numpad1确认', 400, 80);
+  ctx.fillText('P1: A/D选择 J确认 | T: 切换AI', 400, 80);
 
   // Character cards
   const cols = ROSTER.length;
@@ -187,6 +188,31 @@ export function drawCharacterSelect(
   ctx.font = 'bold 48px monospace';
   ctx.fillText('VS', 400, bottomY + 30);
 
+  // Mode selector tabs (hidden when both ready)
+  if (!p1Ready || !p2Ready) {
+    const modeY = 510;
+    const tabs = [
+      { label: '标准模式', desc: 'QCF指令出招', active: !simplifiedMode, x: 330 },
+      { label: '简化模式', desc: 'U/I/O一键出招', active: simplifiedMode, x: 470 },
+    ];
+    for (const t of tabs) {
+      const tw = 120, th = 30;
+      ctx.fillStyle = t.active ? 'rgba(0,180,80,0.9)' : 'rgba(40,40,60,0.8)';
+      roundRect(ctx, t.x - tw / 2, modeY, tw, th, 6); ctx.fill();
+      ctx.strokeStyle = t.active ? '#44ff88' : '#555';
+      ctx.lineWidth = t.active ? 2 : 1;
+      roundRect(ctx, t.x - tw / 2, modeY, tw, th, 6); ctx.stroke();
+      ctx.font = 'bold 14px monospace'; ctx.textAlign = 'center';
+      ctx.fillStyle = t.active ? '#fff' : '#999';
+      ctx.fillText(t.label, t.x, modeY + th / 2);
+      ctx.font = '10px monospace';
+      ctx.fillStyle = t.active ? '#ccffcc' : '#666';
+      ctx.fillText(t.desc, t.x, modeY + th + 14);
+    }
+    ctx.fillStyle = '#555'; ctx.font = '10px monospace'; ctx.textAlign = 'center';
+    ctx.fillText('Tab键切换', 400, modeY + 58);
+  }
+
   // Start hint
   if (p1Ready && p2Ready) {
     const blink = Math.sin(tick * 0.15) > 0;
@@ -203,7 +229,7 @@ export function drawCharacterSelect(
 
 // ===== Intro Overlay =====
 
-/** Draw ROUND 1 / FIGHT! intro overlay */
+/** Draw ROUND 1 / FIGHT! intro overlay with brush-stroke style */
 export function drawIntro(ctx: CanvasRenderingContext2D, phaseTimer: number, currentRound: number = 1): void {
   ctx.save();
   ctx.textAlign = 'center';
@@ -213,19 +239,66 @@ export function drawIntro(ctx: CanvasRenderingContext2D, phaseTimer: number, cur
     const progress = phaseTimer / 60;
     const scale = 1 + Math.max(0, 1 - progress * 3) * 0.5;
     ctx.globalAlpha = Math.min(1, progress * 4);
-    ctx.fillStyle = '#ffffff';
-    ctx.font = `bold ${Math.round(40 * scale)}px monospace`;
+    const fontSize = Math.round(48 * scale);
+
+    // White stroke outline (brush-stroke effect)
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 4;
+    ctx.lineJoin = 'round';
+    ctx.font = `bold ${fontSize}px monospace`;
+    ctx.strokeText(`ROUND ${currentRound}`, 400, 260);
+
+    // Color fill
+    ctx.fillStyle = '#ffcc00';
+    ctx.shadowColor = '#ff8800';
+    ctx.shadowBlur = 12;
     ctx.fillText(`ROUND ${currentRound}`, 400, 260);
+    ctx.shadowBlur = 0;
   } else if (phaseTimer < 100) {
     const fp = (phaseTimer - 60) / 40;
     const scale = 1 + Math.max(0, 1 - fp * 4) * 1.5;
     const alpha = fp < 0.1 ? fp * 10 : Math.max(0, 1 - (fp - 0.5) * 2);
     ctx.globalAlpha = Math.min(1, Math.max(0, alpha));
+
+    // Expanding shockwave ring behind text
+    const ringProgress = Math.min(1, fp * 2);
+    const ringRadius = 20 + ringProgress * 120;
+    const ringAlpha = Math.max(0, 1 - ringProgress);
+    if (ringAlpha > 0) {
+      ctx.beginPath();
+      ctx.arc(400, 300, ringRadius, 0, Math.PI * 2);
+      ctx.strokeStyle = `rgba(255, 100, 0, ${ringAlpha * 0.6})`;
+      ctx.lineWidth = 3 * (1 - ringProgress) + 1;
+      ctx.stroke();
+
+      // Second ring, slightly delayed
+      const ring2Progress = Math.min(1, Math.max(0, fp * 2 - 0.15));
+      const ring2Radius = 20 + ring2Progress * 100;
+      const ring2Alpha = Math.max(0, 1 - ring2Progress);
+      if (ring2Alpha > 0) {
+        ctx.beginPath();
+        ctx.arc(400, 300, ring2Radius, 0, Math.PI * 2);
+        ctx.strokeStyle = `rgba(255, 200, 50, ${ring2Alpha * 0.4})`;
+        ctx.lineWidth = 2 * (1 - ring2Progress) + 1;
+        ctx.stroke();
+      }
+    }
+
+    const fontSize = Math.round(64 * scale);
+
+    // White stroke outline (brush-stroke effect)
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 3;
+    ctx.lineJoin = 'round';
+    ctx.font = `bold ${fontSize}px monospace`;
+    ctx.strokeText('FIGHT!', 400, 300);
+
+    // Color fill with glow
     ctx.shadowColor = '#ff4400';
     ctx.shadowBlur = 20;
     ctx.fillStyle = '#ff4400';
-    ctx.font = `bold ${Math.round(60 * scale)}px monospace`;
     ctx.fillText('FIGHT!', 400, 300);
+    ctx.shadowBlur = 0;
   }
 
   ctx.restore();
@@ -402,5 +475,25 @@ export function drawMatchEnd(
   ctx.font = '14px monospace';
   ctx.fillText('Press any key to continue', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 110);
 
+  ctx.restore();
+}
+
+// ===== In-game Mode Indicator =====
+
+/** Draw control mode badge (pill shape, shown briefly at round start / Tab press) */
+export function drawModeIndicator(ctx: CanvasRenderingContext2D, simplifiedMode: boolean, alpha: number): void {
+  ctx.save();
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.globalAlpha = Math.min(1, alpha);
+  const label = simplifiedMode ? '简化模式' : '标准模式';
+  const bg = simplifiedMode ? 'rgba(0,180,80,0.85)' : 'rgba(60,60,100,0.85)';
+  const border = simplifiedMode ? '#44ff88' : '#8888bb';
+  const pw = 160, ph = 26, px = (CANVAS_WIDTH - pw) / 2, py = 52;
+  ctx.fillStyle = bg; roundRect(ctx, px, py, pw, ph, 13); ctx.fill();
+  ctx.strokeStyle = border; ctx.lineWidth = 1.5;
+  roundRect(ctx, px, py, pw, ph, 13); ctx.stroke();
+  ctx.font = 'bold 14px monospace'; ctx.fillStyle = '#fff';
+  ctx.fillText(label, CANVAS_WIDTH / 2, py + ph / 2);
+  ctx.globalAlpha = 1;
   ctx.restore();
 }
