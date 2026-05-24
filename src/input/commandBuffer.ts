@@ -1,5 +1,5 @@
 import { AttackType, DirectionInput } from '../core/types.js';
-import { COMMAND_WINDOW } from '../core/constants.js';
+import { COMMAND_WINDOW, HCF_WINDOW, DOUBLE_QCF_WINDOW } from '../core/constants.js';
 
 interface DirectionRecord {
   direction: DirectionInput;
@@ -49,6 +49,35 @@ export class CommandBuffer {
     }
     if (this.matchSequence(recent, ['down', 'forward'])) {
       return AttackType.SPECIAL_PROJECTILE;
+    }
+
+    return null;
+  }
+
+  /**
+   * Check for DM (Desperation Move) inputs.
+   * Uses a wider window for complex motions.
+   */
+  checkDM(currentFrame: number, attackPressed: boolean): AttackType | null {
+    if (!attackPressed) return null;
+
+    // 大蛇薙: ↓↙←↙↓↘→ (HCF-like: back→down→downforward→forward)
+    // Simplified as: back → down → forward (half-circle forward shortcut)
+    const wideRecent = this.history.filter(
+      (r) => currentFrame - r.frame <= HCF_WINDOW,
+    );
+    if (this.matchSequence(wideRecent, ['back', 'down', 'downforward', 'forward'])
+      || this.matchSequence(wideRecent, ['back', 'down', 'forward'])) {
+      return AttackType.DM_OROCHINAGI;
+    }
+
+    // Also accept: down→back→down→forward (qcb→qcf pattern)
+    const dmRecent = this.history.filter(
+      (r) => currentFrame - r.frame <= DOUBLE_QCF_WINDOW,
+    );
+    if (this.matchSequence(dmRecent, ['down', 'downback', 'back', 'down', 'downforward', 'forward'])
+      || this.matchSequence(dmRecent, ['down', 'back', 'down', 'forward'])) {
+      return AttackType.DM_OROCHINAGI;
     }
 
     return null;

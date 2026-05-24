@@ -6,11 +6,11 @@ export enum FighterState {
   BACKDASH = 'BACKDASH',
   JUMP = 'JUMP',
   RUN_JUMP = 'RUN_JUMP',
-  HOP = 'HOP',             // 小跳 (短按↑)
-  HYPER_JUMP = 'HYPER_JUMP', // 大跳 (↓→↑)
+  HOP = 'HOP',
+  HYPER_JUMP = 'HYPER_JUMP',
   CROUCH = 'CROUCH',
-  ROLL = 'ROLL',           // 前滚紧急回避
-  BACK_ROLL = 'BACK_ROLL', // 后滚紧急回避
+  ROLL = 'ROLL',
+  BACK_ROLL = 'BACK_ROLL',
   STAND_ATTACK = 'STAND_ATTACK',
   CROUCH_ATTACK = 'CROUCH_ATTACK',
   AIR_ATTACK = 'AIR_ATTACK',
@@ -18,6 +18,7 @@ export enum FighterState {
   BLOCK = 'BLOCK',
   HITSTUN = 'HITSTUN',
   KNOCKDOWN = 'KNOCKDOWN',
+  MAX_MODE = 'MAX_MODE',  // MAX模式激活动画 (短暂)
 }
 
 // ===== Attack Types (KOF 4-button: A=轻拳 B=轻脚 C=重拳 D=重脚) =====
@@ -44,6 +45,8 @@ export enum AttackType {
   THROW = 'THROW',
   SPECIAL_PROJECTILE = 'SPECIAL_PROJECTILE',
   SPECIAL_UPPER = 'SPECIAL_UPPER',
+  // 超必杀技 (DM - Desperation Move)
+  DM_OROCHINAGI = 'DM_OROCHINAGI',   // 大蛇薙 ↓↙←↙↓↘→+P
 }
 
 // ===== Hit Level (防御判定) =====
@@ -82,6 +85,20 @@ export type DirectionInput =
 
 // ===== Block Type =====
 export type BlockType = 'HIGH' | 'LOW';
+
+// ===== Power Gauge (能量槽) =====
+export interface PowerGauge {
+  meter: number;         // 当前能量值 (0~maxMeter)
+  stocks: number;        // 已攒满的能量条数 (0~MAX_STOCKS)
+  maxMeter: number;      // 一条能量的满值
+}
+
+// ===== MAX Mode State =====
+export interface MaxModeState {
+  active: boolean;
+  timer: number;         // 剩余帧数
+  maxDuration: number;   // 总持续帧数
+}
 
 // ===== Attack Phase =====
 export type AttackPhase = 'startup' | 'active' | 'recovery' | 'none';

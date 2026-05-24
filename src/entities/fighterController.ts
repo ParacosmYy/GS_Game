@@ -173,6 +173,12 @@ export class FighterController {
     return null;
   }
 
+  /** Try DM super move (punch buttons) */
+  private tryDM(input: ResolvedInput): AttackType | null {
+    if (!input.punchPressed) return null;
+    return this.cmdBuf.checkDM(this.tickRef.value, true);
+  }
+
   private tickStateMachine(input: ResolvedInput): void {
     const f = this.fighter;
     f.tickTimers();
@@ -256,6 +262,12 @@ export class FighterController {
         if (input.throwAttackPressed && f.canAct()) {
           f.startAttack(AttackType.THROW);
           return;
+        }
+
+        // Priority 5.5: DM super move (check before normal special)
+        if (input.punchPressed && f.canAct()) {
+          const dm = this.tryDM(input);
+          if (dm) { f.startAttack(dm); return; }
         }
 
         // Priority 6: Special move (punch buttons + motion)

@@ -3,6 +3,8 @@ import { Projectile } from '../entities/projectile.js';
 import { CommandBuffer } from '../input/commandBuffer.js';
 import { Camera } from '../core/camera.js';
 import { FighterState, AttackType } from '../core/types.js';
+import type { PowerGauge, MaxModeState } from '../core/types.js';
+import { MAX_STOCKS, MAX_MODE_DURATION } from '../core/constants.js';
 import { CANVAS_WIDTH, CANVAS_HEIGHT, STAGE_GROUND_Y, FIGHTER_WIDTH, MAX_HEALTH, FRAME_DATA } from '../core/constants.js';
 
 export class Renderer {
@@ -391,6 +393,24 @@ export class Renderer {
       ctx.moveTo(sx + 5 * f.facing, sy - f.displayHeight * 0.45);
       ctx.lineTo(sx + (FIGHTER_WIDTH / 2 + reach) * f.facing, sy - f.displayHeight * 0.35);
       ctx.stroke();
+    } else if (f.currentAttack === AttackType.DM_OROCHINAGI) {
+      // DM大蛇薙: 巨大火焰
+      ctx.strokeStyle = '#ff4400';
+      ctx.shadowColor = '#ff6600';
+      ctx.shadowBlur = 20;
+      ctx.lineWidth = 14;
+      const reach = limbLen * 1.5;
+      ctx.beginPath();
+      ctx.moveTo(sx + 5 * f.facing, sy - f.displayHeight * 0.55);
+      ctx.lineTo(sx + (FIGHTER_WIDTH / 2 + reach) * f.facing, sy - f.displayHeight * 0.45);
+      ctx.stroke();
+      // Extra flame arc
+      ctx.strokeStyle = '#ffaa00';
+      ctx.lineWidth = 8;
+      ctx.beginPath();
+      ctx.arc(sx + (FIGHTER_WIDTH / 2 + reach * 0.7) * f.facing, sy - f.displayHeight * 0.5,
+        15 * (0.5 + progress * 0.5), 0, Math.PI * 2);
+      ctx.stroke();
     } else if (f.currentAttack === AttackType.THROW) {
       ctx.strokeStyle = '#ff8844';
       ctx.beginPath();
@@ -761,7 +781,70 @@ export class Renderer {
     ctx.fillStyle = 'rgba(255,255,255,0.25)';
     ctx.font = '9px monospace';
     ctx.textAlign = 'center';
-    ctx.fillText('P1: WASD+J(A)K(B)U(C)I(D)L(投)  P2: Arrows+Np1(A)2(B)3(C)0(D).(投)  R:Restart  F1:Debug', 400, 596);
+    ctx.fillText('P1: WASD+J/K/U/I/L  P2: Arrows+Np1/2/3/0/.  A+B:Roll  C+D:CD  B+C:MAX  R:Restart  F1:Debug', 400, 596);
     ctx.textAlign = 'left';
+  }
+
+  // ===== Power Gauge UI =====
+  drawPowerGauges(gauges: [PowerGauge, PowerGauge], maxModes: [MaxModeState, MaxModeState]): void {
+    const ctx = this.ctx;
+    const gaugeY = 50;
+    const stockW = 30;
+    const stockH = 6;
+    const stockGap = 3;
+
+    for (let p = 0; p < 2; p++) {
+      const gauge = gauges[p];
+      const maxMode = maxModes[p];
+      const isP1 = p === 0;
+      const baseX = isP1 ? 50 : CANVAS_WIDTH - 50 - MAX_STOCKS * (stockW + stockGap);
+
+      // Draw stocks
+      for (let s = 0; s < MAX_STOCKS; s++) {
+        const x = baseX + s * (stockW + stockGap);
+        const filled = s < gauge.stocks;
+
+        ctx.fillStyle = 'rgba(0,0,0,0.5)';
+        ctx.fillRect(x, gaugeY, stockW, stockH);
+
+        if (filled) {
+          const stockGrad = ctx.createLinearGradient(x, gaugeY, x + stockW, gaugeY);
+          stockGrad.addColorStop(0, '#ffaa00');
+          stockGrad.addColorStop(1, '#ff6600');
+          ctx.fillStyle = stockGrad;
+          ctx.fillRect(x, gaugeY, stockW, stockH);
+        } else if (s === gauge.stocks && gauge.meter > 0) {
+          // Partial fill for current charging stock
+          const fillW = (gauge.meter / gauge.maxMeter) * stockW;
+          const partialGrad = ctx.createLinearGradient(x, gaugeY, x + fillW, gaugeY);
+          partialGrad.addColorStop(0, '#4488ff');
+          partialGrad.addColorStop(1, '#2266dd');
+          ctx.fillStyle = partialGrad;
+          ctx.fillRect(x, gaugeY, fillW, stockH);
+        }
+
+        ctx.strokeStyle = 'rgba(255,255,255,0.2)';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(x, gaugeY, stockW, stockH);
+      }
+
+      // MAX mode indicator
+      if (maxMode.active) {
+        const maxBaseX = isP1 ? 50 : CANVAS_WIDTH - 50 - 60;
+        const pct = maxMode.timer / maxMode.maxDuration;
+        ctx.fillStyle = 'rgba(255, 100, 255, 0.8)';
+        ctx.font = 'bold 10px monospace';
+        ctx.textAlign = isP1 ? 'left' : 'right';
+        ctx.fillText('MAX', isP1 ? maxBaseX : maxBaseX + 60, gaugeY + 16);
+
+        // Timer bar
+        const timerX = isP1 ? maxBaseX + 32 : maxBaseX;
+        ctx.fillStyle = 'rgba(0,0,0,0.5)';
+        ctx.fillRect(timerX, gaugeY + 10, 60, 4);
+        ctx.fillStyle = `rgba(255, ${Math.round(100 + 155 * pct)}, 255, 0.8)`;
+        ctx.fillRect(timerX, gaugeY + 10, 60 * pct, 4);
+        ctx.textAlign = 'left';
+      }
+    }
   }
 }

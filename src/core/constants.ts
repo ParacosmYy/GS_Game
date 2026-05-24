@@ -33,6 +33,8 @@ export const MAX_HEALTH = 1000;
 
 // ===== Input Constants =====
 export const COMMAND_WINDOW = 15;
+export const HCF_WINDOW = 25;         // 半圆指令窗口 (↓↙←↙↓↘→)
+export const DOUBLE_QCF_WINDOW = 25;  // 双QCF指令窗口 (↓↘→↓↘→)
 
 // ===== Game Loop Constants =====
 export const TICK_RATE = 1000 / 60;
@@ -133,6 +135,12 @@ export const FRAME_DATA = {
     damage: 60, hitstun: 0, blockstun: 10, pushback: 6,
     hitLevel: 'HIGH' as const, knockdown: true,
   },
+  // ── 超必杀技 (DM) ──
+  DM_OROCHINAGI: {
+    startup: 8, active: 30, recovery: 20,
+    damage: 200, hitstun: 0, blockstun: 18, pushback: 10,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 20,
+  },
 } as const;
 
 // ===== Hitbox Offsets (relative to fighter position, facing right) =====
@@ -159,6 +167,8 @@ export const HITBOX_OFFSETS = {
   // CD击飞攻击
   STAND_CD: { offsetX: 45, offsetY: -50, width: 60, height: 45 },
   JUMP_CD: { offsetX: 40, offsetY: -35, width: 55, height: 40 },
+  // 超必杀技
+  DM_OROCHINAGI: { offsetX: 40, offsetY: -65, width: 80, height: 60 },
 } as const;
 
 // ===== Throw Constants =====
@@ -184,3 +194,17 @@ export const CH_DAMAGE_BONUS = 1.25;   // Counter Hit 伤害x1.25
 // ===== Damage Scaling =====
 export const DAMAGE_SCALE_STEP = 0.10;  // 每连击递减10%
 export const DAMAGE_SCALE_MIN = 0.50;   // 最低50%伤害
+
+// ===== Power Gauge (能量槽) =====
+export const MAX_STOCKS = 3;
+export const METER_PER_STOCK = 100;
+export const METER_GAIN_HIT = 12;
+export const METER_GAIN_BLOCK = 5;
+export const METER_GAIN_WHIFF = 3;
+export const METER_GAIN_HITSTUN = 15;
+export const DM_STOCK_COST = 1;
+
+// ===== MAX Mode =====
+export const MAX_MODE_DURATION = 720;     // 12秒 @60fps
+export const MAX_MODE_STOCK_COST = 1;
+export const MAX_MODE_DMG_REDUCTION = 0.75;
