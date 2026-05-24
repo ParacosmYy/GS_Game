@@ -370,9 +370,10 @@ function updateFighter(
       fighter.vx = 0;
       fighter.state = FighterState.IDLE;
       fighter.landingRecovery = LANDING_RECOVERY;
-    } else {
+    } else if (fighter.vy > 0) {
+      // Only zero downward velocity on ground contact
       fighter.y = STAGE_GROUND_Y;
-      if (fighter.vy > 0) fighter.vy = 0;
+      fighter.vy = 0;
     }
   }
 
@@ -467,7 +468,7 @@ function resolveAttack(attacker: Fighter, defender: Fighter): void {
     defender.health -= attackData.damage;
     defender.health = Math.max(0, defender.health);
     defender.applyKnockdown(30);
-    defender.x = attacker.x - THROW_DISTANCE * attacker.facing;
+    defender.x = attacker.x + THROW_DISTANCE * attacker.facing;
     return;
   }
 
