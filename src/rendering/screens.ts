@@ -225,7 +225,7 @@ export function drawIntro(ctx: CanvasRenderingContext2D, phaseTimer: number): vo
 // ===== KO Screen =====
 
 /** Draw KO overlay with winner announcement */
-export function drawKO(ctx: CanvasRenderingContext2D, winner: number | null): void {
+export function drawKO(ctx: CanvasRenderingContext2D, winner: number | null, perfectPlayer: number | null = null): void {
   ctx.save();
 
   // Dark overlay
@@ -253,32 +253,53 @@ export function drawKO(ctx: CanvasRenderingContext2D, winner: number | null): vo
     ctx.fillText('DOUBLE KO', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 50);
   }
 
+  // PERFECT text — golden glow, shown when winner took zero damage
+  if (perfectPlayer !== null) {
+    ctx.fillStyle = '#ffcc00';
+    ctx.shadowColor = '#ff8800';
+    ctx.shadowBlur = 15;
+    ctx.font = 'bold 36px monospace';
+    ctx.fillText('PERFECT!', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 100);
+    ctx.shadowBlur = 0;
+  }
+
   ctx.fillStyle = 'rgba(255,255,255,0.6)';
   ctx.font = '14px monospace';
-  ctx.fillText('Press R to restart', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 90);
+  ctx.fillText('Press R to restart', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 130);
 
   ctx.restore();
 }
 
 // ===== Super Flash (DM dark screen overlay) =====
 
-/** Draw DM super flash overlay — dark blue screen + burst at character position */
-export function drawSuperFlash(ctx: CanvasRenderingContext2D, timer: number, flashScreenX: number, flashScreenY: number): void {
+/** Draw DM super flash overlay — dark screen + burst at character position */
+export function drawSuperFlash(
+  ctx: CanvasRenderingContext2D, timer: number,
+  flashScreenX: number, flashScreenY: number,
+  flashType: 'DM' | 'SDM' = 'DM',
+): void {
   ctx.save();
   const progress = timer / 20; // 1.0 → 0.0
-  // Dark blue overlay — strongest at start, fading out
+  const isSDM = flashType === 'SDM';
+
+  // Dark overlay — strongest at start, fading out
   const alpha = 0.6 * progress;
-  ctx.fillStyle = `rgba(0, 0, 80, ${alpha})`;
+  ctx.fillStyle = isSDM ? `rgba(80, 0, 0, ${alpha})` : `rgba(0, 0, 80, ${alpha})`;
   ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
-  // Yellow/white flash burst on character position
+  // Flash burst on character position
   if (timer > 14) {
-    // Initial bright flash (first 6 frames)
     const flashAlpha = (timer - 14) / 6 * 0.8;
     const flashGrad = ctx.createRadialGradient(flashScreenX, flashScreenY, 0, flashScreenX, flashScreenY, 150);
-    flashGrad.addColorStop(0, `rgba(255, 255, 200, ${flashAlpha})`);
-    flashGrad.addColorStop(0.3, `rgba(255, 220, 100, ${flashAlpha * 0.6})`);
-    flashGrad.addColorStop(1, `rgba(255, 200, 50, 0)`);
+    if (isSDM) {
+      flashGrad.addColorStop(0, `rgba(255, 220, 160, ${flashAlpha})`);
+      flashGrad.addColorStop(0.3, `rgba(255, 160, 50, ${flashAlpha * 0.6})`);
+      flashGrad.addColorStop(1, `rgba(255, 120, 30, 0)`);
+    } else {
+      flashGrad.addColorStop(0, `rgba(255, 255, 200, ${flashAlpha})`);
+      flashGrad.addColorStop(0.3, `rgba(255, 220, 100, ${flashAlpha * 0.6})`);
+      flashGrad.addColorStop(1, `rgba(255, 200, 50, 0)`);
+    }
     ctx.fillStyle = flashGrad;
     ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
   }
@@ -286,9 +307,15 @@ export function drawSuperFlash(ctx: CanvasRenderingContext2D, timer: number, fla
   // Lingering glow around character
   const glowAlpha = progress * 0.5;
   const glowGrad = ctx.createRadialGradient(flashScreenX, flashScreenY, 0, flashScreenX, flashScreenY, 80 + (1 - progress) * 40);
-  glowGrad.addColorStop(0, `rgba(255, 255, 100, ${glowAlpha})`);
-  glowGrad.addColorStop(0.5, `rgba(255, 200, 50, ${glowAlpha * 0.4})`);
-  glowGrad.addColorStop(1, 'rgba(255, 200, 50, 0)');
+  if (isSDM) {
+    glowGrad.addColorStop(0, `rgba(255, 160, 60, ${glowAlpha})`);
+    glowGrad.addColorStop(0.5, `rgba(255, 100, 30, ${glowAlpha * 0.4})`);
+    glowGrad.addColorStop(1, 'rgba(255, 80, 20, 0)');
+  } else {
+    glowGrad.addColorStop(0, `rgba(255, 255, 100, ${glowAlpha})`);
+    glowGrad.addColorStop(0.5, `rgba(255, 200, 50, ${glowAlpha * 0.4})`);
+    glowGrad.addColorStop(1, 'rgba(255, 200, 50, 0)');
+  }
   ctx.fillStyle = glowGrad;
   ctx.fillRect(flashScreenX - 200, flashScreenY - 200, 400, 400);
 

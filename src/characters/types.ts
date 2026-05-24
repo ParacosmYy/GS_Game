@@ -67,6 +67,20 @@ export function pose(overrides: Partial<Pose> = {}): Pose {
   return { ...defaults, ...overrides };
 }
 
+// ===== 角色数值定义 =====
+
+/** 角色差异化数值 — 每个角色的移动/生命等基础参数 */
+export interface CharacterStats {
+  walkSpeed: number;         // 步行速度 (default: 4)
+  runSpeed: number;          // 跑步速度 (default: 7)
+  jumpVelocity: number;      // 普通跳垂直初速 (default: -14)
+  hopVelocity: number;       // 小跳垂直初速 (default: -10)
+  hyperJumpVelocity: number; // 大跳垂直初速 (default: -17)
+  maxHealth: number;         // 最大生命值 (default: 1000)
+  pushWidth: number;         // 推挤碰撞宽度 (default: 60)
+  jumpForwardSpeed: number;  // 跳跃水平速度 (default: 5)
+}
+
 // ===== 角色定义接口 =====
 
 /** 角色定义 — 所有招式路由逻辑都在这里 */
@@ -80,6 +94,10 @@ export interface CharacterDefinition {
   specialColor: string;  // 必杀技特效色 (火/气/光)
   specialGlow: string;   // 必杀技光晕色
   portrait: string;     // 选人界面图标
+
+  // ── 数值 ──
+  /** 角色差异化数值 (速度/生命/碰撞) */
+  stats: CharacterStats;
 
   // ── 骨骼动画 ──
   /** 角色姿态库: FighterState → Pose 映射 */

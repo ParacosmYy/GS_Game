@@ -19,6 +19,7 @@ import {
   FRAME_DATA,
   HITBOX_OFFSETS,
 } from '../core/constants.js';
+import type { CharacterStats } from '../characters/types.js';
 
 export class Fighter {
   x: number;
@@ -27,6 +28,7 @@ export class Fighter {
   vy = 0;
   health: number;
   maxHealth: number;
+  pushWidth: number;
   facing: Direction;
   state: FighterState = FighterState.IDLE;
   color: string;
@@ -76,6 +78,12 @@ export class Fighter {
   isThrowing = false;
   throwVictim: Fighter | null = null;
 
+  // Super cancel tracking (P9-F)
+  superCancelReady = false;
+
+  // Counter Wire: currently bouncing off wall from counter wire
+  isCounterWire = false;
+
   // Previous frame state tracking (for combo reset detection)
   private _prevState: FighterState = FighterState.IDLE;
   get prevState(): FighterState { return this._prevState; }
@@ -88,6 +96,14 @@ export class Fighter {
     this.facing = facing;
     this.health = MAX_HEALTH;
     this.maxHealth = MAX_HEALTH;
+    this.pushWidth = PUSH_BOX_WIDTH;
+  }
+
+  /** Apply character-specific stats */
+  setStats(stats: CharacterStats): void {
+    this.maxHealth = stats.maxHealth;
+    this.health = stats.maxHealth;
+    this.pushWidth = stats.pushWidth;
   }
 
   /** Update auto-facing toward opponent */
@@ -109,9 +125,9 @@ export class Fighter {
   /** Get the pushbox (for preventing overlap) */
   getPushbox(): { x: number; y: number; width: number; height: number } {
     return {
-      x: this.x - PUSH_BOX_WIDTH / 2,
+      x: this.x - this.pushWidth / 2,
       y: this.y - this.displayHeight,
-      width: PUSH_BOX_WIDTH,
+      width: this.pushWidth,
       height: this.displayHeight,
     };
   }
@@ -137,6 +153,7 @@ export class Fighter {
     this.attackFrame = 0;
     this.attackPhase = 'startup';
     this.hasHit = false;
+    this.superCancelReady = false;
 
     // Determine state from attack type
     const name = attackType as string;
@@ -184,6 +201,8 @@ export class Fighter {
     this.attackFrame = 0;
     this.attackPhase = 'none';
     this.hasHit = false;
+    this.superCancelReady = false;
+    this.isCounterWire = false;
     this.state = FighterState.IDLE;
   }
 
@@ -195,6 +214,7 @@ export class Fighter {
     this.currentAttack = null;
     this.attackPhase = 'none';
     this.attackFrame = 0;
+    this.superCancelReady = false;
   }
 
   /** Apply blockstun */
@@ -214,6 +234,7 @@ export class Fighter {
     this.isHardKnockdown = hard;
     this.currentAttack = null;
     this.attackPhase = 'none';
+    this.superCancelReady = false;
   }
 
   /** Can the fighter act (accept input) right now? */
@@ -266,7 +287,7 @@ export class Fighter {
     this.y = STAGE_GROUND_Y;
     this.vx = 0;
     this.vy = 0;
-    this.health = MAX_HEALTH;
+    this.health = this.maxHealth;
     this.state = FighterState.IDLE;
     this.currentAttack = null;
     this.attackFrame = 0;
@@ -291,5 +312,7 @@ export class Fighter {
     this.guardCrushTimer = 0;
     this.juggleState = JuggleState.NONE;
     this.airHitCount = 0;
+    this.superCancelReady = false;
+    this.isCounterWire = false;
   }
 }

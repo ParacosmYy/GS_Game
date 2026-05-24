@@ -23,6 +23,17 @@ export const KimDef: CharacterDefinition = {
   specialGlow: '#88ccff',
   portrait: '🦵',
 
+  stats: {
+    walkSpeed: 5,
+    runSpeed: 8,
+    jumpVelocity: -13,
+    hopVelocity: -11,
+    hyperJumpVelocity: -16,
+    maxHealth: 920,
+    pushWidth: 56,
+    jumpForwardSpeed: 6,
+  },
+
   poses: {
     [FighterState.IDLE]: pose({
       armFront: bone(8, 15, 0.1),
@@ -71,6 +82,55 @@ export const KimDef: CharacterDefinition = {
       armBack: bone(-6, 3, -0.2),
       legFront: bone(2, -8, 0.4),
       legBack: bone(-4, -2, -0.55),
+    }),
+    // — Attack poses (upright martial arts stance, higher kicks, more leg extension) —
+    [FighterState.STAND_ATTACK]: pose({
+      head: bone(2, 0, 0.05),
+      body: bone(3, 0, 0.08),
+      armFront: bone(24, 5, -0.1, 1.2),     // precise straight punch
+      armBack: bone(-8, 8, -0.6, 0.85),
+      legFront: bone(6, 0, 0.08),
+      legBack: bone(-7, 0, -0.12),
+    }),
+    [FighterState.CROUCH_ATTACK]: pose({
+      head: bone(2, 8, 0.05),
+      body: bone(2, 12, 0.1),
+      armFront: bone(15, 12, -0.1, 1.0),
+      armBack: bone(-8, 15, -0.4, 0.8),
+      legFront: bone(22, 3, 0.5, 1.35),      // HIGH kick extension!
+      legBack: bone(-8, 8, -0.3),
+    }),
+    [FighterState.AIR_ATTACK]: pose({
+      head: bone(0, -2, -0.08),
+      body: bone(1, 0, 0.1),
+      armFront: bone(18, -3, -0.2, 1.1),
+      armBack: bone(-8, 0, -0.35, 0.85),
+      legFront: bone(20, 4, 0.5, 1.3),       // high aerial kick
+      legBack: bone(-6, -2, -0.3),
+    }),
+    [FighterState.THROW]: pose({
+      head: bone(2, 0, 0.05),
+      body: bone(4, 0, 0.12),
+      armFront: bone(26, 3, -0.08, 1.3),     // reaching grab
+      armBack: bone(16, 5, -0.15, 1.1),
+      legFront: bone(5, 0, 0.08),
+      legBack: bone(-6, 0, -0.1),
+    }),
+    [FighterState.GUARD_CRUSH]: pose({
+      head: bone(-3, 3, -0.18),
+      body: bone(-2, 2, -0.08),
+      armFront: bone(-5, 12, 0.4),
+      armBack: bone(-7, 10, 0.3),
+      legFront: bone(2, 0, 0.05),
+      legBack: bone(-4, 0, -0.05),
+    }),
+    [FighterState.HOP]: pose({
+      head: bone(0, -2, -0.05),
+      body: bone(0, -1, 0),
+      armFront: bone(6, 4, 0.2),
+      armBack: bone(-5, 3, -0.2),
+      legFront: bone(4, 3, 0.18),
+      legBack: bone(-5, 2, -0.25),
     }),
   },
 

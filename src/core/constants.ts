@@ -165,12 +165,12 @@ export const FRAME_DATA = {
   STAND_CD: {
     startup: 14, active: 4, recovery: 18,
     damage: 70, hitstun: 0, blockstun: 12, pushback: 8,
-    hitLevel: 'MID' as const, knockdown: true,
+    hitLevel: 'MID' as const, knockdown: true, counterWire: true as const,
   },
   JUMP_CD: {
     startup: 12, active: 5, recovery: 8,
     damage: 60, hitstun: 0, blockstun: 10, pushback: 6,
-    hitLevel: 'HIGH' as const, knockdown: true,
+    hitLevel: 'HIGH' as const, knockdown: true, counterWire: true as const,
   },
   // ── 超必杀技 (DM) ──
   DM_OROCHINAGI: {
@@ -357,6 +357,10 @@ export const CHIP_DAMAGE_RATIO = 0.1;
 export const CH_HITSTUN_BONUS = 1.5;   // Counter Hit 硬直x1.5
 export const CH_DAMAGE_BONUS = 1.25;   // Counter Hit 伤害x1.25
 
+// ===== Counter Wire (墙弹) =====
+export const COUNTER_WIRE_BOUNCE_VX = 8;   // Wall bounce horizontal speed
+export const COUNTER_WIRE_BOUNCE_VY = -6;  // Wall bounce vertical speed (upward)
+
 // ===== Damage Scaling =====
 export const DAMAGE_SCALE_STEP = 0.10;  // 每连击递减10%
 export const DAMAGE_SCALE_MIN = 0.10;   // 最低10%伤害 (KOF 2002标准)
@@ -374,3 +378,8 @@ export const DM_STOCK_COST = 1;
 export const MAX_MODE_DURATION = 720;     // 12秒 @60fps
 export const MAX_MODE_STOCK_COST = 1;
 export const MAX_MODE_DMG_REDUCTION = 0.75;
+
+// ===== Advanced Cancel Mechanics =====
+export const PROXIMITY_GUARD_RANGE = 500;        // ~85% of visible screen width
+export const SUPER_CANCEL_STOCK_COST = 1;         // Extra stock for super cancel
+export const FREE_CANCEL_TIMER_COST = 0.20;       // 20% of MAX mode timer per free cancel

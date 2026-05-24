@@ -18,6 +18,7 @@ export function drawSkeletalFighter(
   bodyColor: string,
   outlineColor: string,
   globalTick: number,
+  maxModeActive: boolean = false,
 ): void {
   const charDef = ROSTER.find(c => c.id === f.charId);
   const poseSet = charDef?.poses;
@@ -173,4 +174,18 @@ export function drawSkeletalFighter(
     armW * p.armFront.scale, armH * p.armFront.scale, frontArm.rot,
     shiftColor(armColor, 15), armColor, outlineColor,
   );
+
+  // === MAX mode glow aura ===
+  if (maxModeActive) {
+    const glowPulse = 0.15 + Math.sin(globalTick / 4) * 0.1;
+    const glowGrad = ctx.createRadialGradient(
+      sx, sy - f.displayHeight / 2, 10,
+      sx, sy - f.displayHeight / 2, f.displayHeight * 0.8
+    );
+    glowGrad.addColorStop(0, `rgba(255, 255, 100, ${glowPulse})`);
+    glowGrad.addColorStop(0.5, `rgba(255, 220, 50, ${glowPulse * 0.5})`);
+    glowGrad.addColorStop(1, 'rgba(255, 200, 50, 0)');
+    ctx.fillStyle = glowGrad;
+    ctx.fillRect(Math.round(sx - 50), Math.round(sy - f.displayHeight - 20), 100, f.displayHeight + 40);
+  }
 }

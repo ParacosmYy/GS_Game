@@ -54,6 +54,76 @@ export class VFXSystem {
     });
   }
 
+  /** Spawn character-specific hit sparks using attacker's special color */
+  spawnCharacterHitSparks(worldX: number, worldY: number, count: number, charColor: string): void {
+    for (let i = 0; i < count; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const speed = 2 + Math.random() * 5;
+      this.particles.push({
+        x: worldX, y: worldY,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed - 2,
+        life: 10 + Math.floor(Math.random() * 10),
+        maxLife: 20,
+        size: 2 + Math.random() * 3,
+        color: Math.random() > 0.4 ? charColor : '#ffffff',
+        type: 'spark',
+        gravity: 0.15,
+        friction: 0.96,
+      });
+    }
+  }
+
+  /** Spawn dramatic guard crush sparks (red + white burst) */
+  spawnGuardCrushSparks(worldX: number, worldY: number): void {
+    // Bright flash
+    this.particles.push({
+      x: worldX, y: worldY,
+      vx: 0, vy: 0,
+      life: 15, maxLife: 15,
+      size: 60,
+      color: '#ff4444',
+      type: 'flash',
+    });
+    // Red/white sparks
+    for (let i = 0; i < 16; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const speed = 3 + Math.random() * 6;
+      this.particles.push({
+        x: worldX, y: worldY,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed - 3,
+        life: 15 + Math.floor(Math.random() * 8),
+        maxLife: 23,
+        size: 3 + Math.random() * 4,
+        color: i % 3 === 0 ? '#ffffff' : '#ff3333',
+        type: 'spark',
+        gravity: 0.18,
+        friction: 0.95,
+      });
+    }
+  }
+
+  /** Spawn throw escape sparks (blue burst) */
+  spawnThrowEscapeSparks(worldX: number, worldY: number): void {
+    for (let i = 0; i < 10; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const speed = 2 + Math.random() * 4;
+      this.particles.push({
+        x: worldX, y: worldY,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        life: 12 + Math.floor(Math.random() * 8),
+        maxLife: 20,
+        size: 2 + Math.random() * 3,
+        color: i % 2 === 0 ? '#4488ff' : '#aaccff',
+        type: 'spark',
+        gravity: 0.1,
+        friction: 0.94,
+      });
+    }
+  }
+
   /** Spawn impact ring at world position */
   spawnImpactRing(worldX: number, worldY: number): void {
     this.particles.push({
@@ -117,6 +187,25 @@ export class VFXSystem {
         type: 'spark',
         gravity: 0.05,
         friction: 0.94,
+      });
+    }
+  }
+
+  /** Spawn counter wire wall impact sparks */
+  spawnCounterWireSparks(worldX: number, worldY: number): void {
+    for (let i = 0; i < 12; i++) {
+      this.particles.push({
+        x: worldX,
+        y: worldY,
+        vx: (Math.random() - 0.5) * 8,
+        vy: -Math.random() * 6 - 2,
+        life: 15 + Math.floor(Math.random() * 10),
+        maxLife: 25,
+        size: 3 + Math.random() * 4,
+        color: '#ffdd44',
+        type: 'spark',
+        gravity: 0.2,
+        friction: 0.95,
       });
     }
   }

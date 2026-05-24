@@ -35,7 +35,7 @@ export class Renderer {
 
   // ===== Main fight frame =====
 
-  render(fighters: Fighter[], cameraX: number, tick: number, ko: boolean, winner: number | null, shakeX: number, shakeY: number): void {
+  render(fighters: Fighter[], cameraX: number, tick: number, ko: boolean, winner: number | null, shakeX: number, shakeY: number, delayedHealth: [number, number], maxModes?: [MaxModeState, MaxModeState], perfectPlayer: number | null = null): void {
     this.frameCount++;
     this.globalTick = tick;
     const now = performance.now();
@@ -51,11 +51,11 @@ export class Renderer {
     ctx.clearRect(-10, -10, CANVAS_WIDTH + 20, CANVAS_HEIGHT + 20);
 
     drawStage(ctx, cameraX, this.stars, this.globalTick);
-    this.drawFighters(ctx, fighters, cameraX);
-    drawHUD(ctx, fighters, tick);
+    this.drawFighters(ctx, fighters, cameraX, maxModes);
+    drawHUD(ctx, fighters, tick, delayedHealth);
 
     if (ko) {
-      drawKO(ctx, winner);
+      drawKO(ctx, winner, perfectPlayer);
     }
 
     ctx.restore();
@@ -67,7 +67,7 @@ export class Renderer {
 
   // ===== Fighter orchestration =====
 
-  private drawFighters(ctx: CanvasRenderingContext2D, fighters: Fighter[], cameraX: number): void {
+  private drawFighters(ctx: CanvasRenderingContext2D, fighters: Fighter[], cameraX: number, maxModes?: [MaxModeState, MaxModeState]): void {
     const sorted = [...fighters].sort((a, b) => a.y - b.y);
 
     for (const f of sorted) {
@@ -75,6 +75,8 @@ export class Renderer {
       const sy = f.y;
       const hw = FIGHTER_WIDTH / 2;
       const isP1 = f === fighters[0];
+      const playerIdx = isP1 ? 0 : 1;
+      const maxModeActive = maxModes ? maxModes[playerIdx].active : false;
 
       // Shadow on ground
       const shadowScale = Math.max(0.3, 1 - (STAGE_GROUND_Y - f.y) / 200);
@@ -116,7 +118,7 @@ export class Renderer {
       ctx.rotate(leanAngle);
       ctx.translate(-(sx + leanOffsetX), -sy);
 
-      drawSkeletalFighter(ctx, f, sx + leanOffsetX, sy, bodyColor, outlineColor, this.globalTick);
+      drawSkeletalFighter(ctx, f, sx + leanOffsetX, sy, bodyColor, outlineColor, this.globalTick, maxModeActive);
 
       ctx.restore();
 
@@ -253,12 +255,12 @@ export class Renderer {
     drawIntro(this.ctx, phaseTimer);
   }
 
-  drawKO(winner: number | null): void {
-    drawKO(this.ctx, winner);
+  drawKO(winner: number | null, perfectPlayer: number | null = null): void {
+    drawKO(this.ctx, winner, perfectPlayer);
   }
 
-  drawSuperFlash(ctx: CanvasRenderingContext2D, timer: number, flashScreenX: number, flashScreenY: number): void {
-    drawSuperFlash(ctx, timer, flashScreenX, flashScreenY);
+  drawSuperFlash(ctx: CanvasRenderingContext2D, timer: number, flashScreenX: number, flashScreenY: number, flashType: 'DM' | 'SDM' = 'DM'): void {
+    drawSuperFlash(ctx, timer, flashScreenX, flashScreenY, flashType);
   }
 
   drawPowerGauges(gauges: [PowerGauge, PowerGauge], maxModes: [MaxModeState, MaxModeState]): void {

@@ -9,6 +9,7 @@ import {
   CHIP_DAMAGE_RATIO,
   CH_HITSTUN_BONUS, CH_DAMAGE_BONUS,
   DAMAGE_SCALE_STEP, DAMAGE_SCALE_MIN,
+  COUNTER_WIRE_BOUNCE_VX, COUNTER_WIRE_BOUNCE_VY,
 } from '../core/constants.js';
 import { FighterState, AttackType, JuggleState } from '../core/types.js';
 import type { HitLevel } from '../core/types.js';
@@ -232,7 +233,21 @@ export class CombatSystem {
     this.comboHits[defIdx]++;
 
     defender.health = Math.max(0, defender.health - damage);
-    if (data.knockdown) {
+
+    // Counter Wire: counter hit + counterWire move → wall bounce instead of knockdown
+    const frameData = data as { counterWire?: boolean };
+    if (counterHit && frameData.counterWire) {
+      defender.isCounterWire = true;
+      // Fly toward wall (away from attacker)
+      const flyDir = defender.x < attacker.x ? -1 : 1;
+      defender.vx = COUNTER_WIRE_BOUNCE_VX * flyDir * -1; // toward wall
+      defender.vy = COUNTER_WIRE_BOUNCE_VY; // slight upward
+      // Full juggle state for follow-up combos
+      defender.juggleState = JuggleState.FULL;
+      defender.state = FighterState.HITSTUN;
+      defender.hitstunTimer = 30;
+      defender.isKnockedDown = false;
+    } else if (data.knockdown) {
       defender.applyKnockdown(25);
     } else {
       defender.applyHitstun(hitstunFrames, data.pushback);

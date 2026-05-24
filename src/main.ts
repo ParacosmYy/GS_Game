@@ -1,6 +1,6 @@
 import { Camera } from './core/camera.js';
 import { GameLoop } from './core/gameLoop.js';
-import { STAGE_WIDTH, KO_DISPLAY_TIME, FRAME_DATA, DM_STOCK_COST, MAX_MODE_STOCK_COST, MAX_MODE_DMG_REDUCTION } from './core/constants.js';
+import { STAGE_WIDTH, KO_DISPLAY_TIME, FRAME_DATA, DM_STOCK_COST, MAX_MODE_STOCK_COST, MAX_MODE_DMG_REDUCTION, MAX_HEALTH } from './core/constants.js';
 import { AttackType, GameState, GamePhase, FighterState } from './core/types.js';
 import type { PowerGauge, MaxModeState } from './core/types.js';
 import { ROSTER } from './characters/index.js';
@@ -57,6 +57,10 @@ const maxModes: [MaxModeState, MaxModeState] = [createMaxMode(), createMaxMode()
 p1Ctrl.setGauge(gauges[0]);
 p2Ctrl.setGauge(gauges[1]);
 
+// Link MAX mode to controllers for Free Cancel
+p1Ctrl.setMaxMode(maxModes[0]);
+p2Ctrl.setMaxMode(maxModes[1]);
+
 // ===== State =====
 let phase: GamePhase = GamePhase.SELECT;
 let phaseTimer = 0;
@@ -84,6 +88,13 @@ let superFlashY = 0;     // Super flash center Y (world)
 let koSlowMo = 0;        // KO slow-motion remaining frames
 let koSlowMoTriggered = false; // Only trigger once per round
 let koSlowMoFrameCounter = 0; // For 3-frame skip pattern
+let superFlashAttacker = 0;  // 0=p1, 1=p2 — which player triggered super flash
+let p1DamageTaken = 0;       // Accumulated damage P1 took (for PERFECT detection)
+let p2DamageTaken = 0;       // Accumulated damage P2 took (for PERFECT detection)
+
+// ===== Delayed Health Bar State =====
+let p1DelayedHealth = MAX_HEALTH;
+let p2DelayedHealth = MAX_HEALTH;
 
 // ===== Window API =====
 declare global {
@@ -138,10 +149,13 @@ function onHit(attacker: Fighter, defender: Fighter, attackType: AttackType, blo
     const comboCount = combatSystem.getComboCount(defIdx);
     gainMeterOnHit(gauges[atkIdx]);
     gainMeterOnHitstun(gauges[defIdx]);
-    vfx.spawnHitSparks(hitX, hitY, attackType === AttackType.SPECIAL_UPPER ? 14
+    const atkCharDef = atkIdx === 0
+      ? ROSTER.find(c => c.id === p1.charId) || ROSTER[0]
+      : ROSTER.find(c => c.id === p2.charId) || ROSTER[1];
+    vfx.spawnCharacterHitSparks(hitX, hitY, attackType === AttackType.SPECIAL_UPPER ? 14
       : attackType === AttackType.DM_OROCHINAGI || attackType === AttackType.DM_YATAGARASU
         || attackType === AttackType.DM_POWER_GEYSER || attackType === AttackType.DM_PHOENIX_KICK ? 20
-      : counterHit ? 12 : 8);
+      : counterHit ? 12 : 8, atkCharDef.specialColor);
     vfx.spawnImpactRing(hitX, hitY);
     vfx.spawnDamageText(defender.x, defender.y - defender.displayHeight - 20, data.damage);
     // Sound effects (reuse isDM/isSpecial from hit-stop above)
@@ -153,6 +167,12 @@ function onHit(attacker: Fighter, defender: Fighter, attackType: AttackType, blo
       vfx.spawnCounterText(defender.x, defender.y - defender.displayHeight - 55);
       playCounter();
     }
+    // Counter Wire: spawn impact sparks when wall bounce triggers
+    if (counterHit && (data as { counterWire?: boolean }).counterWire) {
+      const wallX = defender.x <= STAGE_WIDTH / 2 ? 30 : STAGE_WIDTH - 30;
+      vfx.spawnCounterWireSparks(wallX, defender.y - defender.displayHeight / 2);
+      screenShake.trigger(10, 10);
+    }
     if (comboCount >= 2) {
       vfx.spawnDamageText(defender.x, defender.y - defender.displayHeight - 40, comboCount);
     }
@@ -163,6 +183,9 @@ function onHit(attacker: Fighter, defender: Fighter, attackType: AttackType, blo
       : attackType === AttackType.STAND_C || attackType === AttackType.STAND_D ? 5
       : data.damage > 50 ? 4 : 3;
     screenShake.trigger(shake, 8);
+    // Track damage for PERFECT detection
+    if (defIdx === 0) p1DamageTaken += data.damage;
+    else p2DamageTaken += data.damage;
   }
 }
 
@@ -286,6 +309,12 @@ function update(): void {
         // Apply selected characters
         p1Ctrl.setCharacter(ROSTER[p1SelectCursor]);
         p2Ctrl.setCharacter(ROSTER[p2SelectCursor]);
+        // Apply character-specific stats (health, pushWidth)
+        p1.setStats(ROSTER[p1SelectCursor].stats);
+        p2.setStats(ROSTER[p2SelectCursor].stats);
+        // Sync delayed health bars to new maxHealth
+        p1DelayedHealth = p1.maxHealth;
+        p2DelayedHealth = p2.maxHealth;
         // Initialize AI for P2
         if (p2IsAI) {
           p2AI = new SimpleAI(p2, p1, ROSTER[p2SelectCursor], 0.6);
@@ -351,7 +380,16 @@ function update(): void {
   const throwEscaped = combatSystem.tickThrowState(p1, p2, onHit);
   if (throwEscaped) {
     playBlock(); // block sound for throw escape
+    vfx.spawnThrowEscapeSparks(
+      (p1.x + p2.x) / 2,
+      (p1.y + p2.y) / 2 - 50
+    );
   }
+
+  // ── Delayed health bar decay ──
+  const healthDecayRate = Math.max(p1.maxHealth, p2.maxHealth) * 0.005; // ~0.5% per frame ≈ 1-2s catchup
+  if (p1DelayedHealth > p1.health) p1DelayedHealth = Math.max(p1.health, p1DelayedHealth - healthDecayRate);
+  if (p2DelayedHealth > p2.health) p2DelayedHealth = Math.max(p2.health, p2DelayedHealth - healthDecayRate);
 
   // Check if DM was started and consume stock
   for (let i = 0; i < 2; i++) {
@@ -361,6 +399,7 @@ function update(): void {
         useDM(i);
         // ── Super Flash: trigger dark screen on DM startup ──
         superFlashTimer = 20;
+        superFlashAttacker = i;
         superFlashX = f.x;
         superFlashY = f.y - f.displayHeight / 2;
         hitStop = 20; // Freeze during flash
@@ -378,6 +417,7 @@ function update(): void {
     if ((atk === AttackType.DM_YATAGARASU || atk === AttackType.DM_POWER_GEYSER || atk === AttackType.DM_PHOENIX_KICK)
       && f.attackFrame === 0 && f.attackPhase === 'startup') {
       superFlashTimer = 20;
+      superFlashAttacker = i;
       superFlashX = f.x;
       superFlashY = f.y - f.displayHeight / 2;
       hitStop = 20;
@@ -418,7 +458,7 @@ function update(): void {
       winner = p1.health <= 0 && p2.health <= 0 ? null : p1.health <= 0 ? 1 : 0;
     }
   }
-  if (tickRef.value >= 99 * 60) {
+  if (tickRef.value >= 60 * 60) {
     phase = GamePhase.KO; koTimer = 0;
     winner = p1.health > p2.health ? 0 : p2.health > p1.health ? 1 : null;
     screenShake.trigger(8, 10);
@@ -442,13 +482,18 @@ function render(): void {
 
   camera.update(p1, p2);
   const isKO = phase === GamePhase.KO;
-  renderer.render([p1, p2], camera.x, tickRef.value, isKO, winner, screenShake.offsetX, screenShake.offsetY);
+  // PERFECT: winner took zero damage (health still at MAX)
+  const perfectPlayer = isKO && winner !== null
+    ? (winner === 0 ? (p2DamageTaken === 0 ? 0 : null) : (p1DamageTaken === 0 ? 1 : null))
+    : null;
+  renderer.render([p1, p2], camera.x, tickRef.value, isKO, winner, screenShake.offsetX, screenShake.offsetY, [p1DelayedHealth, p2DelayedHealth], maxModes, perfectPlayer);
   renderer.drawProjectiles(projectiles, camera);
   vfx.render(ctx, camera.x);
 
   // ── Super Flash dark overlay ──
   if (superFlashTimer > 0) {
-    renderer.drawSuperFlash(ctx, superFlashTimer, superFlashX - camera.x, superFlashY);
+    const flashType = maxModes[superFlashAttacker].active ? 'SDM' : 'DM';
+    renderer.drawSuperFlash(ctx, superFlashTimer, superFlashX - camera.x, superFlashY, flashType);
   }
 
   // Power gauge UI
@@ -477,6 +522,9 @@ function restartGame(): void {
   koSlowMo = 0;
   koSlowMoTriggered = false;
   koSlowMoFrameCounter = 0;
+  superFlashAttacker = 0;
+  p1DamageTaken = 0;
+  p2DamageTaken = 0;
   p1.reset(STAGE_WIDTH * 0.33);
   p2.reset(STAGE_WIDTH * 0.67);
   p1Cmd.reset();
@@ -484,6 +532,8 @@ function restartGame(): void {
   combatSystem.reset();
   projectiles.length = 0;
   vfx.reset();
+  p1DelayedHealth = p1.maxHealth;
+  p2DelayedHealth = p2.maxHealth;
   resetMeterSystem(gauges[0], maxModes[0]);
   resetMeterSystem(gauges[1], maxModes[1]);
 }

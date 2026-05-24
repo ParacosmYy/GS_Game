@@ -10,7 +10,7 @@ import { shiftColor, roundRect } from './utils.js';
 // ===== Main HUD =====
 
 /** Draw the complete HUD: health bars, guard gauges, timer */
-export function drawHUD(ctx: CanvasRenderingContext2D, fighters: Fighter[], tick: number): void {
+export function drawHUD(ctx: CanvasRenderingContext2D, fighters: Fighter[], tick: number, delayedHealth: [number, number]): void {
   if (fighters.length < 2) return;
 
   const barWidth = 300;
@@ -41,7 +41,8 @@ export function drawHUD(ctx: CanvasRenderingContext2D, fighters: Fighter[], tick
 
   // P1 health bar
   const p1Ratio = Math.max(0, fighters[0].health / MAX_HEALTH);
-  drawHealthBar(ctx, margin, barY, barWidth, barHeight, p1Ratio, true);
+  const p1DelayedRatio = Math.max(0, delayedHealth[0] / MAX_HEALTH);
+  drawHealthBar(ctx, margin, barY, barWidth, barHeight, p1Ratio, p1DelayedRatio, true);
   // P1 guard gauge bar
   drawGuardGauge(ctx, margin, barY + barHeight + 3, barWidth, 5, fighters[0].guardGauge, true);
 
@@ -52,12 +53,13 @@ export function drawHUD(ctx: CanvasRenderingContext2D, fighters: Fighter[], tick
 
   // P2 health bar
   const p2Ratio = Math.max(0, fighters[1].health / MAX_HEALTH);
-  drawHealthBar(ctx, CANVAS_WIDTH - margin - barWidth, barY, barWidth, barHeight, p2Ratio, false);
+  const p2DelayedRatio = Math.max(0, delayedHealth[1] / MAX_HEALTH);
+  drawHealthBar(ctx, CANVAS_WIDTH - margin - barWidth, barY, barWidth, barHeight, p2Ratio, p2DelayedRatio, false);
   // P2 guard gauge bar
   drawGuardGauge(ctx, CANVAS_WIDTH - margin - barWidth, barY + barHeight + 3, barWidth, 5, fighters[1].guardGauge, false);
 
   // Timer in center
-  const timeSeconds = Math.max(0, 99 - Math.floor(tick / 60));
+  const timeSeconds = Math.max(0, 60 - Math.floor(tick / 60));
   const timeStr = timeSeconds.toString().padStart(2, '0');
   ctx.fillStyle = timeSeconds <= 10 ? '#ff4444' : '#dddddd';
   ctx.font = 'bold 24px monospace';
@@ -70,7 +72,7 @@ export function drawHUD(ctx: CanvasRenderingContext2D, fighters: Fighter[], tick
 
 // ===== Health Bar =====
 
-function drawHealthBar(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, ratio: number, leftAligned: boolean): void {
+function drawHealthBar(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, ratio: number, delayedRatio: number, leftAligned: boolean): void {
   // Outer frame
   ctx.fillStyle = '#0a0a0f';
   roundRect(ctx, x - 2, y - 2, w + 4, h + 4, 4);
@@ -89,8 +91,21 @@ function drawHealthBar(ctx: CanvasRenderingContext2D, x: number, y: number, w: n
     ctx.beginPath(); ctx.moveTo(tx, y); ctx.lineTo(tx, y + h); ctx.stroke();
   }
 
+  // White ghost bar (delayed health — drawn BEFORE colored bar)
+  const delayedFillW = Math.round(w * delayedRatio);
+  if (delayedFillW > 0 && delayedRatio > ratio) {
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+    if (leftAligned) {
+      roundRect(ctx, x, y, delayedFillW, h, 3);
+      ctx.fill();
+    } else {
+      roundRect(ctx, x + w - delayedFillW, y, delayedFillW, h, 3);
+      ctx.fill();
+    }
+  }
+
   // Health fill
-  const fillW = w * ratio;
+  const fillW = Math.round(w * ratio);
   if (fillW <= 0) return;
 
   const healthColor = ratio > 0.5 ? '#22cc55' : ratio > 0.25 ? '#ccaa22' : '#cc2233';
@@ -209,21 +224,49 @@ export function drawPowerGauges(ctx: CanvasRenderingContext2D, gauges: [PowerGau
       ctx.strokeRect(x, gaugeY, stockW, stockH);
     }
 
-    // MAX mode indicator
-    if (maxMode.active) {
-      const maxBaseX = isP1 ? 50 : CANVAS_WIDTH - 50 - 60;
-      const pct = maxMode.timer / maxMode.maxDuration;
-      ctx.fillStyle = 'rgba(255, 100, 255, 0.8)';
+    // MAXIMUM text when all stocks filled AND NOT in MAX mode
+    if (!maxMode.active && gauge.stocks >= MAX_STOCKS) {
+      ctx.fillStyle = '#ffcc00';
+      ctx.shadowColor = '#ff8800';
+      ctx.shadowBlur = 8;
       ctx.font = 'bold 10px monospace';
       ctx.textAlign = isP1 ? 'left' : 'right';
-      ctx.fillText('MAX', isP1 ? maxBaseX : maxBaseX + 60, gaugeY + 16);
+      ctx.fillText('MAXIMUM', isP1 ? baseX : baseX + MAX_STOCKS * (stockW + stockGap), gaugeY + 16);
+      ctx.shadowBlur = 0;
+    }
 
-      // Timer bar
-      const timerX = isP1 ? maxBaseX + 32 : maxBaseX;
-      ctx.fillStyle = 'rgba(0,0,0,0.5)';
-      ctx.fillRect(timerX, gaugeY + 10, 60, 4);
-      ctx.fillStyle = `rgba(255, ${Math.round(100 + 155 * pct)}, 255, 0.8)`;
-      ctx.fillRect(timerX, gaugeY + 10, 60 * pct, 4);
+    // MAX mode timer bar (green, KOF style)
+    if (maxMode.active) {
+      const maxBaseX = isP1 ? 50 : CANVAS_WIDTH - 50 - 80;
+      const pct = maxMode.timer / maxMode.maxDuration;
+      const pulseAlpha = 0.7 + Math.sin(Date.now() / 100) * 0.3;
+
+      // MAX label with glow
+      ctx.fillStyle = `rgba(100, 255, 100, ${pulseAlpha})`;
+      ctx.shadowColor = '#00ff44';
+      ctx.shadowBlur = 6;
+      ctx.font = 'bold 11px monospace';
+      ctx.textAlign = isP1 ? 'left' : 'right';
+      ctx.fillText('MAX', isP1 ? maxBaseX : maxBaseX + 80, gaugeY + 16);
+      ctx.shadowBlur = 0;
+
+      // Timer bar background
+      const timerX = isP1 ? maxBaseX + 30 : maxBaseX;
+      ctx.fillStyle = 'rgba(0,0,0,0.6)';
+      ctx.fillRect(Math.round(timerX), gaugeY + 10, 80, 5);
+
+      // Timer bar fill (green, draining)
+      const greenGrad = ctx.createLinearGradient(Math.round(timerX), gaugeY + 10, Math.round(timerX + 80 * pct), gaugeY + 10);
+      greenGrad.addColorStop(0, '#22ff66');
+      greenGrad.addColorStop(1, '#44ff88');
+      ctx.fillStyle = greenGrad;
+      ctx.fillRect(Math.round(timerX), gaugeY + 10, Math.round(80 * pct), 5);
+
+      // Timer bar border
+      ctx.strokeStyle = 'rgba(100, 255, 100, 0.4)';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(Math.round(timerX), gaugeY + 10, 80, 5);
+
       ctx.textAlign = 'left';
     }
   }

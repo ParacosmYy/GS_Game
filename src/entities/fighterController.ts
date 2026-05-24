@@ -2,19 +2,22 @@ import { Fighter } from './fighter.js';
 import { Projectile } from './projectile.js';
 import { CommandBuffer } from '../input/commandBuffer.js';
 import type { ResolvedInput } from '../input/inputResolver.js';
-import type { CharacterDefinition } from '../characters/types.js';
+import type { CharacterDefinition, CharacterStats } from '../characters/types.js';
 import {
   STAGE_GROUND_Y, STAGE_WIDTH, FIGHTER_WIDTH,
-  WALK_SPEED, RUN_SPEED, GRAVITY, JUMP_VELOCITY,
+  GRAVITY,
   BACKDASH_VX, BACKDASH_VY,
-  DOUBLE_TAP_WINDOW, RUN_JUMP_VX, RUN_JUMP_VY,
-  HOP_THRESHOLD, HOP_VELOCITY, HYPER_JUMP_VY, HYPER_JUMP_VX, HYPER_CHARGE_WINDOW,
+  DOUBLE_TAP_WINDOW, HYPER_CHARGE_WINDOW,
+  HOP_THRESHOLD,
   ROLL_SPEED, ROLL_DURATION, ROLL_RECOVERY,
   LANDING_RECOVERY,
   DM_STOCK_COST,
+  PROXIMITY_GUARD_RANGE,
+  SUPER_CANCEL_STOCK_COST,
+  FREE_CANCEL_TIMER_COST,
 } from '../core/constants.js';
 import { FighterState, AttackType, CLOSE_RANGE, JuggleState } from '../core/types.js';
-import type { PowerGauge } from '../core/types.js';
+import type { PowerGauge, MaxModeState } from '../core/types.js';
 import { spendStocks } from '../combat/meter.js';
 import type { VFXSystem } from '../rendering/vfx.js';
 
@@ -31,7 +34,9 @@ export class FighterController {
   private tickRef: { value: number };
   private opponent: Fighter | null = null;
   private character: CharacterDefinition;
+  private stats: CharacterStats;
   private gauge: PowerGauge | null = null;
+  private maxMode: MaxModeState | null = null;
 
   private lastForwardTick = -999;
   private lastBackTick = -999;
@@ -59,6 +64,7 @@ export class FighterController {
     this.projectiles = projectiles;
     this.tickRef = tickRef;
     this.character = character;
+    this.stats = character.stats;
   }
 
   get fighterRef(): Fighter { return this.fighter; }
@@ -68,13 +74,19 @@ export class FighterController {
 
   setGauge(gauge: PowerGauge): void { this.gauge = gauge; }
 
+  setMaxMode(maxMode: MaxModeState): void { this.maxMode = maxMode; }
+
   setCharacter(char: CharacterDefinition): void {
     this.character = char;
+    this.stats = char.stats;
     this.fighter.color = char.color;
     this.fighter.charId = char.id;
   }
 
   update(input: ResolvedInput): void {
+    // ── Proximity Guard (P9-E) ──
+    if (this.checkProximityGuard(input)) return;
+
     this.tickStateMachine(input);
     this.prevForward = input.forward;
     this.prevBack = input.back;
@@ -90,6 +102,22 @@ export class FighterController {
     const f = this.fighter;
     f.x += f.vx;
     f.y += f.vy;
+
+    // Counter Wire wall bounce detection
+    if (f.isCounterWire) {
+      const leftBound = 30;
+      const rightBound = STAGE_WIDTH - 30;
+      if (f.x <= leftBound || f.x >= rightBound) {
+        // Bounce back toward center with reduced speed
+        f.vx = -f.vx * 0.6;
+        f.vy = -3; // slight upward on bounce
+        f.isCounterWire = false; // one bounce only
+        // Spawn wall impact sparks at bounce point
+        const wallX = f.x <= leftBound ? leftBound : rightBound;
+        this.vfx.spawnCounterWireSparks(wallX, f.y - f.displayHeight / 2);
+      }
+    }
+
     if (f.y >= STAGE_GROUND_Y) {
       const wasAirborne = f.state === FighterState.JUMP || f.state === FighterState.RUN_JUMP
         || f.state === FighterState.HOP || f.state === FighterState.HYPER_JUMP
@@ -167,6 +195,59 @@ export class FighterController {
     return null;
   }
 
+  // ─── Attack Classification Helpers ───
+
+  /** Check if an attack type is a special move (not DM, not normal) */
+  private static isSpecialMove(name: string): boolean {
+    return name.startsWith('KYO_') || name.startsWith('IORI_')
+      || name.startsWith('TERRY_') || name.startsWith('KIM_')
+      || name.startsWith('SPECIAL_');
+  }
+
+  /** Check if an attack type is a DM (super) move */
+  private static isDM(name: string): boolean {
+    return name.startsWith('DM_');
+  }
+
+  /** Check if an attack type is a normal move (not special, not DM) */
+  private static isNormal(name: string): boolean {
+    return !FighterController.isSpecialMove(name) && !FighterController.isDM(name);
+  }
+
+  // ─── Proximity Guard (P9-E) ───
+
+  /** Check and apply proximity guard. Returns true if guard was triggered (skip normal update). */
+  private checkProximityGuard(input: ResolvedInput): boolean {
+    if (!this.opponent) return false;
+    const f = this.fighter;
+    const opp = this.opponent;
+
+    // Opponent must be attacking (startup or active phase)
+    if (!opp.currentAttack || opp.attackPhase === 'none' || opp.attackPhase === 'recovery') return false;
+
+    // Player must be in a blockable state
+    if (!f.canBlock()) return false;
+
+    const dist = Math.abs(f.x - opp.x);
+    const oppAtkName = opp.currentAttack as string;
+    const isNormal = FighterController.isNormal(oppAtkName);
+    const range = isNormal ? PROXIMITY_GUARD_RANGE : STAGE_WIDTH;
+
+    if (dist < range) {
+      const holdingBack = (f.facing === 1 && input.back) || (f.facing === -1 && input.forward);
+      const holdingDown = input.down;
+      const holdingDownBack = holdingDown && holdingBack;
+
+      if (holdingBack || holdingDownBack) {
+        f.state = FighterState.BLOCK;
+        f.blockType = holdingDownBack ? 'LOW' : 'HIGH';
+        f.displayHeight = holdingDown ? 50 : 100;
+        return true;
+      }
+    }
+    return false;
+  }
+
   // ─── State Machine ───
 
   private tickStateMachine(input: ResolvedInput): void {
@@ -201,14 +282,14 @@ export class FighterController {
           f.displayHeight = 80; this.vfx.spawnDust(f.x, STAGE_GROUND_Y); return;
         }
         if (this.dblFwd(input) && f.canAct() && f.isGrounded()) {
-          f.state = FighterState.RUN; f.vx = RUN_SPEED * f.facing; return;
+          f.state = FighterState.RUN; f.vx = this.stats.runSpeed * f.facing; return;
         }
         if (this.upReleased(input) && f.isGrounded() && this.upHoldFrames > 0) {
-          if (this.upHoldFrames <= HOP_THRESHOLD) { f.vy = HOP_VELOCITY; f.state = FighterState.HOP; }
+          if (this.upHoldFrames <= HOP_THRESHOLD) { f.vy = this.stats.hopVelocity; f.state = FighterState.HOP; }
           else if (this.hyperJump()) {
-            f.vy = HYPER_JUMP_VY; f.vx = HYPER_JUMP_VX * (input.forward ? 1 : input.back ? -1 : 0) * f.facing;
+            f.vy = this.stats.hyperJumpVelocity; f.vx = this.stats.jumpForwardSpeed * 1.4 * (input.forward ? 1 : input.back ? -1 : 0) * f.facing;
             f.state = FighterState.HYPER_JUMP; this.vfx.spawnDust(f.x, STAGE_GROUND_Y);
-          } else { f.vy = JUMP_VELOCITY; f.state = FighterState.JUMP; }
+          } else { f.vy = this.stats.jumpVelocity; f.state = FighterState.JUMP; }
           return;
         }
         if (input.down && !this.prevDown) this.lastDownTick = this.tickRef.value;
@@ -216,16 +297,16 @@ export class FighterController {
         if (input.throwAttackPressed && f.canAct()) { f.startAttack(AttackType.THROW); return; }
         if (f.canAct()) { const atk = this.tryAttack(input); if (atk) { f.startAttack(atk); return; } }
 
-        if (input.forward) { f.vx = WALK_SPEED * f.facing; f.state = FighterState.WALK; }
-        else if (input.back) { f.vx = -WALK_SPEED * f.facing; f.state = FighterState.WALK; }
+        if (input.forward) { f.vx = this.stats.walkSpeed * f.facing; f.state = FighterState.WALK; }
+        else if (input.back) { f.vx = -this.stats.walkSpeed * f.facing; f.state = FighterState.WALK; }
         else { f.state = FighterState.IDLE; }
         break;
       }
 
       case FighterState.RUN: {
-        f.displayHeight = 100; f.vx = RUN_SPEED * f.facing;
+        f.displayHeight = 100; f.vx = this.stats.runSpeed * f.facing;
         if (input.up && f.isGrounded()) {
-          f.state = FighterState.RUN_JUMP; f.vy = RUN_JUMP_VY; f.vx = RUN_JUMP_VX * f.facing;
+          f.state = FighterState.RUN_JUMP; f.vy = this.stats.jumpVelocity * 0.93; f.vx = this.stats.jumpForwardSpeed * 1.5 * f.facing;
           this.vfx.spawnDust(f.x, STAGE_GROUND_Y); return;
         }
         if (input.down && f.isGrounded()) { f.state = FighterState.CROUCH; f.displayHeight = 50; f.vx = 0; return; }
@@ -292,6 +373,39 @@ export class FighterController {
         // Character-specific onAttackActive (fireballs, uppercuts etc.)
         if (f.attackPhase === 'active' && f.currentAttack) {
           this.character.onAttackActive(f, f.currentAttack, this.projectiles, this.playerIndex);
+        }
+
+        // ── Super Cancel (P9-F) ──
+        if (f.superCancelReady && this.gauge && f.currentAttack) {
+          const tick = this.tickRef.value;
+          const dmAttack = this.cmdBuf.checkDM(tick, input.punchPressed || input.kickPressed);
+          if (dmAttack && this.gauge.stocks >= DM_STOCK_COST + SUPER_CANCEL_STOCK_COST) {
+            spendStocks(this.gauge, DM_STOCK_COST + SUPER_CANCEL_STOCK_COST);
+            f.startAttack(dmAttack);
+            return;
+          }
+        }
+
+        // ── Free Cancel (P9-G, MAX mode only) ──
+        if (this.maxMode && this.maxMode.active && f.currentAttack) {
+          const atkName = f.currentAttack as string;
+          const isNormalAttack = FighterController.isNormal(atkName);
+
+          // Normals: can cancel even on whiff; Specials: only on contact (hasHit)
+          const canFreeCancel = isNormalAttack || f.hasHit;
+
+          if (canFreeCancel) {
+            const tick = this.tickRef.value;
+            // Try special move input (not DM)
+            const specialAttack = this.character.routeSpecial(input, this.cmdBuf, tick);
+            if (specialAttack && !FighterController.isDM(specialAttack as string)) {
+              // Deduct MAX mode timer
+              this.maxMode.timer -= Math.round(this.maxMode.maxDuration * FREE_CANCEL_TIMER_COST);
+              if (this.maxMode.timer <= 0) this.maxMode.timer = 0;
+              f.startAttack(specialAttack);
+              return;
+            }
+          }
         }
 
         // Rekka followup

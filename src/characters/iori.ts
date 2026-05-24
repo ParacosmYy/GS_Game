@@ -28,6 +28,17 @@ export const IoriDef: CharacterDefinition = {
   specialGlow: '#aa22ff',
   portrait: '🌙',
 
+  stats: {
+    walkSpeed: 4.5,
+    runSpeed: 7.5,
+    jumpVelocity: -13.5,
+    hopVelocity: -10.5,
+    hyperJumpVelocity: -16.5,
+    maxHealth: 950,
+    pushWidth: 58,
+    jumpForwardSpeed: 5.5,
+  },
+
   poses: {
     [FighterState.IDLE]: pose({
       armFront: bone(6, 18, 0.5),
@@ -75,6 +86,55 @@ export const IoriDef: CharacterDefinition = {
       armBack: bone(-10, 6, -0.4),
       legFront: bone(3, -5, 0.25),
       legBack: bone(-6, 0, -0.5),
+    }),
+    // — Attack poses (claw-like hands, hunched, extreme arm rotations) —
+    [FighterState.STAND_ATTACK]: pose({
+      head: bone(4, -2, 0.1),
+      body: bone(5, 0, 0.15),
+      armFront: bone(28, 0, -0.3, 1.4),    // claw swipe - wider rotation
+      armBack: bone(-12, 5, -1.0, 0.9),     // extreme back rotation
+      legFront: bone(5, 0, 0.1),
+      legBack: bone(-6, 0, -0.15),
+    }),
+    [FighterState.CROUCH_ATTACK]: pose({
+      head: bone(5, 10, 0.15),
+      body: bone(5, 14, 0.2),               // hunched forward
+      armFront: bone(26, 14, -0.35, 1.35),  // claw extended low
+      armBack: bone(-10, 18, -0.8, 0.9),
+      legFront: bone(16, 6, 0.35, 1.1),
+      legBack: bone(-10, 10, -0.25),
+    }),
+    [FighterState.AIR_ATTACK]: pose({
+      head: bone(2, -3, -0.12),
+      body: bone(3, -1, 0.18),
+      armFront: bone(24, -5, -0.4, 1.35),   // claw swipe aerial
+      armBack: bone(-15, 2, -0.7, 0.9),
+      legFront: bone(16, 5, 0.4, 1.15),
+      legBack: bone(-10, -4, -0.4),
+    }),
+    [FighterState.THROW]: pose({
+      head: bone(5, -1, 0.08),
+      body: bone(7, 0, 0.2),
+      armFront: bone(30, 4, -0.2, 1.4),     // both claws reaching
+      armBack: bone(22, 6, -0.35, 1.2),
+      legFront: bone(5, 0, 0.1),
+      legBack: bone(-5, 0, -0.12),
+    }),
+    [FighterState.GUARD_CRUSH]: pose({
+      head: bone(-4, 4, -0.25),
+      body: bone(-3, 3, -0.12),
+      armFront: bone(-8, 14, 0.5),           // arms drooping, claw-like
+      armBack: bone(-12, 12, 0.4),
+      legFront: bone(2, 0, 0.05),
+      legBack: bone(-4, 0, -0.05),
+    }),
+    [FighterState.HOP]: pose({
+      head: bone(0, -2, -0.05),
+      body: bone(0, -1, 0),
+      armFront: bone(8, 5, 0.2),
+      armBack: bone(-8, 4, -0.35),
+      legFront: bone(4, 3, 0.15),
+      legBack: bone(-6, 2, -0.25),
     }),
   },
 
