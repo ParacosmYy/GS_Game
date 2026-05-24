@@ -507,14 +507,18 @@ export class CombatSystem {
       attacker.vx = -atkPushback * attacker.facing;
     }
 
-    // KOF2002: 命中闪烁颜色区分攻击类型 — 必杀技金色, DM蓝色, Counter红色, 通常白色
+    // KOF2002: 命中闪烁颜色 — 攻击类型+连击数递增(白→黄→橙→红)
     const atkName2 = (attackType as string);
+    const comboHits = this.comboHits[defIdx];
     if (atkName2.startsWith('DM_') || atkName2.startsWith('SDM_')) defender.hitFlashColor = '#6688ff';
     else if (counterHit) defender.hitFlashColor = '#ffaa44';
     else if (atkName2.startsWith('KYO_') || atkName2.startsWith('IORI_') || atkName2.startsWith('TERRY_')
       || atkName2.startsWith('KIM_') || atkName2.startsWith('RYO_') || atkName2.startsWith('LEONA_')
       || atkName2.startsWith('KDASH_') || atkName2.startsWith('KULA_') || atkName2.startsWith('SPECIAL_'))
       defender.hitFlashColor = '#ffee66';
+    else if (comboHits >= 8) defender.hitFlashColor = '#ff4400';
+    else if (comboHits >= 5) defender.hitFlashColor = '#ff8800';
+    else if (comboHits >= 3) defender.hitFlashColor = '#ffcc00';
     else defender.hitFlashColor = '#ffffff';
 
     // Rapid Cancel: light normal on hit enables chaining into next light normal

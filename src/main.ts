@@ -88,7 +88,7 @@ const onHit = createHitCallback({ fighters: [p1, p2], vfx, screenShake, screenFl
 combatSystem.onThrowEscape = (_attacker, defender, hitX, hitY) => {
   vfx.spawnThrowEscapeSparks(hitX, hitY);
   vfx.spawnTechText(hitX, hitY - 40);
-  screenShake.trigger(4, 6);
+  screenShake.trigger(6, 8); screenFlash.trigger('#aaddff', 0.1, 3);
   playThrowEscape();
   const atkIdx = _attacker === p1 ? 0 : 1;
   const defIdx = defender === p1 ? 0 : 1;
@@ -437,7 +437,7 @@ function update(): void {
 
   for (let i = projectiles.length - 1; i >= 0; i--) { if (!projectiles[i].active) projectiles.splice(i, 1); }
 
-  // Projectile vs projectile collision (KOF2002: 飞行道具相撞互相抵消)
+  // Projectile vs projectile collision
   for (let i = 0; i < projectiles.length; i++) {
     const a = projectiles[i];
     if (!a.active) continue;
@@ -452,9 +452,10 @@ function update(): void {
       if (overlap <= 0) continue;
       const vOverlap = Math.min(aBox.y + aBox.height, bBox.y + bBox.height) - Math.max(aBox.y, bBox.y);
       if (vOverlap <= 0) continue;
-      a.active = false;
-      b.active = false;
-      vfx.spawnCharacterHitSparks((a.x + b.x) / 2, (a.y + b.y) / 2, 10, '#ffffff');
+      a.active = false; b.active = false;
+      const collX = (a.x + b.x) / 2, collY = (a.y + b.y) / 2;
+      vfx.spawnCharacterHitSparks(collX, collY, 20, '#ffffff');
+      vfx.spawnImpactRing(collX, collY);
       break;
     }
   }
@@ -468,8 +469,8 @@ function update(): void {
       const isDMKill = killerAttack?.startsWith('DM_') || killerAttack?.startsWith('SDM_');
       if (isDMKill) cinematic.triggerDMKOSlowMo();
       else cinematic.triggerKOSlowMo();
-      // KOF2002: KO瞬间定格8帧, 增强冲击力
-      cinematic.triggerHitStop(8);
+      // KOF2002: KO定格 — 通常12帧, DM击杀16帧
+      cinematic.triggerHitStop(isDMKill ? 16 : 12);
       screenFlash.trigger('#ff2200', 0.35, 15);
       screenShake.trigger(16, 15);
       playKO();

@@ -30,8 +30,8 @@ function calcHitStop(at: AttackType, isDM: boolean, isSpecial: boolean, ch: bool
   const heavy = at === AttackType.STAND_C || at === AttackType.STAND_D || at === AttackType.CLOSE_C
     || at === AttackType.CLOSE_D || at === AttackType.CROUCH_C || at === AttackType.CROUCH_D
     || at === AttackType.JUMP_C || at === AttackType.JUMP_D;
-  // KOF2002标准: 轻攻击4F, 重攻击8F, 必杀技6F, 超必杀12F, Counter+3F
-  const r = isDM ? 12 : isSpecial ? 6 : heavy ? 8 : 4;
+  // KOF2002: 轻攻击4F, 重攻击8F, 必杀技8F, 超必杀16F, Counter+3F
+  const r = isDM ? 16 : isSpecial ? 8 : heavy ? 8 : 4;
   return ch ? r + 3 : r;
 }
 
@@ -80,9 +80,11 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
     const defIdx = defender === p1 ? 0 : 1;
 
     if (blocked) {
+      // KOF2002: 防御火花按攻击类型着色 — 通常白色, 必杀金色, DM蓝色
+      const { isDM: blkDM, isSpecial: blkSpecial } = classifyAttack(attackType);
+      const blkColor = blkDM ? '#6688ff' : blkSpecial ? '#ffcc44' : '#ffffff';
       deps.vfx.spawnBlockFlash(hitX, hitY);
-      // 防御顿帧: 重攻击5F, 轻攻击3F (比命中略短)
-      const { isSpecial: blkSpecial } = classifyAttack(attackType);
+      if (blkSpecial) deps.vfx.spawnCharacterHitSparks(hitX, hitY, 6, blkColor);
       const blkHeavy = attackType === AttackType.STAND_C || attackType === AttackType.STAND_D
         || attackType === AttackType.CLOSE_C || attackType === AttackType.CLOSE_D
         || attackType === AttackType.CROUCH_C || attackType === AttackType.CROUCH_D;

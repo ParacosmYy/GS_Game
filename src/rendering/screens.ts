@@ -240,11 +240,15 @@ export function drawIntro(ctx: CanvasRenderingContext2D, phaseTimer: number, cur
     ctx.fillRect(0, 0, CANVAS_WIDTH, 100);
     ctx.fillRect(0, CANVAS_HEIGHT - 100, CANVAS_WIDTH, 100);
 
-    // "ROUND X" — SNK style
+    // "ROUND X" — SNK style with roman numeral subtitle
     ctx.shadowColor = '#ff8800';
     ctx.shadowBlur = 15;
     drawSNKText(ctx, `ROUND ${currentRound}`, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 20, fontSize, '#ffcc00');
     ctx.shadowBlur = 0;
+    // KOF2002: 回合罗马数字装饰
+    const romanNumerals = ['', 'I', 'II', 'III', 'IV', 'V'];
+    const roman = romanNumerals[currentRound] || `${currentRound}`;
+    drawSNKText(ctx, roman, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 10, 14, 'rgba(200,168,50,0.6)');
 
     // 角色名显示 — SNK style
     if (p1Name && p2Name) {

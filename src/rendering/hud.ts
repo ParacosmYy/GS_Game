@@ -325,6 +325,13 @@ function drawGuardGauge(ctx: CanvasRenderingContext2D, x: number, y: number, w: 
     ctx.lineWidth = 2;
     ctx.strokeRect(x - 1, y - 1, w + 2, h + 2);
   }
+  // KOF2002: 防御槽健康(>80%)时微弱绿光
+  if (ratio >= 0.8) {
+    const greenPulse = Math.sin(tick * 0.08) * 0.15 + 0.15;
+    ctx.strokeStyle = `rgba(68, 255, 136, ${greenPulse})`;
+    ctx.lineWidth = 1;
+    ctx.strokeRect(x - 1, y - 1, w + 2, h + 2);
+  }
 }
 
 // ===== Power Gauge =====

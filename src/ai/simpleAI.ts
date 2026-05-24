@@ -74,6 +74,8 @@ export class SimpleAI {
       || opp.state === FighterState.HYPER_JUMP;
     const canAct = f.canAct();
     const isClose = dist < 80;
+    // KOF2002: Whiff punish — 对手攻击recovery且未命中时, AI迅速反击
+    const oppWhiffing = oppAttacking && !opp.hasHit && (opp as any).attackPhase === 'recovery';
 
     // ── Throw escape: highest priority, before anything else ──
     if (f.isBeingThrown && f.throwEscapeTimer > 0 && Math.random() < this.difficulty * 0.7) {
@@ -164,10 +166,18 @@ export class SimpleAI {
     // KOF2002: 对手低血量时AI更倾向使用DM终结连段
     const oppLowHp = this.opponent.health < this.opponent.maxHealth * 0.25;
     const hasMeter = this.gauge && this.gauge.stocks >= 1;
+    // Whiff punish: opponent in recovery and whiffed — close distance and punish
+    const oppWhiff = this.opponent.state === FighterState.STAND_ATTACK
+      || this.opponent.state === FighterState.CROUCH_ATTACK;
+    const oppWhiffed = oppWhiff && !this.opponent.hasHit;
 
     // Anti-air: highest priority
     if (oppAirborne && dist < 150 && Math.random() < this.difficulty * 0.8) {
       return 'antiair';
+    }
+    // Whiff punish: opponent attacked but missed → rush in
+    if (oppWhiffed && dist < 180 && Math.random() < this.difficulty * 0.7) {
+      return dist < 90 ? 'attack' : 'approach';
     }
 
     // Counter stance: opponent attacking at mid range
@@ -435,10 +445,8 @@ export class SimpleAI {
 
       case 'throw':
         if (dist < 70 && canAct) {
-          // KOF2002: 靠近墙时后投远离墙, 靠近中心时前投
-          const nearRightWall = f.x > (f.facing === 1 ? 600 : 200);
-          if (nearRightWall) base.back = true;
-          else base.forward = true;
+          const nearWall = f.x > (f.facing === 1 ? 600 : 200);
+          if (nearWall) base.back = true; else base.forward = true;
           base.throwAttack = true;
           base.throwAttackPressed = true;
         }
@@ -446,11 +454,9 @@ export class SimpleAI {
 
       case 'special':
         if (canAct) {
-          // Super Cancel: if combo active and has meter, use DM
           if (this.inCombo && f.hasHit && this.gauge && this.gauge.stocks >= 1
             && Math.random() < this.difficulty * 0.6) {
             const route = this.getCurrentRoute();
-            // Try to route into DM (last step of combo)
             const dmStep = route.find(s => s.attack.toLowerCase().includes('dm'));
             if (dmStep) {
               this.doApplyComboStep(dmStep, base);
@@ -472,27 +478,16 @@ export class SimpleAI {
 
       case 'okizeme':
         this.okiTimer++;
-        // Move slightly forward to stay close
         if (dist > 50) base.forward = true;
-        // Time attack: press button when opponent might be getting up
-        // (knockdown lasts ~40-60 frames, attack at ~30-40 for meaty timing)
         if (this.okiTimer > 20 && this.okiTimer < 45 && canAct) {
-          // Meaty attack: close C or low D for low/throw mixup
           if (Math.random() < 0.6) {
-            base.buttonC = true;
-            base.buttonCPressed = true;
-            base.punchPressed = true;
+            base.buttonC = true; base.buttonCPressed = true; base.punchPressed = true;
           } else {
-            // Low option
-            base.down = true;
-            base.buttonD = true;
-            base.buttonDPressed = true;
-            base.kickPressed = true;
+            base.down = true; base.buttonD = true; base.buttonDPressed = true; base.kickPressed = true;
           }
-          this.okiTimer = 99; // done
+          this.okiTimer = 99;
           this.action = 'idle';
         }
-        // If opponent is up, switch to normal attack
         if (this.opponent.state !== FighterState.KNOCKDOWN) {
           this.action = canAct && dist < 80 ? 'attack' : 'idle';
           this.okiTimer = 0;

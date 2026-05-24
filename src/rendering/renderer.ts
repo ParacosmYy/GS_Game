@@ -177,6 +177,12 @@ export class Renderer {
       ctx.rotate(leanAngle);
       ctx.translate(-(sx + leanOffsetX), -sy);
 
+      // KOF2002: Hitstun body shake — 受击时身体短暂抖动
+      if (f.state === FighterState.HITSTUN && f.hitstunTimer > 0) {
+        const shakeAmt = Math.min(3, f.hitstunTimer * 0.2);
+        ctx.translate((Math.random() - 0.5) * shakeAmt, (Math.random() - 0.5) * shakeAmt * 0.5);
+      }
+
       // 优先使用精灵图渲染, 降级到骨骼渲染
       let usedSprite = false;
       if (this.spriteRenderer) {
