@@ -1951,6 +1951,13 @@
 
 | 战斗手感 | 150/150 | = | 已实现 |
 
+### Iter-V103 — 2026-05-25（SDM防御槽/juggle消耗分类修复 + KO落地特效 +5=603）
+
+**改动:** SDM_前缀攻击guardGaugeDamage(35点,vs DM 25)和getJuggleCost(DM级)修复; KO空中角色落地才触发groundslam(正版行为), 非立即触发
+
+| 战斗手感 | 150/150 | = | SDM防御槽消耗更正版 |
+| 帧数据精度 | 59/100 | +1 | SDM分类bug修复, KO落地特效对标正版 |
+
 ---
 
-**tag: v0.04-kof2002 (458pt) | commit: 待定 | 下一目标: 600分(+200 TAG MILESTONE)**
+**tag: v0.04-kof2002 (458pt) → v0.05-kof2002 (603pt) | commit: 待定 | 下一目标: 800分(+200 TAG MILESTONE)**

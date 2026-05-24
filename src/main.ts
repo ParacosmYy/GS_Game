@@ -25,7 +25,7 @@ import { CinematicState } from './state/cinematicState.js';
 import { SelectState } from './state/selectState.js';
 import { RoundState } from './state/roundState.js';
 import { DMManager } from './combat/dmManager.js';
-import { createHitCallback } from './combat/hitCallback.js';
+import { createHitCallback, triggerKOGroundEffect } from './combat/hitCallback.js';
 import { initAudio, playKO, playVictoryFanfare, playMAXActivation, playPerfect, playThrowEscape, playFight, playRoll, playCancel, playQuickStand } from './audio/sfx.js';
 import { createTeam, defeatActive, switchToNext, activeChar, teamOrderString, type TeamState } from './state/teamState.js';
 import { resolveSimplified } from './input/simplifiedInput.js';
@@ -103,6 +103,7 @@ combatSystem.onGuardCrush = (fighter, hitX, hitY) => {
 let phase: GamePhase = GamePhase.TITLE;
 let phaseTimer = 0;
 let koTimer = 0;
+let koGroundSlamDone = false;
 let winner: number | null = null;
 let continueCountdown = 0;
 const CONTINUE_DURATION = 600; // 10秒倒计时
@@ -203,7 +204,7 @@ function update(): void {
 
   if (phase === GamePhase.INTRO) {
     phaseTimer++;
-    if (phaseTimer >= INTRO_DURATION) { phase = GamePhase.FIGHTING; tickRef.value = 0; modeIndicatorTimer = 180; firstHitTracked = false; bgm.start(); playFight(); }
+    if (phaseTimer >= INTRO_DURATION) { phase = GamePhase.FIGHTING; tickRef.value = 0; modeIndicatorTimer = 180; firstHitTracked = false; koGroundSlamDone = false; bgm.start(); playFight(); }
     return;
   }
 
@@ -420,13 +421,21 @@ function update(): void {
   if (p1.health <= 0 || p2.health <= 0) {
     if (!cinematic.koSlowMoTriggered) {
       cinematic.triggerKOSlowMo();
-      vfx.spawnGroundSlam((p1.x + p2.x) / 2, STAGE_GROUND_Y);
       screenFlash.trigger('#ff2200', 0.35, 15);
       screenShake.trigger(16, 15);
       playKO();
       bgm.stop();
       announcer.knockOut();
-    } else if (cinematic.isKOSlowMoDone()) {
+    }
+    // KO'd fighter落地时触发groundslam (KOF2002正版: 空中KO落地才震地)
+    if (!koGroundSlamDone && cinematic.koSlowMoTriggered) {
+      const loser = p1.health <= 0 ? p1 : p2;
+      if (loser.isGrounded()) {
+        koGroundSlamDone = true;
+        triggerKOGroundEffect({ vfx, screenFlash, screenShake }, loser);
+      }
+    }
+    if (cinematic.koSlowMoTriggered && cinematic.isKOSlowMoDone()) {
       phase = GamePhase.KO;
       koTimer = 0;
       winner = rounds.determineWinner();
@@ -514,6 +523,7 @@ function restartGame(): void {
   phase = GamePhase.TITLE;
   phaseTimer = 0;
   koTimer = 0;
+  koGroundSlamDone = false;
   winner = null;
   tickRef.value = 0;
   select.reset();

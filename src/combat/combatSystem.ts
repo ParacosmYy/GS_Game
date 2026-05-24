@@ -529,8 +529,8 @@ export class CombatSystem {
 /** Guard gauge depletion based on attack type */
 function guardGaugeDamage(attackType: AttackType): number {
   const name = attackType as string;
-  // DMs
-  if (name.startsWith('DM_')) return 25;
+  // DMs / SDMs
+  if (name.startsWith('DM_') || name.startsWith('SDM_')) return name.startsWith('SDM_') ? 35 : 25;
   // Character specials (KYO_, IORI_, TERRY_, KIM_, SPECIAL_)
   if (name.startsWith('KYO_') || name.startsWith('IORI_') || name.startsWith('TERRY_')
     || name.startsWith('KIM_') || name.startsWith('RYO_') || name.startsWith('LEONA_') || name.startsWith('KDASH_') || name.startsWith('KULA_') || name.startsWith('SPECIAL_')) return 15;
@@ -550,7 +550,7 @@ const GUARD_CRUSH_DURATION = 90;
 /** Get juggle point cost for an attack type */
 function getJuggleCost(attackType: AttackType): number {
   const name = attackType as string;
-  if (name.startsWith('DM_')) return JUGGLE_COST_DM;
+  if (name.startsWith('DM_') || name.startsWith('SDM_')) return JUGGLE_COST_DM;
   if (name.startsWith('KYO_') || name.startsWith('IORI_') || name.startsWith('TERRY_')
     || name.startsWith('KIM_') || name.startsWith('RYO_') || name.startsWith('LEONA_') || name.startsWith('KDASH_') || name.startsWith('KULA_') || name.startsWith('SPECIAL_')) return JUGGLE_COST_SPECIAL;
   if (name.endsWith('_C') || name.endsWith('_D') || name.startsWith('CMD_')
