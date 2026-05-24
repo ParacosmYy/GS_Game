@@ -547,6 +547,54 @@ const BLOCK_POSES: Pose[] = [
   { headOff: -1, bodyLean: -1, armL: -0.9, armR: -0.7, legL: -1, legR: 1, crouch: false },
 ];
 
+/** 根据idleStyle生成差异化受击姿态 */
+function getHitPoses(style: string): Pose[] {
+  switch (style) {
+    case 'confident': // Kyo — 后仰但保持平衡
+      return HIT_POSES.map(p => ({ ...p, bodyLean: p.bodyLean * 0.8, legL: -1, legR: 1 }));
+    case 'lazy': // Iori — 缓慢后倾
+      return HIT_POSES.map(p => ({ ...p, bodyLean: p.bodyLean * 0.6, armL: p.armL * 0.5, armR: p.armR * 0.5 }));
+    case 'fighter': // Terry — 剧烈后仰
+      return HIT_POSES.map(p => ({ ...p, bodyLean: p.bodyLean * 1.2, headOff: p.headOff * 1.2 }));
+    case 'martial': // Kim — 稳定后撤
+      return HIT_POSES.map(p => ({ ...p, legL: -2, legR: 2, armL: p.armL * 0.7 }));
+    case 'tense': // Ryo — 硬抗
+      return HIT_POSES.map(p => ({ ...p, bodyLean: p.bodyLean * 0.5, armR: -0.3 }));
+    case 'alert': // Leona — 快速后跳
+      return HIT_POSES.map(p => ({ ...p, bodyLean: p.bodyLean * 1.1, legL: -2, legR: 2 }));
+    case 'rebel': // K' — 漫不经心被打
+      return HIT_POSES.map(p => ({ ...p, bodyLean: p.bodyLean * 0.7, headOff: 0 }));
+    case 'cute': // Kula — 夸张后仰
+      return HIT_POSES.map(p => ({ ...p, bodyLean: p.bodyLean * 1.3, headOff: p.headOff * 1.3 }));
+    default:
+      return HIT_POSES;
+  }
+}
+
+/** 根据idleStyle生成差异化防御姿态 */
+function getBlockPoses(style: string): Pose[] {
+  switch (style) {
+    case 'confident': // Kyo — 前方格挡
+      return BLOCK_POSES.map(p => ({ ...p, armL: -0.6, armR: -1.0, bodyLean: 0 }));
+    case 'lazy': // Iori — 单手防御
+      return BLOCK_POSES.map(p => ({ ...p, armL: 0.1, armR: -1.2, bodyLean: -0.5 }));
+    case 'fighter': // Terry — 双拳紧护
+      return BLOCK_POSES.map(p => ({ ...p, armL: -1.0, armR: -1.0 }));
+    case 'martial': // Kim — 低位防御
+      return BLOCK_POSES.map(p => ({ ...p, armL: -0.6, armR: -0.6, legL: -2, legR: 2 }));
+    case 'tense': // Ryo — 力量格挡
+      return BLOCK_POSES.map(p => ({ ...p, armL: -0.9, armR: -0.9, bodyLean: -0.5 }));
+    case 'alert': // Leona — 紧凑防御
+      return BLOCK_POSES.map(p => ({ ...p, armL: -0.7, armR: -0.7, bodyLean: -1.5 }));
+    case 'rebel': // K' — 随意挡
+      return BLOCK_POSES.map(p => ({ ...p, armL: -0.5, armR: -0.5, bodyLean: 0 }));
+    case 'cute': // Kula — 双手护脸
+      return BLOCK_POSES.map(p => ({ ...p, armL: -1.2, armR: -1.2, headOff: -2 }));
+    default:
+      return BLOCK_POSES;
+  }
+}
+
 /** KO倒地帧 — 带描边 */
 function drawKO(c: CanvasRenderingContext2D, v: CharVisual): void {
   const cy = Math.floor(PH / PIXEL) - 6;
@@ -611,14 +659,16 @@ export function generatePlaceholderSpritesheet(color: string, charId: string): {
   const v = CHAR_VISUALS[charId] ?? getDefaultVisual();
   v.shirtColor = color;
 
-  // 使用角色专属待机/跑步/跳跃姿态
+  // 使用角色专属待机/跑步/跳跃/受击/防御姿态
   const idlePoses = getIdlePoses(v.idleStyle);
   const runPoses = getRunPoses(v.idleStyle);
   const jumpPoses = getJumpPoses(v.idleStyle);
+  const hitPoses = getHitPoses(v.idleStyle);
+  const blockPoses = getBlockPoses(v.idleStyle);
   const POSE_MAP_LOCAL: Record<PoseSet, Pose[]> = {
     idle: idlePoses, walk: WALK_POSES, run: runPoses, attack: ATTACK_POSES,
     crouch_attack: CROUCH_ATTACK_POSES, air_attack: AIR_ATTACK_POSES, throw: THROW_POSES,
-    crouch: CROUCH_POSES, jump: jumpPoses, hit: HIT_POSES, block: BLOCK_POSES,
+    crouch: CROUCH_POSES, jump: jumpPoses, hit: hitPoses, block: blockPoses,
   };
 
   const poseSets: PoseSet[] = ['idle', 'walk', 'run', 'attack', 'crouch_attack', 'air_attack', 'throw', 'crouch', 'jump', 'hit', 'block'];
