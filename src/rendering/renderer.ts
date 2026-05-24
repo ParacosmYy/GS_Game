@@ -185,6 +185,14 @@ export class Renderer {
       ctx.font = 'bold 11px monospace';
       ctx.textAlign = 'center';
       ctx.fillText(isP1 ? 'P1' : 'P2', sx, sy - f.displayHeight - 8);
+
+      // Quick Stand提示: 软倒地时闪烁提示玩家可以按A+B快速起身
+      if (f.state === FighterState.KNOCKDOWN && !f.isHardKnockdown && f.knockdownTimer > 5
+        && this.globalTick % 16 < 10) {
+        ctx.fillStyle = '#ffcc44';
+        ctx.font = 'bold 10px monospace';
+        ctx.fillText('A+B', sx, sy - 10);
+      }
       ctx.textAlign = 'left';
     }
   }
