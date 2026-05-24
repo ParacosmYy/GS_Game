@@ -83,11 +83,12 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       // KOF2002: 防御火花按攻击类型着色 — 通常白色, 必杀金色, DM蓝色
       const { isDM: blkDM, isSpecial: blkSpecial } = classifyAttack(attackType);
       const blkColor = blkDM ? '#6688ff' : blkSpecial ? '#ffcc44' : '#ffffff';
-      deps.vfx.spawnBlockFlash(hitX, hitY);
-      if (blkSpecial) deps.vfx.spawnCharacterHitSparks(hitX, hitY, 6, blkColor);
       const blkHeavy = attackType === AttackType.STAND_C || attackType === AttackType.STAND_D
         || attackType === AttackType.CLOSE_C || attackType === AttackType.CLOSE_D
         || attackType === AttackType.CROUCH_C || attackType === AttackType.CROUCH_D;
+      const blkFlashScale = blkDM ? 1.8 : blkSpecial ? 1.4 : blkHeavy ? 1.2 : 0.8;
+      deps.vfx.spawnBlockFlash(hitX, hitY, blkFlashScale);
+      if (blkSpecial) deps.vfx.spawnCharacterHitSparks(hitX, hitY, 6, blkColor, 1.2);
       const blkStop = blkSpecial ? 5 : blkHeavy ? 5 : 3;
       deps.cinematic.triggerHitStop(blkStop);
       deps.screenShake.trigger(blkSpecial ? 5 : blkHeavy ? 4 : 2, 6);
@@ -124,12 +125,14 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
     const lowHpBonus = defender.health < defender.maxHealth * 0.25 ? 4 : 0;
     const sparks = (isSDM ? 28 : isDM ? 20 : isSpecial ? 14 : counterHit ? 12 : 8) + comboSparkBonus + lowHpBonus;
     const sparkColor = isSpecial ? atkChar.specialColor : isPunch ? '#ffdd44' : '#44ddff';
-    deps.vfx.spawnCharacterHitSparks(hitX, hitY, sparks, sparkColor);
-    deps.vfx.spawnImpactRing(hitX, hitY);
+    const sparkSize = isSDM ? 1.8 : isDM ? 1.5 : isSpecial ? 1.3 : isHeavyAttack(attackType) ? 1.0 : 0.7;
+    deps.vfx.spawnCharacterHitSparks(hitX, hitY, sparks, sparkColor, sparkSize);
+    deps.vfx.spawnImpactRing(hitX, hitY, sparkSize);
 
     // 重攻击斩击线
     if (isHeavyAttack(attackType) || isSpecial) {
-      deps.vfx.spawnSlashLine(hitX, hitY, attacker.facing, sparkColor);
+      const slashScale = isDM ? 2.0 : isSpecial ? 1.4 : 1.0;
+      deps.vfx.spawnSlashLine(hitX, hitY, attacker.facing, sparkColor, slashScale);
     }
 
     // DM: 超必杀华丽爆发 + 全屏闪光

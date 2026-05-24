@@ -42,8 +42,6 @@ export class Renderer {
     this.spriteRenderer = sr;
   }
 
-  // ===== Main fight frame =====
-
   render(fighters: Fighter[], cameraX: number, tick: number, ko: boolean, winner: number | null, shakeX: number, shakeY: number, delayedHealth: [number, number], maxModes?: [MaxModeState, MaxModeState], perfectPlayer: number | null = null, p1Wins: number = 0, p2Wins: number = 0, p1Name: string = '', p2Name: string = '', isTimeOver: boolean = false, currentRound: number = 1, firstAttacker: number | null = null): void {
     this.frameCount++;
     this.globalTick = tick;
@@ -73,8 +71,6 @@ export class Renderer {
   getFps(): number {
     return this.currentFps;
   }
-
-  // ===== Fighter orchestration =====
 
   private drawFighters(ctx: CanvasRenderingContext2D, fighters: Fighter[], cameraX: number, maxModes?: [MaxModeState, MaxModeState]): void {
     const sorted = [...fighters].sort((a, b) => a.y - b.y);
@@ -345,7 +341,7 @@ export class Renderer {
         break;
       case FighterState.HITSTUN:
         if (f.hitFlashFrames > 0) {
-          bodyColor = '#ffffff';
+          bodyColor = f.hitFlashColor || '#ffffff';
           outlineColor = '#ffffffcc';
         } else {
           bodyColor = this.globalTick % 8 < 2 ? '#ffffff' : f.color;

@@ -63,6 +63,20 @@ export function drawAttackLimb(
   const limbWidth = isHeavy ? 16 : 12;
 
   ctx.save();
+  // KOF2002: 重攻击/必杀技拖尾 — active帧半透明回影
+  const showTrail = isHeavy || isSpecialMove;
+  if (showTrail) {
+    ctx.globalAlpha = 0.25;
+    const trailOff = -8 * f.facing;
+    ctx.save();
+    ctx.translate(trailOff, 0);
+    if (name.startsWith('CLOSE')) drawCloseAttack(ctx, f, sx, sy, isPunch, Math.max(0, progress - 0.3), limbLen);
+    else if (name.startsWith('STAND')) drawStandAttack(ctx, f, sx, sy, isPunch, Math.max(0, progress - 0.3), limbLen);
+    else if (name.startsWith('CROUCH')) drawCrouchAttack(ctx, f, sx, sy, isPunch, limbLen);
+    else if (name.startsWith('JUMP')) drawJumpAttack(ctx, f, sx, sy, isPunch, limbLen);
+    ctx.restore();
+    ctx.globalAlpha = 1;
+  }
   if (isSpecialMove) {
     ctx.strokeStyle = isPunch ? specialColor : specialGlow;
     ctx.lineWidth = limbWidth + 4;

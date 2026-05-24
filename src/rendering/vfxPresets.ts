@@ -36,32 +36,32 @@ export function spawnHitSparks(particles: Particle[], worldX: number, worldY: nu
   }
 }
 
-export function spawnBlockFlash(particles: Particle[], worldX: number, worldY: number): void {
+export function spawnBlockFlash(particles: Particle[], worldX: number, worldY: number, scale: number = 1.0): void {
   particles.push({
     x: worldX, y: worldY, vx: 0, vy: 0,
-    life: 8, maxLife: 8, size: 40,
+    life: 8, maxLife: 8, size: 40 * scale,
     color: '#aaccff', type: 'flash',
   });
 }
 
-/** 角色专属命中火花 — KOF风格, 更大更亮 */
-export function spawnCharacterHitSparks(particles: Particle[], worldX: number, worldY: number, count: number, charColor: string): void {
+/** 角色专属命中火花 — KOF风格, 更大更亮. sizeScale: 轻攻击0.7, 重攻击1.0, 必杀1.3, DM1.8 */
+export function spawnCharacterHitSparks(particles: Particle[], worldX: number, worldY: number, count: number, charColor: string, sizeScale: number = 1.0): void {
   particles.push({
     x: worldX, y: worldY, vx: 0, vy: 0,
-    life: 6, maxLife: 6, size: 25,
+    life: 6, maxLife: 6, size: 25 * sizeScale,
     color: charColor, type: 'flash',
   });
   for (let i = 0; i < count; i++) {
     const angle = Math.random() * Math.PI * 2;
-    const speed = 3 + Math.random() * 7;
+    const speed = (3 + Math.random() * 7) * sizeScale;
     const isStar = Math.random() > 0.25;
     particles.push({
       x: worldX, y: worldY,
       vx: Math.cos(angle) * speed,
-      vy: Math.sin(angle) * speed - 3,
+      vy: Math.sin(angle) * speed - 3 * sizeScale,
       life: 14 + Math.floor(Math.random() * 10),
       maxLife: 24,
-      size: isStar ? 4 + Math.random() * 5 : 2 + Math.random() * 3,
+      size: (isStar ? 4 + Math.random() * 5 : 2 + Math.random() * 3) * sizeScale,
       color: Math.random() > 0.35 ? charColor : '#ffffff',
       type: isStar ? 'star' : 'spark',
       gravity: 0.12,
@@ -137,30 +137,30 @@ export function spawnThrowEscapeSparks(particles: Particle[], worldX: number, wo
   }
 }
 
-export function spawnImpactRing(particles: Particle[], worldX: number, worldY: number): void {
+export function spawnImpactRing(particles: Particle[], worldX: number, worldY: number, scale: number = 1.0): void {
   particles.push({
     x: worldX, y: worldY, vx: 0, vy: 0,
-    life: 14, maxLife: 14, size: 8,
+    life: 14, maxLife: 14, size: 8 * scale,
     color: '#ffffff', type: 'ring',
   });
   particles.push({
     x: worldX, y: worldY, vx: 0, vy: 0,
-    life: 10, maxLife: 10, size: 5,
+    life: 10, maxLife: 10, size: 5 * scale,
     color: '#ffcc44', type: 'ring',
   });
 }
 
-/** 打击斩击线 — 重攻击命中时的横向闪光 */
-export function spawnSlashLine(particles: Particle[], worldX: number, worldY: number, _facing: number, color: string): void {
+/** 打击斩击线 — 重攻击命中时的横向闪光. scale: 重1.0, 必杀1.4, DM2.0 */
+export function spawnSlashLine(particles: Particle[], worldX: number, worldY: number, _facing: number, color: string, scale: number = 1.0): void {
   particles.push({
     x: worldX, y: worldY, vx: 0, vy: 0,
-    life: 8, maxLife: 8, size: 30 + Math.random() * 20,
+    life: 8, maxLife: 8, size: (30 + Math.random() * 20) * scale,
     color, type: 'slash',
     rotation: (Math.random() - 0.5) * 0.6,
   });
   particles.push({
     x: worldX, y: worldY, vx: 0, vy: 0,
-    life: 8, maxLife: 8, size: 20 + Math.random() * 15,
+    life: 8, maxLife: 8, size: (20 + Math.random() * 15) * scale,
     color: '#ffffff', type: 'slash',
     rotation: (Math.random() - 0.5) * 0.6 - 0.3,
   });

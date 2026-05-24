@@ -409,6 +409,14 @@ export function drawPowerGauges(ctx: CanvasRenderingContext2D, gauges: [PowerGau
       ctx.strokeRect(segX, gaugeY, segW, gaugeH);
     }
 
+    // KOF2002: 气槽可用脉冲 — 有stock时边框微弱发光提示DM可用
+    if (gauge.stocks >= 1 && !maxMode.active) {
+      const readyPulse = Math.sin(Date.now() / 200) * 0.15 + 0.15;
+      ctx.strokeStyle = `rgba(255, 170, 0, ${readyPulse})`;
+      ctx.lineWidth = 1;
+      ctx.strokeRect(Math.round(baseX) - 1, gaugeY - 1, gaugeW + 2, gaugeH + 2);
+    }
+
     // MAX text when full — SNK style
     if (!maxMode.active && gauge.stocks >= MAX_STOCKS) {
       const pulseAlpha = 0.7 + 0.3 * Math.sin(Date.now() / 120);
@@ -548,8 +556,10 @@ export function drawComboCounters(
     else if (combo >= 5) { comboColor = '#ffcc00'; glowColor = '#ffaa00'; }
     else { comboColor = '#ffffff'; glowColor = '#ffcc44'; }
 
-    // Combo count — SNK style with glow
-    const fontSize = 20 + Math.min(combo, 15);
+    // Combo count — SNK style with glow + pulse on recent hit
+    const baseFontSize = 20 + Math.min(combo, 15);
+    const pulseScale = comboTimer[i] > 50 ? 1.15 : 1.0;
+    const fontSize = baseFontSize * pulseScale;
     ctx.save();
     ctx.shadowColor = glowColor;
     ctx.shadowBlur = 12 + Math.min(combo, 10);
@@ -562,6 +572,17 @@ export function drawComboCounters(
     // Combo damage total display — SNK style
     if (comboDamage && comboDamage[i] > 0) {
       drawSNKText(ctx, `${comboDamage[i]}`, sx, sy + 30, 13, '#ff6644');
+    }
+
+    // Combo timer bar — shows remaining combo window
+    const ctRatio = Math.max(0, comboTimer[i] / 60);
+    if (ctRatio > 0) {
+      const barW = 30, barH = 2;
+      ctx.fillStyle = 'rgba(0,0,0,0.4)';
+      ctx.fillRect(sx - barW / 2, sy + 38, barW, barH);
+      const ctCol = ctRatio > 0.5 ? '#22cc55' : ctRatio > 0.25 ? '#ffcc00' : '#ff4444';
+      ctx.fillStyle = ctCol;
+      ctx.fillRect(sx - barW / 2, sy + 38, barW * ctRatio, barH);
     }
   }
   ctx.restore();

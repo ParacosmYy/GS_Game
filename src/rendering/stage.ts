@@ -63,4 +63,21 @@ export function drawStage(
       drawFactoryStage(ctx, cameraX, stars, globalTick);
       break;
   }
+  // KOF2002: 环境浮尘 — 地面附近缓慢漂浮的微粒
+  drawAmbientDust(ctx, globalTick);
+}
+
+function drawAmbientDust(ctx: CanvasRenderingContext2D, tick: number): void {
+  ctx.save();
+  for (let i = 0; i < 8; i++) {
+    const baseX = ((i * 113 + tick * 0.15) % (CANVAS_WIDTH + 40)) - 20;
+    const y = STAGE_GROUND_Y - 8 - Math.sin(tick * 0.02 + i * 1.7) * 15;
+    const alpha = 0.12 + Math.sin(tick * 0.03 + i) * 0.06;
+    ctx.globalAlpha = alpha;
+    ctx.fillStyle = '#aaaacc';
+    ctx.beginPath();
+    ctx.arc(baseX, y, 1.5, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.restore();
 }

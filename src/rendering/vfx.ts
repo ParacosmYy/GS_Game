@@ -79,13 +79,13 @@ export class VFXSystem {
     spawnHitSparks(this.particles, worldX, worldY, count);
   }
 
-  spawnBlockFlash(worldX: number, worldY: number): void {
-    spawnBlockFlash(this.particles, worldX, worldY);
+  spawnBlockFlash(worldX: number, worldY: number, scale?: number): void {
+    spawnBlockFlash(this.particles, worldX, worldY, scale);
   }
 
   /** 角色专属命中火花 — KOF风格, 更大更亮 */
-  spawnCharacterHitSparks(worldX: number, worldY: number, count: number, charColor: string): void {
-    spawnCharacterHitSparks(this.particles, worldX, worldY, count, charColor);
+  spawnCharacterHitSparks(worldX: number, worldY: number, count: number, charColor: string, sizeScale?: number): void {
+    spawnCharacterHitSparks(this.particles, worldX, worldY, count, charColor, sizeScale);
   }
 
   spawnGuardCrushSparks(worldX: number, worldY: number): void {
@@ -108,13 +108,13 @@ export class VFXSystem {
     spawnThrowEscapeSparks(this.particles, worldX, worldY);
   }
 
-  spawnImpactRing(worldX: number, worldY: number): void {
-    spawnImpactRing(this.particles, worldX, worldY);
+  spawnImpactRing(worldX: number, worldY: number, scale?: number): void {
+    spawnImpactRing(this.particles, worldX, worldY, scale);
   }
 
   /** 打击斩击线 — 重攻击命中时的横向闪光 */
-  spawnSlashLine(worldX: number, worldY: number, facing: number, color: string): void {
-    spawnSlashLine(this.particles, worldX, worldY, facing, color);
+  spawnSlashLine(worldX: number, worldY: number, facing: number, color: string, scale?: number): void {
+    spawnSlashLine(this.particles, worldX, worldY, facing, color, scale);
   }
 
   /** DM/超必杀激活时的华丽爆发 */
