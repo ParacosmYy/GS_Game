@@ -39,6 +39,7 @@ export const RyoDef: CharacterDefinition = {
     pushWidth: 60,
     jumpForwardSpeed: 5,
     closeRange: 88,
+    throwRange: 108,
   },
 
   poses: {

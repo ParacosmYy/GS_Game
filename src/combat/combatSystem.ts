@@ -290,7 +290,9 @@ export class CombatSystem {
       if (defender.juggleState === JuggleState.NONE) return; // Can't hit airborne
       if (defender.juggleState === JuggleState.HALF && defender.vy > 0) return;
       // Juggle point check: each air hit consumes points from budget
-      const juggleCost = getJuggleCost(attackType);
+      // KOF2002: progressive juggle cost — 每次空中命中消耗递增20%
+      const baseCost = getJuggleCost(attackType);
+      const juggleCost = Math.ceil(baseCost * (1 + defender.airHitCount * 0.2));
       if (defender.jugglePoints < juggleCost) return; // not enough juggle budget
       defender.jugglePoints -= juggleCost;
       defender.airHitCount++;
@@ -412,6 +414,11 @@ export class CombatSystem {
     }
 
     this.comboHits[defIdx]++;
+    // KOF2002: 连击伤害缩放 — 第2击起伤害递减 (第2击90%, 第3击80%, 第4击70%, 最低50%)
+    if (this.comboHits[defIdx] > 1) {
+      const scale = Math.max(0.5, 1 - (this.comboHits[defIdx] - 1) * 0.1);
+      damage = Math.round(damage * scale);
+    }
     this.comboDamage[defIdx] += damage;
     this.lastHitFrame[defIdx] = this.currentFrame;
 
@@ -446,8 +453,11 @@ export class CombatSystem {
         defender.juggleState = JuggleState.FULL;
       }
     } else {
-      // KOF2002: pushback reduced by 40% in combos (so follow-up attacks stay in range)
-      const effectivePushback = this.comboHits[defIdx] > 1 ? data.pushback * 0.6 : data.pushback;
+      // KOF2002: pushback递减 — 连段越长推力越小(第2击85%, 第3击70%, 第4+击55%)
+      const comboScale = this.comboHits[defIdx] <= 1 ? 1.0
+        : this.comboHits[defIdx] === 2 ? 0.85
+        : this.comboHits[defIdx] === 3 ? 0.70 : 0.55;
+      const effectivePushback = data.pushback * comboScale;
       defender.applyHitstun(hitstunFrames, effectivePushback);
     }
 

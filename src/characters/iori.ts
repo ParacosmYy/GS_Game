@@ -41,6 +41,7 @@ export const IoriDef: CharacterDefinition = {
     pushWidth: 58,
     jumpForwardSpeed: 5.5,
     closeRange: 90,
+    throwRange: 105,
   },
 
   poses: {

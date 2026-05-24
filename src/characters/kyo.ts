@@ -54,6 +54,7 @@ export const KyoDef: CharacterDefinition = {
     pushWidth: 60,
     jumpForwardSpeed: 5,
     closeRange: 88,
+    throwRange: 100,
   },
 
   poses: {

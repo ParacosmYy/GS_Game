@@ -39,6 +39,7 @@ export const LeonaDef: CharacterDefinition = {
     pushWidth: 58,
     jumpForwardSpeed: 5.5,
     closeRange: 72,
+    throwRange: 115,
   },
 
   poses: {

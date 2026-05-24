@@ -44,6 +44,7 @@ export const KdashDef: CharacterDefinition = {
     pushWidth: 60,
     jumpForwardSpeed: 5,
     closeRange: 78,
+    throwRange: 100,
   },
 
   poses: {

@@ -36,6 +36,7 @@ export const KimDef: CharacterDefinition = {
     pushWidth: 56,
     jumpForwardSpeed: 6,
     closeRange: 85,
+    throwRange: 100,
   },
 
   poses: {

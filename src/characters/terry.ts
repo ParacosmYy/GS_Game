@@ -39,6 +39,7 @@ export const TerryDef: CharacterDefinition = {
     pushWidth: 64,
     jumpForwardSpeed: 4.5,
     closeRange: 82,
+    throwRange: 100,
   },
 
   poses: {

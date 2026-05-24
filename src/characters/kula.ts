@@ -39,6 +39,7 @@ export const KulaDef: CharacterDefinition = {
     pushWidth: 60,
     jumpForwardSpeed: 5,
     closeRange: 75,
+    throwRange: 100,
   },
 
   poses: {

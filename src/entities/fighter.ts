@@ -133,6 +133,9 @@ export class Fighter {
   get prevState(): FighterState { return this._prevState; }
   savePrevState(): void { this._prevState = this.state; }
 
+  // Character stats reference (for per-character throw range etc.)
+  private charStats: CharacterStats | null = null;
+
   constructor(x: number, color: string, facing: Direction) {
     this.x = x;
     this.y = STAGE_GROUND_Y;
@@ -148,6 +151,7 @@ export class Fighter {
     this.maxHealth = stats.maxHealth;
     this.health = stats.maxHealth;
     this.pushWidth = stats.pushWidth;
+    this.charStats = stats;
   }
 
   /** Update auto-facing toward opponent */
@@ -195,15 +199,16 @@ export class Fighter {
       }
     }
 
-    // 普通投: 使用 THROW_RANGE 距离
+    // 普通投: 使用角色专属投技距离
     const isThrowAttack = this.currentAttack === AttackType.THROW
       || this.currentAttack === AttackType.THROW_FORWARD
       || this.currentAttack === AttackType.THROW_BACK;
     if (isThrowAttack) {
+      const range = this.charStats?.throwRange ?? 100;
       return {
-        x: this.facing > 0 ? this.x : this.x - 100,
+        x: this.facing > 0 ? this.x : this.x - range,
         y: this.y - this.displayHeight,
-        width: 100,
+        width: range,
         height: this.displayHeight,
       };
     }

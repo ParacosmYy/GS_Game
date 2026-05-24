@@ -111,6 +111,7 @@ export interface CharacterStats {
   pushWidth: number;         // 推挤碰撞宽度 (default: 60)
   jumpForwardSpeed: number;  // 跳跃水平速度 (default: 5)
   closeRange?: number;       // 近距离攻击触发距离 (default: CLOSE_RANGE=80, 格斗家更大)
+  throwRange?: number;       // 投技距离 (default: THROW_RANGE=100, 投技角色更大)
 }
 
 // ===== 角色定义接口 =====
