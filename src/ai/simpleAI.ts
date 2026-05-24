@@ -39,22 +39,26 @@ const COMBO_ROUTES: Record<string, ComboStep[]> = {
     { type: 'special', attack: 'aragami',     delay: 3 },
     { type: 'special', attack: 'aragamiFollow', delay: 3 },
     { type: 'special', attack: 'aragamiEnder',  delay: 3 },
+    { type: 'special', attack: 'dmOrochinagi',  delay: 4 },
   ],
   iori: [
     { type: 'button',  attack: 'closeC',   delay: 0 },
     { type: 'special', attack: 'aoihana1',  delay: 3 },
     { type: 'special', attack: 'aoihana2',  delay: 3 },
     { type: 'special', attack: 'aoihana3',  delay: 3 },
+    { type: 'special', attack: 'dmYatagarasu', delay: 4 },
   ],
   terry: [
     { type: 'button',  attack: 'closeC',      delay: 0 },
     { type: 'button',  attack: 'standA',       delay: 2 },
     { type: 'special', attack: 'burnKnuckle',  delay: 3 },
+    { type: 'special', attack: 'dmPowerGeyser', delay: 4 },
   ],
   kim: [
     { type: 'button',  attack: 'closeC',  delay: 0 },
     { type: 'button',  attack: 'standB',   delay: 2 },
     { type: 'special', attack: 'hiensen',  delay: 3 },
+    { type: 'special', attack: 'dmPhoenixKick', delay: 4 },
   ],
   _default: [
     { type: 'button',  attack: 'closeC', delay: 0 },
@@ -134,9 +138,24 @@ export class SimpleAI {
       return base;
     }
 
+    // ── MAX mode activation during combo (BC cancel: normal >> MAX) ──
+    // In KOF2002, MAX is best activated mid-combo via BC to extend combos
+    if (this.inCombo && f.hasHit && canAct && this.gauge && this.gauge.stocks >= 2
+      && !f.currentAttack?.toString().startsWith('DM_')
+      && Math.random() < this.difficulty * 0.5) {
+      const base = this.emptyInput();
+      base.buttonB = true;
+      base.buttonC = true;
+      base.buttonBPressed = true;
+      base.buttonCPressed = true;
+      this.inCombo = true;
+      this.comboStep = 0;
+      return base;
+    }
+
     // ── MAX mode activation: when in close range with meter available ──
     if (canAct && this.gauge && this.gauge.stocks >= 1 && dist < 100
-      && Math.random() < this.difficulty * 0.08) {
+      && Math.random() < this.difficulty * 0.05) {
       const base = this.emptyInput();
       base.buttonB = true;
       base.buttonC = true;
@@ -455,6 +474,18 @@ export class SimpleAI {
 
       case 'special':
         if (canAct) {
+          // Super Cancel: if combo active and has meter, use DM
+          if (this.inCombo && f.hasHit && this.gauge && this.gauge.stocks >= 1
+            && Math.random() < this.difficulty * 0.6) {
+            const route = this.getCurrentRoute();
+            // Try to route into DM (last step of combo)
+            const dmStep = route.find(s => s.attack.toLowerCase().includes('dm'));
+            if (dmStep) {
+              this.applyComboStep(dmStep, base);
+              this.inCombo = false;
+              break;
+            }
+          }
           if (Math.random() < 0.3) {
             base.buttonC = true;
             base.buttonCPressed = true;

@@ -425,9 +425,9 @@ export class Fighter {
     if (this.runStopTimer > 0) this.runStopTimer--;
     if (this.throwInvincibilityTimer > 0) this.throwInvincibilityTimer--;
     if (this.hitFlashFrames > 0) this.hitFlashFrames--;
-    // Guard gauge recovery: +0.5/frame when NOT blocking
+    // Guard gauge recovery: +0.25/frame when NOT blocking (KOF2002正版恢复速率)
     if (this.state !== FighterState.BLOCK && this.guardGauge < 100) {
-      this.guardGauge = Math.min(100, this.guardGauge + 0.5);
+      this.guardGauge = Math.min(100, this.guardGauge + 0.25);
     }
   }
 

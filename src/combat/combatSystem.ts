@@ -9,7 +9,7 @@ import {
   FRAME_DATA, THROW_RANGE, THROW_DISTANCE,
   CHIP_DAMAGE_RATIO,
   CH_HITSTUN_BONUS, CH_DAMAGE_BONUS,
-  DAMAGE_SCALE_STEP, DAMAGE_SCALE_MIN, COMBO_TIMEOUT,
+  DAMAGE_SCALE_STEP, DAMAGE_SCALE_MIN_NORMAL, DAMAGE_SCALE_MIN_SPECIAL, DAMAGE_SCALE_MIN_DM, COMBO_TIMEOUT,
   COUNTER_WIRE_BOUNCE_VX, COUNTER_WIRE_BOUNCE_VY,
   LIGHT_NORMALS, NORMAL_ATTACKS, COMMAND_NORMALS,
   STAGE_LEFT, STAGE_RIGHT,
@@ -20,8 +20,8 @@ import { CLOSE_RANGE } from '../core/types.js';
 import { FighterState, AttackType, JuggleState } from '../core/types.js';
 import type { HitLevel } from '../core/types.js';
 
-/** Throw escape window in frames */
-const THROW_ESCAPE_WINDOW = 8;
+/** Throw escape window in frames (KOF2002: 6 frames, strict) */
+const THROW_ESCAPE_WINDOW = 6;
 /** Push-apart distance on successful throw escape */
 const THROW_ESCAPE_PUSH = 60;
 export type HitCallback = (
@@ -171,7 +171,7 @@ export class CombatSystem {
           ? FRAME_DATA[throwType as keyof typeof FRAME_DATA] ?? FRAME_DATA[AttackType.THROW]
           : FRAME_DATA[AttackType.THROW];
         const defIdx = i;
-        let damage = this.scaledDamage(data.damage, defIdx);
+        let damage = this.scaledDamage(data.damage, defIdx, throwType ?? undefined);
         // MAX mode damage penalty on throws
         const atkIdxForThrow = 1 - i;
         if (this.maxModes[atkIdxForThrow]) {
@@ -203,12 +203,19 @@ export class CombatSystem {
     return false;
   }
 
-  /** Calculate damage with scaling based on combo count */
-  private scaledDamage(baseDamage: number, defIdx: number): number {
+  /** KOF2002 damage scaling: scale by combo count, minimum varies by attack type */
+  private scaledDamage(baseDamage: number, defIdx: number, attackType?: AttackType): number {
     const hits = this.comboHits[defIdx];
-    if (hits === 0) return baseDamage; // First hit: full damage
-    const scale = Math.max(DAMAGE_SCALE_MIN, 1 - hits * DAMAGE_SCALE_STEP);
-    return Math.round(baseDamage * scale);
+    if (hits === 0) return baseDamage;
+    const name = (attackType ?? '') as string;
+    const isDM = name.startsWith('DM_');
+    const isSpecial = isDM || name.startsWith('KYO_') || name.startsWith('IORI_') || name.startsWith('TERRY_')
+      || name.startsWith('KIM_') || name.startsWith('RYO_') || name.startsWith('LEONA_')
+      || name.startsWith('KDASH_') || name.startsWith('KULA_') || name.startsWith('SPECIAL_')
+      || name === 'STAND_CD' || name === 'JUMP_CD';
+    const minScale = isDM ? DAMAGE_SCALE_MIN_DM : isSpecial ? DAMAGE_SCALE_MIN_SPECIAL : DAMAGE_SCALE_MIN_NORMAL;
+    const scale = Math.max(minScale, 1 - hits * DAMAGE_SCALE_STEP);
+    return Math.max(1, Math.round(baseDamage * scale));
   }
 
   private resolveHit(attacker: Fighter, defender: Fighter, onHit?: HitCallback): void {
@@ -230,7 +237,7 @@ export class CombatSystem {
       const attackerCtrl = this.defenderControllers?.[this.fighters?.[0] === attacker ? 0 : 1];
       if (attackerCtrl?.charDef?.isCommandThrow?.(attackType)) {
         const defIdx = this.fighters ? (this.fighters[0] === defender ? 0 : 1) : 0;
-        const damage = this.scaledDamage(data.damage, defIdx);
+        const damage = this.scaledDamage(data.damage, defIdx, attackType);
         defender.health = Math.max(0, defender.health - damage);
         this.comboHits[defIdx]++;
         this.lastHitFrame[defIdx] = this.currentFrame;
@@ -286,6 +293,11 @@ export class CombatSystem {
       const juggleCost = getJuggleCost(attackType);
       if (defender.jugglePoints < juggleCost) return; // not enough juggle budget
       defender.jugglePoints -= juggleCost;
+      defender.airHitCount++;
+      // KOF2002 juggle gravity: each successive air hit increases gravity (opponent falls faster)
+      // Makes long juggle combos progressively harder
+      const gravityScale = 1 + defender.airHitCount * 0.15;
+      defender.vy += 0.3 * gravityScale;
     }
 
     const defIdx = this.fighters ? (this.fighters[0] === defender ? 0 : 1) : 0;
@@ -363,7 +375,7 @@ export class CombatSystem {
     }
 
     // Damage
-    let damage = this.scaledDamage(data.damage, defIdx);
+    let damage = this.scaledDamage(data.damage, defIdx, attackType);
     let hitstunFrames: number = data.hitstun;
 
     // Close range damage bonus: CLOSE_ attacks get +10% at point-blank range
@@ -484,7 +496,7 @@ export class CombatSystem {
           this.comboHits[i] = 0;
           onHit?.(attacker, defender, AttackType.SPECIAL_PROJECTILE, true, false);
         } else {
-          const damage = this.scaledDamage(data.damage, i);
+          const damage = this.scaledDamage(data.damage, i, AttackType.SPECIAL_PROJECTILE);
           const projAtkIdx = 1 - i;
           const projDamage = this.maxModes[projAtkIdx] ? Math.round(damage * 0.67) : damage;
           this.comboHits[i]++;
@@ -518,8 +530,8 @@ function guardGaugeDamage(attackType: AttackType): number {
   return 5;
 }
 
-/** Guard Crush constant — stun duration in frames */
-const GUARD_CRUSH_DURATION = 60;
+/** Guard Crush constant — stun duration in frames (KOF2002: 90 frames / 1.5 seconds) */
+const GUARD_CRUSH_DURATION = 90;
 
 /** Get juggle point cost for an attack type */
 function getJuggleCost(attackType: AttackType): number {

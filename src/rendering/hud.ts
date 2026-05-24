@@ -493,30 +493,20 @@ export function drawComboCounters(
     else if (combo >= 5) { comboColor = '#ffcc00'; glowColor = '#ffaa00'; }
     else { comboColor = '#ffffff'; glowColor = '#ffcc44'; }
 
-    // Combo count — styled with glow
+    // Combo count — SNK style with glow
     const fontSize = 20 + Math.min(combo, 15);
     ctx.save();
     ctx.shadowColor = glowColor;
     ctx.shadowBlur = 12 + Math.min(combo, 10);
-    ctx.fillStyle = comboColor;
-    ctx.font = `bold ${fontSize}px "Courier New", monospace`;
-    ctx.fillText(`${combo}`, sx, sy);
-    // 描边增强可读性
-    ctx.strokeStyle = 'rgba(0,0,0,0.5)';
-    ctx.lineWidth = 2;
-    ctx.strokeText(`${combo}`, sx, sy);
+    drawSNKText(ctx, `${combo}`, sx, sy, fontSize, comboColor);
     ctx.restore();
 
-    // "HIT" text below with combo count color
-    ctx.fillStyle = comboColor;
-    ctx.font = `bold 11px "Courier New", monospace`;
-    ctx.fillText('HIT', sx, sy + 16);
+    // "HIT" text below — SNK style
+    drawSNKText(ctx, 'HIT', sx, sy + 16, 11, comboColor);
 
-    // Combo damage total display
+    // Combo damage total display — SNK style
     if (comboDamage && comboDamage[i] > 0) {
-      ctx.fillStyle = '#ff6644';
-      ctx.font = `bold 13px "Courier New", monospace`;
-      ctx.fillText(`${comboDamage[i]}`, sx, sy + 30);
+      drawSNKText(ctx, `${comboDamage[i]}`, sx, sy + 30, 13, '#ff6644');
     }
   }
   ctx.restore();

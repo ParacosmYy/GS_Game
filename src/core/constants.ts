@@ -734,10 +734,14 @@ export const JUGGLE_COST_DM = 3;              // DMs cost 3
 export const COUNTER_WIRE_BOUNCE_VX = 8;   // Wall bounce horizontal speed
 export const COUNTER_WIRE_BOUNCE_VY = -6;  // Wall bounce vertical speed (upward)
 
-// ===== Damage Scaling =====
-export const DAMAGE_SCALE_STEP = 0.08;  // 每连击递减8% (KOF2002: 100/92/84/76/68/60/52/44...)
-export const DAMAGE_SCALE_MIN = 0.20;   // 最低20%伤害 (KOF2002标准, 防止连段伤害过低)
-export const COMBO_TIMEOUT = 60;        // 60帧(1秒)无后续命中则重置连击计数
+// ===== Damage Scaling (KOF2002正版公式) =====
+// 公式: baseDamage * max(minScale, 1 - 0.05 * comboHits)
+// 通常技最低10%, 必杀技最低20%, DM最低30%
+export const DAMAGE_SCALE_STEP = 0.05;         // 每连击递减5% (KOF2002正版)
+export const DAMAGE_SCALE_MIN_NORMAL = 0.10;   // 通常技最低10%
+export const DAMAGE_SCALE_MIN_SPECIAL = 0.20;  // 必杀技最低20%
+export const DAMAGE_SCALE_MIN_DM = 0.30;       // DM最低30%
+export const COMBO_TIMEOUT = 60;               // 60帧(1秒)无后续命中则重置连击计数
 
 // ===== Power Gauge (能量槽) =====
 export const MAX_STOCKS = 5;

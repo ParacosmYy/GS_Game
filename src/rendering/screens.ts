@@ -3,7 +3,7 @@
  */
 import { CANVAS_WIDTH, CANVAS_HEIGHT } from '../core/constants.js';
 import { ROSTER } from '../characters/index.js';
-import { roundRect } from './utils.js';
+import { roundRect, drawSNKText } from './utils.js';
 import { drawPixelPortrait } from './pixelPortraits.js';
 
 // ===== Character Select =====
@@ -54,15 +54,8 @@ export function drawCharacterSelect(
 
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.shadowColor = '#ff8800';
-  ctx.shadowBlur = 15;
-  ctx.fillStyle = '#ffcc00';
-  ctx.font = 'bold 34px "Courier New", monospace';
-  ctx.fillText('SELECT YOUR FIGHTER', CANVAS_WIDTH / 2, 35);
-  ctx.shadowBlur = 0;
-  ctx.fillStyle = '#999';
-  ctx.font = '11px "Courier New", monospace';
-  ctx.fillText('P1: A/D select  J confirm  |  T: toggle AI  |  Tab: toggle mode', CANVAS_WIDTH / 2, 72);
+  drawSNKText(ctx, 'SELECT YOUR FIGHTER', CANVAS_WIDTH / 2, 35, 34, '#ffcc00');
+  drawSNKText(ctx, 'P1: A/D select  J confirm  |  T: toggle AI  |  Tab: toggle mode', CANVAS_WIDTH / 2, 72, 11, '#999999');
 
   // Character cards
   const cols = ROSTER.length;
@@ -124,21 +117,14 @@ export function drawCharacterSelect(
       ctx.fillText(char.portrait, cx + cardW / 2, portraitY + 48);
     }
 
-    // Character name
-    ctx.font = 'bold 15px "Courier New", monospace';
-    ctx.fillStyle = '#eee';
-    ctx.textAlign = 'center';
-    ctx.fillText(char.nameCn, cx + cardW / 2, cy + 120);
-    ctx.font = '9px "Courier New", monospace';
-    ctx.fillStyle = '#777';
-    ctx.fillText(char.name, cx + cardW / 2, cy + 136);
+    // Character name — SNK style
+    drawSNKText(ctx, char.nameCn, cx + cardW / 2, cy + 120, 15, '#eeeeee');
+    drawSNKText(ctx, char.name, cx + cardW / 2, cy + 136, 9, '#777777');
 
-    // Ready indicator
+    // Ready indicator — SNK style
     if ((p1Ready && isP1Here) || (p2Ready && isP2Here)) {
-      ctx.font = 'bold 13px "Courier New", monospace';
-      ctx.fillStyle = '#ffcc00';
       const label = p1Ready && isP1Here ? 'P1 OK!' : 'P2 OK!';
-      ctx.fillText(label, cx + cardW / 2, cy + cardH - 25);
+      drawSNKText(ctx, label, cx + cardW / 2, cy + cardH - 25, 13, '#ffcc00');
     }
 
     // Selection highlight — glowing border
@@ -148,10 +134,7 @@ export function drawCharacterSelect(
       ctx.lineWidth = 3;
       roundRect(ctx, cx - 3, cy - 3, cardW + 6, cardH + 6, 12);
       ctx.stroke();
-      // P1 label
-      ctx.fillStyle = '#ff4444';
-      ctx.font = 'bold 11px "Courier New", monospace';
-      ctx.fillText('P1', cx + cardW / 2, cy - 10);
+      drawSNKText(ctx, 'P1', cx + cardW / 2, cy - 10, 11, '#ff4444');
     }
     if (isP2Here) {
       const pulse = 0.5 + Math.sin(tick * 0.1 + 1) * 0.3;
@@ -159,9 +142,7 @@ export function drawCharacterSelect(
       ctx.lineWidth = 3;
       roundRect(ctx, cx - 3, cy - 3, cardW + 6, cardH + 6, 12);
       ctx.stroke();
-      ctx.fillStyle = '#4488ff';
-      ctx.font = 'bold 11px "Courier New", monospace';
-      ctx.fillText('P2', cx + cardW / 2, cy + cardH + 14);
+      drawSNKText(ctx, 'P2', cx + cardW / 2, cy + cardH + 14, 11, '#4488ff');
     }
   }
 
@@ -178,43 +159,22 @@ export function drawCharacterSelect(
   ctx.lineWidth = 1;
   ctx.beginPath(); ctx.moveTo(0, panelY - 10); ctx.lineTo(CANVAS_WIDTH, panelY - 10); ctx.stroke();
 
-  // P1 info
+  // P1 info — SNK style
   const p1Char = ROSTER[p1Cursor];
-  ctx.textAlign = 'left';
-  ctx.fillStyle = '#ff4444';
-  ctx.font = 'bold 14px "Courier New", monospace';
-  ctx.fillText('P1', 40, panelY + 10);
-  ctx.fillStyle = p1Char.color;
-  ctx.font = 'bold 24px "Courier New", monospace';
-  ctx.fillText(p1Char.nameCn, 40, panelY + 40);
-  ctx.fillStyle = '#888';
-  ctx.font = '10px "Courier New", monospace';
-  ctx.fillText(p1Char.name, 40, panelY + 58);
-  ctx.fillStyle = p1Ready ? '#ffcc00' : '#666';
-  ctx.font = '12px "Courier New", monospace';
-  ctx.fillText(p1Ready ? 'READY!' : 'J to confirm', 40, panelY + 78);
+  drawSNKText(ctx, 'P1', 50, panelY + 10, 14, '#ff4444', '#000000', 'left');
+  drawSNKText(ctx, p1Char.nameCn, 40, panelY + 40, 24, p1Char.color, '#000000', 'left');
+  drawSNKText(ctx, p1Char.name, 40, panelY + 58, 10, '#888888', '#000000', 'left');
+  drawSNKText(ctx, p1Ready ? 'READY!' : 'J to confirm', 40, panelY + 78, 12, p1Ready ? '#ffcc00' : '#666666', '#000000', 'left');
 
-  // P2 info
+  // P2 info — SNK style
   const p2Char = ROSTER[p2Cursor];
-  ctx.textAlign = 'right';
-  ctx.fillStyle = '#4488ff';
-  ctx.font = 'bold 14px "Courier New", monospace';
-  ctx.fillText('P2', CANVAS_WIDTH - 40, panelY + 10);
-  ctx.fillStyle = p2Char.color;
-  ctx.font = 'bold 24px "Courier New", monospace';
-  ctx.fillText(p2Char.nameCn, CANVAS_WIDTH - 40, panelY + 40);
-  ctx.fillStyle = '#888';
-  ctx.font = '10px "Courier New", monospace';
-  ctx.fillText(p2Char.name, CANVAS_WIDTH - 40, panelY + 58);
-  ctx.fillStyle = p2Ready ? '#ffcc00' : '#666';
-  ctx.font = '12px "Courier New", monospace';
-  ctx.fillText(p2Ready ? 'READY!' : p2IsAI ? '[AI]' : 'Numpad to confirm', CANVAS_WIDTH - 40, panelY + 78);
+  drawSNKText(ctx, 'P2', CANVAS_WIDTH - 50, panelY + 10, 14, '#4488ff', '#000000', 'right');
+  drawSNKText(ctx, p2Char.nameCn, CANVAS_WIDTH - 40, panelY + 40, 24, p2Char.color, '#000000', 'right');
+  drawSNKText(ctx, p2Char.name, CANVAS_WIDTH - 40, panelY + 58, 10, '#888888', '#000000', 'right');
+  drawSNKText(ctx, p2Ready ? 'READY!' : p2IsAI ? '[AI]' : 'Numpad to confirm', CANVAS_WIDTH - 40, panelY + 78, 12, p2Ready ? '#ffcc00' : '#666666', '#000000', 'right');
 
-  // VS in center
-  ctx.textAlign = 'center';
-  ctx.fillStyle = '#ffffff15';
-  ctx.font = 'bold 56px "Courier New", monospace';
-  ctx.fillText('VS', CANVAS_WIDTH / 2, panelY + 40);
+  // VS in center — SNK style
+  drawSNKText(ctx, 'VS', CANVAS_WIDTH / 2, panelY + 40, 56, 'rgba(255,255,255,0.08)');
 
   // AI toggle
   ctx.fillStyle = p2IsAI ? '#44ff88' : '#ff6644';
@@ -280,33 +240,18 @@ export function drawIntro(ctx: CanvasRenderingContext2D, phaseTimer: number, cur
     ctx.fillRect(0, 0, CANVAS_WIDTH, 100);
     ctx.fillRect(0, CANVAS_HEIGHT - 100, CANVAS_WIDTH, 100);
 
-    ctx.strokeStyle = '#ffffff';
-    ctx.lineWidth = 4;
-    ctx.lineJoin = 'round';
-    ctx.font = `bold ${fontSize}px "Courier New", monospace`;
-    ctx.strokeText(`ROUND ${currentRound}`, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 20);
-
+    // "ROUND X" — SNK style
     ctx.shadowColor = '#ff8800';
     ctx.shadowBlur = 15;
-    ctx.fillStyle = '#ffcc00';
-    ctx.fillText(`ROUND ${currentRound}`, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 20);
+    drawSNKText(ctx, `ROUND ${currentRound}`, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 20, fontSize, '#ffcc00');
     ctx.shadowBlur = 0;
 
-    // 角色名显示 — Round下方
+    // 角色名显示 — SNK style
     if (p1Name && p2Name) {
       ctx.globalAlpha = Math.min(1, progress * 3);
-      ctx.font = 'bold 16px "Courier New", monospace';
-      ctx.fillStyle = '#ff6644';
-      ctx.textAlign = 'right';
-      ctx.fillText(p1Name, CANVAS_WIDTH / 2 - 30, CANVAS_HEIGHT / 2 + 15);
-      ctx.fillStyle = '#4488ff';
-      ctx.textAlign = 'left';
-      ctx.fillText(p2Name, CANVAS_WIDTH / 2 + 30, CANVAS_HEIGHT / 2 + 15);
-      // VS
-      ctx.textAlign = 'center';
-      ctx.fillStyle = '#ffcc00';
-      ctx.font = 'bold 14px "Courier New", monospace';
-      ctx.fillText('VS', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 15);
+      drawSNKText(ctx, p1Name, CANVAS_WIDTH / 2 - 30, CANVAS_HEIGHT / 2 + 15, 16, '#ff6644', '#000000', 'right');
+      drawSNKText(ctx, p2Name, CANVAS_WIDTH / 2 + 30, CANVAS_HEIGHT / 2 + 15, 16, '#4488ff', '#000000', 'left');
+      drawSNKText(ctx, 'VS', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 15, 14, '#ffcc00');
     }
   } else if (phaseTimer < 100) {
     const fp = (phaseTimer - 60) / 40;
@@ -331,16 +276,9 @@ export function drawIntro(ctx: CanvasRenderingContext2D, phaseTimer: number, cur
     }
 
     const fontSize = Math.round(64 * scale);
-    ctx.strokeStyle = '#ffffff';
-    ctx.lineWidth = 4;
-    ctx.lineJoin = 'round';
-    ctx.font = `bold ${fontSize}px "Courier New", monospace`;
-    ctx.strokeText('FIGHT!', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 20);
-
     ctx.shadowColor = '#ff4400';
     ctx.shadowBlur = 25;
-    ctx.fillStyle = '#ff4400';
-    ctx.fillText('FIGHT!', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 20);
+    drawSNKText(ctx, 'FIGHT!', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 20, fontSize, '#ff4400');
     ctx.shadowBlur = 0;
   }
 
@@ -381,52 +319,33 @@ export function drawKO(ctx: CanvasRenderingContext2D, winner: number | null, per
   }
   ctx.globalAlpha = 1;
 
-  // Title text — dramatic triple-render glow
+  // Title text — SNK style with dramatic glow
   ctx.shadowColor = glowColor;
   ctx.shadowBlur = 60;
-  ctx.fillStyle = titleColor;
-  ctx.font = `bold ${isTimeOver ? 72 : 100}px "Courier New", monospace`;
-  ctx.fillText(titleText, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 20);
-  ctx.shadowBlur = 30;
-  ctx.fillText(titleText, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 20);
+  drawSNKText(ctx, titleText, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 20, isTimeOver ? 72 : 100, titleColor);
   ctx.shadowBlur = 0;
-  ctx.strokeStyle = '#ffffff';
-  ctx.lineWidth = 2;
-  ctx.lineJoin = 'round';
-  ctx.strokeText(titleText, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 20);
 
   if (winner !== null) {
     const wColor = winner === 0 ? '#ff6644' : '#4488ff';
     ctx.shadowColor = wColor;
     ctx.shadowBlur = 12;
-    ctx.fillStyle = wColor;
-    ctx.font = 'bold 28px "Courier New", monospace';
-    ctx.fillText(`P${winner + 1} WINS`, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 50);
+    drawSNKText(ctx, `P${winner + 1} WINS`, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 50, 28, wColor);
     ctx.shadowBlur = 0;
   } else {
     ctx.shadowColor = '#ffcc00';
     ctx.shadowBlur = 12;
-    ctx.fillStyle = '#ffcc00';
-    ctx.font = 'bold 28px "Courier New", monospace';
-    ctx.fillText('DOUBLE KO', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 50);
+    drawSNKText(ctx, 'DOUBLE KO', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 50, 28, '#ffcc00');
     ctx.shadowBlur = 0;
   }
 
   if (perfectPlayer !== null) {
-    // 双层发光 + P色标签
-    const perfColor = perfectPlayer === 0 ? '#ff6644' : '#4488ff';
     ctx.shadowColor = '#ffcc00';
     ctx.shadowBlur = 35;
-    ctx.fillStyle = '#ffcc00';
-    ctx.font = 'bold 42px "Courier New", monospace';
-    ctx.fillText('PERFECT!', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 100);
-    ctx.shadowBlur = 20;
-    ctx.fillText('PERFECT!', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 100);
+    drawSNKText(ctx, 'PERFECT!', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 100, 42, '#ffcc00');
     ctx.shadowBlur = 0;
-    // P标签
-    ctx.font = 'bold 16px "Courier New", monospace';
-    ctx.fillStyle = perfColor;
-    ctx.fillText(`P${perfectPlayer + 1}`, CANVAS_WIDTH / 2 - 80, CANVAS_HEIGHT / 2 + 100);
+    // P标签 — SNK style
+    const perfColor = perfectPlayer === 0 ? '#ff6644' : '#4488ff';
+    drawSNKText(ctx, `P${perfectPlayer + 1}`, CANVAS_WIDTH / 2 - 80, CANVAS_HEIGHT / 2 + 100, 16, perfColor);
   }
 
   ctx.fillStyle = 'rgba(255,255,255,0.4)';
@@ -452,7 +371,7 @@ export function drawSuperFlash(
   ctx.fillStyle = isSDM ? `rgba(80, 0, 0, ${alpha})` : `rgba(0, 0, 80, ${alpha})`;
   ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
-  // Flash burst
+  // Flash burst — initial bright white flash
   if (timer > 14) {
     const flashAlpha = (timer - 14) / 6 * 0.9;
     const flashGrad = ctx.createRadialGradient(flashScreenX, flashScreenY, 0, flashScreenX, flashScreenY, 180);
@@ -487,18 +406,56 @@ export function drawSuperFlash(
   ctx.fillStyle = glowGrad;
   ctx.fillRect(flashScreenX - 200, flashScreenY - 200, 400, 400);
 
-  // Radiating lines
+  // Ground shockwave ring — expanding circle at ground level
+  if (timer > 8 && timer < 18) {
+    const ringProgress = (18 - timer) / 10;
+    const ringRadius = (1 - ringProgress) * 200;
+    const ringAlpha = ringProgress * 0.5;
+    ctx.strokeStyle = isSDM ? `rgba(255, 100, 30, ${ringAlpha})` : `rgba(255, 220, 80, ${ringAlpha})`;
+    ctx.lineWidth = 3 * ringProgress;
+    ctx.beginPath();
+    ctx.ellipse(flashScreenX, flashScreenY + 40, ringRadius, ringRadius * 0.3, 0, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+
+  // Radiating energy lines — 16 lines (enhanced from 12)
   if (timer > 10) {
     const lineAlpha = (timer - 10) / 10 * 0.3;
     ctx.strokeStyle = isSDM ? `rgba(255, 180, 60, ${lineAlpha})` : `rgba(255, 255, 100, ${lineAlpha})`;
     ctx.lineWidth = 2;
-    for (let a = 0; a < 12; a++) {
-      const angle = (a / 12) * Math.PI * 2 + timer * 0.1;
-      const len = 60 + (1 - progress) * 80;
+    for (let a = 0; a < 16; a++) {
+      const angle = (a / 16) * Math.PI * 2 + timer * 0.1;
+      const len = 60 + (1 - progress) * 100;
       ctx.beginPath();
       ctx.moveTo(flashScreenX + Math.cos(angle) * 20, flashScreenY + Math.sin(angle) * 20);
       ctx.lineTo(flashScreenX + Math.cos(angle) * len, flashScreenY + Math.sin(angle) * len);
       ctx.stroke();
+    }
+    // Inner ring of shorter lines
+    ctx.lineWidth = 1.5;
+    for (let a = 0; a < 8; a++) {
+      const angle = (a / 8) * Math.PI * 2 - timer * 0.15;
+      const len = 30 + (1 - progress) * 40;
+      ctx.beginPath();
+      ctx.moveTo(flashScreenX + Math.cos(angle) * 15, flashScreenY + Math.sin(angle) * 15);
+      ctx.lineTo(flashScreenX + Math.cos(angle) * len, flashScreenY + Math.sin(angle) * len);
+      ctx.stroke();
+    }
+  }
+
+  // Floating energy particles around flash point
+  if (timer > 5) {
+    const particleAlpha = Math.min(1, (timer - 5) / 10) * 0.8;
+    for (let p = 0; p < 8; p++) {
+      const pAngle = (p / 8) * Math.PI * 2 + timer * 0.2 + p * 0.5;
+      const pDist = 40 + timer * 2 + p * 5;
+      const px = flashScreenX + Math.cos(pAngle) * pDist;
+      const py = flashScreenY + Math.sin(pAngle) * pDist * 0.6;
+      const pSize = 2 + Math.sin(timer * 0.3 + p) * 1;
+      ctx.fillStyle = isSDM ? `rgba(255, 160, 60, ${particleAlpha})` : `rgba(255, 240, 120, ${particleAlpha})`;
+      ctx.beginPath();
+      ctx.arc(px, py, pSize, 0, Math.PI * 2);
+      ctx.fill();
     }
   }
 
@@ -523,31 +480,24 @@ export function drawMatchEnd(
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
 
-  // "GAME" text with gold glow
+  // "GAME" text — SNK style with gold glow
   ctx.shadowColor = '#ff8800';
   ctx.shadowBlur = 25;
-  ctx.fillStyle = '#FFD700';
-  ctx.font = 'bold 72px "Courier New", monospace';
-  ctx.fillText('GAME', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 80);
+  drawSNKText(ctx, 'GAME', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 80, 72, '#FFD700');
   ctx.shadowBlur = 0;
 
   if (winner !== null) {
-    ctx.fillStyle = winner === 0 ? '#ff6644' : '#4488ff';
-    ctx.font = 'bold 32px "Courier New", monospace';
-    ctx.fillText(`P${winner + 1} WINS THE MATCH`, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 20);
+    const wColor = winner === 0 ? '#ff6644' : '#4488ff';
+    drawSNKText(ctx, `P${winner + 1} WINS THE MATCH`, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 20, 32, wColor);
   } else {
-    ctx.fillStyle = '#ffcc00';
-    ctx.font = 'bold 32px "Courier New", monospace';
-    ctx.fillText('DRAW GAME', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 20);
+    drawSNKText(ctx, 'DRAW GAME', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 20, 32, '#ffcc00');
   }
 
-  // Win Quote
+  // Win Quote — SNK style
   if (winQuote && winnerColor) {
-    ctx.fillStyle = winnerColor;
-    ctx.font = '16px "Courier New", monospace';
     ctx.shadowColor = winnerColor;
     ctx.shadowBlur = 8;
-    ctx.fillText(`"${winQuote}"`, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 25);
+    drawSNKText(ctx, `"${winQuote}"`, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 25, 16, winnerColor);
     ctx.shadowBlur = 0;
   }
 
@@ -573,13 +523,9 @@ export function drawMatchEnd(
     ctx.stroke();
   }
 
-  ctx.fillStyle = '#ffffff30';
-  ctx.font = 'bold 16px "Courier New", monospace';
-  ctx.fillText('VS', CANVAS_WIDTH / 2, dotY);
+  drawSNKText(ctx, 'VS', CANVAS_WIDTH / 2, dotY, 16, 'rgba(255,255,255,0.2)');
 
-  ctx.fillStyle = 'rgba(255,255,255,0.5)';
-  ctx.font = '13px "Courier New", monospace';
-  ctx.fillText('Press any key to continue', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 120);
+  drawSNKText(ctx, 'Press any key to continue', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 120, 13, 'rgba(255,255,255,0.5)');
 
   ctx.restore();
 }
@@ -653,27 +599,22 @@ export function drawTitle(ctx: CanvasRenderingContext2D, tick: number): void {
   ctx.fillStyle = logoGlow;
   ctx.fillRect(CANVAS_WIDTH / 2 - 250, 50, 500, 200);
 
-  // KOF 2002 title — larger with glow
+  // KOF 2002 title — SNK style with glow
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
 
   // Title shadow
   ctx.shadowColor = '#ff4400';
   ctx.shadowBlur = 30;
-  ctx.fillStyle = '#ff6600';
-  ctx.font = 'bold 52px "Courier New", monospace';
-  ctx.fillText('KOF 2002', CANVAS_WIDTH / 2, 140);
-  // Double render for extra glow
+  drawSNKText(ctx, 'KOF 2002', CANVAS_WIDTH / 2, 140, 52, '#ff6600');
   ctx.shadowBlur = 50;
-  ctx.fillText('KOF 2002', CANVAS_WIDTH / 2, 140);
+  drawSNKText(ctx, 'KOF 2002', CANVAS_WIDTH / 2, 140, 52, '#ff6600');
   ctx.shadowBlur = 0;
 
-  // Subtitle — gold
+  // Subtitle — SNK style gold
   ctx.shadowColor = '#cc8800';
   ctx.shadowBlur = 10;
-  ctx.font = 'bold 22px "Courier New", monospace';
-  ctx.fillStyle = '#cc8844';
-  ctx.fillText('风云再起', CANVAS_WIDTH / 2, 185);
+  drawSNKText(ctx, '风云再起', CANVAS_WIDTH / 2, 185, 22, '#cc8844');
   ctx.shadowBlur = 0;
 
   // Decorative line
@@ -704,29 +645,23 @@ export function drawTitle(ctx: CanvasRenderingContext2D, tick: number): void {
     ctx.fillText(ROSTER[i].nameCn[0], sx, silY + bob + 3);
   }
 
-  // PRESS START — smooth blink
+  // PRESS START — SNK style with smooth blink
   const blinkVal = Math.sin(tick * 0.08) * 0.5 + 0.5;
   if (blinkVal > 0.3) {
     ctx.shadowColor = '#ffcc00';
     ctx.shadowBlur = 15;
     ctx.globalAlpha = blinkVal;
-    ctx.font = 'bold 24px "Courier New", monospace';
-    ctx.fillStyle = '#ffcc00';
-    ctx.fillText('PRESS START', CANVAS_WIDTH / 2, 370);
+    drawSNKText(ctx, 'PRESS START', CANVAS_WIDTH / 2, 370, 24, '#ffcc00');
     ctx.globalAlpha = 1;
     ctx.shadowBlur = 0;
   }
 
-  // Input hints
-  ctx.fillStyle = '#444455';
-  ctx.font = '11px "Courier New", monospace';
-  ctx.fillText('Enter / J / R to start', CANVAS_WIDTH / 2, 420);
+  // Input hints — SNK style
+  drawSNKText(ctx, 'Enter / J / R to start', CANVAS_WIDTH / 2, 420, 11, '#444455');
 
-  // Controls
-  ctx.fillStyle = '#333344';
-  ctx.font = '10px "Courier New", monospace';
-  ctx.fillText('Tab: Simplified mode  |  N: Change stage  |  F1: Debug  |  M: Music  |  B: BGM', CANVAS_WIDTH / 2, 545);
-  ctx.fillText('HTML5 Canvas + TypeScript', CANVAS_WIDTH / 2, 565);
+  // Controls — SNK style
+  drawSNKText(ctx, 'Tab: Simplified mode  |  N: Change stage  |  F1: Debug  |  M: Music  |  B: BGM', CANVAS_WIDTH / 2, 545, 10, '#333344');
+  drawSNKText(ctx, 'HTML5 Canvas + TypeScript', CANVAS_WIDTH / 2, 565, 10, '#333344');
 
   ctx.restore();
 }
@@ -744,50 +679,38 @@ export function drawContinue(ctx: CanvasRenderingContext2D, secondsLeft: number,
 
   ctx.shadowColor = '#ff2222';
   ctx.shadowBlur = 25;
-  ctx.font = 'bold 48px "Courier New", monospace';
-  ctx.fillStyle = '#ff4444';
-  ctx.fillText('CONTINUE?', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 80);
+  drawSNKText(ctx, 'CONTINUE?', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 80, 48, '#ff4444');
   ctx.shadowBlur = 0;
 
   ctx.shadowBlur = 12;
-  ctx.font = 'bold 72px "Courier New", monospace';
-  ctx.fillStyle = secondsLeft <= 3 ? '#ff2222' : '#ffcc00';
-  ctx.fillText(`${secondsLeft}`, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 10);
+  const countColor = secondsLeft <= 3 ? '#ff2222' : '#ffcc00';
+  drawSNKText(ctx, `${secondsLeft}`, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 10, 72, countColor);
   ctx.shadowBlur = 0;
 
-  // YES / NO selection
+  // YES / NO selection — SNK style
   const yesX = CANVAS_WIDTH / 2 - 80;
   const noX = CANVAS_WIDTH / 2 + 80;
   const selY = CANVAS_HEIGHT / 2 + 90;
 
-  // YES
-  ctx.font = 'bold 28px "Courier New", monospace';
   if (cursorYes) {
     ctx.shadowColor = '#44ff44';
     ctx.shadowBlur = 15;
-    ctx.fillStyle = '#44ff44';
-    ctx.fillText('> YES <', yesX, selY);
+    drawSNKText(ctx, '> YES <', yesX, selY, 28, '#44ff44');
   } else {
-    ctx.fillStyle = '#666666';
-    ctx.fillText('YES', yesX, selY);
+    drawSNKText(ctx, 'YES', yesX, selY, 28, '#666666');
   }
   ctx.shadowBlur = 0;
 
-  // NO
   if (!cursorYes) {
     ctx.shadowColor = '#ff4444';
     ctx.shadowBlur = 15;
-    ctx.fillStyle = '#ff4444';
-    ctx.fillText('> NO <', noX, selY);
+    drawSNKText(ctx, '> NO <', noX, selY, 28, '#ff4444');
   } else {
-    ctx.fillStyle = '#666666';
-    ctx.fillText('NO', noX, selY);
+    drawSNKText(ctx, 'NO', noX, selY, 28, '#666666');
   }
   ctx.shadowBlur = 0;
 
-  ctx.font = '12px "Courier New", monospace';
-  ctx.fillStyle = '#555566';
-  ctx.fillText('Arrow Keys: Select  |  Enter: Confirm', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 140);
+  drawSNKText(ctx, 'Arrow Keys: Select  |  Enter: Confirm', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 140, 12, '#555566');
 
   ctx.restore();
 }

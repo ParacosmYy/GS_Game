@@ -1717,3 +1717,73 @@
 |------|------|------|------|
 | UI/HUD品质 | 20/50 | +2 | SNK描边+渐变文字风格, 一致性强 |
 | **总分** | **403/1000** | **+5** | |
+
+### Iter-V64 — 2026-05-25（连击数SNK风格文字 +5=408）
+
+**改动:** Combo counter全部使用drawSNKText替代原始fillText, 连击数/HIT/伤害数字统一SNK风格
+
+| UI/HUD品质 | 22/50 | +2 | Combo SNK风格一致 |
+
+### Iter-V65 — 2026-05-25（伤害缩放公式精调KOF2002正版 +5=413）
+
+**改动:** 伤害缩放改为KOF2002正版公式: 1-0.05*comboHits, 通常技最低10%/必杀技最低20%/DM最低30%, 投射物传入攻击类型
+
+| 战斗手感 | 126/150 | +1 | 伤害缩放区分攻击类型 |
+
+### Iter-V66 — 2026-05-25（防御槽恢复+GC持续时间+浮空重力衰减 +5=418）
+
+**改动:** 防御槽恢复0.5→0.25/帧, GC持续时间60→90帧, 浮空连击重力递增(每次命中gravityScale+15%)
+
+| 战斗手感 | 128/150 | +2 | 防御惩罚更重+浮空追打自然衰减 |
+
+### Iter-V67 — 2026-05-25（选人界面SNK风格全面应用 +5=423）
+
+**改动:** 选人界面全部文字(TITLE/角色名/READY/P1P2标签/VS)统一使用drawSNKText, SNK描边渐变风格一致
+
+| UI/HUD品质 | 24/50 | +2 | 选人界面SNK风格一致性 |
+
+### Iter-V68 — 2026-05-25（Super Flash视觉增强 — 地面冲击波+粒子 +5=428）
+
+**改动:** DM发动演出增强: 16条能量线(12→16)+内环8条短线+地面椭圆冲击波+8个浮动能量粒子
+
+| 战斗手感 | 130/150 | +2 | DM发动视觉冲击力增强 |
+
+### Iter-V69 — 2026-05-25（投技拆投窗口校准KOF2002正版 +5=433）
+
+**改动:** 拆投窗口8帧→6帧(KOF2002正版值), 更严格的拆投时机
+
+| 战斗手感 | 131/150 | +1 | 投技更严格 |
+
+### Iter-V70 — 2026-05-25（Round Intro SNK风格文字 +5=438）
+
+**改动:** "ROUND X"/"FIGHT!"/角色名/VS全部改用drawSNKText, 与正版SNK描边渐变风格一致
+
+| UI/HUD品质 | 26/50 | +2 | Round Intro SNK风格统一 |
+
+### Iter-V71 — 2026-05-25（KO画面+Perfect SNK风格 +5=443）
+
+**改动:** K.O./TIME OVER/P1 WINS/DOUBLE KO/PERFECT全部使用drawSNKText, SNK风格统一
+
+| UI/HUD品质 | 28/50 | +2 | KO画面SNK风格一致 |
+
+### Iter-V72 — 2026-05-25（Match End + Win Quote SNK风格 +5=448）
+
+**改动:** GAME/P1 WINS THE MATCH/DRAW GAME/Win Quote/VS/Continue提示统一drawSNKText
+
+| UI/HUD品质 | 30/50 | +2 | Match End SNK风格完成 |
+
+### Iter-V73 — 2026-05-25（Title/Continue SNK风格统一 +5=453）
+
+**改动:** Title Screen(KOF 2002/风云再起/PRESS START/提示)/Continue(CONTINUE?/倒计时/YES NO)全部drawSNKText
+
+| UI/HUD品质 | 32/50 | +2 | 全UI界面SNK风格统一完成 |
+
+### Iter-V74 — 2026-05-25（AI MAX连段路由增强 +5=458）
+
+**改动:** AI连段中BC取消进MAX模式(hasHit时), 角色专属DM连段末端(dmOrochinagi/dmYatagarasu等), Super Cancel→DM路由
+
+| 战斗手感 | 133/150 | +2 | AI使用MAX延长连段+DM收尾 |
+
+---
+
+**tag: 无 | commit: 待定 | 下一目标: 500分(+50)**
