@@ -366,8 +366,11 @@ export class CombatSystem {
     defender.health = Math.max(0, defender.health - damage);
 
     // Counter Wire: counter hit + counterWire move → wall bounce instead of knockdown
+    // CD attacks always cause wall bounce on hit (not just counter)
     const frameData = data as { counterWire?: boolean };
-    if (counterHit && frameData.counterWire) {
+    const isCDAttack = attackType === AttackType.STAND_CD || attackType === AttackType.JUMP_CD;
+    const shouldWallBounce = (counterHit && frameData.counterWire) || isCDAttack;
+    if (shouldWallBounce) {
       defender.isCounterWire = true;
       const flyDir = defender.x < attacker.x ? -1 : 1;
       defender.vx = COUNTER_WIRE_BOUNCE_VX * flyDir * -1;

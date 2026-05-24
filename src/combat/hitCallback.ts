@@ -162,6 +162,13 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       deps.vfx.spawnProjectileExplosion(hitX, hitY, atkChar.specialColor, atkChar.specialGlow);
     }
 
+    // CD击飞攻击: 更强的冲击反馈
+    if (attackType === AttackType.STAND_CD || attackType === AttackType.JUMP_CD) {
+      deps.vfx.spawnCharacterHitSparks(hitX, hitY, 16, '#ffaa00');
+      deps.vfx.spawnImpactRing(hitX, hitY);
+      deps.screenFlash.trigger('#ffcc44', 0.15, 4);
+    }
+
     // 连击数
     const combo = deps.combatSystem.getComboCount(defIdx);
     if (combo >= 2) deps.vfx.spawnDamageText(defender.x, defender.y - defender.displayHeight - 40, combo);
