@@ -189,3 +189,158 @@ export function drawSkeletalFighter(
     ctx.fillRect(Math.round(sx - 50), Math.round(sy - f.displayHeight - 20), 100, f.displayHeight + 40);
   }
 }
+
+/** Draw victory pose — fighter standing triumphant with arms raised */
+export function drawVictoryPose(
+  ctx: CanvasRenderingContext2D,
+  sx: number,
+  sy: number,
+  facing: number,
+  bodyColor: string,
+  outlineColor: string,
+  tick: number,
+): void {
+  const bounce = Math.sin(tick * 0.08) * 3;
+  const victoryPose: Pose = {
+    head: { ox: 0, oy: bounce, rot: 0, scale: 1 },
+    body: { ox: 0, oy: bounce * 0.7, rot: 0, scale: 1 },
+    // Arms raised high in triumph
+    armFront: { ox: 12, oy: -50 + bounce * 0.3, rot: -1.8, scale: 1.1 },
+    armBack: { ox: -10, oy: -50 + bounce * 0.3, rot: 1.8, scale: 1.1 },
+    // Stable stance
+    legFront: { ox: 8, oy: 0, rot: 0.1, scale: 1 },
+    legBack: { ox: -6, oy: 0, rot: -0.1, scale: 1 },
+  };
+
+  // Clone pose
+  const p = {
+    head: { ...victoryPose.head },
+    body: { ...victoryPose.body },
+    armFront: { ...victoryPose.armFront },
+    armBack: { ...victoryPose.armBack },
+    legFront: { ...victoryPose.legFront },
+    legBack: { ...victoryPose.legBack },
+  };
+
+  // Body dimensions (same as drawSkeletalFighter)
+  const headW = 16, headH = 16;
+  const torsoW = 24, torsoH = 30;
+  const armW = 6, armH = 22;
+  const legW = 8, legH = 28;
+
+  const refX = sx;
+  const refY = sy - 100; // FIGHTER_HEIGHT
+
+  const boneScreen = (bp: BonePose) => ({
+    x: refX + bp.ox * facing,
+    y: refY + bp.oy,
+    rot: bp.rot * facing,
+    scale: bp.scale,
+  });
+
+  const armColor = shiftColor(bodyColor, 15);
+  const legColor = shiftColor(bodyColor, -15);
+  const headColor = shiftColor(bodyColor, 25);
+
+  const drawBone = (
+    cx: number, cy: number, w: number, h: number, rot: number,
+    fillTop: string, fillBot: string, outline: string,
+  ) => {
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(rot);
+    const grad = ctx.createLinearGradient(0, -h / 2, 0, h / 2);
+    grad.addColorStop(0, fillTop);
+    grad.addColorStop(1, fillBot);
+    ctx.fillStyle = grad;
+    roundRect(ctx, -w / 2, -h / 2, w, h, 3);
+    ctx.fill();
+    ctx.strokeStyle = outline;
+    ctx.lineWidth = 1.5;
+    roundRect(ctx, -w / 2, -h / 2, w, h, 3);
+    ctx.stroke();
+    ctx.restore();
+  };
+
+  const shoulderY = refY + 8;
+  const hipY = refY + 32;
+
+  // Back arm
+  const backArm = boneScreen(p.armBack);
+  drawBone(
+    backArm.x, shoulderY + p.armBack.oy,
+    armW * p.armBack.scale, armH * p.armBack.scale, backArm.rot,
+    shiftColor(armColor, 10), armColor, outlineColor,
+  );
+
+  // Back leg
+  const backLeg = boneScreen(p.legBack);
+  drawBone(
+    backLeg.x, hipY + p.legBack.oy,
+    legW * p.legBack.scale, legH * p.legBack.scale, backLeg.rot,
+    shiftColor(legColor, 10), legColor, outlineColor,
+  );
+
+  // Torso
+  const torsoCenterY = refY + 18 + p.body.oy;
+  const torsoX = refX + p.body.ox * facing;
+  drawBone(
+    torsoX, torsoCenterY,
+    torsoW, torsoH, p.body.rot * facing,
+    shiftColor(bodyColor, 25), shiftColor(bodyColor, -10), outlineColor,
+  );
+
+  // Head
+  const headPos = boneScreen(p.head);
+  const headCenterY = refY + 4 + p.head.oy;
+  ctx.save();
+  ctx.translate(headPos.x, headCenterY);
+  ctx.rotate(p.head.rot * facing);
+  const hGrad = ctx.createLinearGradient(-headW / 2, -headH / 2, headW / 2, headH / 2);
+  hGrad.addColorStop(0, shiftColor(headColor, 20));
+  hGrad.addColorStop(1, headColor);
+  ctx.fillStyle = hGrad;
+  ctx.beginPath();
+  ctx.arc(0, 0, headW / 2, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = outlineColor;
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+  // Eyes (happy/squinting for victory)
+  const eyeShift = 3 * facing;
+  ctx.fillStyle = '#fff';
+  ctx.beginPath(); ctx.arc(eyeShift, -1, 3, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.arc(eyeShift - 7 * facing, -1, 3, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = '#111';
+  ctx.beginPath(); ctx.arc(eyeShift + 1.2 * facing, -1, 1.8, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.arc(eyeShift - 7 * facing + 1.2 * facing, -1, 1.8, 0, Math.PI * 2); ctx.fill();
+  ctx.restore();
+
+  // Front leg
+  const frontLeg = boneScreen(p.legFront);
+  drawBone(
+    frontLeg.x, hipY + p.legFront.oy,
+    legW * p.legFront.scale, legH * p.legFront.scale, frontLeg.rot,
+    shiftColor(legColor, 15), legColor, outlineColor,
+  );
+
+  // Front arm
+  const frontArm = boneScreen(p.armFront);
+  drawBone(
+    frontArm.x, shoulderY + p.armFront.oy,
+    armW * p.armFront.scale, armH * p.armFront.scale, frontArm.rot,
+    shiftColor(armColor, 15), armColor, outlineColor,
+  );
+
+  // Victory golden glow
+  const glowPulse = 0.2 + Math.sin(tick / 6) * 0.1;
+  const glowGrad = ctx.createRadialGradient(
+    sx, sy - 50, 10,
+    sx, sy - 50, 80
+  );
+  glowGrad.addColorStop(0, `rgba(255, 215, 0, ${glowPulse})`);
+  glowGrad.addColorStop(0.5, `rgba(255, 180, 0, ${glowPulse * 0.4})`);
+  glowGrad.addColorStop(1, 'rgba(255, 150, 0, 0)');
+  ctx.fillStyle = glowGrad;
+  ctx.fillRect(Math.round(sx - 80), Math.round(sy - 130), 160, 130);
+}

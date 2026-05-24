@@ -23,6 +23,7 @@ import type { ResolvedInput } from '../input/inputResolver.js';
 import type { CommandBuffer } from '../input/commandBuffer.js';
 import type { Fighter } from '../entities/fighter.js';
 import { Projectile } from '../entities/projectile.js';
+import { kyoPortrait } from '../rendering/portraits/kyoPortrait.js';
 import {
   FighterState,
   AttackType,
@@ -40,6 +41,7 @@ export const KyoDef: CharacterDefinition = {
   specialColor: '#ff4400',
   specialGlow: '#ff6600',
   portrait: '🔥',
+  pixelPortrait: kyoPortrait,
 
   stats: {
     walkSpeed: 4,

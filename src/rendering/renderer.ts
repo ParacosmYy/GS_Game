@@ -17,7 +17,7 @@ import type { Star } from './stage.js';
 import { drawSkeletalFighter } from './skeletalFighter.js';
 import { drawAttackLimb } from './attackLimb.js';
 import { drawHUD, drawPowerGauges, drawComboCounters } from './hud.js';
-import { drawCharacterSelect, drawIntro, drawKO, drawSuperFlash } from './screens.js';
+import { drawCharacterSelect, drawIntro, drawKO, drawSuperFlash, drawMatchEnd } from './screens.js';
 import { shiftColor, roundRect } from './utils.js';
 
 export class Renderer {
@@ -35,7 +35,7 @@ export class Renderer {
 
   // ===== Main fight frame =====
 
-  render(fighters: Fighter[], cameraX: number, tick: number, ko: boolean, winner: number | null, shakeX: number, shakeY: number, delayedHealth: [number, number], maxModes?: [MaxModeState, MaxModeState], perfectPlayer: number | null = null): void {
+  render(fighters: Fighter[], cameraX: number, tick: number, ko: boolean, winner: number | null, shakeX: number, shakeY: number, delayedHealth: [number, number], maxModes?: [MaxModeState, MaxModeState], perfectPlayer: number | null = null, p1Wins: number = 0, p2Wins: number = 0, p1Name: string = '', p2Name: string = ''): void {
     this.frameCount++;
     this.globalTick = tick;
     const now = performance.now();
@@ -52,7 +52,7 @@ export class Renderer {
 
     drawStage(ctx, cameraX, this.stars, this.globalTick);
     this.drawFighters(ctx, fighters, cameraX, maxModes);
-    drawHUD(ctx, fighters, tick, delayedHealth);
+    drawHUD(ctx, fighters, tick, delayedHealth, p1Wins, p2Wins, p1Name, p2Name);
 
     if (ko) {
       drawKO(ctx, winner, perfectPlayer);
@@ -251,8 +251,8 @@ export class Renderer {
 
   // ===== Screen overlays (thin wrappers) =====
 
-  drawIntro(phaseTimer: number): void {
-    drawIntro(this.ctx, phaseTimer);
+  drawIntro(phaseTimer: number, currentRound: number = 1): void {
+    drawIntro(this.ctx, phaseTimer, currentRound);
   }
 
   drawKO(winner: number | null, perfectPlayer: number | null = null): void {
@@ -285,6 +285,10 @@ export class Renderer {
     p2IsAI: boolean,
   ): void {
     drawCharacterSelect(this.ctx, p1Cursor, p2Cursor, p1Ready, p2Ready, tick, p2IsAI);
+  }
+
+  drawMatchEnd(winner: number | null, p1Wins: number, p2Wins: number): void {
+    drawMatchEnd(this.ctx, winner, p1Wins, p2Wins);
   }
 
   // ===== Debug overlay =====

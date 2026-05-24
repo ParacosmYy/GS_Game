@@ -17,6 +17,7 @@ import {
 } from '../core/types.js';
 import { Projectile } from '../entities/projectile.js';
 import { FRAME_DATA } from '../core/constants.js';
+import { ioriPortrait } from '../rendering/portraits/ioriPortrait.js';
 
 export const IoriDef: CharacterDefinition = {
   id: 'iori',
@@ -27,6 +28,7 @@ export const IoriDef: CharacterDefinition = {
   specialColor: '#8800cc',
   specialGlow: '#aa22ff',
   portrait: '🌙',
+  pixelPortrait: ioriPortrait,
 
   stats: {
     walkSpeed: 4.5,

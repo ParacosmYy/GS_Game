@@ -10,6 +10,8 @@ import {
   CH_HITSTUN_BONUS, CH_DAMAGE_BONUS,
   DAMAGE_SCALE_STEP, DAMAGE_SCALE_MIN,
   COUNTER_WIRE_BOUNCE_VX, COUNTER_WIRE_BOUNCE_VY,
+  LIGHT_NORMALS, NORMAL_ATTACKS, COMMAND_NORMALS,
+  STAGE_LEFT, STAGE_RIGHT,
 } from '../core/constants.js';
 import { FighterState, AttackType, JuggleState } from '../core/types.js';
 import type { HitLevel } from '../core/types.js';
@@ -94,6 +96,9 @@ export class CombatSystem {
         const pushDir = attacker.facing;
         attacker.x -= THROW_ESCAPE_PUSH * pushDir * 0.5;
         defender.x += THROW_ESCAPE_PUSH * pushDir * 0.5;
+        // Clamp to stage bounds
+        attacker.x = Math.max(STAGE_LEFT, Math.min(attacker.x, STAGE_RIGHT));
+        defender.x = Math.max(STAGE_LEFT, Math.min(defender.x, STAGE_RIGHT));
 
         // Reset both fighters to IDLE
         attacker.isThrowing = false;
@@ -117,7 +122,7 @@ export class CombatSystem {
 
         defender.health = Math.max(0, defender.health - damage);
         defender.applyKnockdown(30, true); // hard knockdown from throw
-        defender.x = attacker.x + THROW_DISTANCE * attacker.facing;
+        defender.x = Math.max(STAGE_LEFT, Math.min(attacker.x + THROW_DISTANCE * attacker.facing, STAGE_RIGHT));
         defender.isBeingThrown = false;
 
         attacker.isThrowing = false;
@@ -163,14 +168,16 @@ export class CombatSystem {
     if (attackType === AttackType.THROW) {
       const dist = Math.abs(attacker.x - defender.x);
       if (dist > THROW_RANGE || !defender.isGrounded()) return;
+      // Throw invincibility check
+      if (defender.throwInvincibilityTimer > 0) return;
       // Phase 1: freeze both, start escape window
       attacker.isThrowing = true;
       attacker.throwVictim = defender;
       attacker.hasHit = true;
       defender.isBeingThrown = true;
       defender.throwEscapeTimer = THROW_ESCAPE_WINDOW;
-      // Position defender at throw point
-      defender.x = attacker.x + THROW_DISTANCE * attacker.facing;
+      // Position defender at throw point (clamped to stage)
+      defender.x = Math.max(STAGE_LEFT, Math.min(attacker.x + THROW_DISTANCE * attacker.facing, STAGE_RIGHT));
       return;
     }
 
@@ -190,7 +197,9 @@ export class CombatSystem {
     const defInput = resolveInput(raw, defender.facing, this.prev[defIdx]);
 
     const crouching = defender.state === FighterState.CROUCH;
-    const hitLevel = data.hitLevel as HitLevel;
+    // Cancelled-into command normals lose special properties: MID instead of HIGH/LOW, no knockdown
+    const isCancelledCmdNormal = attacker.cancelledIntoNormal && COMMAND_NORMALS.has(attackType as string);
+    const hitLevel = (isCancelledCmdNormal ? 'MID' : data.hitLevel) as HitLevel;
 
     if (defender.canBlock() && defInput.back && this.canBlock(hitLevel, crouching)) {
       // Guard gauge depletion
@@ -247,11 +256,22 @@ export class CombatSystem {
       defender.state = FighterState.HITSTUN;
       defender.hitstunTimer = 30;
       defender.isKnockedDown = false;
-    } else if (data.knockdown) {
+    } else if (data.knockdown && !isCancelledCmdNormal) {
       defender.applyKnockdown(25);
     } else {
       defender.applyHitstun(hitstunFrames, data.pushback);
     }
+
+    // Rapid Cancel: light normal on hit enables chaining into next light normal
+    if (LIGHT_NORMALS.has(attackType as string)) {
+      attacker.rapidCancelReady = true;
+    }
+
+    // Normal → Command Normal cancel: grounded normal on hit enables cancel into command normal
+    if (NORMAL_ATTACKS.has(attackType as string)) {
+      attacker.normalCancelReady = true;
+    }
+
     onHit?.(attacker, defender, attackType, false, counterHit);
   }
 

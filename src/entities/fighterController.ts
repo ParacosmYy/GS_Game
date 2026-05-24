@@ -5,6 +5,7 @@ import type { ResolvedInput } from '../input/inputResolver.js';
 import type { CharacterDefinition, CharacterStats } from '../characters/types.js';
 import {
   STAGE_GROUND_Y, STAGE_WIDTH, FIGHTER_WIDTH,
+  STAGE_LEFT, STAGE_RIGHT,
   GRAVITY,
   BACKDASH_VX, BACKDASH_VY,
   DOUBLE_TAP_WINDOW, HYPER_CHARGE_WINDOW,
@@ -15,6 +16,11 @@ import {
   PROXIMITY_GUARD_RANGE,
   SUPER_CANCEL_STOCK_COST,
   FREE_CANCEL_TIMER_COST,
+  LIGHT_NORMALS, NORMAL_ATTACKS, COMMAND_NORMALS,
+  THROW_INVINCIBILITY_POST_STUN,
+  THROW_INVINCIBILITY_WAKEUP,
+  THROW_INVINCIBILITY_JUMP_STARTUP,
+  THROW_INVINCIBILITY_LANDING,
 } from '../core/constants.js';
 import { FighterState, AttackType, CLOSE_RANGE, JuggleState } from '../core/types.js';
 import type { PowerGauge, MaxModeState } from '../core/types.js';
@@ -100,13 +106,13 @@ export class FighterController {
 
   applyPhysics(): void {
     const f = this.fighter;
-    f.x += f.vx;
-    f.y += f.vy;
 
     // Counter Wire wall bounce detection
     if (f.isCounterWire) {
-      const leftBound = 30;
-      const rightBound = STAGE_WIDTH - 30;
+      f.x += f.vx;
+      f.y += f.vy;
+      const leftBound = STAGE_LEFT;
+      const rightBound = STAGE_RIGHT;
       if (f.x <= leftBound || f.x >= rightBound) {
         // Bounce back toward center with reduced speed
         f.vx = -f.vx * 0.6;
@@ -116,6 +122,17 @@ export class FighterController {
         const wallX = f.x <= leftBound ? leftBound : rightBound;
         this.vfx.spawnCounterWireSparks(wallX, f.y - f.displayHeight / 2);
       }
+    } else if (f.state === FighterState.HITSTUN || f.state === FighterState.BLOCK
+        || f.state === FighterState.KNOCKDOWN || f.state === FighterState.GUARD_CRUSH) {
+      // Pushback/stun: apply vx as one-time displacement, then zero it immediately
+      // This prevents persistent drift especially at walls
+      f.x += f.vx;
+      f.vx = 0;
+      f.y += f.vy;
+    } else {
+      // Normal movement: apply velocity normally
+      f.x += f.vx;
+      f.y += f.vy;
     }
 
     if (f.y >= STAGE_GROUND_Y) {
@@ -127,12 +144,13 @@ export class FighterController {
         f.y = STAGE_GROUND_Y; f.vy = 0; f.vx = 0;
         f.state = FighterState.IDLE;
         f.landingRecovery = LANDING_RECOVERY;
+        f.throwInvincibilityTimer = THROW_INVINCIBILITY_LANDING;
         f.juggleState = JuggleState.NONE;
         f.airHitCount = 0;
         this.vfx.spawnDust(f.x, STAGE_GROUND_Y);
       } else if (f.vy > 0) { f.y = STAGE_GROUND_Y; f.vy = 0; }
     }
-    f.x = Math.max(FIGHTER_WIDTH / 2, Math.min(f.x, STAGE_WIDTH - FIGHTER_WIDTH / 2));
+    f.x = Math.max(STAGE_LEFT, Math.min(f.x, STAGE_RIGHT));
   }
 
   // ─── Helpers ───
@@ -192,6 +210,40 @@ export class FighterController {
     if (charN) return charN;
     // Default normal
     if (input.punchPressed || input.kickPressed) return this.defaultAttack(input);
+    return null;
+  }
+
+  /** Route light-normal-only attacks for rapid cancel (A/B button → light normal) */
+  private routeRapidCancelLight(input: ResolvedInput): AttackType | null {
+    const f = this.fighter;
+    // Only grounded attacks can rapid cancel
+    if (f.state === FighterState.AIR_ATTACK) return null;
+
+    const isCrouching = f.state === FighterState.CROUCH_ATTACK;
+
+    if (isCrouching) {
+      if (input.buttonAPressed) return AttackType.CROUCH_A;
+      if (input.buttonBPressed) return AttackType.CROUCH_B;
+    } else {
+      const cl = this.closeRange();
+      if (input.buttonAPressed) return cl ? AttackType.CLOSE_A : AttackType.STAND_A;
+      if (input.buttonBPressed) return cl ? AttackType.CLOSE_B : AttackType.STAND_B;
+    }
+    return null;
+  }
+
+  /**
+   * Try to route a command normal for Normal → Command Normal cancel.
+   * Uses character's routeNormal, but only returns command normals (CMD_* types).
+   * Returns null if no command normal detected or if the result is not a command normal.
+   */
+  private tryCommandNormalCancel(input: ResolvedInput): AttackType | null {
+    // Character routeNormal handles direction+button detection for command normals
+    const result = this.character.routeNormal(input, this.fighter.state, this.closeRange());
+    // Only accept command normals (not default normals)
+    if (result && COMMAND_NORMALS.has(result as string)) {
+      return result;
+    }
     return null;
   }
 
@@ -285,6 +337,7 @@ export class FighterController {
           f.state = FighterState.RUN; f.vx = this.stats.runSpeed * f.facing; return;
         }
         if (this.upReleased(input) && f.isGrounded() && this.upHoldFrames > 0) {
+          f.throwInvincibilityTimer = THROW_INVINCIBILITY_JUMP_STARTUP;
           if (this.upHoldFrames <= HOP_THRESHOLD) { f.vy = this.stats.hopVelocity; f.state = FighterState.HOP; }
           else if (this.hyperJump()) {
             f.vy = this.stats.hyperJumpVelocity; f.vx = this.stats.jumpForwardSpeed * 1.4 * (input.forward ? 1 : input.back ? -1 : 0) * f.facing;
@@ -307,6 +360,7 @@ export class FighterController {
         f.displayHeight = 100; f.vx = this.stats.runSpeed * f.facing;
         if (input.up && f.isGrounded()) {
           f.state = FighterState.RUN_JUMP; f.vy = this.stats.jumpVelocity * 0.93; f.vx = this.stats.jumpForwardSpeed * 1.5 * f.facing;
+          f.throwInvincibilityTimer = THROW_INVINCIBILITY_JUMP_STARTUP;
           this.vfx.spawnDust(f.x, STAGE_GROUND_Y); return;
         }
         if (input.down && f.isGrounded()) { f.state = FighterState.CROUCH; f.displayHeight = 50; f.vx = 0; return; }
@@ -408,6 +462,42 @@ export class FighterController {
           }
         }
 
+        // ── Rapid Cancel (轻攻击链): light normal → light normal on hit ──
+        if (f.rapidCancelReady && f.attackPhase === 'recovery' && f.currentAttack
+            && LIGHT_NORMALS.has(f.currentAttack as string)) {
+          const nextAtk = this.routeRapidCancelLight(input);
+          if (nextAtk) {
+            f.startAttack(nextAtk);
+            return;
+          }
+        }
+
+        // ── Normal → Command Normal Cancel (on hit only) ──
+        // After a grounded normal hits, can cancel into a command normal during recovery
+        if (f.normalCancelReady && f.hasHit && f.attackPhase === 'recovery' && f.currentAttack
+            && NORMAL_ATTACKS.has(f.currentAttack as string)) {
+          const cmdNormal = this.tryCommandNormalCancel(input);
+          if (cmdNormal) {
+            f.startAttack(cmdNormal);
+            f.cancelledIntoNormal = true;
+            f.normalCancelReady = false;
+            return;
+          }
+        }
+
+        // ── Command Normal → Special Cancel (cancelled-into command normals only, on hit only) ──
+        if (f.cancelledIntoNormal && f.hasHit && f.attackPhase === 'recovery' && f.currentAttack
+            && COMMAND_NORMALS.has(f.currentAttack as string)) {
+          const tick = this.tickRef.value;
+          const special = this.character.routeSpecial(input, this.cmdBuf, tick);
+          if (special && !FighterController.isDM(special as string)) {
+            f.startAttack(special);
+            f.cancelledIntoNormal = false;
+            f.normalCancelReady = false;
+            return;
+          }
+        }
+
         // Rekka followup
         if (f.currentAttack && this.rekkaWindow > 0 && (f.attackPhase === 'recovery' || f.attackPhase === 'active')) {
           const followup = this.character.routeRekkaFollowup(input, this.cmdBuf, this.tickRef.value, f.currentAttack);
@@ -428,7 +518,7 @@ export class FighterController {
       }
 
       case FighterState.BLOCK: {
-        f.blockstunTimer--; f.vx *= 0.8;
+        f.blockstunTimer--;
         // Guard Cancel Roll (A+B during blockstun, costs 1 stock)
         if (f.blockstunTimer > 0 && input.rollPressed && this.gauge && spendStocks(this.gauge, DM_STOCK_COST)) {
           f.state = FighterState.ROLL;
@@ -445,29 +535,35 @@ export class FighterController {
           f.startAttack(AttackType.STAND_CD);
           break;
         }
-        if (f.blockstunTimer <= 0) { f.state = FighterState.IDLE; f.vx = 0; }
+        if (f.blockstunTimer <= 0) { f.state = FighterState.IDLE; f.vx = 0; f.throwInvincibilityTimer = THROW_INVINCIBILITY_POST_STUN; }
         break;
       }
 
       case FighterState.GUARD_CRUSH: {
-        f.guardCrushTimer--; f.vx *= 0.85;
+        f.guardCrushTimer--;
         // Visual: flicker like hitstun
         if (f.guardCrushTimer <= 0) { f.state = FighterState.IDLE; f.vx = 0; }
         break;
       }
 
       case FighterState.HITSTUN:
-        f.hitstunTimer--; f.vx *= 0.85;
-        if (f.hitstunTimer <= 0) { f.state = FighterState.IDLE; f.vx = 0; }
+        f.hitstunTimer--;
+        if (f.hitstunTimer <= 0) { f.state = FighterState.IDLE; f.vx = 0; f.throwInvincibilityTimer = THROW_INVINCIBILITY_POST_STUN; }
         break;
 
       case FighterState.KNOCKDOWN:
-        f.knockdownTimer--; f.vx *= 0.9;
+        f.knockdownTimer--;
         // Quick stand: A+B during soft knockdown reduces timer to 3 frames
         if (!f.isHardKnockdown && input.rollPressed && f.knockdownTimer > 3) {
           f.knockdownTimer = 3;
+          f.usedQuickStand = true;
         }
-        if (f.knockdownTimer <= 0) { f.state = FighterState.IDLE; f.isKnockedDown = false; f.isHardKnockdown = false; f.displayHeight = 100; f.vx = 0; }
+        if (f.knockdownTimer <= 0) {
+          f.state = FighterState.IDLE; f.isKnockedDown = false; f.isHardKnockdown = false; f.displayHeight = 100; f.vx = 0;
+          // Quick Stand loses wakeup throw invincibility in KOF
+          if (!f.usedQuickStand) f.throwInvincibilityTimer = THROW_INVINCIBILITY_WAKEUP;
+          f.usedQuickStand = false;
+        }
         break;
     }
   }
@@ -479,5 +575,8 @@ export function resolvePushbox(a: Fighter, b: Fighter): void {
   if (overlap > 0) {
     const push = overlap / 2 + 0.5;
     if (a.x < b.x) { a.x -= push; b.x += push; } else { a.x += push; b.x -= push; }
+    // Clamp both fighters to stage bounds after push-apart
+    a.x = Math.max(STAGE_LEFT, Math.min(a.x, STAGE_RIGHT));
+    b.x = Math.max(STAGE_LEFT, Math.min(b.x, STAGE_RIGHT));
   }
 }

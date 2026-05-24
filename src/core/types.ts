@@ -156,6 +156,7 @@ export enum GamePhase {
   INTRO = 'INTRO',     // "ROUND 1... FIGHT!" text
   FIGHTING = 'FIGHTING', // Active gameplay
   KO = 'KO',           // KO state
+  MATCH_END = 'MATCH_END', // Match complete (best of 3)
 }
 
 // ===== Game State (for window.__gameState) =====

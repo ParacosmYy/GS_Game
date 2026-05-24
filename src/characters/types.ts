@@ -12,6 +12,7 @@ import {
   FighterState,
   AttackType,
 } from '../core/types.js';
+import type { PixelPortraitData } from '../rendering/pixelPortraits.js';
 
 // ===== 骨骼动画系统 (Skeletal Pose System) =====
 
@@ -94,6 +95,7 @@ export interface CharacterDefinition {
   specialColor: string;  // 必杀技特效色 (火/气/光)
   specialGlow: string;   // 必杀技光晕色
   portrait: string;     // 选人界面图标
+  pixelPortrait?: PixelPortraitData; // SNK-style pixel portrait for character select
 
   // ── 数值 ──
   /** 角色差异化数值 (速度/生命/碰撞) */

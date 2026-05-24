@@ -11,6 +11,8 @@ export const JUMP_VELOCITY = -14;
 // ===== Fighter Constants =====
 export const FIGHTER_WIDTH = 60;
 export const FIGHTER_HEIGHT = 100;
+export const STAGE_LEFT = FIGHTER_WIDTH / 2;
+export const STAGE_RIGHT = STAGE_WIDTH - FIGHTER_WIDTH / 2;
 export const WALK_SPEED = 4;
 export const RUN_SPEED = 7;
 export const BACKDASH_VX = 8;
@@ -47,101 +49,101 @@ export const FRAME_DATA = {
   // ── 站立攻击 (Stand) ──
   STAND_A: {
     startup: 3, active: 3, recovery: 5,
-    damage: 30, hitstun: 8, blockstun: 5, pushback: 2,
+    damage: 30, hitstun: 11, blockstun: 9, pushback: 2,
     hitLevel: 'MID' as const, knockdown: false,
   },
   STAND_B: {
     startup: 4, active: 3, recovery: 7,
-    damage: 35, hitstun: 9, blockstun: 6, pushback: 2,
+    damage: 35, hitstun: 11, blockstun: 9, pushback: 2,
     hitLevel: 'MID' as const, knockdown: false,
   },
   STAND_C: {
     startup: 7, active: 4, recovery: 12,
-    damage: 80, hitstun: 16, blockstun: 10, pushback: 6,
+    damage: 80, hitstun: 19, blockstun: 17, pushback: 6,
     hitLevel: 'MID' as const, knockdown: false,
   },
   STAND_D: {
     startup: 8, active: 5, recovery: 14,
-    damage: 75, hitstun: 15, blockstun: 10, pushback: 5,
+    damage: 75, hitstun: 19, blockstun: 17, pushback: 5,
     hitLevel: 'MID' as const, knockdown: false,
   },
   // ── 近距离站立 (Close Stand) — 更快但更短 ──
   CLOSE_A: {
     startup: 3, active: 3, recovery: 4,
-    damage: 25, hitstun: 7, blockstun: 4, pushback: 1,
+    damage: 25, hitstun: 11, blockstun: 9, pushback: 1,
     hitLevel: 'MID' as const, knockdown: false,
   },
   CLOSE_B: {
     startup: 4, active: 3, recovery: 6,
-    damage: 30, hitstun: 9, blockstun: 5, pushback: 2,
+    damage: 30, hitstun: 11, blockstun: 9, pushback: 2,
     hitLevel: 'LOW' as const, knockdown: false,
   },
   CLOSE_C: {
     startup: 2, active: 3, recovery: 9,
-    damage: 70, hitstun: 15, blockstun: 9, pushback: 4,
+    damage: 70, hitstun: 19, blockstun: 17, pushback: 4,
     hitLevel: 'MID' as const, knockdown: false,
   },
   CLOSE_D: {
     startup: 4, active: 4, recovery: 12,
-    damage: 65, hitstun: 14, blockstun: 9, pushback: 4,
+    damage: 65, hitstun: 19, blockstun: 17, pushback: 4,
     hitLevel: 'MID' as const, knockdown: false,
   },
   // ── 命令通常技 (Command Normals) ──
   CMD_GOFU_YOU: {
     startup: 10, active: 4, recovery: 14,
-    damage: 45, hitstun: 14, blockstun: 8, pushback: 3,
+    damage: 45, hitstun: 19, blockstun: 17, pushback: 3,
     hitLevel: 'HIGH' as const, knockdown: false,  // overhead
   },
   CMD_88SHIKI: {
     startup: 7, active: 3, recovery: 16,
-    damage: 55, hitstun: 12, blockstun: 7, pushback: 3,
+    damage: 55, hitstun: 19, blockstun: 17, pushback: 3,
     hitLevel: 'LOW' as const, knockdown: false,
   },
   CMD_NARAKU: {
     startup: 5, active: 5, recovery: 4,
-    damage: 50, hitstun: 16, blockstun: 10, pushback: 4,
+    damage: 50, hitstun: 19, blockstun: 17, pushback: 4,
     hitLevel: 'HIGH' as const, knockdown: true,  // 空中KD
   },
   // ── 蹲下攻击 (Crouch) ──
   CROUCH_A: {
     startup: 3, active: 3, recovery: 5,
-    damage: 25, hitstun: 8, blockstun: 5, pushback: 1,
+    damage: 25, hitstun: 11, blockstun: 9, pushback: 1,
     hitLevel: 'MID' as const, knockdown: false,
   },
   CROUCH_B: {
     startup: 4, active: 3, recovery: 7,
-    damage: 35, hitstun: 10, blockstun: 6, pushback: 2,
+    damage: 35, hitstun: 11, blockstun: 9, pushback: 2,
     hitLevel: 'LOW' as const, knockdown: false,
   },
   CROUCH_C: {
     startup: 5, active: 4, recovery: 15,
-    damage: 70, hitstun: 14, blockstun: 9, pushback: 4,
+    damage: 70, hitstun: 19, blockstun: 17, pushback: 4,
     hitLevel: 'MID' as const, knockdown: false,
   },
   CROUCH_D: {
     startup: 7, active: 4, recovery: 18,
-    damage: 60, hitstun: 0, blockstun: 8, pushback: 3,
+    damage: 60, hitstun: 0, blockstun: 17, pushback: 3,
     hitLevel: 'LOW' as const, knockdown: true, // 扫堂腿 = 击倒
   },
-  // ── 跳跃攻击 (Jump) ──
+  // ── 跳跃攻击 (Jump) — jumping heavy hitstun=11 (LESS than ground), blockstun=17 (SAME) ──
   JUMP_A: {
     startup: 4, active: 5, recovery: 4,
-    damage: 40, hitstun: 12, blockstun: 7, pushback: 3,
+    damage: 40, hitstun: 11, blockstun: 9, pushback: 3,
     hitLevel: 'HIGH' as const, knockdown: false,
   },
   JUMP_B: {
     startup: 4, active: 5, recovery: 4,
-    damage: 45, hitstun: 12, blockstun: 7, pushback: 3,
+    damage: 45, hitstun: 11, blockstun: 9, pushback: 3,
     hitLevel: 'HIGH' as const, knockdown: false,
   },
   JUMP_C: {
     startup: 5, active: 6, recovery: 5,
-    damage: 70, hitstun: 16, blockstun: 10, pushback: 5,
+    damage: 70, hitstun: 11, blockstun: 17, pushback: 5,
     hitLevel: 'HIGH' as const, knockdown: false,
   },
   JUMP_D: {
     startup: 6, active: 6, recovery: 5,
-    damage: 65, hitstun: 14, blockstun: 9, pushback: 4,
+    damage: 65, hitstun: 11, blockstun: 17, pushback: 4,
     hitLevel: 'HIGH' as const, knockdown: false,
   },
   // ── 投技 ──
@@ -153,126 +155,126 @@ export const FRAME_DATA = {
   // ── 必杀技 ──
   SPECIAL_PROJECTILE: {
     startup: 10, active: 20, recovery: 15,
-    damage: 90, hitstun: 18, blockstun: 12, pushback: 5,
+    damage: 90, hitstun: 31, blockstun: 29, pushback: 5,
     hitLevel: 'MID' as const, knockdown: false, chipDamage: 9,
   },
   SPECIAL_UPPER: {
     startup: 3, active: 6, recovery: 18,
-    damage: 120, hitstun: 20, blockstun: 14, pushback: 8,
+    damage: 120, hitstun: 25, blockstun: 20, pushback: 8,
     hitLevel: 'MID' as const, knockdown: false, chipDamage: 12,
   },
   // ── CD击飞攻击 ──
   STAND_CD: {
     startup: 14, active: 4, recovery: 18,
-    damage: 70, hitstun: 0, blockstun: 12, pushback: 8,
+    damage: 70, hitstun: 0, blockstun: 21, pushback: 8,
     hitLevel: 'MID' as const, knockdown: true, counterWire: true as const,
   },
   JUMP_CD: {
     startup: 12, active: 5, recovery: 8,
-    damage: 60, hitstun: 0, blockstun: 10, pushback: 6,
+    damage: 60, hitstun: 0, blockstun: 21, pushback: 6,
     hitLevel: 'HIGH' as const, knockdown: true, counterWire: true as const,
   },
   // ── 超必杀技 (DM) ──
   DM_OROCHINAGI: {
     startup: 8, active: 30, recovery: 20,
-    damage: 200, hitstun: 0, blockstun: 18, pushback: 10,
+    damage: 200, hitstun: 0, blockstun: 21, pushback: 10,
     hitLevel: 'MID' as const, knockdown: true, chipDamage: 20,
   },
   // ── 京专属必杀技 (Kyo Kusanagi) ──
   KYO_75KAI: {
     startup: 5, active: 4, recovery: 8,
-    damage: 40, hitstun: 10, blockstun: 6, pushback: 3,
+    damage: 40, hitstun: 19, blockstun: 17, pushback: 3,
     hitLevel: 'MID' as const, knockdown: false,
   },
   KYO_75KAI_2: {
     startup: 3, active: 4, recovery: 10,
-    damage: 50, hitstun: 12, blockstun: 7, pushback: 4,
+    damage: 50, hitstun: 19, blockstun: 17, pushback: 4,
     hitLevel: 'MID' as const, knockdown: true,
   },
   KYO_RED_KICK: {
     startup: 10, active: 5, recovery: 16,
-    damage: 70, hitstun: 14, blockstun: 9, pushback: 5,
+    damage: 70, hitstun: 19, blockstun: 17, pushback: 5,
     hitLevel: 'HIGH' as const, knockdown: true,
   },
   // 荒咬み系
   KYO_ARAGAMI: {
     startup: 6, active: 4, recovery: 10,
-    damage: 55, hitstun: 12, blockstun: 7, pushback: 3,
+    damage: 55, hitstun: 19, blockstun: 17, pushback: 3,
     hitLevel: 'MID' as const, knockdown: false,
   },
   KYO_ARAGAMI_KONOKIZU: {
     startup: 4, active: 4, recovery: 8,
-    damage: 45, hitstun: 10, blockstun: 6, pushback: 3,
+    damage: 45, hitstun: 19, blockstun: 17, pushback: 3,
     hitLevel: 'MID' as const, knockdown: false,
   },
   KYO_ARAGAMI_YANOSABI: {
     startup: 8, active: 5, recovery: 14,
-    damage: 70, hitstun: 16, blockstun: 10, pushback: 5,
+    damage: 70, hitstun: 19, blockstun: 17, pushback: 5,
     hitLevel: 'HIGH' as const, knockdown: false,  // overhead uppercut
   },
   // 毒咬み系
   KYO_DOKUGAMI: {
     startup: 7, active: 4, recovery: 12,
-    damage: 50, hitstun: 12, blockstun: 7, pushback: 3,
+    damage: 50, hitstun: 19, blockstun: 17, pushback: 3,
     hitLevel: 'MID' as const, knockdown: false,
   },
   KYO_TSUMIYOMI: {
     startup: 5, active: 4, recovery: 10,
-    damage: 45, hitstun: 10, blockstun: 6, pushback: 3,
+    damage: 45, hitstun: 19, blockstun: 17, pushback: 3,
     hitLevel: 'MID' as const, knockdown: false,
   },
   KYO_BATSUYOMI: {
     startup: 4, active: 5, recovery: 14,
-    damage: 65, hitstun: 15, blockstun: 9, pushback: 5,
+    damage: 65, hitstun: 19, blockstun: 17, pushback: 5,
     hitLevel: 'MID' as const, knockdown: true,
   },
   // ── 八神庵必杀技 (Iori Yagami) ──
   IORI_AOIHANA: {
     startup: 6, active: 4, recovery: 10,
-    damage: 50, hitstun: 10, blockstun: 6, pushback: 3,
+    damage: 50, hitstun: 19, blockstun: 17, pushback: 3,
     hitLevel: 'MID' as const, knockdown: false,
   },
   IORI_AOIHANA_2: {
     startup: 4, active: 4, recovery: 8,
-    damage: 45, hitstun: 10, blockstun: 6, pushback: 3,
+    damage: 45, hitstun: 19, blockstun: 17, pushback: 3,
     hitLevel: 'LOW' as const, knockdown: false,
   },
   IORI_AOIHANA_3: {
     startup: 5, active: 5, recovery: 14,
-    damage: 60, hitstun: 14, blockstun: 8, pushback: 5,
+    damage: 60, hitstun: 19, blockstun: 17, pushback: 5,
     hitLevel: 'MID' as const, knockdown: true,
   },
   // ── 特瑞必杀技 (Terry Bogard) ──
   TERRY_BURN_KNUCKLE: {
     startup: 8, active: 6, recovery: 14,
-    damage: 60, hitstun: 12, blockstun: 8, pushback: 4,
+    damage: 60, hitstun: 19, blockstun: 17, pushback: 4,
     hitLevel: 'MID' as const, knockdown: false,
   },
   TERRY_CRACK_SHOT: {
     startup: 10, active: 5, recovery: 14,
-    damage: 55, hitstun: 12, blockstun: 7, pushback: 4,
+    damage: 55, hitstun: 19, blockstun: 17, pushback: 4,
     hitLevel: 'HIGH' as const, knockdown: true,
   },
   // ── 金必杀技 (Kim Kaphwan) ──
   KIM_HIENSEN: {
     startup: 5, active: 5, recovery: 14,
-    damage: 65, hitstun: 14, blockstun: 8, pushback: 4,
+    damage: 65, hitstun: 19, blockstun: 17, pushback: 4,
     hitLevel: 'MID' as const, knockdown: true,
   },
   // ── DM超必杀技 ──
   DM_YATAGARASU: {
     startup: 6, active: 20, recovery: 18,
-    damage: 190, hitstun: 0, blockstun: 16, pushback: 8,
+    damage: 190, hitstun: 0, blockstun: 21, pushback: 8,
     hitLevel: 'MID' as const, knockdown: true, chipDamage: 18,
   },
   DM_POWER_GEYSER: {
     startup: 10, active: 15, recovery: 20,
-    damage: 180, hitstun: 0, blockstun: 16, pushback: 10,
+    damage: 180, hitstun: 0, blockstun: 21, pushback: 10,
     hitLevel: 'MID' as const, knockdown: true, chipDamage: 16,
   },
   DM_PHOENIX_KICK: {
     startup: 7, active: 18, recovery: 16,
-    damage: 185, hitstun: 0, blockstun: 16, pushback: 8,
+    damage: 185, hitstun: 0, blockstun: 21, pushback: 8,
     hitLevel: 'MID' as const, knockdown: true, chipDamage: 17,
   },
 } as const;
@@ -383,3 +385,34 @@ export const MAX_MODE_DMG_REDUCTION = 0.75;
 export const PROXIMITY_GUARD_RANGE = 500;        // ~85% of visible screen width
 export const SUPER_CANCEL_STOCK_COST = 1;         // Extra stock for super cancel
 export const FREE_CANCEL_TIMER_COST = 0.20;       // 20% of MAX mode timer per free cancel
+
+// ===== Rapid Cancel (轻攻击链) =====
+// KOF 2002 authentic: light normals (A/B) on HIT can chain into other light normals
+
+/** Light normal attack types (A/B button normals) */
+export const LIGHT_NORMALS: ReadonlySet<string> = new Set([
+  'STAND_A', 'STAND_B',
+  'CLOSE_A', 'CLOSE_B',
+  'CROUCH_A', 'CROUCH_B',
+  'JUMP_A', 'JUMP_B',
+]);
+
+/** Grounded normal attack types (stand/close/crouch, NOT command normals or specials or DMs) */
+export const NORMAL_ATTACKS: ReadonlySet<string> = new Set([
+  'STAND_A', 'STAND_B', 'STAND_C', 'STAND_D',
+  'CLOSE_A', 'CLOSE_B', 'CLOSE_C', 'CLOSE_D',
+  'CROUCH_A', 'CROUCH_B', 'CROUCH_C', 'CROUCH_D',
+]);
+
+/** Command normal attack types (→+B, ↘+D, air↓+C, etc.) */
+export const COMMAND_NORMALS: ReadonlySet<string> = new Set([
+  'CMD_GOFU_YOU',
+  'CMD_88SHIKI',
+  'CMD_NARAKU',
+]);
+
+// ===== Throw Invincibility (KOF 2002 authentic) =====
+export const THROW_INVINCIBILITY_POST_STUN = 9;    // Frames after blockstun/hitstun
+export const THROW_INVINCIBILITY_WAKEUP = 8;        // Frames on wakeup from knockdown
+export const THROW_INVINCIBILITY_JUMP_STARTUP = 4;  // Frames during jump startup
+export const THROW_INVINCIBILITY_LANDING = 2;       // Frames on landing

@@ -9,8 +9,8 @@ import { shiftColor, roundRect } from './utils.js';
 
 // ===== Main HUD =====
 
-/** Draw the complete HUD: health bars, guard gauges, timer */
-export function drawHUD(ctx: CanvasRenderingContext2D, fighters: Fighter[], tick: number, delayedHealth: [number, number]): void {
+/** Draw the complete HUD: health bars, guard gauges, timer, win markers */
+export function drawHUD(ctx: CanvasRenderingContext2D, fighters: Fighter[], tick: number, delayedHealth: [number, number], p1Wins: number = 0, p2Wins: number = 0, p1Name: string = '', p2Name: string = ''): void {
   if (fighters.length < 2) return;
 
   const barWidth = 300;
@@ -39,10 +39,18 @@ export function drawHUD(ctx: CanvasRenderingContext2D, fighters: Fighter[], tick
   ctx.textAlign = 'left';
   ctx.fillText('P1', 10, barY - 8);
 
+  // P1 character name (above health bar)
+  if (p1Name) {
+    ctx.font = 'bold 10px monospace';
+    ctx.fillStyle = '#999';
+    ctx.textAlign = 'left';
+    ctx.fillText(p1Name, margin, barY - 6);
+  }
+
   // P1 health bar
   const p1Ratio = Math.max(0, fighters[0].health / MAX_HEALTH);
   const p1DelayedRatio = Math.max(0, delayedHealth[0] / MAX_HEALTH);
-  drawHealthBar(ctx, margin, barY, barWidth, barHeight, p1Ratio, p1DelayedRatio, true);
+  drawHealthBar(ctx, margin, barY, barWidth, barHeight, p1Ratio, p1DelayedRatio, true, tick);
   // P1 guard gauge bar
   drawGuardGauge(ctx, margin, barY + barHeight + 3, barWidth, 5, fighters[0].guardGauge, true);
 
@@ -51,10 +59,18 @@ export function drawHUD(ctx: CanvasRenderingContext2D, fighters: Fighter[], tick
   ctx.textAlign = 'right';
   ctx.fillText('P2', CANVAS_WIDTH - 10, barY - 8);
 
+  // P2 character name (above health bar)
+  if (p2Name) {
+    ctx.font = 'bold 10px monospace';
+    ctx.fillStyle = '#999';
+    ctx.textAlign = 'right';
+    ctx.fillText(p2Name, CANVAS_WIDTH - margin, barY - 6);
+  }
+
   // P2 health bar
   const p2Ratio = Math.max(0, fighters[1].health / MAX_HEALTH);
   const p2DelayedRatio = Math.max(0, delayedHealth[1] / MAX_HEALTH);
-  drawHealthBar(ctx, CANVAS_WIDTH - margin - barWidth, barY, barWidth, barHeight, p2Ratio, p2DelayedRatio, false);
+  drawHealthBar(ctx, CANVAS_WIDTH - margin - barWidth, barY, barWidth, barHeight, p2Ratio, p2DelayedRatio, false, tick);
   // P2 guard gauge bar
   drawGuardGauge(ctx, CANVAS_WIDTH - margin - barWidth, barY + barHeight + 3, barWidth, 5, fighters[1].guardGauge, false);
 
@@ -66,13 +82,39 @@ export function drawHUD(ctx: CanvasRenderingContext2D, fighters: Fighter[], tick
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   ctx.fillText(timeStr, CANVAS_WIDTH / 2, barY + 8);
+
+  // Win markers (small dots below timer)
+  const winDotY = barY + 22;
+  const winDotR = 4;
+  const winDotSpacing = 12;
+  // P1 wins on left of timer
+  for (let i = 0; i < p1Wins; i++) {
+    ctx.beginPath();
+    ctx.arc(CANVAS_WIDTH / 2 - 20 - i * winDotSpacing, winDotY, winDotR, 0, Math.PI * 2);
+    ctx.fillStyle = '#ff6644';
+    ctx.fill();
+    ctx.strokeStyle = '#FFD700';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+  }
+  // P2 wins on right of timer
+  for (let i = 0; i < p2Wins; i++) {
+    ctx.beginPath();
+    ctx.arc(CANVAS_WIDTH / 2 + 20 + i * winDotSpacing, winDotY, winDotR, 0, Math.PI * 2);
+    ctx.fillStyle = '#4488ff';
+    ctx.fill();
+    ctx.strokeStyle = '#FFD700';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+  }
+
   ctx.textBaseline = 'alphabetic';
   ctx.textAlign = 'left';
 }
 
 // ===== Health Bar =====
 
-function drawHealthBar(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, ratio: number, delayedRatio: number, leftAligned: boolean): void {
+function drawHealthBar(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, ratio: number, delayedRatio: number, leftAligned: boolean, frameCount: number): void {
   // Outer frame
   ctx.fillStyle = '#0a0a0f';
   roundRect(ctx, x - 2, y - 2, w + 4, h + 4, 4);
@@ -108,11 +150,31 @@ function drawHealthBar(ctx: CanvasRenderingContext2D, x: number, y: number, w: n
   const fillW = Math.round(w * ratio);
   if (fillW <= 0) return;
 
-  const healthColor = ratio > 0.5 ? '#22cc55' : ratio > 0.25 ? '#ccaa22' : '#cc2233';
+  // Health bar color: green >50%, yellow 25-50%, orange ≤25% (HSDM signal)
+  const isLowHealth = ratio <= 0.25;
+  const healthColor = ratio > 0.50 ? '#22cc55' : ratio > 0.25 ? '#FFD700' : '#FF8C00';
+
   const healthGrad = ctx.createLinearGradient(x, y, x, y + h);
   healthGrad.addColorStop(0, shiftColor(healthColor, 40));
   healthGrad.addColorStop(0.5, healthColor);
   healthGrad.addColorStop(1, shiftColor(healthColor, -20));
+
+  // Orange glow behind bar when ≤25% (HSDM signal)
+  if (isLowHealth) {
+    ctx.save();
+    const pulseAlpha = 0.3 + 0.2 * Math.sin(frameCount * 0.1);
+    ctx.shadowColor = `rgba(255, 100, 0, ${pulseAlpha + 0.3})`;
+    ctx.shadowBlur = 8 + 4 * Math.sin(frameCount * 0.15);
+    ctx.fillStyle = healthGrad;
+    if (leftAligned) {
+      roundRect(ctx, x, y, fillW, h, 3);
+      ctx.fill();
+    } else {
+      roundRect(ctx, x + w - fillW, y, fillW, h, 3);
+      ctx.fill();
+    }
+    ctx.restore();
+  }
 
   ctx.fillStyle = healthGrad;
   if (leftAligned) {

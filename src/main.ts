@@ -1,7 +1,7 @@
 import { Camera } from './core/camera.js';
 import { GameLoop } from './core/gameLoop.js';
-import { STAGE_WIDTH, KO_DISPLAY_TIME, FRAME_DATA, DM_STOCK_COST, MAX_MODE_STOCK_COST, MAX_MODE_DMG_REDUCTION, MAX_HEALTH } from './core/constants.js';
-import { AttackType, GameState, GamePhase, FighterState } from './core/types.js';
+import { STAGE_WIDTH, KO_DISPLAY_TIME, FRAME_DATA, DM_STOCK_COST, MAX_MODE_STOCK_COST, MAX_MODE_DMG_REDUCTION, MAX_HEALTH, STAGE_GROUND_Y, FIGHTER_HEIGHT } from './core/constants.js';
+import { AttackType, GameState, GamePhase, FighterState, JuggleState } from './core/types.js';
 import type { PowerGauge, MaxModeState } from './core/types.js';
 import { ROSTER } from './characters/index.js';
 import type { CharacterDefinition } from './characters/types.js';
@@ -13,8 +13,11 @@ import { FighterController, resolvePushbox } from './entities/fighterController.
 import { CombatSystem } from './combat/combatSystem.js';
 import { Renderer } from './rendering/renderer.js';
 import { VFXSystem, ScreenShake } from './rendering/vfx.js';
+import { drawVictoryPose } from './rendering/skeletalFighter.js';
 import { SimpleAI } from './ai/simpleAI.js';
-import { initAudio, playHit, playBlock, playSpecial, playDM, playThrow, playKO, playSelect, playCounter } from './audio/sfx.js';
+import { initAudio, playHit, playBlock, playSpecial, playDM, playThrow, playKO, playSelect, playCounter, playVictoryFanfare } from './audio/sfx.js';
+import { bgm } from './audio/bgm.js';
+import { announcer } from './audio/announcer.js';
 import {
   createPowerGauge, createMaxMode,
   gainMeterOnHit, gainMeterOnBlock, gainMeterOnHitstun,
@@ -88,9 +91,21 @@ let superFlashY = 0;     // Super flash center Y (world)
 let koSlowMo = 0;        // KO slow-motion remaining frames
 let koSlowMoTriggered = false; // Only trigger once per round
 let koSlowMoFrameCounter = 0; // For 3-frame skip pattern
+let victoryFanfarePlayed = false; // Play fanfare once when entering MATCH_END
+let currentRound = 1;              // Round counter for announcer
 let superFlashAttacker = 0;  // 0=p1, 1=p2 — which player triggered super flash
 let p1DamageTaken = 0;       // Accumulated damage P1 took (for PERFECT detection)
 let p2DamageTaken = 0;       // Accumulated damage P2 took (for PERFECT detection)
+
+// ===== Round Tracking State =====
+let p1Wins = 0;              // P1 win count (rounds won this match)
+let p2Wins = 0;              // P2 win count (rounds won this match)
+const WINS_NEEDED = 2;       // First to 2 wins = match winner
+
+// ===== Fade Transition State =====
+let fadeAlpha = 0;            // 0 = no fade, 1 = full black
+let fadeDirection = 0;        // 0 = none, 1 = fading out (to black), -1 = fading in (from black)
+let fadeCallback: (() => void) | null = null; // Called when fully black
 
 // ===== Delayed Health Bar State =====
 let p1DelayedHealth = MAX_HEALTH;
@@ -321,7 +336,14 @@ function update(): void {
         }
         phase = GamePhase.INTRO;
         phaseTimer = 0;
+        currentRound = 1;
+        p1Wins = 0;
+        p2Wins = 0;
+        p1DamageTaken = 0;
+        p2DamageTaken = 0;
         p1.savePrevState(); p2.savePrevState();
+        announcer.roundStart(currentRound);
+        announcer.fight();
       }
     }
 
@@ -330,12 +352,47 @@ function update(): void {
 
   if (phase === GamePhase.INTRO) {
     phaseTimer++;
-    if (phaseTimer >= INTRO_DURATION) { phase = GamePhase.FIGHTING; tickRef.value = 0; }
+    if (phaseTimer >= INTRO_DURATION) { phase = GamePhase.FIGHTING; tickRef.value = 0; bgm.start(); }
     return;
   }
   if (phase === GamePhase.KO) {
     koTimer++;
-    if (koTimer > KO_DISPLAY_TIME && inputManager.isKeyDown('KeyR')) restartGame();
+    // Auto-transition after KO display: next round or match end
+    if (koTimer > KO_DISPLAY_TIME) {
+      const roundWinner = winner; // already set when entering KO phase
+      if (roundWinner === 0) p1Wins++;
+      else if (roundWinner === 1) p2Wins++;
+      // Check if match is over
+      if (p1Wins >= WINS_NEEDED || p2Wins >= WINS_NEEDED) {
+        phase = GamePhase.MATCH_END;
+        koTimer = 0;
+        // Announce match winner
+        announcer.winner();
+      } else {
+        // Start fade transition to next round
+        startRoundTransition();
+      }
+    }
+    // Allow restart during KO phase (before auto-transition)
+    if (koTimer <= KO_DISPLAY_TIME && inputManager.isKeyDown('KeyR')) restartGame();
+    return;
+  }
+
+  // MATCH_END phase: display winner, wait for input to return to select
+  if (phase === GamePhase.MATCH_END) {
+    koTimer++;
+    // Play victory fanfare once on enter
+    if (!victoryFanfarePlayed) {
+      victoryFanfarePlayed = true;
+      playVictoryFanfare();
+    }
+    // Any key press or timeout returns to character select
+    if (koTimer > 180 // 3 second auto
+      || (koTimer > 60 && inputManager.isKeyDown('KeyR'))
+      || (koTimer > 60 && inputManager.isKeyDown('KeyJ'))
+      || (koTimer > 60 && inputManager.isKeyDown('Enter'))) {
+      restartGame();
+    }
     return;
   }
 
@@ -452,16 +509,26 @@ function update(): void {
       vfx.spawnHitSparks((p1.x + p2.x) / 2, 380, 20);
       screenShake.trigger(12, 15);
       playKO();
+      bgm.stop();
+      announcer.knockOut();
     } else if (koSlowMo <= 0) {
       // Slow-mo finished — transition to KO phase
       phase = GamePhase.KO; koTimer = 0;
       winner = p1.health <= 0 && p2.health <= 0 ? null : p1.health <= 0 ? 1 : 0;
+      // Announce perfect if winner took zero damage
+      if (winner !== null) {
+        const winnerTookNoDamage = winner === 0 ? p2DamageTaken === 0 : p1DamageTaken === 0;
+        if (winnerTookNoDamage) announcer.perfect();
+      }
+      // Only announce winner for match end; round end uses announcer later
     }
   }
   if (tickRef.value >= 60 * 60) {
     phase = GamePhase.KO; koTimer = 0;
-    winner = p1.health > p2.health ? 0 : p2.health > p1.health ? 1 : null;
+    winner = determineRoundWinner();
     screenShake.trigger(8, 10);
+    bgm.stop();
+    announcer.timeOver();
   }
 
   window.__gameState = {
@@ -480,13 +547,18 @@ function render(): void {
     return;
   }
 
+  // Tick fade transition (applies between rounds)
+  tickFadeTransition();
+
   camera.update(p1, p2);
-  const isKO = phase === GamePhase.KO;
+  const isKO = phase === GamePhase.KO || phase === GamePhase.MATCH_END;
   // PERFECT: winner took zero damage (health still at MAX)
   const perfectPlayer = isKO && winner !== null
     ? (winner === 0 ? (p2DamageTaken === 0 ? 0 : null) : (p1DamageTaken === 0 ? 1 : null))
     : null;
-  renderer.render([p1, p2], camera.x, tickRef.value, isKO, winner, screenShake.offsetX, screenShake.offsetY, [p1DelayedHealth, p2DelayedHealth], maxModes, perfectPlayer);
+  const p1CharDef = ROSTER.find(c => c.id === p1.charId) || ROSTER[0];
+  const p2CharDef = ROSTER.find(c => c.id === p2.charId) || ROSTER[1];
+  renderer.render([p1, p2], camera.x, tickRef.value, phase === GamePhase.KO, winner, screenShake.offsetX, screenShake.offsetY, [p1DelayedHealth, p2DelayedHealth], maxModes, perfectPlayer, p1Wins, p2Wins, p1CharDef.nameCn, p2CharDef.nameCn);
   renderer.drawProjectiles(projectiles, camera);
   vfx.render(ctx, camera.x);
 
@@ -499,13 +571,136 @@ function render(): void {
   // Power gauge UI
   renderer.drawPowerGauges(gauges, maxModes);
 
-  if (phase === GamePhase.INTRO) renderer.drawIntro(phaseTimer);
+  if (phase === GamePhase.INTRO) renderer.drawIntro(phaseTimer, currentRound);
   renderer.drawComboCounters([p1, p2], [combatSystem.getComboCount(0), combatSystem.getComboCount(1)], [0, 0], camera);
   renderer.drawControlsHint();
+
+  // MATCH_END overlay (drawn after everything else)
+  if (phase === GamePhase.MATCH_END) {
+    // Draw winner's victory pose
+    if (winner !== null) {
+      const w = winner === 0 ? p1 : p2;
+      const wSx = w.x - camera.x;
+      const wColor = w.color;
+      const wFacing = w.facing;
+      drawVictoryPose(ctx, wSx, w.y, wFacing, wColor, '#ffffff30', tickRef.value);
+    }
+    renderer.drawMatchEnd(winner, p1Wins, p2Wins);
+  }
+
+  // Fade overlay (drawn on top of everything)
+  if (fadeAlpha > 0) {
+    ctx.fillStyle = `rgba(0, 0, 0, ${fadeAlpha})`;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  }
+
   if (debugMode) renderer.drawDebug([p1, p2], projectiles, camera, tickRef.value, renderer.getFps(), vfx.count, [p1Cmd, p2Cmd]);
 }
 
+// ===== Round Transition Helpers =====
+
+/** Reset fighter state for a new round (keeps power gauge) */
+function resetFightersForNewRound(): void {
+  p1.health = p1.maxHealth;
+  p2.health = p2.maxHealth;
+  p1DelayedHealth = p1.maxHealth;
+  p2DelayedHealth = p2.maxHealth;
+  p1.x = STAGE_WIDTH * 0.33; p1.y = STAGE_GROUND_Y; p1.facing = 1;
+  p2.x = STAGE_WIDTH * 0.67; p2.y = STAGE_GROUND_Y; p2.facing = -1;
+  p1.vx = 0; p1.vy = 0; p2.vx = 0; p2.vy = 0;
+  p1.state = FighterState.IDLE; p2.state = FighterState.IDLE;
+  p1.currentAttack = null; p2.currentAttack = null;
+  p1.attackFrame = 0; p2.attackFrame = 0;
+  p1.attackPhase = 'none'; p2.attackPhase = 'none';
+  p1.hasHit = false; p2.hasHit = false;
+  p1.hitstunTimer = 0; p2.hitstunTimer = 0;
+  p1.blockstunTimer = 0; p2.blockstunTimer = 0;
+  p1.knockdownTimer = 0; p2.knockdownTimer = 0;
+  p1.landingRecovery = 0; p2.landingRecovery = 0;
+  p1.displayHeight = FIGHTER_HEIGHT; p2.displayHeight = FIGHTER_HEIGHT;
+  p1.isKnockedDown = false; p2.isKnockedDown = false;
+  p1.isHardKnockdown = false; p2.isHardKnockdown = false;
+  p1.usedQuickStand = false; p2.usedQuickStand = false;
+  p1.throwInvincibilityTimer = 0; p2.throwInvincibilityTimer = 0;
+  p1.isBeingThrown = false; p2.isBeingThrown = false;
+  p1.throwEscapeTimer = 0; p2.throwEscapeTimer = 0;
+  p1.isThrowing = false; p2.isThrowing = false;
+  p1.throwVictim = null; p2.throwVictim = null;
+  p1.rollTimer = 0; p2.rollTimer = 0;
+  p1.rekkaChain = null; p2.rekkaChain = null;
+  p1.rekkaWindow = 0; p2.rekkaWindow = 0;
+  p1.runStopTimer = 0; p2.runStopTimer = 0;
+  p1.guardGauge = 100; p2.guardGauge = 100;
+  p1.guardCrushTimer = 0; p2.guardCrushTimer = 0;
+  p1.juggleState = JuggleState.NONE; p2.juggleState = JuggleState.NONE;
+  p1.airHitCount = 0; p2.airHitCount = 0;
+  p1.superCancelReady = false; p2.superCancelReady = false;
+  p1.rapidCancelReady = false; p2.rapidCancelReady = false;
+  p1.normalCancelReady = false; p2.normalCancelReady = false;
+  p1.cancelledIntoNormal = false; p2.cancelledIntoNormal = false;
+  p1.isCounterWire = false; p2.isCounterWire = false;
+  p1.savePrevState(); p2.savePrevState();
+  // Keep power gauge (authentic KOF carries gauge between rounds)
+  // Reset combat tracking
+  tickRef.value = 0;
+  p1Cmd.reset();
+  p2Cmd.reset();
+  combatSystem.reset();
+  projectiles.length = 0;
+  vfx.reset();
+  // Reset damage counters for PERFECT detection in new round
+  p1DamageTaken = 0;
+  p2DamageTaken = 0;
+  // Reset KO cinematic state
+  koSlowMoTriggered = false;
+  koSlowMo = 0;
+  koSlowMoFrameCounter = 0;
+  hitStop = 0;
+  superFlashTimer = 0;
+  // Start new round intro
+  phase = GamePhase.INTRO;
+  phaseTimer = 0;
+  announcer.roundStart(currentRound);
+  announcer.fight();
+}
+
+/** Start fade-to-black transition between rounds */
+function startRoundTransition(): void {
+  fadeDirection = 1; // fading to black
+  fadeCallback = () => {
+    currentRound++;
+    resetFightersForNewRound();
+    fadeDirection = -1; // fade back in
+  };
+}
+
+/** Tick the fade transition, returns true if fade is active */
+function tickFadeTransition(): boolean {
+  if (fadeDirection === 0) return false;
+  fadeAlpha += fadeDirection * 0.04; // ~25 frames for full fade
+  if (fadeAlpha >= 1 && fadeDirection === 1) {
+    fadeAlpha = 1;
+    fadeCallback?.();
+    fadeCallback = null;
+  }
+  if (fadeAlpha <= 0 && fadeDirection === -1) {
+    fadeAlpha = 0;
+    fadeDirection = 0;
+  }
+  return true;
+}
+
+/** Determine round winner from health comparison. 0=P1, 1=P2, null=draw */
+function determineRoundWinner(): number | null {
+  if (p1.health <= 0 && p2.health <= 0) return null; // double KO
+  if (p1.health <= 0) return 1;
+  if (p2.health <= 0) return 0;
+  // Time over: higher health wins
+  return p1.health > p2.health ? 0 : p2.health > p1.health ? 1 : null;
+}
+
 function restartGame(): void {
+  bgm.stop();
   phase = GamePhase.SELECT;
   phaseTimer = 0;
   koTimer = 0;
@@ -522,9 +717,16 @@ function restartGame(): void {
   koSlowMo = 0;
   koSlowMoTriggered = false;
   koSlowMoFrameCounter = 0;
+  victoryFanfarePlayed = false;
   superFlashAttacker = 0;
+  currentRound = 1;
+  p1Wins = 0;
+  p2Wins = 0;
   p1DamageTaken = 0;
   p2DamageTaken = 0;
+  fadeAlpha = 0;
+  fadeDirection = 0;
+  fadeCallback = null;
   p1.reset(STAGE_WIDTH * 0.33);
   p2.reset(STAGE_WIDTH * 0.67);
   p1Cmd.reset();
@@ -543,6 +745,8 @@ let f1Down = false;
 window.addEventListener('keydown', e => {
   initAudio(); // Initialize audio on first user interaction
   if (e.code === 'F1') { e.preventDefault(); if (!f1Down) { f1Down = true; debugMode = !debugMode; } }
+  if (e.code === 'KeyM') { announcer.toggle(); }
+  if (e.code === 'KeyB') { bgm.toggle(); }
 });
 window.addEventListener('keyup', e => { if (e.code === 'F1') f1Down = false; });
 

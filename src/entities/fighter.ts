@@ -59,6 +59,9 @@ export class Fighter {
   // Run stop delay (A5: can't instantly block out of run)
   runStopTimer = 0;
 
+  // Throw invincibility frames remaining (set after blockstun/hitstun/wakeup/jump)
+  throwInvincibilityTimer = 0;
+
   // Juggle state (B7: floating/juggle tracking)
   juggleState: JuggleState = JuggleState.NONE;
   airHitCount = 0; // how many air hits in current combo
@@ -69,6 +72,7 @@ export class Fighter {
   // Knockdown state
   isKnockedDown = false;
   isHardKnockdown = false;
+  usedQuickStand = false;
 
   // Throw escape state (defender side)
   isBeingThrown = false;
@@ -80,6 +84,16 @@ export class Fighter {
 
   // Super cancel tracking (P9-F)
   superCancelReady = false;
+
+  // Rapid cancel (轻攻击链): set true when a light normal hits, allows chaining into next light normal
+  rapidCancelReady = false;
+
+  // Normal → Command Normal cancel: set true when a normal attack hits, allows cancel into command normal
+  normalCancelReady = false;
+
+  // True when current attack was cancelled into from a previous normal (not raw).
+  // Cancelled-into command normals LOSE special properties (overhead/low/KD) but CAN cancel into specials.
+  cancelledIntoNormal = false;
 
   // Counter Wire: currently bouncing off wall from counter wire
   isCounterWire = false;
@@ -154,6 +168,9 @@ export class Fighter {
     this.attackPhase = 'startup';
     this.hasHit = false;
     this.superCancelReady = false;
+    this.rapidCancelReady = false;
+    this.normalCancelReady = false;
+    this.cancelledIntoNormal = false;
 
     // Determine state from attack type
     const name = attackType as string;
@@ -202,6 +219,9 @@ export class Fighter {
     this.attackPhase = 'none';
     this.hasHit = false;
     this.superCancelReady = false;
+    this.rapidCancelReady = false;
+    this.normalCancelReady = false;
+    this.cancelledIntoNormal = false;
     this.isCounterWire = false;
     this.state = FighterState.IDLE;
   }
@@ -215,6 +235,9 @@ export class Fighter {
     this.attackPhase = 'none';
     this.attackFrame = 0;
     this.superCancelReady = false;
+    this.rapidCancelReady = false;
+    this.normalCancelReady = false;
+    this.cancelledIntoNormal = false;
   }
 
   /** Apply blockstun */
@@ -235,6 +258,9 @@ export class Fighter {
     this.currentAttack = null;
     this.attackPhase = 'none';
     this.superCancelReady = false;
+    this.rapidCancelReady = false;
+    this.normalCancelReady = false;
+    this.cancelledIntoNormal = false;
   }
 
   /** Can the fighter act (accept input) right now? */
@@ -252,6 +278,7 @@ export class Fighter {
   tickTimers(): void {
     if (this.landingRecovery > 0) this.landingRecovery--;
     if (this.runStopTimer > 0) this.runStopTimer--;
+    if (this.throwInvincibilityTimer > 0) this.throwInvincibilityTimer--;
     // Guard gauge recovery: +0.5/frame when NOT blocking
     if (this.state !== FighterState.BLOCK && this.guardGauge < 100) {
       this.guardGauge = Math.min(100, this.guardGauge + 0.5);
@@ -300,6 +327,8 @@ export class Fighter {
     this.displayHeight = FIGHTER_HEIGHT;
     this.isKnockedDown = false;
     this.isHardKnockdown = false;
+    this.usedQuickStand = false;
+    this.throwInvincibilityTimer = 0;
     this.isBeingThrown = false;
     this.throwEscapeTimer = 0;
     this.isThrowing = false;
@@ -313,6 +342,9 @@ export class Fighter {
     this.juggleState = JuggleState.NONE;
     this.airHitCount = 0;
     this.superCancelReady = false;
+    this.rapidCancelReady = false;
+    this.normalCancelReady = false;
+    this.cancelledIntoNormal = false;
     this.isCounterWire = false;
   }
 }

@@ -15,6 +15,7 @@ import type { CommandBuffer } from '../input/commandBuffer.js';
 import { AttackType, FighterState } from '../core/types.js';
 import { Projectile } from '../entities/projectile.js';
 import { FRAME_DATA } from '../core/constants.js';
+import { terryPortrait } from '../rendering/portraits/terryPortrait.js';
 
 export const TerryDef: CharacterDefinition = {
   id: 'terry',
@@ -25,6 +26,7 @@ export const TerryDef: CharacterDefinition = {
   specialColor: '#ffcc00',
   specialGlow: '#ffaa00',
   portrait: '🎩',
+  pixelPortrait: terryPortrait,
 
   stats: {
     walkSpeed: 3.5,

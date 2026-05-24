@@ -4,6 +4,7 @@
 import { CANVAS_WIDTH, CANVAS_HEIGHT } from '../core/constants.js';
 import { ROSTER } from '../characters/index.js';
 import { roundRect } from './utils.js';
+import { drawPixelPortrait } from './pixelPortraits.js';
 
 // ===== Character Select =====
 
@@ -93,19 +94,27 @@ export function drawCharacterSelect(
     roundRect(ctx, cx + 15, portraitY, cardW - 30, 80, 6);
     ctx.fill();
 
-    // Character color preview block
-    const charGrad = ctx.createLinearGradient(cx + 20, portraitY + 5, cx + cardW - 20, portraitY + 75);
-    charGrad.addColorStop(0, char.color);
-    charGrad.addColorStop(1, char.accentColor);
-    ctx.fillStyle = charGrad;
-    roundRect(ctx, cx + 20, portraitY + 5, cardW - 40, 70, 4);
-    ctx.fill();
-
-    // Portrait emoji
-    ctx.font = '40px serif';
-    ctx.textAlign = 'center';
-    ctx.fillStyle = '#fff';
-    ctx.fillText(char.portrait, cx + cardW / 2, portraitY + 48);
+    // Draw pixel portrait if available
+    if (char.pixelPortrait) {
+      const portraitScale = 2;
+      const portraitWidth = char.pixelPortrait.width * portraitScale;
+      const portraitHeight = char.pixelPortrait.height * portraitScale;
+      const px = cx + 15 + ((cardW - 30) - portraitWidth) / 2;
+      const py = portraitY + (80 - portraitHeight) / 2;
+      drawPixelPortrait(ctx, char.pixelPortrait, px, py, portraitScale);
+    } else {
+      // Fallback to color block + emoji for characters without pixel art
+      const charGrad = ctx.createLinearGradient(cx + 20, portraitY + 5, cx + cardW - 20, portraitY + 75);
+      charGrad.addColorStop(0, char.color);
+      charGrad.addColorStop(1, char.accentColor);
+      ctx.fillStyle = charGrad;
+      roundRect(ctx, cx + 20, portraitY + 5, cardW - 40, 70, 4);
+      ctx.fill();
+      ctx.font = '40px serif';
+      ctx.textAlign = 'center';
+      ctx.fillStyle = '#fff';
+      ctx.fillText(char.portrait, cx + cardW / 2, portraitY + 48);
+    }
 
     // Character name
     ctx.font = 'bold 16px monospace';
@@ -195,7 +204,7 @@ export function drawCharacterSelect(
 // ===== Intro Overlay =====
 
 /** Draw ROUND 1 / FIGHT! intro overlay */
-export function drawIntro(ctx: CanvasRenderingContext2D, phaseTimer: number): void {
+export function drawIntro(ctx: CanvasRenderingContext2D, phaseTimer: number, currentRound: number = 1): void {
   ctx.save();
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
@@ -206,7 +215,7 @@ export function drawIntro(ctx: CanvasRenderingContext2D, phaseTimer: number): vo
     ctx.globalAlpha = Math.min(1, progress * 4);
     ctx.fillStyle = '#ffffff';
     ctx.font = `bold ${Math.round(40 * scale)}px monospace`;
-    ctx.fillText('ROUND 1', 400, 260);
+    ctx.fillText(`ROUND ${currentRound}`, 400, 260);
   } else if (phaseTimer < 100) {
     const fp = (phaseTimer - 60) / 40;
     const scale = 1 + Math.max(0, 1 - fp * 4) * 1.5;
@@ -318,6 +327,80 @@ export function drawSuperFlash(
   }
   ctx.fillStyle = glowGrad;
   ctx.fillRect(flashScreenX - 200, flashScreenY - 200, 400, 400);
+
+  ctx.restore();
+}
+
+// ===== Match End Screen =====
+
+/** Draw MATCH END overlay with winner and round win markers */
+export function drawMatchEnd(
+  ctx: CanvasRenderingContext2D,
+  winner: number | null,
+  p1Wins: number,
+  p2Wins: number,
+): void {
+  ctx.save();
+
+  // Dark overlay
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.65)';
+  ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+
+  // "GAME" text with golden glow
+  ctx.shadowColor = '#ff8800';
+  ctx.shadowBlur = 20;
+  ctx.fillStyle = '#FFD700';
+  ctx.font = 'bold 72px monospace';
+  ctx.fillText('GAME', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 60);
+  ctx.shadowBlur = 0;
+
+  // Winner announcement
+  if (winner !== null) {
+    ctx.fillStyle = winner === 0 ? '#ff6644' : '#4488ff';
+    ctx.font = 'bold 32px monospace';
+    ctx.fillText(`P${winner + 1} WINS THE MATCH`, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2);
+  } else {
+    ctx.fillStyle = '#ffcc00';
+    ctx.font = 'bold 32px monospace';
+    ctx.fillText('DRAW GAME', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2);
+  }
+
+  // Win count markers (golden dots)
+  const dotY = CANVAS_HEIGHT / 2 + 50;
+  const dotSpacing = 22;
+  // P1 wins on left
+  for (let i = 0; i < p1Wins; i++) {
+    ctx.beginPath();
+    ctx.arc(CANVAS_WIDTH / 2 - 50 + i * dotSpacing, dotY, 7, 0, Math.PI * 2);
+    ctx.fillStyle = '#ff6644';
+    ctx.fill();
+    ctx.strokeStyle = '#FFD700';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+  }
+  // P2 wins on right (drawn from center outward)
+  for (let i = 0; i < p2Wins; i++) {
+    ctx.beginPath();
+    ctx.arc(CANVAS_WIDTH / 2 + 50 - i * dotSpacing, dotY, 7, 0, Math.PI * 2);
+    ctx.fillStyle = '#4488ff';
+    ctx.fill();
+    ctx.strokeStyle = '#FFD700';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+  }
+
+  // VS divider
+  ctx.fillStyle = '#ffffff40';
+  ctx.font = 'bold 16px monospace';
+  ctx.fillText('VS', CANVAS_WIDTH / 2, dotY);
+
+  // Continue hint
+  ctx.fillStyle = 'rgba(255,255,255,0.6)';
+  ctx.font = '14px monospace';
+  ctx.fillText('Press any key to continue', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 110);
 
   ctx.restore();
 }

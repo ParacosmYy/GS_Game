@@ -12,6 +12,7 @@ import { pose, bone } from './types.js';
 import type { ResolvedInput } from '../input/inputResolver.js';
 import type { CommandBuffer } from '../input/commandBuffer.js';
 import { FighterState, AttackType } from '../core/types.js';
+import { kimPortrait } from '../rendering/portraits/kimPortrait.js';
 
 export const KimDef: CharacterDefinition = {
   id: 'kim',
@@ -22,6 +23,7 @@ export const KimDef: CharacterDefinition = {
   specialColor: '#44ddff',
   specialGlow: '#88ccff',
   portrait: '🦵',
+  pixelPortrait: kimPortrait,
 
   stats: {
     walkSpeed: 5,

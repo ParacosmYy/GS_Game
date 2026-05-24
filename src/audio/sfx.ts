@@ -215,3 +215,27 @@ export function playCounter(): void {
   osc.connect(gain).connect(ctx.destination);
   osc.start(now); osc.stop(now + 0.1);
 }
+
+/** 胜利号角: C-E-G-C 上行琶音 */
+export function playVictoryFanfare(): void {
+  const ctx = getCtx();
+  const now = ctx.currentTime;
+
+  const notes = [523.3, 659.3, 784, 1047]; // C5, E5, G5, C6
+  const masterGain = ctx.createGain();
+  masterGain.gain.value = 0.3;
+  masterGain.connect(ctx.destination);
+
+  notes.forEach((freq, i) => {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'square';
+    osc.frequency.value = freq;
+    const startTime = now + i * 0.15;
+    gain.gain.setValueAtTime(0.3, startTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.3);
+    osc.connect(gain).connect(masterGain);
+    osc.start(startTime);
+    osc.stop(startTime + 0.35);
+  });
+}
