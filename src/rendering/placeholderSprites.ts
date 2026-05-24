@@ -22,48 +22,49 @@ interface CharVisual {
   bodyW: number;
   legLen: number;
   hairStyle: 'spiky' | 'long' | 'short' | 'ponytail' | 'wild';
+  idleStyle: 'confident' | 'lazy' | 'fighter' | 'martial' | 'tense' | 'alert' | 'rebel' | 'cute';
 }
 
 const CHAR_VISUALS: Record<string, CharVisual> = {
   kyo: {
     hairColor: '#1a1a2e', skinColor: '#f5d0a9', shirtColor: '#ffffff',
     pantsColor: '#2a2a3a', shoeColor: '#8b4513', beltColor: '#4a3520',
-    headW: 5, bodyW: 6, legLen: 6, hairStyle: 'spiky',
+    headW: 5, bodyW: 6, legLen: 6, hairStyle: 'spiky', idleStyle: 'confident',
   },
   iori: {
     hairColor: '#c41e3a', skinColor: '#f5d0a9', shirtColor: '#1a1a2e',
     pantsColor: '#1a1a2e', shoeColor: '#2a2a3a', beltColor: '#8b0000',
-    headW: 5, bodyW: 6, legLen: 6, hairStyle: 'wild',
+    headW: 5, bodyW: 6, legLen: 6, hairStyle: 'wild', idleStyle: 'lazy',
   },
   terry: {
     hairColor: '#c4a000', skinColor: '#f5d0a9', shirtColor: '#2a5a8a',
     pantsColor: '#3a3a4a', shoeColor: '#6a3a1a', beltColor: '#3a3a3a',
-    headW: 5, bodyW: 7, legLen: 6, hairStyle: 'short',
+    headW: 5, bodyW: 7, legLen: 6, hairStyle: 'short', idleStyle: 'fighter',
   },
   kim: {
     hairColor: '#1a1a1a', skinColor: '#f5d0a9', shirtColor: '#ffffff',
     pantsColor: '#ffffff', shoeColor: '#1a1a1a', beltColor: '#000000',
-    headW: 5, bodyW: 5, legLen: 7, hairStyle: 'short',
+    headW: 5, bodyW: 5, legLen: 7, hairStyle: 'short', idleStyle: 'martial',
   },
   ryo: {
     hairColor: '#2a1a0a', skinColor: '#f5d0a9', shirtColor: '#cc3333',
     pantsColor: '#1a1a3a', shoeColor: '#3a2a1a', beltColor: '#000000',
-    headW: 5, bodyW: 7, legLen: 6, hairStyle: 'spiky',
+    headW: 5, bodyW: 7, legLen: 6, hairStyle: 'spiky', idleStyle: 'tense',
   },
   leona: {
     hairColor: '#1a3a8a', skinColor: '#fce4c8', shirtColor: '#3a3a5a',
     pantsColor: '#2a2a4a', shoeColor: '#1a1a2a', beltColor: '#4a4a6a',
-    headW: 4, bodyW: 5, legLen: 6, hairStyle: 'ponytail',
+    headW: 4, bodyW: 5, legLen: 6, hairStyle: 'ponytail', idleStyle: 'alert',
   },
   kdash: {
     hairColor: '#c0c0c0', skinColor: '#f5d0a9', shirtColor: '#1a1a2e',
     pantsColor: '#2a2a3a', shoeColor: '#4a4a4a', beltColor: '#c41e3a',
-    headW: 5, bodyW: 6, legLen: 6, hairStyle: 'spiky',
+    headW: 5, bodyW: 6, legLen: 6, hairStyle: 'spiky', idleStyle: 'rebel',
   },
   kula: {
     hairColor: '#c4a060', skinColor: '#fce4c8', shirtColor: '#4a8aff',
     pantsColor: '#3a3a5a', shoeColor: '#4a4a6a', beltColor: '#6ab0ff',
-    headW: 4, bodyW: 5, legLen: 5, hairStyle: 'long',
+    headW: 4, bodyW: 5, legLen: 5, hairStyle: 'long', idleStyle: 'cute',
   },
 };
 
@@ -350,6 +351,31 @@ const IDLE_POSES: Pose[] = [
   { headOff: 0, bodyLean: 0, armL: 0.28, armR: -0.32, legL: -1, legR: 1, crouch: false },
   { headOff: 0, bodyLean: 0, armL: 0.25, armR: -0.35, legL: -1, legR: 1, crouch: false },
 ];
+
+/** 根据角色idleStyle生成差异化待机姿态偏移 */
+function getIdlePoses(style: string): Pose[] {
+  const base = IDLE_POSES;
+  switch (style) {
+    case 'confident': // Kyo — 微微前倾, 右拳抬起
+      return base.map((p, i) => ({ ...p, bodyLean: 0.5, armR: -0.6 + Math.sin(i * 0.8) * 0.1 }));
+    case 'lazy': // Iori — 极微动, 手臂下垂
+      return base.map((p, i) => ({ ...p, armL: 0.15 + Math.sin(i * 0.5) * 0.03, armR: -0.15 + Math.sin(i * 0.5) * 0.03 }));
+    case 'fighter': // Terry — 拳架, 前倾
+      return base.map((p, i) => ({ ...p, bodyLean: 1, armL: 0.5, armR: -0.7 + Math.sin(i * 0.7) * 0.05 }));
+    case 'martial': // Kim — 武道站姿, 双手前伸
+      return base.map((p, i) => ({ ...p, armL: -0.2, armR: -0.3 + Math.sin(i * 0.6) * 0.05, legL: -2, legR: 2 }));
+    case 'tense': // Ryo — 紧绷, 拳头握紧
+      return base.map((p, i) => ({ ...p, bodyLean: 0.3, armL: 0.4, armR: -0.5 + Math.sin(i * 0.9) * 0.05 }));
+    case 'alert': // Leona — 警觉, 极微动
+      return base.map((p, i) => ({ ...p, armL: 0.2, armR: -0.4 + Math.sin(i * 0.4) * 0.02 }));
+    case 'rebel': // K' — 手插兜, 身体后倾
+      return base.map((p, i) => ({ ...p, bodyLean: -0.5, armL: 0.1, armR: 0.1 }));
+    case 'cute': // Kula — 活泼弹跳
+      return base.map((p, i) => ({ ...p, headOff: Math.sin(i * 0.8) * 0.5, armL: 0.4 + Math.sin(i) * 0.1, armR: -0.4 + Math.sin(i + 1) * 0.1 }));
+    default:
+      return base;
+  }
+}
 const WALK_POSES: Pose[] = [
   { headOff: 0, bodyLean: 1, armL: 0.5, armR: -0.1, legL: -2, legR: 2, crouch: false },
   { headOff: 0, bodyLean: 0.5, armL: 0.4, armR: -0.2, legL: -1, legR: 1, crouch: false },
@@ -468,12 +494,6 @@ function stateToPoseSet(state: FighterState): PoseSet {
   }
 }
 
-const POSE_MAP: Record<PoseSet, Pose[]> = {
-  idle: IDLE_POSES, walk: WALK_POSES, attack: ATTACK_POSES,
-  crouch_attack: CROUCH_ATTACK_POSES, air_attack: AIR_ATTACK_POSES, throw: THROW_POSES,
-  crouch: CROUCH_POSES, jump: JUMP_POSES, hit: HIT_POSES, block: BLOCK_POSES,
-};
-
 /** 生成角色精灵图集 — 返回Image + AnimationMap
  * 图集布局: 每行一个PoseSet, 每行帧数可变
  * 最后一行是KO帧
@@ -485,12 +505,20 @@ export function generatePlaceholderSpritesheet(color: string, charId: string): {
   const v = CHAR_VISUALS[charId] ?? getDefaultVisual();
   v.shirtColor = color;
 
+  // 使用角色专属待机姿态
+  const idlePoses = getIdlePoses(v.idleStyle);
+  const POSE_MAP_LOCAL: Record<PoseSet, Pose[]> = {
+    idle: idlePoses, walk: WALK_POSES, attack: ATTACK_POSES,
+    crouch_attack: CROUCH_ATTACK_POSES, air_attack: AIR_ATTACK_POSES, throw: THROW_POSES,
+    crouch: CROUCH_POSES, jump: JUMP_POSES, hit: HIT_POSES, block: BLOCK_POSES,
+  };
+
   const poseSets: PoseSet[] = ['idle', 'walk', 'attack', 'crouch_attack', 'air_attack', 'throw', 'crouch', 'jump', 'hit', 'block'];
 
   // 计算图集尺寸
   let maxFrames = 0;
   for (const set of poseSets) {
-    maxFrames = Math.max(maxFrames, POSE_MAP[set].length);
+    maxFrames = Math.max(maxFrames, POSE_MAP_LOCAL[set].length);
   }
   const atlasW = PW * maxFrames;
   const atlasH = PH * (poseSets.length + 1); // 每个PoseSet一行 + KO行
@@ -504,7 +532,7 @@ export function generatePlaceholderSpritesheet(color: string, charId: string): {
   const rowMap = new Map<PoseSet, number>();
   poseSets.forEach((set, row) => {
     rowMap.set(set, row);
-    const poses = POSE_MAP[set];
+    const poses = POSE_MAP_LOCAL[set];
     poses.forEach((pose, f) => {
       const frame = document.createElement('canvas');
       frame.width = PW;
@@ -543,7 +571,7 @@ export function generatePlaceholderSpritesheet(color: string, charId: string): {
   for (const state of allStates) {
     const set = stateToPoseSet(state);
     const row = rowMap.get(set)!;
-    const poseCount = POSE_MAP[set].length;
+    const poseCount = POSE_MAP_LOCAL[set].length;
     const frames: SpriteFrame[] = [];
     for (let f = 0; f < poseCount; f++) {
       frames.push({
