@@ -326,9 +326,34 @@ const WALK_POSES: Pose[] = [
   { headOff: 0, bodyLean: 0, armL: 0.3, armR: -0.3, legL: 0, legR: 0, crouch: false },
 ];
 const ATTACK_POSES: Pose[] = [
-  { headOff: 1, bodyLean: 2, armL: 0.4, armR: -1.5, legL: -1, legR: 2, crouch: false },
-  { headOff: 1, bodyLean: 3, armL: 0.3, armR: -1.8, legL: -1, legR: 2, crouch: false },
-  { headOff: 0, bodyLean: 1, armL: 0.4, armR: -0.5, legL: -1, legR: 1, crouch: false },
+  // startup: 拳收回准备
+  { headOff: 0, bodyLean: -1, armL: 0.3, armR: 0.5, legL: -1, legR: 1, crouch: false },
+  // active: 拳全力伸出
+  { headOff: 1, bodyLean: 3, armL: 0.4, armR: -1.8, legL: -1, legR: 2, crouch: false },
+  // recovery: 手臂开始收回
+  { headOff: 0, bodyLean: 1, armL: 0.3, armR: -0.8, legL: -1, legR: 1, crouch: false },
+  // end: 回到待机
+  { headOff: 0, bodyLean: 0, armL: 0.3, armR: -0.3, legL: -1, legR: 1, crouch: false },
+];
+// 蹲攻击 — 身体压低, 手臂向下或水平
+const CROUCH_ATTACK_POSES: Pose[] = [
+  { headOff: 0, bodyLean: -1, armL: 0.3, armR: 0.3, legL: -3, legR: 3, crouch: true },
+  { headOff: 1, bodyLean: 2, armL: 0.4, armR: -1.5, legL: -3, legR: 3, crouch: true },
+  { headOff: 0, bodyLean: 1, armL: 0.3, armR: -0.6, legL: -3, legR: 3, crouch: true },
+  { headOff: 0, bodyLean: 0, armL: 0.3, armR: -0.3, legL: -2, legR: 2, crouch: true },
+];
+// 空中攻击 — 身体前倾, 手臂向下或水平
+const AIR_ATTACK_POSES: Pose[] = [
+  { headOff: 0, bodyLean: 1, armL: -0.3, armR: 0.3, legL: 1, legR: -1, crouch: false },
+  { headOff: 1, bodyLean: 2, armL: 0.2, armR: -1.2, legL: 0, legR: 2, crouch: false },
+  { headOff: 0, bodyLean: 1, armL: 0.1, armR: -0.5, legL: -1, legR: 1, crouch: false },
+  { headOff: 0, bodyLean: 0, armL: 0, armR: 0, legL: 0, legR: 0, crouch: false },
+];
+// 投技 — 双手前伸抓取
+const THROW_POSES: Pose[] = [
+  { headOff: 0, bodyLean: 1, armL: -0.8, armR: -0.8, legL: -1, legR: 1, crouch: false },
+  { headOff: 1, bodyLean: 3, armL: -1.5, armR: -1.5, legL: -1, legR: 2, crouch: false },
+  { headOff: 0, bodyLean: -2, armL: 0.6, armR: 0.6, legL: 0, legR: 0, crouch: false },
   { headOff: 0, bodyLean: 0, armL: 0.3, armR: -0.3, legL: -1, legR: 1, crouch: false },
 ];
 const CROUCH_POSES: Pose[] = [
@@ -388,14 +413,16 @@ function drawKO(c: CanvasRenderingContext2D, v: CharVisual): void {
   px(c, cx + 11, cy + 1, darken(v.shoeColor, 0.3));
 }
 
-type PoseSet = 'idle' | 'walk' | 'attack' | 'crouch' | 'jump' | 'hit' | 'block';
+type PoseSet = 'idle' | 'walk' | 'attack' | 'crouch_attack' | 'air_attack' | 'throw' | 'crouch' | 'jump' | 'hit' | 'block';
 
 function stateToPoseSet(state: FighterState): PoseSet {
   switch (state) {
     case FighterState.WALK: case FighterState.RUN: return 'walk';
-    case FighterState.STAND_ATTACK: case FighterState.CROUCH_ATTACK:
-    case FighterState.AIR_ATTACK: case FighterState.THROW:
-    case FighterState.COUNTER_STANCE: case FighterState.MAX_MODE: return 'attack';
+    case FighterState.CROUCH_ATTACK: return 'crouch_attack';
+    case FighterState.AIR_ATTACK: return 'air_attack';
+    case FighterState.THROW: return 'throw';
+    case FighterState.STAND_ATTACK: case FighterState.COUNTER_STANCE:
+    case FighterState.MAX_MODE: return 'attack';
     case FighterState.CROUCH: case FighterState.ROLL: case FighterState.BACK_ROLL: return 'crouch';
     case FighterState.JUMP: case FighterState.HOP: case FighterState.RUN_JUMP:
     case FighterState.HYPER_JUMP: case FighterState.BACKDASH: return 'jump';
@@ -408,6 +435,7 @@ function stateToPoseSet(state: FighterState): PoseSet {
 
 const POSE_MAP: Record<PoseSet, Pose[]> = {
   idle: IDLE_POSES, walk: WALK_POSES, attack: ATTACK_POSES,
+  crouch_attack: CROUCH_ATTACK_POSES, air_attack: AIR_ATTACK_POSES, throw: THROW_POSES,
   crouch: CROUCH_POSES, jump: JUMP_POSES, hit: HIT_POSES, block: BLOCK_POSES,
 };
 
@@ -420,7 +448,7 @@ export function generatePlaceholderSpritesheet(color: string, charId: string): {
   // 用角色配色覆盖
   v.shirtColor = color;
 
-  const poseSets: PoseSet[] = ['idle', 'walk', 'attack', 'crouch', 'jump', 'hit', 'block'];
+  const poseSets: PoseSet[] = ['idle', 'walk', 'attack', 'crouch_attack', 'air_attack', 'throw', 'crouch', 'jump', 'hit', 'block'];
   const framesPerSet = 4;
   const cols = poseSets.length;
   const atlasW = PW * cols;
