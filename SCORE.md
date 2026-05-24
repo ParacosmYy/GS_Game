@@ -1974,4 +1974,12 @@
 
 ---
 
+### Iter-V106 — 2026-05-25（AI连段路由更新 — 8角色专属combo +5=618）
+
+**改动:** AI COMBO_ROUTES更新: 8角色全部有专属连段路由(含命令通常技), routeComboSpecial新增4角色(Ryo/K'/Kula/Leona), applyComboStep新增7种命令通常技按键映射
+
+| 角色内容 | 26/150 | +2 | AI每角色有独特连段策略 |
+
+---
+
 **tag: v0.09-kof2002 (603pt) | commit: 待定 | 下一目标: 650分(+50 COMMIT) → 800分(+200 TAG)**

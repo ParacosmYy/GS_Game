@@ -42,7 +42,8 @@ const COMBO_ROUTES: Record<string, ComboStep[]> = {
     { type: 'special', attack: 'dmOrochinagi',  delay: 4 },
   ],
   iori: [
-    { type: 'button',  attack: 'closeC',   delay: 0 },
+    { type: 'button',  attack: 'closeC',     delay: 0 },
+    { type: 'button',  attack: 'ioriYumeyumi', delay: 2 },
     { type: 'special', attack: 'aoihana1',  delay: 3 },
     { type: 'special', attack: 'aoihana2',  delay: 3 },
     { type: 'special', attack: 'aoihana3',  delay: 3 },
@@ -50,15 +51,39 @@ const COMBO_ROUTES: Record<string, ComboStep[]> = {
   ],
   terry: [
     { type: 'button',  attack: 'closeC',      delay: 0 },
-    { type: 'button',  attack: 'standA',       delay: 2 },
+    { type: 'button',  attack: 'terryBackKnuckle', delay: 2 },
     { type: 'special', attack: 'burnKnuckle',  delay: 3 },
     { type: 'special', attack: 'dmPowerGeyser', delay: 4 },
   ],
   kim: [
     { type: 'button',  attack: 'closeC',  delay: 0 },
-    { type: 'button',  attack: 'standB',   delay: 2 },
+    { type: 'button',  attack: 'kimHishouKick', delay: 2 },
     { type: 'special', attack: 'hiensen',  delay: 3 },
     { type: 'special', attack: 'dmPhoenixKick', delay: 4 },
+  ],
+  ryo: [
+    { type: 'button',  attack: 'closeC',     delay: 0 },
+    { type: 'button',  attack: 'ryoTsurizao', delay: 2 },
+    { type: 'special', attack: 'specialUpper', delay: 3 },
+    { type: 'special', attack: 'dmTenHaOu',   delay: 4 },
+  ],
+  kdash: [
+    { type: 'button',  attack: 'closeC',      delay: 0 },
+    { type: 'button',  attack: 'kdashOneInch', delay: 2 },
+    { type: 'special', attack: 'specialUpper',  delay: 3 },
+    { type: 'special', attack: 'dmChainShot',   delay: 4 },
+  ],
+  kula: [
+    { type: 'button',  attack: 'closeC',     delay: 0 },
+    { type: 'button',  attack: 'kulaOneMore', delay: 2 },
+    { type: 'special', attack: 'specialUpper', delay: 3 },
+    { type: 'special', attack: 'dmFreeze',    delay: 4 },
+  ],
+  leona: [
+    { type: 'button',  attack: 'closeC',     delay: 0 },
+    { type: 'button',  attack: 'leonaStrikeArc', delay: 2 },
+    { type: 'special', attack: 'specialUpper', delay: 3 },
+    { type: 'special', attack: 'dmVSlasher',  delay: 4 },
   ],
   _default: [
     { type: 'button',  attack: 'closeC', delay: 0 },
@@ -565,7 +590,56 @@ export class SimpleAI {
           base.kickPressed = true;
           break;
         case 'cmdGofuYou':
-          // →+B (command normal)
+          // →+B (Kyo command normal)
+          base.forward = true;
+          base.buttonB = true;
+          base.buttonBPressed = true;
+          base.kickPressed = true;
+          break;
+        case 'ioriYumeyumi':
+          // →+A (Iori command normal)
+          base.forward = true;
+          base.buttonA = true;
+          base.buttonAPressed = true;
+          base.punchPressed = true;
+          break;
+        case 'terryBackKnuckle':
+          // →+A (Terry command normal)
+          base.forward = true;
+          base.buttonA = true;
+          base.buttonAPressed = true;
+          base.punchPressed = true;
+          break;
+        case 'kimHishouKick':
+          // →+B (Kim command normal)
+          base.forward = true;
+          base.buttonB = true;
+          base.buttonBPressed = true;
+          base.kickPressed = true;
+          break;
+        case 'ryoTsurizao':
+          // →+A (Ryo command normal)
+          base.forward = true;
+          base.buttonA = true;
+          base.buttonAPressed = true;
+          base.punchPressed = true;
+          break;
+        case 'kdashOneInch':
+          // →+A (K' command normal)
+          base.forward = true;
+          base.buttonA = true;
+          base.buttonAPressed = true;
+          base.punchPressed = true;
+          break;
+        case 'kulaOneMore':
+          // →+B (Kula command normal)
+          base.forward = true;
+          base.buttonB = true;
+          base.buttonBPressed = true;
+          base.kickPressed = true;
+          break;
+        case 'leonaStrikeArc':
+          // →+B (Leona command normal)
           base.forward = true;
           base.buttonB = true;
           base.buttonBPressed = true;
@@ -713,6 +787,14 @@ export class SimpleAI {
         return this.routeTerryComboSpecial(attack, input, tick);
       case 'kim':
         return this.routeKimComboSpecial(attack, input, tick);
+      case 'ryo':
+        return this.routeRyoComboSpecial(attack, input, tick);
+      case 'kdash':
+        return this.routeKdashComboSpecial(attack, input, tick);
+      case 'kula':
+        return this.routeKulaComboSpecial(attack, input, tick);
+      case 'leona':
+        return this.routeLeonaComboSpecial(attack, input, tick);
       default:
         return null;
     }
@@ -783,6 +865,50 @@ export class SimpleAI {
         return AttackType.KIM_HANGETSU;
       default:
         return AttackType.KIM_HIENZAN;
+    }
+  }
+
+  private routeRyoComboSpecial(attack: string, _input: ResolvedInput, _tick: number): AttackType | null {
+    switch (attack) {
+      case 'specialUpper':
+        return AttackType.RYO_KO_HOU;
+      case 'dmTenHaOu':
+        return AttackType.DM_TEN_HA_OU;
+      default:
+        return AttackType.RYO_KO_HOU;
+    }
+  }
+
+  private routeKdashComboSpecial(attack: string, _input: ResolvedInput, _tick: number): AttackType | null {
+    switch (attack) {
+      case 'specialUpper':
+        return AttackType.KDASH_CROW;
+      case 'dmChainShot':
+        return AttackType.DM_CHAIN_SHOT;
+      default:
+        return AttackType.KDASH_CROW;
+    }
+  }
+
+  private routeKulaComboSpecial(attack: string, _input: ResolvedInput, _tick: number): AttackType | null {
+    switch (attack) {
+      case 'specialUpper':
+        return AttackType.KULA_SHELL;
+      case 'dmFreeze':
+        return AttackType.DM_FREEZE;
+      default:
+        return AttackType.KULA_SHELL;
+    }
+  }
+
+  private routeLeonaComboSpecial(attack: string, _input: ResolvedInput, _tick: number): AttackType | null {
+    switch (attack) {
+      case 'specialUpper':
+        return AttackType.LEONA_EAR_RING;
+      case 'dmVSlasher':
+        return AttackType.DM_V_SLASHER;
+      default:
+        return AttackType.LEONA_EAR_RING;
     }
   }
 }

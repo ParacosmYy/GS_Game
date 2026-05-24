@@ -239,8 +239,8 @@ export const KdashDef: CharacterDefinition = {
       || state === FighterState.HOP
       || state === FighterState.HYPER_JUMP;
     if (isAir) return null;
-    // →+B One Inch (overhead)
-    if (input.buttonBPressed && input.forward && !input.down) return AttackType.KDASH_ONE_INCH;
+    // →+A One Inch (launcher on standalone hit)
+    if (input.buttonAPressed && input.forward && !input.down) return AttackType.KDASH_ONE_INCH;
     // ↘+D Trigger Shot (low)
     if (input.buttonDPressed && input.forward && input.down) return AttackType.KDASH_TRIGGER;
     return null;
