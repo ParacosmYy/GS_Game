@@ -327,6 +327,8 @@ function update(): void {
 
   p1Ctrl.update(p1Input);
   if (p2AI) {
+    p2AI.gauge = gauges[1];
+    p2AI.maxMode = maxModes[1];
     const aiInput = p2AI.getInput();
     p2Ctrl.update(aiInput);
     if (p2.canAct() && Math.random() < 0.02) { const s = p2AI.triggerSpecial(); if (s) p2.startAttack(s); }

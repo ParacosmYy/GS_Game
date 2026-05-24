@@ -18,7 +18,7 @@ import type { CharacterDefinition } from '../characters/types.js';
 import type { ResolvedInput, PrevAttack } from '../input/inputResolver.js';
 import { createPrevAttack } from '../input/inputResolver.js';
 import { FighterState, AttackType } from '../core/types.js';
-import type { PowerGauge } from '../core/types.js';
+import type { PowerGauge, MaxModeState } from '../core/types.js';
 
 // ─── Combo route step definition ───
 interface ComboStep {
@@ -80,6 +80,7 @@ export class SimpleAI {
   private character: CharacterDefinition;
   private difficulty: number; // 0.0 ~ 1.0 reaction speed/aggression
   gauge: PowerGauge | null = null; // set externally for GC awareness
+  maxMode: MaxModeState | null = null; // set externally for SDM awareness
 
   private prev: PrevAttack = createPrevAttack();
   private thinkCooldown = 0;
@@ -625,15 +626,33 @@ export class SimpleAI {
     const input = this.getInput();
     const tick = 0; // tick doesn't matter for AI direct trigger
 
-    // Check DM first (low probability) — use character-specific DM map
+    // Check DM first (low probability) — use character-specific DM/SDM map
     if (Math.random() < 0.05) {
       const dmMap: Record<string, AttackType> = {
         kyo: AttackType.DM_OROCHINAGI,
         iori: AttackType.DM_YATAGARASU,
         terry: AttackType.DM_POWER_GEYSER,
         kim: AttackType.DM_PHOENIX_KICK,
+        ryo: AttackType.DM_TEN_HA_OU,
+        leona: AttackType.DM_V_SLASHER,
+        kdash: AttackType.DM_CHAIN_SHOT,
+        kula: AttackType.DM_FREEZE,
       };
-      const dm = dmMap[this.fighter.charId];
+      // In MAX mode with ≥2 stocks, upgrade to SDM
+      const sdmMap: Record<string, AttackType> = {
+        kyo: AttackType.SDM_OROCHINAGI,
+        iori: AttackType.SDM_YATAGARASU,
+        terry: AttackType.SDM_POWER_GEYSER,
+        kim: AttackType.SDM_PHOENIX_KICK,
+        ryo: AttackType.SDM_TEN_HA_OU,
+        leona: AttackType.SDM_V_SLASHER,
+        kdash: AttackType.SDM_CHAIN_SHOT,
+        kula: AttackType.SDM_FREEZE,
+      };
+      const useSDM = this.maxMode?.active && this.gauge && this.gauge.stocks >= 2;
+      const dm = useSDM
+        ? sdmMap[this.fighter.charId]
+        : dmMap[this.fighter.charId];
       if (dm) return dm;
     }
 
