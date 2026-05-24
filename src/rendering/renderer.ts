@@ -85,6 +85,7 @@ export class Renderer {
       const isP1 = f === fighters[0];
       const playerIdx = isP1 ? 0 : 1;
       const maxModeActive = maxModes ? maxModes[playerIdx].active : false;
+      const guardLow = f.guardGauge < 30; // 防御槽低于30%闪烁警告
 
       // Shadow on ground
       const shadowScale = Math.max(0.3, 1 - (STAGE_GROUND_Y - f.y) / 200);
@@ -98,9 +99,18 @@ export class Renderer {
 
       // Glow behind body
       if (glowColor) {
+        const glowPulse = maxModeActive ? 1 + Math.sin(this.globalTick * 0.12) * 0.3 : 1;
         ctx.fillStyle = glowColor;
         ctx.beginPath();
-        ctx.ellipse(sx, sy - f.displayHeight / 2, hw + 10, f.displayHeight / 2 + 10, 0, 0, Math.PI * 2);
+        ctx.ellipse(sx, sy - f.displayHeight / 2, (hw + 15) * glowPulse, (f.displayHeight / 2 + 15) * glowPulse, 0, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      // MAX模式专属绿色光环
+      if (maxModeActive) {
+        const auraPulse = 0.08 + Math.sin(this.globalTick * 0.1) * 0.04;
+        ctx.fillStyle = `rgba(68, 255, 136, ${auraPulse})`;
+        ctx.beginPath();
+        ctx.ellipse(sx, sy - f.displayHeight / 2, hw + 25, f.displayHeight / 2 + 20, 0, 0, Math.PI * 2);
         ctx.fill();
       }
 
@@ -149,6 +159,15 @@ export class Renderer {
           ctx.globalCompositeOperation = 'screen';
           ctx.globalAlpha = 0.15 + Math.sin(this.globalTick * 0.15) * 0.1;
           ctx.fillStyle = '#44ff88';
+          ctx.fillRect(sx + leanOffsetX - 60, sy - 200, 120, 200);
+          ctx.restore();
+        }
+        // 防御槽低警告 — 红色闪烁
+        if (usedSprite && guardLow && this.globalTick % 20 < 10) {
+          ctx.save();
+          ctx.globalCompositeOperation = 'screen';
+          ctx.globalAlpha = 0.12;
+          ctx.fillStyle = '#ff2222';
           ctx.fillRect(sx + leanOffsetX - 60, sy - 200, 120, 200);
           ctx.restore();
         }
