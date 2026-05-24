@@ -1,7 +1,7 @@
 import { Camera } from './core/camera.js';
 import { GameLoop } from './core/gameLoop.js';
 import { STAGE_WIDTH, KO_DISPLAY_TIME, FRAME_DATA } from './core/constants.js';
-import { FighterState, AttackType, GameState, GamePhase } from './core/types.js';
+import { AttackType, GameState, GamePhase } from './core/types.js';
 import { InputManager, CommandBuffer, resolveInput, getDirectionInput } from './input/index.js';
 import type { ResolvedInput } from './input/index.js';
 import { Fighter } from './entities/fighter.js';

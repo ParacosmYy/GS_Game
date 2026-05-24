@@ -1,4 +1,4 @@
-import { PlayerInput, DirectionInput, Direction } from '../core/types.js';
+import { PlayerInput } from '../core/types.js';
 
 interface KeyState {
   [key: string]: boolean;
