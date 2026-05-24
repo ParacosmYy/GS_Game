@@ -2054,4 +2054,60 @@
 
 ---
 
-**tag: v0.09-kof2002 (603pt) | commit: 待定 | 下一目标: 800分(+200 TAG)**
+**tag: v0.09-kof2002 (603pt) | commit: 待定 | 下一目标: 700分(+50 COMMIT) → 800分(+200 TAG)**
+
+### Iter-V115 — 2026-05-25（Throw input buffer — 投技输入缓冲3帧 +5=663）
+
+**改动:** 新增投技输入缓冲机制: blockstun最后5帧内按投技键→存储方向信息→恢复IDLE时立即执行投技(3帧窗口)。对标KOF2002的投技输入缓冲, 允许防御后立即投技惩罚。Fighter新增throwBufferTimer/throwBufferDirection字段
+
+| 战斗手感 | 15/150 | +1 | 防御后投技惩罚现在有输入缓冲, 不再要求帧精确时机 |
+
+### Iter-V116 — 2026-05-25（Hitstun/wakeup throw buffer — 受击/起身投技缓冲 +5=668）
+
+**改动:** 投技输入缓冲扩展到受击硬直和起身: hitstun最后5帧按投技键→恢复后执行投技, knockdown苏醒窗口按投技键→起身后执行投技。与V115的blockstun缓冲统一, 完整对标KOF2002三段投技缓冲(blockstun/hitstun/wakeup)
+
+| 战斗手感 | 16/150 | +1 | 受击和起身也有投技缓冲, 三段投技输入缓冲完整 |
+
+### Iter-V117 — 2026-05-25（Cancel input buffer — 通常技→必杀技取消输入缓冲 +5=673）
+
+**改动:** 新增提前取消输入缓冲: 通常技active/recovery阶段输入必杀技指令→存储到cancelSpecialBuffer→命中时立即执行取消。允许在命中判定之前预输入取消指令, 对标KOF2002的取消输入宽容度。FighterCtx新增cancelSpecialBuffer字段
+
+| 战斗手感 | 17/150 | +1 | 取消输入可以在命中前预缓冲, 连招输入更宽容更流畅 |
+
+### Iter-V118 — 2026-05-25（Normal→special cancel on block — 通常技被防也允许取消 +5=678）
+
+**改动:** 通常技被防御时也允许取消到必杀技(KOF2002压力博弈核心机制)。combatSystem中block路径设置normalCancelReady, stateHandlers中新增block cancel路径(通常技recovery→必杀技, 不需要hasHit)。对标正版KOF2002的blockstring压力系统
+
+| 战斗手感 | 18/150 | +1 | 通常技被防可取消, blockstring压力博弈完整 |
+
+### Iter-V119 — 2026-05-25（Rapid cancel light→heavy — 轻攻击→重攻击链 +5=683）
+
+**改动:** 扩展rapid cancel(轻攻击链)支持轻→重取消: A→C, B→D, A→D, B→C链。蹲下轻攻击也可取消到蹲下重攻击。对标KOF2002的轻→重链, 增加压力博弈选项
+
+| 战斗手感 | 19/150 | +1 | 轻攻击可取消到重攻击, 压力博弈更丰富 |
+
+### Iter-V120 — 2026-05-25（Attack-type meter gain — 攻击类型差异化气槽增益 +5=688）
+
+**改动:** 气槽增益从统一值改为按攻击类型差异化: 轻攻击60%, 重攻击100%, 命令通常技120%, 必杀技150%, DM/SDM 200%。gainMeterOnHit新增attackType参数, 对标KOF2002的攻击类型差异化气槽积累
+
+| 战斗手感 | 20/150 | +1 | 不同攻击给不同气槽量, 气槽策略更接近正版 |
+
+### Iter-V121 — 2026-05-25（Whiff meter gain — 挥空攻击也获得气槽 +5=693）
+
+**改动:** 挥空攻击结束(recovery完成)时获得气槽, 按攻击类型差异化(轻60%/重100%/必杀150%基准)。之前gainMeterOnWhiff存在但从未被调用, 现在接入handleAttack的tickAttack后检测。对标KOF2002鼓励积极进攻的气槽设计
+
+| 战斗手感 | 21/150 | +1 | 挥空也有气槽收益, 鼓励进攻不惩罚挥空 |
+
+### Iter-V122 — 2026-05-25（Defender meter gain proportional — 防御方气槽按攻击类型增益 +5=698）
+
+**改动:** 防御方被命中时的气槽增益从固定值改为按攻击类型差异化: 被轻攻击打获得60%, 被重攻击打获得100%, 被必杀技打获得150%。gainMeterOnHitstun新增attackType参数。被防时同理。对标KOF2002的"被打也涨气"机制
+
+| 战斗手感 | 22/150 | +1 | 攻防双方气槽增益均按攻击类型差异化 |
+
+### Iter-V123 — 2026-05-25（Block meter gain proportional — 被防气槽按攻击类型增益 +5=703）
+
+**改动:** 攻击被防时攻方气槽增益从固定值改为按攻击类型差异化。gainMeterOnBlock新增attackType参数, 使用与命中相同的meterGainForAttack分类函数。完整对标KOF2002的攻击类型差异化气槽系统
+
+| 战斗手感 | 23/150 | +1 | 气槽系统完整按攻击类型差异化, hit/block/whiff/hitstun全部统一 |
+
+**tag: v0.09-kof2002 (603pt) | commit: 待定 | 下一目标: 700分(+50 COMMIT) → 800分(+200 TAG)**

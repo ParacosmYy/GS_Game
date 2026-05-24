@@ -66,6 +66,7 @@ export class FighterController {
   private chargeDownFrames = 0;
   private wasChargingDown = false;
   private wakeupBuffer: ResolvedInput | null = null;
+  private cancelSpecialBuffer: AttackType | null = null;
   private recoveryRollRequested = false;
 
   constructor(
@@ -227,6 +228,7 @@ export class FighterController {
       chargeDownFrames: this.chargeDownFrames,
       wasChargingDown: this.wasChargingDown,
       wakeupBuffer: this.wakeupBuffer,
+      cancelSpecialBuffer: this.cancelSpecialBuffer,
       recoveryRollRequested: this.recoveryRollRequested,
       prevForward: this.prevForward,
       prevBack: this.prevBack,
@@ -243,6 +245,7 @@ export class FighterController {
     this.rekkaWindow = ctx.rekkaWindow;
     this.counterStanceTimer = ctx.counterStanceTimer;
     this.wakeupBuffer = ctx.wakeupBuffer;
+    this.cancelSpecialBuffer = ctx.cancelSpecialBuffer;
   }
 
   private checkProximityGuard(input: ResolvedInput): boolean {
@@ -324,7 +327,7 @@ export class FighterController {
         handleCounterStance(ctx);
         break;
       case FighterState.HITSTUN:
-        handleHitstun(ctx);
+        handleHitstun(ctx, input);
         break;
       case FighterState.KNOCKDOWN:
         handleKnockdown(ctx, input);

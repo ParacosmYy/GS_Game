@@ -21,7 +21,7 @@ import {
   WAKEUP_BUFFER_WINDOW,
 } from '../core/constants.js';
 import { FighterState, AttackType, CLOSE_RANGE } from '../core/types.js';
-import { spendStocks } from '../combat/meter.js';
+import { spendStocks, gainMeterOnWhiff } from '../combat/meter.js';
 
 // ─── Helper predicates ───
 
@@ -99,10 +99,16 @@ export function routeRapidCancelLight(ctx: FighterCtx, input: ResolvedInput): At
   if (isCrouching) {
     if (input.buttonAPressed) return AttackType.CROUCH_A;
     if (input.buttonBPressed) return AttackType.CROUCH_B;
+    // KOF2002: 轻攻击→重攻击链
+    if (input.buttonCPressed) return AttackType.CROUCH_C;
+    if (input.buttonDPressed) return AttackType.CROUCH_D;
   } else {
     const cl = closeRange(ctx);
     if (input.buttonAPressed) return cl ? AttackType.CLOSE_A : AttackType.STAND_A;
     if (input.buttonBPressed) return cl ? AttackType.CLOSE_B : AttackType.STAND_B;
+    // KOF2002: 轻攻击→重攻击链 (近距离→CLOSE_C/D, 远距离→STAND_C/D)
+    if (input.buttonCPressed) return cl ? AttackType.CLOSE_C : AttackType.STAND_C;
+    if (input.buttonDPressed) return cl ? AttackType.CLOSE_D : AttackType.STAND_D;
   }
   return null;
 }
@@ -134,6 +140,16 @@ export function isNormal(name: string): boolean {
 export function handleIdleWalk(ctx: FighterCtx, input: ResolvedInput): void {
   const f = ctx.fighter;
   f.displayHeight = 100; f.vx = 0;
+
+  // 投技输入缓冲消费: blockstun结束→IDLE时立即执行缓冲的投技
+  if (f.throwBufferTimer > 0 && f.canAct()) {
+    const dir = f.throwBufferDirection;
+    f.throwBufferTimer = 0;
+    if (dir === 'forward') f.startAttack(AttackType.THROW_FORWARD);
+    else if (dir === 'back') f.startAttack(AttackType.THROW_BACK);
+    else f.startAttack(AttackType.THROW);
+    return;
+  }
 
   if (input.rollPressed && f.canAct() && f.isGrounded()) {
     f.state = input.back ? FighterState.BACK_ROLL : FighterState.ROLL;
@@ -286,6 +302,22 @@ export function handleAttack(ctx: FighterCtx, input: ResolvedInput): void {
     ctx.character.onAttackActive(f, f.currentAttack, ctx.projectiles, ctx.playerIndex);
   }
 
+  // 新攻击开始时清除上一招的取消缓冲
+  if (f.attackPhase === 'startup' && f.attackFrame <= 1) {
+    ctx.cancelSpecialBuffer = null;
+  }
+
+  // 提前取消缓冲: active/recovery阶段输入必杀技指令→存储, 命中后立即执行
+  // KOF2002: 你可以在命中之前输入取消指令, 游戏会缓冲它
+  if (f.currentAttack && (f.attackPhase === 'active' || f.attackPhase === 'recovery')
+      && !ctx.cancelSpecialBuffer && (input.punchPressed || input.kickPressed)) {
+    const tick = ctx.tickRef.value;
+    const special = ctx.character.routeSpecial(input, ctx.cmdBuf, tick, ctx.wasChargingDown);
+    if (special && !isDM(special as string)) {
+      ctx.cancelSpecialBuffer = special;
+    }
+  }
+
   // Normal/Command Normal >> MAX activation (BC during attack on hit/block, costs 2 stocks)
   if (input.buttonB && input.buttonC && (input.buttonBPressed || input.buttonCPressed)
       && f.currentAttack && f.hasHit && ctx.gauge && ctx.maxMode
@@ -344,7 +376,17 @@ export function handleAttack(ctx: FighterCtx, input: ResolvedInput): void {
     }
   }
 
-  // Normal → Command Normal Cancel
+  // 提前取消缓冲消费: 命中/被防后立即执行缓冲的必杀技
+  if (ctx.cancelSpecialBuffer && f.normalCancelReady
+      && (f.attackPhase === 'active' || f.attackPhase === 'recovery')
+      && f.currentAttack && NORMAL_ATTACKS.has(f.currentAttack as string)) {
+    const buffered = ctx.cancelSpecialBuffer;
+    ctx.cancelSpecialBuffer = null;
+    f.startAttack(buffered);
+    return;
+  }
+
+  // Normal → Command Normal Cancel (命中时才有, 被防不触发命令通常技取消)
   if (f.normalCancelReady && f.hasHit && f.attackPhase === 'recovery' && f.currentAttack
       && NORMAL_ATTACKS.has(f.currentAttack as string)) {
     const cmdNormal = tryCommandNormalCancel(ctx, input);
@@ -357,7 +399,7 @@ export function handleAttack(ctx: FighterCtx, input: ResolvedInput): void {
     }
   }
 
-  // Command Normal → Special Cancel
+  // Command Normal → Special Cancel (hit only — block doesn't allow cmd normal cancel)
   if (f.cancelledIntoNormal && f.hasHit && f.attackPhase === 'recovery' && f.currentAttack
       && COMMAND_NORMALS.has(f.currentAttack as string)) {
     const tick = ctx.tickRef.value;
@@ -365,6 +407,18 @@ export function handleAttack(ctx: FighterCtx, input: ResolvedInput): void {
     if (special && !isDM(special as string)) {
       f.startAttack(special);
       f.cancelledIntoNormal = false;
+      f.normalCancelReady = false;
+      return;
+    }
+  }
+
+  // KOF2002: 通常技被防→必杀技取消 (压力博弈核心机制)
+  if (f.normalCancelReady && !f.hasHit && f.attackPhase === 'recovery' && f.currentAttack
+      && NORMAL_ATTACKS.has(f.currentAttack as string)) {
+    const tick = ctx.tickRef.value;
+    const special = ctx.character.routeSpecial(input, ctx.cmdBuf, tick, ctx.wasChargingDown);
+    if (special && !isDM(special as string)) {
+      f.startAttack(special);
       f.normalCancelReady = false;
       return;
     }
@@ -398,7 +452,15 @@ export function handleAttack(ctx: FighterCtx, input: ResolvedInput): void {
     return;
   }
 
+  // 捕获当前攻击状态, tickAttack可能清除它
+  const lastAttack = f.currentAttack;
+  const lastHit = f.hasHit;
+
   f.tickAttack();
+  // KOF2002: 挥空攻击也获得气槽 (攻击结束且未命中)
+  if (!f.currentAttack && lastAttack && !lastHit && ctx.gauge) {
+    gainMeterOnWhiff(ctx.gauge, lastAttack);
+  }
   if (!f.currentAttack && !f.isGrounded()) { f.state = FighterState.JUMP; }
 }
 
@@ -406,6 +468,11 @@ export function handleAttack(ctx: FighterCtx, input: ResolvedInput): void {
 export function handleBlock(ctx: FighterCtx, input: ResolvedInput): void {
   const f = ctx.fighter;
   f.blockstunTimer--;
+  // 投技输入缓冲: blockstun中按下投技键 → 存储输入，恢复后立即执行
+  if (f.blockstunTimer > 0 && f.blockstunTimer <= 5 && input.throwAttackPressed) {
+    f.throwBufferTimer = 3;
+    f.throwBufferDirection = input.forward ? 'forward' : input.back ? 'back' : 'neutral';
+  }
   // Guard Cancel Roll (A+B during early blockstun, costs 1 stock)
   if (f.blockstunTimer > 0 && input.rollPressed && ctx.gauge && spendStocks(ctx.gauge, DM_STOCK_COST)) {
     f.state = input.back ? FighterState.BACK_ROLL : FighterState.ROLL;
@@ -450,9 +517,14 @@ export function handleCounterStance(ctx: FighterCtx): void {
 }
 
 /** HITSTUN state handler */
-export function handleHitstun(ctx: FighterCtx): void {
+export function handleHitstun(ctx: FighterCtx, input: ResolvedInput): void {
   const f = ctx.fighter;
   f.hitstunTimer--;
+  // 投技输入缓冲: hitstun最后5帧内按投技键 → 恢复后立即执行
+  if (f.hitstunTimer > 0 && f.hitstunTimer <= 5 && input.throwAttackPressed) {
+    f.throwBufferTimer = 3;
+    f.throwBufferDirection = input.forward ? 'forward' : input.back ? 'back' : 'neutral';
+  }
   if (f.hitstunTimer <= 0) {
     f.state = FighterState.IDLE; f.vx = 0; f.throwInvincibilityTimer = THROW_INVINCIBILITY_POST_STUN;
     ctx.vfx.spawnRecoverySpark(f.x, f.y - f.displayHeight / 2);
@@ -471,6 +543,10 @@ export function handleKnockdown(ctx: FighterCtx, input: ResolvedInput): void {
   }
   // Wake-up reversal buffer
   if (f.knockdownTimer <= WAKEUP_BUFFER_WINDOW && f.knockdownTimer > 0) {
+    if (input.throwAttackPressed) {
+      f.throwBufferTimer = 3;
+      f.throwBufferDirection = input.forward ? 'forward' : input.back ? 'back' : 'neutral';
+    }
     if (input.punchPressed || input.kickPressed || input.rollPressed || input.blowbackPressed) {
       ctx.wakeupBuffer = input;
     }

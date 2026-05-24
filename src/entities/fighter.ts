@@ -75,6 +75,10 @@ export class Fighter {
   // Throw invincibility frames remaining (set after blockstun/hitstun/wakeup/jump)
   throwInvincibilityTimer = 0;
 
+  // Throw input buffer — pressing throw during blockstun stores it for 3F after recovery
+  throwBufferTimer = 0;
+  throwBufferDirection: 'forward' | 'back' | 'neutral' = 'neutral';
+
   // Juggle state (B7: floating/juggle tracking)
   juggleState: JuggleState = JuggleState.NONE;
   airHitCount = 0; // how many air hits in current combo
@@ -321,6 +325,7 @@ export class Fighter {
     this.attackFrame = 0;
     this.attackPhase = 'startup';
     this.hasHit = false;
+    this.throwBufferTimer = 0;
     this.resetCancelFlags();
 
     // Mark air attack used
@@ -425,6 +430,7 @@ export class Fighter {
     if (this.runStopTimer > 0) this.runStopTimer--;
     if (this.throwInvincibilityTimer > 0) this.throwInvincibilityTimer--;
     if (this.hitFlashFrames > 0) this.hitFlashFrames--;
+    if (this.throwBufferTimer > 0) this.throwBufferTimer--;
     // Guard gauge recovery: +0.25/frame when NOT blocking (KOF2002正版恢复速率)
     if (this.state !== FighterState.BLOCK && this.guardGauge < 100) {
       this.guardGauge = Math.min(100, this.guardGauge + 0.25);
@@ -510,6 +516,7 @@ export class Fighter {
     this.isHardKnockdown = false;
     this.usedQuickStand = false;
     this.throwInvincibilityTimer = 0;
+    this.throwBufferTimer = 0;
     this.isBeingThrown = false;
     this.throwEscapeTimer = 0;
     this.isThrowing = false;

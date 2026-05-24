@@ -317,6 +317,8 @@ export class CombatSystem {
       const chip = chipData.chipDamage ?? Math.round(data.damage * CHIP_DAMAGE_RATIO);
       defender.health = Math.max(1, defender.health - chip);
       this.comboHits[defIdx] = 0;
+      // KOF2002: 通常技被防也允许取消到必杀技
+      if (NORMAL_ATTACKS.has(attackType as string)) attacker.normalCancelReady = true;
       onHit?.(attacker, defender, attackType, true, false);
       return;
     }
@@ -343,6 +345,8 @@ export class CombatSystem {
       // A6: Chip damage cannot kill (leave at least 1 HP)
       defender.health = Math.max(1, defender.health - chip);
       this.comboHits[defIdx] = 0; // Block resets combo
+      // KOF2002: 通常技被防也允许取消到必杀技
+      if (NORMAL_ATTACKS.has(attackType as string)) attacker.normalCancelReady = true;
       onHit?.(attacker, defender, attackType, true, false);
       return;
     }

@@ -89,16 +89,16 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       const blkStop = blkSpecial ? 5 : blkHeavy ? 5 : 3;
       deps.cinematic.triggerHitStop(blkStop);
       deps.screenShake.trigger(blkSpecial ? 5 : blkHeavy ? 4 : 2, 6);
-      gainMeterOnBlock(deps.gauges[atkIdx]);
-      gainMeterOnHitstun(deps.gauges[defIdx]);
+      gainMeterOnBlock(deps.gauges[atkIdx], attackType);
+      gainMeterOnHitstun(deps.gauges[defIdx], attackType);
       playBlock();
       return;
     }
 
     const { isDM, isSDM, isSpecial } = classifyAttack(attackType);
     deps.cinematic.triggerHitStop(calcHitStop(attackType, isDM, isSpecial, counterHit));
-    gainMeterOnHit(deps.gauges[atkIdx]);
-    gainMeterOnHitstun(deps.gauges[defIdx]);
+    gainMeterOnHit(deps.gauges[atkIdx], attackType);
+    gainMeterOnHitstun(deps.gauges[defIdx], attackType);
 
     const atkChar = atkIdx === 0
       ? ROSTER.find(c => c.id === p1.charId) || ROSTER[0]

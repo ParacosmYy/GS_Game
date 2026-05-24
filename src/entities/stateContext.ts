@@ -3,6 +3,7 @@
  */
 import type { Fighter } from './fighter.js';
 import type { Projectile } from './projectile.js';
+import type { AttackType } from '../core/types.js';
 import type { CommandBuffer } from '../input/commandBuffer.js';
 import type { ResolvedInput } from '../input/inputResolver.js';
 import type { CharacterDefinition, CharacterStats } from '../characters/types.js';
@@ -26,6 +27,7 @@ export interface FighterCtx {
   chargeDownFrames: number;
   wasChargingDown: boolean;
   wakeupBuffer: ResolvedInput | null;
+  cancelSpecialBuffer: AttackType | null;
   recoveryRollRequested: boolean;
   prevForward: boolean;
   prevBack: boolean;
