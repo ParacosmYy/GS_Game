@@ -487,6 +487,53 @@ const JUMP_POSES: Pose[] = [
   { headOff: 0, bodyLean: 0, armL: -0.4, armR: 0.4, legL: 1, legR: -1, crouch: false },
   { headOff: 0, bodyLean: 0, armL: -0.2, armR: 0.2, legL: 1, legR: -1, crouch: false },
 ];
+
+/** 根据idleStyle生成差异化跳跃姿态 */
+function getJumpPoses(style: string): Pose[] {
+  switch (style) {
+    case 'confident': // Kyo — 前跃踢击准备
+      return JUMP_POSES.map((p, i) => ({
+        ...p, bodyLean: i < 3 ? 1 : 0, armL: -0.2, armR: i < 3 ? -0.5 : 0.3,
+        legR: i === 2 ? 3 : p.legR,
+      }));
+    case 'lazy': // Iori — 低姿态跳, 手臂展开
+      return JUMP_POSES.map((p, i) => ({
+        ...p, armL: -0.6 + Math.sin(i) * 0.2, armR: 0.6 + Math.sin(i) * 0.2,
+        legL: p.legL * 0.5, legR: p.legR * 0.5,
+      }));
+    case 'fighter': // Terry — 高跳, 收膝
+      return JUMP_POSES.map((p, i) => ({
+        ...p, armL: -0.4, armR: -0.6, legL: -2, legR: 2,
+        bodyLean: i < 3 ? 1.5 : -0.5,
+      }));
+    case 'martial': // Kim — 空中踢击姿态
+      return JUMP_POSES.map((p, i) => ({
+        ...p, armL: -0.3, armR: -0.4,
+        legL: i === 2 ? -3 : p.legL, legR: i === 2 ? 4 : p.legR,
+      }));
+    case 'tense': // Ryo — 力量跳, 拳头举起
+      return JUMP_POSES.map((p, i) => ({
+        ...p, armL: -0.8, armR: -1.0, legL: p.legL, legR: p.legR,
+        bodyLean: i < 3 ? 1 : 0,
+      }));
+    case 'alert': // Leona — 紧凑空翻
+      return JUMP_POSES.map((p, i) => ({
+        ...p, armL: -0.4, armR: -0.3, legL: -2, legR: 2,
+        headOff: Math.sin(i * 1.2) * 0.3,
+      }));
+    case 'rebel': // K' — 慵懒跳, 手臂下垂
+      return JUMP_POSES.map((p, i) => ({
+        ...p, armL: 0.1, armR: 0.1, legL: p.legL * 0.6, legR: p.legR * 0.6,
+      }));
+    case 'cute': // Kula — 欢快跳跃, 四肢张开
+      return JUMP_POSES.map((p, i) => ({
+        ...p, armL: -0.8 + Math.sin(i * 1.5) * 0.3, armR: 0.8 + Math.sin(i * 1.5 + 1) * 0.3,
+        legL: p.legL * 1.3, legR: p.legR * 1.3,
+      }));
+    default:
+      return JUMP_POSES;
+  }
+}
 const HIT_POSES: Pose[] = [
   { headOff: -1, bodyLean: -2, armL: 0.8, armR: 0.6, legL: 0, legR: 0, crouch: false },
   { headOff: -1, bodyLean: -3, armL: 1, armR: 0.8, legL: -1, legR: 1, crouch: false },
@@ -564,13 +611,14 @@ export function generatePlaceholderSpritesheet(color: string, charId: string): {
   const v = CHAR_VISUALS[charId] ?? getDefaultVisual();
   v.shirtColor = color;
 
-  // 使用角色专属待机和跑步姿态
+  // 使用角色专属待机/跑步/跳跃姿态
   const idlePoses = getIdlePoses(v.idleStyle);
   const runPoses = getRunPoses(v.idleStyle);
+  const jumpPoses = getJumpPoses(v.idleStyle);
   const POSE_MAP_LOCAL: Record<PoseSet, Pose[]> = {
     idle: idlePoses, walk: WALK_POSES, run: runPoses, attack: ATTACK_POSES,
     crouch_attack: CROUCH_ATTACK_POSES, air_attack: AIR_ATTACK_POSES, throw: THROW_POSES,
-    crouch: CROUCH_POSES, jump: JUMP_POSES, hit: HIT_POSES, block: BLOCK_POSES,
+    crouch: CROUCH_POSES, jump: jumpPoses, hit: HIT_POSES, block: BLOCK_POSES,
   };
 
   const poseSets: PoseSet[] = ['idle', 'walk', 'run', 'attack', 'crouch_attack', 'air_attack', 'throw', 'crouch', 'jump', 'hit', 'block'];
