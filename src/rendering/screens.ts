@@ -413,12 +413,20 @@ export function drawKO(ctx: CanvasRenderingContext2D, winner: number | null, per
   }
 
   if (perfectPlayer !== null) {
-    ctx.shadowColor = '#ff8800';
-    ctx.shadowBlur = 25;
+    // 双层发光 + P色标签
+    const perfColor = perfectPlayer === 0 ? '#ff6644' : '#4488ff';
+    ctx.shadowColor = '#ffcc00';
+    ctx.shadowBlur = 35;
     ctx.fillStyle = '#ffcc00';
-    ctx.font = 'bold 36px "Courier New", monospace';
+    ctx.font = 'bold 42px "Courier New", monospace';
+    ctx.fillText('PERFECT!', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 100);
+    ctx.shadowBlur = 20;
     ctx.fillText('PERFECT!', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 100);
     ctx.shadowBlur = 0;
+    // P标签
+    ctx.font = 'bold 16px "Courier New", monospace';
+    ctx.fillStyle = perfColor;
+    ctx.fillText(`P${perfectPlayer + 1}`, CANVAS_WIDTH / 2 - 80, CANVAS_HEIGHT / 2 + 100);
   }
 
   ctx.fillStyle = 'rgba(255,255,255,0.4)';

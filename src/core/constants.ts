@@ -734,8 +734,8 @@ export const COUNTER_WIRE_BOUNCE_VX = 8;   // Wall bounce horizontal speed
 export const COUNTER_WIRE_BOUNCE_VY = -6;  // Wall bounce vertical speed (upward)
 
 // ===== Damage Scaling =====
-export const DAMAGE_SCALE_STEP = 0.10;  // 每连击递减10%
-export const DAMAGE_SCALE_MIN = 0.10;   // 最低10%伤害 (KOF 2002标准)
+export const DAMAGE_SCALE_STEP = 0.08;  // 每连击递减8% (KOF2002: 100/92/84/76/68/60/52/44...)
+export const DAMAGE_SCALE_MIN = 0.20;   // 最低20%伤害 (KOF2002标准, 防止连段伤害过低)
 export const COMBO_TIMEOUT = 60;        // 60帧(1秒)无后续命中则重置连击计数
 
 // ===== Power Gauge (能量槽) =====
