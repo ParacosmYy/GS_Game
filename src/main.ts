@@ -1,10 +1,11 @@
 import { GameLoop, Camera } from './core/index.js';
 import { InputManager, CommandBuffer, resolveInput, getDirectionInput } from './input/index.js';
-import type { ResolvedInput, PrevAttack } from './input/index.js';
+import type { ResolvedInput } from './input/index.js';
 import { Fighter } from './entities/fighter.js';
 import { Projectile } from './entities/projectile.js';
 import { CombatSystem } from './combat/combatSystem.js';
 import { Renderer } from './rendering/renderer.js';
+import { VFXSystem, ScreenShake } from './rendering/vfx.js';
 import {
   STAGE_WIDTH, STAGE_GROUND_Y, FIGHTER_WIDTH,
   WALK_SPEED, GRAVITY, JUMP_VELOCITY,
@@ -24,6 +25,8 @@ const camera = new Camera();
 const inputManager = new InputManager();
 const combatSystem = new CombatSystem(inputManager);
 const renderer = new Renderer(ctx);
+const vfx = new VFXSystem();
+const screenShake = new ScreenShake();
 const p1Cmd = new CommandBuffer();
 const p2Cmd = new CommandBuffer();
 
@@ -50,7 +53,7 @@ declare global {
 window.__fighters = [p1, p2];
 window.__restart = restartGame;
 
-// ===== Fighter Controller (handles movement/state per fighter) =====
+// ===== Fighter Controller =====
 function controlFighter(fighter: Fighter, input: ResolvedInput, cmdBuf: CommandBuffer): void {
   switch (fighter.state) {
     case FighterState.IDLE:
@@ -192,15 +195,39 @@ function resolvePushbox(a: Fighter, b: Fighter): void {
   }
 }
 
+// ===== Hit callback — triggers VFX =====
+function onHit(attacker: Fighter, defender: Fighter, attackType: AttackType, blocked: boolean): void {
+  const data = FRAME_DATA[attackType];
+  const hitX = (attacker.x + defender.x) / 2;
+  const hitY = defender.y - defender.displayHeight / 2;
+
+  if (blocked) {
+    vfx.spawnBlockFlash(hitX, hitY);
+    screenShake.trigger(3, 4);
+  } else {
+    vfx.spawnHitSparks(hitX, hitY, attackType === AttackType.SPECIAL_UPPER ? 14 : 8);
+    vfx.spawnImpactRing(hitX, hitY);
+    vfx.spawnDamageText(defender.x, defender.y - defender.displayHeight - 20, data.damage);
+    const shakeIntensity = attackType === AttackType.SPECIAL_UPPER ? 8 :
+                           attackType === AttackType.THROW ? 6 :
+                           data.damage > 60 ? 5 : 3;
+    screenShake.trigger(shakeIntensity, 8);
+  }
+}
+
 // ===== Main Loop =====
 function update(): void {
   if (koState) {
     koTimer++;
+    vfx.update();
+    screenShake.update();
     if (koTimer > KO_DISPLAY_TIME && inputManager.isKeyDown('KeyR')) restartGame();
     return;
   }
 
   tick++;
+  vfx.update();
+  screenShake.update();
 
   const rawP1 = inputManager.getP1Input();
   const rawP2 = inputManager.getP2Input();
@@ -224,7 +251,7 @@ function update(): void {
 
   for (const proj of projectiles) proj.update();
 
-  combatSystem.resolveAttacks(p1, p2, projectiles);
+  combatSystem.resolveAttacks(p1, p2, projectiles, onHit);
 
   applyPhysics(p1);
   applyPhysics(p2);
@@ -237,6 +264,9 @@ function update(): void {
     koState = true;
     koTimer = 0;
     winner = p1.health <= 0 && p2.health <= 0 ? null : p1.health <= 0 ? 1 : 0;
+    // Big KO hit effect
+    vfx.spawnHitSparks((p1.x + p2.x) / 2, STAGE_GROUND_Y - 100, 20);
+    screenShake.trigger(12, 15);
   }
 
   window.__gameState = {
@@ -251,34 +281,40 @@ function update(): void {
 
 function render(): void {
   camera.update(p1, p2);
-  renderer.render([p1, p2], camera.x, tick, koState, winner);
+  renderer.render([p1, p2], camera.x, tick, koState, winner, screenShake.offsetX, screenShake.offsetY);
+
+  // VFX (world-space, need camera offset)
+  vfx.render(ctx, camera.x);
 
   // Projectiles
   for (const proj of projectiles) {
     if (!proj.active) continue;
     const sx = camera.worldToScreen(proj.x);
     ctx.save();
-    // Glow
     ctx.shadowColor = '#ff8800';
-    ctx.shadowBlur = 12;
+    ctx.shadowBlur = 15;
     ctx.fillStyle = '#ffaa22';
     ctx.beginPath();
     ctx.arc(sx, proj.y, 10, 0, Math.PI * 2);
     ctx.fill();
     ctx.shadowBlur = 0;
-    // Core
     ctx.fillStyle = '#fff8e0';
     ctx.beginPath();
     ctx.arc(sx, proj.y, 5, 0, Math.PI * 2);
+    ctx.fill();
+    // Trail
+    ctx.fillStyle = 'rgba(255,170,0,0.3)';
+    ctx.beginPath();
+    ctx.arc(sx - proj.facing * 12, proj.y, 7, 0, Math.PI * 2);
     ctx.fill();
     ctx.restore();
   }
 
   // Controls hint
-  ctx.fillStyle = 'rgba(255,255,255,0.3)';
+  ctx.fillStyle = 'rgba(255,255,255,0.25)';
   ctx.font = '9px monospace';
   ctx.textAlign = 'center';
-  ctx.fillText('P1: WASD + J/K/L | P2: Arrows + 4/5/6 | R: Restart | F1: Debug', 400, 596);
+  ctx.fillText('P1: WASD+JKL  P2: Arrows+456  R: Restart  F1: Debug', 400, 596);
   ctx.textAlign = 'left';
 
   if (debugMode) drawDebug();
@@ -286,7 +322,6 @@ function render(): void {
 
 function drawDebug(): void {
   ctx.save();
-  // Panel
   ctx.globalAlpha = 0.88;
   ctx.fillStyle = '#0a0a0a';
   ctx.fillRect(0, 0, 310, 220);
@@ -299,15 +334,16 @@ function drawDebug(): void {
     ctx.fillStyle = i === 0 ? '#ff5555' : '#5599ff';
     ctx.fillText(`P${i + 1} ────────────────────────`, 4, y); y += 13;
     ctx.fillStyle = '#ccc';
-    ctx.fillText(` ${f.state}  hp:${f.health}  pos:(${Math.round(f.x)},${Math.round(f.y)})  face:${f.facing === 1 ? '→' : '←'}`, 4, y); y += 13;
-    ctx.fillText(` vx:${f.vx.toFixed(1)} vy:${f.vy.toFixed(1)} ground:${f.isGrounded()}`, 4, y); y += 13;
+    ctx.fillText(` ${f.state}  hp:${f.health}  (${Math.round(f.x)},${Math.round(f.y)}) ${f.facing === 1 ? '→' : '←'}`, 4, y); y += 13;
+    ctx.fillText(` vx:${f.vx.toFixed(1)} vy:${f.vy.toFixed(1)} gnd:${f.isGrounded()}`, 4, y); y += 13;
     if (f.currentAttack) {
       ctx.fillStyle = '#ffcc00';
       const d = FRAME_DATA[f.currentAttack];
-      ctx.fillText(` ATK:${f.currentAttack} [${f.attackPhase}] ${f.attackFrame}f dmg:${d.damage}`, 4, y); y += 13;
-      // Progress bar
+      ctx.fillText(` ${f.currentAttack} [${f.attackPhase}] ${f.attackFrame}f dmg:${d.damage}`, 4, y); y += 13;
       const total = d.startup + d.active + d.recovery;
-      let prog = f.attackPhase === 'startup' ? f.attackFrame / total : f.attackPhase === 'active' ? (d.startup + f.attackFrame) / total : (d.startup + d.active + f.attackFrame) / total;
+      const prog = f.attackPhase === 'startup' ? f.attackFrame / total
+        : f.attackPhase === 'active' ? (d.startup + f.attackFrame) / total
+        : (d.startup + d.active + f.attackFrame) / total;
       ctx.fillStyle = '#333'; ctx.fillRect(8, y, 200, 5);
       ctx.fillStyle = '#ccaa00'; ctx.fillRect(8, y, 200 * d.startup / total, 5);
       ctx.fillStyle = '#cc2200'; ctx.fillRect(8 + 200 * d.startup / total, y, 200 * d.active / total, 5);
@@ -319,7 +355,7 @@ function drawDebug(): void {
     if (f.blockstunTimer > 0) { ctx.fillStyle = '#8888ff'; ctx.fillText(` blockstun:${f.blockstunTimer}`, 4, y); y += 13; }
   }
   ctx.fillStyle = '#0f0';
-  ctx.fillText(`tick:${tick} fps:${renderer.getFps()} proj:${projectiles.length}`, 4, y);
+  ctx.fillText(`tick:${tick} fps:${renderer.getFps()} proj:${projectiles.length} vfx:${vfx.count}`, 4, y);
 
   // Collision box overlays
   for (const f of [p1, p2]) {
@@ -332,11 +368,9 @@ function drawDebug(): void {
     ctx.strokeStyle = 'rgba(0,100,255,0.5)'; ctx.lineWidth = 1; ctx.strokeRect(hb.x - camera.x, hb.y, hb.width, hb.height);
     const pb = f.getPushbox();
     ctx.strokeStyle = 'rgba(0,255,0,0.3)'; ctx.setLineDash([3, 3]); ctx.strokeRect(pb.x - camera.x, pb.y, pb.width, pb.height); ctx.setLineDash([]);
-
-    // State label above head
     const sx = camera.worldToScreen(f.x);
     ctx.fillStyle = '#fff'; ctx.font = '9px monospace'; ctx.textAlign = 'center';
-    ctx.fillText(f.state, sx, f.y - f.displayHeight - 6);
+    ctx.fillText(f.state, sx, f.y - f.displayHeight - 18);
     ctx.textAlign = 'left';
   }
 
@@ -347,7 +381,6 @@ function drawDebug(): void {
   ctx.globalAlpha = 1;
   ctx.font = '9px monospace';
   const symbols: Record<string, string> = { 'neutral': '·', 'up': '↑', 'down': '↓', 'forward': '→', 'back': '←', 'upforward': '↗', 'upback': '↖', 'downforward': '↘', 'downback': '↙' };
-
   for (let i = 0; i < 2; i++) {
     const buf = i === 0 ? p1Cmd : p2Cmd;
     const py = 13 + i * 48;
@@ -359,7 +392,6 @@ function drawDebug(): void {
     ctx.fillStyle = '#555';
     ctx.fillText(' ages:' + hist.map(h => tick - h.frame).join(','), 564, py + 24);
   }
-
   ctx.restore();
 }
 
@@ -374,6 +406,7 @@ function restartGame(): void {
   p2Cmd.reset();
   combatSystem.reset();
   projectiles.length = 0;
+  vfx.reset();
 }
 
 // ===== F1 Toggle =====

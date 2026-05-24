@@ -6,24 +6,25 @@ import type { PrevAttack } from '../input/inputResolver.js';
 import { FRAME_DATA, THROW_RANGE, THROW_DISTANCE } from '../core/constants.js';
 import { FighterState, AttackType } from '../core/types.js';
 
+export type HitCallback = (attacker: Fighter, defender: Fighter, attackType: AttackType, blocked: boolean) => void;
+
 export class CombatSystem {
   private inputManager: InputManager;
   private prevP1Attack: PrevAttack = { light: false, heavy: false, throwAtk: false };
   private prevP2Attack: PrevAttack = { light: false, heavy: false, throwAtk: false };
+  private p1: Fighter | null = null;
+  private p2: Fighter | null = null;
 
   constructor(inputManager: InputManager) {
     this.inputManager = inputManager;
   }
 
-  private p1: Fighter | null = null;
-  private p2: Fighter | null = null;
-
-  resolveAttacks(p1: Fighter, p2: Fighter, projectiles: Projectile[]): void {
+  resolveAttacks(p1: Fighter, p2: Fighter, projectiles: Projectile[], onHit?: HitCallback): void {
     this.p1 = p1;
     this.p2 = p2;
-    this.resolveHit(p1, p2);
-    this.resolveHit(p2, p1);
-    this.resolveProjectileHits(p1, p2, projectiles);
+    this.resolveHit(p1, p2, onHit);
+    this.resolveHit(p2, p1, onHit);
+    this.resolveProjectileHits(p1, p2, projectiles, onHit);
   }
 
   updateEdgeTracking(rawP1: { lightAttack: boolean; heavyAttack: boolean; throwAttack: boolean },
@@ -41,7 +42,7 @@ export class CombatSystem {
     this.prevP2Attack = { light: false, heavy: false, throwAtk: false };
   }
 
-  private resolveHit(attacker: Fighter, defender: Fighter): void {
+  private resolveHit(attacker: Fighter, defender: Fighter, onHit?: HitCallback): void {
     const hitbox = attacker.getActiveHitbox();
     if (!hitbox || attacker.hasHit) return;
 
@@ -60,6 +61,7 @@ export class CombatSystem {
       defender.health = Math.max(0, defender.health - data.damage);
       defender.applyKnockdown(30);
       defender.x = attacker.x + THROW_DISTANCE * attacker.facing;
+      onHit?.(attacker, defender, attackType, false);
       return;
     }
 
@@ -73,15 +75,17 @@ export class CombatSystem {
       const crouching = defender.state === FighterState.CROUCH;
       if (!(isLow && !crouching) && !(isOverhead && crouching)) {
         defender.applyBlockstun(data.blockstun, data.pushback);
+        onHit?.(attacker, defender, attackType, true);
         return;
       }
     }
 
     defender.health = Math.max(0, defender.health - data.damage);
     defender.applyHitstun(data.hitstun, data.pushback);
+    onHit?.(attacker, defender, attackType, false);
   }
 
-  private resolveProjectileHits(p1: Fighter, p2: Fighter, projectiles: Projectile[]): void {
+  private resolveProjectileHits(p1: Fighter, p2: Fighter, projectiles: Projectile[], onHit?: HitCallback): void {
     const fighters = [p1, p2];
     for (const proj of projectiles) {
       const hitbox = proj.getHitbox();
@@ -89,15 +93,18 @@ export class CombatSystem {
       for (let i = 0; i < fighters.length; i++) {
         if (i === proj.ownerId) continue;
         const defender = fighters[i];
+        const attacker = fighters[1 - i];
         if (!aabbCheck(hitbox, defender.getHurtbox())) continue;
         const data = FRAME_DATA.SPECIAL_PROJECTILE;
         const defRaw = i === 0 ? this.inputManager.getP1Input() : this.inputManager.getP2Input();
         const defInput = resolveInput(defRaw, defender.facing, this.getPrevAttack(i));
         if (defender.canBlock() && defInput.back) {
           defender.applyBlockstun(data.blockstun, data.pushback);
+          onHit?.(attacker, defender, AttackType.SPECIAL_PROJECTILE, true);
         } else {
           defender.health = Math.max(0, defender.health - data.damage);
           defender.applyHitstun(data.hitstun, data.pushback);
+          onHit?.(attacker, defender, AttackType.SPECIAL_PROJECTILE, false);
         }
         proj.active = false;
         break;
