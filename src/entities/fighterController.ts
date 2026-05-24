@@ -59,6 +59,7 @@ export class FighterController {
   private chargeDownFrames = 0; // frames holding ↓ for charge moves
   private wasChargingDown = false;
   private wakeupBuffer: ResolvedInput | null = null; // buffered input during knockdown recovery
+  private recoveryRollRequested = false; // AB pressed during air hitstun for recovery roll
 
   constructor(
     fighter: Fighter,
@@ -177,6 +178,8 @@ export class FighterController {
         || f.state === FighterState.HOP || f.state === FighterState.HYPER_JUMP
         || f.state === FighterState.BACKDASH || f.state === FighterState.AIR_ATTACK
         || f.state === FighterState.AIR_BLOCK;
+      // HITSTUN landing: air hitstun ends → knockdown (or recovery roll if AB pressed)
+      const wasAirHitstun = f.state === FighterState.HITSTUN && f.vy >= 0 && f.y >= STAGE_GROUND_Y - 1;
       if (wasAirborne) {
         if (f.currentAttack) f.endAttack();
         f.y = STAGE_GROUND_Y; f.vy = 0; f.vx = 0;
@@ -187,6 +190,29 @@ export class FighterController {
         f.airHitCount = 0;
         f.hasAttackedInAir = false;
         this.vfx.spawnDust(f.x, STAGE_GROUND_Y);
+      } else if (wasAirHitstun) {
+        // Air hitstun landing: check for recovery roll (AB pressed while falling)
+        // KOF2002: recovery roll = land on feet, no throw invincibility
+        f.y = STAGE_GROUND_Y; f.vy = 0; f.vx = 0;
+        if (this.recoveryRollRequested) {
+          // Recovery roll: land standing with brief recovery
+          f.state = FighterState.IDLE;
+          f.isKnockedDown = false;
+          f.landingRecovery = LANDING_RECOVERY;
+          this.recoveryRollRequested = false;
+          // No throw invincibility (KOF2002: recovery roll loses wakeup throw invuln)
+          this.vfx.spawnDust(f.x, STAGE_GROUND_Y);
+        } else {
+          // Normal air hitstun landing → knockdown
+          f.state = FighterState.KNOCKDOWN;
+          f.knockdownTimer = 25;
+          f.isKnockedDown = true;
+          f.isHardKnockdown = false;
+          f.juggleState = JuggleState.NONE;
+          f.airHitCount = 0;
+          this.recoveryRollRequested = false;
+          this.vfx.spawnDust(f.x, STAGE_GROUND_Y);
+        }
       } else if (f.vy > 0) { f.y = STAGE_GROUND_Y; f.vy = 0; }
     }
     f.x = Math.max(STAGE_LEFT, Math.min(f.x, STAGE_RIGHT));
@@ -353,6 +379,11 @@ export class FighterController {
     f.tickTimers();
     if (this.rekkaWindow > 0) this.rekkaWindow--;
 
+    // Recovery roll: AB pressed during air hitstun (set flag for applyPhysics)
+    if (input.rollPressed && f.state === FighterState.HITSTUN && !f.isGrounded() && !f.isHardKnockdown) {
+      this.recoveryRollRequested = true;
+    }
+
     // If being thrown, skip normal state machine — frozen until throw resolves
     if (f.isBeingThrown) return;
 
@@ -370,6 +401,7 @@ export class FighterController {
         if (input.rollPressed && f.canAct() && f.isGrounded()) {
           f.state = input.back ? FighterState.BACK_ROLL : FighterState.ROLL;
           f.rollTimer = ROLL_DURATION;
+          f.isGCRoll = false;
           f.vx = (f.state === FighterState.ROLL ? ROLL_SPEED : -ROLL_SPEED) * f.facing;
           f.displayHeight = 60;
           this.vfx.spawnDust(f.x, STAGE_GROUND_Y); return;
@@ -460,7 +492,7 @@ export class FighterController {
       case FighterState.ROLL:
       case FighterState.BACK_ROLL: {
         f.rollTimer--; f.displayHeight = 60;
-        if (f.rollTimer <= 0) { f.state = FighterState.IDLE; f.vx = 0; f.displayHeight = 100; f.landingRecovery = ROLL_RECOVERY; }
+        if (f.rollTimer <= 0) { f.state = FighterState.IDLE; f.vx = 0; f.displayHeight = 100; f.landingRecovery = ROLL_RECOVERY; f.isGCRoll = false; }
         break;
       }
 
@@ -600,6 +632,21 @@ export class FighterController {
           if (chain) { f.rekkaChain = chain; this.rekkaWindow = 20; }
         }
 
+        // ── Attack Cancel Roll (AB during attack recovery, on hit/block only) ──
+        // KOF2002: cancel grounded normal/command into forward roll, normal roll vulnerability
+        if (input.rollPressed && f.currentAttack && f.hasHit && f.attackPhase === 'recovery'
+            && f.isGrounded() && !FighterController.isSpecialMove(f.currentAttack as string)) {
+          f.resetAttackState();
+          f.resetCancelFlags();
+          f.state = FighterState.ROLL;
+          f.rollTimer = ROLL_DURATION;
+          f.isGCRoll = false;
+          f.vx = ROLL_SPEED * f.facing;
+          f.displayHeight = 60;
+          this.vfx.spawnDust(f.x, STAGE_GROUND_Y);
+          return;
+        }
+
         f.tickAttack();
         if (!f.currentAttack && !f.isGrounded()) { f.state = FighterState.JUMP; }
         break;
@@ -609,9 +656,10 @@ export class FighterController {
         f.blockstunTimer--;
         // Guard Cancel Roll (A+B during blockstun, costs 1 stock)
         if (f.blockstunTimer > 0 && input.rollPressed && this.gauge && spendStocks(this.gauge, DM_STOCK_COST)) {
-          f.state = FighterState.ROLL;
+          f.state = input.back ? FighterState.BACK_ROLL : FighterState.ROLL;
           f.rollTimer = ROLL_DURATION;
-          f.vx = ROLL_SPEED * f.facing;
+          f.isGCRoll = true;
+          f.vx = (f.state === FighterState.ROLL ? ROLL_SPEED : -ROLL_SPEED) * f.facing;
           f.displayHeight = 60;
           f.blockstunTimer = 0;
           this.vfx.spawnDust(f.x, STAGE_GROUND_Y);

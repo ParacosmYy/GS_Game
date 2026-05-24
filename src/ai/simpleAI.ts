@@ -134,6 +134,17 @@ export class SimpleAI {
       return base;
     }
 
+    // ── MAX mode activation: when in close range with meter available ──
+    if (canAct && this.gauge && this.gauge.stocks >= 1 && dist < 100
+      && Math.random() < this.difficulty * 0.08) {
+      const base = this.emptyInput();
+      base.buttonB = true;
+      base.buttonC = true;
+      base.buttonBPressed = true;
+      base.buttonCPressed = true;
+      return base;
+    }
+
     // ── Guard cancel: while blocking with low guard gauge ──
     if (f.state === FighterState.BLOCK && f.guardGauge < 30
       && this.gauge && this.gauge.stocks >= 1

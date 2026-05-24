@@ -290,9 +290,15 @@ function update(): void {
   combatSystem.updateEdgeTracking(rawP1, rawP2);
   dmMgr.checkMaxActivation(p1Input, 0);
   dmMgr.checkMaxActivation(p2Input, 1);
-  // MAX activation sound
-  if (maxModes[0].active && maxModes[0].timer === maxModes[0].maxDuration - 1) playMAXActivation();
-  if (maxModes[1].active && maxModes[1].timer === maxModes[1].maxDuration - 1) playMAXActivation();
+  // MAX activation sound + screen flash
+  if (maxModes[0].active && maxModes[0].timer === maxModes[0].maxDuration - 1) {
+    playMAXActivation();
+    screenFlash.trigger('#44ff88', 0.3, 8);
+  }
+  if (maxModes[1].active && maxModes[1].timer === maxModes[1].maxDuration - 1) {
+    playMAXActivation();
+    screenFlash.trigger('#44ff88', 0.3, 8);
+  }
   p1Cmd.record(getDirectionInput(p1Input), tickRef.value);
   p2Cmd.record(getDirectionInput(p2Input), tickRef.value);
   // Negative Edge: 记录按键按下/松开
@@ -329,7 +335,7 @@ function update(): void {
 
   resolvePushbox(p1, p2);
   for (const proj of projectiles) proj.update();
-  combatSystem.resolveAttacks(p1, p2, projectiles, onHit, tickRef.value);
+  combatSystem.resolveAttacks(p1, p2, projectiles, onHit, tickRef.value, [maxModes[0].active, maxModes[1].active]);
   combatSystem.tickComboTimeout(tickRef.value);
   combatSystem.tickThrowState(p1, p2, onHit);
 
@@ -361,8 +367,12 @@ function update(): void {
     // Roll音效: 进入ROLL状态
     if (f.prevState !== FighterState.ROLL && f.state === FighterState.ROLL) {
       playRoll();
-      // Guard Cancel Roll: 从BLOCK进入ROLL时播放Cancel音效
-      if (f.prevState === FighterState.BLOCK) playCancel();
+      // Guard Cancel Roll: 从BLOCK进入ROLL时播放Cancel音效+VFX
+      if (f.prevState === FighterState.BLOCK) {
+        playCancel();
+        vfx.spawnGCCDText(f.x, f.y - f.displayHeight - 30);
+        screenFlash.trigger('#22ff88', 0.1, 3);
+      }
     }
 
     // Guard Cancel CD: 从BLOCK直接进入攻击时播放Cancel音效+VFX

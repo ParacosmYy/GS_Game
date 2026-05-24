@@ -394,6 +394,33 @@ export class VFXSystem {
     }
   }
 
+  /** MAX mode activation flash — dramatic screen-wide energy burst */
+  spawnMAXActivationFlash(worldX: number, worldY: number): void {
+    // Large expanding ring burst
+    for (let r = 0; r < 5; r++) {
+      this.particles.push({
+        x: worldX, y: worldY, vx: 0, vy: 0,
+        life: 20 + r * 4, maxLife: 20 + r * 4, size: 12 + r * 8,
+        color: r < 2 ? '#ffffff' : r < 4 ? '#44ff88' : '#22cc55', type: 'ring',
+      });
+    }
+    // Radiating energy lines
+    for (let i = 0; i < 24; i++) {
+      const angle = (Math.PI * 2 * i) / 24;
+      const speed = 4 + Math.random() * 6;
+      this.particles.push({
+        x: worldX, y: worldY,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        life: 18 + Math.floor(Math.random() * 8),
+        maxLife: 26, size: 3 + Math.random() * 3,
+        color: i % 2 === 0 ? '#aaffcc' : '#44ff88',
+        type: 'star', gravity: 0, friction: 0.92,
+        rotation: angle, rotSpeed: 0,
+      });
+    }
+  }
+
   /** Perfect闪光 */
   spawnPerfectFlash(worldX: number, worldY: number): void {
     for (let i = 0; i < 20; i++) {

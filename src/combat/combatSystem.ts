@@ -53,13 +53,16 @@ export class CombatSystem {
   // 连击超时: 最后一次命中帧数, 超过COMBO_TIMEOUT帧未命中则重置
   private lastHitFrame = [0, 0];
   private currentFrame = 0;
+  // MAX mode state per player (true = active, -33% damage penalty)
+  private maxModes: [boolean, boolean] = [false, false];
 
   constructor(inputManager: InputManager) {
     this.inputManager = inputManager;
   }
 
-  resolveAttacks(p1: Fighter, p2: Fighter, projectiles: Projectile[], onHit?: HitCallback, currentFrame: number = 0): void {
+  resolveAttacks(p1: Fighter, p2: Fighter, projectiles: Projectile[], onHit?: HitCallback, currentFrame: number = 0, maxModes?: [boolean, boolean]): void {
     this.fighters = [p1, p2];
+    this.maxModes = maxModes ?? [false, false];
     this.currentFrame = currentFrame;
     this.resolveHit(p1, p2, onHit);
     this.resolveHit(p2, p1, onHit);
@@ -168,7 +171,12 @@ export class CombatSystem {
           ? FRAME_DATA[throwType as keyof typeof FRAME_DATA] ?? FRAME_DATA[AttackType.THROW]
           : FRAME_DATA[AttackType.THROW];
         const defIdx = i;
-        const damage = this.scaledDamage(data.damage, defIdx);
+        let damage = this.scaledDamage(data.damage, defIdx);
+        // MAX mode damage penalty on throws
+        const atkIdxForThrow = 1 - i;
+        if (this.maxModes[atkIdxForThrow]) {
+          damage = Math.round(damage * 0.67);
+        }
 
         defender.health = Math.max(0, defender.health - damage);
         defender.applyKnockdown(30, true);
@@ -372,6 +380,12 @@ export class CombatSystem {
       hitstunFrames = Math.round(hitstunFrames * CH_HITSTUN_BONUS);
     }
 
+    // MAX mode damage penalty: attacker in MAX mode deals -33% damage (KOF2002)
+    const atkIdx = this.fighters![0] === attacker ? 0 : 1;
+    if (this.maxModes[atkIdx]) {
+      damage = Math.round(damage * 0.67);
+    }
+
     this.comboHits[defIdx]++;
     this.comboDamage[defIdx] += damage;
     this.lastHitFrame[defIdx] = this.currentFrame;
@@ -471,9 +485,11 @@ export class CombatSystem {
           onHit?.(attacker, defender, AttackType.SPECIAL_PROJECTILE, true, false);
         } else {
           const damage = this.scaledDamage(data.damage, i);
+          const projAtkIdx = 1 - i;
+          const projDamage = this.maxModes[projAtkIdx] ? Math.round(damage * 0.67) : damage;
           this.comboHits[i]++;
           this.lastHitFrame[i] = this.currentFrame;
-          defender.health = Math.max(0, defender.health - damage);
+          defender.health = Math.max(0, defender.health - projDamage);
           defender.applyHitstun(data.hitstun, data.pushback);
           onHit?.(attacker, defender, AttackType.SPECIAL_PROJECTILE, false, false);
         }

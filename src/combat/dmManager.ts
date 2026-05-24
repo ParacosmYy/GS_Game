@@ -67,7 +67,8 @@ export class DMManager {
       if (activateMaxMode(gauges[playerIndex], maxModes[playerIndex])) {
         const f = fighters[playerIndex];
         vfx.spawnMAXAura(f.x, f.y);
-        screenShake.trigger(6, 8);
+        vfx.spawnMAXActivationFlash(f.x, f.y - f.displayHeight / 2);
+        screenShake.trigger(8, 12);
       }
     }
   }

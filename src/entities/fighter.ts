@@ -69,6 +69,9 @@ export class Fighter {
   // Backdash timer (for invincibility window tracking)
   backdashTimer = 0;
 
+  // Guard Cancel Roll flag — fully invincible unlike normal roll
+  isGCRoll = false;
+
   // Throw invincibility frames remaining (set after blockstun/hitstun/wakeup/jump)
   throwInvincibilityTimer = 0;
 
@@ -212,7 +215,9 @@ export class Fighter {
     if (this.state === FighterState.AIR_BLOCK) return false;
     if (this.state === FighterState.THROW) return false;
     if (this.state === FighterState.GUARD_CRUSH) return false;
-    // KOF2002: 翻滚中可以被投(任何时刻)，这与防御取消翻滚不同
+    // Guard Cancel Roll is unthrowable (KOF2002)
+    if (this.isRolling() && this.isGCRoll) return false;
+    // Normal roll: throwable at any point (KOF2002)
     return true;
   }
 
@@ -458,11 +463,14 @@ export class Fighter {
     this.resetAttackState();
   }
 
-  /** Is the fighter in the invincible portion of a roll? (first ROLL_INVINCIBLE_END frames) */
+  /** Is the fighter in the invincible portion of a roll? (first ROLL_INVINCIBLE_END frames, or entire GC Roll) */
   isRollInvincible(): boolean {
-    return (this.state === FighterState.ROLL || this.state === FighterState.BACK_ROLL)
-      && this.rollTimer > 0
-      && (ROLL_DURATION - this.rollTimer) < ROLL_INVINCIBLE_END;
+    if (this.state !== FighterState.ROLL && this.state !== FighterState.BACK_ROLL) return false;
+    if (this.rollTimer <= 0) return false;
+    // Guard Cancel Roll is fully invincible
+    if (this.isGCRoll) return true;
+    // Normal roll: only first portion is invincible
+    return (ROLL_DURATION - this.rollTimer) < ROLL_INVINCIBLE_END;
   }
 
   /** Is the fighter in a rolling state (for visual/detection purposes) */
@@ -508,6 +516,7 @@ export class Fighter {
     this.throwVictim = null;
     this.rollTimer = 0;
     this.backdashTimer = 0;
+    this.isGCRoll = false;
     this.rekkaChain = null;
     this.rekkaWindow = 0;
     this.runStopTimer = 0;

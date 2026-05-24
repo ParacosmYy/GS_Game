@@ -131,6 +131,17 @@ export class Renderer {
         this.drawAfterimageTrail(ctx, f, sx, leanOffsetX);
       }
 
+      // Guard Cancel Roll: fully invincible green aura
+      if (f.isRolling() && f.isGCRoll) {
+        ctx.save();
+        ctx.globalAlpha = 0.25 + 0.15 * Math.sin(this.globalTick * 1.2);
+        ctx.fillStyle = '#22ff88';
+        ctx.beginPath();
+        ctx.ellipse(sx, STAGE_GROUND_Y - 40, 35, 55, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+
       // Backdash startup invincibility glow (blue flicker)
       if (f.isBackdashInvincible()) {
         ctx.save();
@@ -492,13 +503,21 @@ export class Renderer {
         ctx.fillRect(sx - 15, f.y - f.displayHeight - 38, 30 * invPct, 3);
         ctx.strokeStyle = '#888'; ctx.lineWidth = 0.5; ctx.strokeRect(sx - 15, f.y - f.displayHeight - 38, 30, 3);
       }
-      // Frame advantage indicator
+      // Frame advantage indicator: show on-hit and on-block advantage
       if (f.currentAttack) {
         const d = FRAME_DATA[f.currentAttack as keyof typeof FRAME_DATA];
         if (d) {
-          const adv = f.attackPhase === 'recovery' ? -(d.recovery - f.attackFrame) : f.attackPhase === 'startup' ? d.startup - f.attackFrame : d.active - f.attackFrame;
-          ctx.fillStyle = adv > 0 ? '#44ff44' : adv < 0 ? '#ff4444' : '#ffff44';
-          ctx.fillText(`${adv > 0 ? '+' : ''}${adv}f`, sx, f.y - f.displayHeight - 30);
+          // On-hit advantage = hitstun - remaining_recovery
+          // On-block advantage = blockstun - remaining_recovery
+          const recoveryLeft = f.attackPhase === 'recovery' ? d.recovery - f.attackFrame
+            : f.attackPhase === 'active' ? d.recovery + (d.active - f.attackFrame)
+            : d.recovery + d.active;
+          const onHitAdv = d.hitstun - recoveryLeft;
+          const onBlockAdv = d.blockstun - recoveryLeft;
+          const advText = `H:${onHitAdv > 0 ? '+' : ''}${onHitAdv} B:${onBlockAdv > 0 ? '+' : ''}${onBlockAdv}`;
+          ctx.font = '8px monospace';
+          ctx.fillStyle = '#aaaacc';
+          ctx.fillText(advText, sx, f.y - f.displayHeight - 30);
         }
       }
       ctx.textAlign = 'left';
