@@ -160,6 +160,7 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       playThrow();
       // 投技火花+弧线特效
       deps.vfx.spawnCharacterHitSparks(hitX, hitY, 10, '#aaddff');
+      deps.screenFlash.trigger('#aaddff', 0.12, 4);
       deps.screenShake.trigger(6, 8);
     }
     else if (isSpecial) playSpecial();

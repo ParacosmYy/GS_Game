@@ -431,6 +431,10 @@ export class SimpleAI {
 
       case 'throw':
         if (dist < 70 && canAct) {
+          // KOF2002: 靠近墙时后投远离墙, 靠近中心时前投
+          const nearRightWall = f.x > (f.facing === 1 ? 600 : 200);
+          if (nearRightWall) base.back = true;
+          else base.forward = true;
           base.throwAttack = true;
           base.throwAttackPressed = true;
         }

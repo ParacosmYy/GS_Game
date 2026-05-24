@@ -348,16 +348,24 @@ export function spawnDust(particles: Particle[], worldX: number, worldY: number)
 }
 
 export function spawnCounterWireSparks(particles: Particle[], worldX: number, worldY: number): void {
-  for (let i = 0; i < 12; i++) {
+  for (let i = 0; i < 16; i++) {
+    const angle = Math.random() * Math.PI * 2;
+    const speed = 3 + Math.random() * 7;
     particles.push({
       x: worldX, y: worldY,
-      vx: (Math.random() - 0.5) * 8, vy: -Math.random() * 6 - 2,
+      vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed - 2,
       life: 15 + Math.floor(Math.random() * 10), maxLife: 25,
-      size: 3 + Math.random() * 4, color: '#ffdd44',
-      type: 'star', gravity: 0.2, friction: 0.95,
+      size: 3 + Math.random() * 5, color: i % 3 === 0 ? '#ff6622' : '#ffdd44',
+      type: 'star', gravity: 0.15, friction: 0.95,
       rotation: Math.random() * Math.PI * 2, rotSpeed: (Math.random() - 0.5) * 0.5,
     });
   }
+  // 壁弹冲击环
+  particles.push({
+    x: worldX, y: worldY, vx: 0, vy: 0,
+    life: 15, maxLife: 15, size: 40,
+    color: '#ffaa22', type: 'ring',
+  });
 }
 
 /** MAX模式激活光环 */

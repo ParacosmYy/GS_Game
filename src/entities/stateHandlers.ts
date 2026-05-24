@@ -407,8 +407,8 @@ export function handleAttack(ctx: FighterCtx, input: ResolvedInput): void {
     }
   }
 
-  // Command Normal → Special Cancel (hit only — block doesn't allow cmd normal cancel)
-  if (f.cancelledIntoNormal && f.hasHit && f.attackPhase === 'recovery' && f.currentAttack
+  // KOF2002: Command Normal → Special Cancel (hit AND block both allow cancel)
+  if (f.cancelledIntoNormal && f.attackPhase === 'recovery' && f.currentAttack
       && COMMAND_NORMALS.has(f.currentAttack as string)) {
     const tick = ctx.tickRef.value;
     const special = ctx.character.routeSpecial(input, ctx.cmdBuf, tick, ctx.wasChargingDown);

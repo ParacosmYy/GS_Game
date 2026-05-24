@@ -126,8 +126,9 @@ export class Fighter {
   // Counter Wire: currently bouncing off wall from counter wire
   isCounterWire = false;
 
-  // Hit flash: bright white overlay on hit for visual feedback (counts down from 4)
+  // Hit flash: bright overlay on hit for visual feedback (counts down from 4)
   hitFlashFrames = 0;
+  hitFlashColor = '#ffffff';
 
   // Previous frame state tracking (for combo reset detection)
   private _prevState: FighterState = FighterState.IDLE;

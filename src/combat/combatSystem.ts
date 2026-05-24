@@ -331,8 +331,9 @@ export class CombatSystem {
     // 空中防御：空中按后可防 HIGH/MID 攻击，不能防 LOW
     if (isAirborne && defender.canAirBlock() && defInput.back && hitLevel !== 'LOW') {
       defender.applyAirBlockstun(data.blockstun, data.pushback);
+      // KOF2002: 空中防御chip damage比地面少30%
       const chipData = data as { chipDamage?: number };
-      const chip = chipData.chipDamage ?? Math.round(data.damage * CHIP_DAMAGE_RATIO);
+      const chip = chipData.chipDamage ?? Math.round(data.damage * CHIP_DAMAGE_RATIO * 0.7);
       defender.health = Math.max(1, defender.health - chip);
       this.comboHits[defIdx] = 0;
       // KOF2002: 通常技被防也允许取消到必杀技
@@ -343,8 +344,9 @@ export class CombatSystem {
 
     // 地面防御
     if (defender.canBlock() && !isAirborne && defInput.back && this.canBlock(hitLevel, crouching)) {
-      // Guard gauge depletion
+      // KOF2002: 防御时防御槽减少(被攻击消耗)但成功防御获得少量气槽恢复奖励
       defender.guardGauge = Math.max(0, defender.guardGauge - guardGaugeDamage(attackType));
+      defender.guardGauge = Math.min(100, defender.guardGauge + 2);
 
       if (defender.guardGauge <= 0) {
         // Guard Crush — stunned instead of normal blockstun
@@ -363,6 +365,11 @@ export class CombatSystem {
       // A6: Chip damage cannot kill (leave at least 1 HP)
       defender.health = Math.max(1, defender.health - chip);
       this.comboHits[defIdx] = 0; // Block resets combo
+      // KOF2002: 角落防御时攻击者被额外推回(防御方无法后退, 攻击者被推走)
+      const defNearCorner = defender.x < STAGE_LEFT + 60 || defender.x > STAGE_RIGHT - 60;
+      if (defNearCorner) {
+        attacker.vx = -data.pushback * 0.5 * attacker.facing;
+      }
       // KOF2002: 通常技被防也允许取消到必杀技
       if (NORMAL_ATTACKS.has(attackType as string)) attacker.normalCancelReady = true;
       onHit?.(attacker, defender, attackType, true, false);
@@ -489,10 +496,23 @@ export class CombatSystem {
     }
 
     // Attacker pushback: slight recoil on hit (KOF2002 behavior)
-    const atkPushback = data.pushback * 0.2;
+    // KOF2002: 角落时攻击者额外被推回(防止无限角落压制)
+    const defenderNearCorner = defender.x < STAGE_LEFT + 60 || defender.x > STAGE_RIGHT - 60;
+    const cornerBonus = defenderNearCorner ? 1.5 : 1.0;
+    const atkPushback = data.pushback * 0.2 * cornerBonus;
     if (atkPushback > 0.3) {
       attacker.vx = -atkPushback * attacker.facing;
     }
+
+    // KOF2002: 命中闪烁颜色区分攻击类型 — 必杀技金色, DM蓝色, Counter红色, 通常白色
+    const atkName2 = (attackType as string);
+    if (atkName2.startsWith('DM_') || atkName2.startsWith('SDM_')) defender.hitFlashColor = '#6688ff';
+    else if (counterHit) defender.hitFlashColor = '#ffaa44';
+    else if (atkName2.startsWith('KYO_') || atkName2.startsWith('IORI_') || atkName2.startsWith('TERRY_')
+      || atkName2.startsWith('KIM_') || atkName2.startsWith('RYO_') || atkName2.startsWith('LEONA_')
+      || atkName2.startsWith('KDASH_') || atkName2.startsWith('KULA_') || atkName2.startsWith('SPECIAL_'))
+      defender.hitFlashColor = '#ffee66';
+    else defender.hitFlashColor = '#ffffff';
 
     // Rapid Cancel: light normal on hit enables chaining into next light normal
     if (LIGHT_NORMALS.has(attackType as string)) {

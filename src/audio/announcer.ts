@@ -66,6 +66,11 @@ class FightAnnouncer {
     this.speak('Time Over!');
   }
 
+  /** Called on first hit of the round */
+  firstAttack(): void {
+    this.speak('First Attack!');
+  }
+
   /** Called on match winner */
   winner(): void {
     setTimeout(() => this.speak('Winner!'), 1200);

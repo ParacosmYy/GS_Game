@@ -171,9 +171,9 @@ export function drawSkeletalFighter(
   ctx.fill();
   ctx.restore();
 
-  // Hit flash overlay — pure white for first 4 frames after hit
+  // Hit flash overlay — color varies by attack type (DM=blue, special=gold, CH=orange, normal=white)
   const isFlashing = f.hitFlashFrames > 0;
-  const flashOverride = isFlashing ? '#ffffff' : undefined;
+  const flashOverride = isFlashing ? f.hitFlashColor : undefined;
   const flashOutline = isFlashing ? '#ddd' : undefined;
 
   // Effective colors (may be overridden by flash)

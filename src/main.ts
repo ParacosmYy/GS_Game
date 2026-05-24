@@ -4,7 +4,7 @@
  */
 import { GameLoop } from './core/gameLoop.js';
 import { Camera } from './core/camera.js';
-import { CANVAS_WIDTH, CANVAS_HEIGHT, STAGE_WIDTH, STAGE_GROUND_Y, KO_DISPLAY_TIME } from './core/constants.js';
+import { CANVAS_WIDTH, CANVAS_HEIGHT, STAGE_WIDTH, STAGE_GROUND_Y, KO_DISPLAY_TIME, MAX_STOCKS, METER_PER_STOCK } from './core/constants.js';
 import { GamePhase, FighterState } from './core/types.js';
 import type { PowerGauge, MaxModeState } from './core/types.js';
 import { InputManager, CommandBuffer, resolveInput, getDirectionInput } from './input/index.js';
@@ -91,6 +91,11 @@ combatSystem.onThrowEscape = (_attacker, defender, hitX, hitY) => {
   vfx.spawnTechText(hitX, hitY - 40);
   screenShake.trigger(4, 6);
   playThrowEscape();
+  // KOF2002: 拆投双方获得少量气槽奖励
+  const atkIdx = _attacker === p1 ? 0 : 1;
+  const defIdx = defender === p1 ? 0 : 1;
+  gauges[atkIdx].meter = Math.min(gauges[atkIdx].meter + 8, MAX_STOCKS * METER_PER_STOCK);
+  gauges[defIdx].meter = Math.min(gauges[defIdx].meter + 8, MAX_STOCKS * METER_PER_STOCK);
 };
 combatSystem.onGuardCrush = (fighter, hitX, hitY) => {
   vfx.spawnGuardCrushSparks(hitX, hitY);
@@ -345,12 +350,13 @@ function update(): void {
   combatSystem.tickComboTimeout(tickRef.value);
   combatSystem.tickThrowState(p1, p2, onHit);
 
-  // First Attack detection — KOF2002: first hit bonus meter
+  // First Attack detection — KOF2002: first hit bonus meter + announcer
   if (!firstHitTracked && (combatSystem.getComboCount(0) > 0 || combatSystem.getComboCount(1) > 0)) {
     firstHitTracked = true;
     const hitterIdx = combatSystem.getComboCount(0) > 0 ? 0 : 1;
     const hitter = hitterIdx === 0 ? p1 : p2;
     vfx.spawnFirstAttackText(hitter.x, hitter.y - hitter.displayHeight - 40);
+    announcer.firstAttack();
     // First hit bonus: extra meter for the attacker
     if (gauges[hitterIdx]) {
       gainMeterOnHit(gauges[hitterIdx]);
