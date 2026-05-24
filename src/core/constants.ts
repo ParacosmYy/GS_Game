@@ -63,7 +63,7 @@ export const FRAME_DATA = {
     hitLevel: 'MID' as const, knockdown: false,
   },
   STAND_C: {
-    startup: 8, active: 4, recovery: 18,
+    startup: 12, active: 2, recovery: 17,
     damage: 80, hitstun: 19, blockstun: 17, pushback: 6,
     hitLevel: 'MID' as const, knockdown: false,
   },
@@ -84,7 +84,7 @@ export const FRAME_DATA = {
     hitLevel: 'LOW' as const, knockdown: false,
   },
   CLOSE_C: {
-    startup: 2, active: 5, recovery: 14,
+    startup: 2, active: 3, recovery: 9,
     damage: 70, hitstun: 19, blockstun: 17, pushback: 4,
     hitLevel: 'MID' as const, knockdown: false,
   },
@@ -126,7 +126,7 @@ export const FRAME_DATA = {
     hitLevel: 'MID' as const, knockdown: false,
   },
   CROUCH_D: {
-    startup: 8, active: 6, recovery: 23,
+    startup: 11, active: 3, recovery: 19,
     damage: 70, hitstun: 0, blockstun: 17, pushback: 3,
     hitLevel: 'LOW' as const, knockdown: true,
   },
@@ -142,7 +142,7 @@ export const FRAME_DATA = {
     hitLevel: 'HIGH' as const, knockdown: false,
   },
   JUMP_C: {
-    startup: 5, active: 5, recovery: 0,
+    startup: 5, active: 4, recovery: 0,
     damage: 75, hitstun: 11, blockstun: 17, pushback: 5,
     hitLevel: 'HIGH' as const, knockdown: false,
   },
@@ -215,7 +215,7 @@ export const FRAME_DATA = {
   },
   // 鬼焼き dp+A (正版: 5f startup, single hit)
   KYO_ONIYAKI: {
-    startup: 5, active: 5, recovery: 25,
+    startup: 5, active: 4, recovery: 27,
     damage: 80, hitstun: 22, blockstun: 18, pushback: 6,
     hitLevel: 'MID' as const, knockdown: false, chipDamage: 10,
   },
@@ -239,7 +239,7 @@ export const FRAME_DATA = {
   },
   // 荒咬み qcf+A (正版: 11f startup, guard point frame 10-11)
   KYO_ARAGAMI: {
-    startup: 11, active: 6, recovery: 24,
+    startup: 11, active: 8, recovery: 24,
     damage: 55, hitstun: 19, blockstun: 17, pushback: 3,
     hitLevel: 'MID' as const, knockdown: false,
   },
