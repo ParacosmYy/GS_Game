@@ -19,85 +19,14 @@ import type { ResolvedInput, PrevAttack } from '../input/inputResolver.js';
 import { createPrevAttack } from '../input/inputResolver.js';
 import { FighterState, AttackType } from '../core/types.js';
 import type { PowerGauge, MaxModeState } from '../core/types.js';
-
-// ─── Combo route step definition ───
-interface ComboStep {
-  type: 'button' | 'special';
-  attack: string;
-  delay: number; // frames to wait before this step
-}
+import { COMBO_ROUTES, JUMP_IN_ROUTE, applyComboStep, routeComboSpecial } from './aiRoutes.js';
+import type { ComboStep } from './aiRoutes.js';
 
 // ─── AI action types (expanded) ───
 type AIAction = 'idle' | 'approach' | 'retreat' | 'attack' | 'block'
   | 'antiair' | 'throw' | 'special' | 'jumpIn' | 'okizeme' | 'guardCancel' | 'counterStance';
 
-// ─── Per-character combo routes ───
-const COMBO_ROUTES: Record<string, ComboStep[]> = {
-  kyo: [
-    { type: 'button',  attack: 'closeC',     delay: 0 },
-    { type: 'button',  attack: 'cmdGofuYou', delay: 3 },
-    { type: 'special', attack: 'aragami',     delay: 3 },
-    { type: 'special', attack: 'aragamiFollow', delay: 3 },
-    { type: 'special', attack: 'aragamiEnder',  delay: 3 },
-    { type: 'special', attack: 'dmOrochinagi',  delay: 4 },
-  ],
-  iori: [
-    { type: 'button',  attack: 'closeC',     delay: 0 },
-    { type: 'button',  attack: 'ioriYumeyumi', delay: 2 },
-    { type: 'special', attack: 'aoihana1',  delay: 3 },
-    { type: 'special', attack: 'aoihana2',  delay: 3 },
-    { type: 'special', attack: 'aoihana3',  delay: 3 },
-    { type: 'special', attack: 'dmYatagarasu', delay: 4 },
-  ],
-  terry: [
-    { type: 'button',  attack: 'closeC',      delay: 0 },
-    { type: 'button',  attack: 'terryBackKnuckle', delay: 2 },
-    { type: 'special', attack: 'burnKnuckle',  delay: 3 },
-    { type: 'special', attack: 'dmPowerGeyser', delay: 4 },
-  ],
-  kim: [
-    { type: 'button',  attack: 'closeC',  delay: 0 },
-    { type: 'button',  attack: 'kimHishouKick', delay: 2 },
-    { type: 'special', attack: 'hiensen',  delay: 3 },
-    { type: 'special', attack: 'dmPhoenixKick', delay: 4 },
-  ],
-  ryo: [
-    { type: 'button',  attack: 'closeC',     delay: 0 },
-    { type: 'button',  attack: 'ryoTsurizao', delay: 2 },
-    { type: 'special', attack: 'specialUpper', delay: 3 },
-    { type: 'special', attack: 'dmTenHaOu',   delay: 4 },
-  ],
-  kdash: [
-    { type: 'button',  attack: 'closeC',      delay: 0 },
-    { type: 'button',  attack: 'kdashOneInch', delay: 2 },
-    { type: 'special', attack: 'specialUpper',  delay: 3 },
-    { type: 'special', attack: 'dmChainShot',   delay: 4 },
-  ],
-  kula: [
-    { type: 'button',  attack: 'closeC',     delay: 0 },
-    { type: 'button',  attack: 'kulaOneMore', delay: 2 },
-    { type: 'special', attack: 'specialUpper', delay: 3 },
-    { type: 'special', attack: 'dmFreeze',    delay: 4 },
-  ],
-  leona: [
-    { type: 'button',  attack: 'closeC',     delay: 0 },
-    { type: 'button',  attack: 'leonaStrikeArc', delay: 2 },
-    { type: 'special', attack: 'specialUpper', delay: 3 },
-    { type: 'special', attack: 'dmVSlasher',  delay: 4 },
-  ],
-  _default: [
-    { type: 'button',  attack: 'closeC', delay: 0 },
-    { type: 'button',  attack: 'standA',  delay: 2 },
-    { type: 'special', attack: 'specialUpper', delay: 3 },
-  ],
-};
-
-// ─── Jump-in route: air C → land → close C → special ───
-const JUMP_IN_ROUTE: ComboStep[] = [
-  { type: 'button',  attack: 'jumpC',    delay: 0 },  // air attack
-  { type: 'button',  attack: 'closeC',   delay: 4 },  // land → close C
-  // After this, AI transitions to normal combo route from closeC onward
-];
+// COMBO_ROUTES and JUMP_IN_ROUTE are imported from aiRoutes.ts
 
 export class SimpleAI {
   private fighter: Fighter;
@@ -364,7 +293,7 @@ export class SimpleAI {
           // Apply first combo step (closeC)
           const route = this.getCurrentRoute();
           if (route.length > 0) {
-            this.applyComboStep(route[0], base);
+            this.doApplyComboStep(route[0], base);
             this.comboStep = 1;
             this.comboDelay = route.length > 1 ? route[1].delay : 0;
           }
@@ -381,7 +310,7 @@ export class SimpleAI {
 
         // If in an active combo, continue the route
         if (this.inCombo && this.comboStep < route.length && this.comboDelay <= 0) {
-          this.applyComboStep(route[this.comboStep], base);
+          this.doApplyComboStep(route[this.comboStep], base);
           this.comboStep++;
           if (this.comboStep < route.length) {
             this.comboDelay = route[this.comboStep].delay;
@@ -396,7 +325,7 @@ export class SimpleAI {
             this.inCombo = true;
             this.comboStep = 0;
             if (route.length > 0) {
-              this.applyComboStep(route[0], base);
+              this.doApplyComboStep(route[0], base);
               this.comboStep = 1;
               this.comboDelay = route.length > 1 ? route[1].delay : 0;
             }
@@ -510,7 +439,7 @@ export class SimpleAI {
             // Try to route into DM (last step of combo)
             const dmStep = route.find(s => s.attack.toLowerCase().includes('dm'));
             if (dmStep) {
-              this.applyComboStep(dmStep, base);
+              this.doApplyComboStep(dmStep, base);
               this.inCombo = false;
               break;
             }
@@ -571,126 +500,8 @@ export class SimpleAI {
     return COMBO_ROUTES[charId] ?? COMBO_ROUTES['_default'];
   }
 
-  private applyComboStep(step: ComboStep, base: ResolvedInput): void {
-    if (step.type === 'button') {
-      switch (step.attack) {
-        case 'closeC':
-          base.buttonC = true;
-          base.buttonCPressed = true;
-          base.punchPressed = true;
-          break;
-        case 'standA':
-          base.buttonA = true;
-          base.buttonAPressed = true;
-          base.punchPressed = true;
-          break;
-        case 'standB':
-          base.buttonB = true;
-          base.buttonBPressed = true;
-          base.kickPressed = true;
-          break;
-        case 'cmdGofuYou':
-          // →+B (Kyo command normal)
-          base.forward = true;
-          base.buttonB = true;
-          base.buttonBPressed = true;
-          base.kickPressed = true;
-          break;
-        case 'ioriYumeyumi':
-          // →+A (Iori command normal)
-          base.forward = true;
-          base.buttonA = true;
-          base.buttonAPressed = true;
-          base.punchPressed = true;
-          break;
-        case 'terryBackKnuckle':
-          // →+A (Terry command normal)
-          base.forward = true;
-          base.buttonA = true;
-          base.buttonAPressed = true;
-          base.punchPressed = true;
-          break;
-        case 'kimHishouKick':
-          // →+B (Kim command normal)
-          base.forward = true;
-          base.buttonB = true;
-          base.buttonBPressed = true;
-          base.kickPressed = true;
-          break;
-        case 'ryoTsurizao':
-          // →+A (Ryo command normal)
-          base.forward = true;
-          base.buttonA = true;
-          base.buttonAPressed = true;
-          base.punchPressed = true;
-          break;
-        case 'kdashOneInch':
-          // →+A (K' command normal)
-          base.forward = true;
-          base.buttonA = true;
-          base.buttonAPressed = true;
-          base.punchPressed = true;
-          break;
-        case 'kulaOneMore':
-          // →+B (Kula command normal)
-          base.forward = true;
-          base.buttonB = true;
-          base.buttonBPressed = true;
-          base.kickPressed = true;
-          break;
-        case 'leonaStrikeArc':
-          // →+B (Leona command normal)
-          base.forward = true;
-          base.buttonB = true;
-          base.buttonBPressed = true;
-          base.kickPressed = true;
-          break;
-        case 'jumpC':
-          base.buttonC = true;
-          base.buttonCPressed = true;
-          base.punchPressed = true;
-          break;
-      }
-    }
-    // Special type steps are handled via triggerSpecial() which is called
-    // separately in main.ts. The combo step just marks timing; the actual
-    // special move is picked by the character's routeSpecial logic.
-    if (step.type === 'special') {
-      // Signal that a special should be triggered — we press the button
-      // that corresponds to the special's input (punch or kick)
-      switch (step.attack) {
-        case 'aragami':
-        case 'aoihana1':
-        case 'burnKnuckle':
-        case 'specialUpper':
-          base.buttonA = true; // A version for rekka/special
-          base.buttonAPressed = true;
-          base.punchPressed = true;
-          break;
-        case 'aragamiFollow':
-        case 'aragamiEnder':
-          base.buttonA = true;
-          base.buttonAPressed = true;
-          base.punchPressed = true;
-          break;
-        case 'aoihana2':
-        case 'aoihana3':
-          base.buttonC = true;
-          base.buttonCPressed = true;
-          base.punchPressed = true;
-          break;
-        case 'hiensen':
-          base.buttonB = true;
-          base.buttonBPressed = true;
-          base.kickPressed = true;
-          break;
-        default:
-          base.buttonC = true;
-          base.buttonCPressed = true;
-          base.punchPressed = true;
-          break;
-      }
-    }
+  private doApplyComboStep(step: ComboStep, base: ResolvedInput): void {
+    applyComboStep(step, base);
   }
 
   /** Direct special move trigger (bypasses command buffer) for AI */
@@ -739,7 +550,7 @@ export class SimpleAI {
       if (this.comboStep > 0 && this.comboStep <= route.length) {
         const currentStep = route[Math.min(this.comboStep - 1, route.length - 1)];
         if (currentStep.type === 'special') {
-          return this.routeComboSpecial(charId, currentStep.attack, input, tick);
+          return routeComboSpecial(charId, currentStep.attack, this.character, input, tick);
         }
       }
     }
@@ -771,144 +582,4 @@ export class SimpleAI {
     return result;
   }
 
-  /** Route to the correct special attack during a combo */
-  private routeComboSpecial(
-    charId: string,
-    attack: string,
-    input: ResolvedInput,
-    tick: number,
-  ): AttackType | null {
-    switch (charId) {
-      case 'kyo':
-        return this.routeKyoComboSpecial(attack, input, tick);
-      case 'iori':
-        return this.routeIoriComboSpecial(attack, input, tick);
-      case 'terry':
-        return this.routeTerryComboSpecial(attack, input, tick);
-      case 'kim':
-        return this.routeKimComboSpecial(attack, input, tick);
-      case 'ryo':
-        return this.routeRyoComboSpecial(attack, input, tick);
-      case 'kdash':
-        return this.routeKdashComboSpecial(attack, input, tick);
-      case 'kula':
-        return this.routeKulaComboSpecial(attack, input, tick);
-      case 'leona':
-        return this.routeLeonaComboSpecial(attack, input, tick);
-      default:
-        return null;
-    }
-  }
-
-  private routeKyoComboSpecial(attack: string, input: ResolvedInput, tick: number): AttackType | null {
-    switch (attack) {
-      case 'aragami':
-        return AttackType.KYO_ARAGAMI;
-      case 'aragamiFollow':
-        // Nine wounds followup (qcf+P after aragami)
-        return this.character.routeSpecial(input, {
-          checkSpecial: () => null,
-          checkDMMotion: () => null,
-          checkKickSpecial: () => null,
-          hasQCF: () => true,
-          hasQCB: () => false,
-          checkRekkaFollowQCF: () => AttackType.KYO_ARAGAMI_KONOKIZU,
-          checkRekkaFollowHCB: () => null,
-          checkDokugamiFollow: () => null,
-          checkBatsuyomiInput: () => false,
-        } as any, tick);
-      case 'aragamiEnder':
-        // Eight saké followup (hcb+P after aragami)
-        return this.character.routeSpecial(input, {
-          checkSpecial: () => null,
-          checkDMMotion: () => null,
-          checkKickSpecial: () => null,
-          hasQCF: () => false,
-          hasQCB: () => true,
-          checkRekkaFollowQCF: () => null,
-          checkRekkaFollowHCB: () => AttackType.KYO_ARAGAMI_YANOSABI,
-          checkDokugamiFollow: () => null,
-          checkBatsuyomiInput: () => false,
-        } as any, tick);
-      default:
-        return AttackType.SPECIAL_UPPER;
-    }
-  }
-
-  private routeIoriComboSpecial(attack: string, _input: ResolvedInput, _tick: number): AttackType | null {
-    switch (attack) {
-      case 'aoihana1':
-        return AttackType.IORI_AOIHANA;
-      case 'aoihana2':
-        return AttackType.IORI_AOIHANA_2;
-      case 'aoihana3':
-        return AttackType.IORI_AOIHANA_3;
-      default:
-        return AttackType.IORI_AOIHANA;
-    }
-  }
-
-  private routeTerryComboSpecial(attack: string, _input: ResolvedInput, _tick: number): AttackType | null {
-    switch (attack) {
-      case 'burnKnuckle':
-        return AttackType.TERRY_BURN_KNUCKLE;
-      default:
-        return AttackType.TERRY_BURN_KNUCKLE;
-    }
-  }
-
-  private routeKimComboSpecial(attack: string, _input: ResolvedInput, _tick: number): AttackType | null {
-    switch (attack) {
-      case 'hienzan':
-        return AttackType.KIM_HIENZAN;
-      case 'hangetsu':
-        return AttackType.KIM_HANGETSU;
-      default:
-        return AttackType.KIM_HIENZAN;
-    }
-  }
-
-  private routeRyoComboSpecial(attack: string, _input: ResolvedInput, _tick: number): AttackType | null {
-    switch (attack) {
-      case 'specialUpper':
-        return AttackType.RYO_KO_HOU;
-      case 'dmTenHaOu':
-        return AttackType.DM_TEN_HA_OU;
-      default:
-        return AttackType.RYO_KO_HOU;
-    }
-  }
-
-  private routeKdashComboSpecial(attack: string, _input: ResolvedInput, _tick: number): AttackType | null {
-    switch (attack) {
-      case 'specialUpper':
-        return AttackType.KDASH_CROW;
-      case 'dmChainShot':
-        return AttackType.DM_CHAIN_SHOT;
-      default:
-        return AttackType.KDASH_CROW;
-    }
-  }
-
-  private routeKulaComboSpecial(attack: string, _input: ResolvedInput, _tick: number): AttackType | null {
-    switch (attack) {
-      case 'specialUpper':
-        return AttackType.KULA_SHELL;
-      case 'dmFreeze':
-        return AttackType.DM_FREEZE;
-      default:
-        return AttackType.KULA_SHELL;
-    }
-  }
-
-  private routeLeonaComboSpecial(attack: string, _input: ResolvedInput, _tick: number): AttackType | null {
-    switch (attack) {
-      case 'specialUpper':
-        return AttackType.LEONA_EAR_RING;
-      case 'dmVSlasher':
-        return AttackType.DM_V_SLASHER;
-      default:
-        return AttackType.LEONA_EAR_RING;
-    }
-  }
 }
