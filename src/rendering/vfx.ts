@@ -141,6 +141,14 @@ export class VFXSystem {
     });
   }
 
+  spawnWireText(worldX: number, worldY: number): void {
+    this.particles.push({
+      x: worldX, y: worldY, vx: 0, vy: -0.5,
+      life: 45, maxLife: 45, size: 20,
+      color: '#ff8800', type: 'text', text: 'WIRE!',
+    });
+  }
+
   spawnThrowEscapeSparks(worldX: number, worldY: number): void {
     for (let i = 0; i < 10; i++) {
       const angle = Math.random() * Math.PI * 2;

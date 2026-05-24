@@ -157,6 +157,7 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       playCounter();
     }
     if (counterHit && (data as { counterWire?: boolean }).counterWire) {
+      deps.vfx.spawnWireText(defender.x, defender.y - defender.displayHeight - 55);
       deps.screenFlash.trigger('#ff6600', 0.2, 6);
       deps.screenShake.trigger(10, 10);
       playWire();
