@@ -14,7 +14,7 @@ import { shiftColor, roundRect } from './utils.js';
 
 // ===== Main HUD =====
 
-export function drawHUD(ctx: CanvasRenderingContext2D, fighters: Fighter[], tick: number, delayedHealth: [number, number], p1Wins: number = 0, p2Wins: number = 0, p1Name: string = '', p2Name: string = ''): void {
+export function drawHUD(ctx: CanvasRenderingContext2D, fighters: Fighter[], tick: number, delayedHealth: [number, number], p1Wins: number = 0, p2Wins: number = 0, p1Name: string = '', p2Name: string = '', currentRound: number = 1): void {
   if (fighters.length < 2) return;
 
   // HUD background — dark gradient
@@ -91,18 +91,49 @@ export function drawHUD(ctx: CanvasRenderingContext2D, fighters: Fighter[], tick
   roundRect(ctx, timerX - 27, timerY - 14, 54, 26, 6);
   ctx.stroke();
 
-  // Timer text
+  // Timer text — SNK style large bold
   ctx.fillStyle = timeSeconds <= 10 ? '#ff4444' : timeSeconds <= 30 ? '#ffcc44' : '#eeeeee';
   if (timeSeconds <= 10) {
     ctx.save();
     ctx.shadowColor = '#ff0000';
-    ctx.shadowBlur = 6;
+    ctx.shadowBlur = 8;
   }
-  ctx.font = `bold ${HUD_TIMER_SIZE}px "Courier New", monospace`;
+  ctx.font = `bold 24px "Courier New", monospace`;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   ctx.fillText(timeStr, timerX, timerY);
+  // Timer描边增强可读性
+  ctx.strokeStyle = timeSeconds <= 10 ? 'rgba(100,0,0,0.5)' : 'rgba(0,0,0,0.4)';
+  ctx.lineWidth = 1;
+  ctx.strokeText(timeStr, timerX, timerY);
   if (timeSeconds <= 10) ctx.restore();
+
+  // "TIME" 小标签在计时器上方
+  ctx.font = 'bold 8px "Courier New", monospace';
+  ctx.fillStyle = 'rgba(200, 168, 50, 0.6)';
+  ctx.fillText('TIME', timerX, timerY - 14);
+
+  // Round指示器 — 圆点(最多3局)
+  const maxRounds = 3;
+  const dotY = timerY + 20;
+  const dotSpacing = 8;
+  const dotsStartX = timerX - ((maxRounds - 1) * dotSpacing) / 2;
+  for (let r = 1; r <= maxRounds; r++) {
+    const dx = dotsStartX + (r - 1) * dotSpacing;
+    ctx.beginPath();
+    ctx.arc(dx, dotY, 2.5, 0, Math.PI * 2);
+    if (r === currentRound) {
+      ctx.fillStyle = '#ffcc00';
+      ctx.fill();
+    } else if (r < currentRound) {
+      ctx.fillStyle = '#666';
+      ctx.fill();
+    } else {
+      ctx.strokeStyle = 'rgba(200, 168, 50, 0.3)';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    }
+  }
 
   // Win markers — styled diamonds
   const winMarkerY = HUD_BAR_Y + HUD_BAR_HEIGHT + 16;
@@ -483,20 +514,33 @@ export function drawComboCounters(
     ctx.globalAlpha = alpha;
     ctx.textAlign = 'center';
 
+    // 连击数颜色随连击数变化: 2-4白, 5-9黄, 10-19橙, 20+红
+    const combo = comboCount[i];
+    let comboColor: string;
+    let glowColor: string;
+    if (combo >= 20) { comboColor = '#ff2222'; glowColor = '#ff0000'; }
+    else if (combo >= 10) { comboColor = '#ff8800'; glowColor = '#ff6600'; }
+    else if (combo >= 5) { comboColor = '#ffcc00'; glowColor = '#ffaa00'; }
+    else { comboColor = '#ffffff'; glowColor = '#ffcc44'; }
+
     // Combo count — styled with glow
-    const fontSize = 18 + Math.min(comboCount[i], 10);
+    const fontSize = 20 + Math.min(combo, 15);
     ctx.save();
-    ctx.shadowColor = '#ff8800';
-    ctx.shadowBlur = 10;
-    ctx.fillStyle = '#ffcc00';
+    ctx.shadowColor = glowColor;
+    ctx.shadowBlur = 12 + Math.min(combo, 10);
+    ctx.fillStyle = comboColor;
     ctx.font = `bold ${fontSize}px "Courier New", monospace`;
-    ctx.fillText(`${comboCount[i]}`, sx, sy);
+    ctx.fillText(`${combo}`, sx, sy);
+    // 描边增强可读性
+    ctx.strokeStyle = 'rgba(0,0,0,0.5)';
+    ctx.lineWidth = 2;
+    ctx.strokeText(`${combo}`, sx, sy);
     ctx.restore();
 
-    // "COMBO" text below
-    ctx.fillStyle = '#ff8844';
-    ctx.font = `bold 10px "Courier New", monospace`;
-    ctx.fillText('COMBO', sx, sy + 14);
+    // "HIT" text below with combo count color
+    ctx.fillStyle = comboColor;
+    ctx.font = `bold 11px "Courier New", monospace`;
+    ctx.fillText('HIT', sx, sy + 16);
   }
   ctx.restore();
 }

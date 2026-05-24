@@ -411,7 +411,7 @@ function render(): void {
   const p1Char = ROSTER.find(c => c.id === p1.charId) || ROSTER[0];
   const p2Char = ROSTER.find(c => c.id === p2.charId) || ROSTER[1];
   renderer.render([p1, p2], camera.x, tickRef.value, phase === GamePhase.KO, winner, screenShake.offsetX, screenShake.offsetY,
-    [p1DelayedHealth, p2DelayedHealth], maxModes, perfectPlayer, rounds.p1Wins, rounds.p2Wins, p1Char.nameCn, p2Char.nameCn, isTimeOver);
+    [p1DelayedHealth, p2DelayedHealth], maxModes, perfectPlayer, rounds.p1Wins, rounds.p2Wins, p1Char.nameCn, p2Char.nameCn, isTimeOver, rounds.currentRound);
   renderer.drawProjectiles(projectiles, camera);
   vfx.render(ctx, camera.x);
 
