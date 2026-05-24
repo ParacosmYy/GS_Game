@@ -139,7 +139,12 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
 
     // SFX
     if (isDM) { playSuperFlash(); playDM(); }
-    else if (attackType === AttackType.THROW) playThrow();
+    else if (attackType === AttackType.THROW || attackType === AttackType.THROW_FORWARD || attackType === AttackType.THROW_BACK) {
+      playThrow();
+      // 投技火花+弧线特效
+      deps.vfx.spawnCharacterHitSparks(hitX, hitY, 10, '#aaddff');
+      deps.screenShake.trigger(6, 8);
+    }
     else if (isSpecial) playSpecial();
     else if (data.damage >= 70) playHeavyHit();
     else if (!defender.isGrounded()) playJuggleHit();
