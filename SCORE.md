@@ -1836,6 +1836,12 @@
 
 | 可维护性 | 70/80 | +2 | 核心引擎文件大小合规, 状态机逻辑独立可测 |
 
+### Iter-V84 — 2026-05-25（constants.ts拆分 811行→3模块 +5=508）
+
+**改动:** constants.ts(811行)拆为constants.ts(158行)+frameDataConstants.ts(543行)+hitboxConstants.ts(119行), re-export保持兼容
+
+| 可维护性 | 72/80 | +2 | 所有核心模块低于600行限制 |
+
 ---
 
 **tag: v0.04-kof2002 (458pt) | commit: 待定 | 下一目标: 550分(+50)**
