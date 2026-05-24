@@ -95,6 +95,17 @@ function darken(hex: string, amount: number = 0.35): string {
   return `#${dr.toString(16).padStart(2, '0')}${dg.toString(16).padStart(2, '0')}${db.toString(16).padStart(2, '0')}`;
 }
 
+/** 亮色变体 — 用于上方光照高光 */
+function lighten(hex: string, amount: number = 0.3): string {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  const lr = Math.min(255, Math.floor(r + (255 - r) * amount));
+  const lg = Math.min(255, Math.floor(g + (255 - g) * amount));
+  const lb = Math.min(255, Math.floor(b + (255 - b) * amount));
+  return `#${lr.toString(16).padStart(2, '0')}${lg.toString(16).padStart(2, '0')}${lb.toString(16).padStart(2, '0')}`;
+}
+
 /** 绘制像素角色帧 — 带描边和精细身体部位 */
 function drawPixelChar(
   c: CanvasRenderingContext2D, v: CharVisual,
@@ -107,6 +118,8 @@ function drawPixelChar(
   const skinDark = darken(v.skinColor, 0.2);
   const shirtDark = darken(v.shirtColor, 0.3);
   const pantsDark = darken(v.pantsColor, 0.3);
+  const shirtLight = lighten(v.shirtColor, 0.2);
+  const hairLight = lighten(v.hairColor, 0.25);
 
   // === 头部 ===
   const headY = baseY;
@@ -126,13 +139,15 @@ function drawPixelChar(
       }
     }
   }
-  // 头部填充
+  // 头部填充 — 上方光照: 顶部行用亮色
   for (let dy = 0; dy < hh; dy++) {
     for (let dx = -Math.floor(hw / 2); dx <= Math.floor(hw / 2); dx++) {
       const nx = dx / (hw / 2);
       const ny = dy / hh;
       if (nx * nx + (ny - 0.5) * (ny - 0.5) * 4 < 1) {
-        px(c, headX + dx, headY + dy, v.skinColor);
+        // 上方1-2行用亮色模拟光照
+        const color = dy < 2 ? lighten(v.skinColor, 0.15) : v.skinColor;
+        px(c, headX + dx, headY + dy, color);
       }
     }
   }
@@ -161,13 +176,15 @@ function drawPixelChar(
   }
   px(c, torsoX - Math.floor(bw / 2), torsoY - 1, shirtDark);
   px(c, torsoX + Math.floor(bw / 2), torsoY - 1, shirtDark);
-  // 填充
+  // 填充 — 上方光照: 肩部行用亮色
   for (let dy = 0; dy < torsoH; dy++) {
     const w = dy < 2 ? bw : bw - 1;
     for (let dx = -Math.floor(w / 2); dx <= Math.floor(w / 2); dx++) {
-      // V领效果 — 上部中间留皮肤色
       if (dy < 2 && Math.abs(dx) < 1) {
         px(c, torsoX + dx, torsoY + dy, v.skinColor);
+      } else if (dy === 0) {
+        // 最顶行用亮色模拟光照
+        px(c, torsoX + dx, torsoY + dy, shirtLight);
       } else {
         px(c, torsoX + dx, torsoY + dy, v.shirtColor);
       }
@@ -194,6 +211,16 @@ function drawPixelChar(
   const legLen = Math.floor(v.legLen * scale);
   drawLeg(c, torsoX - 1, legY, legLSpread, legLen, v.pantsColor, v.shoeColor, pantsDark);
   drawLeg(c, torsoX + 1, legY, legRSpread, legLen, v.pantsColor, v.shoeColor, pantsDark);
+
+  // === 地面阴影 — 简单暗色像素行 ===
+  const shadowY = legY + legLen + 2;
+  const shadowW = Math.max(v.bodyW + 2, 8);
+  const shadowColor = '#1a1a1a';
+  const shadowEdge = '#2a2a2a';
+  for (let dx = -Math.floor(shadowW / 2); dx <= Math.floor(shadowW / 2); dx++) {
+    const sx = cx + dx;
+    px(c, sx, shadowY, Math.abs(dx) >= Math.floor(shadowW / 2) ? shadowEdge : shadowColor);
+  }
 }
 
 function drawArm(c: CanvasRenderingContext2D, sx: number, sy: number, angle: number, len: number, color: string, outlineColor: string): void {
