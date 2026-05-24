@@ -108,6 +108,27 @@ Title → 模式选择(单打/组队) → 队伍编排(3v3) → 选人(含色选
 - 角色特有行为通过 `CharacterDefinition` 接口的方法实现
 - 如果两个角色共享某个机制（如上勾拳），提取为通用行为，在角色定义中引用
 
+### 2.4 角色体型差异化（强制）
+
+每个角色必须有独特的身体比例，反映其性别、体型、年龄特征。**禁止所有角色使用统一尺寸。**
+
+**体型定义（通过 `BodyProportions` 接口实现）：**
+
+| 角色 | 性别 | 体型 | 身高 | 特征 |
+|------|------|------|------|------|
+| Kyo | 男 | 中等 | 175cm | 匀称体型，标准骨架 |
+| Iori | 男 | 瘦长 | 182cm | 最长四肢，窄肩，慵懒站姿 |
+| Terry | 男 | 健壮 | 182cm | 宽肩厚胸，粗壮手臂 |
+| Kim | 男 | 精干 | 176cm | 运动员体型，腿部比例长 |
+| Ryo | 男 | 粗壮 | 178cm | 最宽肩膀，最粗四肢 |
+| Leona | 女 | 运动型 | 173cm | 女性曲线，窄肩宽臀，中等四肢 |
+| K' | 男 | 精瘦 | 183cm | 高瘦，年轻体态，肩宽但四肢细 |
+| Kula | 女 | 娇小 | 169cm | 最小骨架，最短四肢，少女体态 |
+
+**比例参数包括：** 头部大小、躯干宽高、手臂粗细长度、腿粗细长度、肩宽、臀宽
+**渲染约束：** 女性角色必须有明显女性特征（更小的头部、更窄的肩膀、更细的四肢）
+**动画约束：** 每个角色的待机动画必须反映其性格（Iori慵懒、Kyo自信、Leona警惕、Kula活泼等）
+
 ---
 
 ## 三、架构约束
@@ -204,11 +225,11 @@ Layer 9 (最顶层，唯一编排入口)
 
 | 触发条件 | 拆分策略 |
 |---------|---------|
-| `constants.ts` 超过 600 行 | 拆为 `frameData.ts` + `combatConstants.ts` + `layoutConstants.ts`，`constants.ts` 做统一 re-export |
-| `fighterController.ts` 超过 600 行 | 拆为 `stateHandlers/` 目录，每个状态族一个文件（movementStates、attackStates、stunStates） |
-| `combatSystem.ts` 超过 600 行 | 拆为 `hitResolver.ts` + `projectileResolver.ts` + `throwResolver.ts` |
-| `renderer.ts` 超过 600 行 | 按 Layer 4 定义已有足够拆分点，检查是否有逻辑泄露进来 |
-| 单个角色定义超过 400 行 | 拆为 `kyo/` 目录：`poses.ts` + `routes.ts` + `index.ts` |
+| `constants.ts` 超过 2000 行 | 拆为 `frameData.ts` + `combatConstants.ts` + `layoutConstants.ts`，`constants.ts` 做统一 re-export |
+| `fighterController.ts` 超过 2000 行 | 拆为 `stateHandlers/` 目录，每个状态族一个文件（movementStates、attackStates、stunStates） |
+| `combatSystem.ts` 超过 2000 行 | 拆为 `hitResolver.ts` + `projectileResolver.ts` + `throwResolver.ts` |
+| `renderer.ts` 超过 2000 行 | 按 Layer 4 定义已有足够拆分点，检查是否有逻辑泄露进来 |
+| 单个角色定义超过 2000 行 | 拆为 `kyo/` 目录：`poses.ts` + `routes.ts` + `index.ts` |
 
 #### 模块 index.ts 规则
 
@@ -222,12 +243,12 @@ Layer 9 (最顶层，唯一编排入口)
 1. **`combatSystem.ts` 直接 import `inputManager.ts` 和 `inputResolver.ts`** — 违反 Layer 2 规则。修复方向：combatSystem 通过参数接收已解析输入，不 import input 层
 2. **`renderer.ts` import `CommandBuffer`** — 违反 Layer 4 规则。修复方向：debug overlay 的输入显示通过参数传入序列化字符串，不 import CommandBuffer
 3. **`fighterController.ts` 的 `isSpecialMove` 用 `startsWith('KYO_')` 硬编码角色名** — 违反 Layer 1 规则。修复方向：改为通过 CharacterDefinition 的 attack classification 或 Set 查询
-4. **`fighterController.ts` 已达 604 行** — 超过 600 行限制。下次修改此文件时必须拆分
+4. **`fighterController.ts` 已达 676 行** — 在2000行限制内暂不需要拆分，但持续监控
 5. **`main.ts` 292 行包含游戏流程状态机** — 超过编排层职责。修复方向：提取 GameFlowController 到 `state/` 目录
 
 ### 3.3 可维护性规则
 
-1. **单文件不超过 600 行** — 超过必须拆分。拆分时保持内聚，不要为了拆而拆
+1. **单文件不超过 2000 行** — 超过必须拆分。拆分时保持内聚，不要为了拆而拆
 2. **switch/case 超过 15 个分支必须重构** — 用查表、策略对象或状态模式替代
 3. **禁止魔法数字** — 所有硬编码数值必须提取到 `constants.ts` 或角色定义中
 4. **函数不超过 50 行** — 超过就提取子函数
@@ -251,7 +272,7 @@ Layer 9 (最顶层，唯一编排入口)
 |------|------|
 | 帧率 | 稳定 60fps，单帧不得超过 16.67ms |
 | 输入延迟 | 从按键到响应不超过 2 帧（≈33ms） |
-| 内存 | 游戏运行时堆内存不超过 100MB |
+| 内存 | 游戏运行时堆内存不设严格上限（优先保证全景精灵图和高音质素材的完全无损释放，只要现代浏览器能跑满60帧即可） |
 | 首次加载 | 从打开到 Title Screen 不超过 3 秒 |
 | Canvas 绘制 | 每帧 draw call 不超过 200 次 |
 
@@ -294,34 +315,45 @@ Layer 9 (最顶层，唯一编排入口)
 
 ## 六、开发优先级
 
+> **核心原则：优先打造硬核的对战博弈逻辑（不好玩一切白搭），随后全面接轨正版级别的视觉体验。**
+> **禁止在P0未完成前写任何角色新招式 — 底层改完所有招式都要推倒重来。**
+
 优先级从高到低，上层未完成时不做下层：
 
-### P0 — 引擎核心（必须先完成）
-1. 逐帧判定框系统（替代当前的统一 AABB）
-2. 投技/指令投/当身技框架
-3. Time Over 判定
-4. 浮空值（Juggle Point）精算系统
+### P0 — 对战系统基石（必须先完成，不碰画面）
+1. **多维判定框系统**：拆分 Hurtbox(上段/下段/无敌)、Hitbox(攻击)、Pushbox(实体排斥)、Throwbox(投技判定)
+2. **近敌判定(Proximity)**：近/远攻击自动切换 + Proximity Guard(牵制防守，对方出招时拉后自动防御)
+3. **投技/指令投框架**：普通投(前后+C/D)、拆投窗口、0帧投/有发生帧指令投、投技过程位置绑定+相机锁定
+4. **指令缓存优化**：前向留存15-20帧、长指令粘性(下后下前容忍杂乱输入)、Negative Edge(松键判定)
+5. **浮空值+伤害缩放**：Juggle Point衰减防无限浮空 + 连击数递减伤害
 
-### P1 — 表现层
-5. 精灵动画引擎（Sprite Sheet 系统，替代骨骼渲染）
-6. 打击反馈精调（顿帧时长、震屏强度、粒子规模 — 参照正版视频逐帧对比）
-7. 采样音效系统（WAV/OGG 播放，替代合成音）
+### P1 — 视觉重塑（告别"假人"与塑料感）
+6. **精灵图动画引擎**：替换骨骼矩形拼接，引入Sprite Sheet逐帧解析器，帧数据↔精灵帧映射
+7. **打击顿帧(Hit-stop)**：重攻击/必杀技命中暂停6-12帧，营造"卡肉感"
+8. **屏幕震动(Camera Shake)**：重击/指令投砸地时Canvas轴向位移
+9. **Super Flash**：超必杀释放时背景变暗+全屏卡顿+角色爆发高光
+10. **角色配色引擎**：通过Canvas ImageData替换调色板实现2P/3P颜色
 
-### P2 — 内容层
-8. 第一批角色补全（当前 4 人 → 8 人）
-9. 多场景支持（至少 3 个舞台）
-10. BGM 系统（采样播放 + 跨场景无缝切换）
+### P2 — 深层攻防机制
+11. **防御崩坏(Guard Crush)**：隐形防御耐久值 → 破防硬直 + 碎玻璃特效
+12. **防御取消**：GC Roll(防中AB消1气) + GC CD(防中CD消1气反击)
+13. **当身技系统**：Guard Point(自带格挡帧) + 当身技(受击瞬间拦截反击)
+14. **MAX模式深度**：Free Cancel(MAX中必杀互取) + HSDM/MAX2(红血+MAX，屏幕变暗+立绘闪现)
+15. **Counter Wire(壁弹)**：特定攻击CH触发壁弹反弹
+16. **受身(Quick Stand)**：击飞落地时AB触发前/后滚，含无敌帧与起身硬直
 
-### P3 — 流程层
-11. Title Screen + 模式选择
-12. 3v3 组队模式
-13. Perfect 判定 + Win Quote
-14. Continue 画面
+### P3 — 比赛流程与仪式感
+17. **Title Screen + 模式选择**
+18. **队伍盲选(Order Select)**：3v3盲选首发/次发/守底
+19. **特殊宿敌开场(Special Intros)**：京vs庵等独特动画交互
+20. **嘲讽(Taunt)**：按Start削减对手气槽
+21. **胜利结算**：Perfect闪屏 + A/B/C/D选择胜利姿势 + Win Quote(按对手文本)
+22. **Continue 画面**
 
 ### P4 — 扩展
-15. 训练模式（含输入显示、帧数显示、伤害显示）
-16. 剩余角色补全
-17. AI 难度分级 + 角色专属 AI 策略
+23. 训练模式(含输入显示、帧数显示、伤害显示)
+24. 剩余角色补全(第二批 8 人 → 第三批 → 完整阵容)
+25. AI 难度分级 + 角色专属 AI 策略
 
 ---
 

@@ -21,6 +21,7 @@ import { drawCharacterSelect, drawIntro, drawKO, drawSuperFlash, drawMatchEnd, d
 import { shiftColor, roundRect } from './utils.js';
 import { ROSTER } from '../characters/index.js';
 import { drawProjectiles as drawProjectilesImpl } from './projectileRenderer.js';
+import type { SpriteRenderer } from './spriteRenderer.js';
 
 export class Renderer {
   private ctx: CanvasRenderingContext2D;
@@ -29,10 +30,15 @@ export class Renderer {
   private currentFps = 0;
   private globalTick = 0;
   private stars: Star[];
+  private spriteRenderer: SpriteRenderer | null = null;
 
   constructor(ctx: CanvasRenderingContext2D) {
     this.ctx = ctx;
     this.stars = generateStars(60);
+  }
+
+  setSpriteRenderer(sr: SpriteRenderer): void {
+    this.spriteRenderer = sr;
   }
 
   // ===== Main fight frame =====
@@ -120,7 +126,18 @@ export class Renderer {
       ctx.rotate(leanAngle);
       ctx.translate(-(sx + leanOffsetX), -sy);
 
-      drawSkeletalFighter(ctx, f, sx + leanOffsetX, sy, bodyColor, outlineColor, this.globalTick, maxModeActive);
+      // 优先使用精灵图渲染, 降级到骨骼渲染
+      let usedSprite = false;
+      if (this.spriteRenderer) {
+        const frameIdx = f.state === FighterState.IDLE ? Math.floor(this.globalTick / 12) % 4 : 0;
+        usedSprite = this.spriteRenderer.render(
+          ctx, f.charId, f.state, frameIdx,
+          sx + leanOffsetX, sy, f.facing, bodyColor,
+        );
+      }
+      if (!usedSprite) {
+        drawSkeletalFighter(ctx, f, sx + leanOffsetX, sy, bodyColor, outlineColor, this.globalTick, maxModeActive);
+      }
 
       ctx.restore();
 

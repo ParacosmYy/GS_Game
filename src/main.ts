@@ -19,6 +19,8 @@ import { cycleStage, setStage, getStage, type StageId } from './rendering/stage.
 import { drawVictoryPose } from './rendering/skeletalFighter.js';
 import type { TeamDisplayInfo } from './rendering/hud.js';
 import { ROSTER } from './characters/index.js';
+import { SpriteManager, SpriteRenderer } from './rendering/spriteRenderer.js';
+import { generatePlaceholderSpritesheet } from './rendering/placeholderSprites.js';
 import { CinematicState } from './state/cinematicState.js';
 import { SelectState } from './state/selectState.js';
 import { RoundState } from './state/roundState.js';
@@ -43,6 +45,19 @@ const inputManager = new InputManager();
 const combatSystem = new CombatSystem(inputManager);
 const renderer = new Renderer(ctx);
 const vfx = new VFXSystem();
+
+// ===== Sprite System =====
+const spriteManager = new SpriteManager();
+const spriteRenderer = new SpriteRenderer(spriteManager);
+// 注册所有角色的占位精灵图 (真实精灵图加载后将替换)
+for (const char of ROSTER) {
+  const sheet = generatePlaceholderSpritesheet(char.color, char.id);
+  spriteManager.register(char.id, '', sheet.animations);
+  // 直接设置已生成的Image (占位精灵不需要从URL加载)
+  const asset = spriteManager.get(char.id);
+  if (asset) { asset.image = sheet.image; asset.loaded = true; }
+}
+renderer.setSpriteRenderer(spriteRenderer);
 const screenShake = new ScreenShake();
 const screenFlash = new ScreenFlash();
 
