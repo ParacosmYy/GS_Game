@@ -80,25 +80,31 @@ export class VFXSystem {
     });
   }
 
-  /** 角色专属命中火花 — 使用四角星形 */
+  /** 角色专属命中火花 — KOF风格, 更大更亮 */
   spawnCharacterHitSparks(worldX: number, worldY: number, count: number, charColor: string): void {
+    // 中央闪光 — 更强的命中反馈
+    this.particles.push({
+      x: worldX, y: worldY, vx: 0, vy: 0,
+      life: 6, maxLife: 6, size: 25,
+      color: charColor, type: 'flash',
+    });
     for (let i = 0; i < count; i++) {
       const angle = Math.random() * Math.PI * 2;
-      const speed = 2 + Math.random() * 6;
-      const isStar = Math.random() > 0.3;
+      const speed = 3 + Math.random() * 7;
+      const isStar = Math.random() > 0.25;
       this.particles.push({
         x: worldX, y: worldY,
         vx: Math.cos(angle) * speed,
-        vy: Math.sin(angle) * speed - 2,
-        life: 12 + Math.floor(Math.random() * 10),
-        maxLife: 22,
-        size: isStar ? 3 + Math.random() * 4 : 2 + Math.random() * 3,
-        color: Math.random() > 0.4 ? charColor : '#ffffff',
+        vy: Math.sin(angle) * speed - 3,
+        life: 14 + Math.floor(Math.random() * 10),
+        maxLife: 24,
+        size: isStar ? 4 + Math.random() * 5 : 2 + Math.random() * 3,
+        color: Math.random() > 0.35 ? charColor : '#ffffff',
         type: isStar ? 'star' : 'spark',
-        gravity: 0.15,
-        friction: 0.95,
+        gravity: 0.12,
+        friction: 0.94,
         rotation: Math.random() * Math.PI * 2,
-        rotSpeed: (Math.random() - 0.5) * 0.3,
+        rotSpeed: (Math.random() - 0.5) * 0.4,
       });
     }
   }
@@ -145,10 +151,17 @@ export class VFXSystem {
   }
 
   spawnImpactRing(worldX: number, worldY: number): void {
+    // 主冲击环 — 更大更亮
     this.particles.push({
       x: worldX, y: worldY, vx: 0, vy: 0,
-      life: 12, maxLife: 12, size: 5,
+      life: 14, maxLife: 14, size: 8,
       color: '#ffffff', type: 'ring',
+    });
+    // 第二层冲击环 — 稍小延迟
+    this.particles.push({
+      x: worldX, y: worldY, vx: 0, vy: 0,
+      life: 10, maxLife: 10, size: 5,
+      color: '#ffcc44', type: 'ring',
     });
   }
 
@@ -439,11 +452,14 @@ export class VFXSystem {
           ctx.rotate(p.rotation || 0);
           ctx.fillStyle = p.color;
           drawStar(ctx, 0, 0, p.size * alpha, 4);
-          // 辉光
-          ctx.globalAlpha = alpha * 0.25;
+          // 外层辉光 — 更大更亮
+          ctx.globalAlpha = alpha * 0.35;
+          ctx.shadowColor = p.color;
+          ctx.shadowBlur = 8;
           ctx.beginPath();
-          ctx.arc(0, 0, p.size * alpha * 2.5, 0, Math.PI * 2);
+          ctx.arc(0, 0, p.size * alpha * 3, 0, Math.PI * 2);
           ctx.fill();
+          ctx.shadowBlur = 0;
           ctx.restore();
           break;
         }
