@@ -492,6 +492,11 @@ export class FighterController {
       case FighterState.ROLL:
       case FighterState.BACK_ROLL: {
         f.rollTimer--; f.displayHeight = 60;
+        // GC Roll cancel into itself (KOF2002: infinite, no extra meter cost)
+        if (f.isGCRoll && input.rollPressed && f.rollTimer > 0) {
+          f.rollTimer = ROLL_DURATION;
+          f.vx = (f.state === FighterState.ROLL ? ROLL_SPEED : -ROLL_SPEED) * f.facing;
+        }
         if (f.rollTimer <= 0) { f.state = FighterState.IDLE; f.vx = 0; f.displayHeight = 100; f.landingRecovery = ROLL_RECOVERY; f.isGCRoll = false; }
         break;
       }
@@ -542,6 +547,22 @@ export class FighterController {
         // Character-specific onAttackActive (fireballs, uppercuts etc.)
         if (f.attackPhase === 'active' && f.currentAttack) {
           this.character.onAttackActive(f, f.currentAttack, this.projectiles, this.playerIndex);
+        }
+
+        // ── Normal/Command Normal >> MAX activation (BC during attack on hit/block, costs 2 stocks) ──
+        if (input.buttonB && input.buttonC && (input.buttonBPressed || input.buttonCPressed)
+            && f.currentAttack && f.hasHit && this.gauge && this.maxMode
+            && !this.maxMode.active && FighterController.isNormal(f.currentAttack as string)
+            && this.gauge.stocks >= 2) {
+          f.resetAttackState();
+          f.resetCancelFlags();
+          f.state = FighterState.IDLE;
+          spendStocks(this.gauge, 1);
+          this.maxMode.active = true;
+          this.maxMode.timer = this.maxMode.maxDuration;
+          this.vfx.spawnMAXAura(f.x, f.y);
+          this.vfx.spawnMAXActivationFlash(f.x, f.y - f.displayHeight / 2);
+          return;
         }
 
         // ── Super Cancel (P9-F) ──
@@ -700,7 +721,11 @@ export class FighterController {
 
       case FighterState.HITSTUN:
         f.hitstunTimer--;
-        if (f.hitstunTimer <= 0) { f.state = FighterState.IDLE; f.vx = 0; f.throwInvincibilityTimer = THROW_INVINCIBILITY_POST_STUN; }
+        if (f.hitstunTimer <= 0) {
+          f.state = FighterState.IDLE; f.vx = 0; f.throwInvincibilityTimer = THROW_INVINCIBILITY_POST_STUN;
+          // Visual hint: subtle white spark on recovery
+          this.vfx.spawnRecoverySpark(f.x, f.y - f.displayHeight / 2);
+        }
         break;
 
       case FighterState.KNOCKDOWN:

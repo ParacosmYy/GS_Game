@@ -130,8 +130,8 @@ export class CombatSystem {
 
       defender.throwEscapeTimer--;
 
-      // Check for throw escape: defender presses throw during escape window
-      if (defInput.throwAttackPressed && defender.throwEscapeTimer >= 0) {
+      // Check for throw escape: defender presses throw or CD (KOF2002 loophole: CD techs both C and D throws)
+      if ((defInput.throwAttackPressed || defInput.blowbackPressed) && defender.throwEscapeTimer >= 0) {
         const attacker = fighters[1 - i];
         const hitX = (attacker.x + defender.x) / 2;
         const hitY = (attacker.y + defender.y) / 2 - attacker.displayHeight / 2;

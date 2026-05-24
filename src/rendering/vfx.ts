@@ -338,6 +338,19 @@ export class VFXSystem {
     });
   }
 
+  /** Recovery spark — subtle white flash when hitstun ends */
+  spawnRecoverySpark(worldX: number, worldY: number): void {
+    for (let i = 0; i < 4; i++) {
+      const angle = Math.PI / 2 * i + Math.random() * 0.5;
+      this.particles.push({
+        x: worldX, y: worldY,
+        vx: Math.cos(angle) * 1.5, vy: Math.sin(angle) * 1.5,
+        life: 8, maxLife: 8, size: 2,
+        color: '#ffffff', type: 'spark', gravity: 0, friction: 0.9,
+      });
+    }
+  }
+
   spawnDust(worldX: number, worldY: number): void {
     for (let i = 0; i < 6; i++) {
       const dir = (i - 3) * 1.2;
