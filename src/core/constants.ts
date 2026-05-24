@@ -12,6 +12,13 @@ export const JUMP_VELOCITY = -14;
 export const FIGHTER_WIDTH = 60;
 export const FIGHTER_HEIGHT = 100;
 export const WALK_SPEED = 4;
+export const RUN_SPEED = 7;             // 前冲跑步速度 (双击→)
+export const BACKDASH_VX = 8;          // 后撤跳水平速度
+export const BACKDASH_VY = -8;         // 后撤跳垂直速度
+export const BACKDASH_DURATION = 18;   // 后撤跳持续帧数
+export const DOUBLE_TAP_WINDOW = 12;   // 双击输入窗口 (帧数)
+export const RUN_JUMP_VX = 8;          // 跑跳水平速度 (比普通跳远)
+export const RUN_JUMP_VY = -13;        // 跑跳垂直速度 (比普通跳略低=更平)
 export const PUSH_BOX_WIDTH = 60;
 export const MAX_HEALTH = 1000;
 

@@ -2,7 +2,10 @@
 export enum FighterState {
   IDLE = 'IDLE',
   WALK = 'WALK',
+  RUN = 'RUN',           // 前冲跑步 (双击→)
+  BACKDASH = 'BACKDASH', // 后撤跳 (双击←)
   JUMP = 'JUMP',
+  RUN_JUMP = 'RUN_JUMP', // 跑跳 (跑步中跳)
   CROUCH = 'CROUCH',
   STAND_ATTACK = 'STAND_ATTACK',
   CROUCH_ATTACK = 'CROUCH_ATTACK',

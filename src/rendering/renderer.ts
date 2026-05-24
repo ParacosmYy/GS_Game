@@ -159,7 +159,18 @@ export class Renderer {
         case FighterState.WALK:
           bodyColor = this.shiftColor(f.color, 12);
           break;
+        case FighterState.RUN:
+          bodyColor = this.shiftColor(f.color, 20);
+          outlineColor = '#ff880050';
+          glowColor = '#ff660025';
+          break;
+        case FighterState.BACKDASH:
+          bodyColor = this.shiftColor(f.color, 35);
+          outlineColor = '#88ccff60';
+          glowColor = '#4488ff20';
+          break;
         case FighterState.JUMP:
+        case FighterState.RUN_JUMP:
           bodyColor = this.shiftColor(f.color, 25);
           break;
         case FighterState.STAND_ATTACK:
@@ -192,33 +203,66 @@ export class Renderer {
         ctx.fill();
       }
 
+      // Lean offset for RUN/BACKDASH
+      let leanOffsetX = 0;
+      let leanAngle = 0;
+      if (f.state === FighterState.RUN) {
+        leanOffsetX = 8 * f.facing;
+        leanAngle = 0.12 * f.facing; // slight forward tilt
+      } else if (f.state === FighterState.BACKDASH) {
+        leanOffsetX = -6 * f.facing;
+        leanAngle = -0.08 * f.facing; // slight backward tilt
+      }
+
+      // Afterimage trail for RUN/BACKDASH
+      if (f.state === FighterState.RUN || f.state === FighterState.BACKDASH) {
+        const trailColor = f.state === FighterState.RUN
+          ? `rgba(255, 140, 0, ${0.15})`
+          : `rgba(100, 180, 255, ${0.18})`;
+        for (let i = 1; i <= 3; i++) {
+          ctx.globalAlpha = 0.3 / i;
+          ctx.fillStyle = trailColor;
+          const trailX = sx - leanOffsetX * i * 1.5 - f.facing * 12 * i;
+          this.roundRect(ctx,
+            trailX - hw, sy - f.displayHeight + i * 4,
+            FIGHTER_WIDTH, f.displayHeight - i * 4, 5);
+          ctx.fill();
+        }
+        ctx.globalAlpha = 1;
+      }
+
+      ctx.save();
+      ctx.translate(sx + leanOffsetX, sy);
+      ctx.rotate(leanAngle);
+      ctx.translate(-(sx + leanOffsetX), -sy);
+
       // Body with gradient
-      const bodyGrad = ctx.createLinearGradient(sx - hw, sy - f.displayHeight, sx + hw, sy);
+      const bodyGrad = ctx.createLinearGradient(sx + leanOffsetX - hw, sy - f.displayHeight, sx + leanOffsetX + hw, sy);
       bodyGrad.addColorStop(0, this.shiftColor(bodyColor, 25));
       bodyGrad.addColorStop(0.5, bodyColor);
       bodyGrad.addColorStop(1, this.shiftColor(bodyColor, -10));
       ctx.fillStyle = bodyGrad;
-      this.roundRect(ctx, sx - hw, sy - f.displayHeight, FIGHTER_WIDTH, f.displayHeight, 5);
+      this.roundRect(ctx, sx + leanOffsetX - hw, sy - f.displayHeight, FIGHTER_WIDTH, f.displayHeight, 5);
       ctx.fill();
 
       // Outline
       ctx.strokeStyle = outlineColor;
       ctx.lineWidth = 2;
-      this.roundRect(ctx, sx - hw, sy - f.displayHeight, FIGHTER_WIDTH, f.displayHeight, 5);
+      this.roundRect(ctx, sx + leanOffsetX - hw, sy - f.displayHeight, FIGHTER_WIDTH, f.displayHeight, 5);
       ctx.stroke();
 
       // Head section (top 30% of body)
       const headY = sy - f.displayHeight;
       const headH = f.displayHeight * 0.3;
-      const headGrad = ctx.createLinearGradient(sx - hw, headY, sx + hw, headY + headH);
+      const headGrad = ctx.createLinearGradient(sx + leanOffsetX - hw, headY, sx + leanOffsetX + hw, headY + headH);
       headGrad.addColorStop(0, this.shiftColor(bodyColor, 35));
       headGrad.addColorStop(1, this.shiftColor(bodyColor, 10));
       ctx.fillStyle = headGrad;
-      this.roundRect(ctx, sx - hw, headY, FIGHTER_WIDTH, headH, 5);
+      this.roundRect(ctx, sx + leanOffsetX - hw, headY, FIGHTER_WIDTH, headH, 5);
       ctx.fill();
 
       // Eyes (facing indicator)
-      const eyeBaseX = sx + 8 * f.facing;
+      const eyeBaseX = sx + leanOffsetX + 8 * f.facing;
       const eyeY = headY + headH * 0.55;
       ctx.fillStyle = '#fff';
       ctx.beginPath(); ctx.arc(eyeBaseX, eyeY, 3.5, 0, Math.PI * 2); ctx.fill();
@@ -226,6 +270,8 @@ export class Renderer {
       ctx.fillStyle = '#111';
       ctx.beginPath(); ctx.arc(eyeBaseX + 1.5 * f.facing, eyeY, 2, 0, Math.PI * 2); ctx.fill();
       ctx.beginPath(); ctx.arc(eyeBaseX - 10 * f.facing + 1.5 * f.facing, eyeY, 2, 0, Math.PI * 2); ctx.fill();
+
+      ctx.restore();
 
       // Attack limb extension
       this.drawAttackLimb(ctx, f, sx, sy, cameraX);
@@ -663,7 +709,7 @@ export class Renderer {
     ctx.fillStyle = 'rgba(255,255,255,0.25)';
     ctx.font = '9px monospace';
     ctx.textAlign = 'center';
-    ctx.fillText('P1: WASD+JKL  P2: Arrows+456  R: Restart  F1: Debug', 400, 596);
+    ctx.fillText('P1: WASD+JKL  P2: Arrows+456  >>Run  <<Backdash  R:Restart  F1:Debug', 400, 596);
     ctx.textAlign = 'left';
   }
 }

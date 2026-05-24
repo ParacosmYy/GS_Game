@@ -173,7 +173,8 @@ export class Fighter {
     return (
       this.state === FighterState.IDLE ||
       this.state === FighterState.WALK ||
-      this.state === FighterState.CROUCH
+      this.state === FighterState.CROUCH ||
+      this.state === FighterState.RUN
     );
   }
 
