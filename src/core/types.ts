@@ -23,30 +23,51 @@ export enum FighterState {
 
 // ===== Attack Types (KOF 4-button: A=轻拳 B=轻脚 C=重拳 D=重脚) =====
 export enum AttackType {
-  // 站立 (Stand)
-  STAND_A = 'STAND_A',   // 轻拳
-  STAND_B = 'STAND_B',   // 轻脚
-  STAND_C = 'STAND_C',   // 重拳
-  STAND_D = 'STAND_D',   // 重脚
+  // 站立 远距离 (Far Stand)
+  STAND_A = 'STAND_A',
+  STAND_B = 'STAND_B',
+  STAND_C = 'STAND_C',
+  STAND_D = 'STAND_D',
+  // 站立 近距离 (Close Stand) — 对手在80px内
+  CLOSE_A = 'CLOSE_A',
+  CLOSE_B = 'CLOSE_B',
+  CLOSE_C = 'CLOSE_C',
+  CLOSE_D = 'CLOSE_D',
+  // 命令通常技 (Command Normals)
+  CMD_GOFU_YOU = 'CMD_GOFU_YOU',   // →+B 外式·轟斧陽 (overhead)
+  CMD_88SHIKI = 'CMD_88SHIKI',     // ↘+D 八拾八式 (下段2Hit)
+  CMD_NARAKU = 'CMD_NARAKU',       // 空中↓+C 外式·奈落落とし
   // 蹲下 (Crouch)
-  CROUCH_A = 'CROUCH_A', // 蹲轻拳
-  CROUCH_B = 'CROUCH_B', // 蹲轻脚 (下段)
-  CROUCH_C = 'CROUCH_C', // 蹲重拳 (对空)
-  CROUCH_D = 'CROUCH_D', // 蹲重脚 (扫堂腿 KD)
+  CROUCH_A = 'CROUCH_A',
+  CROUCH_B = 'CROUCH_B',
+  CROUCH_C = 'CROUCH_C',
+  CROUCH_D = 'CROUCH_D',
   // 跳跃 (Jump)
   JUMP_A = 'JUMP_A',
   JUMP_B = 'JUMP_B',
   JUMP_C = 'JUMP_C',
   JUMP_D = 'JUMP_D',
   // Blowback Attack (CD攻击)
-  STAND_CD = 'STAND_CD',   // 地面CD击飞
-  JUMP_CD = 'JUMP_CD',     // 空中CD击飞
-  // 投技 & 必杀技
+  STAND_CD = 'STAND_CD',
+  JUMP_CD = 'JUMP_CD',
+  // 投技 & 通用必杀技
   THROW = 'THROW',
   SPECIAL_PROJECTILE = 'SPECIAL_PROJECTILE',
   SPECIAL_UPPER = 'SPECIAL_UPPER',
-  // 超必杀技 (DM - Desperation Move)
-  DM_OROCHINAGI = 'DM_OROCHINAGI',   // 大蛇薙 ↓↙←↙↓↘→+P
+  // 京专属必杀技 (Kyo Specials)
+  KYO_75KAI = 'KYO_75KAI',         // 75式·改 ↓↘→+K,K
+  KYO_75KAI_2 = 'KYO_75KAI_2',     // 75式·改 第二段
+  KYO_RED_KICK = 'KYO_RED_KICK',   // R.E.D. Kick ↓↙←+K
+  // 荒咬み连段系 (Aragami Chain)
+  KYO_ARAGAMI = 'KYO_ARAGAMI',             // 114式·荒咬み ↓↘→+A
+  KYO_ARAGAMI_KONOKIZU = 'KYO_ARAGAMI_KONOKIZU',   // 128式·九傷 (qcf+P followup)
+  KYO_ARAGAMI_YANOSABI = 'KYO_ARAGAMI_YANOSABI',   // 127式·八錆 (hcb+P followup)
+  // 毒咬み连段系 (Dokugami Chain)
+  KYO_DOKUGAMI = 'KYO_DOKUGAMI',         // 115式·毒咬み ↓↘→+C
+  KYO_TSUMIYOMI = 'KYO_TSUMIYOMI',       // 401式·罪詠み (hcb+P followup)
+  KYO_BATSUYOMI = 'KYO_BATSUYOMI',       // 402式·罰詠み (f+P followup)
+  // 超必杀技 (DM)
+  DM_OROCHINAGI = 'DM_OROCHINAGI',
 }
 
 // ===== Hit Level (防御判定) =====
@@ -96,9 +117,15 @@ export interface PowerGauge {
 // ===== MAX Mode State =====
 export interface MaxModeState {
   active: boolean;
-  timer: number;         // 剩余帧数
-  maxDuration: number;   // 总持续帧数
+  timer: number;
+  maxDuration: number;
 }
+
+// ===== Rekka Chain State (荒咬み/毒咬み连段) =====
+export type RekkaChain = 'aragami' | 'dokugami' | null;
+
+// ===== Close Range Distance =====
+export const CLOSE_RANGE = 80;
 
 // ===== Attack Phase =====
 export type AttackPhase = 'startup' | 'active' | 'recovery' | 'none';

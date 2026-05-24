@@ -65,6 +65,43 @@ export const FRAME_DATA = {
     damage: 75, hitstun: 15, blockstun: 10, pushback: 5,
     hitLevel: 'MID' as const, knockdown: false,
   },
+  // ── 近距离站立 (Close Stand) — 更快但更短 ──
+  CLOSE_A: {
+    startup: 3, active: 3, recovery: 4,
+    damage: 25, hitstun: 7, blockstun: 4, pushback: 1,
+    hitLevel: 'MID' as const, knockdown: false,
+  },
+  CLOSE_B: {
+    startup: 4, active: 3, recovery: 6,
+    damage: 30, hitstun: 9, blockstun: 5, pushback: 2,
+    hitLevel: 'LOW' as const, knockdown: false,
+  },
+  CLOSE_C: {
+    startup: 2, active: 3, recovery: 9,
+    damage: 70, hitstun: 15, blockstun: 9, pushback: 4,
+    hitLevel: 'MID' as const, knockdown: false,
+  },
+  CLOSE_D: {
+    startup: 4, active: 4, recovery: 12,
+    damage: 65, hitstun: 14, blockstun: 9, pushback: 4,
+    hitLevel: 'MID' as const, knockdown: false,
+  },
+  // ── 命令通常技 (Command Normals) ──
+  CMD_GOFU_YOU: {
+    startup: 10, active: 4, recovery: 14,
+    damage: 45, hitstun: 14, blockstun: 8, pushback: 3,
+    hitLevel: 'HIGH' as const, knockdown: false,  // overhead
+  },
+  CMD_88SHIKI: {
+    startup: 7, active: 3, recovery: 16,
+    damage: 55, hitstun: 12, blockstun: 7, pushback: 3,
+    hitLevel: 'LOW' as const, knockdown: false,
+  },
+  CMD_NARAKU: {
+    startup: 5, active: 5, recovery: 4,
+    damage: 50, hitstun: 16, blockstun: 10, pushback: 4,
+    hitLevel: 'HIGH' as const, knockdown: true,  // 空中KD
+  },
   // ── 蹲下攻击 (Crouch) ──
   CROUCH_A: {
     startup: 3, active: 3, recovery: 5,
@@ -141,6 +178,54 @@ export const FRAME_DATA = {
     damage: 200, hitstun: 0, blockstun: 18, pushback: 10,
     hitLevel: 'MID' as const, knockdown: true, chipDamage: 20,
   },
+  // ── 京专属必杀技 (Kyo Kusanagi) ──
+  KYO_75KAI: {
+    startup: 5, active: 4, recovery: 8,
+    damage: 40, hitstun: 10, blockstun: 6, pushback: 3,
+    hitLevel: 'MID' as const, knockdown: false,
+  },
+  KYO_75KAI_2: {
+    startup: 3, active: 4, recovery: 10,
+    damage: 50, hitstun: 12, blockstun: 7, pushback: 4,
+    hitLevel: 'MID' as const, knockdown: true,
+  },
+  KYO_RED_KICK: {
+    startup: 10, active: 5, recovery: 16,
+    damage: 70, hitstun: 14, blockstun: 9, pushback: 5,
+    hitLevel: 'HIGH' as const, knockdown: true,
+  },
+  // 荒咬み系
+  KYO_ARAGAMI: {
+    startup: 6, active: 4, recovery: 10,
+    damage: 55, hitstun: 12, blockstun: 7, pushback: 3,
+    hitLevel: 'MID' as const, knockdown: false,
+  },
+  KYO_ARAGAMI_KONOKIZU: {
+    startup: 4, active: 4, recovery: 8,
+    damage: 45, hitstun: 10, blockstun: 6, pushback: 3,
+    hitLevel: 'MID' as const, knockdown: false,
+  },
+  KYO_ARAGAMI_YANOSABI: {
+    startup: 8, active: 5, recovery: 14,
+    damage: 70, hitstun: 16, blockstun: 10, pushback: 5,
+    hitLevel: 'HIGH' as const, knockdown: false,  // overhead uppercut
+  },
+  // 毒咬み系
+  KYO_DOKUGAMI: {
+    startup: 7, active: 4, recovery: 12,
+    damage: 50, hitstun: 12, blockstun: 7, pushback: 3,
+    hitLevel: 'MID' as const, knockdown: false,
+  },
+  KYO_TSUMIYOMI: {
+    startup: 5, active: 4, recovery: 10,
+    damage: 45, hitstun: 10, blockstun: 6, pushback: 3,
+    hitLevel: 'MID' as const, knockdown: false,
+  },
+  KYO_BATSUYOMI: {
+    startup: 4, active: 5, recovery: 14,
+    damage: 65, hitstun: 15, blockstun: 9, pushback: 5,
+    hitLevel: 'MID' as const, knockdown: true,
+  },
 } as const;
 
 // ===== Hitbox Offsets (relative to fighter position, facing right) =====
@@ -150,6 +235,15 @@ export const HITBOX_OFFSETS = {
   STAND_B: { offsetX: 45, offsetY: -35, width: 50, height: 30 },
   STAND_C: { offsetX: 50, offsetY: -70, width: 55, height: 35 },
   STAND_D: { offsetX: 45, offsetY: -30, width: 60, height: 40 },
+  // 近距离 — 更近更窄
+  CLOSE_A: { offsetX: 40, offsetY: -70, width: 35, height: 25 },
+  CLOSE_B: { offsetX: 38, offsetY: -25, width: 40, height: 25 },
+  CLOSE_C: { offsetX: 42, offsetY: -65, width: 45, height: 35 },
+  CLOSE_D: { offsetX: 40, offsetY: -25, width: 50, height: 35 },
+  // 命令通常技
+  CMD_GOFU_YOU: { offsetX: 45, offsetY: -55, width: 50, height: 35 },  // overhead kick high
+  CMD_88SHIKI: { offsetX: 50, offsetY: -8, width: 55, height: 18 },    // low sweep
+  CMD_NARAKU: { offsetX: 30, offsetY: -35, width: 45, height: 40 },    // air down
   // 蹲下 — 低位置
   CROUCH_A: { offsetX: 50, offsetY: -35, width: 40, height: 20 },
   CROUCH_B: { offsetX: 50, offsetY: -15, width: 50, height: 20 },
@@ -169,6 +263,16 @@ export const HITBOX_OFFSETS = {
   JUMP_CD: { offsetX: 40, offsetY: -35, width: 55, height: 40 },
   // 超必杀技
   DM_OROCHINAGI: { offsetX: 40, offsetY: -65, width: 80, height: 60 },
+  // 京专属
+  KYO_75KAI: { offsetX: 42, offsetY: -30, width: 50, height: 30 },
+  KYO_75KAI_2: { offsetX: 45, offsetY: -35, width: 55, height: 35 },
+  KYO_RED_KICK: { offsetX: 40, offsetY: -50, width: 55, height: 40 },
+  KYO_ARAGAMI: { offsetX: 45, offsetY: -65, width: 50, height: 35 },
+  KYO_ARAGAMI_KONOKIZU: { offsetX: 45, offsetY: -55, width: 48, height: 30 },
+  KYO_ARAGAMI_YANOSABI: { offsetX: 40, offsetY: -75, width: 45, height: 45 },
+  KYO_DOKUGAMI: { offsetX: 45, offsetY: -60, width: 50, height: 35 },
+  KYO_TSUMIYOMI: { offsetX: 42, offsetY: -55, width: 48, height: 30 },
+  KYO_BATSUYOMI: { offsetX: 45, offsetY: -70, width: 50, height: 40 },
 } as const;
 
 // ===== Throw Constants =====

@@ -11,13 +11,16 @@ import {
   ROLL_SPEED, ROLL_DURATION, ROLL_INVINCIBLE_END, ROLL_RECOVERY,
   FRAME_DATA, LANDING_RECOVERY,
 } from '../core/constants.js';
-import { FighterState, AttackType } from '../core/types.js';
+import { FighterState, AttackType, CLOSE_RANGE } from '../core/types.js';
 import type { VFXSystem } from '../rendering/vfx.js';
+
+// Rekka followup input window (frames after hit/block during recovery)
+const REKKA_WINDOW = 20;
 
 /**
  * Per-frame fighter state controller.
- * Routes A/B/C/D buttons to correct AttackType per stance,
- * handles double-tap dash, special moves, physics, pushbox.
+ * KOF 2002 Kyo-specific routing: close/far, command normals,
+ * rekka chains (荒咬み/毒咬み), kick specials.
  */
 export class FighterController {
   private fighter: Fighter;
@@ -26,6 +29,7 @@ export class FighterController {
   private vfx: VFXSystem;
   private projectiles: Projectile[];
   private tickRef: { value: number };
+  private opponent: Fighter | null = null;
 
   // Double-tap detection
   private lastForwardTick = -999;
@@ -34,10 +38,10 @@ export class FighterController {
   private prevBack = false;
   private prevDown = false;
 
-  // Hop detection: track how long UP has been held
+  // Hop detection
   private upHoldFrames = 0;
   private upWasPressed = false;
-  private lastDownTick = -999; // for hyper jump detection
+  private lastDownTick = -999;
 
   constructor(
     fighter: Fighter,
@@ -57,12 +61,13 @@ export class FighterController {
 
   get fighterRef(): Fighter { return this.fighter; }
 
+  setOpponent(opp: Fighter): void { this.opponent = opp; }
+
   update(input: ResolvedInput): void {
     this.tickStateMachine(input);
     this.prevForward = input.forward;
     this.prevBack = input.back;
     this.prevDown = input.down;
-    // Track UP hold for hop detection
     if (input.up) {
       if (!this.upWasPressed) this.upHoldFrames = 0;
       this.upHoldFrames++;
@@ -99,14 +104,14 @@ export class FighterController {
     f.x = Math.max(FIGHTER_WIDTH / 2, Math.min(f.x, STAGE_WIDTH - FIGHTER_WIDTH / 2));
   }
 
+  // ─── Input helpers ───
+
   private forwardJustPressed(input: ResolvedInput): boolean {
     return input.forward && !this.prevForward;
   }
-
   private backJustPressed(input: ResolvedInput): boolean {
     return input.back && !this.prevBack;
   }
-
   private checkDoubleForward(input: ResolvedInput): boolean {
     if (this.forwardJustPressed(input)) {
       const gap = this.tickRef.value - this.lastForwardTick;
@@ -115,7 +120,6 @@ export class FighterController {
     }
     return false;
   }
-
   private checkDoubleBack(input: ResolvedInput): boolean {
     if (this.backJustPressed(input)) {
       const gap = this.tickRef.value - this.lastBackTick;
@@ -124,23 +128,39 @@ export class FighterController {
     }
     return false;
   }
-
-  /** Check if UP was just released this frame (for hop) */
   private upJustReleased(input: ResolvedInput): boolean {
     return !input.up && this.upWasPressed;
   }
-
-  /** Check hyper jump: ↓ was pressed within HYPER_CHARGE_WINDOW frames before ↑ */
   private checkHyperJump(): boolean {
     const gap = this.tickRef.value - this.lastDownTick;
     return gap > 0 && gap <= HYPER_CHARGE_WINDOW;
   }
 
-  /** Determine AttackType based on stance + button */
+  /** Is the opponent within close-attack range? */
+  private isCloseRange(): boolean {
+    if (!this.opponent) return false;
+    return Math.abs(this.fighter.x - this.opponent.x) < CLOSE_RANGE;
+  }
+
+  // ─── Attack routing ───
+
+  /**
+   * Route A/B/C/D to the correct AttackType based on:
+   *  - Air: check ↓+C for 奈落落とし, else standard air attacks
+   *  - Crouch: standard crouch attacks
+   *  - Stand: close/far distinction + command normals (→+B, ↘+D)
+   */
   private routeAttack(input: ResolvedInput): AttackType | null {
     const f = this.fighter;
+    const isAir = f.state === FighterState.JUMP
+      || f.state === FighterState.RUN_JUMP
+      || f.state === FighterState.HOP
+      || f.state === FighterState.HYPER_JUMP;
 
-    if (f.state === FighterState.JUMP || f.state === FighterState.RUN_JUMP) {
+    // ── Air attacks ──
+    if (isAir) {
+      // 奈落落とし: 空中↓+C
+      if (input.buttonCPressed && input.down) return AttackType.CMD_NARAKU;
       if (input.buttonAPressed) return AttackType.JUMP_A;
       if (input.buttonBPressed) return AttackType.JUMP_B;
       if (input.buttonCPressed) return AttackType.JUMP_C;
@@ -148,7 +168,10 @@ export class FighterController {
       return null;
     }
 
+    // ── Crouch attacks ──
     if (f.state === FighterState.CROUCH) {
+      // ↘+D = 八拾八式 command normal (from crouch)
+      if (input.buttonDPressed && input.forward && input.down) return AttackType.CMD_88SHIKI;
       if (input.buttonAPressed) return AttackType.CROUCH_A;
       if (input.buttonBPressed) return AttackType.CROUCH_B;
       if (input.buttonCPressed) return AttackType.CROUCH_C;
@@ -156,32 +179,105 @@ export class FighterController {
       return null;
     }
 
-    // Stand / Walk / Run
-    if (input.buttonAPressed) return AttackType.STAND_A;
-    if (input.buttonBPressed) return AttackType.STAND_B;
-    if (input.buttonCPressed) return AttackType.STAND_C;
-    if (input.buttonDPressed) return AttackType.STAND_D;
+    // ── Stand / Walk / Run attacks ──
+    const close = this.isCloseRange();
+
+    // Command normals checked first (direction + button)
+    if (input.buttonBPressed && input.forward && !input.down) return AttackType.CMD_GOFU_YOU;  // →+B
+    if (input.buttonDPressed && input.forward && input.down) return AttackType.CMD_88SHIKI;     // ↘+D
+
+    // Close vs Far
+    if (input.buttonAPressed) return close ? AttackType.CLOSE_A : AttackType.STAND_A;
+    if (input.buttonBPressed) return close ? AttackType.CLOSE_B : AttackType.STAND_B;
+    if (input.buttonCPressed) return close ? AttackType.CLOSE_C : AttackType.STAND_C;
+    if (input.buttonDPressed) return close ? AttackType.CLOSE_D : AttackType.STAND_D;
     return null;
   }
 
-  /** Try special move (punch buttons only: A or C) */
-  private trySpecialMove(input: ResolvedInput): AttackType | null {
+  /** Try punch specials: 荒咬み(qcf+A), 毒咬み(qcf+C), fireball, dragon upper */
+  private tryPunchSpecial(input: ResolvedInput): AttackType | null {
     if (!input.punchPressed) return null;
-    const special = this.cmdBuf.checkSpecial(this.tickRef.value, true);
-    if (special === AttackType.SPECIAL_PROJECTILE) return special;
-    if (special === AttackType.SPECIAL_UPPER) return special;
+
+    const tick = this.tickRef.value;
+
+    // Check QCF: determines punch special by which button
+    const qcf = this.cmdBuf.checkSpecial(tick, true);
+    if (qcf) {
+      if (qcf === AttackType.SPECIAL_PROJECTILE) return AttackType.SPECIAL_PROJECTILE;
+      if (qcf === AttackType.SPECIAL_UPPER) return AttackType.SPECIAL_UPPER;
+    }
+
+    // Kyo rekka starters via QCF + specific button
+    if (this.cmdBuf.hasQCF(tick)) {
+      if (input.buttonAPressed) return AttackType.KYO_ARAGAMI;   // 荒咬み: QCF+A
+      if (input.buttonCPressed) return AttackType.KYO_DOKUGAMI;  // 毒咬み: QCF+C
+    }
+
     return null;
   }
 
-  /** Try DM super move (punch buttons) */
+  /** Try kick specials: 75式改(QCF+K), R.E.D. Kick(QCB+K) */
+  private tryKickSpecial(input: ResolvedInput): AttackType | null {
+    if (!input.kickPressed) return null;
+    return this.cmdBuf.checkKickSpecial(this.tickRef.value, true);
+  }
+
+  /** Try DM super move */
   private tryDM(input: ResolvedInput): AttackType | null {
     if (!input.punchPressed) return null;
     return this.cmdBuf.checkDM(this.tickRef.value, true);
   }
 
+  /** Check rekka chain followup inputs during attack recovery */
+  private tryRekkaFollowup(input: ResolvedInput): AttackType | null {
+    const f = this.fighter;
+    if (!f.rekkaChain || f.rekkaWindow <= 0) return null;
+    if (f.attackPhase !== 'recovery' && f.attackPhase !== 'active') return null;
+    if (!input.punchPressed) return null;
+
+    const tick = this.tickRef.value;
+
+    if (f.rekkaChain === 'aragami') {
+      // 荒咬み → 九傷 (QCF+P) or 八錆 (HCB+P)
+      const qcf = this.cmdBuf.checkRekkaFollowQCF(tick, true);
+      if (qcf) return qcf;
+      const hcb = this.cmdBuf.checkRekkaFollowHCB(tick, true);
+      if (hcb) return hcb;
+    }
+
+    if (f.rekkaChain === 'dokugami') {
+      // 毒咬み → 罪詠み (HCB+P)
+      const follow = this.cmdBuf.checkDokugamiFollow(tick, true);
+      if (follow) return follow;
+    }
+
+    return null;
+  }
+
+  /** Check 75式改 second hit: K pressed during first hit recovery */
+  private try75KaiFollowup(input: ResolvedInput): boolean {
+    const f = this.fighter;
+    if (f.currentAttack !== AttackType.KYO_75KAI) return false;
+    if (f.attackPhase !== 'recovery' && f.attackPhase !== 'active') return false;
+    return input.kickPressed;
+  }
+
+  /** Check 罰詠み: f+P after 罪詠み */
+  private tryBatsuyomi(input: ResolvedInput): boolean {
+    const f = this.fighter;
+    if (f.currentAttack !== AttackType.KYO_TSUMIYOMI) return false;
+    if (f.attackPhase !== 'recovery' && f.attackPhase !== 'active') return false;
+    return this.cmdBuf.checkBatsuyomiInput(input.forward, input.punchPressed);
+  }
+
+  // ─── State machine ───
+
   private tickStateMachine(input: ResolvedInput): void {
     const f = this.fighter;
     f.tickTimers();
+
+    // Decrement rekka window
+    if (f.rekkaWindow > 0) f.rekkaWindow--;
 
     switch (f.state) {
       case FighterState.IDLE:
@@ -189,13 +285,9 @@ export class FighterController {
         f.displayHeight = 100;
         f.vx = 0;
 
-        // Priority 0: Roll紧急回避 (A+B)
+        // Roll (A+B)
         if (input.rollPressed && f.canAct() && f.isGrounded()) {
-          if (input.back) {
-            f.state = FighterState.BACK_ROLL;
-          } else {
-            f.state = FighterState.ROLL;
-          }
+          f.state = input.back ? FighterState.BACK_ROLL : FighterState.ROLL;
           f.rollTimer = ROLL_DURATION;
           f.vx = (f.state === FighterState.ROLL ? ROLL_SPEED : -ROLL_SPEED) * f.facing;
           f.displayHeight = 60;
@@ -203,13 +295,13 @@ export class FighterController {
           return;
         }
 
-        // Priority 0.5: CD Blowback (C+D)
+        // CD Blowback (C+D)
         if (input.blowbackPressed && f.canAct()) {
           f.startAttack(AttackType.STAND_CD);
           return;
         }
 
-        // Priority 1: Double-tap back → backdash
+        // Double-tap back → backdash
         if (this.checkDoubleBack(input) && f.canAct() && f.isGrounded()) {
           f.state = FighterState.BACKDASH;
           f.vx = -BACKDASH_VX * f.facing;
@@ -219,70 +311,70 @@ export class FighterController {
           return;
         }
 
-        // Priority 2: Double-tap forward → run
+        // Double-tap forward → run
         if (this.checkDoubleForward(input) && f.canAct() && f.isGrounded()) {
           f.state = FighterState.RUN;
           f.vx = RUN_SPEED * f.facing;
           return;
         }
 
-        // Priority 3: Jump / Hop / Hyper Jump
+        // Jump / Hop / Hyper Jump
         if (this.upJustReleased(input) && f.isGrounded() && this.upHoldFrames > 0) {
           if (this.upHoldFrames <= HOP_THRESHOLD) {
-            // 小跳 (短按↑)
             f.vy = HOP_VELOCITY;
             f.state = FighterState.HOP;
           } else if (this.checkHyperJump()) {
-            // 大跳 (↓→↑)
             f.vy = HYPER_JUMP_VY;
             f.vx = HYPER_JUMP_VX * (input.forward ? 1 : input.back ? -1 : 0) * f.facing;
             f.state = FighterState.HYPER_JUMP;
             this.vfx.spawnDust(f.x, STAGE_GROUND_Y);
           } else {
-            // 普通跳 (长按↑松开)
             f.vy = JUMP_VELOCITY;
             f.state = FighterState.JUMP;
           }
           return;
         }
 
-        // Track ↓ press for hyper jump
-        if (input.down && !this.prevDown) {
-          this.lastDownTick = this.tickRef.value;
-        }
+        if (input.down && !this.prevDown) this.lastDownTick = this.tickRef.value;
 
-        // Priority 4: Crouch
+        // Crouch
         if (input.down && f.isGrounded()) {
           f.state = FighterState.CROUCH;
           f.displayHeight = 50;
           return;
         }
 
-        // Priority 5: Throw
+        // Throw
         if (input.throwAttackPressed && f.canAct()) {
           f.startAttack(AttackType.THROW);
           return;
         }
 
-        // Priority 5.5: DM super move (check before normal special)
-        if (input.punchPressed && f.canAct()) {
+        // DM super move (highest special priority)
+        if (f.canAct()) {
           const dm = this.tryDM(input);
           if (dm) { f.startAttack(dm); return; }
         }
 
-        // Priority 6: Special move (punch buttons + motion)
+        // Punch specials (荒咬み/毒咬み/fireball/upper)
         if (input.punchPressed && f.canAct()) {
-          const special = this.trySpecialMove(input);
+          const special = this.tryPunchSpecial(input);
           if (special) { f.startAttack(special); return; }
         }
 
-        // Priority 7: Normal attack (route by stance + button)
+        // Kick specials (75改/R.E.D. Kick)
+        if (f.canAct()) {
+          const kickSpec = this.tryKickSpecial(input);
+          if (kickSpec) { f.startAttack(kickSpec); return; }
+        }
+
+        // Normal attacks
         if ((input.punchPressed || input.kickPressed) && f.canAct()) {
           const atk = this.routeAttack(input);
           if (atk) { f.startAttack(atk); return; }
         }
 
-        // Walk / idle
+        // Walk
         if (input.forward) {
           f.vx = WALK_SPEED * f.facing;
           f.state = FighterState.WALK;
@@ -319,8 +411,14 @@ export class FighterController {
           return;
         }
 
+        // Kick specials from run
+        if (f.canAct()) {
+          const kickSpec = this.tryKickSpecial(input);
+          if (kickSpec) { f.startAttack(kickSpec); return; }
+        }
+
         if (input.punchPressed && f.canAct()) {
-          const special = this.trySpecialMove(input);
+          const special = this.tryPunchSpecial(input);
           if (special) { f.startAttack(special); return; }
         }
 
@@ -362,16 +460,7 @@ export class FighterController {
         break;
       }
 
-      case FighterState.HOP: {
-        // 小跳: 短弧线, 可以空中攻击
-        if ((input.punchPressed || input.kickPressed) && !f.currentAttack) {
-          const atk = this.routeAttack(input);
-          if (atk) f.startAttack(atk);
-        }
-        f.vy += GRAVITY;
-        break;
-      }
-
+      case FighterState.HOP:
       case FighterState.HYPER_JUMP: {
         if ((input.punchPressed || input.kickPressed) && !f.currentAttack) {
           const atk = this.routeAttack(input);
@@ -383,7 +472,6 @@ export class FighterController {
 
       case FighterState.JUMP:
       case FighterState.RUN_JUMP: {
-        // Air CD blowback
         if (input.blowbackPressed && !f.currentAttack) {
           f.startAttack(AttackType.JUMP_CD);
         } else if ((input.punchPressed || input.kickPressed) && !f.currentAttack) {
@@ -415,15 +503,56 @@ export class FighterController {
       case FighterState.CROUCH_ATTACK:
       case FighterState.AIR_ATTACK:
       case FighterState.THROW: {
+        // Spawn projectile for fireball
         if (f.currentAttack === AttackType.SPECIAL_PROJECTILE && f.attackPhase === 'active' && f.attackFrame === 0) {
           this.projectiles.push(new Projectile(
             f.x + 50 * f.facing, f.y - 50, f.facing,
             FRAME_DATA.SPECIAL_PROJECTILE.active, this.playerIndex,
           ));
         }
+        // Dragon upper rises
         if (f.currentAttack === AttackType.SPECIAL_UPPER && f.attackPhase === 'active') {
           f.vy = -6;
         }
+        // R.E.D. Kick: rises during active
+        if (f.currentAttack === AttackType.KYO_RED_KICK && f.attackPhase === 'active') {
+          f.vy = -4;
+          f.vx = 3 * f.facing;
+        }
+
+        // ── Rekka chain followup checks ──
+        if (f.rekkaChain && f.rekkaWindow > 0 && f.attackPhase === 'recovery') {
+          // 荒咬み chain followups
+          const rekkaFollow = this.tryRekkaFollowup(input);
+          if (rekkaFollow) {
+            f.endAttack();
+            f.startAttack(rekkaFollow);
+            f.rekkaWindow = REKKA_WINDOW;
+            return;
+          }
+          // 毒咬み chain: 罪詠み → 罰詠み
+          if (f.currentAttack === AttackType.KYO_TSUMIYOMI) {
+            if (this.tryBatsuyomi(input)) {
+              f.endAttack();
+              f.startAttack(AttackType.KYO_BATSUYOMI);
+              f.rekkaChain = null;
+              return;
+            }
+          }
+        }
+
+        // ── 75式改 second hit ──
+        if (this.try75KaiFollowup(input)) {
+          f.endAttack();
+          f.startAttack(AttackType.KYO_75KAI_2);
+          return;
+        }
+
+        // Set rekka window on rekka starter hit
+        if (f.rekkaChain && f.attackPhase === 'active' && f.attackFrame === 0) {
+          f.rekkaWindow = REKKA_WINDOW;
+        }
+
         f.tickAttack();
         if (!f.currentAttack && !f.isGrounded()) {
           f.state = FighterState.JUMP;

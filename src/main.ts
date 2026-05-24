@@ -32,7 +32,7 @@ const vfx = new VFXSystem();
 const screenShake = new ScreenShake();
 
 // ===== Entities =====
-const p1 = new Fighter(STAGE_WIDTH * 0.33, '#cc2222', 1);
+const p1 = new Fighter(STAGE_WIDTH * 0.33, '#ff6600', 1);  // 草薙京 orange
 const p2 = new Fighter(STAGE_WIDTH * 0.67, '#2244cc', -1);
 const projectiles: Projectile[] = [];
 const tickRef = { value: 0 };
@@ -42,6 +42,8 @@ const p2Cmd = new CommandBuffer();
 
 const p1Ctrl = new FighterController(p1, 0, p1Cmd, vfx, projectiles, tickRef);
 const p2Ctrl = new FighterController(p2, 1, p2Cmd, vfx, projectiles, tickRef);
+p1Ctrl.setOpponent(p2);
+p2Ctrl.setOpponent(p1);
 
 // ===== Power Gauge & MAX Mode =====
 const gauges: [PowerGauge, PowerGauge] = [createPowerGauge(), createPowerGauge()];

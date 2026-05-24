@@ -313,20 +313,55 @@ export class Renderer {
     const name = f.currentAttack as string;
 
     // Determine punch (A/C) vs kick (B/D) for limb color and style
-    const isPunch = name.endsWith('_A') || name.endsWith('_C') || f.currentAttack === AttackType.SPECIAL_PROJECTILE || f.currentAttack === AttackType.SPECIAL_UPPER;
-    const isHeavy = name.endsWith('_C') || name.endsWith('_D') || f.currentAttack === AttackType.STAND_C || f.currentAttack === AttackType.STAND_D;
+    const isPunch = name.endsWith('_A') || name.endsWith('_C')
+      || f.currentAttack === AttackType.SPECIAL_PROJECTILE
+      || f.currentAttack === AttackType.SPECIAL_UPPER
+      || f.currentAttack === AttackType.KYO_ARAGAMI
+      || f.currentAttack === AttackType.KYO_ARAGAMI_KONOKIZU
+      || f.currentAttack === AttackType.KYO_ARAGAMI_YANOSABI
+      || f.currentAttack === AttackType.KYO_DOKUGAMI
+      || f.currentAttack === AttackType.KYO_TSUMIYOMI
+      || f.currentAttack === AttackType.KYO_BATSUYOMI;
+    const isHeavy = name.endsWith('_C') || name.endsWith('_D')
+      || f.currentAttack === AttackType.STAND_CD
+      || f.currentAttack === AttackType.KYO_RED_KICK;
+
+    const isFireMove = name.startsWith('KYO_') || f.currentAttack === AttackType.DM_OROCHINAGI;
 
     const limbLen = isHeavy ? 42 : 35;
     const limbWidth = isHeavy ? 10 : 8;
 
     ctx.save();
-    ctx.strokeStyle = isPunch ? '#ffdd44' : '#44ddff';
-    ctx.lineWidth = limbWidth;
-    ctx.lineCap = 'round';
-    ctx.shadowColor = isPunch ? '#ffaa00' : '#00aaff';
-    ctx.shadowBlur = 8;
+    if (isFireMove) {
+      // Fire-themed limbs for Kyo specials
+      ctx.strokeStyle = isPunch ? '#ff6622' : '#ff4400';
+      ctx.lineWidth = limbWidth + 4;
+      ctx.lineCap = 'round';
+      ctx.shadowColor = '#ff4400';
+      ctx.shadowBlur = 18;
+    } else {
+      ctx.strokeStyle = isPunch ? '#ffdd44' : '#44ddff';
+      ctx.lineWidth = limbWidth;
+      ctx.lineCap = 'round';
+      ctx.shadowColor = isPunch ? '#ffaa00' : '#00aaff';
+      ctx.shadowBlur = 8;
+    }
 
-    if (name.startsWith('STAND')) {
+    if (name.startsWith('CLOSE')) {
+      // Close-range attacks: short, fast limbs
+      const reach = limbLen * 0.5 * (0.6 + progress * 0.4);
+      if (isPunch) {
+        ctx.beginPath();
+        ctx.moveTo(sx + 8 * f.facing, sy - f.displayHeight * 0.6);
+        ctx.lineTo(sx + (FIGHTER_WIDTH / 2 + reach) * f.facing, sy - f.displayHeight * 0.6);
+        ctx.stroke();
+      } else {
+        ctx.beginPath();
+        ctx.moveTo(sx + 5 * f.facing, sy - f.displayHeight * 0.35);
+        ctx.lineTo(sx + (FIGHTER_WIDTH / 2 + reach) * f.facing, sy - f.displayHeight * 0.25);
+        ctx.stroke();
+      }
+    } else if (name.startsWith('STAND')) {
       // Standing attack
       if (isPunch) {
         const reach = limbLen * (0.5 + progress * 0.5);
@@ -365,12 +400,128 @@ export class Renderer {
         ctx.lineTo(sx + (FIGHTER_WIDTH / 2 + reach) * f.facing, sy - f.displayHeight * 0.4);
         ctx.stroke();
       } else {
-        // Air kick: angles down
         ctx.beginPath();
         ctx.moveTo(sx + 5 * f.facing, sy - f.displayHeight * 0.25);
         ctx.lineTo(sx + (FIGHTER_WIDTH / 2 + reach) * f.facing, sy - f.displayHeight * 0.1);
         ctx.stroke();
       }
+    } else if (f.currentAttack === AttackType.CMD_NARAKU) {
+      // 奈落落とし: downward air punch
+      ctx.strokeStyle = '#ffaa22';
+      ctx.shadowColor = '#ff6600';
+      ctx.lineWidth = 12;
+      const reach = limbLen * 1.0;
+      ctx.beginPath();
+      ctx.moveTo(sx + 5 * f.facing, sy - f.displayHeight * 0.3);
+      ctx.lineTo(sx + 5 * f.facing, sy - f.displayHeight * 0.3 + reach);
+      ctx.stroke();
+    } else if (f.currentAttack === AttackType.CMD_GOFU_YOU) {
+      // 轟斧陽: high overhead kick
+      ctx.strokeStyle = '#44ddff';
+      ctx.shadowColor = '#00aaff';
+      const reach = limbLen * 1.0;
+      ctx.beginPath();
+      ctx.moveTo(sx + 5 * f.facing, sy - f.displayHeight * 0.5);
+      ctx.lineTo(sx + (FIGHTER_WIDTH / 2 + reach) * f.facing, sy - f.displayHeight * 0.7);
+      ctx.stroke();
+    } else if (f.currentAttack === AttackType.CMD_88SHIKI) {
+      // 八拾八式: low two-hit sweep
+      ctx.strokeStyle = '#44ddff';
+      ctx.shadowColor = '#00aaff';
+      ctx.lineWidth = 10;
+      const reach = limbLen * 1.1;
+      ctx.beginPath();
+      ctx.moveTo(sx + 5 * f.facing, sy - 8);
+      ctx.lineTo(sx + (FIGHTER_WIDTH / 2 + reach) * f.facing, sy - 2);
+      ctx.stroke();
+    } else if (f.currentAttack === AttackType.KYO_75KAI || f.currentAttack === AttackType.KYO_75KAI_2) {
+      // 75式改: forward kick combo
+      const reach = limbLen * (f.currentAttack === AttackType.KYO_75KAI_2 ? 1.2 : 1.0);
+      ctx.strokeStyle = '#ff4400';
+      ctx.shadowColor = '#ff6600';
+      ctx.shadowBlur = 14;
+      ctx.lineWidth = f.currentAttack === AttackType.KYO_75KAI_2 ? 12 : 10;
+      ctx.beginPath();
+      ctx.moveTo(sx + 5 * f.facing, sy - f.displayHeight * 0.35);
+      ctx.lineTo(sx + (FIGHTER_WIDTH / 2 + reach) * f.facing, sy - f.displayHeight * 0.25);
+      ctx.stroke();
+    } else if (f.currentAttack === AttackType.KYO_RED_KICK) {
+      // R.E.D. Kick: high overhead flame kick
+      ctx.strokeStyle = '#ff4400';
+      ctx.shadowColor = '#ff2200';
+      ctx.shadowBlur = 16;
+      ctx.lineWidth = 12;
+      const reach = limbLen * 1.3;
+      ctx.beginPath();
+      ctx.moveTo(sx + 5 * f.facing, sy - f.displayHeight * 0.4);
+      ctx.lineTo(sx + (FIGHTER_WIDTH / 2 + reach) * f.facing, sy - f.displayHeight * 0.65);
+      ctx.stroke();
+    } else if (f.currentAttack === AttackType.KYO_ARAGAMI
+      || f.currentAttack === AttackType.KYO_DOKUGAMI) {
+      // 荒咬み/毒咬み: flame fist forward
+      const reach = limbLen * 1.1;
+      ctx.strokeStyle = '#ff6622';
+      ctx.shadowColor = '#ff4400';
+      ctx.shadowBlur = 16;
+      ctx.lineWidth = 12;
+      ctx.beginPath();
+      ctx.moveTo(sx + 10 * f.facing, sy - f.displayHeight * 0.6);
+      ctx.lineTo(sx + (FIGHTER_WIDTH / 2 + reach) * f.facing, sy - f.displayHeight * 0.55);
+      ctx.stroke();
+      // Fire burst at fist
+      ctx.fillStyle = '#ffaa0088';
+      ctx.beginPath();
+      ctx.arc(sx + (FIGHTER_WIDTH / 2 + reach) * f.facing, sy - f.displayHeight * 0.55,
+        8 + progress * 6, 0, Math.PI * 2);
+      ctx.fill();
+    } else if (f.currentAttack === AttackType.KYO_ARAGAMI_KONOKIZU) {
+      // 九傷: flame uppercut followup
+      const reach = limbLen * 1.2;
+      ctx.strokeStyle = '#ff8822';
+      ctx.shadowColor = '#ff4400';
+      ctx.lineWidth = 11;
+      ctx.beginPath();
+      ctx.moveTo(sx + 5 * f.facing, sy - f.displayHeight * 0.5);
+      ctx.lineTo(sx + 10 * f.facing, sy - f.displayHeight * 0.5 - reach);
+      ctx.stroke();
+    } else if (f.currentAttack === AttackType.KYO_ARAGAMI_YANOSABI) {
+      // 八錆: overhead flame slam
+      ctx.strokeStyle = '#ff4400';
+      ctx.shadowColor = '#ff2200';
+      ctx.shadowBlur = 20;
+      ctx.lineWidth = 14;
+      const reach = limbLen * 1.3;
+      ctx.beginPath();
+      ctx.moveTo(sx + 5 * f.facing, sy - f.displayHeight * 0.7);
+      ctx.lineTo(sx + (FIGHTER_WIDTH / 2 + reach) * f.facing, sy - f.displayHeight * 0.35);
+      ctx.stroke();
+    } else if (f.currentAttack === AttackType.KYO_TSUMIYOMI) {
+      // 罪詠み: flame backhand
+      const reach = limbLen * 1.0;
+      ctx.strokeStyle = '#ff6622';
+      ctx.shadowColor = '#ff4400';
+      ctx.lineWidth = 11;
+      ctx.beginPath();
+      ctx.moveTo(sx + 10 * f.facing, sy - f.displayHeight * 0.55);
+      ctx.lineTo(sx + (FIGHTER_WIDTH / 2 + reach) * f.facing, sy - f.displayHeight * 0.5);
+      ctx.stroke();
+    } else if (f.currentAttack === AttackType.KYO_BATSUYOMI) {
+      // 罰詠み: flame uppercut finisher
+      ctx.strokeStyle = '#ff4400';
+      ctx.shadowColor = '#ff2200';
+      ctx.shadowBlur = 20;
+      ctx.lineWidth = 14;
+      const reach = limbLen * 1.4;
+      ctx.beginPath();
+      ctx.moveTo(sx + 5 * f.facing, sy - f.displayHeight * 0.5);
+      ctx.lineTo(sx + 10 * f.facing, sy - f.displayHeight * 0.5 - reach);
+      ctx.stroke();
+      // Fire explosion at top
+      ctx.fillStyle = '#ffaa0066';
+      ctx.beginPath();
+      ctx.arc(sx + 10 * f.facing, sy - f.displayHeight * 0.5 - reach,
+        12 + progress * 8, 0, Math.PI * 2);
+      ctx.fill();
     } else if (f.currentAttack === AttackType.SPECIAL_UPPER) {
       const reach = limbLen * 1.2;
       ctx.beginPath();

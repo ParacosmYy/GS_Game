@@ -83,6 +83,83 @@ export class CommandBuffer {
     return null;
   }
 
+  /** Check kick special moves (75改, R.E.D. Kick) */
+  checkKickSpecial(currentFrame: number, kickPressed: boolean): AttackType | null {
+    if (!kickPressed) return null;
+
+    const recent = this.history.filter(
+      (r) => currentFrame - r.frame <= COMMAND_WINDOW,
+    );
+
+    // QCB ↓↙←+K → R.E.D. Kick
+    if (this.matchSequence(recent, ['down', 'downback', 'back'])
+      || this.matchSequence(recent, ['down', 'back'])) {
+      return AttackType.KYO_RED_KICK;
+    }
+
+    // QCF ↓↘→+K → 75式改
+    if (this.matchSequence(recent, ['down', 'downforward', 'forward'])
+      || this.matchSequence(recent, ['down', 'forward'])) {
+      return AttackType.KYO_75KAI;
+    }
+
+    return null;
+  }
+
+  /** Check rekka followup: QCF+P during recovery */
+  checkRekkaFollowQCF(currentFrame: number, punchPressed: boolean): AttackType | null {
+    if (!punchPressed) return null;
+    const recent = this.history.filter(
+      (r) => currentFrame - r.frame <= COMMAND_WINDOW,
+    );
+    if (this.matchSequence(recent, ['down', 'forward'])
+      || this.matchSequence(recent, ['down', 'downforward', 'forward'])) {
+      return AttackType.KYO_ARAGAMI_KONOKIZU;  // 九傷
+    }
+    return null;
+  }
+
+  /** Check rekka followup: HCB+P during recovery */
+  checkRekkaFollowHCB(currentFrame: number, punchPressed: boolean): AttackType | null {
+    if (!punchPressed) return null;
+    const recent = this.history.filter(
+      (r) => currentFrame - r.frame <= HCF_WINDOW,
+    );
+    if (this.matchSequence(recent, ['forward', 'down', 'back'])
+      || this.matchSequence(recent, ['forward', 'downforward', 'down', 'downback', 'back'])) {
+      return AttackType.KYO_ARAGAMI_YANOSABI;  // 八錆
+    }
+    return null;
+  }
+
+  /** Check dokugami chain followup: HCB+P after 毒咬み */
+  checkDokugamiFollow(currentFrame: number, punchPressed: boolean): AttackType | null {
+    if (!punchPressed) return null;
+    const recent = this.history.filter(
+      (r) => currentFrame - r.frame <= HCF_WINDOW,
+    );
+    // HCB for 罪詠み
+    if (this.matchSequence(recent, ['forward', 'down', 'back'])
+      || this.matchSequence(recent, ['forward', 'downforward', 'down', 'downback', 'back'])) {
+      return AttackType.KYO_TSUMIYOMI;
+    }
+    return null;
+  }
+
+  /** Check dokugami final: f+P after 罪詠み */
+  checkBatsuyomiInput(forward: boolean, punchPressed: boolean): boolean {
+    return forward && punchPressed;
+  }
+
+  /** Check if QCF motion is present in recent history */
+  hasQCF(currentFrame: number): boolean {
+    const recent = this.history.filter(
+      (r) => currentFrame - r.frame <= COMMAND_WINDOW,
+    );
+    return this.matchSequence(recent, ['down', 'downforward', 'forward'])
+      || this.matchSequence(recent, ['down', 'forward']);
+  }
+
   /** Reset buffer (e.g., on knockdown) */
   reset(): void {
     this.history = [];

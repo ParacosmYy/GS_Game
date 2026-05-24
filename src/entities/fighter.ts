@@ -1,9 +1,13 @@
 import {
-  FighterState,
-  AttackType,
   AttackPhase,
   Direction,
   BlockType,
+  RekkaChain,
+} from '../core/types.js';
+import { CLOSE_RANGE } from '../core/types.js';
+import {
+  FighterState,
+  AttackType,
 } from '../core/types.js';
 import {
   STAGE_GROUND_Y,
@@ -39,6 +43,10 @@ export class Fighter {
   landingRecovery = 0;
   rollTimer = 0;
   blockType: BlockType = 'HIGH';
+
+  // Rekka chain state (荒咬み/毒咬み)
+  rekkaChain: RekkaChain = null;
+  rekkaWindow = 0;  // frames remaining to input followup
 
   // Visual height (for crouch)
   displayHeight = FIGHTER_HEIGHT;
@@ -112,7 +120,17 @@ export class Fighter {
     } else if (attackType === AttackType.THROW) {
       this.state = FighterState.THROW;
     } else {
+      // STAND_*, CLOSE_*, CMD_*, KYO_*, SPECIAL_*, DM_*, STAND_CD
       this.state = FighterState.STAND_ATTACK;
+    }
+
+    // Set rekka chain state for followup tracking
+    if (attackType === AttackType.KYO_ARAGAMI) {
+      this.rekkaChain = 'aragami';
+    } else if (attackType === AttackType.KYO_DOKUGAMI) {
+      this.rekkaChain = 'dokugami';
+    } else {
+      this.rekkaChain = null;
     }
   }
 
@@ -225,5 +243,8 @@ export class Fighter {
     this.landingRecovery = 0;
     this.displayHeight = FIGHTER_HEIGHT;
     this.isKnockedDown = false;
+    this.rollTimer = 0;
+    this.rekkaChain = null;
+    this.rekkaWindow = 0;
   }
 }
