@@ -139,6 +139,15 @@ export enum AttackType {
   DM_V_SLASHER = 'DM_V_SLASHER',             // V字金锯 (Leona)
   DM_CHAIN_SHOT = 'DM_CHAIN_SHOT',           // Chain Shot (K')
   DM_FREEZE = 'DM_FREEZE',                   // Freeze Execution (Kula)
+  // 超必杀技SDM (Super Desperation Move — MAX mode only, costs extra stock)
+  SDM_OROCHINAGI = 'SDM_OROCHINAGI',         // 大蛇薙SDM (Kyo)
+  SDM_YATAGARASU = 'SDM_YATAGARASU',         // 八稚女SDM (Iori)
+  SDM_POWER_GEYSER = 'SDM_POWER_GEYSER',     // Power Geyser SDM (Terry)
+  SDM_PHOENIX_KICK = 'SDM_PHOENIX_KICK',     // 鳳凰脚SDM (Kim)
+  SDM_TEN_HA_OU = 'SDM_TEN_HA_OU',           // 天地霸煌拳SDM (Ryo)
+  SDM_V_SLASHER = 'SDM_V_SLASHER',           // V字金锯SDM (Leona)
+  SDM_CHAIN_SHOT = 'SDM_CHAIN_SHOT',         // Chain Shot SDM (K')
+  SDM_FREEZE = 'SDM_FREEZE',                 // Freeze Execution SDM (Kula)
 }
 
 // ===== Hit Level (防御判定) =====

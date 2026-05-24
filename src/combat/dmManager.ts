@@ -11,6 +11,18 @@ import type { CinematicState } from '../state/cinematicState.js';
 import type { VFXSystem, ScreenShake } from '../rendering/vfx.js';
 import type { ResolvedInput } from '../input/inputResolver.js';
 
+// DM → SDM upgrade mapping
+const DM_TO_SDM: Partial<Record<AttackType, AttackType>> = {
+  [AttackType.DM_OROCHINAGI]: AttackType.SDM_OROCHINAGI,
+  [AttackType.DM_YATAGARASU]: AttackType.SDM_YATAGARASU,
+  [AttackType.DM_POWER_GEYSER]: AttackType.SDM_POWER_GEYSER,
+  [AttackType.DM_PHOENIX_KICK]: AttackType.SDM_PHOENIX_KICK,
+  [AttackType.DM_TEN_HA_OU]: AttackType.SDM_TEN_HA_OU,
+  [AttackType.DM_V_SLASHER]: AttackType.SDM_V_SLASHER,
+  [AttackType.DM_CHAIN_SHOT]: AttackType.SDM_CHAIN_SHOT,
+  [AttackType.DM_FREEZE]: AttackType.SDM_FREEZE,
+};
+
 /** Dependencies injected from main.ts during wiring (Phase 7) */
 export interface DMManagerDeps {
   gauges: [PowerGauge, PowerGauge];
@@ -42,11 +54,24 @@ export class DMManager {
       const atk = f.currentAttack;
       if (!atk || f.attackPhase !== 'startup' || f.attackFrame !== 0) continue;
 
-      if (!this.isDMAttack(atk)) continue;
+      if (!this.isDMAttack(atk) && !this.isSDMAttack(atk)) continue;
 
-      // 风云再起: DM usable anytime with ≥1 stock, or free in MAX mode (ends MAX)
-      if (maxModes[i].active) {
-        // MAX mode: DM is free but ends MAX mode immediately
+      if (this.isSDMAttack(atk)) {
+        // SDM: MAX mode required + extra stock (2 total), ends MAX mode
+        if (!maxModes[i].active || gauges[i].stocks < 2) {
+          f.endAttack(); // Not in MAX or not enough stocks → cancel
+          continue;
+        }
+        spendStocks(gauges[i], 2);
+        maxModes[i].active = false;
+        maxModes[i].timer = 0;
+        cinematic.triggerSuperFlash(f.x, f.y - f.displayHeight / 2, i);
+      } else if (maxModes[i].active) {
+        // MAX mode: upgrade DM to SDM if ≥2 stocks, otherwise free DM
+        if (gauges[i].stocks >= 2 && DM_TO_SDM[atk]) {
+          f.currentAttack = DM_TO_SDM[atk]!;
+          spendStocks(gauges[i], 2);
+        }
         maxModes[i].active = false;
         maxModes[i].timer = 0;
         cinematic.triggerSuperFlash(f.x, f.y - f.displayHeight / 2, i);
@@ -82,6 +107,20 @@ export class DMManager {
       atk === AttackType.DM_PHOENIX_KICK ||
       atk === AttackType.DM_CHAIN_SHOT ||
       atk === AttackType.DM_FREEZE
+    );
+  }
+
+  /** Whether the given attack type is an SDM */
+  private isSDMAttack(atk: AttackType): boolean {
+    return (
+      atk === AttackType.SDM_OROCHINAGI ||
+      atk === AttackType.SDM_YATAGARASU ||
+      atk === AttackType.SDM_POWER_GEYSER ||
+      atk === AttackType.SDM_PHOENIX_KICK ||
+      atk === AttackType.SDM_TEN_HA_OU ||
+      atk === AttackType.SDM_V_SLASHER ||
+      atk === AttackType.SDM_CHAIN_SHOT ||
+      atk === AttackType.SDM_FREEZE
     );
   }
 }

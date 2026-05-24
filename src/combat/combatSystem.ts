@@ -208,7 +208,7 @@ export class CombatSystem {
     const hits = this.comboHits[defIdx];
     if (hits === 0) return baseDamage;
     const name = (attackType ?? '') as string;
-    const isDM = name.startsWith('DM_');
+    const isDM = name.startsWith('DM_') || name.startsWith('SDM_');
     const isSpecial = isDM || name.startsWith('KYO_') || name.startsWith('IORI_') || name.startsWith('TERRY_')
       || name.startsWith('KIM_') || name.startsWith('RYO_') || name.startsWith('LEONA_')
       || name.startsWith('KDASH_') || name.startsWith('KULA_') || name.startsWith('SPECIAL_')

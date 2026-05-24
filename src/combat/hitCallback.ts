@@ -14,7 +14,8 @@ import type { CinematicState } from '../state/cinematicState.js';
 
 function classifyAttack(at: AttackType) {
   const s = at as string;
-  const isDM = s.startsWith('DM_');
+  const isSDM = s.startsWith('SDM_');
+  const isDM = s.startsWith('DM_') || isSDM;
   const isSpecial = at === AttackType.SPECIAL_PROJECTILE || at === AttackType.SPECIAL_UPPER
     || s.startsWith('KYO_') || s.startsWith('IORI_') || s.startsWith('TERRY_') || s.startsWith('KIM_')
     || s.startsWith('RYO_') || s.startsWith('LEONA_') || s.startsWith('KDASH_') || s.startsWith('KULA_');
@@ -22,7 +23,7 @@ function classifyAttack(at: AttackType) {
     || s.includes('ONIYAKI') || s.includes('KOTOTSUKI') || s.includes('KUZUKAZE')
     || s.includes('BURN_KNUCKLE') || s.includes('RISING_TACKLE') || s.includes('POWER_DUNK')
     || s.includes('SANREN') || s.includes('TSUMIYOMI') || s.includes('BATSUYOMI');
-  return { isDM, isSpecial, isPunch };
+  return { isDM, isSDM, isSpecial, isPunch };
 }
 
 function calcHitStop(at: AttackType, isDM: boolean, isSpecial: boolean, ch: boolean): number {
@@ -94,7 +95,7 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       return;
     }
 
-    const { isDM, isSpecial } = classifyAttack(attackType);
+    const { isDM, isSDM, isSpecial } = classifyAttack(attackType);
     deps.cinematic.triggerHitStop(calcHitStop(attackType, isDM, isSpecial, counterHit));
     gainMeterOnHit(deps.gauges[atkIdx]);
     gainMeterOnHitstun(deps.gauges[defIdx]);
@@ -103,7 +104,7 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       ? ROSTER.find(c => c.id === p1.charId) || ROSTER[0]
       : ROSTER.find(c => c.id === p2.charId) || ROSTER[1];
     const { isPunch } = classifyAttack(attackType);
-    const sparks = isDM ? 20 : isSpecial ? 14 : counterHit ? 12 : 8;
+    const sparks = isSDM ? 28 : isDM ? 20 : isSpecial ? 14 : counterHit ? 12 : 8;
     const sparkColor = isSpecial ? atkChar.specialColor : isPunch ? '#ffdd44' : '#44ddff';
     deps.vfx.spawnCharacterHitSparks(hitX, hitY, sparks, sparkColor);
     deps.vfx.spawnImpactRing(hitX, hitY);
@@ -116,7 +117,13 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
     // DM: 超必杀华丽爆发 + 全屏闪白
     if (isDM) {
       deps.vfx.spawnSuperBurst(hitX, hitY, atkChar.specialColor, atkChar.specialGlow);
-      deps.screenFlash.trigger('#ffffff', 0.35, 10);
+      // SDM: 更强闪白+冲击环
+      if (isSDM) {
+        deps.screenFlash.trigger('#ffffff', 0.5, 14);
+        deps.vfx.spawnImpactRing(hitX, hitY);
+      } else {
+        deps.screenFlash.trigger('#ffffff', 0.35, 10);
+      }
     }
 
     // 伤害数字

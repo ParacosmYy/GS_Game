@@ -116,4 +116,13 @@ export const HITBOX_OFFSETS = {
   KULA_LAY: { offsetX: 60, offsetY: -50, width: 75, height: 40 },
   KULA_EDGE: { offsetX: 62, offsetY: -50, width: 65, height: 38 },
   DM_FREEZE: { offsetX: 45, offsetY: -130, width: 90, height: 70 },
+  // ── SDM hitboxes (larger than DM) ──
+  SDM_OROCHINAGI: { offsetX: 50, offsetY: -120, width: 100, height: 80 },
+  SDM_YATAGARASU: { offsetX: 45, offsetY: -140, width: 95, height: 85 },
+  SDM_POWER_GEYSER: { offsetX: 50, offsetY: -120, width: 100, height: 80 },
+  SDM_PHOENIX_KICK: { offsetX: 50, offsetY: -130, width: 95, height: 80 },
+  SDM_TEN_HA_OU: { offsetX: 50, offsetY: -120, width: 100, height: 80 },
+  SDM_V_SLASHER: { offsetX: 45, offsetY: -140, width: 95, height: 85 },
+  SDM_CHAIN_SHOT: { offsetX: 50, offsetY: -130, width: 95, height: 80 },
+  SDM_FREEZE: { offsetX: 50, offsetY: -130, width: 100, height: 80 },
 } as const;

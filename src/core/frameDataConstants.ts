@@ -539,5 +539,47 @@ export const FRAME_DATA = {
     damage: 200, hitstun: 0, blockstun: 22, pushback: 10,
     hitLevel: 'MID' as const, knockdown: true, chipDamage: 15,
   },
+  // ── 超必杀技SDM (Super Desperation Moves — MAX mode only) ──
+  // KOF2002: SDM does ~50% more damage than DM, costs extra stock
+  SDM_OROCHINAGI: {
+    startup: 18, active: 25, recovery: 29,
+    damage: 300, hitstun: 0, blockstun: 21, pushback: 12,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 30,
+  },
+  SDM_YATAGARASU: {
+    startup: 6, active: 12, recovery: 38,
+    damage: 310, hitstun: 0, blockstun: 21, pushback: 10,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 28,
+  },
+  SDM_POWER_GEYSER: {
+    startup: 14, active: 20, recovery: 38,
+    damage: 300, hitstun: 0, blockstun: 21, pushback: 12,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 30,
+  },
+  SDM_PHOENIX_KICK: {
+    startup: 6, active: 18, recovery: 32,
+    damage: 290, hitstun: 0, blockstun: 21, pushback: 10,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 25,
+  },
+  SDM_TEN_HA_OU: {
+    startup: 10, active: 22, recovery: 35,
+    damage: 280, hitstun: 0, blockstun: 21, pushback: 10,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 25,
+  },
+  SDM_V_SLASHER: {
+    startup: 8, active: 15, recovery: 38,
+    damage: 290, hitstun: 0, blockstun: 21, pushback: 10,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 25,
+  },
+  SDM_CHAIN_SHOT: {
+    startup: 8, active: 15, recovery: 40,
+    damage: 300, hitstun: 0, blockstun: 21, pushback: 10,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 25,
+  },
+  SDM_FREEZE: {
+    startup: 8, active: 12, recovery: 36,
+    damage: 300, hitstun: 0, blockstun: 22, pushback: 12,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 28,
+  },
 } as const;
 
