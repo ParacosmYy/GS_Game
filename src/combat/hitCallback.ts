@@ -96,8 +96,11 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
     }
 
     const { isDM, isSDM, isSpecial } = classifyAttack(attackType);
-    deps.cinematic.triggerHitStop(calcHitStop(attackType, isDM, isSpecial, counterHit));
-    gainMeterOnHit(deps.gauges[atkIdx], attackType);
+    const combo = deps.combatSystem.getComboCount(defIdx);
+    const baseStop = calcHitStop(attackType, isDM, isSpecial, counterHit);
+    // KOF2002: 高连击数额外hitstop (5+hits +1F, 10+hits +2F), 连段越久节奏感越强
+    const comboStop = combo >= 10 ? 2 : combo >= 5 ? 1 : 0;
+    deps.cinematic.triggerHitStop(baseStop + comboStop);
     gainMeterOnHitstun(deps.gauges[defIdx], attackType);
     // 风云再起特色: 第一次命中奖励 — 每回合首次命中额外+30气槽
     if (!deps.combatSystem.wasFirstHitAwarded(defIdx)) {
@@ -186,13 +189,14 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       deps.screenFlash.trigger('#ffcc44', 0.15, 4);
     }
 
-    // 连击数
-    const combo = deps.combatSystem.getComboCount(defIdx);
+    // 连击数显示
     if (combo >= 2) deps.vfx.spawnDamageText(defender.x, defender.y - defender.displayHeight - 40, combo);
 
     // 震屏时长: 轻攻击5帧, 重攻击8帧, 必杀10帧, DM 14帧
     const shakeDur = isDM ? 14 : isSpecial ? 10 : isHeavyAttack(attackType) ? 8 : 5;
-    deps.screenShake.trigger(calcShake(attackType, counterHit, data.damage), shakeDur);
+    // KOF2002: 高连击数增强震屏 (5+hits时额外+2强度, 10+hits时+4)
+    const comboShake = combo >= 10 ? 4 : combo >= 5 ? 2 : 0;
+    deps.screenShake.trigger(calcShake(attackType, counterHit, data.damage) + comboShake, shakeDur);
     deps.cinematic.trackDamage(defIdx, data.damage);
 
     // KO检测 — 角色倒地时触发震撼效果
