@@ -132,10 +132,56 @@ export type AttackPhase = 'startup' | 'active' | 'recovery' | 'none';
 
 // ===== Game Phase =====
 export enum GamePhase {
+  SELECT = 'SELECT',   // Character select
   INTRO = 'INTRO',     // "ROUND 1... FIGHT!" text
   FIGHTING = 'FIGHTING', // Active gameplay
   KO = 'KO',           // KO state
 }
+
+// ===== Character Roster =====
+export interface CharacterDef {
+  id: string;
+  name: string;
+  nameCn: string;
+  color: string;        // primary body color
+  accentColor: string;  // secondary/limb color
+  portrait: string;     // emoji/icon for select screen
+}
+
+export const CHARACTER_ROSTER: CharacterDef[] = [
+  {
+    id: 'kyo',
+    name: 'Kyo Kusanagi',
+    nameCn: '草薙京',
+    color: '#ff6600',
+    accentColor: '#ffaa00',
+    portrait: '🔥',
+  },
+  {
+    id: 'iori',
+    name: 'Iori Yagami',
+    nameCn: '八神庵',
+    color: '#aa1133',
+    accentColor: '#cc3355',
+    portrait: '🌙',
+  },
+  {
+    id: 'terry',
+    name: 'Terry Bogard',
+    nameCn: '特瑞',
+    color: '#cc8800',
+    accentColor: '#ddaa22',
+    portrait: '🎩',
+  },
+  {
+    id: 'kim',
+    name: 'Kim Kaphwan',
+    nameCn: '金',
+    color: '#2288cc',
+    accentColor: '#44aadd',
+    portrait: '🦵',
+  },
+];
 
 // ===== Game State (for window.__gameState) =====
 export interface PlayerState {

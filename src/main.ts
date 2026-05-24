@@ -3,6 +3,7 @@ import { GameLoop } from './core/gameLoop.js';
 import { STAGE_WIDTH, KO_DISPLAY_TIME, FRAME_DATA, DM_STOCK_COST, MAX_MODE_STOCK_COST, MAX_MODE_DMG_REDUCTION } from './core/constants.js';
 import { AttackType, GameState, GamePhase } from './core/types.js';
 import type { PowerGauge, MaxModeState } from './core/types.js';
+import { CHARACTER_ROSTER } from './core/types.js';
 import { InputManager, CommandBuffer, resolveInput, getDirectionInput } from './input/index.js';
 import type { ResolvedInput } from './input/index.js';
 import { Fighter } from './entities/fighter.js';
@@ -32,8 +33,8 @@ const vfx = new VFXSystem();
 const screenShake = new ScreenShake();
 
 // ===== Entities =====
-const p1 = new Fighter(STAGE_WIDTH * 0.33, '#ff6600', 1);  // 草薙京 orange
-const p2 = new Fighter(STAGE_WIDTH * 0.67, '#2244cc', -1);
+const p1 = new Fighter(STAGE_WIDTH * 0.33, CHARACTER_ROSTER[0].color, 1);
+const p2 = new Fighter(STAGE_WIDTH * 0.67, CHARACTER_ROSTER[1].color, -1);
 const projectiles: Projectile[] = [];
 const tickRef = { value: 0 };
 
@@ -50,12 +51,19 @@ const gauges: [PowerGauge, PowerGauge] = [createPowerGauge(), createPowerGauge()
 const maxModes: [MaxModeState, MaxModeState] = [createMaxMode(), createMaxMode()];
 
 // ===== State =====
-let phase: GamePhase = GamePhase.INTRO;
+let phase: GamePhase = GamePhase.SELECT;
 let phaseTimer = 0;
 const INTRO_DURATION = 120;
 let koTimer = 0;
 let winner: number | null = null;
 let debugMode = false;
+
+// Character select state
+let p1SelectCursor = 0;
+let p2SelectCursor = 1;
+let p1Ready = false;
+let p2Ready = false;
+let selectCountdown = -1;
 
 // ===== Window API =====
 declare global {
@@ -63,6 +71,10 @@ declare global {
     __gameState: GameState;
     __fighters: Fighter[];
     __restart: () => void;
+    __prevP1Left: boolean;
+    __prevP1Right: boolean;
+    __prevP2Left: boolean;
+    __prevP2Right: boolean;
   }
 }
 window.__fighters = [p1, p2];
@@ -138,6 +150,60 @@ function update(): void {
   // Tick MAX mode timers
   tickMaxMode(maxModes[0]);
   tickMaxMode(maxModes[1]);
+
+  // ── CHARACTER SELECT PHASE ──
+  if (phase === GamePhase.SELECT) {
+    tickRef.value++;
+    const rawP1 = inputManager.getP1Input();
+    const rawP2 = inputManager.getP2Input();
+
+    // P1 select: A=left, D=right, J=confirm
+    if (!p1Ready) {
+      if (rawP1.left && !window.__prevP1Left) {
+        p1SelectCursor = (p1SelectCursor - 1 + CHARACTER_ROSTER.length) % CHARACTER_ROSTER.length;
+      }
+      if (rawP1.right && !window.__prevP1Right) {
+        p1SelectCursor = (p1SelectCursor + 1) % CHARACTER_ROSTER.length;
+      }
+      if (rawP1.buttonA) {  // J = buttonA for P1
+        p1Ready = true;
+      }
+    }
+
+    // P2 select: ←=left, →=right, Numpad1=confirm
+    if (!p2Ready) {
+      if (rawP2.left && !window.__prevP2Left) {
+        p2SelectCursor = (p2SelectCursor - 1 + CHARACTER_ROSTER.length) % CHARACTER_ROSTER.length;
+      }
+      if (rawP2.right && !window.__prevP2Right) {
+        p2SelectCursor = (p2SelectCursor + 1) % CHARACTER_ROSTER.length;
+      }
+      if (rawP2.buttonA) {  // Numpad1 = buttonA for P2
+        p2Ready = true;
+      }
+    }
+
+    // Track prev inputs for edge detection
+    window.__prevP1Left = rawP1.left;
+    window.__prevP1Right = rawP1.right;
+    window.__prevP2Left = rawP2.left;
+    window.__prevP2Right = rawP2.right;
+
+    // Both ready → start countdown then go to INTRO
+    if (p1Ready && p2Ready) {
+      if (selectCountdown < 0) selectCountdown = 60;
+      selectCountdown--;
+      if (selectCountdown <= 0) {
+        // Apply selected characters
+        p1.color = CHARACTER_ROSTER[p1SelectCursor].color;
+        p2.color = CHARACTER_ROSTER[p2SelectCursor].color;
+        phase = GamePhase.INTRO;
+        phaseTimer = 0;
+      }
+    }
+
+    return;
+  }
 
   if (phase === GamePhase.INTRO) {
     phaseTimer++;
@@ -221,6 +287,11 @@ function update(): void {
 }
 
 function render(): void {
+  if (phase === GamePhase.SELECT) {
+    renderer.drawCharacterSelect(p1SelectCursor, p2SelectCursor, p1Ready, p2Ready, tickRef.value);
+    return;
+  }
+
   camera.update(p1, p2);
   const isKO = phase === GamePhase.KO;
   renderer.render([p1, p2], camera.x, tickRef.value, isKO, winner, screenShake.offsetX, screenShake.offsetY);
@@ -237,11 +308,16 @@ function render(): void {
 }
 
 function restartGame(): void {
-  phase = GamePhase.INTRO;
+  phase = GamePhase.SELECT;
   phaseTimer = 0;
   koTimer = 0;
   winner = null;
   tickRef.value = 0;
+  p1SelectCursor = 0;
+  p2SelectCursor = 1;
+  p1Ready = false;
+  p2Ready = false;
+  selectCountdown = -1;
   p1.reset(STAGE_WIDTH * 0.33);
   p2.reset(STAGE_WIDTH * 0.67);
   p1Cmd.reset();

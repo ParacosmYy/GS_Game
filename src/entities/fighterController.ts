@@ -194,24 +194,24 @@ export class FighterController {
     return null;
   }
 
-  /** Try punch specials: 荒咬み(qcf+A), 毒咬み(qcf+C), fireball, dragon upper */
+  /** Try punch specials: 升龙拳 → 荒咬み/毒咬み → 波动拳 */
   private tryPunchSpecial(input: ResolvedInput): AttackType | null {
     if (!input.punchPressed) return null;
 
     const tick = this.tickRef.value;
+    const special = this.cmdBuf.checkSpecial(tick, true);
 
-    // Check QCF: determines punch special by which button
-    const qcf = this.cmdBuf.checkSpecial(tick, true);
-    if (qcf) {
-      if (qcf === AttackType.SPECIAL_PROJECTILE) return AttackType.SPECIAL_PROJECTILE;
-      if (qcf === AttackType.SPECIAL_UPPER) return AttackType.SPECIAL_UPPER;
-    }
+    // Priority 1: Dragon Punch →↓↘+P
+    if (special === AttackType.SPECIAL_UPPER) return AttackType.SPECIAL_UPPER;
 
-    // Kyo rekka starters via QCF + specific button
+    // Priority 2: Kyo rekka starters QCF+A/C (before generic fireball)
     if (this.cmdBuf.hasQCF(tick)) {
-      if (input.buttonAPressed) return AttackType.KYO_ARAGAMI;   // 荒咬み: QCF+A
-      if (input.buttonCPressed) return AttackType.KYO_DOKUGAMI;  // 毒咬み: QCF+C
+      if (input.buttonAPressed) return AttackType.KYO_ARAGAMI;   // 荒咬み
+      if (input.buttonCPressed) return AttackType.KYO_DOKUGAMI;  // 毒咬み
     }
+
+    // Priority 3: Generic fireball QCF+P (fallback)
+    if (special === AttackType.SPECIAL_PROJECTILE) return AttackType.SPECIAL_PROJECTILE;
 
     return null;
   }

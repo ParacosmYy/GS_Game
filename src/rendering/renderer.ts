@@ -3,7 +3,8 @@ import { Projectile } from '../entities/projectile.js';
 import { CommandBuffer } from '../input/commandBuffer.js';
 import { Camera } from '../core/camera.js';
 import { FighterState, AttackType } from '../core/types.js';
-import type { PowerGauge, MaxModeState } from '../core/types.js';
+import type { PowerGauge, MaxModeState, CharacterDef } from '../core/types.js';
+import { CHARACTER_ROSTER } from '../core/types.js';
 import { MAX_STOCKS, MAX_MODE_DURATION } from '../core/constants.js';
 import { CANVAS_WIDTH, CANVAS_HEIGHT, STAGE_GROUND_Y, FIGHTER_WIDTH, MAX_HEALTH, FRAME_DATA } from '../core/constants.js';
 
@@ -997,5 +998,180 @@ export class Renderer {
         ctx.textAlign = 'left';
       }
     }
+  }
+
+  // ===== Character Select Screen =====
+  drawCharacterSelect(
+    p1Cursor: number,
+    p2Cursor: number,
+    p1Ready: boolean,
+    p2Ready: boolean,
+    tick: number,
+  ): void {
+    const ctx = this.ctx;
+    ctx.save();
+
+    // Dark background
+    ctx.fillStyle = '#0a0a12';
+    ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+    // Animated background grid
+    ctx.strokeStyle = 'rgba(255,255,255,0.03)';
+    ctx.lineWidth = 1;
+    for (let i = 0; i < 20; i++) {
+      const yOff = (tick * 0.5 + i * 35) % (CANVAS_HEIGHT + 50) - 25;
+      ctx.beginPath();
+      ctx.moveTo(0, yOff);
+      ctx.lineTo(CANVAS_WIDTH, yOff);
+      ctx.stroke();
+    }
+
+    // Title
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = '#ffcc00';
+    ctx.shadowColor = '#ff8800';
+    ctx.shadowBlur = 12;
+    ctx.font = 'bold 32px monospace';
+    ctx.fillText('SELECT CHARACTER', 400, 50);
+    ctx.shadowBlur = 0;
+
+    // Subtitle
+    ctx.fillStyle = '#888';
+    ctx.font = '12px monospace';
+    ctx.fillText('P1: A/D选择  J确认  |  P2: ←/→选择  Numpad1确认', 400, 80);
+
+    // Character cards
+    const cols = CHARACTER_ROSTER.length;
+    const cardW = 140;
+    const cardH = 200;
+    const gap = 20;
+    const totalW = cols * cardW + (cols - 1) * gap;
+    const startX = (CANVAS_WIDTH - totalW) / 2;
+    const startY = 140;
+
+    for (let i = 0; i < cols; i++) {
+      const char = CHARACTER_ROSTER[i];
+      const cx = startX + i * (cardW + gap);
+      const cy = startY;
+
+      const isP1Here = p1Cursor === i;
+      const isP2Here = p2Cursor === i;
+
+      // Card background
+      ctx.fillStyle = '#141420';
+      this.roundRect(ctx, cx, cy, cardW, cardH, 8);
+      ctx.fill();
+
+      // Selection highlight
+      if (isP1Here || isP2Here) {
+        ctx.strokeStyle = p1Ready && isP1Here ? '#ffcc00' : isP1Here ? '#ff4444' : 'transparent';
+        ctx.lineWidth = 3;
+        if (isP1Here) {
+          this.roundRect(ctx, cx - 2, cy - 2, cardW + 4, cardH / 2 + 4, 8);
+          ctx.stroke();
+        }
+        ctx.strokeStyle = p2Ready && isP2Here ? '#ffcc00' : isP2Here ? '#4488ff' : 'transparent';
+        ctx.lineWidth = 3;
+        if (isP2Here) {
+          this.roundRect(ctx, cx - 2, cy + cardH / 2 - 4, cardW + 4, cardH / 2 + 8, 8);
+          ctx.stroke();
+        }
+      }
+
+      // Character portrait area
+      const portraitY = cy + 15;
+      ctx.fillStyle = '#1a1a2a';
+      this.roundRect(ctx, cx + 15, portraitY, cardW - 30, 80, 6);
+      ctx.fill();
+
+      // Character color preview block
+      const charGrad = ctx.createLinearGradient(cx + 20, portraitY + 5, cx + cardW - 20, portraitY + 75);
+      charGrad.addColorStop(0, char.color);
+      charGrad.addColorStop(1, char.accentColor);
+      ctx.fillStyle = charGrad;
+      this.roundRect(ctx, cx + 20, portraitY + 5, cardW - 40, 70, 4);
+      ctx.fill();
+
+      // Portrait emoji
+      ctx.font = '40px serif';
+      ctx.textAlign = 'center';
+      ctx.fillStyle = '#fff';
+      ctx.fillText(char.portrait, cx + cardW / 2, portraitY + 48);
+
+      // Character name
+      ctx.font = 'bold 16px monospace';
+      ctx.fillStyle = '#fff';
+      ctx.fillText(char.nameCn, cx + cardW / 2, cy + 120);
+      ctx.font = '10px monospace';
+      ctx.fillStyle = '#888';
+      ctx.fillText(char.name, cx + cardW / 2, cy + 138);
+
+      // Ready indicator
+      if ((p1Ready && isP1Here) || (p2Ready && isP2Here)) {
+        ctx.font = 'bold 14px monospace';
+        ctx.fillStyle = '#ffcc00';
+        const label = p1Ready && isP1Here ? 'P1 OK!' : 'P2 OK!';
+        ctx.fillText(label, cx + cardW / 2, cy + cardH - 25);
+      }
+
+      // Animated pulse for selected
+      if (isP1Here || isP2Here) {
+        const pulse = 0.3 + Math.sin(tick * 0.1) * 0.15;
+        ctx.strokeStyle = isP1Here
+          ? `rgba(255, 68, 68, ${pulse})`
+          : `rgba(68, 136, 255, ${pulse})`;
+        ctx.lineWidth = 2;
+        this.roundRect(ctx, cx - 4, cy - 4, cardW + 8, cardH + 8, 10);
+        ctx.stroke();
+      }
+    }
+
+    // Player status at bottom
+    const bottomY = 400;
+    // P1 side
+    const p1Char = CHARACTER_ROSTER[p1Cursor];
+    ctx.fillStyle = '#ff4444';
+    ctx.font = 'bold 16px monospace';
+    ctx.textAlign = 'left';
+    ctx.fillText('P1', 50, bottomY);
+    ctx.fillStyle = p1Char.color;
+    ctx.font = 'bold 22px monospace';
+    ctx.fillText(p1Char.nameCn, 50, bottomY + 28);
+    ctx.fillStyle = p1Ready ? '#ffcc00' : '#888';
+    ctx.font = '13px monospace';
+    ctx.fillText(p1Ready ? 'READY!' : 'Press J to confirm', 50, bottomY + 52);
+
+    // P2 side
+    const p2Char = CHARACTER_ROSTER[p2Cursor];
+    ctx.fillStyle = '#4488ff';
+    ctx.font = 'bold 16px monospace';
+    ctx.textAlign = 'right';
+    ctx.fillText('P2', 750, bottomY);
+    ctx.fillStyle = p2Char.color;
+    ctx.font = 'bold 22px monospace';
+    ctx.fillText(p2Char.nameCn, 750, bottomY + 28);
+    ctx.fillStyle = p2Ready ? '#ffcc00' : '#888';
+    ctx.font = '13px monospace';
+    ctx.fillText(p2Ready ? 'READY!' : 'Numpad1 to confirm', 750, bottomY + 52);
+
+    // VS in center
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#ffffff20';
+    ctx.font = 'bold 48px monospace';
+    ctx.fillText('VS', 400, bottomY + 30);
+
+    // Start hint
+    if (p1Ready && p2Ready) {
+      const blink = Math.sin(tick * 0.15) > 0;
+      if (blink) {
+        ctx.fillStyle = '#ffcc00';
+        ctx.font = 'bold 18px monospace';
+        ctx.fillText('GAME START!', 400, 530);
+      }
+    }
+
+    ctx.textAlign = 'left';
+    ctx.restore();
   }
 }
