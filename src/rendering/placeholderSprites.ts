@@ -77,7 +77,25 @@ function px(c: CanvasRenderingContext2D, bx: number, by: number, color: string):
   c.fillRect(bx * PIXEL, by * PIXEL, PIXEL, PIXEL);
 }
 
-/** 绘制像素角色帧 */
+/** 描边像素块 — 在指定像素周围画深色描边 */
+function pxOutline(c: CanvasRenderingContext2D, bx: number, by: number, outlineColor: string): void {
+  const oc = outlineColor;
+  px(c, bx - 1, by, oc); px(c, bx + 1, by, oc);
+  px(c, bx, by - 1, oc); px(c, bx, by + 1, oc);
+}
+
+/** 深色变体 — 用于角色描边和阴影 */
+function darken(hex: string, amount: number = 0.35): string {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  const dr = Math.max(0, Math.floor(r * (1 - amount)));
+  const dg = Math.max(0, Math.floor(g * (1 - amount)));
+  const db = Math.max(0, Math.floor(b * (1 - amount)));
+  return `#${dr.toString(16).padStart(2, '0')}${dg.toString(16).padStart(2, '0')}${db.toString(16).padStart(2, '0')}`;
+}
+
+/** 绘制像素角色帧 — 带描边和精细身体部位 */
 function drawPixelChar(
   c: CanvasRenderingContext2D, v: CharVisual,
   headOff: number, bodyLean: number, armLAngle: number, armRAngle: number,
@@ -85,17 +103,32 @@ function drawPixelChar(
 ): void {
   const scale = crouching ? 0.8 : 1;
   const baseY = crouching ? 15 : 8;
-  const cx = Math.floor(PW / PIXEL / 2); // center X in pixel blocks
+  const cx = Math.floor(PW / PIXEL / 2);
+  const skinDark = darken(v.skinColor, 0.2);
+  const shirtDark = darken(v.shirtColor, 0.3);
+  const pantsDark = darken(v.pantsColor, 0.3);
 
   // === 头部 ===
   const headY = baseY;
   const headX = cx + headOff;
   const hw = v.headW;
   const hh = hw;
-  // 头轮廓
+  // 头部描边
+  for (let dy = -1; dy <= hh; dy++) {
+    for (let dx = -Math.floor(hw / 2) - 1; dx <= Math.floor(hw / 2) + 1; dx++) {
+      const nx = dx / (hw / 2 + 0.5);
+      const ny = (dy - 0.5) / (hh + 1);
+      if (nx * nx + (ny - 0.5) * (ny - 0.5) * 4 < 1) {
+        const inx = dx / (hw / 2);
+        const iny = dy / hh;
+        const inside = inx * inx + (iny - 0.5) * (iny - 0.5) * 4 < 1;
+        if (!inside) px(c, headX + dx, headY + dy, darken(v.hairColor, 0.3));
+      }
+    }
+  }
+  // 头部填充
   for (let dy = 0; dy < hh; dy++) {
     for (let dx = -Math.floor(hw / 2); dx <= Math.floor(hw / 2); dx++) {
-      // 椭圆裁剪
       const nx = dx / (hw / 2);
       const ny = dy / hh;
       if (nx * nx + (ny - 0.5) * (ny - 0.5) * 4 < 1) {
@@ -105,65 +138,119 @@ function drawPixelChar(
   }
   // 发型
   drawHair(c, headX, headY, hw, v.hairColor, v.hairStyle);
-  // 眼睛
-  px(c, headX - 1, headY + Math.floor(hh / 2), '#1a1a1a');
-  px(c, headX + 1, headY + Math.floor(hh / 2), '#1a1a1a');
+  // 眼睛 — 更大更清晰
+  px(c, headX - 1, headY + Math.floor(hh / 2), '#ffffff');
+  px(c, headX + 1, headY + Math.floor(hh / 2), '#ffffff');
+  px(c, headX - 1, headY + Math.floor(hh / 2) + 1, '#1a1a1a');
+  px(c, headX + 1, headY + Math.floor(hh / 2) + 1, '#1a1a1a');
+  // 嘴巴
+  if (hh > 4) px(c, headX, headY + hh - 1, skinDark);
 
-  // === 躯干 ===
+  // === 躯干 — 带衣领和描边 ===
   const torsoY = headY + hh + 1;
   const bw = v.bodyW;
   const torsoH = crouching ? 5 : 7;
   const torsoX = cx + bodyLean;
+  // 描边
   for (let dy = 0; dy < torsoH; dy++) {
-    const w = dy < 2 ? bw : bw - 1; // 肩宽腰窄
+    const w = dy < 2 ? bw : bw - 1;
+    const left = torsoX - Math.floor(w / 2);
+    const right = torsoX + Math.floor(w / 2);
+    px(c, left - 1, torsoY + dy, shirtDark);
+    px(c, right + 1, torsoY + dy, shirtDark);
+  }
+  px(c, torsoX - Math.floor(bw / 2), torsoY - 1, shirtDark);
+  px(c, torsoX + Math.floor(bw / 2), torsoY - 1, shirtDark);
+  // 填充
+  for (let dy = 0; dy < torsoH; dy++) {
+    const w = dy < 2 ? bw : bw - 1;
     for (let dx = -Math.floor(w / 2); dx <= Math.floor(w / 2); dx++) {
-      px(c, torsoX + dx, torsoY + dy, v.shirtColor);
+      // V领效果 — 上部中间留皮肤色
+      if (dy < 2 && Math.abs(dx) < 1) {
+        px(c, torsoX + dx, torsoY + dy, v.skinColor);
+      } else {
+        px(c, torsoX + dx, torsoY + dy, v.shirtColor);
+      }
     }
   }
+  // 衣服阴影(右侧)
+  for (let dy = 1; dy < torsoH - 1; dy++) {
+    const w = dy < 2 ? bw : bw - 1;
+    px(c, torsoX + Math.floor(w / 2), torsoY + dy, shirtDark);
+  }
   // 腰带
-  for (let dx = -Math.floor(bw / 2); dx <= Math.floor(bw / 2); dx++) {
+  for (let dx = -Math.floor((bw - 1) / 2); dx <= Math.floor((bw - 1) / 2); dx++) {
     px(c, torsoX + dx, torsoY + torsoH - 1, v.beltColor);
   }
 
-  // === 手臂 ===
+  // === 手臂 — 带拳头和描边 ===
   const shoulderY = torsoY + 1;
   const armLen = 5;
-  // 左臂
-  drawArm(c, torsoX - Math.floor(bw / 2) - 1, shoulderY, armLAngle, armLen, v.skinColor);
-  // 右臂
-  drawArm(c, torsoX + Math.floor(bw / 2) + 1, shoulderY, armRAngle, armLen, v.skinColor);
+  drawArm(c, torsoX - Math.floor(bw / 2) - 1, shoulderY, armLAngle, armLen, v.skinColor, skinDark);
+  drawArm(c, torsoX + Math.floor(bw / 2) + 1, shoulderY, armRAngle, armLen, v.skinColor, skinDark);
 
-  // === 腿部 ===
+  // === 腿部 — 带描边 ===
   const legY = torsoY + torsoH;
   const legLen = Math.floor(v.legLen * scale);
-  drawLeg(c, torsoX - 1, legY, legLSpread, legLen, v.pantsColor, v.shoeColor);
-  drawLeg(c, torsoX + 1, legY, legRSpread, legLen, v.pantsColor, v.shoeColor);
+  drawLeg(c, torsoX - 1, legY, legLSpread, legLen, v.pantsColor, v.shoeColor, pantsDark);
+  drawLeg(c, torsoX + 1, legY, legRSpread, legLen, v.pantsColor, v.shoeColor, pantsDark);
 }
 
-function drawArm(c: CanvasRenderingContext2D, sx: number, sy: number, angle: number, len: number, color: string): void {
+function drawArm(c: CanvasRenderingContext2D, sx: number, sy: number, angle: number, len: number, color: string, outlineColor: string): void {
   let x = sx, y = sy;
+  const points: [number, number][] = [];
   for (let i = 0; i < len; i++) {
     x += Math.round(Math.sin(angle));
     y += Math.round(Math.cos(angle));
-    px(c, x, y, color);
-    px(c, x, y + 1, color); // 手臂2像素宽
+    points.push([x, y]);
   }
-  // 拳头 (末端大一点)
-  px(c, x, y - 1, color);
+  // 描边
+  for (const [px2, py2] of points) {
+    px(c, px2 - 1, py2, outlineColor);
+    px(c, px2 + 1, py2 + 1, outlineColor);
+  }
+  // 填充手臂(2像素宽)
+  for (const [px2, py2] of points) {
+    px(c, px2, py2, color);
+    px(c, px2, py2 + 1, color);
+  }
+  // 拳头 — 更大的3x2块
+  const fx = points[points.length - 1][0];
+  const fy = points[points.length - 1][1];
+  px(c, fx - 1, fy - 1, outlineColor);
+  px(c, fx, fy - 1, outlineColor);
+  px(c, fx + 1, fy - 1, outlineColor);
+  px(c, fx - 1, fy - 1, color);
+  px(c, fx, fy - 1, color);
+  px(c, fx + 1, fy - 1, color);
+  px(c, fx - 1, fy, color);
+  px(c, fx + 1, fy, color);
 }
 
-function drawLeg(c: CanvasRenderingContext2D, sx: number, sy: number, spread: number, len: number, pantsColor: string, shoeColor: string): void {
+function drawLeg(c: CanvasRenderingContext2D, sx: number, sy: number, spread: number, len: number, pantsColor: string, shoeColor: string, outlineColor: string): void {
   let x = sx + spread, y = sy;
+  // 描边
+  for (let i = 0; i < len; i++) {
+    y += 1;
+    px(c, x - 1, y, outlineColor);
+    px(c, x + 2, y, outlineColor);
+  }
+  // 填充
+  y = sy;
+  x = sx + spread;
   for (let i = 0; i < len; i++) {
     y += 1;
     px(c, x, y, pantsColor);
     px(c, x + 1, y, pantsColor);
+    // 右侧阴影
+    if (i > 1) px(c, x + 1, y, outlineColor);
   }
-  // 鞋子
-  px(c, x - 1, y + 1, shoeColor);
+  // 鞋子 — 带描边
+  const shoeDark = darken(shoeColor, 0.3);
+  px(c, x - 1, y + 1, shoeDark);
   px(c, x, y + 1, shoeColor);
   px(c, x + 1, y + 1, shoeColor);
-  px(c, x + 2, y + 1, shoeColor);
+  px(c, x + 2, y + 1, shoeDark);
 }
 
 function drawHair(c: CanvasRenderingContext2D, hx: number, hy: number, hw: number, color: string, style: string): void {
@@ -269,24 +356,36 @@ const BLOCK_POSES: Pose[] = [
   { headOff: -1, bodyLean: -1, armL: -0.9, armR: -0.7, legL: -1, legR: 1, crouch: false },
 ];
 
-/** KO倒地帧 — 单独绘制 */
+/** KO倒地帧 — 带描边 */
 function drawKO(c: CanvasRenderingContext2D, v: CharVisual): void {
   const cy = Math.floor(PH / PIXEL) - 6;
   const cx = Math.floor(PW / PIXEL / 2);
-  // 横躺身体
+  const shirtDark = darken(v.shirtColor, 0.3);
+  const pantsDark = darken(v.pantsColor, 0.3);
+  // 横躺身体描边
+  for (let dx = -7; dx <= 7; dx++) {
+    px(c, cx + dx, cy - 1, shirtDark);
+    px(c, cx + dx, cy + 2, shirtDark);
+  }
+  // 横躺身体填充
   for (let dx = -6; dx <= 6; dx++) {
     px(c, cx + dx, cy, v.shirtColor);
-    px(c, cx + dx, cy + 1, v.shirtColor);
+    px(c, cx + dx, cy + 1, dx < 3 ? v.shirtColor : shirtDark);
   }
   // 头
-  px(c, cx - 7, cy - 1, v.skinColor);
+  px(c, cx - 7, cy - 1, darken(v.hairColor, 0.3));
   px(c, cx - 7, cy, v.skinColor);
+  px(c, cx - 7, cy + 1, v.skinColor);
   px(c, cx - 8, cy - 1, v.hairColor);
+  px(c, cx - 8, cy, v.hairColor);
   // 腿
   for (let dx = 7; dx <= 10; dx++) {
     px(c, cx + dx, cy, v.pantsColor);
-    px(c, cx + dx, cy + 1, v.pantsColor);
+    px(c, cx + dx, cy + 1, dx > 8 ? pantsDark : v.pantsColor);
   }
+  // 鞋
+  px(c, cx + 11, cy, v.shoeColor);
+  px(c, cx + 11, cy + 1, darken(v.shoeColor, 0.3));
 }
 
 type PoseSet = 'idle' | 'walk' | 'attack' | 'crouch' | 'jump' | 'hit' | 'block';
