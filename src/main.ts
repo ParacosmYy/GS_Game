@@ -3,7 +3,8 @@ import { GameLoop } from './core/gameLoop.js';
 import { STAGE_WIDTH, KO_DISPLAY_TIME, FRAME_DATA, DM_STOCK_COST, MAX_MODE_STOCK_COST, MAX_MODE_DMG_REDUCTION } from './core/constants.js';
 import { AttackType, GameState, GamePhase } from './core/types.js';
 import type { PowerGauge, MaxModeState } from './core/types.js';
-import { CHARACTER_ROSTER } from './core/types.js';
+import { ROSTER } from './characters/index.js';
+import type { CharacterDefinition } from './characters/types.js';
 import { InputManager, CommandBuffer, resolveInput, getDirectionInput } from './input/index.js';
 import type { ResolvedInput } from './input/index.js';
 import { Fighter } from './entities/fighter.js';
@@ -33,16 +34,16 @@ const vfx = new VFXSystem();
 const screenShake = new ScreenShake();
 
 // ===== Entities =====
-const p1 = new Fighter(STAGE_WIDTH * 0.33, CHARACTER_ROSTER[0].color, 1);
-const p2 = new Fighter(STAGE_WIDTH * 0.67, CHARACTER_ROSTER[1].color, -1);
+const p1 = new Fighter(STAGE_WIDTH * 0.33, ROSTER[0].color, 1);
+const p2 = new Fighter(STAGE_WIDTH * 0.67, ROSTER[1].color, -1);
 const projectiles: Projectile[] = [];
 const tickRef = { value: 0 };
 
 const p1Cmd = new CommandBuffer();
 const p2Cmd = new CommandBuffer();
 
-const p1Ctrl = new FighterController(p1, 0, p1Cmd, vfx, projectiles, tickRef);
-const p2Ctrl = new FighterController(p2, 1, p2Cmd, vfx, projectiles, tickRef);
+const p1Ctrl = new FighterController(p1, 0, p1Cmd, vfx, projectiles, tickRef, ROSTER[0]);
+const p2Ctrl = new FighterController(p2, 1, p2Cmd, vfx, projectiles, tickRef, ROSTER[1]);
 p1Ctrl.setOpponent(p2);
 p2Ctrl.setOpponent(p1);
 
@@ -160,10 +161,10 @@ function update(): void {
     // P1 select: A=left, D=right, J=confirm
     if (!p1Ready) {
       if (rawP1.left && !window.__prevP1Left) {
-        p1SelectCursor = (p1SelectCursor - 1 + CHARACTER_ROSTER.length) % CHARACTER_ROSTER.length;
+        p1SelectCursor = (p1SelectCursor - 1 + ROSTER.length) % ROSTER.length;
       }
       if (rawP1.right && !window.__prevP1Right) {
-        p1SelectCursor = (p1SelectCursor + 1) % CHARACTER_ROSTER.length;
+        p1SelectCursor = (p1SelectCursor + 1) % ROSTER.length;
       }
       if (rawP1.buttonA) {  // J = buttonA for P1
         p1Ready = true;
@@ -173,10 +174,10 @@ function update(): void {
     // P2 select: ←=left, →=right, Numpad1=confirm
     if (!p2Ready) {
       if (rawP2.left && !window.__prevP2Left) {
-        p2SelectCursor = (p2SelectCursor - 1 + CHARACTER_ROSTER.length) % CHARACTER_ROSTER.length;
+        p2SelectCursor = (p2SelectCursor - 1 + ROSTER.length) % ROSTER.length;
       }
       if (rawP2.right && !window.__prevP2Right) {
-        p2SelectCursor = (p2SelectCursor + 1) % CHARACTER_ROSTER.length;
+        p2SelectCursor = (p2SelectCursor + 1) % ROSTER.length;
       }
       if (rawP2.buttonA) {  // Numpad1 = buttonA for P2
         p2Ready = true;
@@ -195,8 +196,8 @@ function update(): void {
       selectCountdown--;
       if (selectCountdown <= 0) {
         // Apply selected characters
-        p1.color = CHARACTER_ROSTER[p1SelectCursor].color;
-        p2.color = CHARACTER_ROSTER[p2SelectCursor].color;
+        p1Ctrl.setCharacter(ROSTER[p1SelectCursor]);
+        p2Ctrl.setCharacter(ROSTER[p2SelectCursor]);
         phase = GamePhase.INTRO;
         phaseTimer = 0;
       }

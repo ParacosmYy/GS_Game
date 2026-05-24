@@ -3,8 +3,9 @@ import { Projectile } from '../entities/projectile.js';
 import { CommandBuffer } from '../input/commandBuffer.js';
 import { Camera } from '../core/camera.js';
 import { FighterState, AttackType } from '../core/types.js';
-import type { PowerGauge, MaxModeState, CharacterDef } from '../core/types.js';
-import { CHARACTER_ROSTER } from '../core/types.js';
+import type { PowerGauge, MaxModeState } from '../core/types.js';
+import { ROSTER } from '../characters/index.js';
+import type { CharacterDefinition } from '../characters/types.js';
 import { MAX_STOCKS, MAX_MODE_DURATION } from '../core/constants.js';
 import { CANVAS_WIDTH, CANVAS_HEIGHT, STAGE_GROUND_Y, FIGHTER_WIDTH, MAX_HEALTH, FRAME_DATA } from '../core/constants.js';
 
@@ -1042,7 +1043,7 @@ export class Renderer {
     ctx.fillText('P1: A/D选择  J确认  |  P2: ←/→选择  Numpad1确认', 400, 80);
 
     // Character cards
-    const cols = CHARACTER_ROSTER.length;
+    const cols = ROSTER.length;
     const cardW = 140;
     const cardH = 200;
     const gap = 20;
@@ -1051,7 +1052,7 @@ export class Renderer {
     const startY = 140;
 
     for (let i = 0; i < cols; i++) {
-      const char = CHARACTER_ROSTER[i];
+      const char = ROSTER[i];
       const cx = startX + i * (cardW + gap);
       const cy = startY;
 
@@ -1130,7 +1131,7 @@ export class Renderer {
     // Player status at bottom
     const bottomY = 400;
     // P1 side
-    const p1Char = CHARACTER_ROSTER[p1Cursor];
+    const p1Char = ROSTER[p1Cursor];
     ctx.fillStyle = '#ff4444';
     ctx.font = 'bold 16px monospace';
     ctx.textAlign = 'left';
@@ -1143,7 +1144,7 @@ export class Renderer {
     ctx.fillText(p1Ready ? 'READY!' : 'Press J to confirm', 50, bottomY + 52);
 
     // P2 side
-    const p2Char = CHARACTER_ROSTER[p2Cursor];
+    const p2Char = ROSTER[p2Cursor];
     ctx.fillStyle = '#4488ff';
     ctx.font = 'bold 16px monospace';
     ctx.textAlign = 'right';

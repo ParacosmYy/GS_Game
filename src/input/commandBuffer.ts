@@ -160,6 +160,15 @@ export class CommandBuffer {
       || this.matchSequence(recent, ['down', 'forward']);
   }
 
+  /** Check if QCB motion is present in recent history */
+  hasQCB(currentFrame: number): boolean {
+    const recent = this.history.filter(
+      (r) => currentFrame - r.frame <= COMMAND_WINDOW,
+    );
+    return this.matchSequence(recent, ['down', 'downback', 'back'])
+      || this.matchSequence(recent, ['down', 'back']);
+  }
+
   /** Reset buffer (e.g., on knockdown) */
   reset(): void {
     this.history = [];

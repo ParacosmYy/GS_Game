@@ -226,6 +226,55 @@ export const FRAME_DATA = {
     damage: 65, hitstun: 15, blockstun: 9, pushback: 5,
     hitLevel: 'MID' as const, knockdown: true,
   },
+  // ── 八神庵必杀技 (Iori Yagami) ──
+  IORI_AOIHANA: {
+    startup: 6, active: 4, recovery: 10,
+    damage: 50, hitstun: 10, blockstun: 6, pushback: 3,
+    hitLevel: 'MID' as const, knockdown: false,
+  },
+  IORI_AOIHANA_2: {
+    startup: 4, active: 4, recovery: 8,
+    damage: 45, hitstun: 10, blockstun: 6, pushback: 3,
+    hitLevel: 'LOW' as const, knockdown: false,
+  },
+  IORI_AOIHANA_3: {
+    startup: 5, active: 5, recovery: 14,
+    damage: 60, hitstun: 14, blockstun: 8, pushback: 5,
+    hitLevel: 'MID' as const, knockdown: true,
+  },
+  // ── 特瑞必杀技 (Terry Bogard) ──
+  TERRY_BURN_KNUCKLE: {
+    startup: 8, active: 6, recovery: 14,
+    damage: 60, hitstun: 12, blockstun: 8, pushback: 4,
+    hitLevel: 'MID' as const, knockdown: false,
+  },
+  TERRY_CRACK_SHOT: {
+    startup: 10, active: 5, recovery: 14,
+    damage: 55, hitstun: 12, blockstun: 7, pushback: 4,
+    hitLevel: 'HIGH' as const, knockdown: true,
+  },
+  // ── 金必杀技 (Kim Kaphwan) ──
+  KIM_HIENSEN: {
+    startup: 5, active: 5, recovery: 14,
+    damage: 65, hitstun: 14, blockstun: 8, pushback: 4,
+    hitLevel: 'MID' as const, knockdown: true,
+  },
+  // ── DM超必杀技 ──
+  DM_YATAGARASU: {
+    startup: 6, active: 20, recovery: 18,
+    damage: 190, hitstun: 0, blockstun: 16, pushback: 8,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 18,
+  },
+  DM_POWER_GEYSER: {
+    startup: 10, active: 15, recovery: 20,
+    damage: 180, hitstun: 0, blockstun: 16, pushback: 10,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 16,
+  },
+  DM_PHOENIX_KICK: {
+    startup: 7, active: 18, recovery: 16,
+    damage: 185, hitstun: 0, blockstun: 16, pushback: 8,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 17,
+  },
 } as const;
 
 // ===== Hitbox Offsets (relative to fighter position, facing right) =====
@@ -273,6 +322,19 @@ export const HITBOX_OFFSETS = {
   KYO_DOKUGAMI: { offsetX: 45, offsetY: -60, width: 50, height: 35 },
   KYO_TSUMIYOMI: { offsetX: 42, offsetY: -55, width: 48, height: 30 },
   KYO_BATSUYOMI: { offsetX: 45, offsetY: -70, width: 50, height: 40 },
+  // 八神庵
+  IORI_AOIHANA: { offsetX: 45, offsetY: -55, width: 48, height: 35 },
+  IORI_AOIHANA_2: { offsetX: 45, offsetY: -20, width: 50, height: 25 },
+  IORI_AOIHANA_3: { offsetX: 42, offsetY: -65, width: 50, height: 45 },
+  // 特瑞
+  TERRY_BURN_KNUCKLE: { offsetX: 50, offsetY: -55, width: 55, height: 35 },
+  TERRY_CRACK_SHOT: { offsetX: 45, offsetY: -45, width: 55, height: 40 },
+  // 金
+  KIM_HIENSEN: { offsetX: 38, offsetY: -75, width: 45, height: 50 },
+  // DM超必杀技
+  DM_YATAGARASU: { offsetX: 35, offsetY: -60, width: 70, height: 55 },
+  DM_POWER_GEYSER: { offsetX: 40, offsetY: -55, width: 75, height: 50 },
+  DM_PHOENIX_KICK: { offsetX: 40, offsetY: -50, width: 70, height: 55 },
 } as const;
 
 // ===== Throw Constants =====

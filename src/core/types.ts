@@ -66,8 +66,20 @@ export enum AttackType {
   KYO_DOKUGAMI = 'KYO_DOKUGAMI',         // 115式·毒咬み ↓↘→+C
   KYO_TSUMIYOMI = 'KYO_TSUMIYOMI',       // 401式·罪詠み (hcb+P followup)
   KYO_BATSUYOMI = 'KYO_BATSUYOMI',       // 402式·罰詠み (f+P followup)
+  // 八神庵必杀技 (Iori Specials)
+  IORI_AOIHANA = 'IORI_AOIHANA',       // 葵花 QCB+P (rekka)
+  IORI_AOIHANA_2 = 'IORI_AOIHANA_2',   // 葵花 第二段
+  IORI_AOIHANA_3 = 'IORI_AOIHANA_3',   // 葵花 第三段
+  // 特瑞必杀技 (Terry Specials)
+  TERRY_BURN_KNUCKLE = 'TERRY_BURN_KNUCKLE',  // Burning Knuckle QCB+P
+  TERRY_CRACK_SHOT = 'TERRY_CRACK_SHOT',      // Crack Shot QCB+K
+  // 金必杀技 (Kim Specials)
+  KIM_HIENSEN = 'KIM_HIENSEN',         // 飛燕斬 QCB+K (upper)
   // 超必杀技 (DM)
-  DM_OROCHINAGI = 'DM_OROCHINAGI',
+  DM_OROCHINAGI = 'DM_OROCHINAGI',     // 大蛇薙 (Kyo)
+  DM_YATAGARASU = 'DM_YATAGARASU',     // 八稚女 (Iori)
+  DM_POWER_GEYSER = 'DM_POWER_GEYSER', // Power Geyser (Terry)
+  DM_PHOENIX_KICK = 'DM_PHOENIX_KICK', // 鳳凰脚 (Kim)
 }
 
 // ===== Hit Level (防御判定) =====
@@ -122,7 +134,7 @@ export interface MaxModeState {
 }
 
 // ===== Rekka Chain State (荒咬み/毒咬み连段) =====
-export type RekkaChain = 'aragami' | 'dokugami' | null;
+export type RekkaChain = 'aragami' | 'dokugami' | 'aoihana' | null;
 
 // ===== Close Range Distance =====
 export const CLOSE_RANGE = 80;
@@ -137,51 +149,6 @@ export enum GamePhase {
   FIGHTING = 'FIGHTING', // Active gameplay
   KO = 'KO',           // KO state
 }
-
-// ===== Character Roster =====
-export interface CharacterDef {
-  id: string;
-  name: string;
-  nameCn: string;
-  color: string;        // primary body color
-  accentColor: string;  // secondary/limb color
-  portrait: string;     // emoji/icon for select screen
-}
-
-export const CHARACTER_ROSTER: CharacterDef[] = [
-  {
-    id: 'kyo',
-    name: 'Kyo Kusanagi',
-    nameCn: '草薙京',
-    color: '#ff6600',
-    accentColor: '#ffaa00',
-    portrait: '🔥',
-  },
-  {
-    id: 'iori',
-    name: 'Iori Yagami',
-    nameCn: '八神庵',
-    color: '#aa1133',
-    accentColor: '#cc3355',
-    portrait: '🌙',
-  },
-  {
-    id: 'terry',
-    name: 'Terry Bogard',
-    nameCn: '特瑞',
-    color: '#cc8800',
-    accentColor: '#ddaa22',
-    portrait: '🎩',
-  },
-  {
-    id: 'kim',
-    name: 'Kim Kaphwan',
-    nameCn: '金',
-    color: '#2288cc',
-    accentColor: '#44aadd',
-    portrait: '🦵',
-  },
-];
 
 // ===== Game State (for window.__gameState) =====
 export interface PlayerState {
