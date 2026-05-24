@@ -42,6 +42,7 @@ export const KyoDef: CharacterDefinition = {
   specialGlow: '#ff6600',
   portrait: '🔥',
   pixelPortrait: kyoPortrait,
+  winQuotes: ['まだまだだな', '俺の炎に焼かれる覚悟はできたか?', '草薙の拳、見せてやるよ'],
 
   stats: {
     walkSpeed: 4,

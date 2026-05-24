@@ -27,6 +27,7 @@ export const KulaDef: CharacterDefinition = {
   specialGlow: '#88eeff',
   portrait: '❄️',
   pixelPortrait: kulaPortrait,
+  winQuotes: ['やったー!', '寒くなってきたね', '氷の力、見せてあげる'],
 
   stats: {
     walkSpeed: 4,

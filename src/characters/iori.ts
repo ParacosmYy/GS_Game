@@ -29,6 +29,7 @@ export const IoriDef: CharacterDefinition = {
   specialGlow: '#aa22ff',
   portrait: '🌙',
   pixelPortrait: ioriPortrait,
+  winQuotes: ['くだらん...', '血の叫びが聞こえるか?', '俺の痛みを味わえ'],
 
   stats: {
     walkSpeed: 4.5,

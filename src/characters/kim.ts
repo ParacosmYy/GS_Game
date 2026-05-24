@@ -24,6 +24,7 @@ export const KimDef: CharacterDefinition = {
   specialGlow: '#88ccff',
   portrait: '🦵',
   pixelPortrait: kimPortrait,
+  winQuotes: ['正義は必ず勝つ!', 'その程度ではダメだ', 'テコンドーの素晴らしさを教えよう'],
 
   stats: {
     walkSpeed: 5,

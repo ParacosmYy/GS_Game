@@ -27,6 +27,7 @@ export const LeonaDef: CharacterDefinition = {
   specialGlow: '#88ccff',
   portrait: '⚔️',
   pixelPortrait: leonaPortrait,
+  winQuotes: ['...任務完了', '弱すぎる', 'これが軍人の戦い方だ'],
 
   stats: {
     walkSpeed: 4.5,

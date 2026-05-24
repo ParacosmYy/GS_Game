@@ -27,6 +27,7 @@ export const RyoDef: CharacterDefinition = {
   specialGlow: '#ffaa00',
   portrait: '👊',
   pixelPortrait: ryoPortrait,
+  winQuotes: ['極限流空手、恐るるに足らず', 'まだ修行が足りんな', '虎の拳を見たか!'],
 
   stats: {
     walkSpeed: 4,

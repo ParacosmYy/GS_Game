@@ -126,6 +126,7 @@ export interface CharacterDefinition {
   specialGlow: string;   // 必杀技光晕色
   portrait: string;     // 选人界面图标
   pixelPortrait?: PixelPortraitData; // SNK-style pixel portrait for character select
+  winQuotes: string[];  // 胜利台词(随机选一条显示)
 
   // ── 数值 ──
   /** 角色差异化数值 (速度/生命/碰撞) */

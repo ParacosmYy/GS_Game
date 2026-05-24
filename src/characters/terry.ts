@@ -27,6 +27,7 @@ export const TerryDef: CharacterDefinition = {
   specialGlow: '#ffaa00',
   portrait: '🎩',
   pixelPortrait: terryPortrait,
+  winQuotes: ['Hey, come on come on!', 'Still hungry for more?', "That's power, buddy!"],
 
   stats: {
     walkSpeed: 3.5,

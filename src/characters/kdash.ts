@@ -32,6 +32,7 @@ export const KdashDef: CharacterDefinition = {
   specialGlow: '#ff6600',
   portrait: '🔥',
   pixelPortrait: kdashPortrait,
+  winQuotes: ['...チッ', '俺の邪魔をするな', 'secondから逃げられない'],
 
   stats: {
     walkSpeed: 4,

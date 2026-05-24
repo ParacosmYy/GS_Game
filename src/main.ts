@@ -105,6 +105,16 @@ let koTimer = 0;
 let winner: number | null = null;
 let continueCountdown = 0;
 const CONTINUE_DURATION = 600; // 10秒倒计时
+let continueCursorYes = true; // Continue画面光标
+let currentWinQuote = '';
+
+function pickWinQuote(w: number | null): string {
+  if (w === null) return '';
+  const fighter = w === 0 ? p1 : p2;
+  const charDef = ROSTER.find(c => c.id === fighter.charId);
+  if (!charDef || !charDef.winQuotes.length) return '';
+  return charDef.winQuotes[Math.floor(Math.random() * charDef.winQuotes.length)];
+}
 let debugMode = false;
 let simplifiedMode = false; // Tab to toggle
 let modeIndicatorTimer = 0;
@@ -137,19 +147,27 @@ function update(): void {
   if (phase === GamePhase.CONTINUE) {
     tickRef.value++;
     continueCountdown--;
+    // 左右键切换YES/NO
+    if (inputManager.isKeyDown('ArrowLeft')) continueCursorYes = true;
+    if (inputManager.isKeyDown('ArrowRight')) continueCursorYes = false;
     if (inputManager.isKeyDown('KeyJ') || inputManager.isKeyDown('Enter')) {
-      // Continue: restart match with same characters
-      phase = GamePhase.INTRO;
-      phaseTimer = 0;
-      rounds.currentRound = 1;
-      rounds.fullReset();
-      cinematic.reset();
-      p1DelayedHealth = p1.maxHealth;
-      p2DelayedHealth = p2.maxHealth;
-      p1.savePrevState();
-      p2.savePrevState();
-      announcer.roundStart(1);
-      announcer.fight();
+      if (continueCursorYes) {
+        // Continue: restart match with same characters
+        phase = GamePhase.INTRO;
+        phaseTimer = 0;
+        rounds.currentRound = 1;
+        rounds.fullReset();
+        cinematic.reset();
+        p1DelayedHealth = p1.maxHealth;
+        p2DelayedHealth = p2.maxHealth;
+        p1.savePrevState();
+        p2.savePrevState();
+        announcer.roundStart(1);
+        announcer.fight();
+      } else {
+        // NO → back to title
+        phase = GamePhase.TITLE;
+      }
     }
     if (continueCountdown <= 0) {
       // Time out → Game Over → back to title
@@ -223,6 +241,7 @@ function update(): void {
         if (!p1Team.alive || !p2Team.alive) {
           phase = GamePhase.MATCH_END;
           koTimer = 0;
+          currentWinQuote = pickWinQuote(winner);
           announcer.winner();
           return;
         }
@@ -232,6 +251,7 @@ function update(): void {
       if (matchWinner !== null) {
         phase = GamePhase.MATCH_END;
         koTimer = 0;
+        currentWinQuote = pickWinQuote(winner);
         announcer.winner();
       } else {
         rounds.startRoundTransition();
@@ -247,6 +267,7 @@ function update(): void {
     if (koTimer > 180 || (koTimer > 60 && (inputManager.isKeyDown('KeyR') || inputManager.isKeyDown('KeyJ') || inputManager.isKeyDown('Enter')))) {
       phase = GamePhase.CONTINUE;
       continueCountdown = CONTINUE_DURATION;
+      continueCursorYes = true;
     }
     return;
   }
@@ -415,7 +436,7 @@ function render(): void {
     return;
   }
   if (phase === GamePhase.CONTINUE) {
-    renderer.drawContinue(Math.ceil(continueCountdown / 60));
+    renderer.drawContinue(Math.ceil(continueCountdown / 60), continueCursorYes);
     return;
   }
   if (phase === GamePhase.SELECT) {
@@ -448,7 +469,7 @@ function render(): void {
 
   if (phase === GamePhase.MATCH_END) {
     if (winner !== null) { const w = winner === 0 ? p1 : p2; drawVictoryPose(ctx, w.x - camera.x, w.y, w.facing, w.color, '#ffffff30', tickRef.value, w.charId); }
-    renderer.drawMatchEnd(winner, rounds.p1Wins, rounds.p2Wins);
+    renderer.drawMatchEnd(winner, rounds.p1Wins, rounds.p2Wins, currentWinQuote || undefined, winner !== null ? (winner === 0 ? '#ff6644' : '#4488ff') : undefined);
   }
   if (rounds.fadeAlpha > 0) { ctx.fillStyle = `rgba(0,0,0,${rounds.fadeAlpha})`; ctx.fillRect(0, 0, canvas.width, canvas.height); }
   screenFlash.render(ctx, canvas.width, canvas.height);

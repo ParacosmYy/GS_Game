@@ -504,6 +504,8 @@ export function drawMatchEnd(
   winner: number | null,
   p1Wins: number,
   p2Wins: number,
+  winQuote?: string,
+  winnerColor?: string,
 ): void {
   ctx.save();
 
@@ -518,21 +520,31 @@ export function drawMatchEnd(
   ctx.shadowBlur = 25;
   ctx.fillStyle = '#FFD700';
   ctx.font = 'bold 72px "Courier New", monospace';
-  ctx.fillText('GAME', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 60);
+  ctx.fillText('GAME', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 80);
   ctx.shadowBlur = 0;
 
   if (winner !== null) {
     ctx.fillStyle = winner === 0 ? '#ff6644' : '#4488ff';
     ctx.font = 'bold 32px "Courier New", monospace';
-    ctx.fillText(`P${winner + 1} WINS THE MATCH`, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2);
+    ctx.fillText(`P${winner + 1} WINS THE MATCH`, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 20);
   } else {
     ctx.fillStyle = '#ffcc00';
     ctx.font = 'bold 32px "Courier New", monospace';
-    ctx.fillText('DRAW GAME', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2);
+    ctx.fillText('DRAW GAME', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 20);
+  }
+
+  // Win Quote
+  if (winQuote && winnerColor) {
+    ctx.fillStyle = winnerColor;
+    ctx.font = '16px "Courier New", monospace';
+    ctx.shadowColor = winnerColor;
+    ctx.shadowBlur = 8;
+    ctx.fillText(`"${winQuote}"`, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 25);
+    ctx.shadowBlur = 0;
   }
 
   // Win markers
-  const dotY = CANVAS_HEIGHT / 2 + 50;
+  const dotY = CANVAS_HEIGHT / 2 + 65;
   const dotSpacing = 22;
   for (let i = 0; i < p1Wins; i++) {
     ctx.beginPath();
@@ -559,7 +571,7 @@ export function drawMatchEnd(
 
   ctx.fillStyle = 'rgba(255,255,255,0.5)';
   ctx.font = '13px "Courier New", monospace';
-  ctx.fillText('Press any key to continue', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 110);
+  ctx.fillText('Press any key to continue', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 120);
 
   ctx.restore();
 }
@@ -713,7 +725,7 @@ export function drawTitle(ctx: CanvasRenderingContext2D, tick: number): void {
 
 // ===== Continue Screen =====
 
-export function drawContinue(ctx: CanvasRenderingContext2D, secondsLeft: number): void {
+export function drawContinue(ctx: CanvasRenderingContext2D, secondsLeft: number, cursorYes: boolean): void {
   ctx.save();
 
   ctx.fillStyle = 'rgba(0,0,0,0.88)';
@@ -726,17 +738,48 @@ export function drawContinue(ctx: CanvasRenderingContext2D, secondsLeft: number)
   ctx.shadowBlur = 25;
   ctx.font = 'bold 48px "Courier New", monospace';
   ctx.fillStyle = '#ff4444';
-  ctx.fillText('CONTINUE?', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 60);
+  ctx.fillText('CONTINUE?', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 80);
+  ctx.shadowBlur = 0;
 
   ctx.shadowBlur = 12;
   ctx.font = 'bold 72px "Courier New", monospace';
   ctx.fillStyle = secondsLeft <= 3 ? '#ff2222' : '#ffcc00';
-  ctx.fillText(`${secondsLeft}`, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 30);
+  ctx.fillText(`${secondsLeft}`, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 10);
   ctx.shadowBlur = 0;
 
-  ctx.font = '14px "Courier New", monospace';
-  ctx.fillStyle = '#888899';
-  ctx.fillText('Press J / Enter to continue', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 100);
+  // YES / NO selection
+  const yesX = CANVAS_WIDTH / 2 - 80;
+  const noX = CANVAS_WIDTH / 2 + 80;
+  const selY = CANVAS_HEIGHT / 2 + 90;
+
+  // YES
+  ctx.font = 'bold 28px "Courier New", monospace';
+  if (cursorYes) {
+    ctx.shadowColor = '#44ff44';
+    ctx.shadowBlur = 15;
+    ctx.fillStyle = '#44ff44';
+    ctx.fillText('> YES <', yesX, selY);
+  } else {
+    ctx.fillStyle = '#666666';
+    ctx.fillText('YES', yesX, selY);
+  }
+  ctx.shadowBlur = 0;
+
+  // NO
+  if (!cursorYes) {
+    ctx.shadowColor = '#ff4444';
+    ctx.shadowBlur = 15;
+    ctx.fillStyle = '#ff4444';
+    ctx.fillText('> NO <', noX, selY);
+  } else {
+    ctx.fillStyle = '#666666';
+    ctx.fillText('NO', noX, selY);
+  }
+  ctx.shadowBlur = 0;
+
+  ctx.font = '12px "Courier New", monospace';
+  ctx.fillStyle = '#555566';
+  ctx.fillText('Arrow Keys: Select  |  Enter: Confirm', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 140);
 
   ctx.restore();
 }
