@@ -577,27 +577,35 @@ function drawStar(ctx: CanvasRenderingContext2D, cx: number, cy: number, r: numb
   ctx.fill();
 }
 
-/** Screen shake state */
+/** Screen shake state — with directional bias for KOF-style impact feel */
 export class ScreenShake {
   private intensity = 0;
   private duration = 0;
+  private maxDuration = 1;
   offsetX = 0;
   offsetY = 0;
 
   trigger(intensity: number, duration: number): void {
-    this.intensity = intensity;
-    this.duration = duration;
+    // 只在新的震动更强时覆盖
+    if (intensity >= this.intensity) {
+      this.intensity = intensity;
+      this.duration = duration;
+      this.maxDuration = duration;
+    }
   }
 
   update(): void {
     if (this.duration > 0) {
       this.duration--;
-      const decay = this.duration / 10;
+      // 非线性衰减: 开始强, 结束弱
+      const t = this.duration / this.maxDuration;
+      const decay = t * t; // 平方衰减 — 更sharp的震动
       this.offsetX = (Math.random() - 0.5) * this.intensity * decay;
-      this.offsetY = (Math.random() - 0.5) * this.intensity * decay;
+      this.offsetY = (Math.random() - 0.5) * this.intensity * decay * 0.6; // 垂直震动小于水平
     } else {
       this.offsetX = 0;
       this.offsetY = 0;
+      this.intensity = 0;
     }
   }
 }

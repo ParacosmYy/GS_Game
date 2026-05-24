@@ -166,7 +166,9 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
     const combo = deps.combatSystem.getComboCount(defIdx);
     if (combo >= 2) deps.vfx.spawnDamageText(defender.x, defender.y - defender.displayHeight - 40, combo);
 
-    deps.screenShake.trigger(calcShake(attackType, counterHit, data.damage), 8);
+    // 震屏时长: 轻攻击5帧, 重攻击8帧, 必杀10帧, DM 14帧
+    const shakeDur = isDM ? 14 : isSpecial ? 10 : isHeavyAttack(attackType) ? 8 : 5;
+    deps.screenShake.trigger(calcShake(attackType, counterHit, data.damage), shakeDur);
     deps.cinematic.trackDamage(defIdx, data.damage);
 
     // KO检测 — 角色倒地时触发震撼效果
