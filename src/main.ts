@@ -44,6 +44,11 @@ let winner: number | null = null;
 let tick = 0;
 let debugMode = false;
 
+// Combo tracking per player (tracks consecutive hits on opponent)
+let comboCount = [0, 0];       // [hits on P1, hits on P2]
+let comboTimer = [0, 0];       // frames since last hit
+const COMBO_TIMEOUT = 60;      // 1 second to maintain combo
+
 // ===== Window API =====
 declare global {
   interface Window {
@@ -206,10 +211,28 @@ function onHit(attacker: Fighter, defender: Fighter, attackType: AttackType, blo
   if (blocked) {
     vfx.spawnBlockFlash(hitX, hitY);
     screenShake.trigger(3, 4);
+    // Block resets attacker's combo on defender
+    const defIdx = defender === p1 ? 0 : 1;
+    comboCount[defIdx] = 0;
   } else {
+    // Track combo: comboCount tracks hits ON a player
+    const defIdx = defender === p1 ? 0 : 1;
+    comboCount[defIdx]++;
+    comboTimer[defIdx] = 0;
+
     vfx.spawnHitSparks(hitX, hitY, attackType === AttackType.SPECIAL_UPPER ? 14 : 8);
     vfx.spawnImpactRing(hitX, hitY);
     vfx.spawnDamageText(defender.x, defender.y - defender.displayHeight - 20, data.damage);
+
+    // Combo text for 2+ hits
+    if (comboCount[defIdx] >= 2) {
+      vfx.spawnDamageText(
+        defender.x,
+        defender.y - defender.displayHeight - 40,
+        comboCount[defIdx],
+      );
+    }
+
     const shakeIntensity = attackType === AttackType.SPECIAL_UPPER ? 8 :
                            attackType === AttackType.THROW ? 6 :
                            data.damage > 60 ? 5 : 3;
@@ -242,6 +265,16 @@ function update(): void {
   }
 
   tick++;
+
+  // Combo timeout: reset if no hit within window
+  for (let i = 0; i < 2; i++) {
+    if (comboCount[i] > 0) {
+      comboTimer[i]++;
+      if (comboTimer[i] >= COMBO_TIMEOUT) {
+        comboCount[i] = 0;
+      }
+    }
+  }
 
   const rawP1 = inputManager.getP1Input();
   const rawP2 = inputManager.getP2Input();
@@ -328,6 +361,9 @@ function render(): void {
     drawIntro();
   }
 
+  // Combo counter HUD (above fighters' heads, in screen space)
+  drawComboCounters();
+
   // Controls hint
   ctx.fillStyle = 'rgba(255,255,255,0.25)';
   ctx.font = '9px monospace';
@@ -365,6 +401,33 @@ function drawIntro(): void {
     ctx.fillText('FIGHT!', 400, 300);
   }
 
+  ctx.restore();
+}
+
+function drawComboCounters(): void {
+  // comboCount[0] = hits ON P1 (by P2), comboCount[1] = hits ON P2 (by P1)
+  const fighters = [p1, p2];
+  ctx.save();
+  for (let i = 0; i < 2; i++) {
+    if (comboCount[i] < 2) continue;
+    const f = fighters[i];
+    const sx = camera.worldToScreen(f.x);
+    const sy = f.y - f.displayHeight - 30;
+    const alpha = Math.min(1, comboTimer[i] < 30 ? 1 : 1 - (comboTimer[i] - 30) / 30);
+    if (alpha <= 0) continue;
+
+    ctx.globalAlpha = alpha;
+    ctx.textAlign = 'center';
+
+    // Combo count
+    ctx.fillStyle = '#ffcc00';
+    ctx.shadowColor = '#ff8800';
+    ctx.shadowBlur = 8;
+    ctx.font = `bold ${16 + Math.min(comboCount[i], 10)}px monospace`;
+    ctx.fillText(`${comboCount[i]} COMBO`, sx, sy);
+
+    ctx.shadowBlur = 0;
+  }
   ctx.restore();
 }
 
@@ -449,6 +512,8 @@ function restartGame(): void {
   koTimer = 0;
   winner = null;
   tick = 0;
+  comboCount = [0, 0];
+  comboTimer = [0, 0];
   p1.reset(STAGE_WIDTH * 0.33);
   p2.reset(STAGE_WIDTH * 0.67);
   p1Cmd.reset();

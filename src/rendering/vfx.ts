@@ -70,7 +70,8 @@ export class VFXSystem {
   }
 
   /** Spawn floating damage text */
-  spawnDamageText(worldX: number, worldY: number, damage: number): void {
+  spawnDamageText(worldX: number, worldY: number, value: number): void {
+    const isCombo = value > 0 && value <= 50;
     this.particles.push({
       x: worldX,
       y: worldY,
@@ -78,10 +79,10 @@ export class VFXSystem {
       vy: -1.5,
       life: 40,
       maxLife: 40,
-      size: 14,
-      color: '#ff4444',
+      size: isCombo ? 18 : 14,
+      color: isCombo ? '#ffcc00' : '#ff4444',
       type: 'text',
-      text: `-${damage}`,
+      text: isCombo ? `${value} HITS!` : `-${value}`,
     });
   }
 
