@@ -200,6 +200,12 @@ export class Renderer {
       case FighterState.WALK:
       case FighterState.RUN:
         return Math.floor(tick / 6) % 6;
+      case FighterState.JUMP:
+      case FighterState.HOP:
+      case FighterState.RUN_JUMP:
+      case FighterState.HYPER_JUMP:
+      case FighterState.BACKDASH:
+        return Math.floor(tick / 8) % 6;
       case FighterState.STAND_ATTACK:
       case FighterState.CROUCH_ATTACK:
       case FighterState.AIR_ATTACK:

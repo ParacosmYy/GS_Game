@@ -8,7 +8,7 @@ import type { SpriteAnimationMap, SpriteFrame } from './spriteRenderer.js';
 
 const PW = 120;  // 帧宽度
 const PH = 200;  // 帧高度
-const PIXEL = 4; // 像素块大小 (模拟低分辨率像素感)
+const PIXEL = 3; // 像素块大小 — 更精细的像素分辨率(KOF角色约30-40块高)
 
 /** 角色视觉定义 */
 interface CharVisual {
@@ -396,10 +396,12 @@ const CROUCH_POSES: Pose[] = [
   { headOff: 0, bodyLean: 0, armL: 0.35, armR: -0.45, legL: -2, legR: 2, crouch: true },
 ];
 const JUMP_POSES: Pose[] = [
-  { headOff: 0, bodyLean: 0, armL: -0.5, armR: 0.5, legL: -1, legR: 1, crouch: false },
-  { headOff: 0, bodyLean: 0, armL: -0.8, armR: 0.8, legL: 1, legR: -1, crouch: false },
-  { headOff: 0, bodyLean: 0, armL: -0.3, armR: 0.3, legL: 0, legR: 0, crouch: false },
-  { headOff: 0, bodyLean: 0, armL: 0, armR: 0, legL: -1, legR: 1, crouch: false },
+  { headOff: 0, bodyLean: 0, armL: -0.3, armR: 0.3, legL: 1, legR: -1, crouch: false },
+  { headOff: 0, bodyLean: 0, armL: -0.5, armR: 0.5, legL: 0, legR: 0, crouch: false },
+  { headOff: 0, bodyLean: 0, armL: -0.8, armR: 0.8, legL: -1, legR: 1, crouch: false },
+  { headOff: 0, bodyLean: 0, armL: -0.7, armR: 0.7, legL: 0, legR: 0, crouch: false },
+  { headOff: 0, bodyLean: 0, armL: -0.4, armR: 0.4, legL: 1, legR: -1, crouch: false },
+  { headOff: 0, bodyLean: 0, armL: -0.2, armR: 0.2, legL: 1, legR: -1, crouch: false },
 ];
 const HIT_POSES: Pose[] = [
   { headOff: -1, bodyLean: -2, armL: 0.8, armR: 0.6, legL: 0, legR: 0, crouch: false },
