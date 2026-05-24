@@ -47,6 +47,11 @@ export class InputManager {
     window.addEventListener('keyup', (e) => {
       this.keys[e.code] = false;
     });
+
+    // Reset all keys when window loses focus (prevents stuck keys)
+    window.addEventListener('blur', () => {
+      this.keys = {};
+    });
   }
 
   getP1Input(): PlayerInput {
