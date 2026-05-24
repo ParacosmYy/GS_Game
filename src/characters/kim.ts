@@ -43,19 +43,16 @@ export const KimDef: CharacterDefinition = {
       legFront: bone(8, 0, 0.15),
       legBack: bone(-6, 0, -0.2),
     }),
-    [FighterState.WALK]: pose({
-      armFront: bone(6, 17, 0.05),
-      armBack: bone(-4, 20, -0.35),
-      legFront: bone(10, 0, 0.25),
-      legBack: bone(-4, 0, -0.18),
-    }),
-    [FighterState.RUN]: pose({
-      body: bone(8, 0, 0.2),
-      armFront: bone(-4, 20, -0.85),
-      armBack: bone(12, 24, 0.5),
-      legFront: bone(14, 0, 0.5),
-      legBack: bone(-8, 0, -0.4),
-    }),
+    [FighterState.WALK]: [
+      pose({ legFront: bone(12, -3, 0.3), legBack: bone(-3, 3, -0.22), armFront: bone(6, 19, 0.02), armBack: bone(-4, 22, -0.32) }),
+      pose({ legFront: bone(10, 0, 0.18), legBack: bone(-5, 0, -0.12), armFront: bone(7, 17, 0.06), armBack: bone(-5, 20, -0.36) }),
+      pose({ legFront: bone(6, 3, -0.22), legBack: bone(-12, -3, 0.3), armFront: bone(6, 18, 0.08), armBack: bone(-4, 21, -0.3) }),
+      pose({ legFront: bone(8, 0, -0.1), legBack: bone(-6, 0, 0.08), armFront: bone(6, 16, 0.04), armBack: bone(-4, 19, -0.34) }),
+    ],
+    [FighterState.RUN]: [
+      pose({ body: bone(10, 0, 0.25), armFront: bone(-5, 22, -0.9), armBack: bone(14, 26, 0.55), legFront: bone(16, -5, 0.55), legBack: bone(-8, 5, -0.42) }),
+      pose({ body: bone(6, 0, 0.12), armFront: bone(-3, 18, -0.55), armBack: bone(10, 28, 0.28), legFront: bone(10, 5, 0.22), legBack: bone(-16, -5, 0.55) }),
+    ],
     [FighterState.CROUCH]: pose({
       body: bone(0, 22, 0.12),
       head: bone(0, 16),
@@ -140,44 +137,68 @@ export const KimDef: CharacterDefinition = {
     // DM: QCB×2+K → 鳳凰脚
     const dmMotion = cmdBuf.checkDMMotion(tick, input.punchPressed, input.kickPressed);
     if (dmMotion === 'QCBx2_K') return AttackType.DM_PHOENIX_KICK;
+    // DM: QCF×2+K → 鳳凰天舞脚
+    if (dmMotion === 'QCFx2_K') return AttackType.DM_PHOENIX_HITEN;
 
-    // DP+P → shared upper
+    // DP+K → 飛燕斬 (Kim-specific anti-air)
     const special = cmdBuf.checkSpecial(tick, input.punchPressed || input.kickPressed);
-    if (special === AttackType.SPECIAL_UPPER) return AttackType.SPECIAL_UPPER;
+    if (special === AttackType.SPECIAL_UPPER && input.kickPressed) return AttackType.KIM_HIENZAN;
 
-    // QCB+K → 飛燕斬
+    // QCB+K → 半月斬
     if (input.kickPressed && cmdBuf.hasQCB(tick)) {
-      return AttackType.KIM_HIENSEN;
+      return AttackType.KIM_HANGETSU;
     }
 
-    // QCF+P → fireball (shared, Kim doesn't really have one but reuse for POC)
-    if (special === AttackType.SPECIAL_PROJECTILE) return AttackType.SPECIAL_PROJECTILE;
+    // QCB+P → 三連撃 (rekka chain)
+    if (input.punchPressed && cmdBuf.hasQCB(tick)) {
+      return AttackType.KIM_SANREN;
+    }
+
+    // ↓↓+K → 覇気脚
+    if (input.kickPressed && cmdBuf.hasDD(tick)) {
+      return AttackType.KIM_HAKI;
+    }
+
     return null;
   },
 
   routeNormal(input, state, _isCloseRange) {
-    // →+B mid command kick
-    if (state !== FighterState.JUMP && state !== FighterState.RUN_JUMP
-      && state !== FighterState.HOP && state !== FighterState.HYPER_JUMP) {
-      if (input.buttonBPressed && input.forward && !input.down) {
-        return AttackType.CMD_GOFU_YOU; // reuse as generic overhead
-      }
+    const isAir = state === FighterState.JUMP
+      || state === FighterState.RUN_JUMP
+      || state === FighterState.HOP
+      || state === FighterState.HYPER_JUMP;
+
+    // 飛翔脚: 空中↓↘→+K
+    if (isAir && input.kickPressed && input.forward && input.down) {
+      return AttackType.KIM_HISHOU;
+    }
+
+    // →+B mid command kick (overhead standalone)
+    if (!isAir && input.buttonBPressed && input.forward && !input.down) {
+      return AttackType.CMD_GOFU_YOU;
     }
     return null;
   },
 
-  routeRekkaFollowup() {
+  routeRekkaFollowup(_input, _cmdBuf, _tick, currentAttack) {
+    // 三連撃 chain: 2nd and 3rd hits
+    if (currentAttack === AttackType.KIM_SANREN && _input.punchPressed) {
+      return AttackType.KIM_SANREN; // reuse same type for multi-hit
+    }
     return null;
   },
 
   onAttackActive(fighter, attackType, _projectiles, _playerIndex) {
-    if (attackType === AttackType.KIM_HIENSEN) {
+    // 飛燕斬: rise
+    if (attackType === AttackType.KIM_HIENZAN) {
       fighter.vy = -8;
       fighter.vx = 2 * fighter.facing;
       return true;
     }
-    if (attackType === AttackType.SPECIAL_UPPER) {
-      fighter.vy = -7;
+    // 飛翔脚: air dive
+    if (attackType === AttackType.KIM_HISHOU) {
+      fighter.vy = 5;
+      fighter.vx = 4 * fighter.facing;
       return true;
     }
     return false;

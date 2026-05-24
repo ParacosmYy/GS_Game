@@ -68,6 +68,7 @@ export class Fighter {
   // Juggle state (B7: floating/juggle tracking)
   juggleState: JuggleState = JuggleState.NONE;
   airHitCount = 0; // how many air hits in current combo
+  jugglePoints = 0; // remaining juggle budget (KOF2002: each air hit consumes points)
 
   // Visual height (for crouch)
   displayHeight = FIGHTER_HEIGHT;
@@ -426,6 +427,7 @@ export class Fighter {
     this.guardGauge = 100;
     this.guardCrushTimer = 0;
     this.juggleState = JuggleState.NONE;
+    this.jugglePoints = 0;
     this.airHitCount = 0;
     this.resetCancelFlags();
     this.isCounterWire = false;

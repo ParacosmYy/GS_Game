@@ -341,7 +341,7 @@ const TERRY_CRACK_SHOT_FRAMES: AttackFrame[] = [
 ];
 
 // ===== 金 =====
-const KIM_HIENSEN_FRAMES: AttackFrame[] = [
+const KIM_HIENZAN_FRAMES: AttackFrame[] = [
   // 飛燕斬：上升踢，受击框缩小
   F([{ ox: 32, oy: -75, w: 40, h: 42 }], { ox: 3, oy: -5, w: -10, h: -25 }),
   F([{ ox: 38, oy: -80, w: 45, h: 45 }], { ox: 3, oy: -5, w: -10, h: -25 }),
@@ -438,7 +438,7 @@ export const ATTACK_FRAMES: AttackFrameTable = {
   [AttackType.IORI_AOIHANA_3]: IORI_AOIHANA_3_FRAMES,
   [AttackType.TERRY_BURN_KNUCKLE]: TERRY_BURN_KNUCKLE_FRAMES,
   [AttackType.TERRY_CRACK_SHOT]: TERRY_CRACK_SHOT_FRAMES,
-  [AttackType.KIM_HIENSEN]: KIM_HIENSEN_FRAMES,
+  [AttackType.KIM_HIENZAN]: KIM_HIENZAN_FRAMES,
   [AttackType.DM_OROCHINAGI]: DM_OROCHINAGI_FRAMES,
   [AttackType.DM_YATAGARASU]: DM_YATAGARASU_FRAMES,
   [AttackType.DM_POWER_GEYSER]: DM_POWER_GEYSER_FRAMES,

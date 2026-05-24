@@ -169,6 +169,28 @@ export class CommandBuffer {
       || this.matchSequence(recent, ['down', 'back']);
   }
 
+  /** Check if HCB motion is present in recent history (→↓←) */
+  hasHCB(currentFrame: number): boolean {
+    const recent = this.history.filter(
+      (r) => currentFrame - r.frame <= HCF_WINDOW,
+    );
+    return this.matchSequence(recent, ['forward', 'downforward', 'down', 'downback', 'back'])
+      || this.matchSequence(recent, ['forward', 'down', 'back']);
+  }
+
+  /** Check if ↓↓ motion is present in recent history */
+  hasDD(currentFrame: number): boolean {
+    const recent = this.history.filter(
+      (r) => currentFrame - r.frame <= COMMAND_WINDOW,
+    );
+    let downCount = 0;
+    for (const r of recent) {
+      if (r.direction === 'down') downCount++;
+      else if (r.direction !== 'downforward' && r.direction !== 'downback') break;
+    }
+    return downCount >= 2;
+  }
+
   /** Reset buffer (e.g., on knockdown) */
   reset(): void {
     this.history = [];

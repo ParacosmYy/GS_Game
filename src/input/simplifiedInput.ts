@@ -14,16 +14,16 @@ export interface SimplifiedResult {
 /** Per-character special move mapping for simplified U/I buttons */
 const SPECIAL1: Record<string, AttackType> = {
   kyo: AttackType.KYO_ARAGAMI,
-  iori: AttackType.SPECIAL_PROJECTILE,
-  terry: AttackType.SPECIAL_PROJECTILE,
-  kim: AttackType.KIM_HIENSEN,
+  iori: AttackType.IORI_YAMIBARAI,
+  terry: AttackType.TERRY_POWER_WAVE,
+  kim: AttackType.KIM_HANGETSU,
 };
 
 const SPECIAL2: Record<string, AttackType> = {
-  kyo: AttackType.SPECIAL_UPPER,
-  iori: AttackType.SPECIAL_UPPER,
+  kyo: AttackType.KYO_ONIYAKI,
+  iori: AttackType.IORI_ONIYAKI,
   terry: AttackType.TERRY_BURN_KNUCKLE,
-  kim: AttackType.SPECIAL_UPPER,
+  kim: AttackType.KIM_HIENZAN,
 };
 
 /** Resolve simplified U/I/O input to a character-specific action */

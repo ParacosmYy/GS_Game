@@ -23,22 +23,26 @@ export function drawAttackLimb(
   const isPunch = name.endsWith('_A') || name.endsWith('_C')
     || f.currentAttack === AttackType.SPECIAL_PROJECTILE
     || f.currentAttack === AttackType.SPECIAL_UPPER
+    || f.currentAttack === AttackType.KYO_ONIYAKI
     || f.currentAttack === AttackType.KYO_ARAGAMI
     || f.currentAttack === AttackType.KYO_ARAGAMI_KONOKIZU
     || f.currentAttack === AttackType.KYO_ARAGAMI_YANOSABI
     || f.currentAttack === AttackType.KYO_DOKUGAMI
     || f.currentAttack === AttackType.KYO_TSUMIYOMI
-    || f.currentAttack === AttackType.KYO_BATSUYOMI;
+    || f.currentAttack === AttackType.KYO_BATSUYOMI
+    || f.currentAttack === AttackType.IORI_ONIYAKI
+    || f.currentAttack === AttackType.IORI_KOTOTSUKI
+    || f.currentAttack === AttackType.TERRY_POWER_DUNK
+    || f.currentAttack === AttackType.TERRY_RISING_TACKLE;
   const isHeavy = name.endsWith('_C') || name.endsWith('_D')
     || f.currentAttack === AttackType.STAND_CD
     || f.currentAttack === AttackType.KYO_RED_KICK;
 
   const isSpecialMove = name.startsWith('KYO_') || name.startsWith('IORI_')
     || name.startsWith('TERRY_') || name.startsWith('KIM_')
-    || f.currentAttack === AttackType.DM_OROCHINAGI
-    || f.currentAttack === AttackType.DM_YATAGARASU
-    || f.currentAttack === AttackType.DM_POWER_GEYSER
-    || f.currentAttack === AttackType.DM_PHOENIX_KICK;
+    || f.currentAttack === AttackType.SPECIAL_PROJECTILE
+    || f.currentAttack === AttackType.SPECIAL_UPPER
+    || name.startsWith('DM_');
 
   // Get character-specific colors
   const charDef = ROSTER.find(c => c.id === f.charId);
@@ -168,6 +172,36 @@ export function drawAttackLimb(
     ctx.arc(sx + (FIGHTER_WIDTH / 2 + reach * 0.7) * f.facing, sy - f.displayHeight * 0.5,
       8 + progress * 6, 0, Math.PI * 2);
     ctx.fill();
+  } else if (f.currentAttack === AttackType.IORI_ONIYAKI) {
+    const reach = limbLen * 1.3;
+    ctx.strokeStyle = specialColor;
+    ctx.shadowColor = specialGlow;
+    ctx.shadowBlur = 20;
+    ctx.lineWidth = 14;
+    ctx.beginPath();
+    ctx.moveTo(sx + 8 * f.facing, sy - f.displayHeight * 0.5);
+    ctx.lineTo(sx + 12 * f.facing, sy - f.displayHeight * 0.5 - reach);
+    ctx.stroke();
+    ctx.fillStyle = `${specialGlow}44`;
+    ctx.beginPath();
+    ctx.arc(sx + 12 * f.facing, sy - f.displayHeight * 0.5 - reach,
+      10 + progress * 8, 0, Math.PI * 2);
+    ctx.fill();
+  } else if (f.currentAttack === AttackType.IORI_KOTOTSUKI) {
+    const reach = limbLen * 1.2;
+    ctx.strokeStyle = specialColor;
+    ctx.shadowColor = specialGlow;
+    ctx.shadowBlur = 16;
+    ctx.lineWidth = 12;
+    ctx.beginPath();
+    ctx.moveTo(sx + 5 * f.facing, sy - f.displayHeight * 0.4);
+    ctx.lineTo(sx + (FIGHTER_WIDTH / 2 + reach) * f.facing, sy - f.displayHeight * 0.35);
+    ctx.stroke();
+    ctx.fillStyle = `${specialGlow}44`;
+    ctx.beginPath();
+    ctx.arc(sx + (FIGHTER_WIDTH / 2 + reach * 0.8) * f.facing, sy - f.displayHeight * 0.38,
+      8 + progress * 6, 0, Math.PI * 2);
+    ctx.fill();
 
   // ── 特瑞 specials ──
   } else if (f.currentAttack === AttackType.TERRY_BURN_KNUCKLE) {
@@ -195,9 +229,43 @@ export function drawAttackLimb(
     ctx.moveTo(sx + 5 * f.facing, sy - f.displayHeight * 0.35);
     ctx.lineTo(sx + (FIGHTER_WIDTH / 2 + reach) * f.facing, sy - f.displayHeight * 0.6);
     ctx.stroke();
+  } else if (f.currentAttack === AttackType.TERRY_POWER_DUNK) {
+    const reach = limbLen * 1.4;
+    ctx.strokeStyle = specialColor;
+    ctx.shadowColor = specialGlow;
+    ctx.shadowBlur = 20;
+    ctx.lineWidth = 14;
+    ctx.beginPath();
+    ctx.moveTo(sx + 5 * f.facing, sy - f.displayHeight * 0.45);
+    ctx.lineTo(sx + 12 * f.facing, sy - f.displayHeight * 0.45 - reach);
+    ctx.stroke();
+    ctx.fillStyle = `${specialGlow}55`;
+    ctx.beginPath();
+    ctx.arc(sx + 12 * f.facing, sy - f.displayHeight * 0.45 - reach,
+      12 + progress * 8, 0, Math.PI * 2);
+    ctx.fill();
+  } else if (f.currentAttack === AttackType.TERRY_RISING_TACKLE) {
+    const reach = limbLen * 1.5;
+    ctx.strokeStyle = specialColor;
+    ctx.shadowColor = specialGlow;
+    ctx.shadowBlur = 20;
+    ctx.lineWidth = 14;
+    ctx.beginPath();
+    ctx.moveTo(sx + 5 * f.facing, sy - f.displayHeight * 0.5);
+    ctx.lineTo(sx + 8 * f.facing, sy - f.displayHeight * 0.5 - reach);
+    ctx.stroke();
+    ctx.strokeStyle = `${specialGlow}33`;
+    ctx.lineWidth = 3;
+    for (let i = 0; i < 4; i++) {
+      const yOff = -reach * (0.2 + i * 0.2);
+      ctx.beginPath();
+      ctx.moveTo(sx + (3 + i * 3) * f.facing, sy - f.displayHeight * 0.5 + yOff);
+      ctx.lineTo(sx + (3 + i * 3) * f.facing, sy - f.displayHeight * 0.5 + yOff - 15);
+      ctx.stroke();
+    }
 
   // ── 金 specials ──
-  } else if (f.currentAttack === AttackType.KIM_HIENSEN) {
+  } else if (f.currentAttack === AttackType.KIM_HIENZAN) {
     const reach = limbLen * 1.4;
     ctx.strokeStyle = specialColor;
     ctx.shadowColor = specialGlow;
@@ -215,6 +283,56 @@ export function drawAttackLimb(
       ctx.lineTo(sx + (i * 4 - 2) * f.facing, sy - f.displayHeight * 0.3 - reach * 0.8);
       ctx.stroke();
     }
+  } else if (f.currentAttack === AttackType.KIM_HANGETSU) {
+    const reach = limbLen * 1.2;
+    ctx.strokeStyle = specialColor;
+    ctx.shadowColor = specialGlow;
+    ctx.shadowBlur = 18;
+    ctx.lineWidth = 14;
+    ctx.beginPath();
+    ctx.moveTo(sx + 5 * f.facing, sy - f.displayHeight * 0.35);
+    ctx.lineTo(sx + (FIGHTER_WIDTH / 2 + reach) * f.facing, sy - f.displayHeight * 0.6);
+    ctx.stroke();
+    ctx.fillStyle = `${specialGlow}44`;
+    ctx.beginPath();
+    ctx.arc(sx + (FIGHTER_WIDTH / 2 + reach * 0.6) * f.facing, sy - f.displayHeight * 0.5,
+      12 + progress * 8, 0, Math.PI * 2);
+    ctx.fill();
+  } else if (f.currentAttack === AttackType.KIM_HISHOU) {
+    const reach = limbLen * 1.3;
+    ctx.strokeStyle = specialGlow;
+    ctx.shadowColor = specialColor;
+    ctx.shadowBlur = 16;
+    ctx.lineWidth = 12;
+    ctx.beginPath();
+    ctx.moveTo(sx + 5 * f.facing, sy - f.displayHeight * 0.3);
+    ctx.lineTo(sx + (FIGHTER_WIDTH / 2 + reach) * f.facing, sy);
+    ctx.stroke();
+    ctx.fillStyle = `${specialColor}44`;
+    ctx.beginPath();
+    ctx.arc(sx + (FIGHTER_WIDTH / 2 + reach * 0.7) * f.facing, sy - f.displayHeight * 0.1,
+      10 + progress * 6, 0, Math.PI * 2);
+    ctx.fill();
+  } else if (f.currentAttack === AttackType.KIM_HAKI) {
+    ctx.strokeStyle = specialColor;
+    ctx.shadowColor = specialGlow;
+    ctx.shadowBlur = 14;
+    ctx.lineWidth = 10;
+    const reach = limbLen * 1.0;
+    ctx.beginPath();
+    ctx.moveTo(sx + 5 * f.facing, sy - 8);
+    ctx.lineTo(sx + (FIGHTER_WIDTH / 2 + reach) * f.facing, sy - 3);
+    ctx.stroke();
+  } else if (f.currentAttack === AttackType.KIM_SANREN) {
+    const reach = limbLen * 1.1;
+    ctx.strokeStyle = specialColor;
+    ctx.shadowColor = specialGlow;
+    ctx.shadowBlur = 14;
+    ctx.lineWidth = 12;
+    ctx.beginPath();
+    ctx.moveTo(sx + 10 * f.facing, sy - f.displayHeight * 0.55);
+    ctx.lineTo(sx + (FIGHTER_WIDTH / 2 + reach) * f.facing, sy - f.displayHeight * 0.5);
+    ctx.stroke();
 
   // ── DM 超必杀 visuals ──
   } else if (f.currentAttack === AttackType.DM_YATAGARASU) {
@@ -347,6 +465,56 @@ export function drawAttackLimb(
     ctx.beginPath();
     ctx.arc(sx + 10 * f.facing, sy - f.displayHeight * 0.5 - reach,
       12 + progress * 8, 0, Math.PI * 2);
+    ctx.fill();
+  } else if (f.currentAttack === AttackType.KYO_ONIYAKI) {
+    const reach = limbLen * 1.3;
+    ctx.strokeStyle = '#ff6622';
+    ctx.shadowColor = '#ff4400';
+    ctx.shadowBlur = 20;
+    ctx.lineWidth = 14;
+    ctx.beginPath();
+    ctx.moveTo(sx + 5 * f.facing, sy - f.displayHeight * 0.5);
+    ctx.lineTo(sx + 10 * f.facing, sy - f.displayHeight * 0.5 - reach);
+    ctx.stroke();
+    ctx.fillStyle = '#ffaa0066';
+    ctx.beginPath();
+    ctx.arc(sx + 10 * f.facing, sy - f.displayHeight * 0.5 - reach,
+      12 + progress * 8, 0, Math.PI * 2);
+    ctx.fill();
+  } else if (f.currentAttack === AttackType.KYO_YAMIBARAI) {
+    const reach = limbLen * 0.7;
+    ctx.strokeStyle = '#ff6622';
+    ctx.shadowColor = '#ff4400';
+    ctx.shadowBlur = 14;
+    ctx.lineWidth = 10;
+    ctx.beginPath();
+    ctx.moveTo(sx + 10 * f.facing, sy - f.displayHeight * 0.55);
+    ctx.lineTo(sx + (FIGHTER_WIDTH / 2 + reach) * f.facing, sy - f.displayHeight * 0.55);
+    ctx.stroke();
+  } else if (f.currentAttack === AttackType.IORI_YAMIBARAI) {
+    const reach = limbLen * 0.7;
+    ctx.strokeStyle = '#aa1133';
+    ctx.shadowColor = '#8800cc';
+    ctx.shadowBlur = 14;
+    ctx.lineWidth = 10;
+    ctx.beginPath();
+    ctx.moveTo(sx + 10 * f.facing, sy - f.displayHeight * 0.55);
+    ctx.lineTo(sx + (FIGHTER_WIDTH / 2 + reach) * f.facing, sy - f.displayHeight * 0.55);
+    ctx.stroke();
+  } else if (f.currentAttack === AttackType.TERRY_POWER_WAVE) {
+    const reach = limbLen * 0.8;
+    ctx.strokeStyle = specialColor;
+    ctx.shadowColor = specialGlow;
+    ctx.shadowBlur = 16;
+    ctx.lineWidth = 12;
+    ctx.beginPath();
+    ctx.moveTo(sx + 10 * f.facing, sy - f.displayHeight * 0.5);
+    ctx.lineTo(sx + (FIGHTER_WIDTH / 2 + reach) * f.facing, sy - f.displayHeight * 0.5);
+    ctx.stroke();
+    ctx.fillStyle = `${specialColor}44`;
+    ctx.beginPath();
+    ctx.arc(sx + (FIGHTER_WIDTH / 2 + reach) * f.facing, sy - f.displayHeight * 0.5,
+      8 + progress * 8, 0, Math.PI * 2);
     ctx.fill();
   } else if (f.currentAttack === AttackType.SPECIAL_UPPER) {
     const reach = limbLen * 1.2;

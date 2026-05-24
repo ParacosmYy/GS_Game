@@ -62,32 +62,47 @@ export enum AttackType {
   // 京专属必杀技 (Kyo Specials)
   KYO_75KAI = 'KYO_75KAI',         // 75式·改 ↓↘→+K,K
   KYO_75KAI_2 = 'KYO_75KAI_2',     // 75式·改 第二段
-  KYO_RED_KICK = 'KYO_RED_KICK',   // R.E.D. Kick ↓↙←+K
+  KYO_RED_KICK = 'KYO_RED_KICK',   // R.E.D. Kick ←↓↙+K
+  KYO_ONIYAKI = 'KYO_ONIYAKI',     // 鬼焼き →↓↘+P (升龙, invincible)
+  KYO_YAMIBARAI = 'KYO_YAMIBARAI', // 闇払い ↓↘→+A (projectile)
   // 荒咬み连段系 (Aragami Chain)
   KYO_ARAGAMI = 'KYO_ARAGAMI',             // 114式·荒咬み ↓↘→+A
-  KYO_ARAGAMI_KONOKIZU = 'KYO_ARAGAMI_KONOKIZU',   // 128式·九傷 (qcf+P followup)
-  KYO_ARAGAMI_YANOSABI = 'KYO_ARAGAMI_YANOSABI',   // 127式·八錆 (hcb+P followup)
-  KYO_NANASE = 'KYO_NANASE',                       // 七瀬 — QCF+K from 九傢, kick KD
-  KYO_KOTO_TSUKI = 'KYO_KOTO_TSUKI',               // 琴月陰 — rush elbow KD
-  KYO_YAKISOGI = 'KYO_YAKISOGI',                   // 破砕 — P from 八锊, uppercut finisher
+  KYO_ARAGAMI_KONOKIZU = 'KYO_ARAGAMI_KONOKIZU',   // 128式·九傷
+  KYO_ARAGAMI_YANOSABI = 'KYO_ARAGAMI_YANOSABI',   // 127式·八錆
+  KYO_NANASE = 'KYO_NANASE',                       // 七瀬
+  KYO_KOTO_TSUKI = 'KYO_KOTO_TSUKI',               // 琴月陽
+  KYO_YAKISOGI = 'KYO_YAKISOGI',                   // 破砕
   // 毒咬み连段系 (Dokugami Chain)
   KYO_DOKUGAMI = 'KYO_DOKUGAMI',         // 115式·毒咬み ↓↘→+C
-  KYO_TSUMIYOMI = 'KYO_TSUMIYOMI',       // 401式·罪詠み (hcb+P followup)
-  KYO_BATSUYOMI = 'KYO_BATSUYOMI',       // 402式·罰詠み (f+P followup)
+  KYO_TSUMIYOMI = 'KYO_TSUMIYOMI',       // 401式·罪詠み
+  KYO_BATSUYOMI = 'KYO_BATSUYOMI',       // 402式·罰詠み
   // 八神庵必杀技 (Iori Specials)
   IORI_AOIHANA = 'IORI_AOIHANA',       // 葵花 QCB+P (rekka)
   IORI_AOIHANA_2 = 'IORI_AOIHANA_2',   // 葵花 第二段
   IORI_AOIHANA_3 = 'IORI_AOIHANA_3',   // 葵花 第三段
+  IORI_YAMIBARAI = 'IORI_YAMIBARAI',   // 闇払い ↓↘→+P (projectile)
+  IORI_ONIYAKI = 'IORI_ONIYAKI',       // 鬼焼き →↓↘+P (升龙)
+  IORI_KOTOTSUKI = 'IORI_KOTOTSUKI',   // 琴月陰 ←↙↓↘→+K (dash)
+  IORI_KUZUKAZE = 'IORI_KUZUKAZE',     // 屑風 ←↙↓↘→↗↓↙←+P (command throw)
   // 特瑞必杀技 (Terry Specials)
-  TERRY_BURN_KNUCKLE = 'TERRY_BURN_KNUCKLE',  // Burning Knuckle QCB+P
-  TERRY_CRACK_SHOT = 'TERRY_CRACK_SHOT',      // Crack Shot QCB+K
+  TERRY_POWER_WAVE = 'TERRY_POWER_WAVE',       // Power Wave ↓↘→+P (projectile)
+  TERRY_BURN_KNUCKLE = 'TERRY_BURN_KNUCKLE',   // Burn Knuckle ←↙↓+P
+  TERRY_CRACK_SHOT = 'TERRY_CRACK_SHOT',       // Crack Shot ←↙↓+K
+  TERRY_POWER_DUNK = 'TERRY_POWER_DUNK',       // Power Dunk →↓↘+K (升龙)
+  TERRY_RISING_TACKLE = 'TERRY_RISING_TACKLE', // Rising Tackle ↓蓄↑+P (charge)
   // 金必杀技 (Kim Specials)
-  KIM_HIENSEN = 'KIM_HIENSEN',         // 飛燕斬 QCB+K (upper)
+  KIM_HIENZAN = 'KIM_HIENZAN',         // 飛燕斬 ↓蓄↑+K (升龙)
+  KIM_HANGETSU = 'KIM_HANGETSU',       // 半月斬 ←↙↓+K
+  KIM_HAKI = 'KIM_HAKI',               // 覇気脚 ↓↓+K (low)
+  KIM_HISHOU = 'KIM_HISHOU',           // 飛翔脚 空中↓↘→+K (air dive)
+  KIM_SANREN = 'KIM_SANREN',           // 三連撃 ←↙↓+P chain
   // 超必杀技 (DM)
-  DM_OROCHINAGI = 'DM_OROCHINAGI',     // 大蛇薙 (Kyo)
-  DM_YATAGARASU = 'DM_YATAGARASU',     // 八稚女 (Iori)
-  DM_POWER_GEYSER = 'DM_POWER_GEYSER', // Power Geyser (Terry)
-  DM_PHOENIX_KICK = 'DM_PHOENIX_KICK', // 鳳凰脚 (Kim)
+  DM_OROCHINAGI = 'DM_OROCHINAGI',           // 大蛇薙 (Kyo)
+  DM_YATAGARASU = 'DM_YATAGARASU',           // 八稚女 (Iori)
+  DM_POWER_GEYSER = 'DM_POWER_GEYSER',       // Power Geyser (Terry)
+  DM_HIGH_ANGLE_GEYSER = 'DM_HIGH_ANGLE_GEYSER', // High Angle Geyser (Terry)
+  DM_PHOENIX_KICK = 'DM_PHOENIX_KICK',       // 鳳凰脚 (Kim)
+  DM_PHOENIX_HITEN = 'DM_PHOENIX_HITEN',     // 鳳凰天舞脚 (Kim)
 }
 
 // ===== Hit Level (防御判定) =====

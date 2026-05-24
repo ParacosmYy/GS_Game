@@ -593,7 +593,7 @@ export class SimpleAI {
           AttackType.KYO_75KAI,
           AttackType.KYO_RED_KICK,
           AttackType.TERRY_CRACK_SHOT,
-          AttackType.KIM_HIENSEN,
+          AttackType.KIM_HIENZAN,
         ];
         return kickSpecials[Math.floor(Math.random() * kickSpecials.length)];
       },
@@ -688,10 +688,12 @@ export class SimpleAI {
 
   private routeKimComboSpecial(attack: string, _input: ResolvedInput, _tick: number): AttackType | null {
     switch (attack) {
-      case 'hiensen':
-        return AttackType.KIM_HIENSEN;
+      case 'hienzan':
+        return AttackType.KIM_HIENZAN;
+      case 'hangetsu':
+        return AttackType.KIM_HANGETSU;
       default:
-        return AttackType.KIM_HIENSEN;
+        return AttackType.KIM_HIENZAN;
     }
   }
 }

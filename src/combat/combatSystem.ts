@@ -13,6 +13,7 @@ import {
   COUNTER_WIRE_BOUNCE_VX, COUNTER_WIRE_BOUNCE_VY,
   LIGHT_NORMALS, NORMAL_ATTACKS, COMMAND_NORMALS,
   STAGE_LEFT, STAGE_RIGHT,
+  JUGGLE_POINTS_MAX, JUGGLE_COST_LIGHT, JUGGLE_COST_HEAVY, JUGGLE_COST_SPECIAL, JUGGLE_COST_DM,
 } from '../core/constants.js';
 import { FighterState, AttackType, JuggleState } from '../core/types.js';
 import type { HitLevel } from '../core/types.js';
@@ -202,12 +203,14 @@ export class CombatSystem {
     // Roll invincibility check (attacks pass through, throws don't)
     if (defender.isRolling()) return;
 
-    // B7: Juggle check — if defender is airborne, check juggle state
+    // B7: Juggle check — if defender is airborne, check juggle budget
     if (!defender.isGrounded()) {
       if (defender.juggleState === JuggleState.NONE) return; // Can't hit airborne
-      // HALF: can only juggle in upper portion of arc
-      // FULL: can juggle until near ground
-      if (defender.juggleState === JuggleState.HALF && defender.vy > 0) return; // Only while rising
+      if (defender.juggleState === JuggleState.HALF && defender.vy > 0) return;
+      // Juggle point check: each air hit consumes points from budget
+      const juggleCost = getJuggleCost(attackType);
+      if (defender.jugglePoints < juggleCost) return; // not enough juggle budget
+      defender.jugglePoints -= juggleCost;
     }
 
     const defIdx = this.fighters ? (this.fighters[0] === defender ? 0 : 1) : 0;
@@ -297,17 +300,20 @@ export class CombatSystem {
     const frameData = data as { counterWire?: boolean };
     if (counterHit && frameData.counterWire) {
       defender.isCounterWire = true;
-      // Fly toward wall (away from attacker)
       const flyDir = defender.x < attacker.x ? -1 : 1;
-      defender.vx = COUNTER_WIRE_BOUNCE_VX * flyDir * -1; // toward wall
-      defender.vy = COUNTER_WIRE_BOUNCE_VY; // slight upward
-      // Full juggle state for follow-up combos
+      defender.vx = COUNTER_WIRE_BOUNCE_VX * flyDir * -1;
+      defender.vy = COUNTER_WIRE_BOUNCE_VY;
       defender.juggleState = JuggleState.FULL;
+      defender.jugglePoints = JUGGLE_POINTS_MAX; // full budget on wire launch
       defender.state = FighterState.HITSTUN;
       defender.hitstunTimer = 30;
       defender.isKnockedDown = false;
     } else if (data.knockdown && !isCancelledCmdNormal) {
       defender.applyKnockdown(25);
+      // Launch into air: give juggle budget for follow-up
+      if (!defender.isGrounded()) {
+        defender.jugglePoints = JUGGLE_POINTS_MAX;
+      }
     } else {
       defender.applyHitstun(hitstunFrames, data.pushback);
     }
@@ -394,6 +400,17 @@ function guardGaugeDamage(attackType: AttackType): number {
 
 /** Guard Crush constant — stun duration in frames */
 const GUARD_CRUSH_DURATION = 60;
+
+/** Get juggle point cost for an attack type */
+function getJuggleCost(attackType: AttackType): number {
+  const name = attackType as string;
+  if (name.startsWith('DM_')) return JUGGLE_COST_DM;
+  if (name.startsWith('KYO_') || name.startsWith('IORI_') || name.startsWith('TERRY_')
+    || name.startsWith('KIM_') || name.startsWith('SPECIAL_')) return JUGGLE_COST_SPECIAL;
+  if (name.endsWith('_C') || name.endsWith('_D') || name.startsWith('CMD_')
+    || name.startsWith('CLOSE_C') || name.startsWith('CLOSE_D')) return JUGGLE_COST_HEAVY;
+  return JUGGLE_COST_LIGHT;
+}
 
 function aabbCheck(
   a: { x: number; y: number; width: number; height: number },

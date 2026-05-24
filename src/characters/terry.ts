@@ -46,19 +46,16 @@ export const TerryDef: CharacterDefinition = {
       legFront: bone(5, 0, 0.08),
       legBack: bone(-5, 0, -0.08),
     }),
-    [FighterState.WALK]: pose({
-      armFront: bone(10, 20, 0.1),
-      armBack: bone(-5, 18, -0.3),
-      legFront: bone(8, 0, 0.18),
-      legBack: bone(-3, 0, -0.12),
-    }),
-    [FighterState.RUN]: pose({
-      body: bone(7, 0, 0.18),
-      armFront: bone(-6, 22, -0.9),
-      armBack: bone(14, 26, 0.6),
-      legFront: bone(13, 0, 0.45),
-      legBack: bone(-9, 0, -0.35),
-    }),
+    [FighterState.WALK]: [
+      pose({ legFront: bone(10, -2, 0.2), legBack: bone(-3, 2, -0.15), armFront: bone(10, 22, 0.08), armBack: bone(-5, 20, -0.28) }),
+      pose({ legFront: bone(8, 0, 0.12), legBack: bone(-4, 0, -0.08), armFront: bone(11, 19, 0.12), armBack: bone(-6, 17, -0.32) }),
+      pose({ legFront: bone(5, 2, -0.18), legBack: bone(-10, -2, 0.2), armFront: bone(10, 18, 0.15), armBack: bone(-5, 21, -0.25) }),
+      pose({ legFront: bone(7, 0, -0.08), legBack: bone(-5, 0, 0.06), armFront: bone(10, 20, 0.1), armBack: bone(-5, 18, -0.3) }),
+    ],
+    [FighterState.RUN]: [
+      pose({ body: bone(9, 0, 0.22), armFront: bone(-6, 24, -0.95), armBack: bone(16, 26, 0.65), legFront: bone(14, -5, 0.5), legBack: bone(-9, 5, -0.4) }),
+      pose({ body: bone(5, 0, 0.1), armFront: bone(-4, 18, -0.55), armBack: bone(10, 30, 0.3), legFront: bone(10, 5, 0.22), legBack: bone(-14, -5, 0.5) }),
+    ],
     [FighterState.CROUCH]: pose({
       body: bone(0, 18, 0.05),
       head: bone(0, 14),
@@ -142,9 +139,14 @@ export const TerryDef: CharacterDefinition = {
     // DM: QCF×2+P → Power Geyser
     const dmMotion = cmdBuf.checkDMMotion(tick, input.punchPressed, input.kickPressed);
     if (dmMotion === 'QCFx2_P') return AttackType.DM_POWER_GEYSER;
+    // DM: QCF×2+K → High Angle Geyser
+    if (dmMotion === 'QCFx2_K') return AttackType.DM_HIGH_ANGLE_GEYSER;
 
     const special = cmdBuf.checkSpecial(tick, input.punchPressed || input.kickPressed);
-    if (special === AttackType.SPECIAL_UPPER) return AttackType.SPECIAL_UPPER;
+    // DP+K → Power Dunk (Terry-specific upper)
+    if (special === AttackType.SPECIAL_UPPER && input.kickPressed) return AttackType.TERRY_POWER_DUNK;
+    // DP+P → Rising Tackle (charge upper)
+    if (special === AttackType.SPECIAL_UPPER) return AttackType.TERRY_RISING_TACKLE;
 
     // QCB+P → Burn Knuckle (before fireball)
     if (input.punchPressed && cmdBuf.hasQCB(tick)) {
@@ -155,8 +157,8 @@ export const TerryDef: CharacterDefinition = {
       return AttackType.TERRY_CRACK_SHOT;
     }
 
-    // QCF+P → Power Wave (fireball)
-    if (special === AttackType.SPECIAL_PROJECTILE) return AttackType.SPECIAL_PROJECTILE;
+    // QCF+P → Power Wave (Terry-specific fireball)
+    if (special === AttackType.SPECIAL_PROJECTILE) return AttackType.TERRY_POWER_WAVE;
     return null;
   },
 
@@ -169,15 +171,24 @@ export const TerryDef: CharacterDefinition = {
   },
 
   onAttackActive(fighter, attackType, projectiles, playerIndex) {
-    if (attackType === AttackType.SPECIAL_PROJECTILE && fighter.attackFrame === 0) {
+    // Power Wave: spawn projectile
+    if (attackType === AttackType.TERRY_POWER_WAVE && fighter.attackFrame === 0) {
+      const data = FRAME_DATA.TERRY_POWER_WAVE;
       projectiles.push(new Projectile(
         fighter.x + 50 * fighter.facing, fighter.y - 50, fighter.facing,
-        FRAME_DATA.SPECIAL_PROJECTILE.active, playerIndex, fighter.charId,
+        data.active, playerIndex, fighter.charId,
       ));
       return true;
     }
-    if (attackType === AttackType.SPECIAL_UPPER) {
+    // Rising Tackle: rise (multi-hit)
+    if (attackType === AttackType.TERRY_RISING_TACKLE) {
       fighter.vy = -8;
+      return true;
+    }
+    // Power Dunk: rise + forward
+    if (attackType === AttackType.TERRY_POWER_DUNK) {
+      fighter.vy = -7;
+      fighter.vx = 3 * fighter.facing;
       return true;
     }
     return false;

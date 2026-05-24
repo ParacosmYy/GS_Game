@@ -179,9 +179,9 @@ export const KyoDef: CharacterDefinition = {
     const dmMotion = cmdBuf.checkDMMotion(tick, input.punchPressed, input.kickPressed);
     if (dmMotion === 'QCFx2_P') return AttackType.DM_OROCHINAGI;
 
-    // Dragon Punch →↓↘+P (shared)
+    // Dragon Punch →↓↘+P → 鬼焼き (Kyo-specific)
     const special = cmdBuf.checkSpecial(tick, input.punchPressed || input.kickPressed);
-    if (special === AttackType.SPECIAL_UPPER) return AttackType.SPECIAL_UPPER;
+    if (special === AttackType.SPECIAL_UPPER) return AttackType.KYO_ONIYAKI;
 
     // 荒咬み: QCF+A
     if (cmdBuf.hasQCF(tick) && input.buttonAPressed) return AttackType.KYO_ARAGAMI;
@@ -193,8 +193,8 @@ export const KyoDef: CharacterDefinition = {
       return cmdBuf.checkKickSpecial(tick, input.kickPressed);
     }
 
-    // Fireball fallback: QCF+P (Kyo doesn't have one, but shared route)
-    if (special === AttackType.SPECIAL_PROJECTILE) return AttackType.SPECIAL_PROJECTILE;
+    // Fireball fallback: QCF+P → 闇払い (Kyo-specific)
+    if (special === AttackType.SPECIAL_PROJECTILE) return AttackType.KYO_YAMIBARAI;
 
     return null;
   },
@@ -267,16 +267,17 @@ export const KyoDef: CharacterDefinition = {
   },
 
   onAttackActive(fighter, attackType, projectiles, playerIndex) {
-    // Fireball: spawn projectile
-    if (attackType === AttackType.SPECIAL_PROJECTILE && fighter.attackFrame === 0) {
+    // 闇払い: spawn projectile
+    if (attackType === AttackType.KYO_YAMIBARAI && fighter.attackFrame === 0) {
+      const data = FRAME_DATA.KYO_YAMIBARAI;
       projectiles.push(new Projectile(
         fighter.x + 50 * fighter.facing, fighter.y - 50, fighter.facing,
-        FRAME_DATA.SPECIAL_PROJECTILE.active, playerIndex, fighter.charId,
+        data.active, playerIndex, fighter.charId,
       ));
       return true;
     }
-    // Dragon upper: rise
-    if (attackType === AttackType.SPECIAL_UPPER) {
+    // 鬼焼き: rise (invincible startup)
+    if (attackType === AttackType.KYO_ONIYAKI) {
       fighter.vy = -6;
       return true;
     }

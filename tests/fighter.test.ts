@@ -72,18 +72,21 @@ describe('Fighter', () => {
       const f = createFighter();
       f.startAttack(AttackType.STAND_A);
 
-      // startup: 3帧 (tickAttack 内部自增 attackFrame 并在完成时重置)
+      // STAND_A startup=4 (正版KOF2002平均值)
       expect(f.attackPhase).toBe('startup');
       expect(f.attackFrame).toBe(0);
       f.tickAttack(); // frame 0 → 1
       expect(f.attackFrame).toBe(1);
       f.tickAttack(); // frame 1 → 2
       expect(f.attackFrame).toBe(2);
-      f.tickAttack(); // frame 2 → startup done, active starts, frame reset to 0
+      f.tickAttack(); // frame 2 → 3
+      expect(f.attackFrame).toBe(3);
+      f.tickAttack(); // frame 3 → startup done, active starts, frame reset to 0
       expect(f.attackPhase).toBe('active');
       expect(f.attackFrame).toBe(0);
 
-      // active: 3帧
+      // active: 4帧
+      f.tickAttack();
       f.tickAttack();
       f.tickAttack();
       f.tickAttack(); // active done, recovery starts
