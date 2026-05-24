@@ -448,6 +448,12 @@ export class Renderer {
         ctx.fillStyle = 'rgba(255,0,0,0.2)'; ctx.fillRect(hitbox.x - camera.x, hitbox.y, hitbox.width, hitbox.height);
         ctx.strokeStyle = 'rgba(255,0,0,0.7)'; ctx.lineWidth = 2; ctx.strokeRect(hitbox.x - camera.x, hitbox.y, hitbox.width, hitbox.height);
       }
+      // Throw box (yellow)
+      const throwbox = f.getThrowbox?.();
+      if (throwbox) {
+        ctx.fillStyle = 'rgba(255,200,0,0.15)'; ctx.fillRect(throwbox.x - camera.x, throwbox.y, throwbox.width, throwbox.height);
+        ctx.strokeStyle = 'rgba(255,200,0,0.6)'; ctx.lineWidth = 1; ctx.strokeRect(throwbox.x - camera.x, throwbox.y, throwbox.width, throwbox.height);
+      }
       const hb = f.getHurtbox();
       ctx.strokeStyle = 'rgba(0,100,255,0.5)'; ctx.lineWidth = 1; ctx.strokeRect(hb.x - camera.x, hb.y, hb.width, hb.height);
       const pb = f.getPushbox();
@@ -455,6 +461,15 @@ export class Renderer {
       const sx = camera.worldToScreen(f.x);
       ctx.fillStyle = '#fff'; ctx.font = '9px monospace'; ctx.textAlign = 'center';
       ctx.fillText(f.state, sx, f.y - f.displayHeight - 18);
+      // Frame advantage indicator
+      if (f.currentAttack) {
+        const d = FRAME_DATA[f.currentAttack as keyof typeof FRAME_DATA];
+        if (d) {
+          const adv = f.attackPhase === 'recovery' ? -(d.recovery - f.attackFrame) : f.attackPhase === 'startup' ? d.startup - f.attackFrame : d.active - f.attackFrame;
+          ctx.fillStyle = adv > 0 ? '#44ff44' : adv < 0 ? '#ff4444' : '#ffff44';
+          ctx.fillText(`${adv > 0 ? '+' : ''}${adv}f`, sx, f.y - f.displayHeight - 30);
+        }
+      }
       ctx.textAlign = 'left';
     }
 
