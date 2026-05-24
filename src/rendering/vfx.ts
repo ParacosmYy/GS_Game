@@ -133,6 +133,14 @@ export class VFXSystem {
     }
   }
 
+  spawnGuardCrushText(worldX: number, worldY: number): void {
+    this.particles.push({
+      x: worldX, y: worldY, vx: 0, vy: -0.3,
+      life: 50, maxLife: 50, size: 22,
+      color: '#ff4444', type: 'text', text: 'GUARD CRUSH!',
+    });
+  }
+
   spawnThrowEscapeSparks(worldX: number, worldY: number): void {
     for (let i = 0; i < 10; i++) {
       const angle = Math.random() * Math.PI * 2;

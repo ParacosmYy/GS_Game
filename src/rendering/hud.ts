@@ -49,7 +49,7 @@ export function drawHUD(ctx: CanvasRenderingContext2D, fighters: Fighter[], tick
   const p1Ratio = Math.max(0, fighters[0].health / MAX_HEALTH);
   const p1DelayedRatio = Math.max(0, delayedHealth[0] / MAX_HEALTH);
   drawHealthBar(ctx, HUD_MARGIN, HUD_BAR_Y, HUD_BAR_WIDTH, HUD_BAR_HEIGHT, p1Ratio, p1DelayedRatio, true, tick);
-  drawGuardGauge(ctx, HUD_MARGIN, HUD_BAR_Y + HUD_BAR_HEIGHT + 3, HUD_BAR_WIDTH, 5, fighters[0].guardGauge, true);
+  drawGuardGauge(ctx, HUD_MARGIN, HUD_BAR_Y + HUD_BAR_HEIGHT + 3, HUD_BAR_WIDTH, 5, fighters[0].guardGauge, true, tick);
 
   // P2 label — styled
   drawSNKText(ctx, '2P', CANVAS_WIDTH - HUD_MARGIN - 18, HUD_BAR_Y - 3, 12, '#4488ff', '#000000', 'center');
@@ -63,7 +63,7 @@ export function drawHUD(ctx: CanvasRenderingContext2D, fighters: Fighter[], tick
   const p2Ratio = Math.max(0, fighters[1].health / MAX_HEALTH);
   const p2DelayedRatio = Math.max(0, delayedHealth[1] / MAX_HEALTH);
   drawHealthBar(ctx, CANVAS_WIDTH - HUD_MARGIN - HUD_BAR_WIDTH, HUD_BAR_Y, HUD_BAR_WIDTH, HUD_BAR_HEIGHT, p2Ratio, p2DelayedRatio, false, tick);
-  drawGuardGauge(ctx, CANVAS_WIDTH - HUD_MARGIN - HUD_BAR_WIDTH, HUD_BAR_Y + HUD_BAR_HEIGHT + 3, HUD_BAR_WIDTH, 5, fighters[1].guardGauge, false);
+  drawGuardGauge(ctx, CANVAS_WIDTH - HUD_MARGIN - HUD_BAR_WIDTH, HUD_BAR_Y + HUD_BAR_HEIGHT + 3, HUD_BAR_WIDTH, 5, fighters[1].guardGauge, false, tick);
 
   // Timer — decorative frame
   const timeSeconds = Math.max(0, ROUND_TIME - Math.floor(tick / 60));
@@ -258,7 +258,7 @@ function drawHealthBar(ctx: CanvasRenderingContext2D, x: number, y: number, w: n
 
 // ===== Guard Gauge =====
 
-function drawGuardGauge(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, gauge: number, leftAligned: boolean): void {
+function drawGuardGauge(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, gauge: number, leftAligned: boolean, tick: number = 0): void {
   const ratio = Math.max(0, Math.min(1, gauge / 100));
   const fillW = w * ratio;
 
@@ -274,7 +274,9 @@ function drawGuardGauge(ctx: CanvasRenderingContext2D, x: number, y: number, w: 
     } else if (ratio > 0.3) {
       gaugeColor = '#ccaa22';
     } else {
-      gaugeColor = '#cc2233';
+      // 低防御槽闪烁警告 (KOF2002: guard crush接近时快速闪红/白)
+      const blink = Math.sin(tick * 0.3) > 0;
+      gaugeColor = blink ? '#ff4455' : '#cc2233';
     }
     const grad = ctx.createLinearGradient(x, y, x, y + h);
     grad.addColorStop(0, shiftColor(gaugeColor, 40));
