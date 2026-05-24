@@ -182,6 +182,8 @@ function applyPhysics(fighter: Fighter): void {
       fighter.vx = 0;
       fighter.state = FighterState.IDLE;
       fighter.landingRecovery = LANDING_RECOVERY;
+      // Landing dust
+      vfx.spawnDust(fighter.x, STAGE_GROUND_Y);
     } else if (fighter.vy > 0) {
       fighter.y = STAGE_GROUND_Y;
       fighter.vy = 0;

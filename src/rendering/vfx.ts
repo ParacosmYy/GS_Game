@@ -86,6 +86,26 @@ export class VFXSystem {
     });
   }
 
+  /** Spawn landing dust particles */
+  spawnDust(worldX: number, worldY: number): void {
+    for (let i = 0; i < 6; i++) {
+      const dir = (i - 3) * 1.2;
+      this.particles.push({
+        x: worldX + dir * 2,
+        y: worldY - 2,
+        vx: dir * 0.8,
+        vy: -Math.random() * 1.5,
+        life: 15 + Math.floor(Math.random() * 8),
+        maxLife: 23,
+        size: 4 + Math.random() * 4,
+        color: '#888899',
+        type: 'spark',
+        gravity: 0.05,
+        friction: 0.94,
+      });
+    }
+  }
+
   update(): void {
     for (let i = this.particles.length - 1; i >= 0; i--) {
       const p = this.particles[i];
