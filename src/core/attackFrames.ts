@@ -106,6 +106,109 @@ const CMD_NARAKU_FRAMES: AttackFrame[] = [
   F([{ ox: 25, oy: -15, w: 40, h: 35 }]),
 ];
 
+// ===== 命令通常技 (Character-specific Command Normals) =====
+// Iori
+const IORI_YUMEYUMI_FRAMES: AttackFrame[] = [
+  F([{ ox: 35, oy: -55, w: 38, h: 25 }]),
+  F([{ ox: 42, oy: -52, w: 45, h: 30 }]),
+  F([{ ox: 48, oy: -50, w: 48, h: 32 }]),
+  F([{ ox: 42, oy: -55, w: 40, h: 28 }]),
+];
+const IORI_KATANUGI_FRAMES: AttackFrame[] = [
+  F([{ ox: 45, oy: -10, w: 48, h: 16 }]),
+  F([{ ox: 52, oy: -8, w: 55, h: 18 }]),
+  F([{ ox: 52, oy: -8, w: 55, h: 18 }]),
+  F([{ ox: 48, oy: -10, w: 50, h: 16 }]),
+];
+const IORI_YUKIWARUI_FRAMES: AttackFrame[] = [
+  F([{ ox: 22, oy: -38, w: 40, h: 35 }]),
+  F([{ ox: 28, oy: -32, w: 45, h: 40 }]),
+  F([{ ox: 28, oy: -28, w: 45, h: 42 }]),
+  F([{ ox: 25, oy: -22, w: 42, h: 38 }]),
+  F([{ ox: 22, oy: -18, w: 38, h: 35 }]),
+  F([{ ox: 20, oy: -14, w: 35, h: 32 }]),
+];
+// Terry
+const TERRY_BACK_KNCKLE_FRAMES: AttackFrame[] = [
+  F([{ ox: 35, oy: -52, w: 40, h: 28 }]),
+  F([{ ox: 42, oy: -50, w: 48, h: 32 }]),
+  F([{ ox: 48, oy: -48, w: 50, h: 35 }]),
+  F([{ ox: 45, oy: -52, w: 42, h: 30 }]),
+];
+const TERRY_COMBO_BLOW_FRAMES: AttackFrame[] = [
+  F([{ ox: 45, oy: -12, w: 48, h: 16 }]),
+  F([{ ox: 52, oy: -8, w: 55, h: 18 }]),
+  F([{ ox: 55, oy: -8, w: 55, h: 18 }]),
+  F([{ ox: 50, oy: -10, w: 50, h: 16 }]),
+];
+// Kim
+const KIM_HISHOU_KICK_FRAMES: AttackFrame[] = [
+  F([{ ox: 38, oy: -58, w: 42, h: 28 }]),
+  F([{ ox: 45, oy: -55, w: 50, h: 32 }]),
+  F([{ ox: 50, oy: -52, w: 55, h: 35 }]),
+  F([{ ox: 48, oy: -58, w: 45, h: 30 }]),
+];
+const KIM_HANSEN_FRAMES: AttackFrame[] = [
+  F([{ ox: 48, oy: -15, w: 52, h: 18 }]),
+  F([{ ox: 55, oy: -12, w: 60, h: 22 }]),
+  F([{ ox: 60, oy: -10, w: 62, h: 25 }]),
+  F([{ ox: 55, oy: -15, w: 55, h: 20 }]),
+  F([{ ox: 50, oy: -18, w: 50, h: 18 }]),
+];
+// Ryo
+const RYO_TSURIZAO_FRAMES: AttackFrame[] = [
+  F([{ ox: 35, oy: -52, w: 38, h: 28 }]),
+  F([{ ox: 42, oy: -50, w: 45, h: 32 }]),
+  F([{ ox: 45, oy: -48, w: 48, h: 35 }]),
+  F([{ ox: 42, oy: -52, w: 40, h: 30 }]),
+];
+const RYO_ORISHI_FRAMES: AttackFrame[] = [
+  F([{ ox: 45, oy: -12, w: 48, h: 16 }]),
+  F([{ ox: 52, oy: -8, w: 55, h: 18 }]),
+  F([{ ox: 55, oy: -8, w: 55, h: 18 }]),
+  F([{ ox: 50, oy: -10, w: 50, h: 16 }]),
+];
+// K'
+const KDASH_ONE_INCH_FRAMES: AttackFrame[] = [
+  F([{ ox: 32, oy: -50, w: 38, h: 25 }]),
+  F([{ ox: 38, oy: -48, w: 42, h: 28 }]),
+  F([{ ox: 40, oy: -48, w: 42, h: 28 }]),
+];
+const KDASH_TRIGGER_FRAMES: AttackFrame[] = [
+  F([{ ox: 48, oy: -10, w: 50, h: 18 }]),
+  F([{ ox: 55, oy: -8, w: 58, h: 20 }]),
+  F([{ ox: 58, oy: -8, w: 58, h: 20 }]),
+  F([{ ox: 52, oy: -10, w: 52, h: 18 }]),
+];
+// Kula
+const KULA_ONE_MORE_FRAMES: AttackFrame[] = [
+  F([{ ox: 35, oy: -52, w: 40, h: 28 }]),
+  F([{ ox: 42, oy: -50, w: 48, h: 32 }]),
+  F([{ ox: 45, oy: -48, w: 50, h: 35 }]),
+  F([{ ox: 42, oy: -52, w: 42, h: 30 }]),
+];
+const KULA_SLIDER_FRAMES: AttackFrame[] = [
+  F([{ ox: 50, oy: -8, w: 55, h: 16 }]),
+  F([{ ox: 58, oy: -5, w: 62, h: 18 }]),
+  F([{ ox: 62, oy: -5, w: 62, h: 18 }]),
+  F([{ ox: 58, oy: -8, w: 55, h: 16 }]),
+  F([{ ox: 52, oy: -10, w: 50, h: 15 }]),
+];
+// Leona
+const LEONA_STRIKE_ARC_FRAMES: AttackFrame[] = [
+  F([{ ox: 35, oy: -55, w: 42, h: 28 }]),
+  F([{ ox: 42, oy: -52, w: 50, h: 32 }]),
+  F([{ ox: 48, oy: -50, w: 52, h: 35 }]),
+  F([{ ox: 45, oy: -55, w: 45, h: 30 }]),
+];
+const LEONA_STRIKE_DASH_FRAMES: AttackFrame[] = [
+  F([{ ox: 25, oy: -40, w: 42, h: 35 }]),
+  F([{ ox: 30, oy: -35, w: 48, h: 40 }]),
+  F([{ ox: 35, oy: -28, w: 50, h: 42 }]),
+  F([{ ox: 32, oy: -22, w: 48, h: 38 }]),
+  F([{ ox: 28, oy: -18, w: 42, h: 35 }]),
+];
+
 // ===== 蹲下攻击 =====
 const CROUCH_A_FRAMES: AttackFrame[] = [
   F([{ ox: 45, oy: -35, w: 35, h: 18 }]),
@@ -702,6 +805,21 @@ export const ATTACK_FRAMES: AttackFrameTable = {
   [AttackType.CMD_GOFU_YOU]: CMD_GOFUYOU_FRAMES,
   [AttackType.CMD_88SHIKI]: CMD_88SHIKI_FRAMES,
   [AttackType.CMD_NARAKU]: CMD_NARAKU_FRAMES,
+  [AttackType.IORI_YUMEYUMI]: IORI_YUMEYUMI_FRAMES,
+  [AttackType.IORI_KATANUGI]: IORI_KATANUGI_FRAMES,
+  [AttackType.IORI_YUKIWARUI]: IORI_YUKIWARUI_FRAMES,
+  [AttackType.TERRY_BACK_KNCKLE]: TERRY_BACK_KNCKLE_FRAMES,
+  [AttackType.TERRY_COMBO_BLOW]: TERRY_COMBO_BLOW_FRAMES,
+  [AttackType.KIM_HISHOU_KICK]: KIM_HISHOU_KICK_FRAMES,
+  [AttackType.KIM_HANSEN]: KIM_HANSEN_FRAMES,
+  [AttackType.RYO_TSURIZAO]: RYO_TSURIZAO_FRAMES,
+  [AttackType.RYO_ORISHI]: RYO_ORISHI_FRAMES,
+  [AttackType.KDASH_ONE_INCH]: KDASH_ONE_INCH_FRAMES,
+  [AttackType.KDASH_TRIGGER]: KDASH_TRIGGER_FRAMES,
+  [AttackType.KULA_ONE_MORE]: KULA_ONE_MORE_FRAMES,
+  [AttackType.KULA_SLIDER]: KULA_SLIDER_FRAMES,
+  [AttackType.LEONA_STRIKE_ARC]: LEONA_STRIKE_ARC_FRAMES,
+  [AttackType.LEONA_STRIKE_DASH]: LEONA_STRIKE_DASH_FRAMES,
   [AttackType.CROUCH_A]: CROUCH_A_FRAMES,
   [AttackType.CROUCH_B]: CROUCH_B_FRAMES,
   [AttackType.CROUCH_C]: CROUCH_C_FRAMES,

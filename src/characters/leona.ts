@@ -207,7 +207,15 @@ export const LeonaDef: CharacterDefinition = {
     return null;
   },
 
-  routeNormal(_input, _state, _isCloseRange) {
+  routeNormal(input, state, _isCloseRange) {
+    const isAir = state === FighterState.JUMP
+      || state === FighterState.RUN_JUMP
+      || state === FighterState.HOP
+      || state === FighterState.HYPER_JUMP;
+    // 空中↓+D Strike Dash (air dive)
+    if (isAir && input.buttonDPressed && input.down) return AttackType.LEONA_STRIKE_DASH;
+    // →+B Strike Arc (overhead)
+    if (!isAir && input.buttonBPressed && input.forward && !input.down) return AttackType.LEONA_STRIKE_ARC;
     return null;
   },
 

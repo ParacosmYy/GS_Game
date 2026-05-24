@@ -228,7 +228,16 @@ export const KulaDef: CharacterDefinition = {
     return null;
   },
 
-  routeNormal(_input, _state, _isCloseRange) {
+  routeNormal(input, state, _isCloseRange) {
+    const isAir = state === FighterState.JUMP
+      || state === FighterState.RUN_JUMP
+      || state === FighterState.HOP
+      || state === FighterState.HYPER_JUMP;
+    if (isAir) return null;
+    // →+B One More Icy (overhead)
+    if (input.buttonBPressed && input.forward && !input.down) return AttackType.KULA_ONE_MORE;
+    // ↘+D Slider Shoot (low, knockdown)
+    if (input.buttonDPressed && input.forward && input.down) return AttackType.KULA_SLIDER;
     return null;
   },
 

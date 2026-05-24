@@ -132,6 +132,21 @@ export const COMMAND_NORMALS: ReadonlySet<string> = new Set([
   'CMD_GOFU_YOU',
   'CMD_88SHIKI',
   'CMD_NARAKU',
+  'IORI_YUMEYUMI',
+  'IORI_KATANUGI',
+  'IORI_YUKIWARUI',
+  'TERRY_BACK_KNCKLE',
+  'TERRY_COMBO_BLOW',
+  'KIM_HISHOU_KICK',
+  'KIM_HANSEN',
+  'RYO_TSURIZAO',
+  'RYO_ORISHI',
+  'KDASH_ONE_INCH',
+  'KDASH_TRIGGER',
+  'KULA_ONE_MORE',
+  'KULA_SLIDER',
+  'LEONA_STRIKE_ARC',
+  'LEONA_STRIKE_DASH',
 ]);
 
 // ===== Throw Invincibility (KOF 2002 authentic) =====

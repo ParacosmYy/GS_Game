@@ -66,6 +66,88 @@ export const FRAME_DATA = {
     damage: 50, hitstun: 19, blockstun: 17, pushback: 4,
     hitLevel: 'HIGH' as const, knockdown: true,
   },
+  // ── Iori 命令通常技 — APPROX: 参考KOF2002UM frame data ──
+  IORI_YUMEYUMI: {
+    startup: 14, active: 4, recovery: 18,
+    damage: 48, hitstun: 19, blockstun: 16, pushback: 3,
+    hitLevel: 'HIGH' as const, knockdown: false,
+  },
+  IORI_KATANUGI: {
+    startup: 8, active: 4, recovery: 20,
+    damage: 42, hitstun: 18, blockstun: 15, pushback: 2,
+    hitLevel: 'LOW' as const, knockdown: false,
+  },
+  IORI_YUKIWARUI: {
+    startup: 7, active: 6, recovery: 3,
+    damage: 45, hitstun: 19, blockstun: 17, pushback: 4,
+    hitLevel: 'HIGH' as const, knockdown: false,
+  },
+  // ── Terry 命令通常技 ──
+  TERRY_BACK_KNCKLE: {
+    startup: 15, active: 4, recovery: 19,
+    damage: 46, hitstun: 19, blockstun: 16, pushback: 3,
+    hitLevel: 'HIGH' as const, knockdown: false,
+  },
+  TERRY_COMBO_BLOW: {
+    startup: 9, active: 4, recovery: 21,
+    damage: 40, hitstun: 18, blockstun: 15, pushback: 2,
+    hitLevel: 'LOW' as const, knockdown: false,
+  },
+  // ── Kim 命令通常技 ──
+  KIM_HISHOU_KICK: {
+    startup: 16, active: 4, recovery: 20,
+    damage: 48, hitstun: 20, blockstun: 17, pushback: 3,
+    hitLevel: 'HIGH' as const, knockdown: false,
+  },
+  KIM_HANSEN: {
+    startup: 10, active: 5, recovery: 22,
+    damage: 52, hitstun: 19, blockstun: 16, pushback: 3,
+    hitLevel: 'MID' as const, knockdown: false,
+  },
+  // ── Ryo 命令通常技 ──
+  RYO_TSURIZAO: {
+    startup: 14, active: 4, recovery: 18,
+    damage: 44, hitstun: 19, blockstun: 16, pushback: 3,
+    hitLevel: 'HIGH' as const, knockdown: false,
+  },
+  RYO_ORISHI: {
+    startup: 8, active: 4, recovery: 20,
+    damage: 38, hitstun: 18, blockstun: 15, pushback: 2,
+    hitLevel: 'LOW' as const, knockdown: false,
+  },
+  // ── K' 命令通常技 ──
+  KDASH_ONE_INCH: {
+    startup: 13, active: 3, recovery: 18,
+    damage: 50, hitstun: 20, blockstun: 17, pushback: 4,
+    hitLevel: 'HIGH' as const, knockdown: false,
+  },
+  KDASH_TRIGGER: {
+    startup: 9, active: 4, recovery: 21,
+    damage: 42, hitstun: 18, blockstun: 15, pushback: 3,
+    hitLevel: 'LOW' as const, knockdown: false,
+  },
+  // ── Kula 命令通常技 ──
+  KULA_ONE_MORE: {
+    startup: 14, active: 4, recovery: 19,
+    damage: 46, hitstun: 19, blockstun: 16, pushback: 3,
+    hitLevel: 'HIGH' as const, knockdown: false,
+  },
+  KULA_SLIDER: {
+    startup: 8, active: 5, recovery: 22,
+    damage: 40, hitstun: 18, blockstun: 15, pushback: 3,
+    hitLevel: 'LOW' as const, knockdown: true,
+  },
+  // ── Leona 命令通常技 ──
+  LEONA_STRIKE_ARC: {
+    startup: 15, active: 4, recovery: 20,
+    damage: 44, hitstun: 19, blockstun: 16, pushback: 3,
+    hitLevel: 'HIGH' as const, knockdown: false,
+  },
+  LEONA_STRIKE_DASH: {
+    startup: 8, active: 5, recovery: 5,
+    damage: 48, hitstun: 20, blockstun: 17, pushback: 5,
+    hitLevel: 'HIGH' as const, knockdown: true,
+  },
   // ── 蹲下攻击 (Crouch) ── SuperCombo Wiki KOF2002
   CROUCH_A: {
     startup: 5, active: 4, recovery: 7,

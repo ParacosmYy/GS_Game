@@ -207,7 +207,16 @@ export const RyoDef: CharacterDefinition = {
     return null;
   },
 
-  routeNormal(_input, _state, _isCloseRange) {
+  routeNormal(input, state, _isCloseRange) {
+    const isAir = state === FighterState.JUMP
+      || state === FighterState.RUN_JUMP
+      || state === FighterState.HOP
+      || state === FighterState.HYPER_JUMP;
+    if (isAir) return null;
+    // →+A 冰柱割り (overhead)
+    if (input.buttonAPressed && input.forward && !input.down) return AttackType.RYO_TSURIZAO;
+    // ↘+B 落蹴 (low)
+    if (input.buttonBPressed && input.forward && input.down) return AttackType.RYO_ORISHI;
     return null;
   },
 

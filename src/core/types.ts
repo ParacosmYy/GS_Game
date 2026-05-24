@@ -40,6 +40,28 @@ export enum AttackType {
   CMD_GOFU_YOU = 'CMD_GOFU_YOU',   // →+B 外式·轟斧陽 (overhead)
   CMD_88SHIKI = 'CMD_88SHIKI',     // ↘+D 八拾八式 (下段2Hit)
   CMD_NARAKU = 'CMD_NARAKU',       // 空中↓+C 外式·奈落落とし
+  // Iori 命令通常技
+  IORI_YUMEYUMI = 'IORI_YUMEYUMI',         // →+A 夢弾 (2-hit overhead)
+  IORI_KATANUGI = 'IORI_KATANUGI',         // ↘+B 邯鄲 (low)
+  IORI_YUKIWARUI = 'IORI_YUKIWARUI',       // 空中↓+C 百合折り (air crossup)
+  // Terry 命令通常技
+  TERRY_BACK_KNCKLE = 'TERRY_BACK_KNCKLE', // →+A Back Knuckle (overhead)
+  TERRY_COMBO_BLOW = 'TERRY_COMBO_BLOW',   // ↘+B Combination Blow (low)
+  // Kim 命令通常技
+  KIM_HISHOU_KICK = 'KIM_HISHOU_KICK',     // →+B 飛翔脚 (overhead)
+  KIM_HANSEN = 'KIM_HANSEN',               // ↘+D 半旋蹴 (2-hit mid)
+  // Ryo 命令通常技
+  RYO_TSURIZAO = 'RYO_TSURIZAO',           // →+A 冰柱割り (overhead)
+  RYO_ORISHI = 'RYO_ORISHI',               // ↘+B 落蹴 (low)
+  // K' 命令通常技
+  KDASH_ONE_INCH = 'KDASH_ONE_INCH',       // →+B One Inch (overhead)
+  KDASH_TRIGGER = 'KDASH_TRIGGER',         // ↘+D Trigger Shot (low)
+  // Kula 命令通常技
+  KULA_ONE_MORE = 'KULA_ONE_MORE',         // →+B One More Icy (overhead)
+  KULA_SLIDER = 'KULA_SLIDER',             // ↘+D Slider Shoot (low)
+  // Leona 命令通常技
+  LEONA_STRIKE_ARC = 'LEONA_STRIKE_ARC',   // →+B Strike Arc (overhead)
+  LEONA_STRIKE_DASH = 'LEONA_STRIKE_DASH', // 空中↓+D Strike Dash (air dive)
   // 蹲下 (Crouch)
   CROUCH_A = 'CROUCH_A',
   CROUCH_B = 'CROUCH_B',

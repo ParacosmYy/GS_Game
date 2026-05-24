@@ -18,6 +18,28 @@ export const HITBOX_OFFSETS = {
   CMD_GOFU_YOU: { offsetX: 60, offsetY: -110, width: 75, height: 45 },
   CMD_88SHIKI: { offsetX: 70, offsetY: -15, width: 80, height: 25 },
   CMD_NARAKU: { offsetX: 40, offsetY: -70, width: 60, height: 55 },
+  // Iori 命令通常技
+  IORI_YUMEYUMI: { offsetX: 55, offsetY: -105, width: 70, height: 40 },
+  IORI_KATANUGI: { offsetX: 65, offsetY: -25, width: 75, height: 25 },
+  IORI_YUKIWARUI: { offsetX: 35, offsetY: -75, width: 65, height: 50 },
+  // Terry 命令通常技
+  TERRY_BACK_KNCKLE: { offsetX: 60, offsetY: -100, width: 75, height: 40 },
+  TERRY_COMBO_BLOW: { offsetX: 65, offsetY: -20, width: 75, height: 25 },
+  // Kim 命令通常技
+  KIM_HISHOU_KICK: { offsetX: 60, offsetY: -115, width: 80, height: 40 },
+  KIM_HANSEN: { offsetX: 70, offsetY: -30, width: 85, height: 35 },
+  // Ryo 命令通常技
+  RYO_TSURIZAO: { offsetX: 55, offsetY: -105, width: 70, height: 40 },
+  RYO_ORISHI: { offsetX: 65, offsetY: -20, width: 75, height: 25 },
+  // K' 命令通常技
+  KDASH_ONE_INCH: { offsetX: 50, offsetY: -100, width: 65, height: 40 },
+  KDASH_TRIGGER: { offsetX: 65, offsetY: -25, width: 75, height: 30 },
+  // Kula 命令通常技
+  KULA_ONE_MORE: { offsetX: 55, offsetY: -105, width: 70, height: 40 },
+  KULA_SLIDER: { offsetX: 70, offsetY: -15, width: 85, height: 25 },
+  // Leona 命令通常技
+  LEONA_STRIKE_ARC: { offsetX: 55, offsetY: -110, width: 75, height: 40 },
+  LEONA_STRIKE_DASH: { offsetX: 40, offsetY: -80, width: 60, height: 55 },
   // 蹲下 — 低位置
   CROUCH_A: { offsetX: 65, offsetY: -70, width: 55, height: 30 },
   CROUCH_B: { offsetX: 65, offsetY: -30, width: 75, height: 30 },

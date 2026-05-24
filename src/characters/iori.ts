@@ -217,9 +217,15 @@ export const IoriDef: CharacterDefinition = {
       || state === FighterState.HOP
       || state === FighterState.HYPER_JUMP;
 
-    if (isAir && input.buttonCPressed && input.down) return AttackType.CMD_NARAKU;
+    // 空中↓+C 百合折り (air crossup)
+    if (isAir && input.buttonCPressed && input.down) return AttackType.IORI_YUKIWARUI;
+    // ↘+B 邯鄲 (low)
     if (state === FighterState.CROUCH && input.buttonBPressed && input.forward && input.down) {
-      return AttackType.CMD_88SHIKI;
+      return AttackType.IORI_KATANUGI;
+    }
+    // →+A 夢弾 (overhead, 2-hit)
+    if (!isAir && input.buttonAPressed && input.forward && !input.down) {
+      return AttackType.IORI_YUMEYUMI;
     }
     return null;
   },

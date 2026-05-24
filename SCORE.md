@@ -1960,4 +1960,18 @@
 
 ---
 
-**tag: v0.04-kof2002 (458pt) → v0.05-kof2002 (603pt) | commit: 待定 | 下一目标: 800分(+200 TAG MILESTONE)**
+### Iter-V104 — 2026-05-25（7角色命令通常技 — 15个新AttackType +5=608）
+
+**改动:** Iori(夢弫/邯鄲/百合折), Terry(Back Knuckle/Combo Blow), Kim(飛翔脚/半旋蹴), Ryo(冰柱割/落蹴), K'(One Inch/Trigger Shot), Kula(One More/Slider), Leona(Strike Arc/Strike Dash) — 每角色1-3个独特命令通常技, 替代之前借用Kyo招式的占位
+
+| 角色内容 | 22/150 | +4 | 7角色各有独特命令通常技, 角色差异化显著提升 |
+
+### Iter-V105 — 2026-05-25（命令通常技帧数据+判定框+攻击帧 +5=613）
+
+**改动:** 15个命令通常技完整帧数据(startup/active/recovery/damage/hitstun), hitbox offsets, attackFrames多帧判定, COMMAND_NORMALS集合更新
+
+| 角色内容 | 24/150 | +2 | 帧数据完整, 各招有独特参数 |
+
+---
+
+**tag: v0.09-kof2002 (603pt) | commit: 待定 | 下一目标: 650分(+50 COMMIT) → 800分(+200 TAG)**

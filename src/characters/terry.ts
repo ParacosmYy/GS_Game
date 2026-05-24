@@ -208,8 +208,17 @@ export const TerryDef: CharacterDefinition = {
     return null;
   },
 
-  routeNormal(_input, _state, _isCloseRange) {
-    return null; // uses default routing
+  routeNormal(input, state, _isCloseRange) {
+    const isAir = state === FighterState.JUMP
+      || state === FighterState.RUN_JUMP
+      || state === FighterState.HOP
+      || state === FighterState.HYPER_JUMP;
+    if (isAir) return null;
+    // →+A Back Knuckle (overhead)
+    if (input.buttonAPressed && input.forward && !input.down) return AttackType.TERRY_BACK_KNCKLE;
+    // ↘+B Combination Blow (low)
+    if (input.buttonBPressed && input.forward && input.down) return AttackType.TERRY_COMBO_BLOW;
+    return null;
   },
 
   routeRekkaFollowup() {

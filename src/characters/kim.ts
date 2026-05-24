@@ -220,9 +220,13 @@ export const KimDef: CharacterDefinition = {
       return AttackType.KIM_HISHOU;
     }
 
-    // →+B mid command kick (overhead standalone)
+    // →+B 飛翔脚 (overhead)
     if (!isAir && input.buttonBPressed && input.forward && !input.down) {
-      return AttackType.CMD_GOFU_YOU;
+      return AttackType.KIM_HISHOU_KICK;
+    }
+    // ↘+D 半旋蹴 (2-hit mid)
+    if (!isAir && input.buttonDPressed && input.forward && input.down) {
+      return AttackType.KIM_HANSEN;
     }
     return null;
   },
