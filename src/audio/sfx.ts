@@ -34,7 +34,7 @@ export function playHit(intensity: number = 1): void {
   const noise = noiseBuffer(ctx, 0.06, 0.15);
   const noiseFilter = ctx.createBiquadFilter();
   noiseFilter.type = 'bandpass';
-  noiseFilter.frequency.value = 1200;
+  noiseFilter.frequency.value = 1200 + intensity * 200;
   noiseFilter.Q.value = 0.6;
   const noiseGain = ctx.createGain();
   noiseGain.gain.setValueAtTime(0.3 * intensity, now);
@@ -58,12 +58,23 @@ export function playHit(intensity: number = 1): void {
   snapGain.gain.setValueAtTime(0.1 * intensity, now);
   snapGain.gain.exponentialRampToValueAtTime(0.001, now + 0.02);
 
+  // High transient (crispness)
+  const hi = ctx.createOscillator();
+  hi.type = 'square';
+  hi.frequency.setValueAtTime(2000, now);
+  hi.frequency.exponentialRampToValueAtTime(500, now + 0.015);
+  const hiGain = ctx.createGain();
+  hiGain.gain.setValueAtTime(0.04 * intensity, now);
+  hiGain.gain.exponentialRampToValueAtTime(0.001, now + 0.02);
+
   noise.connect(noiseFilter).connect(noiseGain).connect(ctx.destination);
   osc.connect(oscGain).connect(ctx.destination);
   snap.connect(snapGain).connect(ctx.destination);
+  hi.connect(hiGain).connect(ctx.destination);
   noise.start(now); noise.stop(now + 0.07);
   osc.start(now); osc.stop(now + 0.05);
   snap.start(now); snap.stop(now + 0.03);
+  hi.start(now); hi.stop(now + 0.025);
 }
 
 /** Block — metallic ring with resonance */
@@ -519,7 +530,7 @@ export function playLanding(): void {
   noise.start(now); noise.stop(now + 0.05);
 }
 
-/** Projectile launch */
+/** Projectile launch — energy burst with trailing whoosh */
 export function playProjectileLaunch(): void {
   const ctx = getCtx();
   const now = ctx.currentTime;
@@ -533,6 +544,187 @@ export function playProjectileLaunch(): void {
   gain.gain.setValueAtTime(0.15, now);
   gain.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
 
+  // Energy charge layer
+  const charge = ctx.createOscillator();
+  charge.type = 'triangle';
+  charge.frequency.setValueAtTime(400, now);
+  charge.frequency.exponentialRampToValueAtTime(800, now + 0.04);
+  const cGain = ctx.createGain();
+  cGain.gain.setValueAtTime(0.08, now);
+  cGain.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
+
   osc.connect(gain).connect(ctx.destination);
+  charge.connect(cGain).connect(ctx.destination);
   osc.start(now); osc.stop(now + 0.2);
+  charge.start(now); charge.stop(now + 0.08);
+}
+
+/** MAX activation — power surge */
+export function playMAXActivation(): void {
+  const ctx = getCtx();
+  const now = ctx.currentTime;
+
+  // Rising sweep
+  const osc = ctx.createOscillator();
+  osc.type = 'sawtooth';
+  osc.frequency.setValueAtTime(200, now);
+  osc.frequency.exponentialRampToValueAtTime(1500, now + 0.2);
+  osc.frequency.exponentialRampToValueAtTime(800, now + 0.4);
+  const gain = ctx.createGain();
+  gain.gain.setValueAtTime(0.25, now);
+  gain.gain.setValueAtTime(0.35, now + 0.15);
+  gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+
+  // Sub pulse
+  const sub = ctx.createOscillator();
+  sub.type = 'sine';
+  sub.frequency.setValueAtTime(60, now);
+  sub.frequency.exponentialRampToValueAtTime(40, now + 0.3);
+  const sGain = ctx.createGain();
+  sGain.gain.setValueAtTime(0.3, now);
+  sGain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+
+  // Sparkle layer
+  const sparkle = noiseBuffer(ctx, 0.2, 0.3);
+  const spFilter = ctx.createBiquadFilter();
+  spFilter.type = 'highpass';
+  spFilter.frequency.value = 5000;
+  const spGain = ctx.createGain();
+  spGain.gain.setValueAtTime(0.1, now + 0.1);
+  spGain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+
+  osc.connect(gain).connect(ctx.destination);
+  sub.connect(sGain).connect(ctx.destination);
+  sparkle.connect(spFilter).connect(spGain).connect(ctx.destination);
+  osc.start(now); osc.stop(now + 0.55);
+  sub.start(now); sub.stop(now + 0.4);
+  sparkle.start(now + 0.1); sparkle.stop(now + 0.3);
+}
+
+/** Wall bounce — metallic impact */
+export function playWallBounce(): void {
+  const ctx = getCtx();
+  const now = ctx.currentTime;
+
+  const osc = ctx.createOscillator();
+  osc.type = 'square';
+  osc.frequency.setValueAtTime(600, now);
+  osc.frequency.exponentialRampToValueAtTime(150, now + 0.1);
+  const gain = ctx.createGain();
+  gain.gain.setValueAtTime(0.2, now);
+  gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+
+  // Rattle
+  const noise = noiseBuffer(ctx, 0.08, 0.25);
+  const nGain = ctx.createGain();
+  nGain.gain.setValueAtTime(0.12, now);
+  nGain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+  const filter = ctx.createBiquadFilter();
+  filter.type = 'bandpass';
+  filter.frequency.value = 2000;
+  filter.Q.value = 1.2;
+
+  osc.connect(gain).connect(ctx.destination);
+  noise.connect(filter).connect(nGain).connect(ctx.destination);
+  osc.start(now); osc.stop(now + 0.15);
+  noise.start(now); noise.stop(now + 0.1);
+}
+
+/** Round call — buzzer-like announcement chime */
+export function playRoundCall(): void {
+  const ctx = getCtx();
+  const now = ctx.currentTime;
+  const masterGain = ctx.createGain();
+  masterGain.gain.value = 0.2;
+  masterGain.connect(ctx.destination);
+
+  const notes = [659.3, 784, 659.3]; // E5 G5 E5
+  notes.forEach((freq, i) => {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'square';
+    osc.frequency.value = freq;
+    const t = now + i * 0.12;
+    gain.gain.setValueAtTime(0.3, t);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.15);
+    osc.connect(gain).connect(masterGain);
+    osc.start(t); osc.stop(t + 0.18);
+  });
+}
+
+/** Time Over — warning buzzer */
+export function playTimeOver(): void {
+  const ctx = getCtx();
+  const now = ctx.currentTime;
+
+  // Warning buzzer
+  for (let i = 0; i < 3; i++) {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'square';
+    osc.frequency.value = 440;
+    const t = now + i * 0.15;
+    gain.gain.setValueAtTime(0.2, t);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.1);
+    osc.connect(gain).connect(ctx.destination);
+    osc.start(t); osc.stop(t + 0.12);
+  }
+}
+
+/** Perfect — triumphant chime */
+export function playPerfect(): void {
+  const ctx = getCtx();
+  const now = ctx.currentTime;
+  const masterGain = ctx.createGain();
+  masterGain.gain.value = 0.2;
+  masterGain.connect(ctx.destination);
+
+  const notes = [523.3, 659.3, 784, 1047, 1319]; // C5 E5 G5 C6 E6
+  notes.forEach((freq, i) => {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.value = freq;
+    const t = now + i * 0.08;
+    gain.gain.setValueAtTime(0.25, t);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.3);
+    osc.connect(gain).connect(masterGain);
+    osc.start(t); osc.stop(t + 0.35);
+
+    // Octave harmony
+    const harm = ctx.createOscillator();
+    const hGain = ctx.createGain();
+    harm.type = 'triangle';
+    harm.frequency.value = freq * 2;
+    hGain.gain.setValueAtTime(0.06, t);
+    hGain.gain.exponentialRampToValueAtTime(0.001, t + 0.2);
+    harm.connect(hGain).connect(masterGain);
+    harm.start(t); harm.stop(t + 0.25);
+  });
+}
+
+/** Chip damage — weak hit */
+export function playChip(): void {
+  const ctx = getCtx();
+  const now = ctx.currentTime;
+
+  const noise = noiseBuffer(ctx, 0.04, 0.15);
+  const filter = ctx.createBiquadFilter();
+  filter.type = 'highpass';
+  filter.frequency.value = 3000;
+  const nGain = ctx.createGain();
+  nGain.gain.setValueAtTime(0.12, now);
+  nGain.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
+
+  const osc = ctx.createOscillator();
+  osc.type = 'triangle';
+  osc.frequency.value = 800;
+  const oGain = ctx.createGain();
+  oGain.gain.setValueAtTime(0.06, now);
+  oGain.gain.exponentialRampToValueAtTime(0.001, now + 0.03);
+
+  noise.connect(filter).connect(nGain).connect(ctx.destination);
+  osc.connect(oGain).connect(ctx.destination);
+  noise.start(now); noise.stop(now + 0.05);
+  osc.start(now); osc.stop(now + 0.04);
 }

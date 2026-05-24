@@ -665,6 +665,139 @@ export function drawAttackLimb(
     ctx.moveTo(sx + 10 * f.facing, sy - f.displayHeight * 0.5);
     ctx.lineTo(sx + (FIGHTER_WIDTH / 2 + 20) * f.facing, sy - f.displayHeight * 0.5);
     ctx.stroke();
+
+  // ── K' specials ──
+  } else if (f.currentAttack === AttackType.KDASH_EINS || f.currentAttack === AttackType.KDASH_EINS_C) {
+    const reach = limbLen * 1.1;
+    ctx.strokeStyle = '#ff4400';
+    ctx.shadowColor = '#ff6600';
+    ctx.shadowBlur = 16;
+    ctx.lineWidth = 12;
+    ctx.beginPath();
+    ctx.moveTo(sx + 10 * f.facing, sy - f.displayHeight * 0.55);
+    ctx.lineTo(sx + (FIGHTER_WIDTH / 2 + reach) * f.facing, sy - f.displayHeight * 0.5);
+    ctx.stroke();
+    ctx.fillStyle = '#ff660066';
+    ctx.beginPath();
+    ctx.arc(sx + (FIGHTER_WIDTH / 2 + reach) * f.facing, sy - f.displayHeight * 0.52,
+      10 + progress * 6, 0, Math.PI * 2);
+    ctx.fill();
+  } else if (f.currentAttack === AttackType.KDASH_CROW || f.currentAttack === AttackType.KDASH_CROW_C) {
+    const isStrong = f.currentAttack === AttackType.KDASH_CROW_C;
+    const reach = limbLen * (isStrong ? 1.5 : 1.3);
+    ctx.strokeStyle = '#ff4400';
+    ctx.shadowColor = '#ff6600';
+    ctx.shadowBlur = isStrong ? 28 : 20;
+    ctx.lineWidth = isStrong ? 18 : 14;
+    ctx.beginPath();
+    ctx.moveTo(sx + 5 * f.facing, sy - f.displayHeight * 0.5);
+    ctx.lineTo(sx + 10 * f.facing, sy - f.displayHeight * 0.5 - reach);
+    ctx.stroke();
+    ctx.fillStyle = '#ff440066';
+    ctx.beginPath();
+    ctx.arc(sx + 10 * f.facing, sy - f.displayHeight * 0.5 - reach,
+      (isStrong ? 16 : 12) + progress * (isStrong ? 12 : 8), 0, Math.PI * 2);
+    ctx.fill();
+  } else if (f.currentAttack === AttackType.KDASH_MINUTE || f.currentAttack === AttackType.KDASH_NARROW) {
+    const reach = limbLen * 1.2;
+    ctx.strokeStyle = '#ff4400';
+    ctx.shadowColor = '#ff6600';
+    ctx.shadowBlur = 16;
+    ctx.lineWidth = 12;
+    ctx.beginPath();
+    ctx.moveTo(sx + 5 * f.facing, sy - f.displayHeight * 0.35);
+    ctx.lineTo(sx + (FIGHTER_WIDTH / 2 + reach) * f.facing, sy - f.displayHeight * 0.3);
+    ctx.stroke();
+    ctx.fillStyle = '#ff660044';
+    ctx.beginPath();
+    ctx.arc(sx + (FIGHTER_WIDTH / 2 + reach * 0.7) * f.facing, sy - f.displayHeight * 0.32,
+      10 + progress * 6, 0, Math.PI * 2);
+    ctx.fill();
+  } else if (f.currentAttack === AttackType.DM_CHAIN_SHOT) {
+    ctx.strokeStyle = '#ff4400';
+    ctx.shadowColor = '#ff2200';
+    ctx.shadowBlur = 25;
+    ctx.lineWidth = 18;
+    const reach = limbLen * 1.5;
+    ctx.beginPath();
+    ctx.moveTo(sx + 5 * f.facing, sy - f.displayHeight * 0.55);
+    ctx.lineTo(sx + (FIGHTER_WIDTH / 2 + reach) * f.facing, sy - f.displayHeight * 0.45);
+    ctx.stroke();
+    ctx.fillStyle = '#ff440044';
+    ctx.beginPath();
+    ctx.arc(sx + (FIGHTER_WIDTH / 2 + reach * 0.6) * f.facing, sy - f.displayHeight * 0.5,
+      20 + progress * 15, 0, Math.PI * 2);
+    ctx.fill();
+
+  // ── Kula specials ──
+  } else if (f.currentAttack === AttackType.KULA_BREATH || f.currentAttack === AttackType.KULA_BREATH_C) {
+    const reach = limbLen * 0.7;
+    ctx.strokeStyle = '#44ccff';
+    ctx.shadowColor = '#88eeff';
+    ctx.shadowBlur = 16;
+    ctx.lineWidth = 12;
+    ctx.beginPath();
+    ctx.moveTo(sx + 10 * f.facing, sy - f.displayHeight * 0.55);
+    ctx.lineTo(sx + (FIGHTER_WIDTH / 2 + reach) * f.facing, sy - f.displayHeight * 0.55);
+    ctx.stroke();
+    ctx.fillStyle = '#88eeff44';
+    ctx.beginPath();
+    ctx.arc(sx + (FIGHTER_WIDTH / 2 + reach) * f.facing, sy - f.displayHeight * 0.55,
+      10 + progress * 6, 0, Math.PI * 2);
+    ctx.fill();
+  } else if (f.currentAttack === AttackType.KULA_SHELL || f.currentAttack === AttackType.KULA_SHELL_C) {
+    const isStrong = f.currentAttack === AttackType.KULA_SHELL_C;
+    const reach = limbLen * 0.6;
+    ctx.strokeStyle = '#44ccff';
+    ctx.shadowColor = '#88eeff';
+    ctx.shadowBlur = isStrong ? 20 : 14;
+    ctx.lineWidth = isStrong ? 16 : 12;
+    ctx.beginPath();
+    ctx.moveTo(sx + 5 * f.facing, sy - f.displayHeight * 0.5);
+    ctx.lineTo(sx + 5 * f.facing, sy - f.displayHeight * 0.5 - reach);
+    ctx.stroke();
+    // Ice shield arc
+    ctx.strokeStyle = '#88eeff66';
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.arc(sx + 5 * f.facing, sy - f.displayHeight * 0.5 - reach * 0.5,
+      15 + progress * 10, -Math.PI * 0.7, Math.PI * 0.7);
+    ctx.stroke();
+  } else if (f.currentAttack === AttackType.KULA_LAY || f.currentAttack === AttackType.KULA_EDGE) {
+    const reach = limbLen * 1.2;
+    ctx.strokeStyle = '#44ccff';
+    ctx.shadowColor = '#88eeff';
+    ctx.shadowBlur = 16;
+    ctx.lineWidth = 12;
+    ctx.beginPath();
+    ctx.moveTo(sx + 5 * f.facing, sy - f.displayHeight * 0.35);
+    ctx.lineTo(sx + (FIGHTER_WIDTH / 2 + reach) * f.facing, sy - f.displayHeight * 0.3);
+    ctx.stroke();
+    ctx.fillStyle = '#44ccff44';
+    ctx.beginPath();
+    ctx.arc(sx + (FIGHTER_WIDTH / 2 + reach * 0.7) * f.facing, sy - f.displayHeight * 0.32,
+      10 + progress * 8, 0, Math.PI * 2);
+    ctx.fill();
+  } else if (f.currentAttack === AttackType.DM_FREEZE) {
+    ctx.strokeStyle = '#44ccff';
+    ctx.shadowColor = '#88eeff';
+    ctx.shadowBlur = 25;
+    ctx.lineWidth = 18;
+    const reach = limbLen * 1.3;
+    ctx.beginPath();
+    ctx.moveTo(sx + 5 * f.facing, sy - f.displayHeight * 0.5);
+    ctx.lineTo(sx + (FIGHTER_WIDTH / 2 + reach) * f.facing, sy - f.displayHeight * 0.45);
+    ctx.stroke();
+    // Ice crystal burst
+    ctx.fillStyle = '#44ccff44';
+    for (let i = 0; i < 5; i++) {
+      const angle = (i / 5) * Math.PI * 2 + progress * 2;
+      const dist = 15 + progress * 25;
+      ctx.beginPath();
+      ctx.arc(sx + Math.cos(angle) * dist * f.facing, sy - f.displayHeight * 0.45 + Math.sin(angle) * dist,
+        6 + progress * 4, 0, Math.PI * 2);
+      ctx.fill();
+    }
   }
   ctx.restore();
 }

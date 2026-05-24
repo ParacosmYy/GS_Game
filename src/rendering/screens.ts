@@ -332,7 +332,7 @@ export function drawIntro(ctx: CanvasRenderingContext2D, phaseTimer: number, cur
 
 // ===== KO Screen =====
 
-export function drawKO(ctx: CanvasRenderingContext2D, winner: number | null, perfectPlayer: number | null = null): void {
+export function drawKO(ctx: CanvasRenderingContext2D, winner: number | null, perfectPlayer: number | null = null, isTimeOver: boolean = false): void {
   ctx.save();
 
   // Dark overlay with red vignette
@@ -348,11 +348,15 @@ export function drawKO(ctx: CanvasRenderingContext2D, winner: number | null, per
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
 
-  // KO shockwave rings
+  const titleText = isTimeOver ? 'TIME OVER' : 'K.O.!';
+  const titleColor = isTimeOver ? '#ffaa00' : '#ff2200';
+  const glowColor = isTimeOver ? '#ff8800' : '#ff0000';
+
+  // KO/Time Over shockwave rings
   for (let r = 0; r < 3; r++) {
     const ringR = 60 + r * 50;
     ctx.globalAlpha = 0.15 - r * 0.04;
-    ctx.strokeStyle = '#ff4400';
+    ctx.strokeStyle = isTimeOver ? '#ffaa00' : '#ff4400';
     ctx.lineWidth = 3 - r;
     ctx.beginPath();
     ctx.arc(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 20, ringR, 0, Math.PI * 2);
@@ -360,20 +364,19 @@ export function drawKO(ctx: CanvasRenderingContext2D, winner: number | null, per
   }
   ctx.globalAlpha = 1;
 
-  // KO text — dramatic triple-render glow
-  ctx.shadowColor = '#ff0000';
+  // Title text — dramatic triple-render glow
+  ctx.shadowColor = glowColor;
   ctx.shadowBlur = 60;
-  ctx.fillStyle = '#ff2200';
-  ctx.font = 'bold 100px "Courier New", monospace';
-  ctx.fillText('K.O.!', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 20);
+  ctx.fillStyle = titleColor;
+  ctx.font = `bold ${isTimeOver ? 72 : 100}px "Courier New", monospace`;
+  ctx.fillText(titleText, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 20);
   ctx.shadowBlur = 30;
-  ctx.fillText('K.O.!', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 20);
+  ctx.fillText(titleText, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 20);
   ctx.shadowBlur = 0;
-  // White stroke outline
   ctx.strokeStyle = '#ffffff';
   ctx.lineWidth = 2;
   ctx.lineJoin = 'round';
-  ctx.strokeText('K.O.!', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 20);
+  ctx.strokeText(titleText, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 20);
 
   if (winner !== null) {
     const wColor = winner === 0 ? '#ff6644' : '#4488ff';

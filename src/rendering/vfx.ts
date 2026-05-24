@@ -304,6 +304,60 @@ export class VFXSystem {
     }
   }
 
+  /** MAX模式激活光环 */
+  spawnMAXAura(worldX: number, worldY: number): void {
+    // 中心爆发
+    for (let r = 0; r < 3; r++) {
+      this.particles.push({
+        x: worldX, y: worldY - 30, vx: 0, vy: 0,
+        life: 18 + r * 6, maxLife: 18 + r * 6, size: 8 + r * 5,
+        color: r === 0 ? '#ffffff' : r === 1 ? '#44ff88' : '#22cc55', type: 'ring',
+      });
+    }
+    // 能量粒子向上散射
+    for (let i = 0; i < 16; i++) {
+      const angle = -Math.PI / 2 + (Math.random() - 0.5) * Math.PI * 1.2;
+      const speed = 3 + Math.random() * 5;
+      this.particles.push({
+        x: worldX + (Math.random() - 0.5) * 30,
+        y: worldY - 20,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        life: 15 + Math.floor(Math.random() * 10),
+        maxLife: 25,
+        size: 2 + Math.random() * 4,
+        color: i % 3 === 0 ? '#ffffff' : i % 2 === 0 ? '#88ffaa' : '#44ff66',
+        type: 'star', gravity: -0.05, friction: 0.94,
+        rotation: Math.random() * Math.PI * 2, rotSpeed: (Math.random() - 0.5) * 0.4,
+      });
+    }
+  }
+
+  /** Perfect闪光 */
+  spawnPerfectFlash(worldX: number, worldY: number): void {
+    for (let i = 0; i < 20; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const speed = 3 + Math.random() * 7;
+      this.particles.push({
+        x: worldX, y: worldY,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed - 3,
+        life: 20 + Math.floor(Math.random() * 15),
+        maxLife: 35,
+        size: 3 + Math.random() * 5,
+        color: i % 3 === 0 ? '#ffffff' : i % 2 === 0 ? '#ffcc00' : '#ff8800',
+        type: 'star', gravity: 0.1, friction: 0.94,
+        rotation: Math.random() * Math.PI * 2, rotSpeed: (Math.random() - 0.5) * 0.5,
+      });
+    }
+    // 大金色冲击环
+    this.particles.push({
+      x: worldX, y: worldY, vx: 0, vy: 0,
+      life: 25, maxLife: 25, size: 15,
+      color: '#ffcc00', type: 'ring',
+    });
+  }
+
   spawnProjectileExplosion(worldX: number, worldY: number, charColor: string, charGlow: string): void {
     this.particles.push({
       x: worldX, y: worldY, vx: 0, vy: 0,

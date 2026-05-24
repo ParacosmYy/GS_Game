@@ -71,50 +71,59 @@ export class BGMPlayer {
   private playBattleBeat(now: number): void {
     if (!this.ctx || !this.masterGain) return;
 
-    // Drums
-    if (this.beat % 4 === 0) this.playKick(now, 0.6);
-    if (this.beat % 4 === 2) this.playKick(now, 0.3); // lighter second kick
-    if (this.beat % 4 === 1 || this.beat % 4 === 3) this.playSnare(now);
+    // Drums — varied pattern
+    const beatInBar = this.beat % 8;
+    if (beatInBar === 0) this.playKick(now, 0.6);
+    if (beatInBar === 2) this.playKick(now, 0.3);
+    if (beatInBar === 4) this.playKick(now, 0.5);
+    if (beatInBar === 6) this.playKick(now, 0.25);
+    if (beatInBar === 2 || beatInBar === 6) this.playSnare(now);
+    if (beatInBar === 0 || beatInBar === 4) this.playSnare(now);
     this.playHihat(now, this.beat % 2 === 0 ? 0.08 : 0.04);
+    // Extra hihat on off-beats in second half
+    if (this.beat >= 32 && this.beat % 2 === 0) this.playHihat(now, 0.05);
 
-    // Bass line (16 positions)
-    const bassNotes = [
-      82.4, 82.4, 110, 82.4,
-      130.8, 110, 82.4, 98,
-      73.4, 73.4, 98, 73.4,
-      130.8, 110, 98, 82.4,
-    ];
+    // Bass line (16 positions) — more variation in second half
+    const bassNotes = this.beat < 32
+      ? [82.4, 82.4, 110, 82.4, 130.8, 110, 82.4, 98, 73.4, 73.4, 98, 73.4, 130.8, 110, 98, 82.4]
+      : [98, 98, 82.4, 73.4, 110, 98, 130.8, 110, 82.4, 82.4, 110, 130.8, 98, 82.4, 73.4, 82.4];
     if (this.beat % 4 === 0) this.playBass(now, bassNotes[(this.beat / 4) % 16]);
+    // Walking bass on off-beats in second half
+    if (this.beat >= 32 && this.beat % 4 === 2) {
+      this.playBass(now, bassNotes[(this.beat / 4) % 16] * 1.5, 0.06);
+    }
 
-    // Lead melody (every other 8th note, 32 positions)
+    // Lead melody — two different phrases
     if (this.beat % 2 === 1) {
-      const melody: number[] = [
-        659.3, 0, 784, 659.3, 523.3, 587.3, 659.3, 0,
-        440, 523.3, 587.3, 659.3, 0, 784, 880, 0,
-        659.3, 784, 880, 784, 659.3, 587.3, 523.3, 0,
-        440, 0, 523.3, 587.3, 659.3, 0, 880, 0,
-      ];
+      const melodyA = [659.3, 0, 784, 659.3, 523.3, 587.3, 659.3, 0, 440, 523.3, 587.3, 659.3, 0, 784, 880, 0];
+      const melodyB = [880, 784, 659.3, 523.3, 587.3, 659.3, 784, 880, 659.3, 784, 880, 1046.5, 880, 784, 659.3, 0];
+      const melody = this.beat < 32 ? melodyA : melodyB;
       const note = melody[Math.floor(this.beat / 2) % melody.length];
       if (note > 0) this.playLead(now, note);
     }
 
+    // Counter-melody (second voice, quieter)
+    if (this.beat % 4 === 3 && this.beat >= 16) {
+      const counterNotes = [392, 440, 523.3, 587.3, 440, 392, 349.2, 392, 523.3, 587.3, 659.3, 523.3, 440, 392, 349.2, 0];
+      const cn = counterNotes[(this.beat / 4) % counterNotes.length];
+      if (cn > 0) this.playLead(now, cn, 0.04);
+    }
+
     // Pad chord (every 8 beats)
     if (this.beat % 8 === 0) {
-      const chords: number[][] = [
-        [220, 261.6, 329.6], // Am
-        [220, 277.2, 329.6], // Am7
-        [196, 246.9, 293.7], // G
-        [174.6, 220, 261.6], // F
-        [220, 261.6, 329.6], // Am
-        [164.8, 196, 246.9], // Em
-        [196, 246.9, 293.7], // G
-        [220, 261.6, 329.6], // Am
-      ];
+      const chords = this.beat < 32
+        ? [[220, 261.6, 329.6], [220, 277.2, 329.6], [196, 246.9, 293.7], [174.6, 220, 261.6],
+            [220, 261.6, 329.6], [164.8, 196, 246.9], [196, 246.9, 293.7], [220, 261.6, 329.6]]
+        : [[261.6, 329.6, 392], [220, 261.6, 329.6], [196, 246.9, 293.7], [174.6, 220, 261.6],
+            [261.6, 329.6, 392], [220, 277.2, 329.6], [196, 246.9, 349.2], [220, 261.6, 329.6]];
       this.playPad(now, chords[(this.beat / 8) % 8]);
     }
 
     // Arp accent at phrase end
-    if (this.beat === 60) this.playArpAccent(now);
+    if (this.beat === 60 || this.beat === 28) this.playArpAccent(now);
+
+    // Tom fill before second half
+    if (this.beat === 30 || this.beat === 31) this.playTom(now, this.beat === 30 ? 200 : 150);
   }
 
   // ─── Title Theme (110 BPM, 32 beats = 4 bars, calmer) ───
@@ -252,6 +261,19 @@ export class BGMPlayer {
       osc.connect(gain).connect(this.masterGain);
       osc.start(time); osc.stop(time + duration + 0.05);
     }
+  }
+
+  private playTom(time: number, freq: number): void {
+    if (!this.ctx || !this.masterGain) return;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(freq, time);
+    osc.frequency.exponentialRampToValueAtTime(freq * 0.4, time + 0.15);
+    gain.gain.setValueAtTime(0.25, time);
+    gain.gain.exponentialRampToValueAtTime(0.001, time + 0.18);
+    osc.connect(gain).connect(this.masterGain);
+    osc.start(time); osc.stop(time + 0.2);
   }
 
   private playArpAccent(time: number): void {

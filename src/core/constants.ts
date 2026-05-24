@@ -49,48 +49,49 @@ export const MAX_FRAME_DELTA = 250;
 // 数据源: SuperCombo Wiki KOF2002 原版 (非UM)
 // hitLevel: MID=站蹲都能挡, LOW=只能蹲防, HIGH=只能站防
 // knockdown: true = 击倒 (进入KNOCKDOWN状态)
-// 共享通常技取4角色平均值; 角色专属技取正版精确值
+// 通常技基于KOF2002UM Kyo数据 (Dream Cancel Wiki), startup含首帧active
+// KOF通用: light hitstun=11F blockstun=9F, heavy ground=19F/17F, heavy air=11F/17F
 export const FRAME_DATA = {
-  // ── 远距离站立 (Far Stand) ── 正版数据源 SuperCombo
+  // ── 远距离站立 (Far Stand) ── KOF2002UM Kyo (Dream Cancel Wiki)
   STAND_A: {
-    startup: 4, active: 4, recovery: 5,
-    damage: 30, hitstun: 11, blockstun: 9, pushback: 2,
+    startup: 5, active: 4, recovery: 5,
+    damage: 33, hitstun: 11, blockstun: 9, pushback: 2,
     hitLevel: 'MID' as const, knockdown: false,
   },
   STAND_B: {
-    startup: 7, active: 3, recovery: 15,
-    damage: 35, hitstun: 11, blockstun: 9, pushback: 2,
+    startup: 6, active: 3, recovery: 14,
+    damage: 42, hitstun: 11, blockstun: 9, pushback: 2,
     hitLevel: 'MID' as const, knockdown: false,
   },
   STAND_C: {
-    startup: 12, active: 2, recovery: 17,
-    damage: 80, hitstun: 19, blockstun: 17, pushback: 6,
+    startup: 8, active: 5, recovery: 17,
+    damage: 100, hitstun: 19, blockstun: 17, pushback: 6,
     hitLevel: 'MID' as const, knockdown: false,
   },
   STAND_D: {
-    startup: 12, active: 5, recovery: 17,
-    damage: 80, hitstun: 19, blockstun: 17, pushback: 5,
+    startup: 13, active: 2, recovery: 17,
+    damage: 75, hitstun: 19, blockstun: 17, pushback: 5,
     hitLevel: 'MID' as const, knockdown: false,
   },
-  // ── 近距离站立 (Close Stand) ──
+  // ── 近距离站立 (Close Stand) ── KOF2002UM Kyo
   CLOSE_A: {
-    startup: 4, active: 4, recovery: 5,
+    startup: 5, active: 4, recovery: 5,
     damage: 25, hitstun: 11, blockstun: 9, pushback: 1,
     hitLevel: 'MID' as const, knockdown: false,
   },
   CLOSE_B: {
-    startup: 5, active: 4, recovery: 7,
-    damage: 30, hitstun: 11, blockstun: 9, pushback: 2,
+    startup: 7, active: 4, recovery: 8,
+    damage: 25, hitstun: 11, blockstun: 9, pushback: 2,
     hitLevel: 'LOW' as const, knockdown: false,
   },
   CLOSE_C: {
-    startup: 2, active: 3, recovery: 9,
-    damage: 70, hitstun: 19, blockstun: 17, pushback: 4,
+    startup: 5, active: 3, recovery: 22,
+    damage: 100, hitstun: 19, blockstun: 17, pushback: 4,
     hitLevel: 'MID' as const, knockdown: false,
   },
   CLOSE_D: {
-    startup: 6, active: 5, recovery: 17,
-    damage: 70, hitstun: 19, blockstun: 17, pushback: 4,
+    startup: 5, active: 4, recovery: 5,
+    damage: 25, hitstun: 11, blockstun: 9, pushback: 4,
     hitLevel: 'MID' as const, knockdown: false,
   },
   // ── 命令通常技 (Command Normals) ──
@@ -109,46 +110,46 @@ export const FRAME_DATA = {
     damage: 50, hitstun: 19, blockstun: 17, pushback: 4,
     hitLevel: 'HIGH' as const, knockdown: true,
   },
-  // ── 蹲下攻击 (Crouch) ──
+  // ── 蹲下攻击 (Crouch) ── KOF2002UM Kyo
   CROUCH_A: {
-    startup: 4, active: 4, recovery: 6,
-    damage: 25, hitstun: 11, blockstun: 9, pushback: 1,
+    startup: 5, active: 4, recovery: 5,
+    damage: 17, hitstun: 11, blockstun: 9, pushback: 1,
     hitLevel: 'MID' as const, knockdown: false,
   },
   CROUCH_B: {
-    startup: 4, active: 4, recovery: 6,
-    damage: 30, hitstun: 11, blockstun: 9, pushback: 2,
+    startup: 7, active: 4, recovery: 8,
+    damage: 25, hitstun: 11, blockstun: 9, pushback: 2,
     hitLevel: 'LOW' as const, knockdown: false,
   },
   CROUCH_C: {
     startup: 6, active: 5, recovery: 17,
-    damage: 80, hitstun: 19, blockstun: 17, pushback: 4,
+    damage: 90, hitstun: 19, blockstun: 17, pushback: 4,
     hitLevel: 'MID' as const, knockdown: false,
   },
   CROUCH_D: {
     startup: 11, active: 3, recovery: 19,
-    damage: 70, hitstun: 0, blockstun: 17, pushback: 3,
+    damage: 75, hitstun: 0, blockstun: 17, pushback: 3,
     hitLevel: 'LOW' as const, knockdown: true,
   },
-  // ── 跳跃攻击 (Jump) ── KOF2002: jump hitstun=11 (less than ground), blockstun=9/17
+  // ── 跳跃攻击 (Jump) ── KOF2002: air hitstun=11F, air heavy blockstun=17F
   JUMP_A: {
-    startup: 4, active: 7, recovery: 0,
-    damage: 40, hitstun: 11, blockstun: 9, pushback: 3,
+    startup: 5, active: 7, recovery: 0,
+    damage: 33, hitstun: 11, blockstun: 9, pushback: 3,
     hitLevel: 'HIGH' as const, knockdown: false,
   },
   JUMP_B: {
-    startup: 3, active: 7, recovery: 0,
-    damage: 45, hitstun: 11, blockstun: 9, pushback: 3,
+    startup: 5, active: 7, recovery: 0,
+    damage: 33, hitstun: 11, blockstun: 9, pushback: 3,
     hitLevel: 'HIGH' as const, knockdown: false,
   },
   JUMP_C: {
-    startup: 5, active: 4, recovery: 0,
-    damage: 75, hitstun: 11, blockstun: 17, pushback: 5,
+    startup: 12, active: 6, recovery: 0,
+    damage: 58, hitstun: 11, blockstun: 17, pushback: 5,
     hitLevel: 'HIGH' as const, knockdown: false,
   },
   JUMP_D: {
-    startup: 7, active: 6, recovery: 0,
-    damage: 70, hitstun: 11, blockstun: 17, pushback: 4,
+    startup: 18, active: 6, recovery: 0,
+    damage: 25, hitstun: 11, blockstun: 17, pushback: 4,
     hitLevel: 'HIGH' as const, knockdown: false,
   },
   // ── 投技 ── KOF2002: throw = 3f startup, 2f active, ~20f recovery
@@ -178,15 +179,15 @@ export const FRAME_DATA = {
     damage: 120, hitstun: 25, blockstun: 20, pushback: 8,
     hitLevel: 'MID' as const, knockdown: true, chipDamage: 12,
   },
-  // ── CD击飞攻击 ── KOF2002: CD blockstun=21, KD on hit, counterWire
+  // ── CD击飞攻击 ── KOF2002UM Kyo: CD=20f startup/2f active/27f recovery
   STAND_CD: {
-    startup: 19, active: 4, recovery: 18,
-    damage: 70, hitstun: 0, blockstun: 21, pushback: 8,
+    startup: 20, active: 2, recovery: 27,
+    damage: 83, hitstun: 0, blockstun: 21, pushback: 8,
     hitLevel: 'MID' as const, knockdown: true, counterWire: true as const,
   },
   JUMP_CD: {
-    startup: 13, active: 5, recovery: 0,
-    damage: 60, hitstun: 0, blockstun: 21, pushback: 6,
+    startup: 11, active: 3, recovery: 0,
+    damage: 33, hitstun: 0, blockstun: 21, pushback: 6,
     hitLevel: 'HIGH' as const, knockdown: true, counterWire: true as const,
   },
   // ── 超必杀技 (DM) ──

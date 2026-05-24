@@ -37,7 +37,7 @@ export class Renderer {
 
   // ===== Main fight frame =====
 
-  render(fighters: Fighter[], cameraX: number, tick: number, ko: boolean, winner: number | null, shakeX: number, shakeY: number, delayedHealth: [number, number], maxModes?: [MaxModeState, MaxModeState], perfectPlayer: number | null = null, p1Wins: number = 0, p2Wins: number = 0, p1Name: string = '', p2Name: string = ''): void {
+  render(fighters: Fighter[], cameraX: number, tick: number, ko: boolean, winner: number | null, shakeX: number, shakeY: number, delayedHealth: [number, number], maxModes?: [MaxModeState, MaxModeState], perfectPlayer: number | null = null, p1Wins: number = 0, p2Wins: number = 0, p1Name: string = '', p2Name: string = '', isTimeOver: boolean = false): void {
     this.frameCount++;
     this.globalTick = tick;
     const now = performance.now();
@@ -57,7 +57,7 @@ export class Renderer {
     drawHUD(ctx, fighters, tick, delayedHealth, p1Wins, p2Wins, p1Name, p2Name);
 
     if (ko) {
-      drawKO(ctx, winner, perfectPlayer);
+      drawKO(ctx, winner, perfectPlayer, isTimeOver);
     }
 
     ctx.restore();

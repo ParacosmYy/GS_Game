@@ -72,7 +72,7 @@ describe('Fighter', () => {
       const f = createFighter();
       f.startAttack(AttackType.STAND_A);
 
-      // STAND_A startup=4 (正版KOF2002平均值)
+      // STAND_A startup=5 (KOF2002UM Kyo, Dream Cancel Wiki)
       expect(f.attackPhase).toBe('startup');
       expect(f.attackFrame).toBe(0);
       f.tickAttack(); // frame 0 → 1
@@ -81,7 +81,9 @@ describe('Fighter', () => {
       expect(f.attackFrame).toBe(2);
       f.tickAttack(); // frame 2 → 3
       expect(f.attackFrame).toBe(3);
-      f.tickAttack(); // frame 3 → startup done, active starts, frame reset to 0
+      f.tickAttack(); // frame 3 → 4
+      expect(f.attackFrame).toBe(4);
+      f.tickAttack(); // frame 4 → startup done, active starts, frame reset to 0
       expect(f.attackPhase).toBe('active');
       expect(f.attackFrame).toBe(0);
 

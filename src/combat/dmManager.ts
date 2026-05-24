@@ -66,7 +66,7 @@ export class DMManager {
       const { gauges, maxModes, vfx, screenShake, fighters } = this.deps;
       if (activateMaxMode(gauges[playerIndex], maxModes[playerIndex])) {
         const f = fighters[playerIndex];
-        vfx.spawnHitSparks(f.x, f.y - 50, 15);
+        vfx.spawnMAXAura(f.x, f.y);
         screenShake.trigger(6, 8);
       }
     }
@@ -78,7 +78,9 @@ export class DMManager {
       atk === AttackType.DM_OROCHINAGI ||
       atk === AttackType.DM_YATAGARASU ||
       atk === AttackType.DM_POWER_GEYSER ||
-      atk === AttackType.DM_PHOENIX_KICK
+      atk === AttackType.DM_PHOENIX_KICK ||
+      atk === AttackType.DM_CHAIN_SHOT ||
+      atk === AttackType.DM_FREEZE
     );
   }
 }

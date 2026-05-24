@@ -24,7 +24,7 @@ import { SelectState } from './state/selectState.js';
 import { RoundState } from './state/roundState.js';
 import { DMManager } from './combat/dmManager.js';
 import { createHitCallback } from './combat/hitCallback.js';
-import { initAudio, playKO, playVictoryFanfare } from './audio/sfx.js';
+import { initAudio, playKO, playVictoryFanfare, playMAXActivation, playPerfect } from './audio/sfx.js';
 import { createTeam, defeatActive, switchToNext, activeChar, teamOrderString, type TeamState } from './state/teamState.js';
 import { resolveSimplified } from './input/simplifiedInput.js';
 import { bgm } from './audio/bgm.js';
@@ -83,6 +83,7 @@ let debugMode = false;
 let simplifiedMode = false; // Tab to toggle
 let modeIndicatorTimer = 0;
 let stageIndicatorTimer = 0;
+let isTimeOver = false;
 let p2AI: InstanceType<typeof import('./ai/simpleAI.js').SimpleAI> | null = null;
 const INTRO_DURATION = 120;
 let p1Team: TeamState | null = null;
@@ -144,6 +145,7 @@ function update(): void {
       phase = GamePhase.INTRO;
       phaseTimer = 0;
       rounds.currentRound = 1;
+      isTimeOver = false;
       p1DelayedHealth = p1.maxHealth;
       p2DelayedHealth = p2.maxHealth;
       p1.savePrevState();
@@ -241,6 +243,9 @@ function update(): void {
   combatSystem.updateEdgeTracking(rawP1, rawP2);
   dmMgr.checkMaxActivation(p1Input, 0);
   dmMgr.checkMaxActivation(p2Input, 1);
+  // MAX activation sound
+  if (maxModes[0].active && maxModes[0].timer === maxModes[0].maxDuration - 1) playMAXActivation();
+  if (maxModes[1].active && maxModes[1].timer === maxModes[1].maxDuration - 1) playMAXActivation();
   p1Cmd.record(getDirectionInput(p1Input), tickRef.value);
   p2Cmd.record(getDirectionInput(p2Input), tickRef.value);
 
@@ -307,15 +312,23 @@ function update(): void {
       phase = GamePhase.KO;
       koTimer = 0;
       winner = rounds.determineWinner();
-      if (winner !== null && cinematic.getPerfectPlayer(winner) !== null) announcer.perfect();
+      if (winner !== null && cinematic.getPerfectPlayer(winner) !== null) {
+        const pw = winner === 0 ? p1 : p2;
+        vfx.spawnPerfectFlash(pw.x, pw.y - pw.displayHeight / 2);
+        screenFlash.trigger('#ffcc00', 0.25, 8);
+        playPerfect();
+        announcer.perfect();
+      }
     }
   }
 
   if (tickRef.value >= 3600) {
     phase = GamePhase.KO;
     koTimer = 0;
+    isTimeOver = true;
     winner = rounds.determineWinner();
     screenShake.trigger(8, 10);
+    screenFlash.trigger('#ffaa00', 0.2, 8);
     bgm.stop();
     announcer.timeOver();
   }
@@ -342,7 +355,7 @@ function render(): void {
   const p1Char = ROSTER.find(c => c.id === p1.charId) || ROSTER[0];
   const p2Char = ROSTER.find(c => c.id === p2.charId) || ROSTER[1];
   renderer.render([p1, p2], camera.x, tickRef.value, phase === GamePhase.KO, winner, screenShake.offsetX, screenShake.offsetY,
-    [p1DelayedHealth, p2DelayedHealth], maxModes, perfectPlayer, rounds.p1Wins, rounds.p2Wins, p1Char.nameCn, p2Char.nameCn);
+    [p1DelayedHealth, p2DelayedHealth], maxModes, perfectPlayer, rounds.p1Wins, rounds.p2Wins, p1Char.nameCn, p2Char.nameCn, isTimeOver);
   renderer.drawProjectiles(projectiles, camera);
   vfx.render(ctx, camera.x);
 
