@@ -330,6 +330,14 @@ export class VFXSystem {
     });
   }
 
+  spawnReversalText(worldX: number, worldY: number): void {
+    this.particles.push({
+      x: worldX, y: worldY, vx: 0, vy: -2.5,
+      life: 50, maxLife: 50, size: 20,
+      color: '#ff44ff', type: 'text', text: 'REVERSAL!',
+    });
+  }
+
   spawnDust(worldX: number, worldY: number): void {
     for (let i = 0; i < 6; i++) {
       const dir = (i - 3) * 1.2;

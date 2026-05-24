@@ -7,7 +7,7 @@ import {
   STAGE_GROUND_Y, STAGE_WIDTH, FIGHTER_WIDTH,
   STAGE_LEFT, STAGE_RIGHT,
   GRAVITY,
-  BACKDASH_VX, BACKDASH_VY,
+  BACKDASH_VX, BACKDASH_VY, BACKDASH_DURATION, BACKDASH_INVINCIBLE_FRAMES,
   DOUBLE_TAP_WINDOW, HYPER_CHARGE_WINDOW,
   HOP_THRESHOLD,
   ROLL_SPEED, ROLL_DURATION, ROLL_RECOVERY,
@@ -22,6 +22,7 @@ import {
   THROW_INVINCIBILITY_JUMP_STARTUP,
   THROW_INVINCIBILITY_LANDING,
   FRAME_DATA,
+  WAKEUP_BUFFER_WINDOW,
 } from '../core/constants.js';
 import { FighterState, AttackType, CLOSE_RANGE, JuggleState } from '../core/types.js';
 import type { PowerGauge, MaxModeState, CounterConfig } from '../core/types.js';
@@ -57,6 +58,7 @@ export class FighterController {
   private counterStanceTimer = 0;
   private chargeDownFrames = 0; // frames holding ↓ for charge moves
   private wasChargingDown = false;
+  private wakeupBuffer: ResolvedInput | null = null; // buffered input during knockdown recovery
 
   constructor(
     fighter: Fighter,
@@ -154,10 +156,10 @@ export class FighterController {
       }
     } else if (f.state === FighterState.HITSTUN || f.state === FighterState.BLOCK
         || f.state === FighterState.KNOCKDOWN || f.state === FighterState.GUARD_CRUSH) {
-      // Pushback/stun: apply vx as one-time displacement, then zero it immediately
-      // This prevents persistent drift especially at walls
+      // Pushback: gradual velocity with friction (KOF2002 behavior)
       f.x += f.vx;
-      f.vx = 0;
+      f.vx *= 0.85; // friction decay — pushback tapers off over ~5-8 frames
+      if (Math.abs(f.vx) < 0.1) f.vx = 0;
       f.y += f.vy;
     } else {
       // Normal movement: apply velocity normally
@@ -375,6 +377,7 @@ export class FighterController {
         if (input.blowbackPressed && f.canAct()) { f.startAttack(AttackType.STAND_CD); return; }
         if (this.dblBack(input) && f.canAct() && f.isGrounded()) {
           f.state = FighterState.BACKDASH; f.vx = -BACKDASH_VX * f.facing; f.vy = BACKDASH_VY;
+          f.backdashTimer = BACKDASH_DURATION;
           f.displayHeight = 80; this.vfx.spawnDust(f.x, STAGE_GROUND_Y); return;
         }
         if (this.dblFwd(input) && f.canAct() && f.isGrounded()) {
@@ -445,8 +448,10 @@ export class FighterController {
       }
 
       case FighterState.BACKDASH: {
+        if (f.backdashTimer > 0) f.backdashTimer--;
         if (f.isGrounded() && f.vy >= 0) {
           f.state = FighterState.IDLE; f.vx = 0; f.vy = 0; f.displayHeight = 100;
+          f.backdashTimer = 0;
           f.landingRecovery = LANDING_RECOVERY; this.vfx.spawnDust(f.x, STAGE_GROUND_Y);
         }
         break;
@@ -657,11 +662,40 @@ export class FighterController {
           f.knockdownTimer = 3;
           f.usedQuickStand = true;
         }
+        // Wake-up reversal buffer: store input during last WAKEUP_BUFFER_WINDOW frames
+        if (f.knockdownTimer <= WAKEUP_BUFFER_WINDOW && f.knockdownTimer > 0) {
+          if (input.punchPressed || input.kickPressed || input.rollPressed || input.blowbackPressed) {
+            this.wakeupBuffer = input;
+          }
+        }
         if (f.knockdownTimer <= 0) {
           f.state = FighterState.IDLE; f.isKnockedDown = false; f.isHardKnockdown = false; f.displayHeight = 100; f.vx = 0;
           // Quick Stand loses wakeup throw invincibility in KOF
           if (!f.usedQuickStand) f.throwInvincibilityTimer = THROW_INVINCIBILITY_WAKEUP;
           f.usedQuickStand = false;
+          // Execute buffered reversal input on first wakeup frame
+          if (this.wakeupBuffer) {
+            const buf = this.wakeupBuffer;
+            this.wakeupBuffer = null;
+            let reversed = false;
+            if (buf.rollPressed) {
+              f.state = buf.back ? FighterState.BACK_ROLL : FighterState.ROLL;
+              f.rollTimer = ROLL_DURATION;
+              f.vx = (f.state === FighterState.ROLL ? ROLL_SPEED : -ROLL_SPEED) * f.facing;
+              f.displayHeight = 60;
+              this.vfx.spawnDust(f.x, STAGE_GROUND_Y);
+              reversed = true;
+            } else if (buf.blowbackPressed) {
+              f.startAttack(AttackType.STAND_CD);
+              reversed = true;
+            } else {
+              const atk = this.tryAttack(buf);
+              if (atk) { f.startAttack(atk); reversed = true; }
+            }
+            if (reversed) {
+              this.vfx.spawnReversalText(f.x, f.y - f.displayHeight - 30);
+            }
+          }
         }
         break;
     }

@@ -49,6 +49,7 @@ export class CombatSystem {
   onGuardCrush: GuardCrushCallback | null = null;
   // Damage scaling combo tracking (per defender)
   private comboHits = [0, 0];
+  private comboDamage = [0, 0]; // cumulative combo damage per defender
   // 连击超时: 最后一次命中帧数, 超过COMBO_TIMEOUT帧未命中则重置
   private lastHitFrame = [0, 0];
   private currentFrame = 0;
@@ -77,6 +78,7 @@ export class CombatSystem {
   /** Reset combo for a player (called on block or timeout) */
   resetCombo(playerIndex: number): void {
     this.comboHits[playerIndex] = 0;
+    this.comboDamage[playerIndex] = 0;
   }
 
   /** Get current combo count for a player */
@@ -84,11 +86,17 @@ export class CombatSystem {
     return this.comboHits[playerIndex];
   }
 
+  /** Get cumulative combo damage for a player */
+  getComboDamage(playerIndex: number): number {
+    return this.comboDamage[playerIndex];
+  }
+
   /** 每帧调用: 检查连击超时, 超过COMBO_TIMEOUT帧未命中则重置连击 */
   tickComboTimeout(currentFrame: number): void {
     for (let i = 0; i < 2; i++) {
       if (this.comboHits[i] > 0 && currentFrame - this.lastHitFrame[i] > COMBO_TIMEOUT) {
         this.comboHits[i] = 0;
+        this.comboDamage[i] = 0;
       }
     }
   }
@@ -96,6 +104,7 @@ export class CombatSystem {
   reset(): void {
     this.prev = [createPrevAttack(), createPrevAttack()];
     this.comboHits = [0, 0];
+    this.comboDamage = [0, 0];
     this.lastHitFrame = [0, 0];
   }
 
@@ -255,8 +264,11 @@ export class CombatSystem {
 
     attacker.hasHit = true;
 
-    // Roll invincibility check (attacks pass through)
-    if (defender.isRolling()) return;
+    // Roll invincibility check — only invincible during first portion of roll
+    if (defender.isRollInvincible()) return;
+
+    // Backdash invincibility — first 5 frames of backdash are strike-invincible
+    if (defender.isBackdashInvincible()) return;
 
     // B7: Juggle check — if defender is airborne, check juggle budget
     if (!defender.isGrounded()) {
@@ -361,6 +373,7 @@ export class CombatSystem {
     }
 
     this.comboHits[defIdx]++;
+    this.comboDamage[defIdx] += damage;
     this.lastHitFrame[defIdx] = this.currentFrame;
 
     defender.health = Math.max(0, defender.health - damage);
@@ -389,6 +402,12 @@ export class CombatSystem {
       }
     } else {
       defender.applyHitstun(hitstunFrames, data.pushback);
+    }
+
+    // Attacker pushback: slight recoil on hit (KOF2002 behavior)
+    const atkPushback = data.pushback * 0.2;
+    if (atkPushback > 0.3) {
+      attacker.vx = -atkPushback * attacker.facing;
     }
 
     // Rapid Cancel: light normal on hit enables chaining into next light normal
@@ -422,8 +441,8 @@ export class CombatSystem {
         const attacker = fighters[1 - i];
         if (!aabbCheck(hitbox, defender.getEffectiveHurtbox() ?? defender.getHurtbox())) continue;
 
-        // Roll invincibility
-        if (defender.isRolling()) { proj.active = false; break; }
+        // Roll invincibility — only first portion
+        if (defender.isRollInvincible()) { proj.active = false; break; }
 
         const data = FRAME_DATA.SPECIAL_PROJECTILE;
         const raw = i === 0 ? this.inputManager.getP1Input() : this.inputManager.getP2Input();

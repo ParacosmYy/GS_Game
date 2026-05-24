@@ -501,6 +501,7 @@ export function drawComboCounters(
   comboCount: number[],
   comboTimer: number[],
   camera: Camera,
+  comboDamage?: number[],
 ): void {
   ctx.save();
   for (let i = 0; i < 2; i++) {
@@ -541,6 +542,13 @@ export function drawComboCounters(
     ctx.fillStyle = comboColor;
     ctx.font = `bold 11px "Courier New", monospace`;
     ctx.fillText('HIT', sx, sy + 16);
+
+    // Combo damage total display
+    if (comboDamage && comboDamage[i] > 0) {
+      ctx.fillStyle = '#ff6644';
+      ctx.font = `bold 13px "Courier New", monospace`;
+      ctx.fillText(`${comboDamage[i]}`, sx, sy + 30);
+    }
   }
   ctx.restore();
 }

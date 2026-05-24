@@ -19,6 +19,10 @@ import {
   PUSH_BOX_WIDTH,
   FRAME_DATA,
   HITBOX_OFFSETS,
+  ROLL_DURATION,
+  ROLL_INVINCIBLE_END,
+  BACKDASH_DURATION,
+  BACKDASH_INVINCIBLE_FRAMES,
 } from '../core/constants.js';
 import { ATTACK_FRAMES } from '../core/attackFrames.js';
 import type { CharacterStats } from '../characters/types.js';
@@ -61,6 +65,9 @@ export class Fighter {
 
   // Run stop delay (A5: can't instantly block out of run)
   runStopTimer = 0;
+
+  // Backdash timer (for invincibility window tracking)
+  backdashTimer = 0;
 
   // Throw invincibility frames remaining (set after blockstun/hitstun/wakeup/jump)
   throwInvincibilityTimer = 0;
@@ -205,7 +212,7 @@ export class Fighter {
     if (this.state === FighterState.AIR_BLOCK) return false;
     if (this.state === FighterState.THROW) return false;
     if (this.state === FighterState.GUARD_CRUSH) return false;
-    if (this.state === FighterState.ROLL || this.state === FighterState.BACK_ROLL) return false;
+    // KOF2002: 翻滚中可以被投(任何时刻)，这与防御取消翻滚不同
     return true;
   }
 
@@ -371,7 +378,8 @@ export class Fighter {
     this.state = FighterState.HITSTUN;
     this.hitstunTimer = frames;
     this.hitFlashFrames = 4;
-    this.vx = pushback * (this.facing === 1 ? -1 : 1);
+    // KOF2002: pushback as gradual velocity over hitstun duration
+    this.vx = pushback * (this.facing === 1 ? -1 : 1) * 0.6;
     this.resetAttackState();
     this.resetCancelFlags();
   }
@@ -380,7 +388,8 @@ export class Fighter {
   applyBlockstun(frames: number, pushback: number): void {
     this.state = FighterState.BLOCK;
     this.blockstunTimer = frames;
-    this.vx = pushback * (this.facing === 1 ? -1 : 1);
+    // KOF2002: block pushback is stronger than hit pushback
+    this.vx = pushback * (this.facing === 1 ? -1 : 1) * 0.8;
     this.resetAttackState();
   }
 
@@ -449,10 +458,24 @@ export class Fighter {
     this.resetAttackState();
   }
 
-  /** Is the fighter in a rolling state (invincible to attacks but not throws)? */
+  /** Is the fighter in the invincible portion of a roll? (first ROLL_INVINCIBLE_END frames) */
+  isRollInvincible(): boolean {
+    return (this.state === FighterState.ROLL || this.state === FighterState.BACK_ROLL)
+      && this.rollTimer > 0
+      && (ROLL_DURATION - this.rollTimer) < ROLL_INVINCIBLE_END;
+  }
+
+  /** Is the fighter in a rolling state (for visual/detection purposes) */
   isRolling(): boolean {
     return (this.state === FighterState.ROLL || this.state === FighterState.BACK_ROLL)
       && this.rollTimer > 0;
+  }
+
+  /** Is the fighter in the invincible portion of backdash? (first BACKDASH_INVINCIBLE_FRAMES frames) */
+  isBackdashInvincible(): boolean {
+    return this.state === FighterState.BACKDASH
+      && this.backdashTimer > 0
+      && (BACKDASH_DURATION - this.backdashTimer) < BACKDASH_INVINCIBLE_FRAMES;
   }
 
   /** Is the fighter on the ground? */
@@ -484,6 +507,7 @@ export class Fighter {
     this.isThrowing = false;
     this.throwVictim = null;
     this.rollTimer = 0;
+    this.backdashTimer = 0;
     this.rekkaChain = null;
     this.rekkaWindow = 0;
     this.runStopTimer = 0;

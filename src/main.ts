@@ -462,7 +462,7 @@ function render(): void {
     renderer.drawSuperFlash(ctx, cinematic.superFlashTimer, cinematic.superFlashX - camera.x, cinematic.superFlashY, maxModes[cinematic.superFlashAttacker].active ? 'SDM' : 'DM');
   renderer.drawPowerGauges(gauges, maxModes);
   if (phase === GamePhase.INTRO) renderer.drawIntro(phaseTimer, rounds.currentRound, p1Char.nameCn, p2Char.nameCn);
-  renderer.drawComboCounters([p1, p2], [combatSystem.getComboCount(0), combatSystem.getComboCount(1)], [0, 0], camera);
+  renderer.drawComboCounters([p1, p2], [combatSystem.getComboCount(0), combatSystem.getComboCount(1)], [0, 0], camera, [combatSystem.getComboDamage(0), combatSystem.getComboDamage(1)]);
   if (teamMode && p1Team && p2Team) {
     const toDisp = (t: TeamState): TeamDisplayInfo => ({
       members: t.members.map((m, i) => ({ name: m.charDef.nameCn, defeated: m.defeated, active: i === t.activeIndex && !m.defeated })),

@@ -131,6 +131,28 @@ export class Renderer {
         this.drawAfterimageTrail(ctx, f, sx, leanOffsetX);
       }
 
+      // Backdash startup invincibility glow (blue flicker)
+      if (f.isBackdashInvincible()) {
+        ctx.save();
+        ctx.globalAlpha = 0.3 + 0.2 * Math.sin(this.globalTick * 0.8);
+        ctx.fillStyle = '#4488ff';
+        ctx.beginPath();
+        ctx.ellipse(sx, STAGE_GROUND_Y - 50, 40, 60, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+
+      // Roll recovery vulnerability flash (orange warning)
+      if (f.isRolling() && !f.isRollInvincible()) {
+        ctx.save();
+        ctx.globalAlpha = 0.2 + 0.15 * Math.sin(this.globalTick * 1.2);
+        ctx.fillStyle = '#ffaa00';
+        ctx.beginPath();
+        ctx.ellipse(sx, STAGE_GROUND_Y - 30, 30, 40, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+
       ctx.save();
       ctx.translate(sx + leanOffsetX, sy);
       ctx.rotate(leanAngle);
@@ -353,8 +375,9 @@ export class Renderer {
     comboCount: number[],
     comboTimer: number[],
     camera: Camera,
+    comboDamage?: number[],
   ): void {
-    drawComboCounters(this.ctx, fighters, comboCount, comboTimer, camera);
+    drawComboCounters(this.ctx, fighters, comboCount, comboTimer, camera, comboDamage);
   }
 
   drawTeamOrder(p1Team: TeamDisplayInfo | null, p2Team: TeamDisplayInfo | null): void {
@@ -461,6 +484,14 @@ export class Renderer {
       const sx = camera.worldToScreen(f.x);
       ctx.fillStyle = '#fff'; ctx.font = '9px monospace'; ctx.textAlign = 'center';
       ctx.fillText(f.state, sx, f.y - f.displayHeight - 18);
+      // Roll invincibility bar
+      if (f.isRolling()) {
+        const elapsed = 20 - f.rollTimer;
+        const invPct = Math.min(elapsed / 15, 1);
+        ctx.fillStyle = invPct < 1 ? '#44ff88' : '#ff4444';
+        ctx.fillRect(sx - 15, f.y - f.displayHeight - 38, 30 * invPct, 3);
+        ctx.strokeStyle = '#888'; ctx.lineWidth = 0.5; ctx.strokeRect(sx - 15, f.y - f.displayHeight - 38, 30, 3);
+      }
       // Frame advantage indicator
       if (f.currentAttack) {
         const d = FRAME_DATA[f.currentAttack as keyof typeof FRAME_DATA];
