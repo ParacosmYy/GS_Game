@@ -29,7 +29,7 @@ interface ComboStep {
 
 // ─── AI action types (expanded) ───
 type AIAction = 'idle' | 'approach' | 'retreat' | 'attack' | 'block'
-  | 'antiair' | 'throw' | 'special' | 'jumpIn' | 'okizeme' | 'guardCancel';
+  | 'antiair' | 'throw' | 'special' | 'jumpIn' | 'okizeme' | 'guardCancel' | 'counterStance';
 
 // ─── Per-character combo routes ───
 const COMBO_ROUTES: Record<string, ComboStep[]> = {
@@ -193,6 +193,12 @@ export class SimpleAI {
     // Anti-air: highest priority
     if (oppAirborne && dist < 150 && Math.random() < this.difficulty * 0.8) {
       return 'antiair';
+    }
+
+    // Counter stance: use when opponent is attacking at mid range (only for characters with getCounterConfig)
+    if (oppAttacking && dist < 120 && dist > 50 && this.character.getCounterConfig
+      && Math.random() < this.difficulty * 0.25) {
+      return 'counterStance';
     }
 
     // Block when opponent is attacking
@@ -391,6 +397,24 @@ export class SimpleAI {
           }
         }
         break;
+
+      case 'counterStance': {
+        // 当身技: QCB+Punch input simulation
+        if (canAct && this.character.getCounterConfig) {
+          // Simulate QCB motion: down → downback → back + punch
+          if (this.actionFrames > 4) {
+            base.down = true;
+          } else if (this.actionFrames > 2) {
+            base.down = true;
+            base.back = true;
+          } else {
+            base.back = true;
+            base.buttonC = true;
+            base.punchPressed = true;
+          }
+        }
+        break;
+      }
 
       case 'antiair': {
         const charId = f.charId;
