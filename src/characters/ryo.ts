@@ -242,5 +242,12 @@ export const RyoDef: CharacterDefinition = {
   },
 
   isCommandThrow(_attackType) { return false; },
-  getCounterConfig() { return null; },
+  getCounterConfig() {
+    return {
+      activeFrames: 20,
+      counterAttack: AttackType.RYO_KO_HOU,
+      counterDamage: 50,
+      failureStun: 25,
+    };
+  },
 };

@@ -408,6 +408,17 @@ export class FighterController {
         }
         if (f.canAct()) { const atk = this.tryAttack(input); if (atk) { f.startAttack(atk); return; } }
 
+        // 当身技: QCB+Punch (214+P) — 只有有getCounterConfig的角色可用
+        if (f.canAct() && input.punchPressed && this.character.getCounterConfig) {
+          const cfg = this.character.getCounterConfig();
+          if (cfg && this.cmdBuf.hasQCB(this.tickRef.value)) {
+            f.state = FighterState.COUNTER_STANCE;
+            this.counterStanceTimer = cfg.activeFrames;
+            this.vfx.spawnCharacterHitSparks(f.x, f.y - f.displayHeight / 2, 8, '#44ffcc');
+            return;
+          }
+        }
+
         if (input.forward) { f.vx = this.stats.walkSpeed * f.facing; f.state = FighterState.WALK; }
         else if (input.back) { f.vx = -this.stats.walkSpeed * f.facing; f.state = FighterState.WALK; }
         else { f.state = FighterState.IDLE; }

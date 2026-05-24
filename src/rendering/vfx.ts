@@ -322,6 +322,14 @@ export class VFXSystem {
     });
   }
 
+  spawnCounterStanceText(worldX: number, worldY: number): void {
+    this.particles.push({
+      x: worldX, y: worldY, vx: 0, vy: -2,
+      life: 55, maxLife: 55, size: 22,
+      color: '#44ffcc', type: 'text', text: 'COUNTER!',
+    });
+  }
+
   spawnDust(worldX: number, worldY: number): void {
     for (let i = 0; i < 6; i++) {
       const dir = (i - 3) * 1.2;
