@@ -44,7 +44,7 @@ export class Renderer {
 
   // ===== Main fight frame =====
 
-  render(fighters: Fighter[], cameraX: number, tick: number, ko: boolean, winner: number | null, shakeX: number, shakeY: number, delayedHealth: [number, number], maxModes?: [MaxModeState, MaxModeState], perfectPlayer: number | null = null, p1Wins: number = 0, p2Wins: number = 0, p1Name: string = '', p2Name: string = '', isTimeOver: boolean = false, currentRound: number = 1): void {
+  render(fighters: Fighter[], cameraX: number, tick: number, ko: boolean, winner: number | null, shakeX: number, shakeY: number, delayedHealth: [number, number], maxModes?: [MaxModeState, MaxModeState], perfectPlayer: number | null = null, p1Wins: number = 0, p2Wins: number = 0, p1Name: string = '', p2Name: string = '', isTimeOver: boolean = false, currentRound: number = 1, firstAttacker: number | null = null): void {
     this.frameCount++;
     this.globalTick = tick;
     const now = performance.now();
@@ -61,10 +61,10 @@ export class Renderer {
 
     drawStage(ctx, cameraX, this.stars, this.globalTick);
     this.drawFighters(ctx, fighters, cameraX, maxModes);
-    drawHUD(ctx, fighters, tick, delayedHealth, p1Wins, p2Wins, p1Name, p2Name, currentRound);
+    drawHUD(ctx, fighters, tick, delayedHealth, p1Wins, p2Wins, p1Name, p2Name, currentRound, firstAttacker);
 
     if (ko) {
-      drawKO(ctx, winner, perfectPlayer, isTimeOver);
+      drawKO(ctx, winner, perfectPlayer, isTimeOver, fighters[0].health, fighters[1].health, fighters[0].maxHealth);
     }
 
     ctx.restore();
@@ -106,13 +106,20 @@ export class Renderer {
         ctx.ellipse(sx, sy - f.displayHeight / 2, (hw + 15) * glowPulse, (f.displayHeight / 2 + 15) * glowPulse, 0, 0, Math.PI * 2);
         ctx.fill();
       }
-      // MAX模式专属绿色光环
+      // MAX模式专属绿色光环+轮廓发光
       if (maxModeActive) {
         const auraPulse = 0.08 + Math.sin(this.globalTick * 0.1) * 0.04;
         ctx.fillStyle = `rgba(68, 255, 136, ${auraPulse})`;
         ctx.beginPath();
         ctx.ellipse(sx, sy - f.displayHeight / 2, hw + 25, f.displayHeight / 2 + 20, 0, 0, Math.PI * 2);
         ctx.fill();
+        // KOF2002: MAX轮廓发光 — 脉动的绿色外框
+        const outlinePulse = Math.sin(this.globalTick * 0.15) * 0.3 + 0.4;
+        ctx.strokeStyle = `rgba(68, 255, 136, ${outlinePulse})`;
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.ellipse(sx, sy - f.displayHeight / 2, hw + 8, f.displayHeight / 2 + 8, 0, 0, Math.PI * 2);
+        ctx.stroke();
       }
 
       // Lean offset for RUN/BACKDASH

@@ -112,6 +112,7 @@ let continueCountdown = 0;
 const CONTINUE_DURATION = 600; // 10秒倒计时
 let continueCursorYes = true; // Continue画面光标
 let currentWinQuote = '';
+let firstAttacker: number | null = null;
 
 function pickWinQuote(w: number | null): string {
   if (w === null) return '';
@@ -207,7 +208,7 @@ function update(): void {
 
   if (phase === GamePhase.INTRO) {
     phaseTimer++;
-    if (phaseTimer >= INTRO_DURATION) { phase = GamePhase.FIGHTING; tickRef.value = 0; modeIndicatorTimer = 180; firstHitTracked = false; koGroundSlamDone = false; bgm.start(); playFight(); }
+    if (phaseTimer >= INTRO_DURATION) { phase = GamePhase.FIGHTING; tickRef.value = 0; modeIndicatorTimer = 180; firstHitTracked = false; firstAttacker = null; koGroundSlamDone = false; bgm.start(); playFight(); }
     return;
   }
 
@@ -283,9 +284,7 @@ function update(): void {
   cinematic.tickSuperFlash();
   tickRef.value++;
   tickAutoMeter(gauges);
-
   if (cinematic.shouldSkipFrame()) return;
-
   const rawP1 = inputManager.getP1Input();
   const rawP2 = inputManager.getP2Input();
   p1.updateFacing(p2);
@@ -308,7 +307,6 @@ function update(): void {
   }
   p1Cmd.record(getDirectionInput(p1Input), tickRef.value);
   p2Cmd.record(getDirectionInput(p2Input), tickRef.value);
-  // Negative Edge: 记录按键按下/松开
   if (p1Input.punchPressed) p1Cmd.recordPress('punch', tickRef.value);
   if (p1Input.kickPressed) p1Cmd.recordPress('kick', tickRef.value);
   if (p1Input.punchJustReleased) p1Cmd.recordRelease('punch', tickRef.value);
@@ -317,8 +315,6 @@ function update(): void {
   if (p2Input.kickPressed) p2Cmd.recordPress('kick', tickRef.value);
   if (p2Input.punchJustReleased) p2Cmd.recordRelease('punch', tickRef.value);
   if (p2Input.kickJustReleased) p2Cmd.recordRelease('kick', tickRef.value);
-
-  // Simplified mode: U/I/O trigger character-specific specials directly
   if (simplifiedMode && !p1.currentAttack && p1.canAct()) {
     const p1Char = ROSTER.find(c => c.id === p1.charId) || ROSTER[0];
     const simp = resolveSimplified(
@@ -352,6 +348,7 @@ function update(): void {
   if (!firstHitTracked && (combatSystem.getComboCount(0) > 0 || combatSystem.getComboCount(1) > 0)) {
     firstHitTracked = true;
     const hitterIdx = combatSystem.getComboCount(0) > 0 ? 0 : 1;
+    firstAttacker = hitterIdx;
     const hitter = hitterIdx === 0 ? p1 : p2;
     vfx.spawnFirstAttackText(hitter.x, hitter.y - hitter.displayHeight - 40);
     announcer.firstAttack();
@@ -372,12 +369,16 @@ function update(): void {
   [p1, p2].forEach((f, i) => {
     const wasStun = f.prevState === FighterState.HITSTUN || f.prevState === FighterState.KNOCKDOWN;
     if (wasStun && f.state === FighterState.IDLE) {
-      // KOF2002: 连击中断时如果>=3hits显示连击结束标记+总伤害
       const lastCombo = combatSystem.getComboCount(i);
       if (lastCombo >= 3) {
         const lastDmg = combatSystem.getComboDamage(i);
         vfx.spawnComboEndText(f.x, f.y - f.displayHeight - 50, lastCombo);
         vfx.spawnComboDamageText(f.x, f.y - f.displayHeight - 50, lastDmg);
+      }
+      // KOF2002: 连击中断尘埃 — 对手恢复时攻击者脚下小尘埃
+      if (lastCombo >= 2) {
+        const opp = i === 0 ? p2 : p1;
+        vfx.spawnDust(opp.x, STAGE_GROUND_Y);
       }
       combatSystem.resetCombo(i);
     }
@@ -532,7 +533,7 @@ function render(): void {
   const p1Char = ROSTER.find(c => c.id === p1.charId) || ROSTER[0];
   const p2Char = ROSTER.find(c => c.id === p2.charId) || ROSTER[1];
   renderer.render([p1, p2], camera.x, tickRef.value, phase === GamePhase.KO, winner, screenShake.offsetX, screenShake.offsetY,
-    [p1DelayedHealth, p2DelayedHealth], maxModes, perfectPlayer, rounds.p1Wins, rounds.p2Wins, p1Char.nameCn, p2Char.nameCn, isTimeOver, rounds.currentRound);
+    [p1DelayedHealth, p2DelayedHealth], maxModes, perfectPlayer, rounds.p1Wins, rounds.p2Wins, p1Char.nameCn, p2Char.nameCn, isTimeOver, rounds.currentRound, firstAttacker);
   renderer.drawProjectiles(projectiles, camera);
   vfx.render(ctx, camera.x);
 
@@ -566,7 +567,6 @@ function render(): void {
   }
   if (debugMode) renderer.drawDebug([p1, p2], projectiles, camera, tickRef.value, renderer.getFps(), vfx.count, [p1Cmd, p2Cmd]);
 }
-// ===== Restart =====
 function restartGame(): void {
   bgm.stop();
   phase = GamePhase.TITLE;
@@ -597,4 +597,3 @@ window.addEventListener('keyup', e => { if (e.code === 'F1') f1Down = false; });
 
 // ===== Start =====
 new GameLoop(update, render).start();
-console.log('KOF 2002 initialized');

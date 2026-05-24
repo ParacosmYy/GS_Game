@@ -14,7 +14,7 @@ import { shiftColor, roundRect, drawSNKText } from './utils.js';
 
 // ===== Main HUD =====
 
-export function drawHUD(ctx: CanvasRenderingContext2D, fighters: Fighter[], tick: number, delayedHealth: [number, number], p1Wins: number = 0, p2Wins: number = 0, p1Name: string = '', p2Name: string = '', currentRound: number = 1): void {
+export function drawHUD(ctx: CanvasRenderingContext2D, fighters: Fighter[], tick: number, delayedHealth: [number, number], p1Wins: number = 0, p2Wins: number = 0, p1Name: string = '', p2Name: string = '', currentRound: number = 1, firstAttacker: number | null = null): void {
   if (fighters.length < 2) return;
 
   // HUD background — dark gradient
@@ -73,6 +73,17 @@ export function drawHUD(ctx: CanvasRenderingContext2D, fighters: Fighter[], tick
   // KOF2002: P2 low health DANGER warning
   if (p2Ratio <= 0.25 && p2Ratio > 0 && tick % 30 < 20) {
     drawSNKText(ctx, '!', CANVAS_WIDTH - HUD_MARGIN - 18, HUD_BAR_Y + HUD_BAR_HEIGHT + 14, 11, '#ff2200', '#000000', 'center');
+  }
+
+  // KOF2002: First Attack badge — persistent indicator for the round
+  if (firstAttacker !== null) {
+    const faColor = firstAttacker === 0 ? '#ff6644' : '#4488ff';
+    const faX = firstAttacker === 0 ? HUD_MARGIN + HUD_BAR_WIDTH + 10 : CANVAS_WIDTH - HUD_MARGIN - HUD_BAR_WIDTH - 10;
+    const faY = HUD_BAR_Y + HUD_BAR_HEIGHT + 16;
+    const pulse = Math.sin(tick * 0.1) * 0.3 + 0.7;
+    ctx.globalAlpha = pulse;
+    drawSNKText(ctx, 'FA', faX + (firstAttacker === 0 ? 30 : -30), faY, 8, faColor, '#000000', 'center');
+    ctx.globalAlpha = 1;
   }
 
   // Timer — decorative frame
@@ -306,6 +317,14 @@ function drawGuardGauge(ctx: CanvasRenderingContext2D, x: number, y: number, w: 
   ctx.strokeStyle = 'rgba(255,255,255,0.08)';
   ctx.lineWidth = 1;
   ctx.strokeRect(x, y, w, h);
+
+  // KOF2002: 防御崩坏预警 — 低于30%时边框闪烁红光
+  if (ratio <= 0.3 && ratio > 0) {
+    const warnPulse = Math.sin(tick * 0.25) * 0.5 + 0.5;
+    ctx.strokeStyle = `rgba(255, 40, 40, ${warnPulse * 0.8})`;
+    ctx.lineWidth = 2;
+    ctx.strokeRect(x - 1, y - 1, w + 2, h + 2);
+  }
 }
 
 // ===== Power Gauge =====

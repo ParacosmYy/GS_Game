@@ -1,17 +1,7 @@
 /**
  * SimpleAI — 升级版格斗AI
- *
- * 策略:
- *   远距离: 跳入 / 发波 / 接近
- *   中距离: 试探poke (stand A/B) / 跳入
- *   近距离: 连段 (4-8 hit combo routes) / 投技
- *   防御: 智能蹲站交替防 + GC Roll / GC CD
- *   对空: 角色专属升龙 + 备用蹲防
- *   起身压制: 对手倒地时上前okizeme
- *   投技逃脱: 在escape window内高概率拆投
- *
- * AI直接生成 ResolvedInput 馈入 FighterController，
- * 必杀技通过 CharacterDefinition 路由直接触发 (跳过指令缓冲)。
+ * 策略: 远距离跳入/发波, 中距离poke, 近距离连段/投技, 智能防御+GC, 角色专属对空/起身
+ * AI直接生成 ResolvedInput, 必杀技通过 CharacterDefinition 路由直接触发
  */
 import type { Fighter } from '../entities/fighter.js';
 import type { CharacterDefinition } from '../characters/types.js';
@@ -93,33 +83,25 @@ export class SimpleAI {
       return base;
     }
 
-    // ── MAX mode activation during combo (BC cancel: normal >> MAX) ──
-    // In KOF2002, MAX is best activated mid-combo via BC to extend combos
+    // ── MAX activation during combo (BC cancel) ──
     if (this.inCombo && f.hasHit && canAct && this.gauge && this.gauge.stocks >= 2
       && !f.currentAttack?.toString().startsWith('DM_')
       && Math.random() < this.difficulty * 0.5) {
       const base = this.emptyInput();
-      base.buttonB = true;
-      base.buttonC = true;
-      base.buttonBPressed = true;
-      base.buttonCPressed = true;
-      this.inCombo = true;
-      this.comboStep = 0;
+      base.buttonB = true; base.buttonC = true;
+      base.buttonBPressed = true; base.buttonCPressed = true;
+      this.inCombo = true; this.comboStep = 0;
       return base;
     }
-
-    // ── MAX mode activation: when in close range with meter available ──
+    // ── MAX activation: close range with meter ──
     if (canAct && this.gauge && this.gauge.stocks >= 1 && dist < 100
       && Math.random() < this.difficulty * 0.05) {
       const base = this.emptyInput();
-      base.buttonB = true;
-      base.buttonC = true;
-      base.buttonBPressed = true;
-      base.buttonCPressed = true;
+      base.buttonB = true; base.buttonC = true;
+      base.buttonBPressed = true; base.buttonCPressed = true;
       return base;
     }
-
-    // ── Guard cancel: while blocking (low gauge or sustained pressure) ──
+    // ── Guard cancel while blocking ──
     if (f.state === FighterState.BLOCK && this.gauge && this.gauge.stocks >= 1) {
       const lowGauge = f.guardGauge < 30;
       const sustainedBlock = f.blockstunTimer > 8;
@@ -178,25 +160,50 @@ export class SimpleAI {
   // ─── Decision making ───
 
   private decide(dist: number, oppAttacking: boolean, oppAirborne: boolean, isClose: boolean): AIAction {
+    const lowHp = this.fighter.health < this.fighter.maxHealth * 0.25;
+    // KOF2002: 对手低血量时AI更倾向使用DM终结连段
+    const oppLowHp = this.opponent.health < this.opponent.maxHealth * 0.25;
+    const hasMeter = this.gauge && this.gauge.stocks >= 1;
+
     // Anti-air: highest priority
     if (oppAirborne && dist < 150 && Math.random() < this.difficulty * 0.8) {
       return 'antiair';
     }
 
-    // Counter stance: use when opponent is attacking at mid range (only for characters with getCounterConfig)
+    // Counter stance: opponent attacking at mid range
     if (oppAttacking && dist < 120 && dist > 50 && this.character.getCounterConfig
       && Math.random() < this.difficulty * 0.25) {
       return 'counterStance';
     }
-
-    // Block when opponent is attacking
-    if (oppAttacking && dist < 120 && Math.random() < this.difficulty * 0.9) {
+    if (oppAttacking && dist < 120 && Math.random() < this.difficulty * (lowHp ? 0.95 : 0.9)) {
       return 'block';
     }
 
     // Close range: attack combo or throw
     if (isClose) {
       const r = Math.random();
+      if (lowHp) {
+        if (r < 0.25) return 'retreat';
+        if (r < 0.50) return 'block';
+        if (r < 0.70) return 'attack';
+        if (r < 0.85) return 'throw';
+        return 'retreat';
+      }
+      // KOF2002: 对手低血量且有气槽时, 优先用DM终结的连段
+      if (oppLowHp && hasMeter) {
+        if (r < 0.55) return 'attack';
+        if (r < 0.75) return 'special';
+        if (r < 0.85) return 'throw';
+        return 'attack';
+      }
+      // KOF2002: 角落压力 — 对手靠近墙时保持进攻不停
+      const oppInCorner = this.opponent.x < 80 || this.opponent.x > 720;
+      if (oppInCorner) {
+        if (r < 0.55) return 'attack';
+        if (r < 0.70) return 'throw';
+        if (r < 0.85) return 'attack';
+        return 'special';
+      }
       if (r < 0.45) return 'attack';
       if (r < 0.60) return 'throw';
       if (r < 0.75) return 'retreat';
@@ -205,10 +212,18 @@ export class SimpleAI {
 
     // Mid range: poke, jump-in, or approach
     if (dist < 180) {
+      const maxBonus = this.maxMode?.active ? 0.15 : 0;
       const r = Math.random();
-      if (r < 0.25) return 'approach';
-      if (r < 0.40) return 'jumpIn';
-      if (r < 0.55) return 'attack';
+      // KOF2002: 对手低血量时更多special(DM)尝试
+      if (oppLowHp && hasMeter) {
+        if (r < 0.30 + maxBonus) return 'approach';
+        if (r < 0.45 + maxBonus) return 'jumpIn';
+        if (r < 0.60 + maxBonus) return 'special';
+        return 'attack';
+      }
+      if (r < 0.25 + maxBonus) return 'approach';
+      if (r < 0.40 + maxBonus) return 'jumpIn';
+      if (r < 0.55 + maxBonus) return 'attack';
       if (r < 0.70) return 'special';
       return 'idle';
     }
@@ -222,7 +237,6 @@ export class SimpleAI {
   }
 
   // ─── Input generation ───
-
   private emptyInput(): ResolvedInput {
     return {
       up: false, down: false, forward: false, back: false,
@@ -262,30 +276,20 @@ export class SimpleAI {
 
       case 'retreat':
         base.back = true;
-        // Sometimes jump back
         if (Math.random() < 0.08) base.up = true;
         break;
 
       case 'jumpIn': {
-        const fIsAirborne = f.state === FighterState.JUMP
-          || f.state === FighterState.RUN_JUMP
-          || f.state === FighterState.HOP
-          || f.state === FighterState.HYPER_JUMP;
+        const fIsAirborne = f.state === FighterState.JUMP || f.state === FighterState.RUN_JUMP
+          || f.state === FighterState.HOP || f.state === FighterState.HYPER_JUMP;
 
         if (this.jumpInPhase === 0 && canAct) {
-          // Phase 0: Jump toward opponent
-          base.up = true;
-          base.forward = true;
-          this.jumpInPhase = 1;
-          this.inCombo = true;
+          base.up = true; base.forward = true;
+          this.jumpInPhase = 1; this.inCombo = true;
         } else if (this.jumpInPhase === 1 && fIsAirborne) {
-          // Phase 1: In air → air attack (JUMP_C)
-          base.buttonC = true;
-          base.buttonCPressed = true;
-          base.punchPressed = true;
-          this.jumpInPhase = 2;
+          base.buttonC = true; base.buttonCPressed = true;
+          base.punchPressed = true; this.jumpInPhase = 2;
         } else if (this.jumpInPhase === 2 && canAct) {
-          // Phase 2: Landed → start ground combo from closeC
           this.jumpInPhase = 0;
           this.action = 'attack';
           this.comboStep = 0;
@@ -504,7 +508,6 @@ export class SimpleAI {
   }
 
   // ─── Combo helpers ───
-
   private getCurrentRoute(): ComboStep[] {
     const charId = this.fighter.charId;
     return COMBO_ROUTES[charId] ?? COMBO_ROUTES['_default'];
@@ -521,8 +524,10 @@ export class SimpleAI {
     const input = this.getInput();
     const tick = 0; // tick doesn't matter for AI direct trigger
 
-    // Check DM first (low probability) — use character-specific DM/SDM map
-    if (Math.random() < 0.05) {
+    // Check DM first — higher probability when opponent is low HP (KOF2002: DM finisher)
+    const oppLowHp = this.opponent.health < this.opponent.maxHealth * 0.25;
+    const dmProb = oppLowHp && this.gauge && this.gauge.stocks >= 1 ? 0.15 : 0.05;
+    if (Math.random() < dmProb) {
       const dmMap: Record<string, AttackType> = {
         kyo: AttackType.DM_OROCHINAGI,
         iori: AttackType.DM_YATAGARASU,

@@ -178,6 +178,8 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
     }
     if (counterHit && (data as { counterWire?: boolean }).counterWire) {
       deps.vfx.spawnWireText(defender.x, defender.y - defender.displayHeight - 55);
+      deps.vfx.spawnCharacterHitSparks(hitX, hitY, 20, '#ff6600');
+      deps.vfx.spawnImpactRing(hitX, hitY);
       deps.screenFlash.trigger('#ff6600', 0.2, 6);
       deps.screenShake.trigger(10, 10);
       playWire();
@@ -196,6 +198,7 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
     // CD击飞攻击: 更强的冲击反馈
     if (attackType === AttackType.STAND_CD || attackType === AttackType.JUMP_CD) {
       deps.vfx.spawnCharacterHitSparks(hitX, hitY, 16, '#ffaa00');
+      deps.vfx.spawnImpactRing(hitX, hitY);
       deps.vfx.spawnImpactRing(hitX, hitY);
       deps.screenFlash.trigger('#ffcc44', 0.15, 4);
     }

@@ -287,7 +287,7 @@ export function drawIntro(ctx: CanvasRenderingContext2D, phaseTimer: number, cur
 
 // ===== KO Screen =====
 
-export function drawKO(ctx: CanvasRenderingContext2D, winner: number | null, perfectPlayer: number | null = null, isTimeOver: boolean = false): void {
+export function drawKO(ctx: CanvasRenderingContext2D, winner: number | null, perfectPlayer: number | null = null, isTimeOver: boolean = false, p1Hp: number = 0, p2Hp: number = 0, maxHp: number = 1000): void {
   ctx.save();
 
   // Dark overlay with red vignette
@@ -346,6 +346,29 @@ export function drawKO(ctx: CanvasRenderingContext2D, winner: number | null, per
     // P标签 — SNK style
     const perfColor = perfectPlayer === 0 ? '#ff6644' : '#4488ff';
     drawSNKText(ctx, `P${perfectPlayer + 1}`, CANVAS_WIDTH / 2 - 80, CANVAS_HEIGHT / 2 + 100, 16, perfColor);
+  }
+
+  // KOF2002: Time Over时显示血量对比条
+  if (isTimeOver && winner !== null) {
+    const barY = CANVAS_HEIGHT / 2 + 85;
+    const barW = 200;
+    const barH = 12;
+    const barX = CANVAS_WIDTH / 2 - barW / 2;
+    const p1Ratio = Math.max(0, p1Hp / maxHp);
+    const p2Ratio = Math.max(0, p2Hp / maxHp);
+    ctx.fillStyle = 'rgba(0,0,0,0.6)';
+    roundRect(ctx, barX - 2, barY - 2, barW + 4, barH + 4, 4);
+    ctx.fill();
+    ctx.fillStyle = '#ff6644';
+    roundRect(ctx, barX, barY, barW * p1Ratio, barH, 3);
+    ctx.fill();
+    ctx.fillStyle = '#4488ff';
+    roundRect(ctx, barX + barW * p1Ratio, barY, barW * p2Ratio, barH, 3);
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(200,168,50,0.4)';
+    ctx.lineWidth = 1;
+    roundRect(ctx, barX, barY, barW, barH, 3);
+    ctx.stroke();
   }
 
   ctx.fillStyle = 'rgba(255,255,255,0.4)';
