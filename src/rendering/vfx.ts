@@ -171,6 +171,22 @@ export class VFXSystem {
     });
   }
 
+  /** Spawn "FIRST ATTACK!" text — shown on the first hit of a round */
+  spawnFirstAttackText(worldX: number, worldY: number): void {
+    this.particles.push({
+      x: worldX,
+      y: worldY,
+      vx: 0,
+      vy: -1.5,
+      life: 70,
+      maxLife: 70,
+      size: 22,
+      color: '#ffdd00',
+      type: 'text',
+      text: 'FIRST ATTACK!',
+    });
+  }
+
   /** Spawn landing dust particles */
   spawnDust(worldX: number, worldY: number): void {
     for (let i = 0; i < 6; i++) {

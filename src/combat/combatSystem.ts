@@ -15,6 +15,7 @@ import {
   STAGE_LEFT, STAGE_RIGHT,
   JUGGLE_POINTS_MAX, JUGGLE_COST_LIGHT, JUGGLE_COST_HEAVY, JUGGLE_COST_SPECIAL, JUGGLE_COST_DM,
 } from '../core/constants.js';
+import { CLOSE_RANGE } from '../core/types.js';
 import { FighterState, AttackType, JuggleState } from '../core/types.js';
 import type { HitLevel } from '../core/types.js';
 
@@ -315,6 +316,15 @@ export class CombatSystem {
     // Damage
     let damage = this.scaledDamage(data.damage, defIdx);
     let hitstunFrames: number = data.hitstun;
+
+    // Close range damage bonus: CLOSE_ attacks get +10% at point-blank range
+    const attackName = attackType as string;
+    if (attackName.startsWith('CLOSE_')) {
+      const dist = Math.abs(attacker.x - defender.x);
+      if (dist < CLOSE_RANGE * 0.5) {
+        damage = Math.round(damage * 1.1);
+      }
+    }
 
     if (counterHit) {
       damage = Math.round(damage * CH_DAMAGE_BONUS);

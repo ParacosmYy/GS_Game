@@ -87,6 +87,7 @@ let p2Team: TeamState | null = null;
 let teamMode = true; // 3v3 team mode
 let p1DelayedHealth = p1.maxHealth;
 let p2DelayedHealth = p2.maxHealth;
+let firstHitTracked = false;
 
 // ===== Update =====
 function update(): void {
@@ -151,7 +152,7 @@ function update(): void {
 
   if (phase === GamePhase.INTRO) {
     phaseTimer++;
-    if (phaseTimer >= INTRO_DURATION) { phase = GamePhase.FIGHTING; tickRef.value = 0; modeIndicatorTimer = 180; bgm.start(); }
+    if (phaseTimer >= INTRO_DURATION) { phase = GamePhase.FIGHTING; tickRef.value = 0; modeIndicatorTimer = 180; firstHitTracked = false; bgm.start(); }
     return;
   }
 
@@ -265,6 +266,13 @@ function update(): void {
   for (const proj of projectiles) proj.update();
   combatSystem.resolveAttacks(p1, p2, projectiles, onHit);
   combatSystem.tickThrowState(p1, p2, onHit);
+
+  // First Attack detection
+  if (!firstHitTracked && (combatSystem.getComboCount(0) > 0 || combatSystem.getComboCount(1) > 0)) {
+    firstHitTracked = true;
+    const hitter = combatSystem.getComboCount(0) > 0 ? p1 : p2;
+    vfx.spawnFirstAttackText(hitter.x, hitter.y - hitter.displayHeight - 40);
+  }
 
   const healthDecay = Math.max(p1.maxHealth, p2.maxHealth) * 0.005;
   if (p1DelayedHealth > p1.health) p1DelayedHealth = Math.max(p1.health, p1DelayedHealth - healthDecay);
