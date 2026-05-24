@@ -15,20 +15,22 @@ interface ProjectileVisuals {
   trailSpacing: number;
   pulseSpeed: number;
   pulseAmount: number;   // 0–1
+  energyLines: number;   // 旋转能量线数量
+  energySpeed: number;   // 能量线旋转速度
 }
 
 const VISUALS: Record<string, ProjectileVisuals> = {
-  kyo:   { baseRadius: 12, stretch: 1.6, groundHug: false, trailCount: 4, trailSpacing: 16, pulseSpeed: 8, pulseAmount: 0.25 },
-  iori:  { baseRadius: 11, stretch: 1.3, groundHug: false, trailCount: 3, trailSpacing: 14, pulseSpeed: 6, pulseAmount: 0.2 },
-  terry: { baseRadius: 10, stretch: 2.0, groundHug: true,  trailCount: 5, trailSpacing: 12, pulseSpeed: 10, pulseAmount: 0.15 },
-  kim:   { baseRadius: 10, stretch: 1.0, groundHug: false, trailCount: 3, trailSpacing: 14, pulseSpeed: 7, pulseAmount: 0.2 },
-  ryo:   { baseRadius: 13, stretch: 1.5, groundHug: false, trailCount: 4, trailSpacing: 15, pulseSpeed: 9, pulseAmount: 0.22 },
-  leona: { baseRadius: 11, stretch: 1.4, groundHug: false, trailCount: 4, trailSpacing: 14, pulseSpeed: 8, pulseAmount: 0.2 },
-  kdash: { baseRadius: 12, stretch: 1.5, groundHug: false, trailCount: 4, trailSpacing: 15, pulseSpeed: 9, pulseAmount: 0.2 },
-  kula:  { baseRadius: 11, stretch: 1.3, groundHug: false, trailCount: 3, trailSpacing: 14, pulseSpeed: 7, pulseAmount: 0.22 },
+  kyo:   { baseRadius: 12, stretch: 1.6, groundHug: false, trailCount: 4, trailSpacing: 16, pulseSpeed: 8, pulseAmount: 0.25, energyLines: 3, energySpeed: 0.15 },
+  iori:  { baseRadius: 11, stretch: 1.3, groundHug: false, trailCount: 3, trailSpacing: 14, pulseSpeed: 6, pulseAmount: 0.2, energyLines: 2, energySpeed: 0.12 },
+  terry: { baseRadius: 10, stretch: 2.0, groundHug: true,  trailCount: 5, trailSpacing: 12, pulseSpeed: 10, pulseAmount: 0.15, energyLines: 4, energySpeed: 0.2 },
+  kim:   { baseRadius: 10, stretch: 1.0, groundHug: false, trailCount: 3, trailSpacing: 14, pulseSpeed: 7, pulseAmount: 0.2, energyLines: 2, energySpeed: 0.1 },
+  ryo:   { baseRadius: 13, stretch: 1.5, groundHug: false, trailCount: 4, trailSpacing: 15, pulseSpeed: 9, pulseAmount: 0.22, energyLines: 3, energySpeed: 0.18 },
+  leona: { baseRadius: 11, stretch: 1.4, groundHug: false, trailCount: 4, trailSpacing: 14, pulseSpeed: 8, pulseAmount: 0.2, energyLines: 2, energySpeed: 0.14 },
+  kdash: { baseRadius: 12, stretch: 1.5, groundHug: false, trailCount: 4, trailSpacing: 15, pulseSpeed: 9, pulseAmount: 0.2, energyLines: 3, energySpeed: 0.16 },
+  kula:  { baseRadius: 11, stretch: 1.3, groundHug: false, trailCount: 3, trailSpacing: 14, pulseSpeed: 7, pulseAmount: 0.22, energyLines: 4, energySpeed: 0.1 },
 };
 
-const DEFAULT_VIS: ProjectileVisuals = { baseRadius: 10, stretch: 1.0, groundHug: false, trailCount: 3, trailSpacing: 14, pulseSpeed: 7, pulseAmount: 0.2 };
+const DEFAULT_VIS: ProjectileVisuals = { baseRadius: 10, stretch: 1.0, groundHug: false, trailCount: 3, trailSpacing: 14, pulseSpeed: 7, pulseAmount: 0.2, energyLines: 2, energySpeed: 0.15 };
 
 export function drawProjectiles(ctx: CanvasRenderingContext2D, projectiles: Projectile[], camera: Camera): void {
   for (const proj of projectiles) {
@@ -87,6 +89,21 @@ export function drawProjectiles(ctx: CanvasRenderingContext2D, projectiles: Proj
     ctx.beginPath();
     ctx.ellipse(sx, y, radius * 0.6 * vis.stretch, radius * 0.6, 0, 0, Math.PI * 2);
     ctx.fill();
+
+    // Rotating energy lines — KOF-style energy swirl
+    ctx.globalAlpha = 0.5 * fadeIn;
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 1.5;
+    const rotBase = proj.currentFrame * vis.energySpeed;
+    for (let e = 0; e < vis.energyLines; e++) {
+      const angle = rotBase + (e * Math.PI * 2 / vis.energyLines);
+      const innerR = radius * 0.3;
+      const outerR = radius * 0.9;
+      ctx.beginPath();
+      ctx.moveTo(sx + Math.cos(angle) * innerR * vis.stretch, y + Math.sin(angle) * innerR);
+      ctx.lineTo(sx + Math.cos(angle + 0.3) * outerR * vis.stretch, y + Math.sin(angle + 0.3) * outerR);
+      ctx.stroke();
+    }
 
     // Spawn burst ring (first 6 frames)
     if (proj.currentFrame < 6) {
