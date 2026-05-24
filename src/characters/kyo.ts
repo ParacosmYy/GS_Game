@@ -55,9 +55,21 @@ export const KyoDef: CharacterDefinition = {
   },
 
   poses: {
+    // 6帧呼吸待机 — 包含重心微移、手臂微动、头部摆动
+    // 帧序：中立 → 吸气(重心略升) → 呼气过渡 → 呼气(重心略降/微后倾) → 回升过渡 → 微前倾 → 回中
     [FighterState.IDLE]: [
-      pose({ armFront: bone(10, 20, 0.3), armBack: bone(-8, 15, -0.5), legFront: bone(6, 0, 0.1), legBack: bone(-6, 0, -0.1) }),
-      pose({ armFront: bone(10, 18, 0.28), armBack: bone(-8, 13, -0.48), legFront: bone(6, 0, 0.1), legBack: bone(-6, 0, -0.1), body: bone(0, -1) }),
+      // 帧0: 中立站姿 — 基准帧，双手自然下垂
+      pose({ head: bone(0, 0), body: bone(0, 0), armFront: bone(10, 20, 0.3), armBack: bone(-8, 15, -0.5), legFront: bone(6, 0, 0.1), legBack: bone(-6, 0, -0.1) }),
+      // 帧1: 吸气 — 身体微升，头微抬，前臂略收，后臂略开，重心微前
+      pose({ head: bone(0.5, -2, -0.03), body: bone(0, -2), armFront: bone(9, 18, 0.25), armBack: bone(-9, 14, -0.55), legFront: bone(6, -1, 0.12), legBack: bone(-6, 1, -0.08) }),
+      // 帧2: 吸气顶点 — 最大升高，头最高，前臂进一步收紧，重心最前
+      pose({ head: bone(0.3, -3, -0.04), body: bone(0.5, -3), armFront: bone(8, 16, 0.22), armBack: bone(-10, 13, -0.58), legFront: bone(7, -1, 0.14), legBack: bone(-5, 1, -0.06) }),
+      // 帧3: 呼气过渡 — 开始下沉，头前倾微点，手臂开始放松
+      pose({ head: bone(0.8, -1, 0.02), body: bone(0, -1), armFront: bone(10, 19, 0.28), armBack: bone(-8, 15, -0.5), legFront: bone(6, 0, 0.1), legBack: bone(-6, 0, -0.1) }),
+      // 帧4: 呼气 — 身体微沉，头微低，重心微后移，前臂微外展，后臂放松
+      pose({ head: bone(-0.5, 2, 0.05), body: bone(-0.5, 2), armFront: bone(11, 22, 0.35), armBack: bone(-7, 17, -0.45), legFront: bone(5, 1, 0.08), legBack: bone(-7, -1, -0.12) }),
+      // 帧5: 呼气底点 — 最大下沉，后倾最明显，手臂最放松
+      pose({ head: bone(-0.8, 3, 0.06), body: bone(-0.8, 3), armFront: bone(12, 24, 0.38), armBack: bone(-6, 18, -0.42), legFront: bone(5, 2, 0.06), legBack: bone(-7, -1, -0.14) }),
     ],
     [FighterState.WALK]: [
       // 4帧走步循环 — 腿交替前后摆动
@@ -175,6 +187,15 @@ export const KyoDef: CharacterDefinition = {
       legFront: bone(3, -2, 0.1),
       legBack: bone(-4, 0, -0.15),
     }),
+  },
+
+  proportions: {
+    headW: 44, headH: 44,
+    torsoW: 56, torsoH: 68,
+    armW: 22, armH: 48,
+    legW: 26, legH: 60,
+    shoulderY: 16, hipY: 60,
+    torsoCenterY: 34, headCenterY: 8,
   },
 
   routeSpecial(input, cmdBuf, tick, _hasChargeRelease = false) {

@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { Fighter } from '../src/entities/fighter.js';
 import { FighterState, AttackType, JuggleState } from '../src/core/types.js';
-import { MAX_HEALTH, STAGE_GROUND_Y, FIGHTER_WIDTH } from '../src/core/constants.js';
+import { MAX_HEALTH, STAGE_GROUND_Y, FIGHTER_WIDTH, THROW_INVINCIBILITY_WAKEUP, THROW_INVINCIBILITY_POST_STUN, THROW_INVINCIBILITY_POST_ESCAPE } from '../src/core/constants.js';
 
 describe('Fighter', () => {
   function createFighter(x = 400): Fighter {
@@ -213,6 +213,180 @@ describe('Fighter', () => {
       // 非攻击状态应该返回默认受击框
       const normal = f.getEffectiveHurtbox();
       expect(normal).toEqual(f.getHurtbox());
+    });
+  });
+
+  describe('投技判定框系统', () => {
+    it('非攻击状态时 getThrowbox() 应该返回 null', () => {
+      const f = createFighter();
+      expect(f.getThrowbox()).toBeNull();
+    });
+
+    it('attackPhase 不是 active 时 getThrowbox() 应该返回 null', () => {
+      const f = createFighter();
+      f.startAttack(AttackType.THROW_FORWARD);
+      // startup 阶段
+      expect(f.attackPhase).toBe('startup');
+      expect(f.getThrowbox()).toBeNull();
+    });
+
+    it('THROW_FORWARD 在 active 阶段应该返回投技判定框', () => {
+      const f = createFighter();
+      f.startAttack(AttackType.THROW_FORWARD);
+      f.attackPhase = 'active';
+      f.attackFrame = 0;
+      const box = f.getThrowbox();
+      expect(box).not.toBeNull();
+      expect(box!.width).toBeGreaterThan(0);
+      expect(box!.height).toBeGreaterThan(0);
+    });
+
+    it('THROW_BACK 在 active 阶段应该返回投技判定框', () => {
+      const f = createFighter();
+      f.startAttack(AttackType.THROW_BACK);
+      f.attackPhase = 'active';
+      f.attackFrame = 0;
+      const box = f.getThrowbox();
+      expect(box).not.toBeNull();
+      expect(box!.width).toBeGreaterThan(0);
+      expect(box!.height).toBeGreaterThan(0);
+    });
+
+    it('throwInvulnFrames > 0 时 getThrowbox() 应该返回 null', () => {
+      const f = createFighter();
+      f.startAttack(AttackType.THROW_FORWARD);
+      f.attackPhase = 'active';
+      f.attackFrame = 0;
+      f.throwInvulnFrames = 5;
+      expect(f.getThrowbox()).toBeNull();
+    });
+  });
+
+  describe('投技可被抓状态', () => {
+    it('IDLE 状态下 isThrowVulnerable() 应该返回 true', () => {
+      const f = createFighter();
+      f.state = FighterState.IDLE;
+      expect(f.isThrowVulnerable()).toBe(true);
+    });
+
+    it('HITSTUN 状态下 isThrowVulnerable() 应该返回 false', () => {
+      const f = createFighter();
+      f.state = FighterState.HITSTUN;
+      expect(f.isThrowVulnerable()).toBe(false);
+    });
+
+    it('KNOCKDOWN 状态下 isThrowVulnerable() 应该返回 false', () => {
+      const f = createFighter();
+      f.state = FighterState.KNOCKDOWN;
+      expect(f.isThrowVulnerable()).toBe(false);
+    });
+
+    it('BLOCK 状态下 isThrowVulnerable() 应该返回 false', () => {
+      const f = createFighter();
+      f.state = FighterState.BLOCK;
+      expect(f.isThrowVulnerable()).toBe(false);
+    });
+
+    it('ROLL 状态下 isThrowVulnerable() 应该返回 false', () => {
+      const f = createFighter();
+      f.state = FighterState.ROLL;
+      expect(f.isThrowVulnerable()).toBe(false);
+    });
+
+    it('throwInvulnFrames > 0 时 isThrowVulnerable() 应该返回 false', () => {
+      const f = createFighter();
+      f.state = FighterState.IDLE;
+      f.throwInvulnFrames = 3;
+      expect(f.isThrowVulnerable()).toBe(false);
+    });
+  });
+
+  describe('无敌状态', () => {
+    it('正常状态下 getEffectiveHurtbox() 应该返回受击框', () => {
+      const f = createFighter();
+      const hurtbox = f.getEffectiveHurtbox();
+      expect(hurtbox).not.toBeNull();
+      expect(hurtbox).toEqual(f.getHurtbox());
+    });
+
+    it('invincible=true 时 getEffectiveHurtbox() 应该返回 null', () => {
+      const f = createFighter();
+      f.invincible = true;
+      expect(f.getEffectiveHurtbox()).toBeNull();
+    });
+
+    it('reset() 应该清除 invincible 和 throwInvulnFrames', () => {
+      const f = createFighter();
+      f.invincible = true;
+      f.throwInvulnFrames = 10;
+      f.reset(400);
+      expect(f.invincible).toBe(false);
+      expect(f.throwInvulnFrames).toBe(0);
+    });
+  });
+
+  describe('投技无敌帧衰减', () => {
+    it('tickAttack() 每次调用应该递减 throwInvulnFrames', () => {
+      const f = createFighter();
+      f.startAttack(AttackType.STAND_A);
+      f.throwInvulnFrames = 3;
+      f.tickAttack();
+      expect(f.throwInvulnFrames).toBe(2);
+      f.tickAttack();
+      expect(f.throwInvulnFrames).toBe(1);
+      f.tickAttack();
+      expect(f.throwInvulnFrames).toBe(0);
+    });
+
+    it('throwInvulnFrames 不应该低于 0', () => {
+      const f = createFighter();
+      f.startAttack(AttackType.STAND_A);
+      f.throwInvulnFrames = 1;
+      f.tickAttack();
+      expect(f.throwInvulnFrames).toBe(0);
+      f.tickAttack();
+      expect(f.throwInvulnFrames).toBe(0);
+    });
+  });
+
+  describe('投技拆投状态 (Throw Escape State)', () => {
+    it('初始状态不应该处于被投状态', () => {
+      const f = createFighter();
+      expect(f.isBeingThrown).toBe(false);
+      expect(f.throwEscapeTimer).toBe(0);
+    });
+
+    it('初始状态不应该处于投人状态', () => {
+      const f = createFighter();
+      expect(f.isThrowing).toBe(false);
+      expect(f.throwVictim).toBeNull();
+    });
+
+    it('reset() 应该清除投技相关状态', () => {
+      const f = createFighter();
+      f.isBeingThrown = true;
+      f.throwEscapeTimer = 8;
+      f.isThrowing = true;
+      f.throwVictim = createFighter(500);
+      f.reset(400);
+      expect(f.isBeingThrown).toBe(false);
+      expect(f.throwEscapeTimer).toBe(0);
+      expect(f.isThrowing).toBe(false);
+      expect(f.throwVictim).toBeNull();
+    });
+  });
+
+  describe('投技无敌常量验证 (KOF2002 Authentic)', () => {
+    it('WAKEUP 投技无敌应为 9 帧 (KOF2002标准)', () => {
+      expect(THROW_INVINCIBILITY_WAKEUP).toBe(9);
+    });
+
+    it('POST_STUN 投技无敌应为 9 帧', () => {
+      expect(THROW_INVINCIBILITY_POST_STUN).toBe(9);
+    });
+
+    it('POST_ESCAPE 投技无敌应为 6 帧', () => {
+      expect(THROW_INVINCIBILITY_POST_ESCAPE).toBe(6);
     });
   });
 });

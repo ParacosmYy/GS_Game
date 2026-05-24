@@ -9,11 +9,12 @@ import {
   FRAME_DATA, THROW_RANGE, THROW_DISTANCE,
   CHIP_DAMAGE_RATIO,
   CH_HITSTUN_BONUS, CH_DAMAGE_BONUS,
-  DAMAGE_SCALE_STEP, DAMAGE_SCALE_MIN,
+  DAMAGE_SCALE_STEP, DAMAGE_SCALE_MIN, COMBO_TIMEOUT,
   COUNTER_WIRE_BOUNCE_VX, COUNTER_WIRE_BOUNCE_VY,
   LIGHT_NORMALS, NORMAL_ATTACKS, COMMAND_NORMALS,
   STAGE_LEFT, STAGE_RIGHT,
   JUGGLE_POINTS_MAX, JUGGLE_COST_LIGHT, JUGGLE_COST_HEAVY, JUGGLE_COST_SPECIAL, JUGGLE_COST_DM,
+  THROW_INVINCIBILITY_POST_ESCAPE,
 } from '../core/constants.js';
 import { CLOSE_RANGE } from '../core/types.js';
 import { FighterState, AttackType, JuggleState } from '../core/types.js';
@@ -29,20 +30,36 @@ export type HitCallback = (
   counterHit: boolean,
 ) => void;
 
+export type ThrowEscapeCallback = (
+  attacker: Fighter, defender: Fighter,
+  hitX: number, hitY: number,
+) => void;
+
+export type GuardCrushCallback = (
+  fighter: Fighter,
+  hitX: number, hitY: number,
+) => void;
+
 export class CombatSystem {
   private inputManager: InputManager;
   private prev: [PrevAttack, PrevAttack] = [createPrevAttack(), createPrevAttack()];
   private fighters: [Fighter, Fighter] | null = null;
   defenderControllers: [FighterController, FighterController] | null = null;
-  // Damage scaling combo tracking (per defender: [comboCount, scaledDamageTotal])
+  onThrowEscape: ThrowEscapeCallback | null = null;
+  onGuardCrush: GuardCrushCallback | null = null;
+  // Damage scaling combo tracking (per defender)
   private comboHits = [0, 0];
+  // 连击超时: 最后一次命中帧数, 超过COMBO_TIMEOUT帧未命中则重置
+  private lastHitFrame = [0, 0];
+  private currentFrame = 0;
 
   constructor(inputManager: InputManager) {
     this.inputManager = inputManager;
   }
 
-  resolveAttacks(p1: Fighter, p2: Fighter, projectiles: Projectile[], onHit?: HitCallback): void {
+  resolveAttacks(p1: Fighter, p2: Fighter, projectiles: Projectile[], onHit?: HitCallback, currentFrame: number = 0): void {
     this.fighters = [p1, p2];
+    this.currentFrame = currentFrame;
     this.resolveHit(p1, p2, onHit);
     this.resolveHit(p2, p1, onHit);
     this.resolveProjectileHits(p1, p2, projectiles, onHit);
@@ -67,9 +84,19 @@ export class CombatSystem {
     return this.comboHits[playerIndex];
   }
 
+  /** 每帧调用: 检查连击超时, 超过COMBO_TIMEOUT帧未命中则重置连击 */
+  tickComboTimeout(currentFrame: number): void {
+    for (let i = 0; i < 2; i++) {
+      if (this.comboHits[i] > 0 && currentFrame - this.lastHitFrame[i] > COMBO_TIMEOUT) {
+        this.comboHits[i] = 0;
+      }
+    }
+  }
+
   reset(): void {
     this.prev = [createPrevAttack(), createPrevAttack()];
     this.comboHits = [0, 0];
+    this.lastHitFrame = [0, 0];
   }
 
   /**
@@ -93,14 +120,14 @@ export class CombatSystem {
 
       // Check for throw escape: defender presses throw during escape window
       if (defInput.throwAttackPressed && defender.throwEscapeTimer >= 0) {
-        // Successful throw escape!
         const attacker = fighters[1 - i];
+        const hitX = (attacker.x + defender.x) / 2;
+        const hitY = (attacker.y + defender.y) / 2 - attacker.displayHeight / 2;
 
         // Push both apart
         const pushDir = attacker.facing;
         attacker.x -= THROW_ESCAPE_PUSH * pushDir * 0.5;
         defender.x += THROW_ESCAPE_PUSH * pushDir * 0.5;
-        // Clamp to stage bounds
         attacker.x = Math.max(STAGE_LEFT, Math.min(attacker.x, STAGE_RIGHT));
         defender.x = Math.max(STAGE_LEFT, Math.min(defender.x, STAGE_RIGHT));
 
@@ -113,6 +140,13 @@ export class CombatSystem {
         defender.state = FighterState.IDLE;
         defender.isKnockedDown = false;
 
+        // Post-escape throw invincibility
+        attacker.throwInvulnFrames = THROW_INVINCIBILITY_POST_ESCAPE;
+        defender.throwInvulnFrames = THROW_INVINCIBILITY_POST_ESCAPE;
+
+        // VFX + audio callback
+        this.onThrowEscape?.(attacker, defender, hitX, hitY);
+
         escaped = true;
         break;
       }
@@ -120,7 +154,6 @@ export class CombatSystem {
       // Timer expired — resolve throw as damage + hard knockdown
       if (defender.throwEscapeTimer <= 0) {
         const attacker = fighters[1 - i];
-        // 根据投技类型选择帧数据
         const throwType = attacker.currentAttack;
         const data = (throwType === AttackType.THROW_FORWARD || throwType === AttackType.THROW_BACK)
           ? FRAME_DATA[throwType as keyof typeof FRAME_DATA] ?? FRAME_DATA[AttackType.THROW]
@@ -130,7 +163,6 @@ export class CombatSystem {
 
         defender.health = Math.max(0, defender.health - damage);
         defender.applyKnockdown(30, true);
-        // 使用投技方向（前投向前飞，后投向后飞）
         const throwDir = defender.throwDirection;
         defender.x = Math.max(STAGE_LEFT, Math.min(attacker.x + THROW_DISTANCE * throwDir, STAGE_RIGHT));
         defender.isBeingThrown = false;
@@ -139,6 +171,7 @@ export class CombatSystem {
         attacker.throwVictim = null;
 
         this.comboHits[defIdx]++;
+        this.lastHitFrame[defIdx] = this.currentFrame;
         onHit?.(attacker, defender, AttackType.THROW, false, false);
       }
     }
@@ -162,12 +195,57 @@ export class CombatSystem {
   }
 
   private resolveHit(attacker: Fighter, defender: Fighter, onHit?: HitCallback): void {
-    // 使用多框判定：检查攻击者的所有攻击框
-    const hitboxes = attacker.getActiveHitboxes();
-    if (hitboxes.length === 0 || attacker.hasHit) return;
+    const attackType = attacker.currentAttack;
+    if (!attackType || attacker.hasHit) return;
 
-    // 使用受击框覆盖（出招时身体可能缩小）
+    const data = FRAME_DATA[attackType as keyof typeof FRAME_DATA];
+
+    // === 投技判定通道: Throwbox vs Hurtbox ===
+    const throwbox = attacker.getThrowbox();
+    if (throwbox) {
+      if (!defender.isThrowVulnerable()) return;
+      const defenderHurt = defender.getEffectiveHurtbox() ?? defender.getHurtbox();
+      if (!aabbCheck(throwbox, defenderHurt)) return;
+
+      attacker.hasHit = true;
+
+      // 指令投(不可拆投): 直接结算伤害
+      const attackerCtrl = this.defenderControllers?.[this.fighters?.[0] === attacker ? 0 : 1];
+      if (attackerCtrl?.charDef?.isCommandThrow?.(attackType)) {
+        const defIdx = this.fighters ? (this.fighters[0] === defender ? 0 : 1) : 0;
+        const damage = this.scaledDamage(data.damage, defIdx);
+        defender.health = Math.max(0, defender.health - damage);
+        this.comboHits[defIdx]++;
+        this.lastHitFrame[defIdx] = this.currentFrame;
+        if (attackType === AttackType.IORI_KUZUKAZE) {
+          const tempX = attacker.x;
+          attacker.x = defender.x;
+          defender.x = tempX;
+        }
+        defender.state = FighterState.KNOCKDOWN;
+        defender.isKnockedDown = true;
+        defender.vx = 0; defender.vy = 0;
+        onHit?.(attacker, defender, attackType, false, false);
+        return;
+      }
+
+      // 普通投(可拆投): 进入拆投窗口
+      const throwDir: 1 | -1 = attackType === AttackType.THROW_BACK ? (-attacker.facing as 1 | -1) : attacker.facing;
+      attacker.isThrowing = true;
+      attacker.throwVictim = defender;
+      defender.isBeingThrown = true;
+      defender.throwEscapeTimer = THROW_ESCAPE_WINDOW;
+      defender.throwDirection = throwDir;
+      defender.x = Math.max(STAGE_LEFT, Math.min(attacker.x + THROW_DISTANCE * throwDir, STAGE_RIGHT));
+      return;
+    }
+
+    // === 攻击判定通道: Hitbox vs Hurtbox ===
+    const hitboxes = attacker.getActiveHitboxes();
+    if (hitboxes.length === 0) return;
+
     const hurtbox = defender.getEffectiveHurtbox();
+    if (!hurtbox) return; // 完全无敌,跳过
 
     let hit = false;
     for (const hitbox of hitboxes) {
@@ -175,62 +253,9 @@ export class CombatSystem {
     }
     if (!hit) return;
 
-    const attackType = attacker.currentAttack;
-    if (!attackType) return;
-    const data = FRAME_DATA[attackType as keyof typeof FRAME_DATA];
-
     attacker.hasHit = true;
 
-    // Throw handling — Phase 1: setup throw with escape window
-    if (attackType === AttackType.THROW || attackType === AttackType.THROW_FORWARD || attackType === AttackType.THROW_BACK) {
-      const dist = Math.abs(attacker.x - defender.x);
-      if (dist > THROW_RANGE || !defender.isGrounded()) return;
-      // Throw invincibility check
-      if (defender.throwInvincibilityTimer > 0) return;
-      // Determine throw direction
-      const throwDir: 1 | -1 = attackType === AttackType.THROW_BACK ? (-attacker.facing as 1 | -1) : attacker.facing;
-      // Phase 1: freeze both, start escape window
-      attacker.isThrowing = true;
-      attacker.throwVictim = defender;
-      attacker.hasHit = true;
-      defender.isBeingThrown = true;
-      defender.throwEscapeTimer = THROW_ESCAPE_WINDOW;
-      defender.throwDirection = throwDir;
-      // Position defender at throw point
-      defender.x = Math.max(STAGE_LEFT, Math.min(attacker.x + THROW_DISTANCE * throwDir, STAGE_RIGHT));
-      return;
-    }
-
-    // Command throw handling — character-specific throws that bypass escape window
-    const attackerCtrl = this.defenderControllers?.[this.fighters?.[0] === attacker ? 0 : 1];
-    if (attackerCtrl?.charDef?.isCommandThrow?.(attackType)) {
-      const dist = Math.abs(attacker.x - defender.x);
-      if (dist > THROW_RANGE * 1.2 || !defender.isGrounded()) return;
-      if (defender.throwInvincibilityTimer > 0) return;
-      // Command throw: no escape window, instant effect
-      attacker.hasHit = true;
-      const data = FRAME_DATA[attackType as keyof typeof FRAME_DATA];
-      const defIdx = this.fighters ? (this.fighters[0] === defender ? 0 : 1) : 0;
-      const damage = this.scaledDamage(data.damage, defIdx);
-      defender.health = Math.max(0, defender.health - damage);
-      this.comboHits[defIdx]++;
-      // Kuzukaze special: swap positions
-      if (attackType === AttackType.IORI_KUZUKAZE) {
-        const tempX = attacker.x;
-        attacker.x = defender.x;
-        defender.x = tempX;
-        // Attacker faces the same direction, defender is now behind
-        defender.state = FighterState.HITSTUN;
-        defender.hitstunTimer = 16; // +16f advantage for attacker
-        defender.vx = 0;
-      } else {
-        defender.applyKnockdown(25);
-      }
-      onHit?.(attacker, defender, attackType, false, false);
-      return;
-    }
-
-    // Roll invincibility check (attacks pass through, throws don't)
+    // Roll invincibility check (attacks pass through)
     if (defender.isRolling()) return;
 
     // B7: Juggle check — if defender is airborne, check juggle budget
@@ -275,6 +300,9 @@ export class CombatSystem {
         defender.guardCrushTimer = GUARD_CRUSH_DURATION;
         defender.vx = data.pushback * (defender.facing === 1 ? -1 : 1) * 1.5;
         defender.resetAttackState();
+        const hitX = (attacker.x + defender.x) / 2;
+        const hitY = defender.y - defender.displayHeight / 2;
+        this.onGuardCrush?.(defender, hitX, hitY);
       } else {
         defender.applyBlockstun(data.blockstun, data.pushback);
       }
@@ -308,6 +336,7 @@ export class CombatSystem {
           defender.vx = 0;
           onHit?.(defender, attacker, counterConfig.counterAttack, false, true);
           this.comboHits[defIdx]++;
+          this.lastHitFrame[defIdx] = this.currentFrame;
           return;
         }
       }
@@ -332,6 +361,7 @@ export class CombatSystem {
     }
 
     this.comboHits[defIdx]++;
+    this.lastHitFrame[defIdx] = this.currentFrame;
 
     defender.health = Math.max(0, defender.health - damage);
 
@@ -349,9 +379,10 @@ export class CombatSystem {
       defender.isKnockedDown = false;
     } else if (data.knockdown && !isCancelledCmdNormal) {
       defender.applyKnockdown(25);
-      // Launch into air: give juggle budget for follow-up
+      // 浮空追打: 击飞时给予完整的juggle预算和FULL状态
       if (!defender.isGrounded()) {
         defender.jugglePoints = JUGGLE_POINTS_MAX;
+        defender.juggleState = JuggleState.FULL;
       }
     } else {
       defender.applyHitstun(hitstunFrames, data.pushback);
@@ -386,7 +417,7 @@ export class CombatSystem {
         if (i === proj.ownerId) continue;
         const defender = fighters[i];
         const attacker = fighters[1 - i];
-        if (!aabbCheck(hitbox, defender.getHurtbox())) continue;
+        if (!aabbCheck(hitbox, defender.getEffectiveHurtbox() ?? defender.getHurtbox())) continue;
 
         // Roll invincibility
         if (defender.isRolling()) { proj.active = false; break; }
@@ -405,6 +436,9 @@ export class CombatSystem {
             defender.guardCrushTimer = GUARD_CRUSH_DURATION;
             defender.vx = data.pushback * (defender.facing === 1 ? -1 : 1) * 1.5;
             defender.resetAttackState();
+            const hitX = (attacker.x + defender.x) / 2;
+            const hitY = defender.y - defender.displayHeight / 2;
+            this.onGuardCrush?.(defender, hitX, hitY);
           } else {
             defender.applyBlockstun(data.blockstun, data.pushback);
           }
@@ -416,6 +450,7 @@ export class CombatSystem {
         } else {
           const damage = this.scaledDamage(data.damage, i);
           this.comboHits[i]++;
+          this.lastHitFrame[i] = this.currentFrame;
           defender.health = Math.max(0, defender.health - damage);
           defender.applyHitstun(data.hitstun, data.pushback);
           onHit?.(attacker, defender, AttackType.SPECIAL_PROJECTILE, false, false);

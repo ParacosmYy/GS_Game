@@ -21,6 +21,7 @@ import {
   THROW_INVINCIBILITY_WAKEUP,
   THROW_INVINCIBILITY_JUMP_STARTUP,
   THROW_INVINCIBILITY_LANDING,
+  FRAME_DATA,
 } from '../core/constants.js';
 import { FighterState, AttackType, CLOSE_RANGE, JuggleState } from '../core/types.js';
 import type { PowerGauge, MaxModeState, CounterConfig } from '../core/types.js';
@@ -147,6 +148,9 @@ export class FighterController {
         // Spawn wall impact sparks at bounce point
         const wallX = f.x <= leftBound ? leftBound : rightBound;
         this.vfx.spawnCounterWireSparks(wallX, f.y - f.displayHeight / 2);
+        // Re-enable juggle state after wall bounce (can follow up)
+        f.juggleState = JuggleState.FULL;
+        f.jugglePoints = 3; // limited follow-up budget after wall bounce
       }
     } else if (f.state === FighterState.HITSTUN || f.state === FighterState.BLOCK
         || f.state === FighterState.KNOCKDOWN || f.state === FighterState.GUARD_CRUSH) {
@@ -296,7 +300,7 @@ export class FighterController {
     return !FighterController.isSpecialMove(name) && !FighterController.isDM(name);
   }
 
-  // ─── Proximity Guard (P9-E) ───
+  // ─── Proximity Guard (KOF2002正版) ───
 
   /** Check and apply proximity guard. Returns true if guard was triggered (skip normal update). */
   private checkProximityGuard(input: ResolvedInput): boolean {
@@ -304,10 +308,10 @@ export class FighterController {
     const f = this.fighter;
     const opp = this.opponent;
 
-    // Opponent must be in active phase (not just startup — 正版KOF只在攻击判定生效时触发)
-    if (!opp.currentAttack || opp.attackPhase !== 'active') return false;
+    // 对手必须在攻击中(startup或active都触发proximity guard)
+    if (!opp.currentAttack || (opp.attackPhase !== 'active' && opp.attackPhase !== 'startup')) return false;
 
-    // Player must be in a blockable state
+    // 玩家必须在可防御状态
     if (!f.canBlock()) return false;
 
     // 如果玩家在按攻击键，不触发proximity guard — 允许玩家选择攻击而非防御
@@ -324,6 +328,13 @@ export class FighterController {
       const holdingDownBack = holdingDown && holdingBack;
 
       if (holdingBack || holdingDownBack) {
+        // 检查hitLevel: LOW攻击必须蹲防, HIGH攻击必须站防
+        const oppData = FRAME_DATA[oppAtkName as keyof typeof FRAME_DATA];
+        if (oppData) {
+          const hitLevel = oppData.hitLevel;
+          if (hitLevel === 'LOW' && !holdingDown) return false; // 下段攻击必须蹲防
+          // HIGH(空中攻击)站防蹲防皆可 — 不阻止
+        }
         f.state = FighterState.BLOCK;
         f.blockType = holdingDownBack ? 'LOW' : 'HIGH';
         f.displayHeight = holdingDown ? 50 : 100;

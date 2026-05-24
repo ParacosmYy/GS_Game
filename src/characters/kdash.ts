@@ -45,10 +45,20 @@ export const KdashDef: CharacterDefinition = {
   },
 
   poses: {
-    // 待机 — K' 特有的懒散/挑衅站姿：手臂下垂，重心后倾
+    // 待机 — K' 特有的懒散/挑衅站姿：手臂下垂，重心后倾，hands-in-pockets attitude
     [FighterState.IDLE]: [
-      pose({ armFront: bone(12, 20, 0.08), armBack: bone(-10, 18, -0.35), legFront: bone(8, 0, 0.1), legBack: bone(-6, 0, -0.14), body: bone(-2, 0, -0.04) }),
-      pose({ armFront: bone(12, 18, 0.06), armBack: bone(-10, 16, -0.33), legFront: bone(8, 0, 0.1), legBack: bone(-6, 0, -0.14), body: bone(-2, -1, -0.04) }),
+      // Frame 0: 中性 — 微微驼背，一手略微抬起，无聊的神态
+      pose({ armFront: bone(12, 20, 0.08), armBack: bone(-10, 18, -0.35), legFront: bone(8, 0, 0.1), legBack: bone(-6, 0, -0.14), body: bone(-2, 0, -0.04), head: bone(1, 0, -0.02) }),
+      // Frame 1: 微吸气 — 几乎不动，太酷了不在乎
+      pose({ armFront: bone(12, 19, 0.07), armBack: bone(-10, 17, -0.34), legFront: bone(8, 0, 0.1), legBack: bone(-6, 0, -0.14), body: bone(-2, -1, -0.04), head: bone(1, -1, -0.02) }),
+      // Frame 2: 吸气顶部 — 肩膀微微抬起
+      pose({ armFront: bone(12, 18, 0.06), armBack: bone(-10, 16, -0.33), legFront: bone(8, 0, 0.1), legBack: bone(-6, 0, -0.14), body: bone(-2, -1, -0.03), head: bone(1, -1, -0.01) }),
+      // Frame 3: 呼气开始 — 肩膀滚动，手部调整
+      pose({ armFront: bone(13, 19, 0.09), armBack: bone(-10, 17, -0.36), legFront: bone(8, 0, 0.1), legBack: bone(-6, 0, -0.14), body: bone(-2, 0, -0.04), head: bone(1, 0, -0.02) }),
+      // Frame 4: 呼气中 — 肩膀滚动继续
+      pose({ armFront: bone(13, 20, 0.08), armBack: bone(-9, 18, -0.34), legFront: bone(8, 0, 0.1), legBack: bone(-6, 0, -0.14), body: bone(-2, 0, -0.05), head: bone(0, 0, -0.03) }),
+      // Frame 5: 呼气结束 — 安顿，手放回口袋
+      pose({ armFront: bone(12, 20, 0.08), armBack: bone(-10, 18, -0.35), legFront: bone(8, 0, 0.1), legBack: bone(-6, 0, -0.14), body: bone(-2, 0, -0.04), head: bone(1, 0, -0.02) }),
     ],
     // 步行 — 手臂自然摆动，步伐放松
     [FighterState.WALK]: [
@@ -181,6 +191,16 @@ export const KdashDef: CharacterDefinition = {
       legFront: bone(4, -2, 0.08),
       legBack: bone(-5, 0, -0.12),
     }),
+  },
+
+  // K' 体型：183cm 高瘦，年轻体态，肩宽但四肢细
+  proportions: {
+    headW: 42, headH: 43,
+    torsoW: 54, torsoH: 70,
+    armW: 18, armH: 50,
+    legW: 22, legH: 62,
+    shoulderY: 17, hipY: 62,
+    torsoCenterY: 35, headCenterY: 8,
   },
 
   routeSpecial(input, cmdBuf, tick, _hasChargeRelease = false) {

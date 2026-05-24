@@ -41,8 +41,18 @@ export const RyoDef: CharacterDefinition = {
 
   poses: {
     [FighterState.IDLE]: [
+      // Frame 0: 中立 — 宽站姿，双拳准备，重心居中
       pose({ armFront: bone(10, 18, 0.25), armBack: bone(-8, 16, -0.45), legFront: bone(7, 0, 0.12), legBack: bone(-5, 0, -0.12) }),
-      pose({ armFront: bone(10, 16, 0.23), armBack: bone(-8, 14, -0.43), legFront: bone(7, 0, 0.12), legBack: bone(-5, 0, -0.12), body: bone(0, -1) }),
+      // Frame 1: 吸气开始 — 身体微升，胸膛扩张，力量蓄积
+      pose({ armFront: bone(10, 16, 0.23), armBack: bone(-8, 14, -0.43), legFront: bone(7, -1, 0.1), legBack: bone(-5, -1, -0.1), body: bone(0, -2) }),
+      // Frame 2: 吸气巅峰 — 最大上升，拳位收紧
+      pose({ armFront: bone(9, 15, 0.2), armBack: bone(-7, 13, -0.4), legFront: bone(6, -1, 0.08), legBack: bone(-4, -1, -0.08), body: bone(0, -3), head: bone(0, -1) }),
+      // Frame 3: 过渡 — 开始下沉
+      pose({ armFront: bone(10, 17, 0.24), armBack: bone(-8, 15, -0.44), legFront: bone(7, 0, 0.11), legBack: bone(-5, 0, -0.11), body: bone(0, -1) }),
+      // Frame 4: 呼气下沉 — 重心下沉，扎根地面
+      pose({ armFront: bone(11, 20, 0.28), armBack: bone(-9, 18, -0.48), legFront: bone(8, 1, 0.14), legBack: bone(-6, 1, -0.14), body: bone(0, 2) }),
+      // Frame 5: 呼气完成 — 最大下沉，力量沉稳
+      pose({ armFront: bone(12, 21, 0.3), armBack: bone(-9, 19, -0.5), legFront: bone(8, 2, 0.15), legBack: bone(-6, 2, -0.15), body: bone(0, 3), head: bone(0, 1) }),
     ],
     [FighterState.WALK]: [
       pose({ legFront: bone(10, -2, 0.22), legBack: bone(-4, 2, -0.18), armFront: bone(8, 20, 0.15), armBack: bone(-6, 18, -0.38) }),
@@ -156,6 +166,15 @@ export const RyoDef: CharacterDefinition = {
       legFront: bone(3, -2, 0.1),
       legBack: bone(-4, 0, -0.15),
     }),
+  },
+
+  proportions: {
+    headW: 46, headH: 46,
+    torsoW: 64, torsoH: 64,
+    armW: 28, armH: 44,
+    legW: 30, legH: 56,
+    shoulderY: 14, hipY: 54,
+    torsoCenterY: 30, headCenterY: 7,
   },
 
   routeSpecial(input, cmdBuf, tick, _hasChargeRelease = false) {

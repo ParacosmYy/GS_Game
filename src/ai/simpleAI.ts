@@ -239,6 +239,7 @@ export class SimpleAI {
       throwAttackPressed: false,
       punchPressed: false, kickPressed: false,
       rollPressed: false, blowbackPressed: false,
+      punchJustReleased: false, kickJustReleased: false,
     };
   }
 

@@ -12,8 +12,16 @@
 import type { AttackFrame, AttackFrameTable } from './types.js';
 import { AttackType } from './types.js';
 
-const F: (attack: Array<{ ox: number; oy: number; w: number; h: number }>, body?: { ox: number; oy: number; w: number; h: number }) => AttackFrame =
-  (attack, body) => ({ attack, bodyOverride: body ?? null });
+const F: (
+  attack: Array<{ ox: number; oy: number; w: number; h: number }>,
+  body?: { ox: number; oy: number; w: number; h: number } | null,
+  throwBoxes?: Array<{ ox: number; oy: number; w: number; h: number }>,
+) => AttackFrame =
+  (attack, body, throwBoxes) => {
+    const frame: AttackFrame = { attack, bodyOverride: body ?? null };
+    if (throwBoxes) frame.throwBoxes = throwBoxes;
+    return frame;
+  };
 
 // ===== 站立远距离攻击 (Far Stand) =====
 // 出招时身体前倾，攻击框随帧前移
@@ -163,9 +171,22 @@ const JUMP_D_FRAMES: AttackFrame[] = [
 ];
 
 // ===== 投技 =====
+// 通用投：throw detection box 覆盖前方近距离
 const THROW_FRAMES: AttackFrame[] = [
-  F([{ ox: 10, oy: -60, w: 70, h: 60 }]),
-  F([{ ox: 10, oy: -60, w: 70, h: 60 }]),
+  F([], null, [{ ox: 40, oy: -60, w: 50, h: 80 }]),
+  F([], null, [{ ox: 40, oy: -60, w: 50, h: 80 }]),
+];
+
+// 前投：throw box 偏向前方
+const THROW_FORWARD_FRAMES: AttackFrame[] = [
+  F([], null, [{ ox: 40, oy: -60, w: 50, h: 80 }]),
+  F([], null, [{ ox: 40, oy: -60, w: 50, h: 80 }]),
+];
+
+// 后投：throw box 偏向后方
+const THROW_BACK_FRAMES: AttackFrame[] = [
+  F([], null, [{ ox: -40, oy: -60, w: 50, h: 80 }]),
+  F([], null, [{ ox: -40, oy: -60, w: 50, h: 80 }]),
 ];
 
 // ===== CD 击飞攻击 =====
@@ -399,11 +420,12 @@ const IORI_KOTOTSUKI_FRAMES: AttackFrame[] = [
 ];
 
 // 八神：屑風 (command throw)
+// 指令投：throw detection box 覆盖更大范围
 const IORI_KUZUKAZE_FRAMES: AttackFrame[] = [
-  F([{ ox: 45, oy: -55, w: 40, h: 50 }]),
-  F([{ ox: 50, oy: -52, w: 44, h: 52 }]),
-  F([{ ox: 50, oy: -52, w: 44, h: 52 }]),
-  F([{ ox: 48, oy: -55, w: 42, h: 50 }]),
+  F([], null, [{ ox: 45, oy: -55, w: 45, h: 85 }]),
+  F([], null, [{ ox: 50, oy: -52, w: 48, h: 88 }]),
+  F([], null, [{ ox: 50, oy: -52, w: 48, h: 88 }]),
+  F([], null, [{ ox: 48, oy: -55, w: 45, h: 85 }]),
 ];
 
 // ===== 特瑞 =====
@@ -689,6 +711,8 @@ export const ATTACK_FRAMES: AttackFrameTable = {
   [AttackType.JUMP_C]: JUMP_C_FRAMES,
   [AttackType.JUMP_D]: JUMP_D_FRAMES,
   [AttackType.THROW]: THROW_FRAMES,
+  [AttackType.THROW_FORWARD]: THROW_FORWARD_FRAMES,
+  [AttackType.THROW_BACK]: THROW_BACK_FRAMES,
   [AttackType.STAND_CD]: STAND_CD_FRAMES,
   [AttackType.JUMP_CD]: JUMP_CD_FRAMES,
   [AttackType.SPECIAL_UPPER]: SPECIAL_UPPER_FRAMES,

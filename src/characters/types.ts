@@ -68,6 +68,36 @@ export function pose(overrides: Partial<Pose> = {}): Pose {
   return { ...defaults, ...overrides };
 }
 
+// ===== 体型差异化系统 =====
+
+/** 角色体型参数 — 骨骼渲染使用的各部位尺寸 */
+export interface BodyProportions {
+  headW: number;       // 头部宽度
+  headH: number;       // 头部高度
+  torsoW: number;      // 躯干宽度
+  torsoH: number;      // 躯干高度
+  armW: number;        // 手臂宽度
+  armH: number;        // 手臂长度
+  legW: number;        // 腿部宽度
+  legH: number;        // 腿部长度
+  shoulderY: number;   // 肩膀Y偏移(相对refY)
+  hipY: number;        // 髋部Y偏移(相对refY)
+  torsoCenterY: number; // 躯干中心Y偏移(相对refY)
+  headCenterY: number;  // 头部中心Y偏移(相对refY)
+}
+
+// 默认体型（Kyo基准）
+export const DEFAULT_PROPORTIONS: BodyProportions = {
+  headW: 44, headH: 44,
+  torsoW: 56, torsoH: 68,
+  armW: 22, armH: 48,
+  legW: 26, legH: 60,
+  shoulderY: 16,
+  hipY: 60,
+  torsoCenterY: 34,
+  headCenterY: 8,
+};
+
 // ===== 角色数值定义 =====
 
 /** 角色差异化数值 — 每个角色的移动/生命等基础参数 */
@@ -104,6 +134,10 @@ export interface CharacterDefinition {
   // ── 骨骼动画 ──
   /** 角色姿态库: FighterState → Pose 映射 */
   poses: PoseSet;
+
+  // ── 体型差异化 ──
+  /** 角色体型参数（头/躯干/四肢尺寸），未定义时使用 DEFAULT_PROPORTIONS */
+  proportions?: BodyProportions;
 
   // ── 招式路由 ──
 

@@ -269,6 +269,14 @@ export class VFXSystem {
     });
   }
 
+  spawnTechText(worldX: number, worldY: number): void {
+    this.particles.push({
+      x: worldX, y: worldY, vx: 0, vy: -1.8,
+      life: 45, maxLife: 45, size: 18,
+      color: '#44aaff', type: 'text', text: 'TECH!',
+    });
+  }
+
   spawnFirstAttackText(worldX: number, worldY: number): void {
     this.particles.push({
       x: worldX, y: worldY, vx: 0, vy: -1.5,

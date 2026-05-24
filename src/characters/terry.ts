@@ -41,8 +41,18 @@ export const TerryDef: CharacterDefinition = {
 
   poses: {
     [FighterState.IDLE]: [
-      pose({ armFront: bone(12, 18, 0.15), armBack: bone(-6, 16, -0.35), legFront: bone(5, 0, 0.08), legBack: bone(-5, 0, -0.08) }),
-      pose({ armFront: bone(12, 16, 0.13), armBack: bone(-6, 14, -0.33), legFront: bone(5, 0, 0.08), legBack: bone(-5, 0, -0.08), body: bone(0, -1) }),
+      // Frame 0: Neutral — fists up, athletic stance, weight balanced
+      pose({ head: bone(0, 0, 0.02), body: bone(0, 0, 0.05), armFront: bone(14, 16, 0.18), armBack: bone(-7, 14, -0.38), legFront: bone(6, 0, 0.1), legBack: bone(-6, 0, -0.1) }),
+      // Frame 1: Breathe in — chest expands, body rises, fists tighten
+      pose({ head: bone(0, -1, 0.02), body: bone(0, -2, 0.04), armFront: bone(13, 14, 0.2), armBack: bone(-7, 12, -0.4), legFront: bone(6, 0, 0.1), legBack: bone(-6, 0, -0.1) }),
+      // Frame 2: Peak — maximum rise, shoulders back, confident
+      pose({ head: bone(0, -2, 0.01), body: bone(-1, -3, 0.02), armFront: bone(12, 12, 0.22), armBack: bone(-8, 10, -0.42), legFront: bone(5, 0, 0.08), legBack: bone(-5, 0, -0.08) }),
+      // Frame 3: Transition — starts to sink, relax slightly
+      pose({ head: bone(0, -1, 0.02), body: bone(0, -1, 0.04), armFront: bone(13, 14, 0.19), armBack: bone(-7, 12, -0.39), legFront: bone(6, 0, 0.1), legBack: bone(-6, 0, -0.1) }),
+      // Frame 4: Exhale — sinks, shoulders roll forward slightly
+      pose({ head: bone(1, 1, 0.04), body: bone(1, 1, 0.07), armFront: bone(15, 18, 0.15), armBack: bone(-6, 16, -0.34), legFront: bone(6, 0, 0.1), legBack: bone(-6, 0, -0.1) }),
+      // Frame 5: Exhale trough — lowest point, then cycles back
+      pose({ head: bone(1, 2, 0.05), body: bone(1, 2, 0.08), armFront: bone(15, 19, 0.14), armBack: bone(-6, 17, -0.33), legFront: bone(7, 0, 0.11), legBack: bone(-7, 0, -0.11) }),
     ],
     [FighterState.WALK]: [
       pose({ legFront: bone(10, -2, 0.2), legBack: bone(-3, 2, -0.15), armFront: bone(10, 22, 0.08), armBack: bone(-5, 20, -0.28) }),
@@ -157,6 +167,15 @@ export const TerryDef: CharacterDefinition = {
       legFront: bone(3, -2, 0.1),
       legBack: bone(-4, 0, -0.15),
     }),
+  },
+
+  proportions: {
+    headW: 44, headH: 44,
+    torsoW: 62, torsoH: 66,
+    armW: 26, armH: 46,
+    legW: 28, legH: 58,
+    shoulderY: 14, hipY: 56,
+    torsoCenterY: 32, headCenterY: 7,
   },
 
   routeSpecial(input, cmdBuf, tick, hasChargeRelease = false) {

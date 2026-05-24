@@ -42,9 +42,20 @@ export const IoriDef: CharacterDefinition = {
   },
 
   poses: {
+    // 八神待机：慵懒、傲慢、漫不经心 — 动作幅度极小
     [FighterState.IDLE]: [
-      pose({ armFront: bone(6, 18, 0.5), armBack: bone(-10, 12, -0.7), legFront: bone(5, 0, 0.05), legBack: bone(-5, 0, -0.15) }),
-      pose({ armFront: bone(6, 16, 0.48), armBack: bone(-10, 10, -0.68), legFront: bone(5, 0, 0.05), legBack: bone(-5, 0, -0.15), body: bone(0, -1) }),
+      // Frame 0: 基础站姿 — 微驼，头微低，双手垂在身侧
+      pose({ head: bone(0, 2, -0.04), body: bone(0, 0, 0.05), armFront: bone(6, 18, 0.5), armBack: bone(-10, 14, -0.7), legFront: bone(5, 0, 0.05), legBack: bone(-5, 0, -0.15) }),
+      // Frame 1: 缓慢吸气 — 身体微微上抬1px，头几乎不动
+      pose({ head: bone(0, 1, -0.02), body: bone(0, -1, 0.04), armFront: bone(6, 17, 0.48), armBack: bone(-10, 13, -0.68), legFront: bone(5, 0, 0.05), legBack: bone(-5, 0, -0.15) }),
+      // Frame 2: 吸气顶点 — 最高点，手臂极微抬
+      pose({ head: bone(0, 0, 0.0), body: bone(0, -2, 0.03), armFront: bone(5, 15, 0.45), armBack: bone(-10, 12, -0.65), legFront: bone(5, 0, 0.05), legBack: bone(-5, 0, -0.15) }),
+      // Frame 3: 开始呼气 — 身体开始下沉
+      pose({ head: bone(0, 1, -0.02), body: bone(0, -1, 0.04), armFront: bone(6, 17, 0.48), armBack: bone(-10, 13, -0.68), legFront: bone(5, 0, 0.05), legBack: bone(-5, 0, -0.15) }),
+      // Frame 4: 呼气 — 下沉2px，手臂更放松外展，更驼
+      pose({ head: bone(0, 3, -0.06), body: bone(0, 1, 0.06), armFront: bone(7, 20, 0.55), armBack: bone(-11, 16, -0.75), legFront: bone(5, 0, 0.05), legBack: bone(-5, 0, -0.15) }),
+      // Frame 5: 呼气最低点 — 最驼，头前倾，手臂最放松
+      pose({ head: bone(1, 4, -0.08), body: bone(0, 2, 0.07), armFront: bone(8, 22, 0.58), armBack: bone(-12, 18, -0.78), legFront: bone(5, 0, 0.05), legBack: bone(-5, 0, -0.15) }),
     ],
     [FighterState.WALK]: [
       pose({ legFront: bone(9, -3, 0.25), legBack: bone(-4, 3, -0.2), armFront: bone(5, 22, 0.3), armBack: bone(-6, 18, -0.5) }),
@@ -159,6 +170,15 @@ export const IoriDef: CharacterDefinition = {
       legFront: bone(3, -2, 0.1),
       legBack: bone(-4, 0, -0.15),
     }),
+  },
+
+  proportions: {
+    headW: 42, headH: 43,
+    torsoW: 50, torsoH: 72,
+    armW: 18, armH: 52,
+    legW: 22, legH: 66,
+    shoulderY: 18, hipY: 64,
+    torsoCenterY: 36, headCenterY: 8,
   },
 
   routeSpecial(input, cmdBuf, tick, _hasChargeRelease = false) {

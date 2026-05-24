@@ -23,6 +23,10 @@ export interface ResolvedInput {
   rollPressed: boolean;
   /** C+D just pressed (Blowback Attack) */
   blowbackPressed: boolean;
+  /** Negative Edge: punch just released (A or C) */
+  punchJustReleased: boolean;
+  /** Negative Edge: kick just released (B or D) */
+  kickJustReleased: boolean;
 }
 
 export interface RawInput {
@@ -54,6 +58,11 @@ export function resolveInput(raw: RawInput, facing: Direction, prev: PrevAttack)
   const cPressed = raw.buttonC && !prev.c;
   const bPressed = raw.buttonB && !prev.b;
   const dPressed = raw.buttonD && !prev.d;
+  // Negative Edge: 松键检测
+  const aReleased = !raw.buttonA && prev.a;
+  const cReleased = !raw.buttonC && prev.c;
+  const bReleased = !raw.buttonB && prev.b;
+  const dReleased = !raw.buttonD && prev.d;
 
   return {
     up: raw.up,
@@ -72,9 +81,10 @@ export function resolveInput(raw: RawInput, facing: Direction, prev: PrevAttack)
     throwAttackPressed: raw.throwAttack && !prev.throwAtk,
     punchPressed: aPressed || cPressed,
     kickPressed: bPressed || dPressed,
-    // Simultaneous buttons: both held + at least one just pressed
     rollPressed: raw.buttonA && raw.buttonB && (aPressed || bPressed),
     blowbackPressed: raw.buttonC && raw.buttonD && (cPressed || dPressed),
+    punchJustReleased: aReleased || cReleased,
+    kickJustReleased: bReleased || dReleased,
   };
 }
 

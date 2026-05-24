@@ -24,7 +24,7 @@ import { SelectState } from './state/selectState.js';
 import { RoundState } from './state/roundState.js';
 import { DMManager } from './combat/dmManager.js';
 import { createHitCallback } from './combat/hitCallback.js';
-import { initAudio, playKO, playVictoryFanfare, playMAXActivation, playPerfect } from './audio/sfx.js';
+import { initAudio, playKO, playVictoryFanfare, playMAXActivation, playPerfect, playThrowEscape } from './audio/sfx.js';
 import { createTeam, defeatActive, switchToNext, activeChar, teamOrderString, type TeamState } from './state/teamState.js';
 import { resolveSimplified } from './input/simplifiedInput.js';
 import { bgm } from './audio/bgm.js';
@@ -71,6 +71,17 @@ const select = new SelectState(p1Ctrl, p2Ctrl, p1, p2, p2Cmd);
 const rounds = new RoundState({ p1, p2, p1Cmd, p2Cmd, combatSystem, projectiles, vfx, cinematic, gauges, maxModes, tickRef });
 const dmMgr = new DMManager({ gauges, maxModes, cinematic, vfx, screenShake, fighters: [p1, p2] });
 const onHit = createHitCallback({ fighters: [p1, p2], vfx, screenShake, screenFlash, gauges, cinematic, combatSystem });
+combatSystem.onThrowEscape = (_attacker, defender, hitX, hitY) => {
+  vfx.spawnThrowEscapeSparks(hitX, hitY);
+  vfx.spawnTechText(hitX, hitY - 40);
+  screenShake.trigger(4, 6);
+  playThrowEscape();
+};
+combatSystem.onGuardCrush = (fighter, hitX, hitY) => {
+  vfx.spawnGuardCrushSparks(hitX, hitY);
+  screenFlash.trigger('#ff4444', 0.3, 12);
+  screenShake.trigger(12, 15);
+};
 
 // ===== Game state =====
 let phase: GamePhase = GamePhase.TITLE;
@@ -248,6 +259,15 @@ function update(): void {
   if (maxModes[1].active && maxModes[1].timer === maxModes[1].maxDuration - 1) playMAXActivation();
   p1Cmd.record(getDirectionInput(p1Input), tickRef.value);
   p2Cmd.record(getDirectionInput(p2Input), tickRef.value);
+  // Negative Edge: 记录按键按下/松开
+  if (p1Input.punchPressed) p1Cmd.recordPress('punch', tickRef.value);
+  if (p1Input.kickPressed) p1Cmd.recordPress('kick', tickRef.value);
+  if (p1Input.punchJustReleased) p1Cmd.recordRelease('punch', tickRef.value);
+  if (p1Input.kickJustReleased) p1Cmd.recordRelease('kick', tickRef.value);
+  if (p2Input.punchPressed) p2Cmd.recordPress('punch', tickRef.value);
+  if (p2Input.kickPressed) p2Cmd.recordPress('kick', tickRef.value);
+  if (p2Input.punchJustReleased) p2Cmd.recordRelease('punch', tickRef.value);
+  if (p2Input.kickJustReleased) p2Cmd.recordRelease('kick', tickRef.value);
 
   // Simplified mode: U/I/O trigger character-specific specials directly
   if (simplifiedMode && !p1.currentAttack && p1.canAct()) {
@@ -273,7 +293,8 @@ function update(): void {
 
   resolvePushbox(p1, p2);
   for (const proj of projectiles) proj.update();
-  combatSystem.resolveAttacks(p1, p2, projectiles, onHit);
+  combatSystem.resolveAttacks(p1, p2, projectiles, onHit, tickRef.value);
+  combatSystem.tickComboTimeout(tickRef.value);
   combatSystem.tickThrowState(p1, p2, onHit);
 
   // First Attack detection

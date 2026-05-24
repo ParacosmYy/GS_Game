@@ -41,8 +41,18 @@ export const LeonaDef: CharacterDefinition = {
 
   poses: {
     [FighterState.IDLE]: [
+      // Frame 0: 中立 — 直立，双手垂于身侧，警觉姿态
       pose({ armFront: bone(8, 16, 0.2), armBack: bone(-7, 14, -0.4), legFront: bone(6, 0, 0.1), legBack: bone(-5, 0, -0.1) }),
-      pose({ armFront: bone(8, 14, 0.18), armBack: bone(-7, 12, -0.38), legFront: bone(6, 0, 0.1), legBack: bone(-5, 0, -0.1), body: bone(0, -1) }),
+      // Frame 1: 吸气 — 微幅上升，军人体能纪律，极少移动
+      pose({ armFront: bone(8, 15, 0.19), armBack: bone(-7, 13, -0.39), legFront: bone(6, 0, 0.1), legBack: bone(-5, 0, -0.1), body: bone(0, -1) }),
+      // Frame 2: 吸气巅峰 — 极微上移，保持紧张
+      pose({ armFront: bone(8, 14, 0.18), armBack: bone(-7, 12, -0.38), legFront: bone(6, -1, 0.09), legBack: bone(-5, -1, -0.09), body: bone(0, -2), head: bone(0, -1) }),
+      // Frame 3: 过渡 — 开始微松
+      pose({ armFront: bone(8, 15, 0.19), armBack: bone(-7, 13, -0.39), legFront: bone(6, 0, 0.1), legBack: bone(-5, 0, -0.1), body: bone(0, -1) }),
+      // Frame 4: 呼气 — 轻微放松但仍保持紧张
+      pose({ armFront: bone(8, 17, 0.21), armBack: bone(-7, 15, -0.41), legFront: bone(6, 0, 0.1), legBack: bone(-5, 0, -0.1), body: bone(0, 1) }),
+      // Frame 5: 呼气完成 — 恢复警觉但略沉
+      pose({ armFront: bone(9, 17, 0.22), armBack: bone(-7, 15, -0.42), legFront: bone(6, 1, 0.11), legBack: bone(-5, 1, -0.11), body: bone(0, 1), head: bone(0, 1) }),
     ],
     [FighterState.WALK]: [
       pose({ legFront: bone(10, -2, 0.2), legBack: bone(-4, 2, -0.16), armFront: bone(7, 18, 0.12), armBack: bone(-6, 16, -0.35) }),
@@ -156,6 +166,15 @@ export const LeonaDef: CharacterDefinition = {
       legFront: bone(3, -2, 0.1),
       legBack: bone(-4, 0, -0.15),
     }),
+  },
+
+  proportions: {
+    headW: 40, headH: 40,
+    torsoW: 44, torsoH: 62,
+    armW: 16, armH: 44,
+    legW: 20, legH: 60,
+    shoulderY: 16, hipY: 58,
+    torsoCenterY: 33, headCenterY: 8,
   },
 
   routeSpecial(input, cmdBuf, tick, _hasChargeRelease = false) {

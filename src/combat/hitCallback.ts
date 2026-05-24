@@ -29,8 +29,9 @@ function calcHitStop(at: AttackType, isDM: boolean, isSpecial: boolean, ch: bool
   const heavy = at === AttackType.STAND_C || at === AttackType.STAND_D || at === AttackType.CLOSE_C
     || at === AttackType.CLOSE_D || at === AttackType.CROUCH_C || at === AttackType.CROUCH_D
     || at === AttackType.JUMP_C || at === AttackType.JUMP_D;
-  const r = isDM ? 8 : isSpecial ? 6 : heavy ? 5 : 3;
-  return ch ? r + 2 : r;
+  // KOF2002标准: 轻攻击4F, 重攻击8F, 必杀技6F, 超必杀12F, Counter+3F
+  const r = isDM ? 12 : isSpecial ? 6 : heavy ? 8 : 4;
+  return ch ? r + 3 : r;
 }
 
 function calcShake(at: AttackType, ch: boolean, dmg: number): number {
@@ -79,7 +80,14 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
 
     if (blocked) {
       deps.vfx.spawnBlockFlash(hitX, hitY);
-      deps.screenShake.trigger(3, 4);
+      // 防御顿帧: 重攻击5F, 轻攻击3F (比命中略短)
+      const { isSpecial: blkSpecial } = classifyAttack(attackType);
+      const blkHeavy = attackType === AttackType.STAND_C || attackType === AttackType.STAND_D
+        || attackType === AttackType.CLOSE_C || attackType === AttackType.CLOSE_D
+        || attackType === AttackType.CROUCH_C || attackType === AttackType.CROUCH_D;
+      const blkStop = blkSpecial ? 5 : blkHeavy ? 5 : 3;
+      deps.cinematic.triggerHitStop(blkStop);
+      deps.screenShake.trigger(blkSpecial ? 5 : blkHeavy ? 4 : 2, 6);
       gainMeterOnBlock(deps.gauges[atkIdx]);
       gainMeterOnHitstun(deps.gauges[defIdx]);
       playBlock();
@@ -143,8 +151,8 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       playCounter();
     }
     if (counterHit && (data as { counterWire?: boolean }).counterWire) {
-      const wallX = defender.x <= STAGE_WIDTH / 2 ? 30 : STAGE_WIDTH - 30;
-      deps.vfx.spawnCounterWireSparks(wallX, defender.y - defender.displayHeight / 2);
+      // Counter Wire launch flash — wall impact VFX handled in fighterController on bounce
+      deps.screenFlash.trigger('#ff6600', 0.2, 6);
       deps.screenShake.trigger(10, 10);
     }
 

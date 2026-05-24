@@ -37,9 +37,20 @@ export const KimDef: CharacterDefinition = {
   },
 
   poses: {
+    // 6-frame idle: disciplined taekwondo stance with breathing cycle
     [FighterState.IDLE]: [
+      // Frame 0: Neutral — upright guard, balanced weight
       pose({ armFront: bone(8, 15, 0.1), armBack: bone(-5, 18, -0.4), legFront: bone(8, 0, 0.15), legBack: bone(-6, 0, -0.2) }),
-      pose({ armFront: bone(8, 13, 0.08), armBack: bone(-5, 16, -0.38), legFront: bone(8, 0, 0.15), legBack: bone(-6, 0, -0.2), body: bone(0, -1) }),
+      // Frame 1: Breathe in — body rises 2px, weight shifts to back leg
+      pose({ armFront: bone(8, 13, 0.08), armBack: bone(-5, 16, -0.38), legFront: bone(7, 0, 0.12), legBack: bone(-7, 0, -0.22), body: bone(0, -2), head: bone(0, -2) }),
+      // Frame 2: Peak — maximum rise, hands slightly higher
+      pose({ armFront: bone(8, 11, 0.06), armBack: bone(-5, 14, -0.36), legFront: bone(6, 0, 0.1), legBack: bone(-8, 0, -0.24), body: bone(0, -2), head: bone(0, -2) }),
+      // Frame 3: Transition — begins descent, weight shifts forward
+      pose({ armFront: bone(8, 13, 0.09), armBack: bone(-5, 16, -0.39), legFront: bone(8, 0, 0.16), legBack: bone(-6, 0, -0.2), body: bone(0, -1) }),
+      // Frame 4: Exhale — sinks 2px, hands lower slightly
+      pose({ armFront: bone(8, 17, 0.12), armBack: bone(-5, 20, -0.42), legFront: bone(9, 0, 0.18), legBack: bone(-5, 0, -0.18), body: bone(0, 2), head: bone(0, 2) }),
+      // Frame 5: Trough — lowest point, weight on front leg
+      pose({ armFront: bone(8, 18, 0.13), armBack: bone(-5, 21, -0.43), legFront: bone(10, 0, 0.2), legBack: bone(-5, 0, -0.16), body: bone(0, 2), head: bone(0, 2) }),
     ],
     [FighterState.WALK]: [
       pose({ legFront: bone(12, -3, 0.3), legBack: bone(-3, 3, -0.22), armFront: bone(6, 19, 0.02), armBack: bone(-4, 22, -0.32) }),
@@ -154,6 +165,15 @@ export const KimDef: CharacterDefinition = {
       legFront: bone(3, -2, 0.1),
       legBack: bone(-4, 0, -0.15),
     }),
+  },
+
+  proportions: {
+    headW: 42, headH: 42,
+    torsoW: 52, torsoH: 64,
+    armW: 20, armH: 46,
+    legW: 24, legH: 64,
+    shoulderY: 15, hipY: 58,
+    torsoCenterY: 33, headCenterY: 7,
   },
 
   routeSpecial(input, cmdBuf, tick, hasChargeRelease = false) {

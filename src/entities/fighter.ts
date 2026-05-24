@@ -78,6 +78,11 @@ export class Fighter {
   isHardKnockdown = false;
   usedQuickStand = false;
 
+  // Throw invincibility
+  throwInvulnFrames: number = 0;  // 投技无敌帧计数器
+  // Hurtbox invincibility
+  invincible: boolean = false;    // 完全无敌(受击框消失)
+
   // Throw escape state (defender side)
   isBeingThrown = false;
   throwEscapeTimer = 0;
@@ -154,6 +159,53 @@ export class Fighter {
     };
   }
 
+  /** Get the throw box for throw-type attacks (world space) */
+  getThrowbox(): { x: number; y: number; width: number; height: number } | null {
+    if (this.attackPhase !== 'active' || !this.currentAttack) return null;
+    if (this.throwInvulnFrames > 0) return null;
+
+    const perFrame = ATTACK_FRAMES[this.currentAttack];
+    if (perFrame && this.attackFrame < perFrame.length) {
+      const frame = perFrame[this.attackFrame];
+      if (frame.throwBoxes && frame.throwBoxes.length > 0) {
+        const box = frame.throwBoxes[0];
+        return {
+          x: this.x + box.ox * this.facing,
+          y: this.y + box.oy,
+          width: box.w,
+          height: box.h,
+        };
+      }
+    }
+
+    // 普通投: 使用 THROW_RANGE 距离
+    const isThrowAttack = this.currentAttack === AttackType.THROW
+      || this.currentAttack === AttackType.THROW_FORWARD
+      || this.currentAttack === AttackType.THROW_BACK;
+    if (isThrowAttack) {
+      return {
+        x: this.facing > 0 ? this.x : this.x - 100,
+        y: this.y - this.displayHeight,
+        width: 100,
+        height: this.displayHeight,
+      };
+    }
+    return null;
+  }
+
+  /** 是否可被投(防御中/被击中/倒地时不可被投) */
+  isThrowVulnerable(): boolean {
+    if (this.throwInvulnFrames > 0) return false;
+    if (this.state === FighterState.HITSTUN) return false;
+    if (this.state === FighterState.KNOCKDOWN) return false;
+    if (this.state === FighterState.BLOCK) return false;
+    if (this.state === FighterState.AIR_BLOCK) return false;
+    if (this.state === FighterState.THROW) return false;
+    if (this.state === FighterState.GUARD_CRUSH) return false;
+    if (this.state === FighterState.ROLL || this.state === FighterState.BACK_ROLL) return false;
+    return true;
+  }
+
   /** Get the active hitbox in world coordinates, or null if not attacking */
   getActiveHitbox(): { x: number; y: number; width: number; height: number } | null {
     if (this.attackPhase !== 'active' || !this.currentAttack) return null;
@@ -226,8 +278,9 @@ export class Fighter {
     return null;
   }
 
-  /** Get the effective hurtbox (with body override if applicable) */
-  getEffectiveHurtbox(): { x: number; y: number; width: number; height: number } {
+  /** Get the effective hurtbox (with body override if applicable, null if invincible) */
+  getEffectiveHurtbox(): { x: number; y: number; width: number; height: number } | null {
+    if (this.invincible) return null;
     return this.getBodyOverride() ?? this.getHurtbox();
   }
 
@@ -298,6 +351,7 @@ export class Fighter {
     } else if (this.attackPhase === 'recovery' && this.attackFrame >= data.recovery) {
       this.endAttack();
     }
+    if (this.throwInvulnFrames > 0) this.throwInvulnFrames--;
   }
 
   endAttack(): void {
@@ -437,6 +491,8 @@ export class Fighter {
     this.resetCancelFlags();
     this.isCounterWire = false;
     this.hasAttackedInAir = false;
+    this.throwInvulnFrames = 0;
+    this.invincible = false;
     this.state = FighterState.IDLE;
   }
 }

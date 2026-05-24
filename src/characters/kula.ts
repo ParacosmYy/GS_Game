@@ -40,10 +40,20 @@ export const KulaDef: CharacterDefinition = {
   },
 
   poses: {
-    // 优雅站立 — 重心稍偏后，手臂轻盈抬起
+    // 优雅站立 — 活泼弹跳，双手合拢，元气少女
     [FighterState.IDLE]: [
-      pose({ armFront: bone(8, 16, 0.18), armBack: bone(-6, 14, -0.35), legFront: bone(5, 0, 0.08), legBack: bone(-4, 0, -0.1) }),
-      pose({ armFront: bone(8, 14, 0.16), armBack: bone(-6, 12, -0.33), legFront: bone(5, 0, 0.08), legBack: bone(-4, 0, -0.1), body: bone(0, -1) }),
+      // Frame 0: 中性 — 微微弹跳，双手合拢
+      pose({ armFront: bone(8, 16, 0.18), armBack: bone(-6, 14, -0.35), legFront: bone(5, 0, 0.08), legBack: bone(-4, 0, -0.1), body: bone(0, 0, 0.02), head: bone(0, 0, 0.02) }),
+      // Frame 1: 弹起开始 — 充满活力地上升，手臂微抬
+      pose({ armFront: bone(8, 14, 0.2), armBack: bone(-6, 12, -0.33), legFront: bone(5, 0, 0.08), legBack: bone(-4, 0, -0.1), body: bone(0, -2, 0.02), head: bone(0, -1, 0.01) }),
+      // Frame 2: 继续上升 — 充满活力，手臂伸展
+      pose({ armFront: bone(7, 12, 0.22), armBack: bone(-5, 10, -0.3), legFront: bone(5, -1, 0.08), legBack: bone(-4, -1, -0.1), body: bone(0, -3, 0.01), head: bone(0, -2, 0.0) }),
+      // Frame 3: 弹跳顶点 — 最高点，开心
+      pose({ armFront: bone(7, 10, 0.24), armBack: bone(-5, 8, -0.28), legFront: bone(5, -1, 0.06), legBack: bone(-4, -1, -0.08), body: bone(0, -3, 0.0), head: bone(0, -2, -0.01) }),
+      // Frame 4: 弹下 — 安顿，微微倾斜
+      pose({ armFront: bone(8, 13, 0.2), armBack: bone(-6, 11, -0.32), legFront: bone(5, 0, 0.08), legBack: bone(-4, 0, -0.1), body: bone(0, -1, 0.01), head: bone(0, -1, 0.01) }),
+      // Frame 5: 弹下结束 — 安顿，微微倾斜
+      pose({ armFront: bone(8, 15, 0.18), armBack: bone(-6, 13, -0.34), legFront: bone(5, 0, 0.08), legBack: bone(-4, 0, -0.1), body: bone(0, 0, 0.02), head: bone(0, 0, 0.02) }),
     ],
     // 步行 — 轻盈步伐，身体微倾
     [FighterState.WALK]: [
@@ -176,6 +186,16 @@ export const KulaDef: CharacterDefinition = {
       legFront: bone(2, -2, 0.08),
       legBack: bone(-3, 0, -0.12),
     }),
+  },
+
+  // Kula 体型：169cm 女性娇小体型，最小骨架，最短四肢，少女体态
+  proportions: {
+    headW: 38, headH: 38,
+    torsoW: 40, torsoH: 56,
+    armW: 14, armH: 40,
+    legW: 18, legH: 54,
+    shoulderY: 17, hipY: 54,
+    torsoCenterY: 31, headCenterY: 9,
   },
 
   routeSpecial(input, cmdBuf, tick, _hasChargeRelease = false) {

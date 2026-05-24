@@ -147,6 +147,12 @@ export type HitLevel = 'MID' | 'LOW' | 'HIGH';
 // LOW: 只能蹲防 (下段攻击)
 // HIGH: 只能站防 (打逆/空中攻击)
 
+export enum HitHeight {
+  HIGH = 'HIGH',   // 上段 — 站防可，蹲防不可（跳跃攻击、大部分站立攻击）
+  MID = 'MID',     // 中段 — 站防蹲防皆可
+  LOW = 'LOW',     // 下段 — 蹲防可，站防不可（蹲攻击、下段必杀技）
+}
+
 // ===== Player Input =====
 export interface PlayerInput {
   up: boolean;
@@ -202,8 +208,19 @@ export enum JuggleState {
   FULL = 'FULL',       // 全追打 (落地前都可打 — 大多数必杀技/升龙)
 }
 
+// ===== 碰撞矩形 (世界空间) =====
+export interface Rect {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
 // ===== Close Range Distance =====
 export const CLOSE_RANGE = 80;
+
+// ===== Proximity (近敌判定) =====
+// proximity guard范围在 constants.ts 中定义 (PROXIMITY_GUARD_RANGE)
 
 // ===== Attack Phase =====
 export type AttackPhase = 'startup' | 'active' | 'recovery' | 'none';
@@ -226,6 +243,8 @@ export interface AttackFrame {
   attack: FrameBox[];
   /** Body box override relative to default (null = use default hurtbox) */
   bodyOverride: FrameBox | null;
+  /** Throw boxes for this frame (null = not a throw attack) */
+  throwBoxes?: FrameBox[];
 }
 
 /** Map of attack type to per-active-frame hitbox data */

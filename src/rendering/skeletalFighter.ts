@@ -7,7 +7,8 @@ import { FighterState } from '../core/types.js';
 import { FIGHTER_WIDTH } from '../core/constants.js';
 import { ROSTER } from '../characters/index.js';
 import { bone, pose } from '../characters/types.js';
-import type { Pose, BonePose } from '../characters/types.js';
+import type { Pose, BonePose, BodyProportions } from '../characters/types.js';
+import { DEFAULT_PROPORTIONS } from '../characters/types.js';
 import { shiftColor, roundRect } from './utils.js';
 
 // Character-specific outfit color overrides (secondary colors)
@@ -330,6 +331,7 @@ export function drawSkeletalFighter(
   const charDef = ROSTER.find(c => c.id === f.charId);
   const poseSet = charDef?.poses;
   const outfit = getOutfit(f.charId);
+  const prop: BodyProportions = charDef?.proportions ?? DEFAULT_PROPORTIONS;
 
   // Resolve pose
   const rawPose = poseSet?.[f.state] ?? poseSet?.[FighterState.IDLE] ?? pose({
@@ -390,11 +392,11 @@ export function drawSkeletalFighter(
   const isRolling = f.state === FighterState.ROLL || f.state === FighterState.BACK_ROLL;
   const heightFactor = (isCrouching || isRolling) ? 0.6 : 1.0;
 
-  // === Enhanced body dimensions (larger, KOF-proportional) ===
-  const headW = 44, headH = 44;
-  const torsoW = 56, torsoH = 68;
-  const armW = 22, armH = 48;
-  const legW = 26, legH = 60;
+  // === Per-character body dimensions ===
+  const headW = prop.headW, headH = prop.headH;
+  const torsoW = prop.torsoW, torsoH = prop.torsoH;
+  const armW = prop.armW, armH = prop.armH;
+  const legW = prop.legW, legH = prop.legH;
 
   // Reference point
   const refX = sx;
@@ -467,8 +469,8 @@ export function drawSkeletalFighter(
   const effSkinColor = flashOverride ?? skinColor;
   const effOutline = flashOutline ?? shiftColor(outfit.shirt, -50);
 
-  const shoulderY = refY + 16 * heightFactor;
-  const hipY = refY + 60 * heightFactor;
+  const shoulderY = refY + prop.shoulderY * heightFactor;
+  const hipY = refY + prop.hipY * heightFactor;
 
   // === Layer order: shadow → back → body → front ===
 
@@ -495,7 +497,7 @@ export function drawSkeletalFighter(
   }
 
   // 3. Torso (body) — shirt color with collar detail
-  const torsoCenterY = refY + 34 * heightFactor + p.body.oy * heightFactor;
+  const torsoCenterY = refY + prop.torsoCenterY * heightFactor + p.body.oy * heightFactor;
   const torsoX = refX + p.body.ox * f.facing;
   drawBone(
     torsoX, torsoCenterY,
@@ -524,7 +526,7 @@ export function drawSkeletalFighter(
 
   // 4. Head
   const headPos = boneScreen(p.head);
-  const headCenterY = refY + 8 * heightFactor + p.head.oy * heightFactor;
+  const headCenterY = refY + prop.headCenterY * heightFactor + p.head.oy * heightFactor;
   ctx.save();
   ctx.translate(headPos.x, headCenterY);
   ctx.rotate(p.head.rot * f.facing);

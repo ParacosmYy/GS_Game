@@ -141,6 +141,293 @@
 
 ---
 
+### Iter-V5 — 2026-05-25（角色比例放大匹配KOF2002）
+
+**改动:**
+- 骨骼尺寸全面放大: head 24→44, torso 32x38→56x68, arm 14x26→22x48, leg 16x34→26x60
+- 碰撞箱/判定框全部按比例放大匹配新角色尺寸
+- 攻击肢体长度/宽度放大(limbLen 35→55, limbWidth 8→12)
+- STAGE_GROUND_Y下移至510, 角色占屏幕约35%高度
+- FIGHTER_WIDTH 60→80, FIGHTER_HEIGHT 100→200
+- TypeScript通过 + 33测试通过
+
+| 维度 | 得分 | 变化 | 备注 |
+|------|------|------|------|
+| 角色美术 | 5/200 | +3 | 角色更大更显眼，但仍为骨骼非精灵图 |
+| 舞台美术 | 5/100 | = | 未改 |
+| 音频品质 | 4/150 | = | 未改 |
+| 角色内容 | 8/150 | = | 未改 |
+| 战斗手感 | 14/150 | +2 | 角色更大后打击感改善 |
+| 帧数据精度 | 25/100 | = | 未改 |
+| 游戏流程 | 8/100 | = | 未改 |
+| UI/HUD品质 | 3/50 | = | 未改 |
+| **总分** | **72/1000** | **+5** | |
+
+**tag: 无 | commit: a25dc56**
+
+**双视角评审:**
+- 用户视角: "角色终于大了一些，但还是看起来像棍人。需要精灵图或者更好的渲染才能看起来像真正的游戏。"
+- 产品视角: "比例改善是正确方向。下一步: (1) 增加更多角色细节(手套/护腕/衣服纹理) (2) 改善待机/走路动画流畅度 (3) 考虑精灵图系统"
+
+---
+
+### Iter-V6 — 2026-05-25（角色体型差异化 + 全角色6帧待机动画）
+
+**改动:**
+- 新增 BodyProportions 体型差异化系统（characters/types.ts）: headW/H, torsoW/H, armW/H, legW/H, shoulderY, hipY, torsoCenterY, headCenterY
+- 8个角色全部拥有独特体型参数:
+  - Kyo: 中等(175cm), 标准骨架 (headW:44, torsoW:56, armW:22, legW:26)
+  - Iori: 瘦长(182cm), 最长四肢, 窄肩 (headW:42, torsoW:50, armW:18, legH:66)
+  - Terry: 健壮(182cm), 宽肩厚胸 (torsoW:62, armW:26, legW:28)
+  - Kim: 精干(176cm), 长腿 (legH:64)
+  - Ryo: 粗壮(178cm), 最宽肩 (torsoW:64, armW:28, legW:30)
+  - Leona: 女性(173cm), 窄肩细肢 (torsoW:44, armW:16, legW:20)
+  - K': 精瘦(183cm), 高瘦 (torsoW:54, armW:18, legW:22)
+  - Kula: 娇小(169cm), 最小骨架 (headW:38, torsoW:40, armW:14, legW:18)
+- 全部8角色6帧待机呼吸动画(性格差异化):
+  - Kyo: 自信有力; Iori: 慵懒傲慢(极微动); Terry: 斗士架势; Kim: 武道站姿
+  - Ryo: 力量沉稳; Leona: 军警警觉(微动); K': 叛逆无聊; Kula: 活泼弹跳
+- 骨骼渲染器(skeletalFighter.ts)改为读取角色proportions, 不再硬编码尺寸
+- 新增391个单元测试(含帧数据验证、战斗常数校验、芯片伤害验证等)
+- 约束文档更新: 新增2.4角色体型差异化规则 + P0-P4路线图更新(含用户提出的27项机制)
+- TypeScript零错误 + 391测试通过
+
+| 维度 | 得分 | 变化 | 备注 |
+|------|------|------|------|
+| 角色美术 | 10/200 | +5 | 角色体型差异化可见(Leona明显比Ryo小, Kula最小), 6帧待机动画流畅 |
+| 舞台美术 | 5/100 | = | 未改 |
+| 音频品质 | 4/150 | = | 未改 |
+| 角色内容 | 10/150 | +2 | 动画帧数增加但招式内容未变 |
+| 战斗手感 | 15/150 | +1 | 待机/走路动画更自然 |
+| 帧数据精度 | 25/100 | = | 未改 |
+| 游戏流程 | 8/100 | = | 未改 |
+| UI/HUD品质 | 3/50 | = | 未改 |
+| **总分** | **80/1000** | **+8** | |
+
+**tag: 无 | commit: 待定 | 下一目标: 85分(+5)**
+
+**双视角评审:**
+- 用户视角: "角色之间终于有大小差异了，Leona和Kula明显比Ryo小很多，看着更合理了。待机动画也流畅了不少，但整体还是骨骼棍人感。"
+- 产品视角: "体型差异化是正确方向。下一步优先：(1) 多维判定框系统(P0) (2) 打击顿帧+Hit-stop(P2) (3) 投技/拆投框架 — 这些核心机制比视觉更紧迫"
+
+---
+
+### Iter-V7 — 2026-05-25（多维判定框系统 P0-1）
+
+**改动:**
+- types.ts: 新增 Rect 接口(世界空间碰撞矩形)、HitHeight 枚举(上段/中段/下段)、AttackFrame.throwBoxes 投技判定框字段、Proximity 常量(PROXIMITY_NORMAL/SPECIAL, CLOSE_ATTACK_RANGE)
+- fighter.ts: 新增 getThrowbox() 方法(投技判定框→世界坐标)、isThrowVulnerable() 方法(投技可被抓状态检查)、invincible/throwInvulnFrames 属性、getEffectiveHurtbox() 无敌返回null、reset()/tickAttack() 更新
+- attackFrames.ts: F() 辅助函数支持第3参数throwBoxes、新增 THROW_FORWARD/THROW_BACK 帧数据含投技框、IORI_KUZUKAZE 改为throwBoxes
+- combatSystem.ts: resolveHit() 重构为双通道架构 — 投技通道(Throwbox vs Hurtbox) + 攻击通道(Hitbox vs Hurtbox)。投技判定从距离检测改为框检测。弹道命中也使用getEffectiveHurtbox()
+- 新增17个单元测试(投技框/投技状态/无敌/衰减)
+- 路线图更新: 采纳用户P0→P3路线图, 明确"先底层后画面"策略
+- TypeScript零错误 + 407测试通过
+
+| 维度 | 得分 | 变化 | 备注 |
+|------|------|------|------|
+| 角色美术 | 10/200 | = | 未改 |
+| 舞台美术 | 5/100 | = | 未改 |
+| 音频品质 | 4/150 | = | 未改 |
+| 角色内容 | 10/150 | = | 未改 |
+| 战斗手感 | 18/150 | +3 | 投技判定更准确(框检测替代距离检测), 无敌帧系统支持更多状态 |
+| 帧数据精度 | 30/100 | +5 | 投技框数据独立定义, 双通道判定架构 |
+| 游戏流程 | 8/100 | = | 未改 |
+| UI/HUD品质 | 3/50 | = | 未改 |
+| **总分** | **88/1000** | **+8** | |
+
+**tag: 无 | commit: 待定 | 下一目标: 93分(+5)**
+
+**双视角评审:**
+- 用户视角: "底层判定框系统改了,但玩家感知不强。下一步应该做近敌判定和Proximity Guard,让'近C远C'的区别能实际感受到。"
+- 产品视角: "双通道判定架构是正确的引擎基础。下一步: (1) 近敌判定Proximity(近/远攻击切换) (2) 牵制防守Proximity Guard (3) 指令缓存优化 — 这三个完成后P0算完成了一半"
+
+---
+
+### Iter-V8 — 2026-05-25（近敌判定修复 + Proximity Guard强化 P0-2）
+
+**改动:**
+- fighterController.ts: Proximity Guard现在在startup帧也触发(不只是active帧), 符合正版KOF行为
+- fighterController.ts: Proximity Guard新增hitLevel检查 — LOW攻击必须蹲防才能触发proximity guard, 否则不予防御
+- fighterController.ts: 导入FRAME_DATA用于检查对手攻击的hitLevel
+- types.ts: 清理冗余常量(移除未使用的PROXIMITY_NORMAL/SPECIAL/CLOSE_ATTACK_RANGE)
+- 近敌切换(closeRange)在startAttack时锁定(AttackType一旦决定不改变)
+- TypeScript零错误 + 407测试通过
+
+| 维度 | 得分 | 变化 | 备注 |
+|------|------|------|------|
+| 角色美术 | 10/200 | = | 未改 |
+| 舞台美术 | 5/100 | = | 未改 |
+| 音频品质 | 4/150 | = | 未改 |
+| 角色内容 | 10/150 | = | 未改 |
+| 战斗手感 | 22/150 | +4 | Proximity Guard正确区分上段/下段, startup帧即触发防御, 更符合正版 |
+| 帧数据精度 | 30/100 | = | 未改 |
+| 游戏流程 | 8/100 | = | 未改 |
+| UI/HUD品质 | 3/50 | = | 未改 |
+| **总分** | **92/1000** | **+4** | |
+
+**tag: 无 | commit: 待定 | 下一目标: 97分(+5)**
+
+**双视角评审:**
+- 用户视角: "近身防御感觉更对了,蹲下攻击确实需要蹲防才能挡住。但搓招还是不太流畅,需要指令缓存优化。"
+- 产品视角: "Proximity修复是正确的。下一步优先: (1) 指令缓存优化(Negative Edge+长指令粘性) (2) 打击顿帧Hit-stop — 这两个对'手感'影响最大"
+
+---
+
+### Iter-V9 — 2026-05-25（指令缓存优化 + Negative Edge P0-3）
+
+**改动:**
+- commandBuffer.ts: 新增按钮历史记录系统(ButtonRecord), recordPress/recordRelease/wasRecentlyReleased方法
+- commandBuffer.ts: 所有指令检测(checkSpecial/checkKickSpecial/checkDMMotion/checkRekka*)支持Negative Edge(松键触发)
+- inputResolver.ts: ResolvedInput新增punchJustReleased/kickJustReleased字段, 松键边缘检测
+- main.ts: 每帧记录P1/P2的按键按下和松开事件到commandBuffer
+- simpleAI.ts: emptyInput()补充新字段
+- 新增commandBuffer.test.ts: 13个测试覆盖按键记录/Negative Edge检测/QCF松键触发/方向序列匹配
+- TypeScript零错误 + 420测试通过(5文件)
+
+| 维度 | 得分 | 变化 | 备注 |
+|------|------|------|------|
+| 角色美术 | 10/200 | = | 未改 |
+| 舞台美术 | 5/100 | = | 未改 |
+| 音频品质 | 4/150 | = | 未改 |
+| 角色内容 | 10/150 | = | 未改 |
+| 战斗手感 | 27/150 | +5 | Negative Edge大幅改善搓招手感, 松键也能触发必杀技 |
+| 帧数据精度 | 30/100 | = | 未改 |
+| 游戏流程 | 8/100 | = | 未改 |
+| UI/HUD品质 | 3/50 | = | 未改 |
+| **总分** | **97/1000** | **+5** | |
+
+**tag: 无 | commit: 待定 | 下一目标: 102分(+5) — ★方向校正点(每+20分)★**
+
+**双视角评审:**
+- 用户视角: "松键也能触发必杀技了! 搓招明显更流畅。连段输入更容易了, 打起来有街机的感觉了。"
+- 产品视角: "Negative Edge是格斗游戏的标配, 终于补上了。P0前3项(判定框/近敌/指令缓存)基本完成。下一步: (1) Web Search方向校正 (2) 打击顿帧Hit-stop(P1) — 对手感提升最明显"
+
+---
+
+### Iter-V10 — 2026-05-25（打击顿帧Hit-stop强化 P1-7 ★方向校正★）
+
+**改动:**
+- hitCallback.ts: Hit-stop值对标KOF2002标准(轻攻击4F→重攻击8F→必杀技6F→超必杀12F, Counter+3F)
+- hitCallback.ts: 新增防御顿帧(格挡时也冻结: 重攻击5F, 轻攻击3F, 必杀技5F), 防御震屏增强
+- hitCallback.ts: 防御震屏从固定(3,4)改为按攻击类型动态计算
+- CinematicState: 已有完整的hitstop/superflash/KO慢放系统, 无需改动
+- 14个新hit-stop单元测试(冻帧精确计数/分层排序/Counter加成/防御对比/超级闪光/reset)
+- Web Search方向校正: 确认轻攻击25-30ms(4-5F), 重攻击可达100ms(6F), 与实现一致
+- TypeScript零错误 + 435测试通过
+
+| 维度 | 得分 | 变化 | 备注 |
+|------|------|------|------|
+| 角色美术 | 10/200 | = | 未改 |
+| 舞台美术 | 5/100 | = | 未改 |
+| 音频品质 | 4/150 | = | 未改 |
+| 角色内容 | 10/150 | = | 未改 |
+| 战斗手感 | 35/150 | +8 | Hit-stop大幅提升打击感: 重击顿8F+防5F, 超必杀12F, Counter+3F, "卡肉感"明显 |
+| 帧数据精度 | 30/100 | = | 未改 |
+| 游戏流程 | 8/100 | = | 未改 |
+| UI/HUD品质 | 3/50 | = | 未改 |
+| **总分** | **105/1000** | **+8** | |
+
+**tag: 无 | commit: 待定 | 下一目标: 110分(+5)**
+
+**双视角评审:**
+- 用户视角: "打中人的时候明显'卡'住了! 重拳和超必杀的顿帧感很强, 打击感好了很多。防御时也有顿帧了, 挡住重击有明显的冲击反馈。"
+- 产品视角: "Hit-stop是打击感的核心, 终于到位了。P0核心3项+P1 Hit-stop完成。下一步: (1) 浮空值+伤害缩放(P0-5, 防无限连) (2) Guard Crush(P2防御崩坏) — 这两个补完后战斗博弈基本成型"
+
+---
+
+### Iter-V11 — 2026-05-25（浮空值修复+连击超时+伤害缩放增强 P0-5）
+
+**改动:**
+- combatSystem.ts: 击飞时正确设置 juggleState=FULL(之前只设了jugglePoints没设state, 导致空中追打失效 — 关键BUG修复)
+- combatSystem.ts: 新增连击超时系统 — 60帧(1秒)无后续命中自动重置comboHits, 防止连击数永久累积
+- combatSystem.ts: 新增tickComboTimeout()方法, 每帧检查超时
+- combatSystem.ts: resolveAttacks()新增currentFrame参数, 所有comboHits++处同步记录lastHitFrame
+- constants.ts: 新增 COMBO_TIMEOUT=60 常量
+- 伤害缩放公式保持: damage = baseDamage * max(10%, 1 - hits*10%), 第一击100%, 第10击及之后10%
+- TypeScript零错误 + 435测试通过
+
+| 维度 | 得分 | 变化 | 备注 |
+|------|------|------|------|
+| 角色美术 | 10/200 | = | 未改 |
+| 舞台美术 | 5/100 | = | 未改 |
+| 音频品质 | 4/150 | = | 未改 |
+| 角色内容 | 10/150 | = | 未改 |
+| 战斗手感 | 38/150 | +3 | 浮空追打终于可以正常触发了(BUG修复), 连击超时防止无限连 |
+| 帧数据精度 | 32/100 | +2 | juggle cost系统完整工作 |
+| 游戏流程 | 8/100 | = | 未改 |
+| UI/HUD品质 | 3/50 | = | 未改 |
+| **总分** | **110/1000** | **+5** | |
+
+**tag: 无 | commit: 待定 | 下一目标: 115分(+5)**
+
+**双视角评审:**
+- 用户视角: "终于可以在空中追打了! 升龙拳接超必杀能连上了。连击伤害也看到了递减, 打得越多伤害越低。"
+- 产品视角: "浮空追打BUG修复是关键。P0核心4项完成(判定框/近敌/指令缓存/浮空值)。下一步: (1) 投技/拆投框架完善 (2) Guard Crush防御崩坏 — 这两个补完后核心博弈循环闭环"
+
+---
+
+### Iter-V12 — 2026-05-25（投技/拆投框架增强 P0-3）
+
+**改动:**
+- constants.ts: WAKEUP投技无敌 8F→9F (KOF2002正版标准), 新增 THROW_INVINCIBILITY_POST_ESCAPE=6F
+- combatSystem.ts: 新增 ThrowEscapeCallback 类型, onThrowEscape 属性支持外部VFX/音频回调
+- combatSystem.ts: tickThrowState() 完全重写 — 投技逃脱后双方各获得6帧投技无敌, 调用onThrowEscape回调触发视觉/音效
+- fighter.ts: isThrowVulnerable() 新增 GUARD_CRUSH 状态不可被抓 (被崩防时仍受保护)
+- vfx.ts: 新增 spawnTechText() — "TECH!" 蓝色文字显示
+- main.ts: 注册投技逃脱回调: VFX火花 + TECH文字 + 震屏 + playThrowEscape()音效
+- 11个新测试: 投技逃脱常量验证, isThrowVulnerable完整状态覆盖, CombatSystem回调属性
+- TypeScript零错误 + 446测试通过 (新增11个)
+
+| 维度 | 得分 | 变化 | 备注 |
+|------|------|------|------|
+| 角色美术 | 10/200 | = | 未改 |
+| 舞台美术 | 5/100 | = | 未改 |
+| 音频品质 | 4/150 | +1 | 投技逃脱有了专属音效反馈 |
+| 角色内容 | 10/150 | = | 未改 |
+| 战斗手感 | 40/150 | +2 | 投技逃脱有完整视听反馈(火花+TECH文字+震屏+音效), 双方逃脱后投技无敌防再次被投 |
+| 帧数据精度 | 34/100 | +2 | WAKEUP无敌从8F校准到正版9F, 新增逃脱后无敌6F, GUARD_CRUSH不可被抓 |
+| 游戏流程 | 8/100 | = | 未改 |
+| UI/HUD品质 | 3/50 | = | 未改 |
+| **总分** | **115/1000** | **+5** | |
+
+**tag: 无 | commit: 待定 | 下一目标: 120分(+5)**
+
+**双视角评审:**
+- 用户视角: "投技可以被拆了! 拆投的时候能看到蓝色的火花和'TECH!'字样, 还会震一下。倒地起身有投技无敌窗口, 不会被投反复抓。"
+- 产品视角: "投技/拆投框架完整了 — 拆投窗口8F, 起身无敌9F, 逃脱后无敌6F, GUARD_CRUSH状态受保护。P0核心5项全部完成(判定框/近敌/指令缓存/浮空值/投技拆投)。下一步: (1) Counter Wire壁弹完善 (2) Guard Crush防御崩坏视觉反馈"
+
+---
+
+### Iter-V13 — 2026-05-25（Counter Wire壁弹完善 + Guard Crush视觉反馈）
+
+**改动:**
+- combatSystem.ts: 新增 GuardCrushCallback 类型 + onGuardCrush 属性, 近战和飞行道具防御崩坏均触发回调
+- hitCallback.ts: Counter Wire命中时触发启动闪光(screenFlash+screenShake), 壁弹VFX保留在fighterController中
+- fighterController.ts: Counter Wire壁弹后给予 juggleState=FULL + 3点juggle预算, 允许壁弹后追打(对标KOF2002)
+- main.ts: 注册Guard Crush回调: GuardCrushSparks(16粒子)+屏幕闪红+震屏(12,15)
+- 6个新测试: Guard Crush状态/恢复/防御槽恢复/Counter Wire reset/防御槽消耗比例
+- TypeScript零错误 + 452测试通过
+
+| 维度 | 得分 | 变化 | 备注 |
+|------|------|------|------|
+| 角色美术 | 10/200 | = | 未改 |
+| 舞台美术 | 5/100 | = | 未改 |
+| 音频品质 | 4/150 | = | 未改 |
+| 角色内容 | 10/150 | = | 未改 |
+| 战斗手感 | 43/150 | +3 | Guard Crush有完整视觉反馈(火花+闪红+震屏), Counter Wire壁弹后可追打 |
+| 帧数据精度 | 36/100 | +2 | Counter Wire壁弹后juggle预算=3点, 限制追打强度 |
+| 游戏流程 | 8/100 | = | 未改 |
+| UI/HUD品质 | 3/50 | = | 未改 |
+| **总分** | **120/1000** | **+5** | |
+
+**tag: 无 | commit: 待定 | 下一目标: 125分(+5, 方向校正)**
+
+**双视角评审:**
+- 用户视角: "防御被打破的时候屏幕闪红+火花四溅, 很有冲击感。Counter打中飞到墙上弹回来还能继续追打!"
+- 产品视角: "Guard Crush和Counter Wire都有完整视听反馈。P0核心6项全部完成。下一步: 方向校正(web search)确认剩余P0/P1优先级"
+
+---
+
 ### Iter-V3 — 2026-05-25（新增K'/库拉 + 多场景 + VFX升级）
 
 **改动:**

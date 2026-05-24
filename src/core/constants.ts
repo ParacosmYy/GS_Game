@@ -736,6 +736,7 @@ export const COUNTER_WIRE_BOUNCE_VY = -6;  // Wall bounce vertical speed (upward
 // ===== Damage Scaling =====
 export const DAMAGE_SCALE_STEP = 0.10;  // 每连击递减10%
 export const DAMAGE_SCALE_MIN = 0.10;   // 最低10%伤害 (KOF 2002标准)
+export const COMBO_TIMEOUT = 60;        // 60帧(1秒)无后续命中则重置连击计数
 
 // ===== Power Gauge (能量槽) =====
 export const MAX_STOCKS = 5;
@@ -783,9 +784,10 @@ export const COMMAND_NORMALS: ReadonlySet<string> = new Set([
 
 // ===== Throw Invincibility (KOF 2002 authentic) =====
 export const THROW_INVINCIBILITY_POST_STUN = 9;    // Frames after blockstun/hitstun
-export const THROW_INVINCIBILITY_WAKEUP = 8;        // Frames on wakeup from knockdown
+export const THROW_INVINCIBILITY_WAKEUP = 9;        // Frames on wakeup from knockdown (KOF2002: 9F)
 export const THROW_INVINCIBILITY_JUMP_STARTUP = 4;  // Frames during jump startup
 export const THROW_INVINCIBILITY_LANDING = 2;       // Frames on landing
+export const THROW_INVINCIBILITY_POST_ESCAPE = 6;  // Frames after throw escape (both fighters)
 
 // ===== HUD Layout =====
 export const HUD_BAR_WIDTH = 300;
