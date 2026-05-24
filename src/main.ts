@@ -365,10 +365,14 @@ function update(): void {
       if (f.prevState === FighterState.BLOCK) playCancel();
     }
 
-    // Guard Cancel CD: 从BLOCK直接进入攻击时播放Cancel音效
+    // Guard Cancel CD: 从BLOCK直接进入攻击时播放Cancel音效+VFX
     if (f.prevState === FighterState.BLOCK
       && (f.state === FighterState.STAND_ATTACK || f.state === FighterState.CROUCH_ATTACK)) {
       playCancel();
+      // GC CD闪光效果
+      vfx.spawnCharacterHitSparks(f.x, f.y - f.displayHeight / 2, 12, '#ff8800');
+      vfx.spawnGCCDText(f.x, f.y - f.displayHeight - 30);
+      screenFlash.trigger('#ff8800', 0.1, 3);
     }
 
     // Cancel VFX: 检测取消事件并触发视觉反馈
