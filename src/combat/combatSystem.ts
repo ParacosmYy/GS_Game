@@ -378,6 +378,11 @@ export class CombatSystem {
     let damage = this.scaledDamage(data.damage, defIdx, attackType);
     let hitstunFrames: number = data.hitstun;
 
+    // KOF2002: aerial defender hitstun reduced (harder to combo airborne opponents)
+    if (!defender.isGrounded()) {
+      hitstunFrames = Math.round(hitstunFrames * 0.65);
+    }
+
     // Close range damage bonus: CLOSE_ attacks get +10% at point-blank range
     const attackName = attackType as string;
     if (attackName.startsWith('CLOSE_')) {
@@ -427,7 +432,9 @@ export class CombatSystem {
         defender.juggleState = JuggleState.FULL;
       }
     } else {
-      defender.applyHitstun(hitstunFrames, data.pushback);
+      // KOF2002: pushback reduced by 40% in combos (so follow-up attacks stay in range)
+      const effectivePushback = this.comboHits[defIdx] > 1 ? data.pushback * 0.6 : data.pushback;
+      defender.applyHitstun(hitstunFrames, effectivePushback);
     }
 
     // Attacker pushback: slight recoil on hit (KOF2002 behavior)

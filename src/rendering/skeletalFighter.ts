@@ -362,16 +362,35 @@ export function drawSkeletalFighter(
     legBack: { ...currentPose.legBack },
   };
 
-  // Idle breathing
+  // Idle breathing — character-specific
   if (f.state === FighterState.IDLE) {
-    const breathe = Math.sin(globalTick / 30) * 2;
+    const charId = f.charId ?? '';
+    // Breathing speed/amplitude varies by character
+    let breathSpeed = 30;
+    let breathAmp = 2;
+    let headBob = 0;
+    if (charId === 'kyo') { breathSpeed = 25; breathAmp = 2.5; headBob = 1; }
+    else if (charId === 'iori') { breathSpeed = 35; breathAmp = 1.5; headBob = 0; } // iori: slower, menacing
+    else if (charId === 'terry') { breathSpeed = 28; breathAmp = 3; headBob = 1.5; }
+    else if (charId === 'kim') { breathSpeed = 22; breathAmp = 2; headBob = 0.5; } // kim: athletic, faster
+    else if (charId === 'ryo') { breathSpeed = 26; breathAmp = 2.5; headBob = 1; }
+    else if (charId === 'leona') { breathSpeed = 32; breathAmp = 1.5; headBob = 0; } // leona: controlled
+    else if (charId === 'kdash') { breathSpeed = 24; breathAmp = 2; headBob = 0.5; }
+    else if (charId === 'kula') { breathSpeed = 28; breathAmp = 1.8; headBob = 0.8; }
+    const breathe = Math.sin(globalTick / breathSpeed) * breathAmp;
     p.body.oy += breathe;
-    p.head.oy += breathe;
+    p.head.oy += breathe + headBob * Math.sin(globalTick / breathSpeed * 0.5);
   }
 
-  // Walk cycle
+  // Walk cycle — character-specific stride
   if (f.state === FighterState.WALK) {
-    const walkCycle = Math.sin(globalTick / 8) * 5;
+    const charId = f.charId ?? '';
+    let walkSpeed = 8, walkAmp = 5;
+    if (charId === 'kim') { walkSpeed = 7; walkAmp = 6; } // martial arts stance walk
+    else if (charId === 'iori') { walkSpeed = 10; walkAmp = 4; } // deliberate, slower
+    else if (charId === 'leona') { walkSpeed = 7; walkAmp = 5; }
+    else if (charId === 'kdash') { walkSpeed = 8; walkAmp = 4.5; }
+    const walkCycle = Math.sin(globalTick / walkSpeed) * walkAmp;
     p.legFront.oy += walkCycle;
     p.legBack.oy -= walkCycle;
     p.armFront.oy -= walkCycle * 0.3;

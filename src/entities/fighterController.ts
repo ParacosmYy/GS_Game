@@ -675,7 +675,8 @@ export class FighterController {
 
       case FighterState.BLOCK: {
         f.blockstunTimer--;
-        // Guard Cancel Roll (A+B during blockstun, costs 1 stock)
+        // Guard Cancel Roll (A+B during early blockstun, costs 1 stock)
+        // KOF2002: GC must be input in first half of blockstun
         if (f.blockstunTimer > 0 && input.rollPressed && this.gauge && spendStocks(this.gauge, DM_STOCK_COST)) {
           f.state = input.back ? FighterState.BACK_ROLL : FighterState.ROLL;
           f.rollTimer = ROLL_DURATION;
@@ -686,7 +687,7 @@ export class FighterController {
           this.vfx.spawnDust(f.x, STAGE_GROUND_Y);
           break;
         }
-        // Guard Cancel CD (C+D during blockstun, costs 1 stock)
+        // Guard Cancel CD (C+D during early blockstun, costs 1 stock)
         if (f.blockstunTimer > 0 && input.blowbackPressed && this.gauge && spendStocks(this.gauge, DM_STOCK_COST)) {
           f.blockstunTimer = 0;
           f.startAttack(AttackType.STAND_CD);
@@ -730,8 +731,9 @@ export class FighterController {
 
       case FighterState.KNOCKDOWN:
         f.knockdownTimer--;
-        // Quick stand: A+B during soft knockdown reduces timer to 3 frames
-        if (!f.isHardKnockdown && input.rollPressed && f.knockdownTimer > 3) {
+        // Quick stand: A+B during first 15 frames of soft knockdown (KOF2002 window)
+        if (!f.isHardKnockdown && input.rollPressed && f.knockdownTimer > 3
+          && f.knockdownTimer >= 10) { // must press within first ~15 frames of landing
           f.knockdownTimer = 3;
           f.usedQuickStand = true;
         }

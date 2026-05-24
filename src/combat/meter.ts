@@ -67,7 +67,8 @@ export function tickMaxMode(maxMode: MaxModeState): void {
 export function tickAutoMeter(gauges: [PowerGauge, PowerGauge]): void {
   for (const g of gauges) {
     if (g.stocks < MAX_STOCKS) {
-      g.meter = Math.min(METER_PER_STOCK, g.meter + 0.5);
+      // KOF2002风云再起模式: 快速回气 (100点/3.3秒 ≈ 0.5/frame → 加速到1.0/frame)
+      g.meter = Math.min(METER_PER_STOCK, g.meter + 1.0);
       if (g.meter >= METER_PER_STOCK && g.stocks < MAX_STOCKS) {
         g.stocks++;
         g.meter = 0;
