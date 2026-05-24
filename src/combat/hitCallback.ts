@@ -111,7 +111,9 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       ? ROSTER.find(c => c.id === p1.charId) || ROSTER[0]
       : ROSTER.find(c => c.id === p2.charId) || ROSTER[1];
     const { isPunch } = classifyAttack(attackType);
-    const sparks = isSDM ? 28 : isDM ? 20 : isSpecial ? 14 : counterHit ? 12 : 8;
+    // KOF2002: 连击中火花递增 (5+hits +4, 10+hits +8)
+    const comboSparkBonus = combo >= 10 ? 8 : combo >= 5 ? 4 : 0;
+    const sparks = (isSDM ? 28 : isDM ? 20 : isSpecial ? 14 : counterHit ? 12 : 8) + comboSparkBonus;
     const sparkColor = isSpecial ? atkChar.specialColor : isPunch ? '#ffdd44' : '#44ddff';
     deps.vfx.spawnCharacterHitSparks(hitX, hitY, sparks, sparkColor);
     deps.vfx.spawnImpactRing(hitX, hitY);

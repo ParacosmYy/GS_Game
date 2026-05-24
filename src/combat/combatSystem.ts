@@ -432,6 +432,10 @@ export class CombatSystem {
     if (this.maxModes[atkIdx]) {
       damage = Math.round(damage * 0.67);
     }
+    // MAX mode defense bonus: defender in MAX mode takes -25% damage (KOF2002)
+    if (this.maxModes[defIdx]) {
+      damage = Math.round(damage * 0.75);
+    }
 
     this.comboHits[defIdx]++;
     // KOF2002: 连击伤害缩放 — 第2击起伤害递减 (第2击90%, 第3击80%, 第4击70%, 最低50%)
