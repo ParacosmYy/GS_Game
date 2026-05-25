@@ -119,6 +119,24 @@ export const COMBO_ROUTES: Record<string, ComboStep[]> = {
     { type: 'special', attack: 'changTekkyuuKaiten', delay: 3 },
     { type: 'special', attack: 'dmTekkyuuDaiBousou', delay: 4 },
   ],
+  choi: [
+    { type: 'button',  attack: 'closeC', delay: 0 },
+    { type: 'button',  attack: 'choiSoutenMekkyaku', delay: 2 },
+    { type: 'special', attack: 'choiKaitenHienZan', delay: 3 },
+    { type: 'special', attack: 'dmShinChouHouyoku', delay: 4 },
+  ],
+  mature: [
+    { type: 'button',  attack: 'closeC', delay: 0 },
+    { type: 'button',  attack: 'matureDespair', delay: 2 },
+    { type: 'special', attack: 'matureMassacre', delay: 3 },
+    { type: 'special', attack: 'dmNocturnalLight', delay: 4 },
+  ],
+  yashiro: [
+    { type: 'button',  attack: 'closeC', delay: 0 },
+    { type: 'button',  attack: 'yashiroShuuWani', delay: 2 },
+    { type: 'special', attack: 'yashiroUpperDu', delay: 3 },
+    { type: 'special', attack: 'dmArmageddonBusters', delay: 4 },
+  ],
   _default: [
     { type: 'button',  attack: 'closeC', delay: 0 },
     { type: 'button',  attack: 'standA',  delay: 2 },
@@ -174,6 +192,12 @@ export function applyComboStep(step: ComboStep, base: ResolvedInput): void {
         base.forward = true; base.buttonA = true; base.buttonAPressed = true; base.punchPressed = true; break;
       case 'changHikiNage':
         base.forward = true; base.buttonA = true; base.buttonAPressed = true; base.punchPressed = true; break;
+      case 'choiSoutenMekkyaku':
+        base.forward = true; base.buttonA = true; base.buttonAPressed = true; base.punchPressed = true; break;
+      case 'matureDespair':
+        base.forward = true; base.buttonA = true; base.buttonAPressed = true; base.punchPressed = true; break;
+      case 'yashiroShuuWani':
+        base.forward = true; base.buttonA = true; base.buttonAPressed = true; base.punchPressed = true; break;
       case 'jumpC':
         base.buttonC = true; base.buttonCPressed = true; base.punchPressed = true; break;
     }
@@ -219,6 +243,9 @@ export function routeComboSpecial(
     case 'andy': return routeAndy(attack);
     case 'billy': return routeBilly(attack);
     case 'chang': return routeChang(attack);
+    case 'choi': return routeChoi(attack);
+    case 'mature': return routeMature(attack);
+    case 'yashiro': return routeYashiro(attack);
     default: return null;
   }
 }
@@ -374,5 +401,50 @@ function routeBilly(attack: string): AttackType | null {
     case 'billyHienZanD': return AttackType.BILLY_HIEN_ZAN_D;
     case 'dmKaenSenpuJin': return AttackType.DM_KAEN_SENPU_JIN;
     default: return AttackType.BILLY_SENPU_KON;
+  }
+}
+
+function routeChang(attack: string): AttackType | null {
+  switch (attack) {
+    case 'changTekkyuuKaiten': return AttackType.CHANG_TEKKYUU_KAITEN;
+    case 'changTekkyuuKaitenC': return AttackType.CHANG_TEKKYUU_KAITEN_C;
+    case 'changTekkyuuFasshu': return AttackType.CHANG_TEKKYUU_FASSHU;
+    case 'changTekkyuuHienZan': return AttackType.CHANG_TEKKYUU_HIEN_ZAN;
+    case 'dmTekkyuuDaiBousou': return AttackType.DM_TEKKYUU_DAI_BOUSOU;
+    default: return AttackType.CHANG_TEKKYUU_KAITEN;
+  }
+}
+
+function routeChoi(attack: string): AttackType | null {
+  switch (attack) {
+    case 'choiHishouKyaku': return AttackType.CHOI_HISHOU_KYAKU;
+    case 'choiHishouKyakuC': return AttackType.CHOI_HISHOU_KYAKU_C;
+    case 'choiKaitenHienZan': return AttackType.CHOI_KAITEN_HIEN_ZAN;
+    case 'choiKaitenHienZanC': return AttackType.CHOI_KAITEN_HIEN_ZAN_C;
+    case 'choiHouyokuTenshin': return AttackType.CHOI_HOUYOKU_TENSHIN;
+    case 'dmShinChouHouyoku': return AttackType.DM_SHIN_CHOU_HOUYOKU;
+    default: return AttackType.CHOI_KAITEN_HIEN_ZAN;
+  }
+}
+
+function routeMature(attack: string): AttackType | null {
+  switch (attack) {
+    case 'matureMassacre': return AttackType.MATURE_MASSACRE;
+    case 'matureMassacreC': return AttackType.MATURE_MASSACRE_C;
+    case 'matureHeavensGate': return AttackType.MATURE_HEAVENS_GATE;
+    case 'matureEcstasy': return AttackType.MATURE_ECSTASY;
+    case 'dmNocturnalLight': return AttackType.DM_NOCTURNAL_LIGHT;
+    default: return AttackType.MATURE_MASSACRE;
+  }
+}
+
+function routeYashiro(attack: string): AttackType | null {
+  switch (attack) {
+    case 'yashiroUpperDu': return AttackType.YASHIRO_UPPER_DU;
+    case 'yashiroUpperDuC': return AttackType.YASHIRO_UPPER_DU_C;
+    case 'yashiroNiraai': return AttackType.YASHIRO_NIRAAI;
+    case 'yashiroMusatsu': return AttackType.YASHIRO_MUSATSU;
+    case 'dmArmageddonBusters': return AttackType.DM_ARMAGEDDON_BUSTERS;
+    default: return AttackType.YASHIRO_UPPER_DU;
   }
 }

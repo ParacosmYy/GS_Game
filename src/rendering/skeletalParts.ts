@@ -23,6 +23,9 @@ export const CHAR_OUTFIT: Record<string, { shirt: string; pants: string; belt: s
   andy: { shirt: '#dd6622', pants: '#f0f0f0', belt: '#884422', shoes: '#443322' },
   billy: { shirt: '#3366aa', pants: '#e8e8e8', belt: '#884422', shoes: '#664422' },
   chang: { shirt: '#885522', pants: '#cc8833', belt: '#553311', shoes: '#442211' },
+  choi: { shirt: '#338833', pants: '#225522', belt: '#884422', shoes: '#334422' },
+  mature: { shirt: '#882255', pants: '#882255', belt: '#aa3377', shoes: '#661844' },
+  yashiro: { shirt: '#553377', pants: '#333355', belt: '#444', shoes: '#222' },
 };
 
 const DEFAULT_OUTFIT = { shirt: '#888', pants: '#556', belt: '#444', shoes: '#333' };
@@ -38,6 +41,9 @@ export function getHairColor(charId: string): string {
     kdash: '#C0C0C0', kula: '#cc8855', robert: '#2a1a0a',
     athena: '#7744cc', mai: '#7a4828', andy: '#ccaa44',
     ralf: '#ccaa44', clark: '#ccaa44', joe: '#ddbb44', billy: '#ccaa44', chang: '#222222',
+    choi: '#888888',
+    mature: '#dab840',
+    yashiro: '#aaaacc',
   };
   return colors[charId] ?? '#333';
 }
@@ -49,6 +55,9 @@ export function getEyeColor(charId: string): string {
     kdash: '#ff4400', kula: '#4488ff', robert: '#4169E1',
     athena: '#6644cc', mai: '#4488aa', andy: '#4466cc',
     ralf: '#4466aa', clark: '#664422', joe: '#664422', billy: '#4466cc', chang: '#664422',
+    choi: '#cc2222',
+    mature: '#663399',
+    yashiro: '#553388',
   };
   return colors[charId] ?? '#444';
 }
@@ -633,6 +642,59 @@ function drawHair(ctx: CanvasRenderingContext2D, charId: string, facing: number,
     for (let i = -3; i <= 3; i++) {
       ctx.fillRect(i * 4 - 1, -r + 1, 2, 2);
     }
+  } else if (charId === 'choi') {
+    // Choi: wild spiky grey hair, small head
+    ctx.fillStyle = '#888888';
+    const spikes = [[-10, -16], [-5, -22], [0, -18], [5, -24], [10, -16]];
+    for (const [sx, sy] of spikes) {
+      ctx.beginPath();
+      ctx.moveTo(sx - 4, -r + 2);
+      ctx.lineTo(sx, -r + sy);
+      ctx.lineTo(sx + 4, -r + 2);
+      ctx.closePath();
+      ctx.fill();
+    }
+    // Hair base
+    ctx.fillStyle = '#777777';
+    ctx.beginPath();
+    ctx.moveTo(-r + 2, -r + 3);
+    ctx.quadraticCurveTo(-r + 4, -r - 6, 0, -r - 4);
+    ctx.quadraticCurveTo(r - 4, -r - 6, r - 2, -r + 3);
+    ctx.lineTo(r - 3, -r + 6);
+    ctx.lineTo(-r + 3, -r + 6);
+    ctx.closePath();
+    ctx.fill();
+    // Face paint stripe across eyes
+    ctx.fillStyle = '#cc2222';
+    ctx.fillRect(-r + 4, -4, headW - 8, 3);
+  } else if (charId === 'mature') {
+    // Mature: long flowing blonde hair, sultry
+    ctx.fillStyle = '#dab840';
+    ctx.beginPath();
+    ctx.moveTo(-r + 1, -r + 2);
+    ctx.lineTo(-r - 2, -r - 8);
+    ctx.quadraticCurveTo(0, -r - 10, r + 2, -r - 8);
+    ctx.lineTo(r - 1, -r + 2);
+    ctx.closePath();
+    ctx.fill();
+    // Long side hair flowing down
+    const sideX = r * facing * 0.7;
+    ctx.fillStyle = '#c8a830';
+    ctx.beginPath();
+    ctx.moveTo(sideX * 0.4, -r);
+    ctx.quadraticCurveTo(sideX + 5 * facing, -r + 6, sideX + 10 * facing, r + 14);
+    ctx.lineTo(sideX + 6 * facing, r + 12);
+    ctx.quadraticCurveTo(sideX - 2 * facing, -r + 10, sideX * 0.2, -r + 3);
+    ctx.closePath();
+    ctx.fill();
+    // Darker blonde strands
+    ctx.fillStyle = '#b89820';
+    ctx.beginPath();
+    ctx.moveTo(-r, -r + 4);
+    ctx.lineTo(-r - 4, -r + 16);
+    ctx.lineTo(-r + 2, -r + 10);
+    ctx.closePath();
+    ctx.fill();
   }
 }
 

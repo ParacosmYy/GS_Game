@@ -1178,3 +1178,142 @@ export const SDM_SHIN_CHOU_HOUYOKU_FRAMES: AttackFrame[] = [
   F([{ ox: 32, oy: -78, w: 55, h: 45 }]),
   F([{ ox: 30, oy: -75, w: 50, h: 42 }]),
 ];
+
+// ===== 大门五郎 (Yashiro Nanakase) ===== APPROX based on KOF2002UM
+// Upper Du Bag (A) — multi-hit rush
+export const YASHIRO_UPPER_DU_FRAMES: AttackFrame[] = [
+  F([{ ox: 38, oy: -58, w: 45, h: 30 }]),
+  F([{ ox: 45, oy: -55, w: 52, h: 34 }]),
+  F([{ ox: 50, oy: -52, w: 58, h: 36 }]),
+  F([{ ox: 50, oy: -52, w: 58, h: 36 }]),
+  F([{ ox: 48, oy: -55, w: 55, h: 34 }]),
+  F([{ ox: 45, oy: -58, w: 50, h: 32 }]),
+  F([{ ox: 42, oy: -60, w: 48, h: 30 }]),
+  F([{ ox: 40, oy: -62, w: 45, h: 28 }]),
+  F([{ ox: 38, oy: -64, w: 42, h: 26 }]),
+  F([{ ox: 36, oy: -66, w: 40, h: 24 }]),
+];
+
+// Upper Du Bag (C) — more hits, bigger reach
+export const YASHIRO_UPPER_DU_C_FRAMES: AttackFrame[] = [
+  F([{ ox: 38, oy: -58, w: 48, h: 32 }]),
+  F([{ ox: 45, oy: -55, w: 55, h: 36 }]),
+  F([{ ox: 52, oy: -52, w: 62, h: 40 }]),
+  F([{ ox: 55, oy: -50, w: 65, h: 42 }]),
+  F([{ ox: 55, oy: -50, w: 65, h: 42 }]),
+  F([{ ox: 52, oy: -52, w: 62, h: 40 }]),
+  F([{ ox: 50, oy: -54, w: 58, h: 38 }]),
+  F([{ ox: 48, oy: -56, w: 55, h: 36 }]),
+  F([{ ox: 48, oy: -56, w: 55, h: 36 }]),
+  F([{ ox: 45, oy: -58, w: 52, h: 34 }]),
+  F([{ ox: 42, oy: -60, w: 48, h: 32 }]),
+  F([{ ox: 40, oy: -62, w: 45, h: 30 }]),
+  F([{ ox: 38, oy: -64, w: 42, h: 28 }]),
+  F([{ ox: 36, oy: -66, w: 40, h: 26 }]),
+  F([{ ox: 34, oy: -68, w: 38, h: 24 }]),
+  F([{ ox: 32, oy: -70, w: 36, h: 22 }]),
+];
+
+// Niraai Kaname — overhead smash
+export const YASHIRO_NIRAAI_FRAMES: AttackFrame[] = [
+  F([{ ox: 42, oy: -65, w: 50, h: 38 }]),
+  F([{ ox: 48, oy: -60, w: 58, h: 42 }]),
+  F([{ ox: 52, oy: -55, w: 65, h: 48 }]),
+  F([{ ox: 55, oy: -52, w: 70, h: 52 }]),
+  F([{ ox: 55, oy: -52, w: 70, h: 52 }]),
+  F([{ ox: 52, oy: -55, w: 65, h: 48 }]),
+];
+
+// Musatsu Niraai — sliding kick
+export const YASHIRO_MUSATSU_FRAMES: AttackFrame[] = [
+  F([{ ox: 45, oy: -20, w: 55, h: 25 }]),
+  F([{ ox: 55, oy: -18, w: 65, h: 28 }]),
+  F([{ ox: 60, oy: -16, w: 72, h: 30 }]),
+  F([{ ox: 60, oy: -16, w: 72, h: 30 }]),
+  F([{ ox: 55, oy: -18, w: 65, h: 28 }]),
+  F([{ ox: 50, oy: -20, w: 60, h: 25 }]),
+];
+
+// DM: Armageddon Busters
+export const DM_ARMAGEDDON_BUSTERS_FRAMES: AttackFrame[] = [
+  F([{ ox: 30, oy: -65, w: 55, h: 42 }]),
+  F([{ ox: 38, oy: -62, w: 65, h: 48 }]),
+  F([{ ox: 45, oy: -58, w: 78, h: 55 }]),
+  F([{ ox: 50, oy: -55, w: 88, h: 60 }]),
+  F([{ ox: 52, oy: -55, w: 92, h: 62 }]),
+  F([{ ox: 52, oy: -55, w: 92, h: 62 }]),
+  F([{ ox: 50, oy: -58, w: 85, h: 58 }]),
+  F([{ ox: 48, oy: -60, w: 78, h: 55 }]),
+  F([{ ox: 45, oy: -62, w: 72, h: 50 }]),
+  F([{ ox: 42, oy: -65, w: 65, h: 45 }]),
+];
+
+// SDM: Armageddon Busters
+export const SDM_ARMAGEDDON_BUSTERS_FRAMES: AttackFrame[] = [
+  F([{ ox: 28, oy: -68, w: 58, h: 45 }]),
+  F([{ ox: 36, oy: -65, w: 68, h: 50 }]),
+  F([{ ox: 42, oy: -60, w: 80, h: 58 }]),
+  F([{ ox: 48, oy: -55, w: 90, h: 65 }]),
+  F([{ ox: 52, oy: -52, w: 98, h: 70 }]),
+  F([{ ox: 52, oy: -52, w: 100, h: 72 }]),
+  F([{ ox: 52, oy: -52, w: 100, h: 72 }]),
+  F([{ ox: 52, oy: -52, w: 100, h: 72 }]),
+  F([{ ox: 50, oy: -55, w: 92, h: 68 }]),
+  F([{ ox: 48, oy: -58, w: 85, h: 62 }]),
+  F([{ ox: 45, oy: -60, w: 78, h: 58 }]),
+  F([{ ox: 42, oy: -62, w: 72, h: 52 }]),
+  F([{ ox: 38, oy: -65, w: 65, h: 48 }]),
+  F([{ ox: 35, oy: -68, w: 58, h: 45 }]),
+  F([{ ox: 32, oy: -70, w: 52, h: 42 }]),
+  F([{ ox: 30, oy: -72, w: 48, h: 40 }]),
+];
+
+// ── 玛卓必杀技 (Mature) ──
+export const MATURE_MASSACRE_FRAMES: AttackFrame[] = [
+  F([{ ox: 50, oy: -95, w: 62, h: 40 }]),
+  F([{ ox: 55, oy: -100, w: 68, h: 42 }]),
+  F([{ ox: 60, oy: -105, w: 75, h: 45 }]),
+];
+export const MATURE_MASSACRE_C_FRAMES: AttackFrame[] = [
+  F([{ ox: 48, oy: -92, w: 65, h: 42 }]),
+  F([{ ox: 52, oy: -98, w: 72, h: 45 }]),
+  F([{ ox: 58, oy: -105, w: 80, h: 50 }]),
+  F([{ ox: 62, oy: -105, w: 80, h: 50 }]),
+];
+export const MATURE_HEAVENS_GATE_FRAMES: AttackFrame[] = [
+  F([{ ox: 40, oy: -120, w: 65, h: 55 }]),
+  F([{ ox: 45, oy: -118, w: 70, h: 58 }]),
+  F([{ ox: 50, oy: -115, w: 70, h: 60 }]),
+  F([{ ox: 50, oy: -120, w: 70, h: 60 }]),
+];
+export const MATURE_ECSTASY_FRAMES: AttackFrame[] = [
+  F([{ ox: 35, oy: -155, w: 55, h: 65 }]),
+  F([{ ox: 38, oy: -150, w: 58, h: 68 }]),
+  F([{ ox: 40, oy: -148, w: 60, h: 70 }]),
+  F([{ ox: 40, oy: -155, w: 60, h: 70 }]),
+  F([{ ox: 40, oy: -160, w: 60, h: 68 }]),
+];
+export const DM_NOCTURNAL_LIGHT_FRAMES: AttackFrame[] = [
+  F([{ ox: 40, oy: -130, w: 70, h: 60 }]),
+  F([{ ox: 42, oy: -128, w: 78, h: 65 }]),
+  F([{ ox: 45, oy: -125, w: 85, h: 68 }]),
+  F([{ ox: 45, oy: -130, w: 90, h: 70 }]),
+  F([{ ox: 45, oy: -132, w: 90, h: 70 }]),
+  F([{ ox: 42, oy: -135, w: 85, h: 68 }]),
+  F([{ ox: 40, oy: -138, w: 80, h: 65 }]),
+  F([{ ox: 38, oy: -140, w: 75, h: 60 }]),
+];
+export const SDM_NOCTURNAL_LIGHT_FRAMES: AttackFrame[] = [
+  F([{ ox: 38, oy: -138, w: 72, h: 62 }]),
+  F([{ ox: 40, oy: -135, w: 82, h: 68 }]),
+  F([{ ox: 42, oy: -130, w: 92, h: 75 }]),
+  F([{ ox: 45, oy: -125, w: 100, h: 80 }]),
+  F([{ ox: 45, oy: -128, w: 100, h: 80 }]),
+  F([{ ox: 45, oy: -132, w: 100, h: 80 }]),
+  F([{ ox: 45, oy: -135, w: 100, h: 80 }]),
+  F([{ ox: 42, oy: -138, w: 92, h: 75 }]),
+  F([{ ox: 40, oy: -140, w: 85, h: 70 }]),
+  F([{ ox: 38, oy: -142, w: 78, h: 65 }]),
+  F([{ ox: 36, oy: -145, w: 72, h: 62 }]),
+  F([{ ox: 35, oy: -148, w: 68, h: 58 }]),
+];

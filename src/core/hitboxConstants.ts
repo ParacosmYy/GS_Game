@@ -255,4 +255,22 @@ export const HITBOX_OFFSETS = {
   CHOI_HOUYOKU_TENSHIN: { offsetX: 42, offsetY: -130, width: 60, height: 65 },
   DM_SHIN_CHOU_HOUYOKU: { offsetX: 42, offsetY: -130, width: 85, height: 70 },
   SDM_SHIN_CHOU_HOUYOKU: { offsetX: 42, offsetY: -140, width: 95, height: 75 },
+  // 玛卓 (Mature)
+  MATURE_DESPAIR: { offsetX: 55, offsetY: -105, width: 70, height: 40 },
+  MATURE_JAB: { offsetX: 60, offsetY: -20, width: 70, height: 25 },
+  MATURE_MASSACRE: { offsetX: 60, offsetY: -105, width: 75, height: 45 },
+  MATURE_MASSACRE_C: { offsetX: 60, offsetY: -105, width: 80, height: 50 },
+  MATURE_HEAVENS_GATE: { offsetX: 50, offsetY: -120, width: 70, height: 60 },
+  MATURE_ECSTASY: { offsetX: 40, offsetY: -155, width: 60, height: 70 },
+  DM_NOCTURNAL_LIGHT: { offsetX: 45, offsetY: -130, width: 90, height: 70 },
+  SDM_NOCTURNAL_LIGHT: { offsetX: 45, offsetY: -140, width: 100, height: 80 },
+  // 大门五郎 (Yashiro Nanakase)
+  YASHIRO_SHUU_WANI: { offsetX: 58, offsetY: -100, width: 75, height: 45 },
+  YASHIRO_JUU_ZUTSU: { offsetX: 60, offsetY: -105, width: 70, height: 42 },
+  YASHIRO_UPPER_DU: { offsetX: 52, offsetY: -92, width: 78, height: 48 },
+  YASHIRO_UPPER_DU_C: { offsetX: 52, offsetY: -92, width: 84, height: 54 },
+  YASHIRO_NIRAAI: { offsetX: 45, offsetY: -110, width: 80, height: 55 },
+  YASHIRO_MUSATSU: { offsetX: 60, offsetY: -20, width: 82, height: 28 },
+  DM_ARMAGEDDON_BUSTERS: { offsetX: 38, offsetY: -118, width: 105, height: 78 },
+  SDM_ARMAGEDDON_BUSTERS: { offsetX: 38, offsetY: -128, width: 115, height: 85 },
 } as const;

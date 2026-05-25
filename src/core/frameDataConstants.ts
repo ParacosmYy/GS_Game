@@ -232,6 +232,17 @@ const FRAME_DATA_GENERIC = {
     damage: 45, hitstun: 18, blockstun: 15, pushback: 3,
     hitLevel: 'LOW' as const, knockdown: false,
   },
+  // Yashiro 命令通常技 — APPROX based on KOF2002UM
+  YASHIRO_SHUU_WANI: {
+    startup: 12, active: 4, recovery: 20,
+    damage: 52, hitstun: 19, blockstun: 17, pushback: 4,
+    hitLevel: 'MID' as const, knockdown: false,
+  },
+  YASHIRO_JUU_ZUTSU: {
+    startup: 14, active: 4, recovery: 22,
+    damage: 48, hitstun: 20, blockstun: 17, pushback: 3,
+    hitLevel: 'HIGH' as const, knockdown: false,
+  },
   // ── 蹲下攻击 (Crouch) ──
   CROUCH_A: {
     startup: 5, active: 4, recovery: 7,

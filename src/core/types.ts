@@ -90,6 +90,12 @@ export enum AttackType {
   // 蔡宝奇命令通常技 (Choi Bounge Command Normals)
   CHOI_SOUTEN_MEKKYAKU = 'CHOI_SOUTEN_MEKKYAKU',     // →+A Souten Mekkyaku (upper)
   CHOI_SAN_REN_GEKI = 'CHOI_SAN_REN_GEKI',           // →+B San Ren Geki (low)
+  // 玛卓命令通常技 (Mature Command Normals)
+  MATURE_DESPAIR = 'MATURE_DESPAIR',                 // →+A Despair (upper)
+  MATURE_JAB = 'MATURE_JAB',                         // →+B Jab (low)
+  // 大门五郎命令通常技 (Yashiro Nanakase Command Normals)
+  YASHIRO_SHUU_WANI = 'YASHIRO_SHUU_WANI',           // →+A Shuu Wani (upper)
+  YASHIRO_JUU_ZUTSU = 'YASHIRO_JUU_ZUTSU',           // →+B Juu Zutsu (overhead)
   // 蹲下 (Crouch)
   CROUCH_A = 'CROUCH_A',
   CROUCH_B = 'CROUCH_B',
@@ -242,6 +248,16 @@ export enum AttackType {
   CHOI_KAITEN_HIEN_ZAN = 'CHOI_KAITEN_HIEN_ZAN',         // QCB+A Kaiten Hien Zan
   CHOI_KAITEN_HIEN_ZAN_C = 'CHOI_KAITEN_HIEN_ZAN_C',     // QCB+C Kaiten Hien Zan (strong)
   CHOI_HOUYOKU_TENSHIN = 'CHOI_HOUYOKU_TENSHIN',         // DP+K Houyoku Tenshin Sen
+  // 玛卓必杀技 (Mature Specials)
+  MATURE_MASSACRE = 'MATURE_MASSACRE',                 // QCF+A Metal Massacre
+  MATURE_MASSACRE_C = 'MATURE_MASSACRE_C',             // QCF+C Metal Massacre (strong)
+  MATURE_HEAVENS_GATE = 'MATURE_HEAVENS_GATE',         // QCB+P Heaven's Gate
+  MATURE_ECSTASY = 'MATURE_ECSTASY',                   // DP+K Ecstasy 816
+  // 大门五郎必杀技 (Yashiro Nanakase Specials)
+  YASHIRO_UPPER_DU = 'YASHIRO_UPPER_DU',               // QCF+A Upper Du Bag
+  YASHIRO_UPPER_DU_C = 'YASHIRO_UPPER_DU_C',           // QCF+C Upper Du Bag (strong)
+  YASHIRO_NIRAAI = 'YASHIRO_NIRAAI',                   // QCB+P Niraai Kaname
+  YASHIRO_MUSATSU = 'YASHIRO_MUSATSU',                 // HCF+K Musatsu Niraai
   // 超必杀技 (DM)
   DM_OROCHINAGI = 'DM_OROCHINAGI',           // 大蛇薙 (Kyo)
   DM_YATAGARASU = 'DM_YATAGARASU',           // 八稚女 (Iori)
@@ -264,6 +280,8 @@ export enum AttackType {
   DM_KAEN_SENPU_JIN = 'DM_KAEN_SENPU_JIN',             // Chou Kaen Senpu Jin (Billy)
   DM_TEKKYUU_DAI_BOUSOU = 'DM_TEKKYUU_DAI_BOUSOU',       // Tekkyuu Dai Bousou (Chang)
   DM_SHIN_CHOU_HOUYOKU = 'DM_SHIN_CHOU_HOUYOKU',         // Shin! Chou Houyoku Tenshin Sen (Choi)
+  DM_NOCTURNAL_LIGHT = 'DM_NOCTURNAL_LIGHT',           // Nocturnal Light (Mature)
+  DM_ARMAGEDDON_BUSTERS = 'DM_ARMAGEDDON_BUSTERS',     // Armageddon Busters (Yashiro)
   // 超必杀技SDM (Super Desperation Move — MAX mode only, costs extra stock)
   SDM_OROCHINAGI = 'SDM_OROCHINAGI',         // 大蛇薙SDM (Kyo)
   SDM_YATAGARASU = 'SDM_YATAGARASU',         // 八稚女SDM (Iori)
@@ -284,6 +302,8 @@ export enum AttackType {
   SDM_KAEN_SENPU_JIN = 'SDM_KAEN_SENPU_JIN',           // Chou Kaen Senpu Jin SDM (Billy)
   SDM_TEKKYUU_DAI_BOUSOU = 'SDM_TEKKYUU_DAI_BOUSOU',     // Tekkyuu Dai Bousou SDM (Chang)
   SDM_SHIN_CHOU_HOUYOKU = 'SDM_SHIN_CHOU_HOUYOKU',       // Shin! Chou Houyoku Tenshin Sen SDM (Choi)
+  SDM_NOCTURNAL_LIGHT = 'SDM_NOCTURNAL_LIGHT',         // Nocturnal Light SDM (Mature)
+  SDM_ARMAGEDDON_BUSTERS = 'SDM_ARMAGEDDON_BUSTERS',   // Armageddon Busters SDM (Yashiro)
 }
 
 // ===== Hit Level (防御判定) =====

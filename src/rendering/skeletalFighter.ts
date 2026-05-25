@@ -74,6 +74,8 @@ export function drawSkeletalFighter(
     else if (charId === 'kdash') { breathSpeed = 24; breathAmp = 2; headBob = 0.5; }
     else if (charId === 'kula') { breathSpeed = 28; breathAmp = 1.8; headBob = 0.8; }
     else if (charId === 'robert') { breathSpeed = 26; breathAmp = 2.2; headBob = 1; }
+    else if (charId === 'mature') { breathSpeed = 30; breathAmp = 1.8; headBob = 0.5; } // mature: seductive, slow
+    else if (charId === 'yashiro') { breathSpeed = 22; breathAmp = 2.5; headBob = 1.2; } // yashiro: heavy, powerful
     const breathe = Math.sin(globalTick / breathSpeed) * breathAmp;
     p.body.oy += breathe;
     p.head.oy += breathe + headBob * Math.sin(globalTick / breathSpeed * 0.5);

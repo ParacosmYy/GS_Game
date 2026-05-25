@@ -806,4 +806,90 @@ export const FRAME_DATA_CHARS = {
     damage: 300, hitstun: 0, blockstun: 22, pushback: 12,
     hitLevel: 'MID' as const, knockdown: true, chipDamage: 28,
   },
+  // ── 玛卓命令通常技 (Mature) ── APPROX based on KOF2002UM
+  MATURE_DESPAIR: {
+    startup: 14, active: 4, recovery: 19,
+    damage: 45, hitstun: 19, blockstun: 16, pushback: 3,
+    hitLevel: 'HIGH' as const, knockdown: false,
+  },
+  MATURE_JAB: {
+    startup: 8, active: 4, recovery: 21,
+    damage: 38, hitstun: 18, blockstun: 15, pushback: 2,
+    hitLevel: 'LOW' as const, knockdown: false,
+  },
+  // ── 玛卓必杀技 (Mature) ── APPROX based on KOF2002UM
+  MATURE_MASSACRE: {
+    startup: 8, active: 8, recovery: 22,
+    damage: 75, hitstun: 22, blockstun: 18, pushback: 5,
+    hitLevel: 'MID' as const, knockdown: false, chipDamage: 9,
+  },
+  MATURE_MASSACRE_C: {
+    startup: 10, active: 12, recovery: 26,
+    damage: 110, hitstun: 26, blockstun: 22, pushback: 7,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 12,
+  },
+  MATURE_HEAVENS_GATE: {
+    startup: 18, active: 6, recovery: 26,
+    damage: 80, hitstun: 22, blockstun: 18, pushback: 5,
+    hitLevel: 'HIGH' as const, knockdown: true, chipDamage: 10,
+  },
+  MATURE_ECSTASY: {
+    startup: 5, active: 6, recovery: 26,
+    damage: 85, hitstun: 22, blockstun: 18, pushback: 7,
+    hitLevel: 'MID' as const, knockdown: false, chipDamage: 10,
+  },
+  // ── 玛卓DM (Mature) ──
+  DM_NOCTURNAL_LIGHT: {
+    startup: 8, active: 14, recovery: 38,
+    damage: 200, hitstun: 0, blockstun: 22, pushback: 10,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 18,
+  },
+  // ── 玛卓SDM (Mature) ──
+  SDM_NOCTURNAL_LIGHT: {
+    startup: 8, active: 20, recovery: 36,
+    damage: 300, hitstun: 0, blockstun: 22, pushback: 12,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 28,
+  },
+  // ── 大门五郎必杀技 (Yashiro Nanakase) ── APPROX based on KOF2002UM
+  YASHIRO_SHUU_WANI: {
+    startup: 12, active: 4, recovery: 20,
+    damage: 40, hitstun: 16, blockstun: 14, pushback: 4,
+    hitLevel: 'MID' as const, knockdown: false,
+  },
+  YASHIRO_JUU_ZUTSU: {
+    startup: 18, active: 4, recovery: 22,
+    damage: 45, hitstun: 18, blockstun: 15, pushback: 4,
+    hitLevel: 'HIGH' as const, knockdown: false,
+  },
+  YASHIRO_UPPER_DU: {
+    startup: 8, active: 10, recovery: 24,
+    damage: 60, hitstun: 22, blockstun: 18, pushback: 5,
+    hitLevel: 'MID' as const, knockdown: false, chipDamage: 8,
+  },
+  YASHIRO_UPPER_DU_C: {
+    startup: 10, active: 16, recovery: 28,
+    damage: 95, hitstun: 26, blockstun: 22, pushback: 8,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 12,
+  },
+  YASHIRO_NIRAAI: {
+    startup: 18, active: 6, recovery: 26,
+    damage: 80, hitstun: 24, blockstun: 20, pushback: 6,
+    hitLevel: 'HIGH' as const, knockdown: true, chipDamage: 10,
+  },
+  YASHIRO_MUSATSU: {
+    startup: 14, active: 6, recovery: 28,
+    damage: 70, hitstun: 22, blockstun: 18, pushback: 5,
+    hitLevel: 'LOW' as const, knockdown: true, chipDamage: 8,
+  },
+  // ── 大门五郎DM/SDM (Yashiro) ── APPROX based on KOF2002UM
+  DM_ARMAGEDDON_BUSTERS: {
+    startup: 10, active: 10, recovery: 42,
+    damage: 230, hitstun: 0, blockstun: 22, pushback: 14,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 22,
+  },
+  SDM_ARMAGEDDON_BUSTERS: {
+    startup: 8, active: 16, recovery: 40,
+    damage: 330, hitstun: 0, blockstun: 22, pushback: 16,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 32,
+  },
 } as const;
