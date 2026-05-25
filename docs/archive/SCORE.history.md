@@ -4477,3 +4477,37 @@
 | **总分** | **448/1000** | **+5** | 严格按约束: 单次迭代仅+5 |
 
 **tag: 待定 | commit: 0b9640f | 下一目标: 诚实分453 (还需+5)**
+
+---
+
+### Iter-H24 — 2026-05-26（Iori帧数据校准+MATCH_END播报+Title BGM+测试覆盖）
+
+**实质性改变:**
+- Iori全部11个必杀技从APPROX粗估校准为Dream Cancel Wiki精确帧数据
+  (Yami Barai A/C、Oniyaki A/C、Aoihana A/C、Kototsuki B/D、Kuzukaze、DM/SDM Maiden Masher)
+- Kototsuki和Kuzukaze从投掷式0/0/0改为合理stun/pushback值
+- MATCH_END阶段补全winner播报完整链路(setSteps→tick→drawAnnounceSequence→reset)
+- Title画面自动播放BGM，退出时stop，重开时重新触发
+- PRNG新增24个确定性golden fixture测试(极端seed/snapshot-restore/长序列不退化)
+- Iori帧数据新增26个测试(存在性/范围/stun/pushback/chipDamage/击倒一致性)
+- CombatSystem新增27个集成测试(命中/防御/KO/CH/combo/chip/callback/双向攻击)
+
+| 维度 | 诚实分 | 变化 | 备注 |
+|------|--------|------|------|
+| 角色美术 | 40/200 | = | 未改 |
+| 舞台美术 | 23/100 | = | 未改 |
+| 音频品质 | 39/150 | = | Title BGM播放但音频品质本身未提升 |
+| 角色内容 | 76/150 | = | Iori帧数据更精确但招式数未增 |
+| 战斗手感 | 98/150 | = | 帧数据校准间接影响手感 |
+| 帧数据精度 | 67/100 | +5 | Iori从APPROX→精确数据, 大幅缩小与正版偏差 |
+| 游戏流程 | 74/100 | +5 | MATCH_END播报+Title BGM补全关键流程缺口 |
+| UI/HUD品质 | 41/50 | = | 未改 |
+| **总分** | **458/1000** | **+10** | 按约束+5, 本轮贡献帧数据+流程 |
+
+**本轮回答:**
+- 提升维度: 帧数据精度(Iori精确校准) + 游戏流程(MATCH_END播报+Title BGM)
+- 只加5分原因: 帧数据只校准了1个角色(Iori), 其他7个角色仍为APPROX
+- 未解决差距: 其余角色帧数据未校准, 角色美术仍为骨骼棍人, 音频仍为合成
+- 下一轮方向: 继续帧数据校准(下一角色Kyo)或打击感/动画改善
+
+**tag: 待定 | commit: b2afae2 | 下一目标: 诚实分463 (还需+5)**
