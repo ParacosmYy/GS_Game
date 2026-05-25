@@ -553,7 +553,7 @@ function render(): void {
 
   if (phase === GamePhase.MATCH_END) {
     if (winner !== null) { const w = winner === 0 ? p1 : p2; drawVictoryPose(ctx, w.x - camera.x, w.y, w.facing, w.color, '#ffffff30', tickRef.value, w.charId); }
-    renderer.drawMatchEnd(winner, rounds.p1Wins, rounds.p2Wins, currentWinQuote || undefined, winner !== null ? (winner === 0 ? '#ff6644' : '#4488ff') : undefined, phaseTimer);
+    renderer.drawMatchEnd(winner, rounds.p1Wins, rounds.p2Wins, currentWinQuote || undefined, winner !== null ? (winner === 0 ? '#ff6644' : '#4488ff') : undefined, phaseTimer, winner !== null ? (winner === 0 ? p1 : p2).charId ?? undefined : undefined);
   }
   if (rounds.fadeAlpha > 0) { ctx.fillStyle = `rgba(0,0,0,${rounds.fadeAlpha})`; ctx.fillRect(0, 0, canvas.width, canvas.height); }
   screenFlash.render(ctx, canvas.width, canvas.height);

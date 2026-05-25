@@ -94,18 +94,18 @@ export const TerryDef: CharacterDefinition = {
       legFront: bone(4, -3, 0.2),
       legBack: bone(-5, 0, -0.35),
     }),
-    // — Attack poses (boxing stance, compact arms, wider legs) —
+    // — Attack poses (Boxing style: hook punches, wide swings, body sways more) —
     [FighterState.STAND_ATTACK]: [
-      pose({ head: bone(2, 0, 0.03), body: bone(3, 0, 0.08), armFront: bone(16, 6, 0.1, 1.0), armBack: bone(-8, 10, -0.7, 0.9), legFront: bone(6, 0, 0.1), legBack: bone(-7, 0, -0.12) }),
-      pose({ head: bone(3, 1, 0.05), body: bone(4, 0, 0.12), armFront: bone(22, 8, -0.08, 1.2), armBack: bone(-8, 10, -0.7, 0.9), legFront: bone(8, 0, 0.15), legBack: bone(-8, 0, -0.15) }),
+      pose({ head: bone(3, -1, 0.04), body: bone(2, 0, 0.1), armFront: bone(15, 4, 0.15, 1.1), armBack: bone(-10, 12, -0.85, 0.9), legFront: bone(7, 0, 0.12), legBack: bone(-8, 0, -0.14) }),
+      pose({ head: bone(4, 0, 0.06), body: bone(5, 0, 0.15), armFront: bone(25, 10, 0.08, 1.25), armBack: bone(-10, 12, -0.85, 0.9), legFront: bone(9, 0, 0.18), legBack: bone(-9, 0, -0.18) }),
     ],
     [FighterState.CROUCH_ATTACK]: [
-      pose({ head: bone(2, 8, 0.05), body: bone(2, 10, 0.08), armFront: bone(15, 10, 0.0, 1.0), armBack: bone(-6, 15, -0.5, 0.85), legFront: bone(13, 3, 0.25, 1.0), legBack: bone(-10, 8, -0.2) }),
-      pose({ head: bone(3, 9, 0.08), body: bone(3, 12, 0.12), armFront: bone(20, 12, -0.15, 1.15), armBack: bone(-6, 15, -0.5, 0.85), legFront: bone(16, 4, 0.3, 1.05), legBack: bone(-10, 8, -0.2) }),
+      pose({ head: bone(3, 7, 0.06), body: bone(2, 10, 0.1), armFront: bone(14, 8, 0.05, 1.05), armBack: bone(-8, 16, -0.6, 0.85), legFront: bone(14, 3, 0.28, 1.05), legBack: bone(-10, 8, -0.22) }),
+      pose({ head: bone(4, 8, 0.1), body: bone(4, 12, 0.15), armFront: bone(22, 10, -0.1, 1.2), armBack: bone(-8, 16, -0.6, 0.85), legFront: bone(17, 4, 0.35, 1.1), legBack: bone(-10, 8, -0.25) }),
     ],
     [FighterState.AIR_ATTACK]: [
-      pose({ head: bone(0, -1, -0.04), body: bone(1, 0, 0.08), armFront: bone(14, -3, -0.15, 1.0), armBack: bone(-10, 0, -0.4, 0.85), legFront: bone(11, 3, 0.3, 1.1), legBack: bone(-8, -2, -0.2) }),
-      pose({ head: bone(0, -2, -0.08), body: bone(2, 0, 0.12), armFront: bone(18, -4, -0.25, 1.15), armBack: bone(-10, 0, -0.4, 0.85), legFront: bone(14, 4, 0.35, 1.15), legBack: bone(-8, -2, -0.25) }),
+      pose({ head: bone(1, -1, -0.05), body: bone(2, 0, 0.1), armFront: bone(16, -2, -0.12, 1.1), armBack: bone(-12, 0, -0.5, 0.85), legFront: bone(12, 3, 0.32, 1.1), legBack: bone(-9, -2, -0.22) }),
+      pose({ head: bone(2, -2, -0.1), body: bone(4, 0, 0.16), armFront: bone(22, -4, -0.2, 1.25), armBack: bone(-12, 0, -0.5, 0.85), legFront: bone(16, 5, 0.4, 1.2), legBack: bone(-9, -2, -0.28) }),
     ],
     [FighterState.THROW]: [
       pose({ head: bone(2, 0, 0.03), body: bone(4, 0, 0.12), armFront: bone(20, 3, 0.0, 1.2), armBack: bone(14, 5, -0.1, 1.05), legFront: bone(5, 0, 0.1), legBack: bone(-5, 0, -0.1) }),

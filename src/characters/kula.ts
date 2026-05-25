@@ -102,20 +102,20 @@ export const KulaDef: CharacterDefinition = {
       legFront: bone(2, -3, 0.12),
       legBack: bone(-4, 0, -0.25),
     }),
-    // 站立攻击 — 手臂前伸
+    // 站立攻击 — Graceful ice fighter: light airy strikes, more body rotation, smaller arm scale
     [FighterState.STAND_ATTACK]: [
-      pose({ head: bone(1, 0, 0.02), body: bone(2, 0, 0.06), armFront: bone(14, 4, 0.1, 1.0), armBack: bone(-7, 8, -0.55, 0.85), legFront: bone(5, 0, 0.06), legBack: bone(-5, 0, -0.08) }),
-      pose({ head: bone(2, 1, 0.04), body: bone(3, 0, 0.1), armFront: bone(20, 5, -0.04, 1.15), armBack: bone(-7, 8, -0.55, 0.85), legFront: bone(6, 0, 0.1), legBack: bone(-6, 0, -0.1) }),
+      pose({ head: bone(1, 0, 0.03), body: bone(2, 0, 0.08), armFront: bone(12, 6, 0.08, 0.9), armBack: bone(-4, 8, -0.45, 0.8), legFront: bone(4, 0, 0.04), legBack: bone(-4, 0, -0.06) }),
+      pose({ head: bone(2, 0, 0.05), body: bone(4, 0, 0.14), armFront: bone(20, 7, 0.1, 1.0), armBack: bone(-4, 8, -0.45, 0.8), legFront: bone(5, 0, 0.08), legBack: bone(-5, 0, -0.08) }),
     ],
-    // 蹲下攻击
+    // 蹲下攻击 — graceful sweep
     [FighterState.CROUCH_ATTACK]: [
-      pose({ head: bone(1, 8, 0.04), body: bone(2, 10, 0.06), armFront: bone(12, 10, 0.02, 1.0), armBack: bone(-5, 12, -0.42, 0.85), legFront: bone(13, 2, 0.24, 1.0), legBack: bone(-6, 8, -0.15) }),
-      pose({ head: bone(2, 9, 0.06), body: bone(3, 12, 0.1), armFront: bone(16, 12, -0.08, 1.1), armBack: bone(-5, 12, -0.42, 0.85), legFront: bone(16, 3, 0.3, 1.05), legBack: bone(-6, 8, -0.18) }),
+      pose({ head: bone(1, 6, 0.03), body: bone(2, 8, 0.06), armFront: bone(10, 8, 0.04, 0.9), armBack: bone(-4, 12, -0.35, 0.8), legFront: bone(14, 2, 0.26, 1.0), legBack: bone(-5, 6, -0.12) }),
+      pose({ head: bone(2, 7, 0.05), body: bone(3, 10, 0.1), armFront: bone(14, 10, -0.04, 1.0), armBack: bone(-4, 12, -0.35, 0.8), legFront: bone(18, 3, 0.32, 1.05), legBack: bone(-5, 6, -0.15) }),
     ],
-    // 空中攻击
+    // 空中攻击 — light and airy
     [FighterState.AIR_ATTACK]: [
-      pose({ head: bone(0, -1, -0.03), body: bone(1, 0, 0.06), armFront: bone(12, -2, -0.1, 1.0), armBack: bone(-7, 0, -0.3, 0.85), legFront: bone(8, 2, 0.2, 1.0), legBack: bone(-6, -1, -0.15) }),
-      pose({ head: bone(0, -2, -0.06), body: bone(2, 0, 0.1), armFront: bone(16, -3, -0.16, 1.1), armBack: bone(-7, 0, -0.3, 0.85), legFront: bone(11, 3, 0.28, 1.1), legBack: bone(-6, -1, -0.18) }),
+      pose({ head: bone(0, -1, -0.02), body: bone(1, 0, 0.06), armFront: bone(10, -1, -0.06, 0.9), armBack: bone(-4, 2, -0.22, 0.8), legFront: bone(10, 3, 0.25, 1.0), legBack: bone(-4, 0, -0.1) }),
+      pose({ head: bone(0, -1, -0.04), body: bone(3, 0, 0.12), armFront: bone(14, -2, -0.1, 1.05), armBack: bone(-4, 2, -0.22, 0.8), legFront: bone(14, 4, 0.32, 1.1), legBack: bone(-4, 0, -0.14) }),
     ],
     // 投技
     [FighterState.THROW]: [

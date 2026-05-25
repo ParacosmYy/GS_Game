@@ -107,20 +107,20 @@ export const KdashDef: CharacterDefinition = {
       legFront: bone(4, -5, 0.12),
       legBack: bone(-6, -2, -0.28),
     }),
-    // 站立攻击 — 出拳时前倾发力
+    // 站立攻击 — Lazy but explosive: one-handed powerful strikes, armBack stays low (in pocket)
     [FighterState.STAND_ATTACK]: [
-      pose({ head: bone(2, 0, 0.02), body: bone(4, 0, 0.1), armFront: bone(18, 4, 0.08, 1.0), armBack: bone(-10, 12, -0.6, 0.85), legFront: bone(7, 0, 0.06), legBack: bone(-7, 0, -0.12) }),
-      pose({ head: bone(3, 1, 0.04), body: bone(5, 0, 0.14), armFront: bone(24, 5, -0.06, 1.2), armBack: bone(-10, 12, -0.6, 0.85), legFront: bone(8, 0, 0.1), legBack: bone(-8, 0, -0.14) }),
+      pose({ head: bone(2, 0, 0.02), body: bone(5, 0, 0.12), armFront: bone(18, 4, 0.1, 1.05), armBack: bone(-8, 18, -0.15, 0.75), legFront: bone(7, 0, 0.06), legBack: bone(-7, 0, -0.12) }),
+      pose({ head: bone(3, 1, 0.04), body: bone(7, 0, 0.16), armFront: bone(26, 5, -0.02, 1.3), armBack: bone(-8, 18, -0.15, 0.75), legFront: bone(8, 0, 0.1), legBack: bone(-8, 0, -0.14) }),
     ],
-    // 蹲下攻击 — 前腿扫出
+    // 蹲下攻击 — front arm does all the work, back arm lazy
     [FighterState.CROUCH_ATTACK]: [
-      pose({ head: bone(2, 8, 0.04), body: bone(2, 10, 0.06), armFront: bone(16, 10, 0.02, 1.0), armBack: bone(-8, 15, -0.45, 0.85), legFront: bone(16, 2, 0.3, 1.0), legBack: bone(-10, 8, -0.16) }),
-      pose({ head: bone(3, 9, 0.06), body: bone(3, 12, 0.1), armFront: bone(20, 12, -0.08, 1.15), armBack: bone(-8, 15, -0.45, 0.85), legFront: bone(20, 3, 0.38, 1.1), legBack: bone(-10, 8, -0.2) }),
+      pose({ head: bone(2, 8, 0.04), body: bone(3, 10, 0.08), armFront: bone(16, 8, 0.05, 1.05), armBack: bone(-8, 20, -0.12, 0.75), legFront: bone(16, 2, 0.3, 1.0), legBack: bone(-10, 8, -0.16) }),
+      pose({ head: bone(3, 9, 0.06), body: bone(4, 12, 0.12), armFront: bone(22, 10, -0.06, 1.25), armBack: bone(-8, 20, -0.12, 0.75), legFront: bone(20, 3, 0.38, 1.1), legBack: bone(-10, 8, -0.2) }),
     ],
-    // 空中攻击 — 踢腿下压
+    // 空中攻击 — front arm thrusts, back arm stays relaxed
     [FighterState.AIR_ATTACK]: [
-      pose({ head: bone(0, -1, -0.06), body: bone(2, 0, 0.1), armFront: bone(16, -2, -0.1, 1.0), armBack: bone(-10, 0, -0.3, 0.85), legFront: bone(12, 3, 0.28, 1.0), legBack: bone(-8, -1, -0.16) }),
-      pose({ head: bone(0, -2, -0.1), body: bone(3, 0, 0.14), armFront: bone(20, -3, -0.18, 1.15), armBack: bone(-10, 0, -0.3, 0.85), legFront: bone(15, 4, 0.35, 1.15), legBack: bone(-8, -1, -0.2) }),
+      pose({ head: bone(0, -1, -0.06), body: bone(3, 0, 0.12), armFront: bone(16, -2, -0.08, 1.05), armBack: bone(-8, 4, -0.12, 0.75), legFront: bone(12, 3, 0.28, 1.0), legBack: bone(-8, -1, -0.16) }),
+      pose({ head: bone(0, -2, -0.1), body: bone(5, 0, 0.16), armFront: bone(22, -3, -0.14, 1.3), armBack: bone(-8, 4, -0.12, 0.75), legFront: bone(16, 4, 0.35, 1.15), legBack: bone(-8, -1, -0.2) }),
     ],
     // 投技 — 伸手抓住
     [FighterState.THROW]: [

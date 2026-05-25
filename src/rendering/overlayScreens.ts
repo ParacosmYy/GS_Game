@@ -4,6 +4,7 @@
 import { CANVAS_WIDTH, CANVAS_HEIGHT } from '../core/constants.js';
 import { ROSTER } from '../characters/index.js';
 import { roundRect, drawSNKText } from './utils.js';
+import { drawPixelPortrait } from './pixelPortraits.js';
 
 // ===== Super Flash =====
 
@@ -122,6 +123,7 @@ export function drawMatchEnd(
   winQuote?: string,
   winnerColor?: string,
   tick?: number,
+  winnerCharId?: string,
 ): void {
   ctx.save();
 
@@ -131,30 +133,59 @@ export function drawMatchEnd(
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
 
+  // Winner portrait
+  if (winner !== null && winnerCharId) {
+    const charDef = ROSTER.find(c => c.id === winnerCharId);
+    if (charDef?.pixelPortrait) {
+      const portraitScale = 3;
+      const pw = charDef.pixelPortrait.width * portraitScale;
+      const ph = charDef.pixelPortrait.height * portraitScale;
+      const px = CANVAS_WIDTH / 2 - pw / 2;
+      const py = 40;
+      // Portrait background frame
+      ctx.fillStyle = 'rgba(20, 20, 40, 0.8)';
+      roundRect(ctx, px - 8, py - 8, pw + 16, ph + 16, 8);
+      ctx.fill();
+      ctx.strokeStyle = winnerColor ?? '#FFD700';
+      ctx.lineWidth = 2;
+      roundRect(ctx, px - 8, py - 8, pw + 16, ph + 16, 8);
+      ctx.stroke();
+      drawPixelPortrait(ctx, charDef.pixelPortrait, px, py, portraitScale);
+    }
+  }
+
+  const textOffsetY = (winner !== null && winnerCharId) ? 190 : 0;
+
   ctx.shadowColor = '#ff8800';
   ctx.shadowBlur = 25;
-  drawSNKText(ctx, 'GAME', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 80, 72, '#FFD700');
+  drawSNKText(ctx, 'GAME', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 80 + textOffsetY, 72, '#FFD700');
   ctx.shadowBlur = 0;
 
   if (winner !== null) {
     const wColor = winner === 0 ? '#ff6644' : '#4488ff';
-    drawSNKText(ctx, `P${winner + 1} WINS THE MATCH`, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 20, 32, wColor);
+    drawSNKText(ctx, `P${winner + 1} WINS THE MATCH`, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 20 + textOffsetY, 32, wColor);
+    // Winner name
+    if (winnerCharId) {
+      const charDef = ROSTER.find(c => c.id === winnerCharId);
+      if (charDef) {
+        drawSNKText(ctx, charDef.nameCn, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 12 + textOffsetY, 20, wColor);
+      }
+    }
   } else {
-    drawSNKText(ctx, 'DRAW GAME', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 20, 32, '#ffcc00');
+    drawSNKText(ctx, 'DRAW GAME', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 20 + textOffsetY, 32, '#ffcc00');
   }
 
   if (winQuote && winnerColor) {
     ctx.shadowColor = winnerColor;
     ctx.shadowBlur = 8;
-    // KOF2002: 打字机效果 — 每3tick显示一个字符
     const chars = Math.min(winQuote.length, Math.floor((tick || 0) / 3));
     const visible = winQuote.substring(0, chars);
-    drawSNKText(ctx, `"${visible}"`, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 25, 16, winnerColor);
+    drawSNKText(ctx, `"${visible}"`, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 45 + textOffsetY, 16, winnerColor);
     ctx.shadowBlur = 0;
   }
 
   // Win markers
-  const dotY = CANVAS_HEIGHT / 2 + 65;
+  const dotY = CANVAS_HEIGHT / 2 + 80 + textOffsetY;
   const dotSpacing = 22;
   for (let i = 0; i < p1Wins; i++) {
     ctx.beginPath();

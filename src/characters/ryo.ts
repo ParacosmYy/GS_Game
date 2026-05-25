@@ -94,17 +94,18 @@ export const RyoDef: CharacterDefinition = {
       legFront: bone(3, -4, 0.15),
       legBack: bone(-5, -1, -0.3),
     }),
+    // — Attack poses (Kyokugenryu: powerful straight punch, deep horse stance, body rotates more) —
     [FighterState.STAND_ATTACK]: [
-      pose({ head: bone(2, 0, 0.03), body: bone(3, 0, 0.08), armFront: bone(16, 5, 0.12, 1.0), armBack: bone(-8, 10, -0.65, 0.85), legFront: bone(6, 0, 0.08), legBack: bone(-6, 0, -0.1) }),
-      pose({ head: bone(3, 1, 0.05), body: bone(4, 0, 0.12), armFront: bone(22, 6, -0.05, 1.2), armBack: bone(-8, 10, -0.65, 0.85), legFront: bone(7, 0, 0.12), legBack: bone(-7, 0, -0.12) }),
+      pose({ head: bone(3, 0, 0.04), body: bone(4, 0, 0.1), armFront: bone(17, 4, 0.18, 1.1), armBack: bone(-12, 12, -0.8, 0.9), legFront: bone(7, 0, 0.1), legBack: bone(-7, 0, -0.12) }),
+      pose({ head: bone(4, 1, 0.06), body: bone(6, 0, 0.15), armFront: bone(30, 6, 0.15, 1.3), armBack: bone(-12, 12, -0.8, 0.9), legFront: bone(8, 0, 0.14), legBack: bone(-8, 0, -0.15) }),
     ],
     [FighterState.CROUCH_ATTACK]: [
-      pose({ head: bone(2, 8, 0.05), body: bone(2, 10, 0.08), armFront: bone(14, 10, 0.05, 1.0), armBack: bone(-6, 14, -0.5, 0.85), legFront: bone(15, 2, 0.28, 1.0), legBack: bone(-8, 8, -0.18) }),
-      pose({ head: bone(3, 9, 0.08), body: bone(3, 12, 0.12), armFront: bone(18, 12, -0.1, 1.15), armBack: bone(-6, 14, -0.5, 0.85), legFront: bone(18, 3, 0.35, 1.1), legBack: bone(-8, 8, -0.22) }),
+      pose({ head: bone(3, 10, 0.06), body: bone(3, 14, 0.12), armFront: bone(15, 8, 0.08, 1.0), armBack: bone(-8, 16, -0.55, 0.85), legFront: bone(18, 4, 0.35, 1.05), legBack: bone(-12, 12, -0.3) }),
+      pose({ head: bone(4, 11, 0.1), body: bone(4, 16, 0.18), armFront: bone(20, 10, -0.06, 1.2), armBack: bone(-8, 16, -0.55, 0.85), legFront: bone(22, 5, 0.45, 1.15), legBack: bone(-12, 12, -0.35) }),
     ],
     [FighterState.AIR_ATTACK]: [
-      pose({ head: bone(0, -1, -0.04), body: bone(1, 0, 0.08), armFront: bone(14, -2, -0.12, 1.0), armBack: bone(-8, 0, -0.35, 0.85), legFront: bone(10, 3, 0.25, 1.0), legBack: bone(-7, -1, -0.18) }),
-      pose({ head: bone(0, -2, -0.08), body: bone(2, 0, 0.12), armFront: bone(18, -3, -0.2, 1.15), armBack: bone(-8, 0, -0.35, 0.85), legFront: bone(13, 4, 0.32, 1.15), legBack: bone(-7, -1, -0.22) }),
+      pose({ head: bone(1, -1, -0.05), body: bone(2, 0, 0.1), armFront: bone(15, -2, -0.15, 1.05), armBack: bone(-10, 0, -0.45, 0.85), legFront: bone(12, 4, 0.3, 1.05), legBack: bone(-8, -1, -0.2) }),
+      pose({ head: bone(2, -2, -0.1), body: bone(4, 0, 0.16), armFront: bone(22, -4, -0.22, 1.25), armBack: bone(-10, 0, -0.45, 0.85), legFront: bone(16, 5, 0.4, 1.2), legBack: bone(-8, -1, -0.25) }),
     ],
     [FighterState.THROW]: [
       pose({ head: bone(2, 0, 0.03), body: bone(4, 0, 0.12), armFront: bone(20, 3, 0.0, 1.15), armBack: bone(14, 5, -0.1, 1.0), legFront: bone(5, 0, 0.08), legBack: bone(-5, 0, -0.08) }),

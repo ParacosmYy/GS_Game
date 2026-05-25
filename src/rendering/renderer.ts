@@ -419,8 +419,8 @@ export class Renderer {
     drawCharacterSelect(this.ctx, p1Cursor, p2Cursor, p1Ready, p2Ready, tick, p2IsAI, simplifiedMode);
   }
 
-  drawMatchEnd(winner: number | null, p1Wins: number, p2Wins: number, winQuote?: string, winnerColor?: string, tick?: number): void {
-    drawMatchEnd(this.ctx, winner, p1Wins, p2Wins, winQuote, winnerColor, tick);
+  drawMatchEnd(winner: number | null, p1Wins: number, p2Wins: number, winQuote?: string, winnerColor?: string, tick?: number, winnerCharId?: string): void {
+    drawMatchEnd(this.ctx, winner, p1Wins, p2Wins, winQuote, winnerColor, tick, winnerCharId);
   }
 
   drawModeIndicator(simplifiedMode: boolean, alpha: number): void {

@@ -11,6 +11,7 @@ import { DEFAULT_PROPORTIONS } from '../characters/types.js';
 import { shiftColor, roundRect } from './utils.js';
 import { getOutfit, drawCharacterHead } from './skeletalParts.js';
 import { drawPixelTorso, drawPixelArm, drawPixelLeg } from './bodyPartRenderer.js';
+import { getVictoryPose, drawVictoryVFX } from './victoryPose.js';
 
 /** Draw skeletal body using 6-bone pose system — enhanced rendering */
 export function drawSkeletalFighter(
@@ -127,7 +128,6 @@ export function drawSkeletalFighter(
 
   // Colors
   const skinColor = '#e8b88a';
-  const skinColorDark = shiftColor(skinColor, -20);
 
   // Draw shadow on ground
   const shadowY = sy + 2;
@@ -262,18 +262,14 @@ export function drawSkeletalFighter(
   }
   ctx.restore();
 
-  // Fist glow on front arm when attacking
+  // Fist glow on front arm when attacking — character-specific element
   if (!isFlashing && (f.state === FighterState.STAND_ATTACK || f.state === FighterState.CROUCH_ATTACK || f.state === FighterState.AIR_ATTACK)) {
     ctx.save();
     ctx.translate(frontArm.x, shoulderY + p.armFront.oy * heightFactor);
     ctx.rotate(frontArm.rot);
-    ctx.fillStyle = skinColor;
-    ctx.strokeStyle = skinColorDark;
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.arc(0, armH * p.armFront.scale / 2 - 2, armW * 0.4, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.stroke();
+    const fistR = armW * 0.45;
+    const fistY = armH * p.armFront.scale / 2 - 2;
+    drawFistGlow(ctx, f.charId ?? '', fistR, fistY, globalTick);
     ctx.restore();
   }
 
@@ -305,7 +301,100 @@ export function drawSkeletalFighter(
   }
 }
 
-/** Draw victory pose — fighter standing triumphant with arms raised */
+/** 角色专属拳头光效 — 通常攻击时可见 */
+function drawFistGlow(
+  ctx: CanvasRenderingContext2D, charId: string,
+  fistR: number, fistY: number, tick: number,
+): void {
+  const skinColor = '#e8b88a';
+  const skinDark = shiftColor(skinColor, -20);
+  // 基础拳头
+  ctx.fillStyle = skinColor;
+  ctx.strokeStyle = skinDark;
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.arc(0, fistY, fistR, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+  // 角色专属光效
+  const flicker = 0.3 + Math.sin(tick * 0.2) * 0.15;
+  switch (charId) {
+    case 'kyo': {
+      ctx.shadowColor = '#ff4400';
+      ctx.shadowBlur = 12;
+      ctx.fillStyle = `rgba(255, 120, 0, ${flicker})`;
+      ctx.beginPath(); ctx.arc(0, fistY, fistR + 3, 0, Math.PI * 2); ctx.fill();
+      ctx.shadowBlur = 0;
+      break;
+    }
+    case 'iori': {
+      ctx.shadowColor = '#8800cc';
+      ctx.shadowBlur = 10;
+      ctx.fillStyle = `rgba(136, 0, 204, ${flicker})`;
+      ctx.beginPath(); ctx.arc(0, fistY, fistR + 2, 0, Math.PI * 2); ctx.fill();
+      ctx.shadowBlur = 0;
+      break;
+    }
+    case 'terry': {
+      ctx.shadowColor = '#ffcc00';
+      ctx.shadowBlur = 8;
+      ctx.fillStyle = `rgba(255, 200, 0, ${flicker * 0.7})`;
+      ctx.beginPath(); ctx.arc(0, fistY, fistR + 2, 0, Math.PI * 2); ctx.fill();
+      ctx.shadowBlur = 0;
+      break;
+    }
+    case 'kim': {
+      ctx.shadowColor = '#4488ff';
+      ctx.shadowBlur = 8;
+      ctx.fillStyle = `rgba(100, 150, 255, ${flicker * 0.6})`;
+      ctx.beginPath(); ctx.arc(0, fistY, fistR + 2, 0, Math.PI * 2); ctx.fill();
+      ctx.shadowBlur = 0;
+      break;
+    }
+    case 'ryo': {
+      ctx.shadowColor = '#ff8800';
+      ctx.shadowBlur = 10;
+      ctx.fillStyle = `rgba(255, 160, 0, ${flicker})`;
+      ctx.beginPath(); ctx.arc(0, fistY, fistR + 3, 0, Math.PI * 2); ctx.fill();
+      ctx.shadowBlur = 0;
+      break;
+    }
+    case 'leona': {
+      ctx.shadowColor = '#44ff88';
+      ctx.shadowBlur = 6;
+      ctx.fillStyle = `rgba(80, 255, 120, ${flicker * 0.5})`;
+      ctx.beginPath(); ctx.arc(0, fistY, fistR + 1, 0, Math.PI * 2); ctx.fill();
+      ctx.shadowBlur = 0;
+      break;
+    }
+    case 'kdash': {
+      ctx.shadowColor = '#ff4400';
+      ctx.shadowBlur = 8;
+      ctx.fillStyle = `rgba(255, 80, 0, ${flicker * 0.8})`;
+      ctx.beginPath(); ctx.arc(0, fistY, fistR + 2, 0, Math.PI * 2); ctx.fill();
+      ctx.shadowBlur = 0;
+      break;
+    }
+    case 'kula': {
+      ctx.shadowColor = '#44ccff';
+      ctx.shadowBlur = 8;
+      ctx.fillStyle = `rgba(100, 200, 255, ${flicker * 0.6})`;
+      ctx.beginPath(); ctx.arc(0, fistY, fistR + 2, 0, Math.PI * 2); ctx.fill();
+      ctx.shadowBlur = 0;
+      break;
+    }
+    case 'robert': {
+      ctx.shadowColor = '#22dd66';
+      ctx.shadowBlur = 8;
+      ctx.fillStyle = `rgba(68, 255, 136, ${flicker * 0.7})`;
+      ctx.beginPath(); ctx.arc(0, fistY, fistR + 2, 0, Math.PI * 2); ctx.fill();
+      ctx.shadowBlur = 0;
+      break;
+    }
+  }
+}
+
+/** Draw victory pose — character-specific win pose */
 export function drawVictoryPose(
   ctx: CanvasRenderingContext2D,
   sx: number,
@@ -316,16 +405,7 @@ export function drawVictoryPose(
   tick: number,
   charId: string = 'kyo',
 ): void {
-  const bounce = Math.sin(tick * 0.08) * 3;
-  const victoryPose: Pose = {
-    head: { ox: 0, oy: bounce, rot: 0, scale: 1 },
-    body: { ox: 0, oy: bounce * 0.7, rot: 0, scale: 1 },
-    armFront: { ox: 12, oy: -50 + bounce * 0.3, rot: -1.8, scale: 1.1 },
-    armBack: { ox: -10, oy: -50 + bounce * 0.3, rot: 1.8, scale: 1.1 },
-    legFront: { ox: 8, oy: 0, rot: 0.1, scale: 1 },
-    legBack: { ox: -6, oy: 0, rot: -0.1, scale: 1 },
-  };
-
+  const victoryPose = getVictoryPose(charId, tick);
   const p = {
     head: { ...victoryPose.head },
     body: { ...victoryPose.body },
@@ -408,6 +488,9 @@ export function drawVictoryPose(
   ctx.rotate(frontArm.rot);
   drawPixelArm(ctx, charId, armW * p.armFront.scale, armH * p.armFront.scale, false);
   ctx.restore();
+
+  // Character-specific victory VFX
+  drawVictoryVFX(ctx, sx, sy, tick, charId, facing);
 
   // Victory golden glow
   const glowPulse = 0.25 + Math.sin(tick / 6) * 0.1;

@@ -94,17 +94,18 @@ export const LeonaDef: CharacterDefinition = {
       legFront: bone(3, -3, 0.12),
       legBack: bone(-4, 0, -0.25),
     }),
+    // — Attack poses (Military combat: quick jabs, minimal telegraph, upright posture) —
     [FighterState.STAND_ATTACK]: [
-      pose({ head: bone(2, 0, 0.03), body: bone(3, 0, 0.08), armFront: bone(15, 5, 0.1, 1.0), armBack: bone(-7, 8, -0.6, 0.85), legFront: bone(5, 0, 0.06), legBack: bone(-5, 0, -0.08) }),
-      pose({ head: bone(3, 1, 0.05), body: bone(4, 0, 0.12), armFront: bone(20, 6, -0.05, 1.15), armBack: bone(-7, 8, -0.6, 0.85), legFront: bone(6, 0, 0.1), legBack: bone(-6, 0, -0.1) }),
+      pose({ head: bone(1, 0, 0.02), body: bone(2, 0, 0.04), armFront: bone(14, 6, 0.12, 0.9), armBack: bone(-5, 10, -0.55, 0.8), legFront: bone(4, 0, 0.04), legBack: bone(-4, 0, -0.06) }),
+      pose({ head: bone(1, 0, 0.03), body: bone(3, 0, 0.06), armFront: bone(22, 7, 0.02, 1.05), armBack: bone(-5, 10, -0.55, 0.8), legFront: bone(5, 0, 0.06), legBack: bone(-5, 0, -0.08) }),
     ],
     [FighterState.CROUCH_ATTACK]: [
-      pose({ head: bone(2, 7, 0.04), body: bone(2, 9, 0.06), armFront: bone(13, 9, 0.02, 1.0), armBack: bone(-6, 13, -0.45, 0.85), legFront: bone(14, 2, 0.25, 1.0), legBack: bone(-7, 7, -0.15) }),
-      pose({ head: bone(3, 8, 0.06), body: bone(3, 11, 0.1), armFront: bone(17, 11, -0.08, 1.1), armBack: bone(-6, 13, -0.45, 0.85), legFront: bone(17, 3, 0.32, 1.05), legBack: bone(-7, 7, -0.2) }),
+      pose({ head: bone(1, 6, 0.02), body: bone(1, 8, 0.04), armFront: bone(12, 8, 0.06, 0.9), armBack: bone(-5, 14, -0.4, 0.8), legFront: bone(13, 2, 0.22, 1.0), legBack: bone(-6, 6, -0.12) }),
+      pose({ head: bone(1, 7, 0.04), body: bone(2, 10, 0.06), armFront: bone(16, 10, -0.04, 1.0), armBack: bone(-5, 14, -0.4, 0.8), legFront: bone(16, 3, 0.28, 1.05), legBack: bone(-6, 6, -0.16) }),
     ],
     [FighterState.AIR_ATTACK]: [
-      pose({ head: bone(0, -1, -0.03), body: bone(1, 0, 0.06), armFront: bone(12, -2, -0.1, 1.0), armBack: bone(-7, 0, -0.3, 0.85), legFront: bone(9, 3, 0.2, 1.0), legBack: bone(-6, -1, -0.15) }),
-      pose({ head: bone(0, -2, -0.06), body: bone(2, 0, 0.1), armFront: bone(16, -3, -0.18, 1.1), armBack: bone(-7, 0, -0.3, 0.85), legFront: bone(12, 4, 0.28, 1.1), legBack: bone(-6, -1, -0.2) }),
+      pose({ head: bone(0, -1, -0.02), body: bone(1, 0, 0.04), armFront: bone(10, -1, -0.08, 0.9), armBack: bone(-5, 2, -0.25, 0.8), legFront: bone(10, 4, 0.25, 1.0), legBack: bone(-5, 0, -0.12) }),
+      pose({ head: bone(0, -1, -0.04), body: bone(2, 0, 0.08), armFront: bone(16, -2, -0.12, 1.05), armBack: bone(-5, 2, -0.25, 0.8), legFront: bone(14, 5, 0.32, 1.1), legBack: bone(-5, 0, -0.16) }),
     ],
     [FighterState.THROW]: [
       pose({ head: bone(2, 0, 0.03), body: bone(4, 0, 0.1), armFront: bone(18, 3, 0.0, 1.1), armBack: bone(12, 5, -0.1, 0.95), legFront: bone(4, 0, 0.06), legBack: bone(-5, 0, -0.06) }),
