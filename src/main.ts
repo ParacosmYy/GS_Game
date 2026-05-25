@@ -653,7 +653,11 @@ function render(): void {
     return;
   }
   if (phase === GamePhase.SELECT) {
-    renderer.drawCharacterSelect(select.p1Cursor, select.p2Cursor, select.p1Ready, select.p2Ready, tickRef.value, select.p2IsAI, simplifiedMode);
+    renderer.drawCharacterSelect(select, tickRef.value, simplifiedMode, getStage());
+    // VS闪屏叠加层
+    if (select.vsSplashTimer >= 0) {
+      renderer.drawVSSplash(select, tickRef.value);
+    }
     return;
   }
   rounds.tickFade();

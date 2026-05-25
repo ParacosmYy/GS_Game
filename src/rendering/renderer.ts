@@ -16,11 +16,13 @@ import { drawStage, generateStars, getStage } from './stage.js';
 import type { Star } from './stage.js';
 import { drawFighters as drawFightersImpl } from './rendererFighter.js';
 import { drawHUD, drawPowerGauges, drawComboCounters, drawTeamOrder, type TeamDisplayInfo } from './hud.js';
-import { drawCharacterSelect, drawIntro, drawKO, drawWinQuote, WIN_QUOTE_DURATION } from './screens.js';
+import { drawCharacterSelect, drawIntro, drawKO, drawWinQuote, drawVSSplash, WIN_QUOTE_DURATION } from './screens.js';
 import { drawSuperFlash, drawMatchEnd, drawModeIndicator, drawStageIndicator, drawTitle, drawContinue, drawModeSelect } from './overlayScreens.js';
 import { ROSTER } from '../characters/index.js';
 import { drawProjectiles as drawProjectilesImpl } from './projectileRenderer.js';
 import type { SpriteRenderer } from './spriteRenderer.js';
+import type { SelectState } from '../state/selectState.js';
+import type { StageId } from './stage.js';
 
 export class Renderer {
   private ctx: CanvasRenderingContext2D;
@@ -153,15 +155,16 @@ export class Renderer {
   }
 
   drawCharacterSelect(
-    p1Cursor: number,
-    p2Cursor: number,
-    p1Ready: boolean,
-    p2Ready: boolean,
+    selectState: SelectState,
     tick: number,
-    p2IsAI: boolean,
     simplifiedMode: boolean,
+    currentStage: StageId,
   ): void {
-    drawCharacterSelect(this.ctx, p1Cursor, p2Cursor, p1Ready, p2Ready, tick, p2IsAI, simplifiedMode);
+    drawCharacterSelect(this.ctx, selectState, tick, simplifiedMode, currentStage);
+  }
+
+  drawVSSplash(selectState: SelectState, tick: number): void {
+    drawVSSplash(this.ctx, selectState, tick);
   }
 
   drawMatchEnd(winner: number | null, p1Wins: number, p2Wins: number, winQuote?: string, winnerColor?: string, tick?: number, winnerCharId?: string): void {

@@ -89,23 +89,30 @@ export function drawCharacterHead(
 ): void {
   const r = headW / 2;
 
+  // 角色面部特征差异化参数
+  const isFemale = ['leona', 'kula', 'athena', 'mai', 'sherrie', 'mature', 'vice', 'xiangfei', 'kasumi', 'mary', 'shermie'].includes(charId);
+  const faceScale = isFemale ? 0.92 : 1.0; // 女性面部略窄
+  const eyeScale = isFemale ? 1.15 : 1.0; // 女性眼睛略大
+  const eyeSpacingBase = isFemale ? 7 : 8;
+  const eyeRBase = isFemale ? 6.0 : 5.5;
+
   // Head base — skin color with gradient
   const hg = ctx.createRadialGradient(-2, -2, 0, 0, 0, r);
   hg.addColorStop(0, shiftColor(skinColor, 25));
   hg.addColorStop(0.7, skinColor);
   hg.addColorStop(1, shiftColor(skinColor, -15));
   ctx.fillStyle = hg;
-  ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(0, 0, r * faceScale, r, 0, 0, Math.PI * 2); ctx.fill();
 
   // Head outline
   ctx.strokeStyle = shiftColor(skinColor, -40);
   ctx.lineWidth = 1.5;
-  ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI * 2); ctx.stroke();
+  ctx.beginPath(); ctx.ellipse(0, 0, r * faceScale, r, 0, 0, Math.PI * 2); ctx.stroke();
 
-  // Eyes — white sclera + colored iris + black pupil
-  const eyeSpacing = 8;
+  // Eyes — 角色差异化大小和间距
+  const eyeSpacing = eyeSpacingBase;
   const eyeY = -2;
-  const eyeR = 5.5;
+  const eyeR = eyeRBase * eyeScale;
   for (const side of [-1, 1]) {
     const ex = side * eyeSpacing;
     // Sclera
@@ -115,37 +122,31 @@ export function drawCharacterHead(
     ctx.lineWidth = 0.5;
     ctx.stroke();
     // Iris
+    const irisR = eyeR * 0.58;
     ctx.fillStyle = getEyeColor(charId);
-    ctx.beginPath(); ctx.arc(ex + facing * 1.5, eyeY, 3.2, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(ex + facing * 1.5, eyeY, irisR, 0, Math.PI * 2); ctx.fill();
     // Pupil
     ctx.fillStyle = '#111';
-    ctx.beginPath(); ctx.arc(ex + facing * 2, eyeY, 1.6, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(ex + facing * 2, eyeY, irisR * 0.5, 0, Math.PI * 2); ctx.fill();
     // Eye shine
     ctx.fillStyle = 'rgba(255,255,255,0.6)';
-    ctx.beginPath(); ctx.arc(ex + facing * 0.8, eyeY - 1.5, 1.2, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(ex + facing * 0.8, eyeY - 1.5, irisR * 0.35, 0, Math.PI * 2); ctx.fill();
   }
 
-  // Eyebrows
+  // Eyebrows — 角色差异化角度和粗细
+  const browWidth = isFemale ? 2 : 3;
   ctx.strokeStyle = getHairColor(charId);
-  ctx.lineWidth = 3;
+  ctx.lineWidth = browWidth;
+  const browAngle = getBrowAngle(charId);
   for (const side of [-1, 1]) {
     ctx.beginPath();
-    ctx.moveTo(side * (eyeSpacing - 5), eyeY - 8);
-    ctx.lineTo(side * (eyeSpacing + 5), eyeY - 8.5);
+    ctx.moveTo(side * (eyeSpacing - 5), eyeY - 8 - browAngle * side);
+    ctx.lineTo(side * (eyeSpacing + 5), eyeY - 8.5 + browAngle * side);
     ctx.stroke();
   }
 
-  // Mouth — simple line, character-specific expression
-  ctx.strokeStyle = shiftColor(skinColor, -30);
-  ctx.lineWidth = 1.5;
-  ctx.beginPath();
-  ctx.moveTo(-5, r * 0.45);
-  if (charId === 'iori') {
-    ctx.lineTo(5, r * 0.5); // slight smirk
-  } else {
-    ctx.lineTo(5, r * 0.42); // neutral
-  }
-  ctx.stroke();
+  // Mouth — 角色专属表情
+  drawMouth(ctx, charId, r, skinColor, facing);
 
   // Nose hint
   ctx.fillStyle = shiftColor(skinColor, -10);
@@ -153,8 +154,115 @@ export function drawCharacterHead(
   ctx.arc(facing * 1, r * 0.15, 1.5, 0, Math.PI * 2);
   ctx.fill();
 
+  // 女性角色腮红
+  if (isFemale) {
+    ctx.fillStyle = 'rgba(255, 150, 150, 0.12)';
+    ctx.beginPath(); ctx.ellipse(-eyeSpacing - 2, eyeY + 4, 4, 2.5, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(eyeSpacing + 2, eyeY + 4, 4, 2.5, 0, 0, Math.PI * 2); ctx.fill();
+  }
+
   // === Character-specific hair/accessories ===
   drawHair(ctx, charId, facing, r, headW);
+}
+
+// 眉毛角度 — 正值=内侧低(怒), 负值=内侧高(温和)
+function getBrowAngle(charId: string): number {
+  const angles: Record<string, number> = {
+    kyo: -0.5, iori: 2, terry: 0, kim: -1, ryo: 1.5, leona: 0.5,
+    kdash: 1, kula: -1.5, robert: 0, athena: -1, mai: -0.5,
+    ralf: 2, clark: 1, joe: 0, andy: 0, billy: 1, chang: 0.5,
+    choi: 2, mature: -0.5, yashiro: 1.5, chris: -1, shermie: -1,
+    vice: 1.5, yamazaki: 3, xiangfei: -0.5, mary: 0, kasumi: -1,
+  };
+  return angles[charId] ?? 0;
+}
+
+// 嘴巴 — 角色专属表情
+function drawMouth(ctx: CanvasRenderingContext2D, charId: string, r: number, skinColor: string, facing: number): void {
+  const mouthY = r * 0.45;
+  ctx.strokeStyle = shiftColor(skinColor, -30);
+  ctx.lineWidth = 1.5;
+
+  switch (charId) {
+    case 'iori':
+      // 冷笑 — 一侧上扬
+      ctx.beginPath();
+      ctx.moveTo(-5, mouthY);
+      ctx.quadraticCurveTo(0, mouthY + 3, 6, mouthY - 1);
+      ctx.stroke();
+      break;
+    case 'kyo':
+      // 自信微笑
+      ctx.beginPath();
+      ctx.moveTo(-4, mouthY);
+      ctx.quadraticCurveTo(0, mouthY + 2, 4, mouthY);
+      ctx.stroke();
+      break;
+    case 'terry':
+      // 开朗笑容 — 稍宽
+      ctx.beginPath();
+      ctx.moveTo(-6, mouthY - 0.5);
+      ctx.quadraticCurveTo(0, mouthY + 3, 6, mouthY - 0.5);
+      ctx.stroke();
+      break;
+    case 'yamazaki':
+      // 疯狂咧嘴 — 露齿
+      ctx.beginPath();
+      ctx.moveTo(-6, mouthY);
+      ctx.lineTo(6, mouthY);
+      ctx.stroke();
+      ctx.fillStyle = '#fff';
+      ctx.fillRect(-4, mouthY - 1.5, 8, 2);
+      break;
+    case 'choi':
+      // 锯齿嘴 — 疯狂
+      ctx.beginPath();
+      ctx.moveTo(-4, mouthY);
+      for (let t = -3; t <= 4; t += 2) {
+        ctx.lineTo(t, mouthY + (t % 4 === 1 ? 2 : 0));
+      }
+      ctx.stroke();
+      break;
+    case 'leona':
+      // 紧闭 — 严肃
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(-4, mouthY);
+      ctx.lineTo(4, mouthY);
+      ctx.stroke();
+      break;
+    case 'kula':
+    case 'athena':
+      // 开心微笑 — 上弧
+      ctx.beginPath();
+      ctx.moveTo(-4, mouthY);
+      ctx.quadraticCurveTo(0, mouthY - 3, 4, mouthY);
+      ctx.stroke();
+      break;
+    case 'mai':
+      // 魅惑微笑
+      ctx.beginPath();
+      ctx.moveTo(-4, mouthY);
+      ctx.quadraticCurveTo(2, mouthY + 2, 5, mouthY - 1);
+      ctx.stroke();
+      break;
+    case 'ralf':
+    case 'clark':
+      // 坚毅一字
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(-5, mouthY);
+      ctx.lineTo(5, mouthY);
+      ctx.stroke();
+      break;
+    default:
+      // 中性
+      ctx.beginPath();
+      ctx.moveTo(-5, mouthY);
+      ctx.lineTo(5, mouthY - 0.5);
+      ctx.stroke();
+      break;
+  }
 }
 
 function drawHair(ctx: CanvasRenderingContext2D, charId: string, facing: number, r: number, headW: number): void {
