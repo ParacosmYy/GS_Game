@@ -16,7 +16,7 @@ import { drawStage, generateStars, getStage } from './stage.js';
 import type { Star } from './stage.js';
 import { drawFighters as drawFightersImpl } from './rendererFighter.js';
 import { drawHUD, drawPowerGauges, drawComboCounters, drawTeamOrder, type TeamDisplayInfo } from './hud.js';
-import { drawCharacterSelect, drawIntro, drawKO } from './screens.js';
+import { drawCharacterSelect, drawIntro, drawKO, drawWinQuote, WIN_QUOTE_DURATION } from './screens.js';
 import { drawSuperFlash, drawMatchEnd, drawModeIndicator, drawStageIndicator, drawTitle, drawContinue, drawModeSelect } from './overlayScreens.js';
 import { ROSTER } from '../characters/index.js';
 import { drawProjectiles as drawProjectilesImpl } from './projectileRenderer.js';
@@ -186,6 +186,10 @@ export class Renderer {
 
   drawContinue(secondsLeft: number, cursorYes: boolean): void {
     drawContinue(this.ctx, secondsLeft, cursorYes);
+  }
+
+  drawWinQuote(timer: number, charName: string, winQuote: string, charColor: string, pixelPortrait: import('./pixelPortraits.js').PixelPortraitData | undefined): void {
+    drawWinQuote(this.ctx, timer, charName, winQuote, charColor, pixelPortrait);
   }
 
   // ===== Debug overlay =====

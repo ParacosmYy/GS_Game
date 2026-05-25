@@ -33,6 +33,7 @@ import { bgm } from './audio/bgm.js';
 import { announcer } from './audio/announcer.js';
 import { SimpleAI } from './ai/simpleAI.js';
 import { updateMovementVfx } from './state/movementVfx.js';
+import { WIN_QUOTE_DURATION } from './rendering/screens.js';
 
 const canvas = document.getElementById('gameCanvas') as HTMLCanvasElement;
 const ctx = canvas.getContext('2d')!;
@@ -110,6 +111,9 @@ let continueCursorYes = true; // Continue画面光标
 let modeSelectCursor = 0; // 模式选择光标
 let isTrainingMode = false; // 训练模式标志
 let currentWinQuote = '';
+let winQuoteTimer = 0;
+let winQuoteCharName = '';
+let winQuoteCharColor = '#ffcc00';
 let firstAttacker: number | null = null;
 
 function pickWinQuote(w: number | null): string {
@@ -125,7 +129,7 @@ let modeIndicatorTimer = 0;
 let stageIndicatorTimer = 0;
 let isTimeOver = false;
 let p2AI: InstanceType<typeof import('./ai/simpleAI.js').SimpleAI> | null = null;
-const INTRO_DURATION = 120;
+const INTRO_DURATION = 150; // 90帧(ROUND) + 60帧(FIGHT!) = 2.5秒
 let p1Team: TeamState | null = null;
 let p2Team: TeamState | null = null;
 let teamMode = false; // 3v3 team mode, enabled via mode select
@@ -226,12 +230,33 @@ function update(): void {
   if (phase === GamePhase.KO) {
     koTimer++;
     if (koTimer > KO_DISPLAY_TIME) {
+      // KO显示结束后进入胜利台词画面
+      currentWinQuote = pickWinQuote(winner);
+      if (winner !== null) {
+        const fighter = winner === 0 ? p1 : p2;
+        const charDef = ROSTER.find(c => c.id === fighter.charId);
+        winQuoteCharName = charDef?.nameCn ?? '';
+        winQuoteCharColor = charDef?.color ?? '#ffcc00';
+      } else {
+        winQuoteCharName = '';
+        winQuoteCharColor = '#ffcc00';
+      }
+      phase = GamePhase.WIN_QUOTE;
+      winQuoteTimer = 0;
+    }
+    if (koTimer <= KO_DISPLAY_TIME && inputManager.isKeyDown('KeyR')) restartGame();
+    return;
+  }
+
+  if (phase === GamePhase.WIN_QUOTE) {
+    winQuoteTimer++;
+    if (winQuoteTimer >= WIN_QUOTE_DURATION) {
+      // 胜利台词结束后判定比赛走向
       // 3v3 team mode: switch to next team member if available
       if (teamMode && p1Team && p2Team && winner !== null) {
         const loserTeam = winner === 0 ? p2Team : p1Team;
         const hasAlive = defeatActive(loserTeam);
         if (hasAlive && switchToNext(loserTeam)) {
-          // Switch to next character — restart round with new character
           const losingIdx = winner === 0 ? 1 : 0;
           const newChar = activeChar(loserTeam);
           const loser = losingIdx === 0 ? p1 : p2;
@@ -243,8 +268,8 @@ function update(): void {
           if (p2AI && losingIdx === 1) {
             p2AI = new SimpleAI(p2, p1, newChar, 0.6);
           }
-          // Restart as a new round
-          rounds.startRoundTransition();
+          rounds.currentRound++;
+          rounds.resetForNextRound();
           phase = GamePhase.INTRO;
           phaseTimer = 0;
           p1DelayedHealth = p1.maxHealth;
@@ -254,27 +279,33 @@ function update(): void {
           announcer.fight();
           return;
         }
-        // All team members defeated — match over
         if (!p1Team.alive || !p2Team.alive) {
           phase = GamePhase.MATCH_END;
           koTimer = 0;
-          currentWinQuote = pickWinQuote(winner);
           announcer.winner();
           return;
         }
       }
-      // Standard mode or team mode fallback
       const matchWinner = rounds.addWin(winner);
       if (matchWinner !== null) {
         phase = GamePhase.MATCH_END;
         koTimer = 0;
-        currentWinQuote = pickWinQuote(winner);
         announcer.winner();
       } else {
-        rounds.startRoundTransition();
+        // 比赛未结束，进入下一回合
+        rounds.currentRound++;
+        rounds.resetForNextRound();
+        phase = GamePhase.INTRO;
+        phaseTimer = 0;
+        isTimeOver = false;
+        koGroundSlamDone = false;
+        p1DelayedHealth = p1.maxHealth;
+        p2DelayedHealth = p2.maxHealth;
+        announcer.roundStart(rounds.currentRound);
+        announcer.fight();
       }
     }
-    if (koTimer <= KO_DISPLAY_TIME && inputManager.isKeyDown('KeyR')) restartGame();
+    if (inputManager.isKeyDown('KeyR')) restartGame();
     return;
   }
 
@@ -627,8 +658,8 @@ function render(): void {
   }
   rounds.tickFade();
   camera.update(p1, p2);
-  const isKO = phase === GamePhase.KO || phase === GamePhase.MATCH_END;
-  const perfectPlayer = isKO ? cinematic.getPerfectPlayer(winner) : null;
+  const isKO = phase === GamePhase.KO || phase === GamePhase.WIN_QUOTE || phase === GamePhase.MATCH_END;
+  const perfectPlayer = (phase === GamePhase.KO) ? cinematic.getPerfectPlayer(winner) : null;
   const p1Char = ROSTER.find(c => c.id === p1.charId) || ROSTER[0];
   const p2Char = ROSTER.find(c => c.id === p2.charId) || ROSTER[1];
   renderer.render([p1, p2], camera.x, tickRef.value, phase === GamePhase.KO, winner, screenShake.offsetX, screenShake.offsetY,
@@ -649,6 +680,18 @@ function render(): void {
     renderer.drawTeamOrder(toDisp(p1Team), toDisp(p2Team));
   }
   renderer.drawControlsHint(simplifiedMode, p1.charId);
+
+  // 胜利台词画面 — 在战斗场景上方叠加显示
+  if (phase === GamePhase.WIN_QUOTE && winner !== null) {
+    const charDef = ROSTER.find(c => c.id === (winner === 0 ? p1 : p2).charId);
+    renderer.drawWinQuote(
+      winQuoteTimer,
+      winQuoteCharName,
+      currentWinQuote,
+      winQuoteCharColor,
+      charDef?.pixelPortrait,
+    );
+  }
 
   if (phase === GamePhase.MATCH_END) {
     if (winner !== null) { const w = winner === 0 ? p1 : p2; drawVictoryPose(ctx, w.x - camera.x, w.y, w.facing, w.color, '#ffffff30', tickRef.value, w.charId); }

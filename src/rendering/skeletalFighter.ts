@@ -10,7 +10,7 @@ import type { Pose, BonePose, BodyProportions } from '../characters/types.js';
 import { DEFAULT_PROPORTIONS } from '../characters/types.js';
 import { shiftColor, roundRect } from './utils.js';
 import { getOutfit, drawCharacterHead } from './skeletalParts.js';
-import { drawPixelTorso, drawPixelArm, drawPixelLeg } from './bodyPartRenderer.js';
+import { drawPixelTorso, drawPixelArm, drawPixelLeg, setBodyPartTick } from './bodyPartRenderer.js';
 import { getVictoryPose, drawVictoryVFX } from './victoryPose.js';
 
 /** Draw skeletal body using 6-bone pose system — enhanced rendering */
@@ -28,6 +28,9 @@ export function drawSkeletalFighter(
   const poseSet = charDef?.poses;
   const outfit = getOutfit(f.charId);
   const prop: BodyProportions = charDef?.proportions ?? DEFAULT_PROPORTIONS;
+
+  // 将动画帧传递给身体部位渲染器（用于呼吸偏移、闪烁等动态效果）
+  setBodyPartTick(globalTick);
 
   // Resolve pose
   const rawPose = poseSet?.[f.state] ?? poseSet?.[FighterState.IDLE] ?? pose({
@@ -431,6 +434,7 @@ export function drawVictoryPose(
   charId: string = 'kyo',
 ): void {
   const victoryPose = getVictoryPose(charId, tick);
+  setBodyPartTick(tick);
   const p = {
     head: { ...victoryPose.head },
     body: { ...victoryPose.body },

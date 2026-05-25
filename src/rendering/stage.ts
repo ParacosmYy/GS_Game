@@ -1,11 +1,14 @@
 /**
  * Stage system — routes to stage-specific renderers based on current stage ID.
- * Stages: temple (日本寺庙), china (唐人街), factory (工場)
+ * Stages: temple (日本寺庙), china (唐人街), factory (工場),
+ *         orochi (大蛇神社), street (街市夜市)
  */
 import { CANVAS_WIDTH, CANVAS_HEIGHT, STAGE_GROUND_Y } from '../core/constants.js';
 import { drawTempleStage } from './stageTemple.js';
 import { drawChinaStage } from './stageChina.js';
 import { drawFactoryStage } from './stageFactory.js';
+import { drawOrochiStage } from './stageOrochi.js';
+import { drawStreetStage } from './stageStreet.js';
 
 export interface Star {
   x: number;
@@ -27,9 +30,9 @@ export function generateStars(count: number): Star[] {
   return stars;
 }
 
-export type StageId = 'temple' | 'china' | 'factory';
+export type StageId = 'temple' | 'china' | 'factory' | 'orochi' | 'street';
 
-const ALL_STAGES: StageId[] = ['temple', 'china', 'factory'];
+const ALL_STAGES: StageId[] = ['temple', 'china', 'factory', 'orochi', 'street'];
 let currentStage: StageId = 'temple';
 
 export function setStage(id: StageId): void {
@@ -61,6 +64,12 @@ export function drawStage(
       break;
     case 'factory':
       drawFactoryStage(ctx, cameraX, stars, globalTick);
+      break;
+    case 'orochi':
+      drawOrochiStage(ctx, cameraX, stars, globalTick);
+      break;
+    case 'street':
+      drawStreetStage(ctx, cameraX, stars, globalTick);
       break;
   }
   // KOF2002: 环境浮尘 — 地面附近缓慢漂浮的微粒

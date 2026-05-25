@@ -529,6 +529,11 @@ export function drawContinue(ctx: CanvasRenderingContext2D, secondsLeft: number,
   ctx.fillStyle = 'rgba(0,0,0,0.88)';
   ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
+  // KOF2002: 红色脉冲背景 — 倒计时紧迫感
+  const pulseAlpha = secondsLeft <= 3 ? 0.15 + Math.sin(Date.now() * 0.01) * 0.1 : 0.05;
+  ctx.fillStyle = `rgba(80, 0, 0, ${pulseAlpha})`;
+  ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
 
@@ -537,10 +542,29 @@ export function drawContinue(ctx: CanvasRenderingContext2D, secondsLeft: number,
   drawSNKText(ctx, 'CONTINUE?', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 80, 48, '#ff4444');
   ctx.shadowBlur = 0;
 
-  ctx.shadowBlur = 12;
-  const countColor = secondsLeft <= 3 ? '#ff2222' : '#ffcc00';
-  drawSNKText(ctx, `${secondsLeft}`, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 10, 72, countColor);
+  // 倒计时数字 — 最后3秒脉动效果
+  const isUrgent = secondsLeft <= 3;
+  const countColor = isUrgent ? '#ff2222' : '#ffcc00';
+  const countScale = isUrgent ? 1 + Math.sin(Date.now() * 0.015) * 0.1 : 1;
+  const countSize = Math.round(72 * countScale);
+  ctx.shadowColor = isUrgent ? '#ff0000' : '#ffaa00';
+  ctx.shadowBlur = isUrgent ? 20 : 12;
+  drawSNKText(ctx, `${secondsLeft}`, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 10, countSize, countColor);
   ctx.shadowBlur = 0;
+
+  // 进度条 — 可视化倒计时剩余
+  const barW = 300;
+  const barH = 6;
+  const barX = CANVAS_WIDTH / 2 - barW / 2;
+  const barY = CANVAS_HEIGHT / 2 + 55;
+  const ratio = secondsLeft / 10;
+  ctx.fillStyle = 'rgba(40, 40, 60, 0.8)';
+  roundRect(ctx, barX, barY, barW, barH, 3);
+  ctx.fill();
+  const barColor = isUrgent ? '#ff2222' : '#ffcc00';
+  ctx.fillStyle = barColor;
+  roundRect(ctx, barX, barY, barW * ratio, barH, 3);
+  ctx.fill();
 
   const yesX = CANVAS_WIDTH / 2 - 80;
   const noX = CANVAS_WIDTH / 2 + 80;

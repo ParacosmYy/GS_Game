@@ -512,9 +512,7 @@ export class CombatSystem {
     const comboHits = this.comboHits[defIdx];
     if (atkName2.startsWith('DM_') || atkName2.startsWith('SDM_')) defender.hitFlashColor = '#6688ff';
     else if (counterHit) defender.hitFlashColor = '#ffaa44';
-    else if (atkName2.startsWith('KYO_') || atkName2.startsWith('IORI_') || atkName2.startsWith('TERRY_')
-      || atkName2.startsWith('KIM_') || atkName2.startsWith('RYO_') || atkName2.startsWith('LEONA_')
-      || atkName2.startsWith('KDASH_') || atkName2.startsWith('KULA_') || atkName2.startsWith('SPECIAL_'))
+    else if (isSpecial(attackType))
       defender.hitFlashColor = '#ffee66';
     else if (comboHits >= 8) defender.hitFlashColor = '#ff4400';
     else if (comboHits >= 5) defender.hitFlashColor = '#ff8800';
@@ -543,16 +541,24 @@ export class CombatSystem {
   }
 }
 
+/** Check if attack is a special move (not normal, not throw, not DM) */
+function isSpecial(at: AttackType): boolean {
+  const name = at as string;
+  if (name.startsWith('DM_') || name.startsWith('SDM_')) return false;
+  if (NORMAL_ATTACKS.has(name) || COMMAND_NORMALS.has(name)) return false;
+  if (at === AttackType.THROW || at === AttackType.THROW_FORWARD || at === AttackType.THROW_BACK) return false;
+  return true;
+}
+
 /** Guard gauge depletion based on attack type */
 function guardGaugeDamage(attackType: AttackType): number {
   const name = attackType as string;
   // DMs / SDMs
   if (name.startsWith('DM_') || name.startsWith('SDM_')) return name.startsWith('SDM_') ? 35 : 25;
-  // Character specials (KYO_, IORI_, TERRY_, KIM_, SPECIAL_)
-  if (name.startsWith('KYO_') || name.startsWith('IORI_') || name.startsWith('TERRY_')
-    || name.startsWith('KIM_') || name.startsWith('RYO_') || name.startsWith('LEONA_') || name.startsWith('KDASH_') || name.startsWith('KULA_') || name.startsWith('SPECIAL_')) return 15;
+  // Specials (any character-specific move that isn't normal/throw/DM)
+  if (isSpecial(attackType)) return 15;
   // Command normals
-  if (name.startsWith('CMD_')) return 12;
+  if (COMMAND_NORMALS.has(name)) return 12;
   // CD blowback
   if (attackType === AttackType.STAND_CD || attackType === AttackType.JUMP_CD) return 12;
   // Heavy normals (C/D, CLOSE_C/D)
@@ -568,9 +574,9 @@ const GUARD_CRUSH_DURATION = 90;
 function getJuggleCost(attackType: AttackType): number {
   const name = attackType as string;
   if (name.startsWith('DM_') || name.startsWith('SDM_')) return JUGGLE_COST_DM;
-  if (name.startsWith('KYO_') || name.startsWith('IORI_') || name.startsWith('TERRY_')
-    || name.startsWith('KIM_') || name.startsWith('RYO_') || name.startsWith('LEONA_') || name.startsWith('KDASH_') || name.startsWith('KULA_') || name.startsWith('SPECIAL_')) return JUGGLE_COST_SPECIAL;
-  if (name.endsWith('_C') || name.endsWith('_D') || name.startsWith('CMD_')
+  if (isSpecial(attackType)) return JUGGLE_COST_SPECIAL;
+  if (name.endsWith('_C') || name.endsWith('_D')
+    || COMMAND_NORMALS.has(name)
     || name.startsWith('CLOSE_C') || name.startsWith('CLOSE_D')) return JUGGLE_COST_HEAVY;
   return JUGGLE_COST_LIGHT;
 }

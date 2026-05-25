@@ -136,4 +136,20 @@ export class RoundState {
     resetMeterSystem(this.gauges[0], this.maxModes[0]);
     resetMeterSystem(this.gauges[1], this.maxModes[1]);
   }
+
+  /** Reset fighters for next round (called externally after currentRound++). */
+  resetForNextRound(): void {
+    this.p1.reset(STAGE_WIDTH * 0.30);
+    this.p2.reset(STAGE_WIDTH * 0.70);
+    this.tickRef.value = 0;
+    this.p1Cmd.reset();
+    this.p2Cmd.reset();
+    this.combatSystem.reset();
+    this.projectiles.length = 0;
+    this.vfx.reset();
+    this.cinematic.resetForNewRound();
+    this.fadeAlpha = 0;
+    this.fadeDirection = 0;
+    this.fadeCallback = null;
+  }
 }

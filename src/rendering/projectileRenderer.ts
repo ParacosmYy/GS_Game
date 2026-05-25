@@ -29,6 +29,14 @@ const VISUALS: Record<string, ProjectileVisuals> = {
   kdash: { baseRadius: 12, stretch: 1.5, groundHug: false, trailCount: 4, trailSpacing: 15, pulseSpeed: 9, pulseAmount: 0.2, energyLines: 3, energySpeed: 0.16 },
   kula:    { baseRadius: 11, stretch: 1.3, groundHug: false, trailCount: 3, trailSpacing: 14, pulseSpeed: 7, pulseAmount: 0.22, energyLines: 4, energySpeed: 0.1 },
   robert:  { baseRadius: 13, stretch: 1.5, groundHug: false, trailCount: 4, trailSpacing: 15, pulseSpeed: 9, pulseAmount: 0.22, energyLines: 3, energySpeed: 0.18 },
+  athena:  { baseRadius: 11, stretch: 1.4, groundHug: false, trailCount: 4, trailSpacing: 14, pulseSpeed: 8, pulseAmount: 0.2, energyLines: 3, energySpeed: 0.15 },
+  mai:     { baseRadius: 10, stretch: 1.3, groundHug: false, trailCount: 3, trailSpacing: 13, pulseSpeed: 7, pulseAmount: 0.22, energyLines: 2, energySpeed: 0.12 },
+  joe:     { baseRadius: 14, stretch: 1.8, groundHug: false, trailCount: 5, trailSpacing: 16, pulseSpeed: 10, pulseAmount: 0.18, energyLines: 4, energySpeed: 0.2 },
+  andy:    { baseRadius: 10, stretch: 1.4, groundHug: false, trailCount: 3, trailSpacing: 14, pulseSpeed: 8, pulseAmount: 0.2, energyLines: 2, energySpeed: 0.14 },
+  billy:   { baseRadius: 9,  stretch: 2.2, groundHug: true,  trailCount: 4, trailSpacing: 18, pulseSpeed: 12, pulseAmount: 0.12, energyLines: 3, energySpeed: 0.22 },
+  yashiro: { baseRadius: 12, stretch: 1.4, groundHug: false, trailCount: 4, trailSpacing: 15, pulseSpeed: 8, pulseAmount: 0.2, energyLines: 2, energySpeed: 0.14 },
+  chris:   { baseRadius: 10, stretch: 1.3, groundHug: false, trailCount: 3, trailSpacing: 14, pulseSpeed: 7, pulseAmount: 0.22, energyLines: 2, energySpeed: 0.12 },
+  mature:  { baseRadius: 10, stretch: 1.5, groundHug: false, trailCount: 3, trailSpacing: 14, pulseSpeed: 7, pulseAmount: 0.2, energyLines: 2, energySpeed: 0.13 },
 };
 
 const DEFAULT_VIS: ProjectileVisuals = { baseRadius: 10, stretch: 1.0, groundHug: false, trailCount: 3, trailSpacing: 14, pulseSpeed: 7, pulseAmount: 0.2, energyLines: 2, energySpeed: 0.15 };
@@ -107,7 +115,7 @@ export function drawProjectiles(ctx: CanvasRenderingContext2D, projectiles: Proj
     ctx.ellipse(sx, y, radius * 0.6 * vis.stretch, radius * 0.6, 0, 0, Math.PI * 2);
     ctx.fill();
 
-    // Rotating energy lines — KOF-style energy swirl
+    // 角色专属能量线 — KOF风格旋转能量
     ctx.globalAlpha = 0.5 * fadeIn;
     ctx.strokeStyle = '#ffffff';
     ctx.lineWidth = 1.5;
@@ -122,7 +130,102 @@ export function drawProjectiles(ctx: CanvasRenderingContext2D, projectiles: Proj
       ctx.stroke();
     }
 
-    // Spawn burst ring (first 6 frames)
+    // 角色专属细节: Kyo火焰尖端 / Iori爪痕 / Terry地面波 / Kula冰晶 / Athena精神环
+    ctx.globalAlpha = 0.7 * fadeIn;
+    switch (proj.charId) {
+      case 'kyo': {
+        // 火焰尖端 — 前方3个火焰舌
+        for (let t = 0; t < 3; t++) {
+          const tAngle = -0.4 + t * 0.4 + Math.sin(proj.currentFrame * 0.3 + t) * 0.15;
+          const tLen = radius * 1.2 + Math.sin(proj.currentFrame * 0.4 + t * 2) * 3;
+          const tx = sx + proj.facing * radius * vis.stretch * 0.5 + Math.cos(tAngle) * tLen * proj.facing;
+          const ty = y + Math.sin(tAngle) * tLen;
+          ctx.fillStyle = t === 1 ? '#ffee44' : '#ff8800';
+          ctx.beginPath();
+          ctx.moveTo(sx + proj.facing * radius * vis.stretch * 0.3, y + (t - 1) * 4);
+          ctx.lineTo(tx, ty);
+          ctx.lineTo(sx + proj.facing * radius * vis.stretch * 0.3, y + (t - 1) * 4 + 3 * proj.facing);
+          ctx.fill();
+        }
+        break;
+      }
+      case 'iori': {
+        // 紫色爪痕 — 3条斜线
+        ctx.strokeStyle = '#cc44ff';
+        ctx.lineWidth = 2;
+        for (let c = 0; c < 3; c++) {
+          const cx = sx + proj.facing * (radius * 0.5 + c * 6);
+          const wobble = Math.sin(proj.currentFrame * 0.25 + c) * 3;
+          ctx.beginPath();
+          ctx.moveTo(cx, y - radius * 0.8 + wobble);
+          ctx.lineTo(cx + proj.facing * 5, y + radius * 0.8 + wobble);
+          ctx.stroke();
+        }
+        break;
+      }
+      case 'terry': {
+        // 地面波纹 — Terry Power Wave沿地面传播的弧形波
+        if (vis.groundHug) {
+          ctx.strokeStyle = '#ffcc44';
+          ctx.lineWidth = 2;
+          for (let w = 0; w < 3; w++) {
+            const wOff = w * 8 - 4;
+            const wH = 6 + Math.sin(proj.currentFrame * 0.3 + w) * 3;
+            ctx.beginPath();
+            ctx.arc(sx + proj.facing * wOff, y + 3, wH, Math.PI, 0);
+            ctx.stroke();
+          }
+        }
+        break;
+      }
+      case 'kula': {
+        // 冰晶碎片 — 4个小菱形环绕
+        ctx.fillStyle = '#88ddff';
+        for (let i = 0; i < 4; i++) {
+          const iAngle = rotBase * 2 + i * Math.PI * 0.5;
+          const iR = radius * 1.1;
+          const ix = sx + Math.cos(iAngle) * iR * vis.stretch;
+          const iy = y + Math.sin(iAngle) * iR;
+          const sz = 2;
+          ctx.beginPath();
+          ctx.moveTo(ix, iy - sz); ctx.lineTo(ix + sz, iy);
+          ctx.lineTo(ix, iy + sz); ctx.lineTo(ix - sz, iy);
+          ctx.closePath(); ctx.fill();
+        }
+        break;
+      }
+      case 'athena': {
+        // 精神能量环 — 外圈旋转环
+        ctx.strokeStyle = '#ff88cc';
+        ctx.lineWidth = 1.5;
+        const ringAngle = rotBase * 1.5;
+        ctx.beginPath();
+        ctx.ellipse(sx, y, radius * 1.3 * vis.stretch, radius * 1.3, ringAngle, 0, Math.PI);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.ellipse(sx, y, radius * 1.3 * vis.stretch, radius * 1.3, ringAngle + Math.PI, 0, Math.PI);
+        ctx.stroke();
+        break;
+      }
+      case 'robert': {
+        // 龙气旋涡 — 螺旋线条
+        ctx.strokeStyle = '#ffaa33';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        for (let s = 0; s < 20; s++) {
+          const sAngle = rotBase * 3 + s * 0.5;
+          const sR = radius * (0.4 + s * 0.04);
+          const px = sx + Math.cos(sAngle) * sR * vis.stretch;
+          const py = y + Math.sin(sAngle) * sR;
+          if (s === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+        }
+        ctx.stroke();
+        break;
+      }
+      default: break;
+    }
+
+    // 生成时爆发环 (前6帧)
     if (proj.currentFrame < 6) {
       const prog = proj.currentFrame / 6;
       ctx.globalAlpha = (1 - prog) * 0.5;
@@ -131,6 +234,19 @@ export function drawProjectiles(ctx: CanvasRenderingContext2D, projectiles: Proj
       ctx.beginPath();
       ctx.arc(sx, y, 10 + prog * 40, 0, Math.PI * 2);
       ctx.stroke();
+    }
+
+    // KOF2002: 飞行道具地面阴影
+    if (!vis.groundHug) {
+      const groundSy = STAGE_GROUND_Y;
+      const shadowDist = groundSy - y;
+      if (shadowDist > 0 && shadowDist < 200) {
+        ctx.globalAlpha = 0.15 * fadeIn * (1 - shadowDist / 200);
+        ctx.fillStyle = '#000000';
+        ctx.beginPath();
+        ctx.ellipse(sx, groundSy, radius * vis.stretch * 0.8, 3, 0, 0, Math.PI * 2);
+        ctx.fill();
+      }
     }
 
     ctx.restore();

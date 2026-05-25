@@ -511,6 +511,7 @@ export enum GamePhase {
   INTRO = 'INTRO',     // "ROUND 1... FIGHT!" text
   FIGHTING = 'FIGHTING', // Active gameplay
   KO = 'KO',           // KO state
+  WIN_QUOTE = 'WIN_QUOTE', // 胜利台词显示
   MATCH_END = 'MATCH_END', // Match complete (best of 3)
   CONTINUE = 'CONTINUE', // Continue? countdown
   TRAINING = 'TRAINING', // Training mode (no timer, health regen, input display)

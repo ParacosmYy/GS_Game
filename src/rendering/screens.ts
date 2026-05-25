@@ -1,10 +1,11 @@
 /**
- * Screens — Character Select, Intro, KO
+ * Screens — Character Select, Intro, KO, Win Quote
  */
 import { CANVAS_WIDTH, CANVAS_HEIGHT } from '../core/constants.js';
 import { ROSTER } from '../characters/index.js';
 import { roundRect, drawSNKText } from './utils.js';
 import { drawPixelPortrait } from './pixelPortraits.js';
+import type { PixelPortraitData } from './pixelPortraits.js';
 
 // ===== Character Select =====
 
@@ -272,26 +273,37 @@ export function drawCharacterSelect(
 
 // ===== Intro Overlay =====
 
+// 回合介绍时间分配: ROUND显示90帧(1.5s) + FIGHT!显示60帧(1s) = 总150帧(2.5s)
+const INTRO_ROUND_FRAMES = 90;
+const INTRO_FIGHT_FRAMES = 60;
+
 export function drawIntro(ctx: CanvasRenderingContext2D, phaseTimer: number, currentRound: number = 1, p1Name: string = '', p2Name: string = ''): void {
   ctx.save();
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
 
-  if (phaseTimer < 60) {
-    const progress = phaseTimer / 60;
-    const scale = 1 + Math.max(0, 1 - progress * 3) * 0.5;
-    ctx.globalAlpha = Math.min(1, progress * 4);
-    const fontSize = Math.round(48 * scale);
+  // Phase 1: "ROUND X" (0 ~ INTRO_ROUND_FRAMES)
+  if (phaseTimer < INTRO_ROUND_FRAMES) {
+    const progress = phaseTimer / INTRO_ROUND_FRAMES;
+    // 淡入前20帧，淡出最后20帧
+    const fadeIn = Math.min(1, phaseTimer / 20);
+    const fadeOut = phaseTimer > INTRO_ROUND_FRAMES - 20 ? (INTRO_ROUND_FRAMES - phaseTimer) / 20 : 1;
+    const alpha = Math.min(fadeIn, fadeOut);
+    // 缩放动画: 快速放大后回弹
+    const scaleProgress = Math.min(1, phaseTimer / 15);
+    const scale = 1 + (1 - scaleProgress) * 0.6;
+    ctx.globalAlpha = alpha;
+    const fontSize = Math.round(52 * scale);
 
-    // Black bars top/bottom for cinematic feel
-    const barAlpha = Math.min(1, progress * 2) * 0.7;
+    // 电影感黑条
+    const barAlpha = alpha * 0.7;
     ctx.fillStyle = `rgba(0,0,0,${barAlpha})`;
     ctx.fillRect(0, 0, CANVAS_WIDTH, 100);
     ctx.fillRect(0, CANVAS_HEIGHT - 100, CANVAS_WIDTH, 100);
 
     // "ROUND X" — SNK style with roman numeral subtitle
     ctx.shadowColor = '#ff8800';
-    ctx.shadowBlur = 15;
+    ctx.shadowBlur = 15 + (1 - scaleProgress) * 10;
     drawSNKText(ctx, `ROUND ${currentRound}`, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 20, fontSize, '#ffcc00');
     ctx.shadowBlur = 0;
     // KOF2002: 回合罗马数字装饰
@@ -301,24 +313,31 @@ export function drawIntro(ctx: CanvasRenderingContext2D, phaseTimer: number, cur
 
     // 角色名显示 — SNK style
     if (p1Name && p2Name) {
-      ctx.globalAlpha = Math.min(1, progress * 3);
-      drawSNKText(ctx, p1Name, CANVAS_WIDTH / 2 - 30, CANVAS_HEIGHT / 2 + 15, 16, '#ff6644', '#000000', 'right');
-      drawSNKText(ctx, p2Name, CANVAS_WIDTH / 2 + 30, CANVAS_HEIGHT / 2 + 15, 16, '#4488ff', '#000000', 'left');
-      drawSNKText(ctx, 'VS', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 15, 14, '#ffcc00');
+      const nameAlpha = Math.min(1, Math.max(0, (phaseTimer - 10) / 20));
+      ctx.globalAlpha = nameAlpha * alpha;
+      drawSNKText(ctx, p1Name, CANVAS_WIDTH / 2 - 30, CANVAS_HEIGHT / 2 + 35, 16, '#ff6644', '#000000', 'right');
+      drawSNKText(ctx, p2Name, CANVAS_WIDTH / 2 + 30, CANVAS_HEIGHT / 2 + 35, 16, '#4488ff', '#000000', 'left');
+      drawSNKText(ctx, 'VS', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 35, 14, '#ffcc00');
     }
-  } else if (phaseTimer < 100) {
-    const fp = (phaseTimer - 60) / 40;
-    const scale = 1 + Math.max(0, 1 - fp * 4) * 1.5;
-    const alpha = fp < 0.1 ? fp * 10 : Math.max(0, 1 - (fp - 0.5) * 2);
-    ctx.globalAlpha = Math.min(1, Math.max(0, alpha));
+  }
+  // Phase 2: "FIGHT!" (INTRO_ROUND_FRAMES ~ INTRO_ROUND_FRAMES + INTRO_FIGHT_FRAMES)
+  else if (phaseTimer < INTRO_ROUND_FRAMES + INTRO_FIGHT_FRAMES) {
+    const fightTimer = phaseTimer - INTRO_ROUND_FRAMES;
+    const fp = fightTimer / INTRO_FIGHT_FRAMES;
+    // 缩放: 爆发式放大后收缩
+    const scaleProgress = Math.min(1, fightTimer / 8);
+    const scale = 1 + (1 - scaleProgress) * 1.8;
+    // 淡出后半段
+    const fadeAlpha = fp > 0.5 ? Math.max(0, 1 - (fp - 0.5) * 2) : 1;
+    ctx.globalAlpha = Math.min(1, Math.max(0, fadeAlpha));
 
-    // Expanding shockwave rings
+    // 冲击波环
     for (let r = 0; r < 3; r++) {
       const ringDelay = r * 0.1;
       const ringProgress = Math.min(1, Math.max(0, fp * 2 - ringDelay));
       if (ringProgress <= 0) continue;
-      const ringRadius = 20 + ringProgress * (130 - r * 20);
-      const ringAlpha = Math.max(0, 1 - ringProgress) * (1 - r * 0.3);
+      const ringRadius = 20 + ringProgress * (150 - r * 25);
+      const ringAlpha = Math.max(0, 1 - ringProgress) * (1 - r * 0.3) * fadeAlpha;
       if (ringAlpha > 0) {
         ctx.beginPath();
         ctx.arc(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 20, ringRadius, 0, Math.PI * 2);
@@ -328,9 +347,9 @@ export function drawIntro(ctx: CanvasRenderingContext2D, phaseTimer: number, cur
       }
     }
 
-    const fontSize = Math.round(64 * scale);
+    const fontSize = Math.round(72 * scale);
     ctx.shadowColor = '#ff4400';
-    ctx.shadowBlur = 25;
+    ctx.shadowBlur = 25 + (1 - scaleProgress) * 15;
     drawSNKText(ctx, 'FIGHT!', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 20, fontSize, '#ff4400');
     ctx.shadowBlur = 0;
   }
@@ -442,5 +461,102 @@ export function drawKO(ctx: CanvasRenderingContext2D, winner: number | null, per
   ctx.font = '13px "Courier New", monospace';
   ctx.fillText('Press R to restart', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 140);
 
+  ctx.restore();
+}
+
+// ===== Win Quote Overlay =====
+
+// WIN_QUOTE_DURATION: ~180帧 (3秒)
+export const WIN_QUOTE_DURATION = 180;
+
+export function drawWinQuote(
+  ctx: CanvasRenderingContext2D,
+  timer: number,
+  charName: string,
+  winQuote: string,
+  charColor: string,
+  pixelPortrait: PixelPortraitData | undefined,
+): void {
+  ctx.save();
+
+  // 淡入: 前30帧渐变出现
+  const fadeIn = Math.min(1, timer / 30);
+  // 淡出: 最后30帧渐变消失
+  const fadeOut = timer > WIN_QUOTE_DURATION - 30 ? (WIN_QUOTE_DURATION - timer) / 30 : 1;
+  const alpha = Math.min(fadeIn, fadeOut);
+
+  // 深色背景覆盖
+  ctx.fillStyle = `rgba(0, 0, 0, ${0.7 * alpha})`;
+  ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.globalAlpha = alpha;
+
+  // 角色头像 (左侧)
+  const portraitScale = 3;
+  if (pixelPortrait) {
+    const pw = pixelPortrait.width * portraitScale;
+    const ph = pixelPortrait.height * portraitScale;
+    const px = CANVAS_WIDTH / 2 - pw / 2;
+    const py = 80;
+    // 头像背景框
+    ctx.fillStyle = 'rgba(20, 20, 40, 0.85)';
+    roundRect(ctx, px - 10, py - 10, pw + 20, ph + 20, 8);
+    ctx.fill();
+    ctx.strokeStyle = charColor;
+    ctx.lineWidth = 2;
+    roundRect(ctx, px - 10, py - 10, pw + 20, ph + 20, 8);
+    ctx.stroke();
+    drawPixelPortrait(ctx, pixelPortrait, px, py, portraitScale);
+  }
+
+  // 角色名 — 金色大字
+  const nameY = pixelPortrait ? 260 : CANVAS_HEIGHT / 2 - 60;
+  ctx.shadowColor = '#ffcc00';
+  ctx.shadowBlur = 20 * alpha;
+  drawSNKText(ctx, charName, CANVAS_WIDTH / 2, nameY, 40, '#ffcc00');
+  ctx.shadowBlur = 0;
+
+  // 装饰分隔线
+  const lineY = nameY + 30;
+  const lineGrad = ctx.createLinearGradient(CANVAS_WIDTH / 2 - 120, 0, CANVAS_WIDTH / 2 + 120, 0);
+  lineGrad.addColorStop(0, '#ffcc0000');
+  lineGrad.addColorStop(0.3, `${charColor}88`);
+  lineGrad.addColorStop(0.5, '#ffcc4466');
+  lineGrad.addColorStop(0.7, `${charColor}88`);
+  lineGrad.addColorStop(1, '#ffcc0000');
+  ctx.strokeStyle = lineGrad;
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(CANVAS_WIDTH / 2 - 120, lineY);
+  ctx.lineTo(CANVAS_WIDTH / 2 + 120, lineY);
+  ctx.stroke();
+
+  // 胜利台词 — 打字机效果
+  const quoteY = lineY + 40;
+  const charsVisible = Math.min(winQuote.length, Math.floor(Math.max(0, timer - 15) / 2.5));
+  const visibleQuote = winQuote.substring(0, charsVisible);
+  ctx.shadowColor = '#ffffff';
+  ctx.shadowBlur = 6 * alpha;
+  drawSNKText(ctx, `"${visibleQuote}"`, CANVAS_WIDTH / 2, quoteY, 22, '#ffffff');
+  ctx.shadowBlur = 0;
+
+  // KOF2002: 引号装饰
+  if (charsVisible > 0) {
+    const quoteWidth = ctx.measureText(`"${visibleQuote}"`).width;
+    const decorAlpha = 0.3 * alpha;
+    ctx.fillStyle = `rgba(255, 204, 0, ${decorAlpha})`;
+    // 左引号装饰点
+    ctx.beginPath();
+    ctx.arc(CANVAS_WIDTH / 2 - quoteWidth / 2 - 15, quoteY, 3, 0, Math.PI * 2);
+    ctx.fill();
+    // 右引号装饰点
+    ctx.beginPath();
+    ctx.arc(CANVAS_WIDTH / 2 + quoteWidth / 2 + 15, quoteY, 3, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  ctx.globalAlpha = 1;
   ctx.restore();
 }
