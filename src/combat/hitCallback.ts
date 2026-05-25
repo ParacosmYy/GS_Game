@@ -16,13 +16,19 @@ function classifyAttack(at: AttackType) {
   const s = at as string;
   const isSDM = s.startsWith('SDM_');
   const isDM = s.startsWith('DM_') || isSDM;
-  const isSpecial = at === AttackType.SPECIAL_PROJECTILE || at === AttackType.SPECIAL_UPPER
-    || s.startsWith('KYO_') || s.startsWith('IORI_') || s.startsWith('TERRY_') || s.startsWith('KIM_')
-    || s.startsWith('RYO_') || s.startsWith('LEONA_') || s.startsWith('KDASH_') || s.startsWith('KULA_');
-  const isPunch = s.endsWith('_A') || s.endsWith('_C') || s.includes('ARAGAMI') || s.includes('DOKUGAMI')
-    || s.includes('ONIYAKI') || s.includes('KOTOTSUKI') || s.includes('KUZUKAZE')
-    || s.includes('BURN_KNUCKLE') || s.includes('RISING_TACKLE') || s.includes('POWER_DUNK')
-    || s.includes('SANREN') || s.includes('TSUMIYOMI') || s.includes('BATSUYOMI');
+  // 通常技/投技/CD/COMMAND_NORMAL以外的全部视为必杀技
+  const normalAttack = at === AttackType.STAND_A || at === AttackType.STAND_B || at === AttackType.STAND_C || at === AttackType.STAND_D
+    || at === AttackType.CLOSE_A || at === AttackType.CLOSE_B || at === AttackType.CLOSE_C || at === AttackType.CLOSE_D
+    || at === AttackType.CROUCH_A || at === AttackType.CROUCH_B || at === AttackType.CROUCH_C || at === AttackType.CROUCH_D
+    || at === AttackType.JUMP_A || at === AttackType.JUMP_B || at === AttackType.JUMP_C || at === AttackType.JUMP_D
+    || at === AttackType.STAND_CD || at === AttackType.JUMP_CD;
+  const isThrow = at === AttackType.THROW || at === AttackType.THROW_FORWARD || at === AttackType.THROW_BACK;
+  const isSpecial = !normalAttack && !isThrow && !isDM;
+  const isPunch = s.endsWith('_A') || s.endsWith('_C')
+    || s.includes('ARAGAMI') || s.includes('DOKUGAMI') || s.includes('ONIYAKI')
+    || s.includes('KOTOTSUKI') || s.includes('KUZUKAZE') || s.includes('BURN_KNUCKLE')
+    || s.includes('RISING_TACKLE') || s.includes('POWER_DUNK') || s.includes('SANREN')
+    || s.includes('TSUMIYOMI') || s.includes('BATSUYOMI');
   return { isDM, isSDM, isSpecial, isPunch };
 }
 
