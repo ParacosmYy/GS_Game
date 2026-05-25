@@ -202,50 +202,51 @@ export function playKO(): void {
   noise.start(now); noise.stop(now + 0.4);
 }
 
-/** Heavy hit (C/D) — KOF-style deep meaty impact */
-export function playHeavyHit(): void {
+/** Heavy hit (C/D) — KOF-style deep meaty impact. intensity: 1.0-1.8, 按伤害值缩放 */
+export function playHeavyHit(intensity: number = 1): void {
   const ctx = getCtx();
   const now = ctx.currentTime;
+  const i = Math.min(intensity, 1.8);
 
   const noise = noiseBuffer(ctx, 0.12, 0.2);
   const filter = ctx.createBiquadFilter();
   filter.type = 'bandpass';
-  filter.frequency.value = 600;
+  filter.frequency.value = 600 * i;
   filter.Q.value = 0.6;
   const nGain = ctx.createGain();
-  nGain.gain.setValueAtTime(0.4, now);
+  nGain.gain.setValueAtTime(0.4 * i, now);
   nGain.gain.exponentialRampToValueAtTime(0.001, now + 0.14);
 
   const osc = ctx.createOscillator();
   osc.type = 'sine';
-  osc.frequency.setValueAtTime(100, now);
+  osc.frequency.setValueAtTime(100 * i, now);
   osc.frequency.exponentialRampToValueAtTime(28, now + 0.12);
   const oGain = ctx.createGain();
-  oGain.gain.setValueAtTime(0.5, now);
+  oGain.gain.setValueAtTime(0.5 * i, now);
   oGain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
 
   const crack = ctx.createOscillator();
   crack.type = 'triangle';
-  crack.frequency.setValueAtTime(500, now);
+  crack.frequency.setValueAtTime(500 * i, now);
   crack.frequency.exponentialRampToValueAtTime(100, now + 0.05);
   const cGain = ctx.createGain();
-  cGain.gain.setValueAtTime(0.25, now);
+  cGain.gain.setValueAtTime(0.25 * i, now);
   cGain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
 
   const harm = ctx.createOscillator();
   harm.type = 'sawtooth';
-  harm.frequency.setValueAtTime(800, now);
+  harm.frequency.setValueAtTime(800 * i, now);
   harm.frequency.exponentialRampToValueAtTime(200, now + 0.07);
   const hGain = ctx.createGain();
-  hGain.gain.setValueAtTime(0.1, now);
+  hGain.gain.setValueAtTime(0.1 * i, now);
   hGain.gain.exponentialRampToValueAtTime(0.001, now + 0.07);
 
   const hi = ctx.createOscillator();
   hi.type = 'square';
-  hi.frequency.setValueAtTime(2500, now);
+  hi.frequency.setValueAtTime(2500 * i, now);
   hi.frequency.exponentialRampToValueAtTime(400, now + 0.02);
   const hiGain = ctx.createGain();
-  hiGain.gain.setValueAtTime(0.08, now);
+  hiGain.gain.setValueAtTime(0.08 * i, now);
   hiGain.gain.exponentialRampToValueAtTime(0.001, now + 0.025);
 
   noise.connect(filter).connect(nGain).connect(ctx.destination);

@@ -5,7 +5,7 @@ import { CombatSystem } from './combatSystem.js';
 import type { Fighter } from '../entities/fighter.js';
 import type { VFXSystem, ScreenShake, ScreenFlash } from '../rendering/vfx.js';
 import type { PowerGauge } from '../core/types.js';
-import { AttackType } from '../core/types.js';
+import { AttackType, FighterState } from '../core/types.js';
 import { FRAME_DATA, STAGE_WIDTH, MAX_STOCKS, METER_PER_STOCK } from '../core/constants.js';
 import { ROSTER } from '../characters/index.js';
 import { gainMeterOnHit, gainMeterOnBlock, gainMeterOnHitstun } from './meter.js';
@@ -92,7 +92,8 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
     if (blocked) {
       // KOF2002: 防御火花偏向防御者面前
       const blkX = defender.x - defender.facing * 15;
-      const blkY = defender.y - defender.displayHeight / 2;
+      const isCrouchBlock = defender.state === FighterState.CROUCH;
+      const blkY = isCrouchBlock ? defender.y - 10 : defender.y - defender.displayHeight / 2;
       const { isDM: blkDM, isSpecial: blkSpecial } = classifyAttack(attackType);
       const blkColor = blkDM ? '#6688ff' : blkSpecial ? '#ffcc44' : '#ffffff';
       const blkHeavy = attackType === AttackType.STAND_C || attackType === AttackType.STAND_D
@@ -100,10 +101,16 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
         || attackType === AttackType.CROUCH_C || attackType === AttackType.CROUCH_D;
       const blkFlashScale = blkDM ? 1.8 : blkSpecial ? 1.4 : blkHeavy ? 1.2 : 0.8;
       deps.vfx.spawnBlockFlash(blkX, blkY, blkFlashScale);
-      if (blkSpecial) deps.vfx.spawnCharacterHitSparks(blkX, blkY, 6, blkColor, 1.2);
-      const blkStop = blkSpecial ? 5 : blkHeavy ? 5 : 3;
+      if (blkDM) {
+        deps.vfx.spawnCharacterHitSparks(blkX, blkY, 14, blkColor, 1.6);
+        deps.screenFlash.trigger('#4466ff', 0.15, 4);
+      } else if (blkSpecial) {
+        deps.vfx.spawnCharacterHitSparks(blkX, blkY, 6, blkColor, 1.2);
+      }
+      // KOF2002: 防御顿帧 — DM 8F, 必杀/重攻击 5F, 轻攻击 3F
+      const blkStop = blkDM ? 8 : blkSpecial ? 5 : blkHeavy ? 5 : 3;
       deps.cinematic.triggerHitStop(blkStop);
-      deps.screenShake.trigger(blkSpecial ? 5 : blkHeavy ? 4 : 2, 6);
+      deps.screenShake.trigger(blkDM ? 8 : blkSpecial ? 5 : blkHeavy ? 4 : 2, blkDM ? 10 : 6);
       gainMeterOnBlock(deps.gauges[atkIdx], attackType);
       gainMeterOnHitstun(deps.gauges[defIdx], attackType);
       // Chip伤害数字: 必杀技/DM防御时显示灰色小数字
@@ -138,7 +145,8 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
     const sparks = (isSDM ? 28 : isDM ? 20 : isSpecial ? 14 : counterHit ? 12 : 8) + comboSparkBonus + lowHpBonus;
     const sparkColor = isSpecial ? atkChar.specialColor : isPunch ? '#ffdd44' : '#44ddff';
     const sparkSize = isSDM ? 1.8 : isDM ? 1.5 : isSpecial ? 1.3 : isHeavyAttack(attackType) ? 1.0 : 0.7;
-    deps.vfx.spawnCharacterHitSparks(hitX, hitY, sparks, sparkColor, sparkSize);
+    const sparkSpeed = isDM ? 1.4 : isSpecial ? 1.2 : 1.0;
+    deps.vfx.spawnCharacterHitSparks(hitX, hitY, sparks, sparkColor, sparkSize, sparkSpeed);
     deps.vfx.spawnImpactRing(hitX, hitY, sparkSize);
 
     // 重攻击斩击线
@@ -160,8 +168,9 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       }
     }
 
-    // 伤害数字
-    deps.vfx.spawnDamageText(defender.x, defender.y - defender.displayHeight - 20, data.damage);
+    // 伤害数字 — KOF2002: DM用角色色, 通常/必杀用默认分级色
+    const dmgColor = isDM ? atkChar.specialColor : undefined;
+    deps.vfx.spawnDamageText(defender.x, defender.y - defender.displayHeight - 20, data.damage, dmgColor);
 
     // Rekka finisher增强
     const isRekkaFinisher = attackType === AttackType.KYO_NANASE
@@ -187,8 +196,8 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       deps.screenFlash.trigger('#aaddff', 0.12, 4);
       deps.screenShake.trigger(6, 8);
     }
-    else if (isSpecial) playSpecial();
-    else if (data.damage >= 70) playHeavyHit();
+    else if (isSpecial) { playSpecial(); if (combo > 0) playHit(0.6, combo); }
+    else if (data.damage >= 70) playHeavyHit(1 + Math.min(data.damage - 70, 50) / 62.5);
     else if (!defender.isGrounded()) playJuggleHit(combo);
     else playHit(data.damage > 50 ? 1.2 : 1.0, combo);
 
@@ -232,7 +241,7 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
     const shakeDur = isDM ? 14 : isSpecial ? 10 : isHeavyAttack(attackType) ? 8 : 5;
     // KOF2002: 高连击数增强震屏 (5+hits时额外+2强度, 10+hits时+4)
     const comboShake = combo >= 10 ? 4 : combo >= 5 ? 2 : 0;
-    deps.screenShake.trigger(calcShake(attackType, counterHit, data.damage) + comboShake, shakeDur);
+    deps.screenShake.trigger(calcShake(attackType, counterHit, data.damage) + comboShake, shakeDur, attacker.facing * 8);
     deps.cinematic.trackDamage(defIdx, data.damage);
 
     // KO检测 — 角色倒地时触发震撼效果

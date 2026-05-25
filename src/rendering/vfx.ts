@@ -84,8 +84,8 @@ export class VFXSystem {
   }
 
   /** 角色专属命中火花 — KOF风格, 更大更亮 */
-  spawnCharacterHitSparks(worldX: number, worldY: number, count: number, charColor: string, sizeScale?: number): void {
-    spawnCharacterHitSparks(this.particles, worldX, worldY, count, charColor, sizeScale);
+  spawnCharacterHitSparks(worldX: number, worldY: number, count: number, charColor: string, sizeScale?: number, speedScale?: number): void {
+    spawnCharacterHitSparks(this.particles, worldX, worldY, count, charColor, sizeScale, speedScale);
   }
 
   spawnGuardCrushSparks(worldX: number, worldY: number): void {
@@ -127,8 +127,8 @@ export class VFXSystem {
     spawnGroundSlam(this.particles, worldX, worldY);
   }
 
-  spawnDamageText(worldX: number, worldY: number, value: number): void {
-    spawnDamageText(this.particles, worldX, worldY, value);
+  spawnDamageText(worldX: number, worldY: number, value: number, overrideColor?: string): void {
+    spawnDamageText(this.particles, worldX, worldY, value, overrideColor);
   }
 
   spawnCounterText(worldX: number, worldY: number): void {
@@ -393,26 +393,26 @@ export class ScreenShake {
   private intensity = 0;
   private duration = 0;
   private maxDuration = 1;
+  private biasX = 0;
   offsetX = 0;
   offsetY = 0;
 
-  trigger(intensity: number, duration: number): void {
-    // 只在新的震动更强时覆盖
+  trigger(intensity: number, duration: number, biasX: number = 0): void {
     if (intensity >= this.intensity) {
       this.intensity = intensity;
       this.duration = duration;
       this.maxDuration = duration;
+      this.biasX = biasX;
     }
   }
 
   update(): void {
     if (this.duration > 0) {
       this.duration--;
-      // 非线性衰减: 开始强, 结束弱
       const t = this.duration / this.maxDuration;
-      const decay = t * t; // 平方衰减 — 更sharp的震动
-      this.offsetX = (Math.random() - 0.5) * this.intensity * decay;
-      this.offsetY = (Math.random() - 0.5) * this.intensity * decay * 0.6; // 垂直震动小于水平
+      const decay = t * t;
+      this.offsetX = (Math.random() - 0.5) * this.intensity * decay + this.biasX * decay * 0.3;
+      this.offsetY = (Math.random() - 0.5) * this.intensity * decay * 0.6;
     } else {
       this.offsetX = 0;
       this.offsetY = 0;

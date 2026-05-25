@@ -45,7 +45,7 @@ export function spawnBlockFlash(particles: Particle[], worldX: number, worldY: n
 }
 
 /** 角色专属命中火花 — KOF风格, 更大更亮. sizeScale: 轻攻击0.7, 重攻击1.0, 必杀1.3, DM1.8 */
-export function spawnCharacterHitSparks(particles: Particle[], worldX: number, worldY: number, count: number, charColor: string, sizeScale: number = 1.0): void {
+export function spawnCharacterHitSparks(particles: Particle[], worldX: number, worldY: number, count: number, charColor: string, sizeScale: number = 1.0, speedScale: number = 1.0): void {
   particles.push({
     x: worldX, y: worldY, vx: 0, vy: 0,
     life: 6, maxLife: 6, size: 25 * sizeScale,
@@ -53,14 +53,14 @@ export function spawnCharacterHitSparks(particles: Particle[], worldX: number, w
   });
   for (let i = 0; i < count; i++) {
     const angle = Math.random() * Math.PI * 2;
-    const speed = (3 + Math.random() * 7) * sizeScale;
+    const speed = (3 + Math.random() * 7) * sizeScale * speedScale;
     const isStar = Math.random() > 0.25;
     particles.push({
       x: worldX, y: worldY,
       vx: Math.cos(angle) * speed,
       vy: Math.sin(angle) * speed - 3 * sizeScale,
-      life: 14 + Math.floor(Math.random() * 10),
-      maxLife: 24,
+      life: Math.floor((14 + Math.random() * 10) * sizeScale),
+      maxLife: Math.floor(24 * sizeScale),
       size: (isStar ? 4 + Math.random() * 5 : 2 + Math.random() * 3) * sizeScale,
       color: Math.random() > 0.35 ? charColor : '#ffffff',
       type: isStar ? 'star' : 'spark',
@@ -241,11 +241,24 @@ export function spawnGroundSlam(particles: Particle[], worldX: number, worldY: n
   }
 }
 
-export function spawnDamageText(particles: Particle[], worldX: number, worldY: number, value: number): void {
+export function spawnDamageText(particles: Particle[], worldX: number, worldY: number, value: number, overrideColor?: string): void {
   const isCombo = value > 0 && value <= 50;
   const dmgSize = isCombo ? 18 + Math.min(value, 10) : value >= 120 ? 24 : value >= 80 ? 22 : value >= 50 ? 18 : 14;
-  const color = isCombo ? (value >= 10 ? '#ff8800' : '#ffcc00') : value >= 120 ? '#ff0000' : value >= 80 ? '#ff4444' : '#ff4444';
-  // KOF2002: 连击数向右漂, 伤害数字向左漂, 产生视觉分离
+  // KOF2002: 伤害数字颜色分级 — 低伤害白色, 中等黄色, 高伤害橙红, 超高纯红
+  let color: string;
+  if (overrideColor) {
+    color = overrideColor;
+  } else if (isCombo) {
+    color = value >= 10 ? '#ff8800' : '#ffcc00';
+  } else if (value >= 120) {
+    color = '#ff0000';
+  } else if (value >= 80) {
+    color = '#ff4444';
+  } else if (value >= 50) {
+    color = '#ffaa22';
+  } else {
+    color = '#ffffff';
+  }
   const driftX = isCombo ? 1.2 : -0.8;
   particles.push({
     x: worldX, y: worldY, vx: driftX + (Math.random() - 0.5) * 0.3, vy: -2,
