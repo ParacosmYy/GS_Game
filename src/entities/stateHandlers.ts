@@ -390,10 +390,23 @@ export function handleAttack(ctx: FighterCtx, input: ResolvedInput): void {
       && f.currentAttack && NORMAL_ATTACKS.has(f.currentAttack as string)) {
     const buffered = ctx.cancelSpecialBuffer;
     ctx.cancelSpecialBuffer = null;
-    // KOF2002: 正常→必杀技取消视觉反馈 — 小蓝色冲击环
     ctx.vfx.spawnImpactRing(f.x, f.y - f.displayHeight * 0.5);
     f.startAttack(buffered);
     return;
+  }
+
+  // 提前取消缓冲消费: 命令通常技命中后执行缓冲的必杀技
+  if (ctx.cancelSpecialBuffer && f.hasHit
+      && (f.attackPhase === 'active' || f.attackPhase === 'recovery')
+      && f.currentAttack && COMMAND_NORMALS.has(f.currentAttack as string)) {
+    const canCancel = f.cancelledIntoNormal ? true : f.hasHit;
+    if (canCancel) {
+      const buffered = ctx.cancelSpecialBuffer;
+      ctx.cancelSpecialBuffer = null;
+      ctx.vfx.spawnImpactRing(f.x, f.y - f.displayHeight * 0.5);
+      f.startAttack(buffered);
+      return;
+    }
   }
 
   // Normal → Command Normal Cancel (命中时才有, 被防不触发命令通常技取消)
@@ -409,16 +422,21 @@ export function handleAttack(ctx: FighterCtx, input: ResolvedInput): void {
     }
   }
 
-  // KOF2002: Command Normal → Special Cancel (hit AND block both allow cancel)
-  if (f.cancelledIntoNormal && f.attackPhase === 'recovery' && f.currentAttack
+  // KOF2002: Command Normal → Special Cancel
+  // 取消链中的命令通常技：命中+被防均可取消
+  // 独立命令通常技：仅命中时可取消
+  if (f.attackPhase === 'recovery' && f.currentAttack
       && COMMAND_NORMALS.has(f.currentAttack as string)) {
-    const tick = ctx.tickRef.value;
-    const special = ctx.character.routeSpecial(input, ctx.cmdBuf, tick, ctx.wasChargingDown);
-    if (special && !isDM(special as string)) {
-      f.startAttack(special);
-      f.cancelledIntoNormal = false;
-      f.normalCancelReady = false;
-      return;
+    const canCancel = f.cancelledIntoNormal ? true : f.hasHit;
+    if (canCancel) {
+      const tick = ctx.tickRef.value;
+      const special = ctx.character.routeSpecial(input, ctx.cmdBuf, tick, ctx.wasChargingDown);
+      if (special && !isDM(special as string)) {
+        f.startAttack(special);
+        f.cancelledIntoNormal = false;
+        f.normalCancelReady = false;
+        return;
+      }
     }
   }
 
