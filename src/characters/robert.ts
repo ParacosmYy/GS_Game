@@ -107,7 +107,7 @@ export const RobertDef: CharacterDefinition = {
     // — Attack poses (Kyokugenryu flashier: deeper stance, wider arm swings, more exaggerated) —
     [FighterState.STAND_ATTACK]: [
       pose({ head: bone(3, -1, 0.04), body: bone(5, 0, 0.12), armFront: bone(20, 3, 0.16, 1.05), armBack: bone(-8, 12, -0.7, 0.9), legFront: bone(8, 0, 0.1), legBack: bone(-7, 0, -0.12) }),
-      pose({ head: bone(4, 0, 0.06), body: bone(7, 0, 0.18), armFront: bone(32, 6, 0.2, 1.3), armBack: bone(-8, 12, -0.7, 0.9), legFront: bone(9, 0, 0.14), legBack: bone(-8, 0, -0.15) }),
+      pose({ head: bone(4, 0, 0.06), body: bone(7, 0, 0.18), armFront: bone(32, 6, 0.38, 1.3), armBack: bone(-8, 12, -0.7, 0.9), legFront: bone(9, 0, 0.14), legBack: bone(-8, 0, -0.15) }),
     ],
     [FighterState.CROUCH_ATTACK]: [
       pose({ head: bone(3, 9, 0.06), body: bone(4, 12, 0.14), armFront: bone(18, 8, 0.1, 1.05), armBack: bone(-6, 16, -0.5, 0.85), legFront: bone(18, 3, 0.35, 1.05), legBack: bone(-10, 10, -0.22) }),

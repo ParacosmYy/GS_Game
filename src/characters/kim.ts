@@ -95,7 +95,7 @@ export const KimDef: CharacterDefinition = {
     // — Attack poses (Taekwondo: kick-focused, arms guard, legFront emphasized on crouch) —
     [FighterState.STAND_ATTACK]: [
       pose({ head: bone(0, -1, 0.02), body: bone(1, 0, 0.04), armFront: bone(12, 8, 0.0, 0.9), armBack: bone(-6, 6, -0.5, 0.8), legFront: bone(8, 0, 0.06), legBack: bone(-6, 0, -0.08) }),
-      pose({ head: bone(1, -1, 0.04), body: bone(2, 0, 0.06), armFront: bone(14, 10, -0.15, 1.05), armBack: bone(-6, 6, -0.5, 0.8), legFront: bone(10, 0, 0.1), legBack: bone(-7, 0, -0.1) }),
+      pose({ head: bone(1, -1, 0.04), body: bone(2, 0, 0.06), armFront: bone(15, 10, -0.25, 1.05), armBack: bone(-6, 6, -0.5, 0.8), legFront: bone(10, 0, 0.1), legBack: bone(-7, 0, -0.1) }),
     ],
     [FighterState.CROUCH_ATTACK]: [
       pose({ head: bone(0, 5, 0.02), body: bone(1, 8, 0.04), armFront: bone(8, 12, -0.05, 0.85), armBack: bone(-6, 14, -0.35, 0.75), legFront: bone(20, 2, 0.48, 1.3), legBack: bone(-6, 6, -0.2) }),

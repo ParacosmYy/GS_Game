@@ -132,21 +132,46 @@ export function drawCharacterSelect(
       drawSNKText(ctx, label, cx + cardW / 2, cy + cardH - 25, 13, '#ffcc00');
     }
 
-    // Selection highlight — glowing border
+    // Selection highlight — animated corner bracket + trailing glow
     if (isP1Here) {
       const pulse = 0.5 + Math.sin(tick * 0.1) * 0.3;
+      const color = p1Ready ? '#ffcc00' : '#ff4444';
+      // Full glowing border
       ctx.strokeStyle = p1Ready ? `rgba(255, 204, 0, ${pulse})` : `rgba(255, 68, 68, ${pulse})`;
       ctx.lineWidth = 3;
       roundRect(ctx, cx - 3, cy - 3, cardW + 6, cardH + 6, 12);
       ctx.stroke();
+      // Corner brackets — animated highlight
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 2;
+      const bLen = 12;
+      const bOff = 6 + Math.sin(tick * 0.15) * 2;
+      // Top-left
+      ctx.beginPath(); ctx.moveTo(cx - bOff, cy - bOff + bLen); ctx.lineTo(cx - bOff, cy - bOff); ctx.lineTo(cx - bOff + bLen, cy - bOff); ctx.stroke();
+      // Top-right
+      ctx.beginPath(); ctx.moveTo(cx + cardW + bOff - bLen, cy - bOff); ctx.lineTo(cx + cardW + bOff, cy - bOff); ctx.lineTo(cx + cardW + bOff, cy - bOff + bLen); ctx.stroke();
+      // Bottom-left
+      ctx.beginPath(); ctx.moveTo(cx - bOff, cy + cardH + bOff - bLen); ctx.lineTo(cx - bOff, cy + cardH + bOff); ctx.lineTo(cx - bOff + bLen, cy + cardH + bOff); ctx.stroke();
+      // Bottom-right
+      ctx.beginPath(); ctx.moveTo(cx + cardW + bOff - bLen, cy + cardH + bOff); ctx.lineTo(cx + cardW + bOff, cy + cardH + bOff); ctx.lineTo(cx + cardW + bOff, cy + cardH + bOff - bLen); ctx.stroke();
       drawSNKText(ctx, 'P1', cx + cardW / 2, cy - 10, 11, '#ff4444');
     }
     if (isP2Here) {
       const pulse = 0.5 + Math.sin(tick * 0.1 + 1) * 0.3;
+      const color = p2Ready ? '#ffcc00' : '#4488ff';
       ctx.strokeStyle = p2Ready ? `rgba(255, 204, 0, ${pulse})` : `rgba(68, 136, 255, ${pulse})`;
       ctx.lineWidth = 3;
       roundRect(ctx, cx - 3, cy - 3, cardW + 6, cardH + 6, 12);
       ctx.stroke();
+      // Corner brackets
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 2;
+      const bLen = 12;
+      const bOff = 6 + Math.sin(tick * 0.15 + 1) * 2;
+      ctx.beginPath(); ctx.moveTo(cx - bOff, cy - bOff + bLen); ctx.lineTo(cx - bOff, cy - bOff); ctx.lineTo(cx - bOff + bLen, cy - bOff); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(cx + cardW + bOff - bLen, cy - bOff); ctx.lineTo(cx + cardW + bOff, cy - bOff); ctx.lineTo(cx + cardW + bOff, cy - bOff + bLen); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(cx - bOff, cy + cardH + bOff - bLen); ctx.lineTo(cx - bOff, cy + cardH + bOff); ctx.lineTo(cx - bOff + bLen, cy + cardH + bOff); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(cx + cardW + bOff - bLen, cy + cardH + bOff); ctx.lineTo(cx + cardW + bOff, cy + cardH + bOff); ctx.lineTo(cx + cardW + bOff, cy + cardH + bOff - bLen); ctx.stroke();
       drawSNKText(ctx, 'P2', cx + cardW / 2, cy + cardH + 14, 11, '#4488ff');
     }
   }
@@ -164,19 +189,45 @@ export function drawCharacterSelect(
   ctx.lineWidth = 1;
   ctx.beginPath(); ctx.moveTo(0, panelY - 10); ctx.lineTo(CANVAS_WIDTH, panelY - 10); ctx.stroke();
 
-  // P1 info — SNK style
+  // P1 info — SNK style with portrait preview
   const p1Char = ROSTER[p1Cursor];
-  drawSNKText(ctx, 'P1', 50, panelY + 10, 14, '#ff4444', '#000000', 'left');
-  drawSNKText(ctx, p1Char.nameCn, 40, panelY + 40, 24, p1Char.color, '#000000', 'left');
-  drawSNKText(ctx, p1Char.name, 40, panelY + 58, 10, '#888888', '#000000', 'left');
-  drawSNKText(ctx, p1Ready ? 'READY!' : 'J to confirm', 40, panelY + 78, 12, p1Ready ? '#ffcc00' : '#666666', '#000000', 'left');
+  if (p1Char.pixelPortrait) {
+    const pScale = 2.5;
+    const pw = p1Char.pixelPortrait.width * pScale;
+    const ph = p1Char.pixelPortrait.height * pScale;
+    const ppx = 10;
+    const ppy = panelY + 2;
+    ctx.fillStyle = 'rgba(10, 10, 20, 0.7)';
+    roundRect(ctx, ppx, ppy, pw + 8, ph + 8, 4); ctx.fill();
+    drawPixelPortrait(ctx, p1Char.pixelPortrait, ppx + 4, ppy + 4, pScale);
+  }
+  drawSNKText(ctx, 'P1', 105, panelY + 10, 14, '#ff4444', '#000000', 'left');
+  drawSNKText(ctx, p1Char.nameCn, 105, panelY + 40, 24, p1Char.color, '#000000', 'left');
+  drawSNKText(ctx, p1Char.name, 105, panelY + 58, 10, '#888888', '#000000', 'left');
+  drawSNKText(ctx, p1Ready ? 'READY!' : 'J to confirm', 105, panelY + 78, 12, p1Ready ? '#ffcc00' : '#666666', '#000000', 'left');
+  // P1 color accent bar
+  ctx.fillStyle = p1Char.color;
+  ctx.fillRect(100, panelY - 5, 120, 2);
 
-  // P2 info — SNK style
+  // P2 info — SNK style with portrait preview
   const p2Char = ROSTER[p2Cursor];
-  drawSNKText(ctx, 'P2', CANVAS_WIDTH - 50, panelY + 10, 14, '#4488ff', '#000000', 'right');
-  drawSNKText(ctx, p2Char.nameCn, CANVAS_WIDTH - 40, panelY + 40, 24, p2Char.color, '#000000', 'right');
-  drawSNKText(ctx, p2Char.name, CANVAS_WIDTH - 40, panelY + 58, 10, '#888888', '#000000', 'right');
-  drawSNKText(ctx, p2Ready ? 'READY!' : p2IsAI ? '[AI]' : 'Numpad to confirm', CANVAS_WIDTH - 40, panelY + 78, 12, p2Ready ? '#ffcc00' : '#666666', '#000000', 'right');
+  if (p2Char.pixelPortrait) {
+    const pScale = 2.5;
+    const pw = p2Char.pixelPortrait.width * pScale;
+    const ph = p2Char.pixelPortrait.height * pScale;
+    const ppx = CANVAS_WIDTH - pw - 18;
+    const ppy = panelY + 2;
+    ctx.fillStyle = 'rgba(10, 10, 20, 0.7)';
+    roundRect(ctx, ppx, ppy, pw + 8, ph + 8, 4); ctx.fill();
+    drawPixelPortrait(ctx, p2Char.pixelPortrait, ppx + 4, ppy + 4, pScale);
+  }
+  drawSNKText(ctx, 'P2', CANVAS_WIDTH - 105, panelY + 10, 14, '#4488ff', '#000000', 'right');
+  drawSNKText(ctx, p2Char.nameCn, CANVAS_WIDTH - 105, panelY + 40, 24, p2Char.color, '#000000', 'right');
+  drawSNKText(ctx, p2Char.name, CANVAS_WIDTH - 105, panelY + 58, 10, '#888888', '#000000', 'right');
+  drawSNKText(ctx, p2Ready ? 'READY!' : p2IsAI ? '[AI]' : 'Numpad to confirm', CANVAS_WIDTH - 105, panelY + 78, 12, p2Ready ? '#ffcc00' : '#666666', '#000000', 'right');
+  // P2 color accent bar
+  ctx.fillStyle = p2Char.color;
+  ctx.fillRect(CANVAS_WIDTH - 220, panelY - 5, 120, 2);
 
   // VS in center — SNK style
   drawSNKText(ctx, 'VS', CANVAS_WIDTH / 2, panelY + 40, 56, 'rgba(255,255,255,0.08)');

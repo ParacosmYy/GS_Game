@@ -97,7 +97,7 @@ export const RyoDef: CharacterDefinition = {
     // — Attack poses (Kyokugenryu: powerful straight punch, deep horse stance, body rotates more) —
     [FighterState.STAND_ATTACK]: [
       pose({ head: bone(3, 0, 0.04), body: bone(4, 0, 0.1), armFront: bone(17, 4, 0.18, 1.1), armBack: bone(-12, 12, -0.8, 0.9), legFront: bone(7, 0, 0.1), legBack: bone(-7, 0, -0.12) }),
-      pose({ head: bone(4, 1, 0.06), body: bone(6, 0, 0.15), armFront: bone(30, 6, 0.15, 1.3), armBack: bone(-12, 12, -0.8, 0.9), legFront: bone(8, 0, 0.14), legBack: bone(-8, 0, -0.15) }),
+      pose({ head: bone(4, 1, 0.06), body: bone(6, 0, 0.15), armFront: bone(30, 6, 0.26, 1.3), armBack: bone(-12, 12, -0.8, 0.9), legFront: bone(8, 0, 0.14), legBack: bone(-8, 0, -0.15) }),
     ],
     [FighterState.CROUCH_ATTACK]: [
       pose({ head: bone(3, 10, 0.06), body: bone(3, 14, 0.12), armFront: bone(15, 8, 0.08, 1.0), armBack: bone(-8, 16, -0.55, 0.85), legFront: bone(18, 4, 0.35, 1.05), legBack: bone(-12, 12, -0.3) }),

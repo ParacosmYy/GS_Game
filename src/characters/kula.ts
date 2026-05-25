@@ -105,7 +105,7 @@ export const KulaDef: CharacterDefinition = {
     // 站立攻击 — Graceful ice fighter: light airy strikes, more body rotation, smaller arm scale
     [FighterState.STAND_ATTACK]: [
       pose({ head: bone(1, 0, 0.03), body: bone(2, 0, 0.08), armFront: bone(12, 6, 0.08, 0.9), armBack: bone(-4, 8, -0.45, 0.8), legFront: bone(4, 0, 0.04), legBack: bone(-4, 0, -0.06) }),
-      pose({ head: bone(2, 0, 0.05), body: bone(4, 0, 0.14), armFront: bone(20, 7, 0.1, 1.0), armBack: bone(-4, 8, -0.45, 0.8), legFront: bone(5, 0, 0.08), legBack: bone(-5, 0, -0.08) }),
+      pose({ head: bone(2, 0, 0.05), body: bone(4, 0, 0.14), armFront: bone(23, 7, 0.18, 1.0), armBack: bone(-4, 8, -0.45, 0.8), legFront: bone(5, 0, 0.08), legBack: bone(-5, 0, -0.08) }),
     ],
     // 蹲下攻击 — graceful sweep
     [FighterState.CROUCH_ATTACK]: [

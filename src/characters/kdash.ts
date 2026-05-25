@@ -110,7 +110,7 @@ export const KdashDef: CharacterDefinition = {
     // 站立攻击 — Lazy but explosive: one-handed powerful strikes, armBack stays low (in pocket)
     [FighterState.STAND_ATTACK]: [
       pose({ head: bone(2, 0, 0.02), body: bone(5, 0, 0.12), armFront: bone(18, 4, 0.1, 1.05), armBack: bone(-8, 18, -0.15, 0.75), legFront: bone(7, 0, 0.06), legBack: bone(-7, 0, -0.12) }),
-      pose({ head: bone(3, 1, 0.04), body: bone(7, 0, 0.16), armFront: bone(26, 5, -0.02, 1.3), armBack: bone(-8, 18, -0.15, 0.75), legFront: bone(8, 0, 0.1), legBack: bone(-8, 0, -0.14) }),
+      pose({ head: bone(3, 1, 0.04), body: bone(7, 0, 0.16), armFront: bone(28, 5, -0.35, 1.3), armBack: bone(-8, 18, -0.15, 0.75), legFront: bone(8, 0, 0.1), legBack: bone(-8, 0, -0.14) }),
     ],
     // 蹲下攻击 — front arm does all the work, back arm lazy
     [FighterState.CROUCH_ATTACK]: [

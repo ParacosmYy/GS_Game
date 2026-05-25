@@ -97,7 +97,7 @@ export const TerryDef: CharacterDefinition = {
     // — Attack poses (Boxing style: hook punches, wide swings, body sways more) —
     [FighterState.STAND_ATTACK]: [
       pose({ head: bone(3, -1, 0.04), body: bone(2, 0, 0.1), armFront: bone(15, 4, 0.15, 1.1), armBack: bone(-10, 12, -0.85, 0.9), legFront: bone(7, 0, 0.12), legBack: bone(-8, 0, -0.14) }),
-      pose({ head: bone(4, 0, 0.06), body: bone(5, 0, 0.15), armFront: bone(25, 10, 0.08, 1.25), armBack: bone(-10, 12, -0.85, 0.9), legFront: bone(9, 0, 0.18), legBack: bone(-9, 0, -0.18) }),
+      pose({ head: bone(4, 0, 0.06), body: bone(5, 0, 0.15), armFront: bone(30, 10, 0.1, 1.25), armBack: bone(-10, 12, -0.85, 0.9), legFront: bone(9, 0, 0.18), legBack: bone(-9, 0, -0.18) }),
     ],
     [FighterState.CROUCH_ATTACK]: [
       pose({ head: bone(3, 7, 0.06), body: bone(2, 10, 0.1), armFront: bone(14, 8, 0.05, 1.05), armBack: bone(-8, 16, -0.6, 0.85), legFront: bone(14, 3, 0.28, 1.05), legBack: bone(-10, 8, -0.22) }),

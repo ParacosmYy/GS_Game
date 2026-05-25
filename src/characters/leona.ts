@@ -97,7 +97,7 @@ export const LeonaDef: CharacterDefinition = {
     // — Attack poses (Military combat: quick jabs, minimal telegraph, upright posture) —
     [FighterState.STAND_ATTACK]: [
       pose({ head: bone(1, 0, 0.02), body: bone(2, 0, 0.04), armFront: bone(14, 6, 0.12, 0.9), armBack: bone(-5, 10, -0.55, 0.8), legFront: bone(4, 0, 0.04), legBack: bone(-4, 0, -0.06) }),
-      pose({ head: bone(1, 0, 0.03), body: bone(3, 0, 0.06), armFront: bone(22, 7, 0.02, 1.05), armBack: bone(-5, 10, -0.55, 0.8), legFront: bone(5, 0, 0.06), legBack: bone(-5, 0, -0.08) }),
+      pose({ head: bone(1, 0, 0.03), body: bone(3, 0, 0.06), armFront: bone(18, 8, -0.02, 1.05), armBack: bone(-5, 10, -0.55, 0.8), legFront: bone(5, 0, 0.06), legBack: bone(-5, 0, -0.08) }),
     ],
     [FighterState.CROUCH_ATTACK]: [
       pose({ head: bone(1, 6, 0.02), body: bone(1, 8, 0.04), armFront: bone(12, 8, 0.06, 0.9), armBack: bone(-5, 14, -0.4, 0.8), legFront: bone(13, 2, 0.22, 1.0), legBack: bone(-6, 6, -0.12) }),

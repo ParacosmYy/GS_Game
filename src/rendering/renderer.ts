@@ -84,11 +84,19 @@ export class Renderer {
       const maxModeActive = maxModes ? maxModes[playerIdx].active : false;
       const guardLow = f.guardGauge < 30; // 防御槽低于30%闪烁警告
 
-      // Shadow on ground
-      const shadowScale = Math.max(0.3, 1 - (STAGE_GROUND_Y - f.y) / 200);
-      ctx.fillStyle = `rgba(0, 0, 0, ${0.25 * shadowScale})`;
+      // Enhanced ground shadow — soft gradient with distance-based scaling
+      const airDist = Math.max(0, STAGE_GROUND_Y - f.y);
+      const shadowScale = Math.max(0.2, 1 - airDist / 250);
+      const shadowW = (hw + 8) * (0.6 + shadowScale * 0.4);
+      const shadowH = 4 + shadowScale * 3;
+      const shadowAlpha = 0.15 + 0.15 * shadowScale;
+      const shadowGrad = ctx.createRadialGradient(sx, STAGE_GROUND_Y + 2, 0, sx, STAGE_GROUND_Y + 2, shadowW);
+      shadowGrad.addColorStop(0, `rgba(0, 0, 0, ${shadowAlpha})`);
+      shadowGrad.addColorStop(0.5, `rgba(0, 0, 0, ${shadowAlpha * 0.5})`);
+      shadowGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      ctx.fillStyle = shadowGrad;
       ctx.beginPath();
-      ctx.ellipse(sx, STAGE_GROUND_Y + 2, hw * 0.7 * shadowScale, 3 * shadowScale, 0, 0, Math.PI * 2);
+      ctx.ellipse(sx, STAGE_GROUND_Y + 2, shadowW, shadowH, 0, 0, Math.PI * 2);
       ctx.fill();
 
       // Resolve body colors from fighter state
@@ -118,15 +126,16 @@ export class Renderer {
         ctx.stroke();
       }
 
-      // Ground shadow — ellipse under fighter
-      const shadowAlpha = f.isGrounded() ? 0.25 : 0.1;
-      ctx.save();
-      ctx.globalAlpha = shadowAlpha;
-      ctx.fillStyle = '#000000';
-      ctx.beginPath();
-      ctx.ellipse(sx, STAGE_GROUND_Y + 2, hw + 4, 4, 0, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.restore();
+      // Ground reflection — subtle mirrored silhouette at ground level
+      if (f.isGrounded()) {
+        ctx.save();
+        ctx.globalAlpha = 0.06;
+        ctx.translate(sx, STAGE_GROUND_Y);
+        ctx.scale(1, -0.15);
+        ctx.translate(-sx, -STAGE_GROUND_Y);
+        drawSkeletalFighter(ctx, f, sx, f.y, f.color, '#000000', this.globalTick, maxModeActive);
+        ctx.restore();
+      }
 
       // Lean offset for RUN/BACKDASH
       let leanOffsetX = 0;

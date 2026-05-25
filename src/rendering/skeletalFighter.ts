@@ -299,6 +299,21 @@ export function drawSkeletalFighter(
       ctx.restore();
     }
   }
+
+  // KOF2002: 低血量红色脉冲光环 — 血量<25%时可见的警告效果
+  const healthRatio = f.health / f.maxHealth;
+  if (healthRatio < 0.25 && healthRatio > 0) {
+    const dangerPulse = Math.sin(globalTick * 0.15) * 0.15 + 0.15;
+    const dangerGrad = ctx.createRadialGradient(
+      sx, sy - f.displayHeight / 2, 5,
+      sx, sy - f.displayHeight / 2, f.displayHeight * 0.6,
+    );
+    dangerGrad.addColorStop(0, `rgba(255, 50, 20, ${dangerPulse})`);
+    dangerGrad.addColorStop(0.5, `rgba(255, 20, 0, ${dangerPulse * 0.4})`);
+    dangerGrad.addColorStop(1, 'rgba(255, 0, 0, 0)');
+    ctx.fillStyle = dangerGrad;
+    ctx.fillRect(Math.round(sx - 55), Math.round(sy - f.displayHeight - 20), 110, f.displayHeight + 40);
+  }
 }
 
 /** 角色专属拳头光效 — 通常攻击时可见 */

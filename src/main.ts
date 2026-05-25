@@ -4,7 +4,7 @@
  */
 import { GameLoop } from './core/gameLoop.js';
 import { Camera } from './core/camera.js';
-import { CANVAS_WIDTH, CANVAS_HEIGHT, STAGE_WIDTH, STAGE_GROUND_Y, KO_DISPLAY_TIME, MAX_STOCKS, METER_PER_STOCK } from './core/constants.js';
+import { CANVAS_WIDTH, CANVAS_HEIGHT, STAGE_WIDTH, STAGE_GROUND_Y, STAGE_LEFT, STAGE_RIGHT, KO_DISPLAY_TIME, MAX_STOCKS, METER_PER_STOCK } from './core/constants.js';
 import { GamePhase, FighterState } from './core/types.js';
 import type { PowerGauge, MaxModeState } from './core/types.js';
 import { InputManager, CommandBuffer, resolveInput, getDirectionInput } from './input/index.js';
@@ -433,6 +433,45 @@ function update(): void {
     }
 
     f.savePrevState();
+  });
+
+  // 移动视觉反馈
+  [p1, p2].forEach((f) => {
+    // 跑步: 每8帧一次小尘埃
+    if (f.state === FighterState.RUN && tickRef.value % 8 === 0) {
+      vfx.spawnDust(f.x, STAGE_GROUND_Y);
+    }
+    // 后撤步: 起跳瞬间脚下尘埃
+    if (f.prevState !== FighterState.BACKDASH && f.state === FighterState.BACKDASH) {
+      vfx.spawnHeavyDust(f.x, STAGE_GROUND_Y, 4);
+    }
+    // 前滚/后滚: 起滚尘埃
+    if ((f.prevState !== FighterState.ROLL && f.state === FighterState.ROLL)
+      || (f.prevState !== FighterState.BACK_ROLL && f.state === FighterState.BACK_ROLL)) {
+      vfx.spawnDust(f.x, STAGE_GROUND_Y);
+    }
+    // 着陆检测: 从空中状态进入地面状态
+    const wasAir = f.prevState === FighterState.JUMP
+      || f.prevState === FighterState.RUN_JUMP
+      || f.prevState === FighterState.HOP
+      || f.prevState === FighterState.HYPER_JUMP
+      || f.prevState === FighterState.AIR_ATTACK
+      || f.prevState === FighterState.AIR_BLOCK;
+    const isGround = f.state === FighterState.IDLE
+      || f.state === FighterState.CROUCH
+      || f.state === FighterState.WALK;
+    if (wasAir && isGround) {
+      vfx.spawnHeavyDust(f.x, STAGE_GROUND_Y, 5);
+    }
+    // 壁弹火花: 角色到达舞台边缘时
+    const hitLeft = f.x <= STAGE_LEFT + 5;
+    const hitRight = f.x >= STAGE_RIGHT - 5;
+    if ((hitLeft || hitRight) && (f.state === FighterState.HITSTUN || f.state === FighterState.KNOCKDOWN)) {
+      const wallX = hitLeft ? STAGE_LEFT : STAGE_RIGHT;
+      if (tickRef.value % 3 === 0) {
+        vfx.spawnCharacterHitSparks(wallX, f.y - f.displayHeight / 2, 6, '#ffaa44');
+      }
+    }
   });
 
   for (let i = projectiles.length - 1; i >= 0; i--) { if (!projectiles[i].active) projectiles.splice(i, 1); }
