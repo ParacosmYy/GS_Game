@@ -130,6 +130,12 @@ export function spawnQuickStandText(particles: Particle[], worldX: number, world
 }
 
 export function spawnThrowEscapeSparks(particles: Particle[], worldX: number, worldY: number): void {
+  // KOF2002: 拆投初始蓝色闪光核心
+  particles.push({
+    x: worldX, y: worldY, vx: 0, vy: 0,
+    life: 6, maxLife: 6, size: 25,
+    color: '#4488ff', type: 'flash',
+  });
   for (let i = 0; i < 10; i++) {
     const angle = Math.random() * Math.PI * 2;
     const speed = 2 + Math.random() * 4;
@@ -366,6 +372,12 @@ export function spawnReversalText(particles: Particle[], worldX: number, worldY:
 
 /** Recovery spark — subtle white flash when hitstun ends */
 export function spawnRecoverySpark(particles: Particle[], worldX: number, worldY: number): void {
+  // KOF2002: 硬直恢复柔和白色闪光
+  particles.push({
+    x: worldX, y: worldY, vx: 0, vy: 0,
+    life: 8, maxLife: 8, size: 20,
+    color: '#ffffff', type: 'flash',
+  });
   for (let i = 0; i < 4; i++) {
     const angle = Math.PI / 2 * i + Math.random() * 0.5;
     particles.push({
@@ -407,6 +419,12 @@ export function spawnHeavyDust(particles: Particle[], worldX: number, worldY: nu
 }
 
 export function spawnCounterWireSparks(particles: Particle[], worldX: number, worldY: number): void {
+  // KOF2002: 壁弹初始橙色闪光核心
+  particles.push({
+    x: worldX, y: worldY, vx: 0, vy: 0,
+    life: 8, maxLife: 8, size: 30,
+    color: '#ff8800', type: 'flash',
+  });
   for (let i = 0; i < 16; i++) {
     const angle = Math.random() * Math.PI * 2;
     const speed = 3 + Math.random() * 7;

@@ -121,6 +121,8 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       if (blkSpecial || blkDM) {
         const chip = Math.round(data.damage * 0.07);
         deps.vfx.spawnDamageText(defender.x, defender.y - defender.displayHeight - 15, chip);
+        // KOF2002: Chip伤害微闪 — 防守方感受到持续压力
+        deps.screenFlash.trigger(blkDM ? '#2244aa' : '#443300', 0.04, 2);
       }
       playBlock(blkDM || blkHeavy);
       return;
@@ -168,6 +170,11 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       deps.vfx.spawnSlashLine(hitX, hitY, attacker.facing, sparkColor, slashScale);
     }
 
+    // KOF2002: 必杀技额外冲击环 — 角色色+白色双层
+    if (isSpecial && !isDM) {
+      deps.vfx.spawnImpactRing(hitX, hitY, 0.8);
+    }
+
     // DM: 超必杀华丽爆发 + 全屏闪光
     if (isDM) {
       deps.vfx.spawnSuperBurst(hitX, hitY, atkChar.specialColor, atkChar.specialGlow, isSDM);
@@ -188,6 +195,11 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
     // 伤害数字 — KOF2002: DM用角色色, CH用橙色, 通常用默认分级色
     const dmgColor = isDM ? atkChar.specialColor : counterHit ? '#ff8800' : undefined;
     deps.vfx.spawnDamageText(defender.x, defender.y - defender.displayHeight - 20, data.damage, dmgColor);
+
+    // KOF2002: 重攻击(非必杀)命中微闪 — 增强打击感
+    if (isHeavyAttack(attackType) && !isSpecial && !isDM) {
+      deps.screenFlash.trigger('#ffffcc', 0.07, 3);
+    }
 
     // Rekka finisher增强
     const isRekkaFinisher = attackType === AttackType.KYO_NANASE
@@ -218,6 +230,10 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       // KOF2002: 投技额外向上飘散蓝色小火花
       deps.vfx.spawnCharacterHitSparks(hitX, hitY - 20, 4, '#aaddff', 0.5, 0.6);
       deps.screenFlash.trigger('#aaddff', 0.15, 5);
+      // KOF2002: 投技命中地面扬尘
+      if (defender.isGrounded()) {
+        deps.vfx.spawnDust(defender.x, defender.y);
+      }
       deps.screenShake.trigger(7, 9);
     }
     else if (isSpecial) { playSpecial(); if (combo > 0) playHit(0.6, combo); }
@@ -252,6 +268,10 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       const airBonus = combo >= 5 ? 4 : 0;
       deps.vfx.spawnCharacterHitSparks(hitX, hitY - 15, 6 + airBonus, '#aaddff', 0.8, 0.8, 0.3, true);
     }
+    // KOF2002: 站立被通常技命中时脚下尘土
+    if (defender.isGrounded() && !isDM && !isSpecial) {
+      deps.vfx.spawnDust(defender.x, defender.y);
+    }
 
     // CD击飞攻击: 更强的冲击反馈
     if (attackType === AttackType.STAND_CD || attackType === AttackType.JUMP_CD) {
@@ -269,6 +289,8 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
     if (combo >= 10) {
       deps.vfx.spawnImpactRing(hitX, hitY, 2.0);
       deps.vfx.spawnCharacterHitSparks(hitX, hitY, 6, '#ffffff', 0.5, 2.0);
+      // KOF2002: 10+hits微闪白 — 强化连段满足感
+      deps.screenFlash.trigger('#ffffff', 0.06, 3);
     }
 
     // 震屏时长: 轻攻击5帧, 重攻击8帧, 必杀10帧, DM 14帧
@@ -280,7 +302,9 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
 
     // KO检测 — 角色倒地时触发震撼效果
     if (defender.health <= 0 && !defender.isGrounded()) {
-      // 延迟到落地时触发groundslam（在main.ts的KO逻辑中处理）
+      // KOF2002: KO前最后一击额外顿帧+微闪
+      deps.cinematic.triggerHitStop(2);
+      deps.screenFlash.trigger('#ff4400', 0.08, 3);
     }
   };
 }
