@@ -128,7 +128,7 @@ let p2AI: InstanceType<typeof import('./ai/simpleAI.js').SimpleAI> | null = null
 const INTRO_DURATION = 120;
 let p1Team: TeamState | null = null;
 let p2Team: TeamState | null = null;
-let teamMode = true; // 3v3 team mode
+let teamMode = false; // 3v3 team mode, enabled via mode select
 let p1DelayedHealth = p1.maxHealth;
 let p2DelayedHealth = p2.maxHealth;
 let firstHitTracked = false;
@@ -154,7 +154,7 @@ function update(): void {
     if (inputManager.isKeyDown('ArrowLeft') || inputManager.isKeyDown('KeyA')) modeSelectCursor = Math.max(0, modeSelectCursor - 1);
     if (inputManager.isKeyDown('ArrowRight') || inputManager.isKeyDown('KeyD')) modeSelectCursor = Math.min(2, modeSelectCursor + 1);
     if (inputManager.isKeyDown('Enter') || inputManager.isKeyDown('KeyJ')) {
-      if (modeSelectCursor === 1) return; // Team mode not ready
+      teamMode = modeSelectCursor === 1;
       isTrainingMode = modeSelectCursor === 2;
       phase = GamePhase.SELECT;
     }

@@ -55,6 +55,7 @@ export function drawAttackLimb(
 
   const isSpecialMove = name.startsWith('KYO_') || name.startsWith('IORI_')
     || name.startsWith('TERRY_') || name.startsWith('KIM_') || name.startsWith('RYO_') || name.startsWith('LEONA_') || name.startsWith('ROBERT_')
+    || name.startsWith('VICE_')
     || f.currentAttack === AttackType.SPECIAL_PROJECTILE
     || f.currentAttack === AttackType.SPECIAL_UPPER
     || name.startsWith('DM_');

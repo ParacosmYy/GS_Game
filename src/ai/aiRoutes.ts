@@ -137,6 +137,24 @@ export const COMBO_ROUTES: Record<string, ComboStep[]> = {
     { type: 'special', attack: 'yashiroUpperDu', delay: 3 },
     { type: 'special', attack: 'dmArmageddonBusters', delay: 4 },
   ],
+  chris: [
+    { type: 'button',  attack: 'closeC', delay: 0 },
+    { type: 'button',  attack: 'chrisMakashippo', delay: 2 },
+    { type: 'special', attack: 'chrisShotWeave', delay: 3 },
+    { type: 'special', attack: 'dmChainSlideTouch', delay: 4 },
+  ],
+  shermie: [
+    { type: 'button',  attack: 'closeC', delay: 0 },
+    { type: 'button',  attack: 'shermieStand', delay: 2 },
+    { type: 'special', attack: 'shermieShoot', delay: 3 },
+    { type: 'special', attack: 'dmShermieCarnival', delay: 4 },
+  ],
+  vice: [
+    { type: 'button',  attack: 'closeC', delay: 0 },
+    { type: 'button',  attack: 'viceMonstrosity', delay: 2 },
+    { type: 'special', attack: 'viceOutrage', delay: 3 },
+    { type: 'special', attack: 'dmNegativeGain', delay: 4 },
+  ],
   _default: [
     { type: 'button',  attack: 'closeC', delay: 0 },
     { type: 'button',  attack: 'standA',  delay: 2 },
@@ -198,6 +216,12 @@ export function applyComboStep(step: ComboStep, base: ResolvedInput): void {
         base.forward = true; base.buttonA = true; base.buttonAPressed = true; base.punchPressed = true; break;
       case 'yashiroShuuWani':
         base.forward = true; base.buttonA = true; base.buttonAPressed = true; base.punchPressed = true; break;
+      case 'chrisMakashippo':
+        base.forward = true; base.buttonA = true; base.buttonAPressed = true; base.punchPressed = true; break;
+      case 'shermieStand':
+        base.forward = true; base.buttonA = true; base.buttonAPressed = true; base.punchPressed = true; break;
+      case 'viceMonstrosity':
+        base.forward = true; base.buttonA = true; base.buttonAPressed = true; base.punchPressed = true; break;
       case 'jumpC':
         base.buttonC = true; base.buttonCPressed = true; base.punchPressed = true; break;
     }
@@ -246,6 +270,9 @@ export function routeComboSpecial(
     case 'choi': return routeChoi(attack);
     case 'mature': return routeMature(attack);
     case 'yashiro': return routeYashiro(attack);
+    case 'chris': return routeChris(attack);
+    case 'shermie': return routeShermie(attack);
+    case 'vice': return routeVice(attack);
     default: return null;
   }
 }
@@ -446,5 +473,38 @@ function routeYashiro(attack: string): AttackType | null {
     case 'yashiroMusatsu': return AttackType.YASHIRO_MUSATSU;
     case 'dmArmageddonBusters': return AttackType.DM_ARMAGEDDON_BUSTERS;
     default: return AttackType.YASHIRO_UPPER_DU;
+  }
+}
+
+function routeChris(attack: string): AttackType | null {
+  switch (attack) {
+    case 'chrisShotWeave': return AttackType.CHRIS_SHOT_WEAVE;
+    case 'chrisShotWeaveC': return AttackType.CHRIS_SHOT_WEAVE_C;
+    case 'chrisTwisterDrive': return AttackType.CHRIS_TWISTER_DRIVE;
+    case 'chrisScrambleDash': return AttackType.CHRIS_SCRAMBLE_DASH;
+    case 'dmChainSlideTouch': return AttackType.DM_CHAIN_SLIDE_TOUCH;
+    default: return AttackType.CHRIS_SHOT_WEAVE;
+  }
+}
+
+function routeShermie(attack: string): AttackType | null {
+  switch (attack) {
+    case 'shermieShoot': return AttackType.SHERMIE_SHOOT;
+    case 'shermieShootC': return AttackType.SHERMIE_SHOOT_C;
+    case 'shermieCarnival': return AttackType.SHERMIE_CARNIVAL;
+    case 'shermieAxleSpin': return AttackType.SHERMIE_AXLE_SPIN;
+    case 'dmShermieCarnival': return AttackType.DM_SHERMIE_CARNIVAL;
+    default: return AttackType.SHERMIE_SHOOT;
+  }
+}
+
+function routeVice(attack: string): AttackType | null {
+  switch (attack) {
+    case 'viceOutrage': return AttackType.VICE_OUTRAGE;
+    case 'viceOutrageC': return AttackType.VICE_OUTRAGE_C;
+    case 'viceBlackEnd': return AttackType.VICE_BLACK_END;
+    case 'viceMayhem': return AttackType.VICE_MAYHEM;
+    case 'dmNegativeGain': return AttackType.DM_NEGATIVE_GAIN;
+    default: return AttackType.VICE_OUTRAGE;
   }
 }

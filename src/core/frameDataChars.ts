@@ -892,4 +892,134 @@ export const FRAME_DATA_CHARS = {
     damage: 330, hitstun: 0, blockstun: 22, pushback: 16,
     hitLevel: 'MID' as const, knockdown: true, chipDamage: 32,
   },
+  // ── 克里斯命令通常技 (Chris) ── APPROX based on KOF2002UM
+  CHRIS_MAKASHIPPO: {
+    startup: 10, active: 4, recovery: 18,
+    damage: 38, hitstun: 16, blockstun: 14, pushback: 3,
+    hitLevel: 'MID' as const, knockdown: false,
+  },
+  CHRIS_KAZAGURUMA: {
+    startup: 8, active: 4, recovery: 20,
+    damage: 35, hitstun: 14, blockstun: 12, pushback: 2,
+    hitLevel: 'LOW' as const, knockdown: false,
+  },
+  // ── 克里斯必杀技 (Chris) ── APPROX based on KOF2002UM
+  CHRIS_SHOT_WEAVE: {
+    startup: 7, active: 4, recovery: 18,
+    damage: 55, hitstun: 16, blockstun: 14, pushback: 4,
+    hitLevel: 'MID' as const, knockdown: false,
+  },
+  CHRIS_SHOT_WEAVE_C: {
+    startup: 10, active: 6, recovery: 22,
+    damage: 72, hitstun: 20, blockstun: 16, pushback: 6,
+    hitLevel: 'MID' as const, knockdown: false,
+  },
+  CHRIS_TWISTER_DRIVE: {
+    startup: 12, active: 8, recovery: 28,
+    damage: 78, hitstun: 22, blockstun: 18, pushback: 5,
+    hitLevel: 'MID' as const, knockdown: true,
+  },
+  CHRIS_SCRAMBLE_DASH: {
+    startup: 8, active: 6, recovery: 24,
+    damage: 60, hitstun: 18, blockstun: 15, pushback: 4,
+    hitLevel: 'LOW' as const, knockdown: false,
+  },
+  // ── 克里斯DM (Chris) ── APPROX based on KOF2002UM
+  DM_CHAIN_SLIDE_TOUCH: {
+    startup: 7, active: 14, recovery: 36,
+    damage: 190, hitstun: 0, blockstun: 20, pushback: 10,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 18,
+  },
+  // ── 克里斯SDM (Chris) ── APPROX based on KOF2002UM
+  SDM_CHAIN_SLIDE_TOUCH: {
+    startup: 5, active: 20, recovery: 38,
+    damage: 290, hitstun: 0, blockstun: 22, pushback: 12,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 28,
+  },
+  // ── 夏尔美命令通常技 (Shermie) ── APPROX based on KOF2002UM
+  SHERMIE_STAND: {
+    startup: 14, active: 4, recovery: 20,
+    damage: 42, hitstun: 18, blockstun: 15, pushback: 3,
+    hitLevel: 'MID' as const, knockdown: false,
+  },
+  SHERMIE_CLASH: {
+    startup: 8, active: 4, recovery: 22,
+    damage: 38, hitstun: 16, blockstun: 14, pushback: 2,
+    hitLevel: 'LOW' as const, knockdown: false,
+  },
+  // ── 夏尔美必杀技 (Shermie) ── APPROX based on KOF2002UM
+  SHERMIE_SHOOT: {
+    startup: 10, active: 6, recovery: 24,
+    damage: 70, hitstun: 20, blockstun: 17, pushback: 5,
+    hitLevel: 'MID' as const, knockdown: false, chipDamage: 8,
+  },
+  SHERMIE_SHOOT_C: {
+    startup: 14, active: 10, recovery: 28,
+    damage: 90, hitstun: 24, blockstun: 20, pushback: 7,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 12,
+  },
+  SHERMIE_CARNIVAL: {
+    startup: 12, active: 5, recovery: 26,
+    damage: 75, hitstun: 22, blockstun: 18, pushback: 6,
+    hitLevel: 'MID' as const, knockdown: false, chipDamage: 10,
+  },
+  SHERMIE_AXLE_SPIN: {
+    startup: 14, active: 6, recovery: 28,
+    damage: 68, hitstun: 20, blockstun: 16, pushback: 5,
+    hitLevel: 'LOW' as const, knockdown: true, chipDamage: 8,
+  },
+  // ── 夏尔美DM/SDM (Shermie) ── APPROX based on KOF2002UM
+  DM_SHERMIE_CARNIVAL: {
+    startup: 8, active: 16, recovery: 38,
+    damage: 200, hitstun: 0, blockstun: 22, pushback: 12,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 20,
+  },
+  SDM_SHERMIE_CARNIVAL: {
+    startup: 6, active: 22, recovery: 40,
+    damage: 310, hitstun: 0, blockstun: 24, pushback: 14,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 30,
+  },
+  // ── 薇丝命令通常技 (Vice) ── APPROX based on KOF2002UM
+  VICE_MONSTROSITY: {
+    startup: 12, active: 4, recovery: 20,
+    damage: 42, hitstun: 18, blockstun: 15, pushback: 3,
+    hitLevel: 'MID' as const, knockdown: false,
+  },
+  VICE_OVERKILL: {
+    startup: 8, active: 4, recovery: 22,
+    damage: 38, hitstun: 16, blockstun: 14, pushback: 2,
+    hitLevel: 'LOW' as const, knockdown: false,
+  },
+  // ── 薇丝必杀技 (Vice) ── APPROX based on KOF2002UM
+  VICE_OUTRAGE: {
+    startup: 9, active: 6, recovery: 22,
+    damage: 68, hitstun: 20, blockstun: 16, pushback: 5,
+    hitLevel: 'MID' as const, knockdown: false, chipDamage: 8,
+  },
+  VICE_OUTRAGE_C: {
+    startup: 12, active: 8, recovery: 26,
+    damage: 85, hitstun: 22, blockstun: 18, pushback: 7,
+    hitLevel: 'MID' as const, knockdown: false, chipDamage: 10,
+  },
+  VICE_BLACK_END: {
+    startup: 14, active: 6, recovery: 28,
+    damage: 75, hitstun: 22, blockstun: 18, pushback: 6,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 10,
+  },
+  VICE_MAYHEM: {
+    startup: 12, active: 5, recovery: 26,
+    damage: 72, hitstun: 20, blockstun: 16, pushback: 5,
+    hitLevel: 'LOW' as const, knockdown: true, chipDamage: 8,
+  },
+  // ── 薇丝DM/SDM (Vice) ── APPROX based on KOF2002UM
+  DM_NEGATIVE_GAIN: {
+    startup: 8, active: 16, recovery: 38,
+    damage: 210, hitstun: 0, blockstun: 22, pushback: 12,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 22,
+  },
+  SDM_NEGATIVE_GAIN: {
+    startup: 6, active: 22, recovery: 40,
+    damage: 320, hitstun: 0, blockstun: 24, pushback: 14,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 32,
+  },
 } as const;

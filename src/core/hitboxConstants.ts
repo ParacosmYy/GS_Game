@@ -273,4 +273,37 @@ export const HITBOX_OFFSETS = {
   YASHIRO_MUSATSU: { offsetX: 60, offsetY: -20, width: 82, height: 28 },
   DM_ARMAGEDDON_BUSTERS: { offsetX: 38, offsetY: -118, width: 105, height: 78 },
   SDM_ARMAGEDDON_BUSTERS: { offsetX: 38, offsetY: -128, width: 115, height: 85 },
+  // 克里斯命令通常技 (Chris Command Normals)
+  CHRIS_MAKASHIPPO: { offsetX: 52, offsetY: -100, width: 68, height: 38 },
+  CHRIS_KAZAGURUMA: { offsetX: 58, offsetY: -18, width: 72, height: 24 },
+  // 克里斯必杀技 (Chris Specials)
+  CHRIS_SHOT_WEAVE: { offsetX: 55, offsetY: -95, width: 72, height: 42 },
+  CHRIS_SHOT_WEAVE_C: { offsetX: 58, offsetY: -92, width: 80, height: 48 },
+  CHRIS_TWISTER_DRIVE: { offsetX: 50, offsetY: -85, width: 75, height: 55 },
+  CHRIS_SCRAMBLE_DASH: { offsetX: 55, offsetY: -45, width: 70, height: 35 },
+  // 克里斯DM/SDM (Chris)
+  DM_CHAIN_SLIDE_TOUCH: { offsetX: 42, offsetY: -110, width: 95, height: 65 },
+  SDM_CHAIN_SLIDE_TOUCH: { offsetX: 42, offsetY: -120, width: 105, height: 75 },
+  // 夏尔美命令通常技 (Shermie Command Normals)
+  SHERMIE_STAND: { offsetX: 55, offsetY: -95, width: 68, height: 38 },
+  SHERMIE_CLASH: { offsetX: 58, offsetY: -18, width: 65, height: 24 },
+  // 夏尔美必杀技 (Shermie Specials)
+  SHERMIE_SHOOT: { offsetX: 55, offsetY: -100, width: 72, height: 45 },
+  SHERMIE_SHOOT_C: { offsetX: 52, offsetY: -98, width: 80, height: 52 },
+  SHERMIE_CARNIVAL: { offsetX: 48, offsetY: -105, width: 75, height: 48 },
+  SHERMIE_AXLE_SPIN: { offsetX: 55, offsetY: -22, width: 78, height: 28 },
+  // 夏尔美DM/SDM (Shermie)
+  DM_SHERMIE_CARNIVAL: { offsetX: 42, offsetY: -125, width: 95, height: 68 },
+  SDM_SHERMIE_CARNIVAL: { offsetX: 42, offsetY: -135, width: 105, height: 75 },
+  // 薇丝命令通常技 (Vice Command Normals)
+  VICE_MONSTROSITY: { offsetX: 55, offsetY: -105, width: 70, height: 40 },
+  VICE_OVERKILL: { offsetX: 60, offsetY: -20, width: 70, height: 25 },
+  // 薇丝必杀技 (Vice Specials)
+  VICE_OUTRAGE: { offsetX: 58, offsetY: -100, width: 75, height: 45 },
+  VICE_OUTRAGE_C: { offsetX: 58, offsetY: -100, width: 82, height: 50 },
+  VICE_BLACK_END: { offsetX: 48, offsetY: -115, width: 72, height: 58 },
+  VICE_MAYHEM: { offsetX: 55, offsetY: -22, width: 78, height: 28 },
+  // 薇丝DM/SDM (Vice)
+  DM_NEGATIVE_GAIN: { offsetX: 42, offsetY: -125, width: 92, height: 70 },
+  SDM_NEGATIVE_GAIN: { offsetX: 42, offsetY: -135, width: 100, height: 78 },
 } as const;

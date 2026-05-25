@@ -156,6 +156,10 @@ export const COMMAND_NORMALS: ReadonlySet<string> = new Set([
   'MATURE_JAB',
   'YASHIRO_SHUU_WANI',
   'YASHIRO_JUU_ZUTSU',
+  'CHRIS_MAKASHIPPO',
+  'CHRIS_KAZAGURUMA',
+  'SHERMIE_STAND',
+  'SHERMIE_CLASH',
 ]);
 
 // ===== Throw Invincibility (KOF 2002 authentic) =====

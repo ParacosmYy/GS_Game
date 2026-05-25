@@ -25,6 +25,9 @@ import { ChoiDef } from './choi.js';
 import { ChangDef } from './chang.js';
 import { MatureDef } from './mature.js';
 import { YashiroDef } from './yashiro.js';
+import { ChrisDef } from './chris.js';
+import { ShermieDef } from './shermie.js';
+import { ViceDef } from './vice.js';
 export type { CharacterDefinition } from './types.js';
 
 /** 全角色列表 — 选人界面和游戏初始化都从这里读取 */
@@ -49,4 +52,7 @@ export const ROSTER: CharacterDefinition[] = [
   ChangDef,
   MatureDef,
   YashiroDef,
+  ChrisDef,
+  ShermieDef,
+  ViceDef,
 ];

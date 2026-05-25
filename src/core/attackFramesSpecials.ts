@@ -1317,3 +1317,253 @@ export const SDM_NOCTURNAL_LIGHT_FRAMES: AttackFrame[] = [
   F([{ ox: 36, oy: -145, w: 72, h: 62 }]),
   F([{ ox: 35, oy: -148, w: 68, h: 58 }]),
 ];
+
+// ── 薇丝必杀技 (Vice) ──
+export const VICE_OUTRAGE_FRAMES: AttackFrame[] = [
+  F([{ ox: 48, oy: -90, w: 58, h: 38 }]),
+  F([{ ox: 52, oy: -95, w: 65, h: 42 }]),
+  F([{ ox: 58, oy: -100, w: 75, h: 45 }]),
+  F([{ ox: 58, oy: -100, w: 75, h: 45 }]),
+  F([{ ox: 55, oy: -98, w: 72, h: 42 }]),
+];
+export const VICE_OUTRAGE_C_FRAMES: AttackFrame[] = [
+  F([{ ox: 46, oy: -88, w: 62, h: 40 }]),
+  F([{ ox: 50, oy: -92, w: 70, h: 45 }]),
+  F([{ ox: 56, oy: -100, w: 82, h: 50 }]),
+  F([{ ox: 60, oy: -100, w: 82, h: 50 }]),
+  F([{ ox: 60, oy: -100, w: 82, h: 50 }]),
+  F([{ ox: 58, oy: -98, w: 78, h: 48 }]),
+  F([{ ox: 55, oy: -95, w: 72, h: 45 }]),
+];
+export const VICE_BLACK_END_FRAMES: AttackFrame[] = [
+  F([{ ox: 38, oy: -110, w: 60, h: 50 }]),
+  F([{ ox: 42, oy: -112, w: 68, h: 55 }]),
+  F([{ ox: 48, oy: -115, w: 72, h: 58 }]),
+  F([{ ox: 48, oy: -115, w: 72, h: 58 }]),
+  F([{ ox: 45, oy: -118, w: 68, h: 55 }]),
+  F([{ ox: 42, oy: -120, w: 62, h: 50 }]),
+];
+export const VICE_MAYHEM_FRAMES: AttackFrame[] = [
+  F([{ ox: 45, oy: -18, w: 65, h: 24 }]),
+  F([{ ox: 50, oy: -20, w: 72, h: 26 }]),
+  F([{ ox: 55, oy: -22, w: 78, h: 28 }]),
+  F([{ ox: 55, oy: -22, w: 78, h: 28 }]),
+  F([{ ox: 52, oy: -20, w: 72, h: 26 }]),
+];
+export const DM_NEGATIVE_GAIN_FRAMES: AttackFrame[] = [
+  F([{ ox: 38, oy: -125, w: 68, h: 55 }]),
+  F([{ ox: 40, oy: -122, w: 78, h: 60 }]),
+  F([{ ox: 42, oy: -118, w: 88, h: 65 }]),
+  F([{ ox: 42, oy: -125, w: 92, h: 70 }]),
+  F([{ ox: 42, oy: -128, w: 92, h: 70 }]),
+  F([{ ox: 42, oy: -130, w: 92, h: 70 }]),
+  F([{ ox: 42, oy: -130, w: 92, h: 70 }]),
+  F([{ ox: 42, oy: -132, w: 88, h: 68 }]),
+  F([{ ox: 40, oy: -135, w: 82, h: 65 }]),
+  F([{ ox: 38, oy: -138, w: 75, h: 60 }]),
+  F([{ ox: 36, oy: -140, w: 68, h: 55 }]),
+  F([{ ox: 35, oy: -142, w: 62, h: 50 }]),
+];
+export const SDM_NEGATIVE_GAIN_FRAMES: AttackFrame[] = [
+  F([{ ox: 36, oy: -135, w: 65, h: 55 }]),
+  F([{ ox: 38, oy: -132, w: 75, h: 60 }]),
+  F([{ ox: 40, oy: -128, w: 88, h: 68 }]),
+  F([{ ox: 42, oy: -122, w: 98, h: 75 }]),
+  F([{ ox: 42, oy: -125, w: 100, h: 78 }]),
+  F([{ ox: 42, oy: -128, w: 100, h: 78 }]),
+  F([{ ox: 42, oy: -130, w: 100, h: 78 }]),
+  F([{ ox: 42, oy: -132, w: 100, h: 78 }]),
+  F([{ ox: 42, oy: -135, w: 100, h: 78 }]),
+  F([{ ox: 40, oy: -138, w: 92, h: 72 }]),
+  F([{ ox: 38, oy: -140, w: 82, h: 68 }]),
+  F([{ ox: 36, oy: -142, w: 72, h: 62 }]),
+  F([{ ox: 35, oy: -145, w: 65, h: 58 }]),
+  F([{ ox: 34, oy: -148, w: 60, h: 55 }]),
+  F([{ ox: 33, oy: -150, w: 55, h: 52 }]),
+];
+
+// ===== 克里斯 (Chris) ===== APPROX based on KOF2002UM
+// Shot Weave (A) — rushing punch, fast
+export const CHRIS_SHOT_WEAVE_FRAMES: AttackFrame[] = [
+  F([{ ox: 38, oy: -58, w: 45, h: 30 }]),
+  F([{ ox: 48, oy: -55, w: 55, h: 34 }]),
+  F([{ ox: 55, oy: -52, w: 62, h: 38 }]),
+  F([{ ox: 55, oy: -52, w: 62, h: 38 }]),
+  F([{ ox: 52, oy: -55, w: 58, h: 34 }]),
+  F([{ ox: 48, oy: -58, w: 52, h: 30 }]),
+  F([{ ox: 42, oy: -60, w: 45, h: 28 }]),
+];
+
+// Shot Weave (C) — rushing punch, strong
+export const CHRIS_SHOT_WEAVE_C_FRAMES: AttackFrame[] = [
+  F([{ ox: 38, oy: -58, w: 48, h: 32 }]),
+  F([{ ox: 50, oy: -55, w: 58, h: 36 }]),
+  F([{ ox: 58, oy: -50, w: 68, h: 42 }]),
+  F([{ ox: 62, oy: -48, w: 75, h: 45 }]),
+  F([{ ox: 62, oy: -48, w: 75, h: 45 }]),
+  F([{ ox: 58, oy: -50, w: 68, h: 42 }]),
+  F([{ ox: 52, oy: -54, w: 58, h: 38 }]),
+  F([{ ox: 48, oy: -58, w: 52, h: 34 }]),
+  F([{ ox: 42, oy: -60, w: 45, h: 30 }]),
+  F([{ ox: 38, oy: -62, w: 40, h: 28 }]),
+];
+
+// Twister Drive (QCB+K) — spinning kick, knockdown
+export const CHRIS_TWISTER_DRIVE_FRAMES: AttackFrame[] = [
+  F([{ ox: 35, oy: -55, w: 50, h: 38 }]),
+  F([{ ox: 42, oy: -50, w: 58, h: 42 }]),
+  F([{ ox: 48, oy: -45, w: 65, h: 48 }]),
+  F([{ ox: 52, oy: -42, w: 70, h: 52 }]),
+  F([{ ox: 52, oy: -42, w: 70, h: 52 }]),
+  F([{ ox: 52, oy: -42, w: 70, h: 52 }]),
+  F([{ ox: 48, oy: -45, w: 65, h: 48 }]),
+  F([{ ox: 45, oy: -48, w: 58, h: 42 }]),
+];
+
+// Scramble Dash (DP+K) — low rushing attack
+export const CHRIS_SCRAMBLE_DASH_FRAMES: AttackFrame[] = [
+  F([{ ox: 40, oy: -28, w: 50, h: 30 }]),
+  F([{ ox: 50, oy: -25, w: 58, h: 32 }]),
+  F([{ ox: 58, oy: -22, w: 65, h: 35 }]),
+  F([{ ox: 62, oy: -20, w: 70, h: 38 }]),
+  F([{ ox: 62, oy: -20, w: 70, h: 38 }]),
+  F([{ ox: 58, oy: -22, w: 65, h: 35 }]),
+  F([{ ox: 52, oy: -25, w: 58, h: 32 }]),
+  F([{ ox: 45, oy: -28, w: 50, h: 30 }]),
+];
+
+// DM: Chain Slide Touch — multi-hit sliding attack
+export const DM_CHAIN_SLIDE_TOUCH_FRAMES: AttackFrame[] = [
+  F([{ ox: 35, oy: -55, w: 55, h: 40 }]),
+  F([{ ox: 42, oy: -50, w: 65, h: 48 }]),
+  F([{ ox: 50, oy: -45, w: 75, h: 55 }]),
+  F([{ ox: 55, oy: -42, w: 82, h: 58 }]),
+  F([{ ox: 55, oy: -42, w: 85, h: 60 }]),
+  F([{ ox: 55, oy: -42, w: 85, h: 60 }]),
+  F([{ ox: 55, oy: -42, w: 85, h: 60 }]),
+  F([{ ox: 55, oy: -42, w: 85, h: 60 }]),
+  F([{ ox: 55, oy: -42, w: 85, h: 60 }]),
+  F([{ ox: 55, oy: -42, w: 85, h: 60 }]),
+  F([{ ox: 55, oy: -42, w: 85, h: 60 }]),
+  F([{ ox: 55, oy: -42, w: 85, h: 60 }]),
+  F([{ ox: 55, oy: -42, w: 85, h: 60 }]),
+  F([{ ox: 52, oy: -45, w: 78, h: 55 }]),
+  F([{ ox: 48, oy: -48, w: 70, h: 50 }]),
+];
+
+// SDM: Chain Slide Touch SDM — bigger, more devastating
+export const SDM_CHAIN_SLIDE_TOUCH_FRAMES: AttackFrame[] = [
+  F([{ ox: 35, oy: -55, w: 60, h: 42 }]),
+  F([{ ox: 45, oy: -50, w: 72, h: 50 }]),
+  F([{ ox: 52, oy: -45, w: 82, h: 58 }]),
+  F([{ ox: 58, oy: -40, w: 92, h: 65 }]),
+  F([{ ox: 62, oy: -38, w: 98, h: 68 }]),
+  F([{ ox: 62, oy: -38, w: 100, h: 70 }]),
+  F([{ ox: 62, oy: -38, w: 100, h: 70 }]),
+  F([{ ox: 62, oy: -38, w: 100, h: 70 }]),
+  F([{ ox: 62, oy: -38, w: 100, h: 70 }]),
+  F([{ ox: 62, oy: -38, w: 100, h: 70 }]),
+  F([{ ox: 62, oy: -38, w: 100, h: 70 }]),
+  F([{ ox: 62, oy: -38, w: 100, h: 70 }]),
+  F([{ ox: 62, oy: -38, w: 100, h: 70 }]),
+  F([{ ox: 62, oy: -38, w: 100, h: 70 }]),
+  F([{ ox: 62, oy: -38, w: 100, h: 70 }]),
+  F([{ ox: 62, oy: -38, w: 100, h: 70 }]),
+  F([{ ox: 62, oy: -38, w: 100, h: 70 }]),
+  F([{ ox: 62, oy: -38, w: 100, h: 70 }]),
+  F([{ ox: 62, oy: -38, w: 100, h: 70 }]),
+  F([{ ox: 62, oy: -38, w: 100, h: 70 }]),
+  F([{ ox: 58, oy: -42, w: 92, h: 62 }]),
+  F([{ ox: 55, oy: -45, w: 82, h: 58 }]),
+  F([{ ox: 52, oy: -48, w: 75, h: 52 }]),
+  F([{ ox: 48, oy: -52, w: 68, h: 48 }]),
+];
+
+// ===== 夏尔美 (Shermie) ===== APPROX based on KOF2002UM
+// Shermie Shoot (A) — spinning kick, fast
+export const SHERMIE_SHOOT_FRAMES: AttackFrame[] = [
+  F([{ ox: 48, oy: -90, w: 55, h: 38 }]),
+  F([{ ox: 52, oy: -95, w: 62, h: 42 }]),
+  F([{ ox: 55, oy: -100, w: 68, h: 45 }]),
+  F([{ ox: 55, oy: -100, w: 68, h: 45 }]),
+  F([{ ox: 52, oy: -95, w: 62, h: 42 }]),
+  F([{ ox: 48, oy: -90, w: 55, h: 38 }]),
+];
+
+// Shermie Shoot (C) — spinning kick, strong knockdown
+export const SHERMIE_SHOOT_C_FRAMES: AttackFrame[] = [
+  F([{ ox: 45, oy: -88, w: 60, h: 42 }]),
+  F([{ ox: 50, oy: -92, w: 68, h: 48 }]),
+  F([{ ox: 55, oy: -96, w: 75, h: 52 }]),
+  F([{ ox: 58, oy: -98, w: 80, h: 52 }]),
+  F([{ ox: 58, oy: -98, w: 80, h: 52 }]),
+  F([{ ox: 58, oy: -98, w: 80, h: 52 }]),
+  F([{ ox: 55, oy: -96, w: 75, h: 50 }]),
+  F([{ ox: 52, oy: -92, w: 68, h: 48 }]),
+  F([{ ox: 48, oy: -90, w: 62, h: 42 }]),
+  F([{ ox: 45, oy: -92, w: 55, h: 38 }]),
+];
+
+// Shermie Carnival (QCB+P) — multi-hit spinning attack
+export const SHERMIE_CARNIVAL_FRAMES: AttackFrame[] = [
+  F([{ ox: 42, oy: -95, w: 58, h: 40 }]),
+  F([{ ox: 48, oy: -100, w: 65, h: 45 }]),
+  F([{ ox: 52, oy: -105, w: 72, h: 48 }]),
+  F([{ ox: 52, oy: -105, w: 75, h: 48 }]),
+  F([{ ox: 48, oy: -100, w: 70, h: 45 }]),
+  F([{ ox: 45, oy: -95, w: 62, h: 42 }]),
+];
+
+// Axle Spin Kick (HCF+K) — low spinning sweep
+export const SHERMIE_AXLE_SPIN_FRAMES: AttackFrame[] = [
+  F([{ ox: 48, oy: -18, w: 55, h: 22 }]),
+  F([{ ox: 52, oy: -16, w: 62, h: 24 }]),
+  F([{ ox: 55, oy: -14, w: 70, h: 26 }]),
+  F([{ ox: 58, oy: -12, w: 75, h: 28 }]),
+  F([{ ox: 58, oy: -12, w: 78, h: 28 }]),
+  F([{ ox: 55, oy: -14, w: 72, h: 26 }]),
+  F([{ ox: 52, oy: -16, w: 65, h: 24 }]),
+  F([{ ox: 48, oy: -18, w: 58, h: 22 }]),
+];
+
+// DM: Shermie Carnival DM (QCFx2+K) — multi-hit spinning super
+export const DM_SHERMIE_CARNIVAL_FRAMES: AttackFrame[] = [
+  F([{ ox: 38, oy: -110, w: 62, h: 52 }]),
+  F([{ ox: 42, oy: -115, w: 72, h: 58 }]),
+  F([{ ox: 45, oy: -120, w: 82, h: 62 }]),
+  F([{ ox: 48, oy: -122, w: 88, h: 65 }]),
+  F([{ ox: 48, oy: -125, w: 92, h: 68 }]),
+  F([{ ox: 48, oy: -125, w: 95, h: 68 }]),
+  F([{ ox: 48, oy: -125, w: 95, h: 68 }]),
+  F([{ ox: 48, oy: -125, w: 95, h: 68 }]),
+  F([{ ox: 45, oy: -122, w: 88, h: 65 }]),
+  F([{ ox: 42, oy: -118, w: 80, h: 60 }]),
+  F([{ ox: 40, oy: -115, w: 72, h: 55 }]),
+  F([{ ox: 38, oy: -112, w: 65, h: 50 }]),
+  F([{ ox: 36, oy: -110, w: 58, h: 45 }]),
+  F([{ ox: 35, oy: -108, w: 52, h: 42 }]),
+];
+
+// SDM: Shermie Carnival SDM — bigger, more devastating
+export const SDM_SHERMIE_CARNIVAL_FRAMES: AttackFrame[] = [
+  F([{ ox: 38, oy: -115, w: 68, h: 55 }]),
+  F([{ ox: 42, oy: -120, w: 78, h: 62 }]),
+  F([{ ox: 45, oy: -125, w: 88, h: 68 }]),
+  F([{ ox: 48, oy: -128, w: 95, h: 72 }]),
+  F([{ ox: 50, oy: -130, w: 100, h: 75 }]),
+  F([{ ox: 50, oy: -132, w: 105, h: 75 }]),
+  F([{ ox: 50, oy: -132, w: 105, h: 75 }]),
+  F([{ ox: 50, oy: -132, w: 105, h: 75 }]),
+  F([{ ox: 50, oy: -132, w: 105, h: 75 }]),
+  F([{ ox: 50, oy: -132, w: 105, h: 75 }]),
+  F([{ ox: 50, oy: -132, w: 105, h: 75 }]),
+  F([{ ox: 50, oy: -132, w: 105, h: 75 }]),
+  F([{ ox: 48, oy: -130, w: 98, h: 72 }]),
+  F([{ ox: 45, oy: -128, w: 88, h: 68 }]),
+  F([{ ox: 42, oy: -125, w: 78, h: 62 }]),
+  F([{ ox: 40, oy: -122, w: 72, h: 58 }]),
+  F([{ ox: 38, oy: -120, w: 65, h: 52 }]),
+  F([{ ox: 36, oy: -118, w: 58, h: 48 }]),
+  F([{ ox: 35, oy: -115, w: 52, h: 42 }]),
+  F([{ ox: 34, oy: -112, w: 48, h: 38 }]),
+];

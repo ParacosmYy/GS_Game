@@ -26,6 +26,9 @@ export const CHAR_OUTFIT: Record<string, { shirt: string; pants: string; belt: s
   choi: { shirt: '#338833', pants: '#225522', belt: '#884422', shoes: '#334422' },
   mature: { shirt: '#882255', pants: '#882255', belt: '#aa3377', shoes: '#661844' },
   yashiro: { shirt: '#553377', pants: '#333355', belt: '#444', shoes: '#222' },
+  chris: { shirt: '#ff8844', pants: '#cc6622', belt: '#aa4422', shoes: '#883322' },
+  shermie: { shirt: '#cc44aa', pants: '#cc44aa', belt: '#dd55bb', shoes: '#992288' },
+  vice: { shirt: '#3366aa', pants: '#3366aa', belt: '#4488cc', shoes: '#224488' },
 };
 
 const DEFAULT_OUTFIT = { shirt: '#888', pants: '#556', belt: '#444', shoes: '#333' };
@@ -44,6 +47,9 @@ export function getHairColor(charId: string): string {
     choi: '#888888',
     mature: '#dab840',
     yashiro: '#aaaacc',
+    chris: '#c88848',
+    shermie: '#8b4a6a',
+    vice: '#a0a0b0',
   };
   return colors[charId] ?? '#333';
 }
@@ -58,6 +64,9 @@ export function getEyeColor(charId: string): string {
     choi: '#cc2222',
     mature: '#663399',
     yashiro: '#553388',
+    chris: '#cc6622',
+    shermie: '#663399',
+    vice: '#cc2222',
   };
   return colors[charId] ?? '#444';
 }
@@ -693,6 +702,120 @@ function drawHair(ctx: CanvasRenderingContext2D, charId: string, facing: number,
     ctx.moveTo(-r, -r + 4);
     ctx.lineTo(-r - 4, -r + 16);
     ctx.lineTo(-r + 2, -r + 10);
+    ctx.closePath();
+    ctx.fill();
+  } else if (charId === 'chris') {
+    // Chris: light brown spiky hair, youthful
+    ctx.fillStyle = '#c88848';
+    const spikes = [[-8, -14], [-3, -18], [2, -16], [7, -12]];
+    for (const [sx, sy] of spikes) {
+      ctx.beginPath();
+      ctx.moveTo(sx - 4, -r + 2);
+      ctx.lineTo(sx, -r + sy);
+      ctx.lineTo(sx + 4, -r + 2);
+      ctx.closePath();
+      ctx.fill();
+    }
+    // Hair base
+    ctx.fillStyle = '#c88848';
+    ctx.beginPath();
+    ctx.moveTo(-r + 2, -r + 3);
+    ctx.quadraticCurveTo(-r + 4, -r - 6, 0, -r - 4);
+    ctx.quadraticCurveTo(r - 4, -r - 6, r - 2, -r + 3);
+    ctx.lineTo(r - 3, -r + 7);
+    ctx.lineTo(-r + 3, -r + 7);
+    ctx.closePath();
+    ctx.fill();
+    // Darker brown strands
+    ctx.fillStyle = '#a06830';
+    ctx.beginPath();
+    ctx.moveTo(-r, -r + 4);
+    ctx.lineTo(-r - 3, -r + 14);
+    ctx.lineTo(-r + 2, -r + 9);
+    ctx.closePath();
+    ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(r, -r + 4);
+    ctx.lineTo(r + 3, -r + 14);
+    ctx.lineTo(r - 2, -r + 9);
+    ctx.closePath();
+    ctx.fill();
+    // Warm highlight
+    ctx.fillStyle = 'rgba(220, 160, 80, 0.3)';
+    ctx.beginPath();
+    ctx.moveTo(-3, -r + 1);
+    ctx.quadraticCurveTo(0, -r - 5, 3, -r + 1);
+    ctx.lineTo(2, -r + 4);
+    ctx.lineTo(-2, -r + 4);
+    ctx.closePath();
+    ctx.fill();
+  } else if (charId === 'shermie') {
+    // Shermie: brown-purple wavy hair, alluring
+    ctx.fillStyle = '#8b5a7a';
+    ctx.beginPath();
+    ctx.moveTo(-r + 1, -r + 2);
+    ctx.lineTo(-r - 2, -r - 8);
+    ctx.quadraticCurveTo(0, -r - 12, r + 2, -r - 8);
+    ctx.lineTo(r - 1, -r + 2);
+    ctx.closePath();
+    ctx.fill();
+    // Long side hair flowing down
+    const sideX = r * facing * 0.7;
+    ctx.fillStyle = '#7a4a6a';
+    ctx.beginPath();
+    ctx.moveTo(sideX * 0.4, -r);
+    ctx.quadraticCurveTo(sideX + 5 * facing, -r + 8, sideX + 12 * facing, r + 18);
+    ctx.lineTo(sideX + 8 * facing, r + 16);
+    ctx.quadraticCurveTo(sideX - 2 * facing, -r + 12, sideX * 0.2, -r + 3);
+    ctx.closePath();
+    ctx.fill();
+    // Darker strands
+    ctx.fillStyle = '#6b3a5a';
+    ctx.beginPath();
+    ctx.moveTo(-r, -r + 4);
+    ctx.lineTo(-r - 4, -r + 16);
+    ctx.lineTo(-r + 2, -r + 10);
+    ctx.closePath();
+    ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(r, -r + 4);
+    ctx.lineTo(r + 4, -r + 16);
+    ctx.lineTo(r - 2, -r + 10);
+    ctx.closePath();
+    ctx.fill();
+  } else if (charId === 'vice') {
+    // Vice: short silver/gray hair, fierce
+    ctx.fillStyle = '#a0a0b0';
+    ctx.beginPath();
+    ctx.moveTo(-r + 1, -r + 2);
+    ctx.lineTo(-r - 1, -r - 6);
+    ctx.quadraticCurveTo(0, -r - 8, r + 1, -r - 6);
+    ctx.lineTo(r - 1, -r + 2);
+    ctx.closePath();
+    ctx.fill();
+    // Short spiky bangs
+    ctx.fillStyle = '#888898';
+    const spikes = [[-8, -12], [-3, -15], [2, -14], [7, -11]];
+    for (const [sx, sy] of spikes) {
+      ctx.beginPath();
+      ctx.moveTo(sx - 3, -r + 2);
+      ctx.lineTo(sx, -r + sy);
+      ctx.lineTo(sx + 3, -r + 2);
+      ctx.closePath();
+      ctx.fill();
+    }
+    // Side fringe — short angular
+    ctx.fillStyle = '#909098';
+    ctx.beginPath();
+    ctx.moveTo(-r, -r + 4);
+    ctx.lineTo(-r - 3, -r + 12);
+    ctx.lineTo(-r + 2, -r + 8);
+    ctx.closePath();
+    ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(r, -r + 4);
+    ctx.lineTo(r + 3, -r + 12);
+    ctx.lineTo(r - 2, -r + 8);
     ctx.closePath();
     ctx.fill();
   }

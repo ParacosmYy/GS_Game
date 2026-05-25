@@ -61,6 +61,15 @@ import {
   MATURE_MASSACRE_FRAMES, MATURE_MASSACRE_C_FRAMES,
   MATURE_HEAVENS_GATE_FRAMES, MATURE_ECSTASY_FRAMES,
   DM_NOCTURNAL_LIGHT_FRAMES, SDM_NOCTURNAL_LIGHT_FRAMES,
+  CHRIS_SHOT_WEAVE_FRAMES, CHRIS_SHOT_WEAVE_C_FRAMES,
+  CHRIS_TWISTER_DRIVE_FRAMES, CHRIS_SCRAMBLE_DASH_FRAMES,
+  DM_CHAIN_SLIDE_TOUCH_FRAMES, SDM_CHAIN_SLIDE_TOUCH_FRAMES,
+  SHERMIE_SHOOT_FRAMES, SHERMIE_SHOOT_C_FRAMES,
+  SHERMIE_CARNIVAL_FRAMES, SHERMIE_AXLE_SPIN_FRAMES,
+  DM_SHERMIE_CARNIVAL_FRAMES, SDM_SHERMIE_CARNIVAL_FRAMES,
+  VICE_OUTRAGE_FRAMES, VICE_OUTRAGE_C_FRAMES,
+  VICE_BLACK_END_FRAMES, VICE_MAYHEM_FRAMES,
+  DM_NEGATIVE_GAIN_FRAMES, SDM_NEGATIVE_GAIN_FRAMES,
 } from './attackFramesSpecials.js';
 
 const F: (
@@ -387,6 +396,47 @@ const MATURE_JAB_FRAMES: AttackFrame[] = [
   F([{ ox: 48, oy: -16, w: 60, h: 24 }]),
 ];
 
+// Chris 命令通常技
+const CHRIS_MAKASHIPPO_FRAMES: AttackFrame[] = [
+  F([{ ox: 38, oy: -62, w: 42, h: 26 }]),
+  F([{ ox: 45, oy: -60, w: 48, h: 28 }]),
+  F([{ ox: 45, oy: -60, w: 48, h: 28 }]),
+];
+
+const CHRIS_KAZAGURUMA_FRAMES: AttackFrame[] = [
+  F([{ ox: 35, oy: -18, w: 48, h: 24 }]),
+  F([{ ox: 42, oy: -16, w: 55, h: 26 }]),
+  F([{ ox: 42, oy: -16, w: 55, h: 26 }]),
+];
+
+// Shermie 命令通常技
+const SHERMIE_STAND_FRAMES: AttackFrame[] = [
+  F([{ ox: 40, oy: -62, w: 44, h: 26 }]),
+  F([{ ox: 48, oy: -60, w: 52, h: 28 }]),
+  F([{ ox: 48, oy: -60, w: 52, h: 28 }]),
+  F([{ ox: 48, oy: -60, w: 52, h: 28 }]),
+];
+
+const SHERMIE_CLASH_FRAMES: AttackFrame[] = [
+  F([{ ox: 38, oy: -18, w: 48, h: 24 }]),
+  F([{ ox: 45, oy: -16, w: 55, h: 26 }]),
+  F([{ ox: 45, oy: -16, w: 55, h: 26 }]),
+];
+
+// Vice 命令通常技
+const VICE_MONSTROSITY_FRAMES: AttackFrame[] = [
+  F([{ ox: 45, oy: -100, w: 55, h: 35 }]),
+  F([{ ox: 50, oy: -95, w: 60, h: 38 }]),
+  F([{ ox: 50, oy: -95, w: 60, h: 38 }]),
+  F([{ ox: 48, oy: -98, w: 58, h: 36 }]),
+];
+
+const VICE_OVERKILL_FRAMES: AttackFrame[] = [
+  F([{ ox: 42, oy: -18, w: 55, h: 22 }]),
+  F([{ ox: 48, oy: -16, w: 60, h: 24 }]),
+  F([{ ox: 48, oy: -16, w: 60, h: 24 }]),
+];
+
 // ===== 蹲下攻击 =====
 const CROUCH_A_FRAMES: AttackFrame[] = [
   F([{ ox: 35, oy: -30, w: 32, h: 20 }]),
@@ -672,4 +722,31 @@ export const ATTACK_FRAMES: AttackFrameTable = {
   [AttackType.MATURE_ECSTASY]: MATURE_ECSTASY_FRAMES,
   [AttackType.DM_NOCTURNAL_LIGHT]: DM_NOCTURNAL_LIGHT_FRAMES,
   [AttackType.SDM_NOCTURNAL_LIGHT]: SDM_NOCTURNAL_LIGHT_FRAMES,
+  // Chris (克里斯)
+  [AttackType.CHRIS_MAKASHIPPO]: CHRIS_MAKASHIPPO_FRAMES,
+  [AttackType.CHRIS_KAZAGURUMA]: CHRIS_KAZAGURUMA_FRAMES,
+  [AttackType.CHRIS_SHOT_WEAVE]: CHRIS_SHOT_WEAVE_FRAMES,
+  [AttackType.CHRIS_SHOT_WEAVE_C]: CHRIS_SHOT_WEAVE_C_FRAMES,
+  [AttackType.CHRIS_TWISTER_DRIVE]: CHRIS_TWISTER_DRIVE_FRAMES,
+  [AttackType.CHRIS_SCRAMBLE_DASH]: CHRIS_SCRAMBLE_DASH_FRAMES,
+  [AttackType.DM_CHAIN_SLIDE_TOUCH]: DM_CHAIN_SLIDE_TOUCH_FRAMES,
+  [AttackType.SDM_CHAIN_SLIDE_TOUCH]: SDM_CHAIN_SLIDE_TOUCH_FRAMES,
+  // Shermie (夏尔美)
+  [AttackType.SHERMIE_STAND]: SHERMIE_STAND_FRAMES,
+  [AttackType.SHERMIE_CLASH]: SHERMIE_CLASH_FRAMES,
+  [AttackType.SHERMIE_SHOOT]: SHERMIE_SHOOT_FRAMES,
+  [AttackType.SHERMIE_SHOOT_C]: SHERMIE_SHOOT_C_FRAMES,
+  [AttackType.SHERMIE_CARNIVAL]: SHERMIE_CARNIVAL_FRAMES,
+  [AttackType.SHERMIE_AXLE_SPIN]: SHERMIE_AXLE_SPIN_FRAMES,
+  [AttackType.DM_SHERMIE_CARNIVAL]: DM_SHERMIE_CARNIVAL_FRAMES,
+  [AttackType.SDM_SHERMIE_CARNIVAL]: SDM_SHERMIE_CARNIVAL_FRAMES,
+  // Vice (薇丝)
+  [AttackType.VICE_MONSTROSITY]: VICE_MONSTROSITY_FRAMES,
+  [AttackType.VICE_OVERKILL]: VICE_OVERKILL_FRAMES,
+  [AttackType.VICE_OUTRAGE]: VICE_OUTRAGE_FRAMES,
+  [AttackType.VICE_OUTRAGE_C]: VICE_OUTRAGE_C_FRAMES,
+  [AttackType.VICE_BLACK_END]: VICE_BLACK_END_FRAMES,
+  [AttackType.VICE_MAYHEM]: VICE_MAYHEM_FRAMES,
+  [AttackType.DM_NEGATIVE_GAIN]: DM_NEGATIVE_GAIN_FRAMES,
+  [AttackType.SDM_NEGATIVE_GAIN]: SDM_NEGATIVE_GAIN_FRAMES,
 };

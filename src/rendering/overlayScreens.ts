@@ -409,7 +409,7 @@ export function drawModeSelect(ctx: CanvasRenderingContext2D, tick: number, curs
   // Mode cards
   const modes = [
     { label: 'SINGLE BATTLE', labelCn: '单人模式', desc: '1P vs CPU/AI — Best of 3 rounds', color: '#ff4444' },
-    { label: 'TEAM BATTLE', labelCn: '组队模式 3v3', desc: '3v3 Team KOF — Coming soon!', color: '#4488ff' },
+    { label: 'TEAM BATTLE', labelCn: '组队模式 3v3', desc: '3v3 Team KOF — KO switches to next fighter', color: '#4488ff' },
     { label: 'TRAINING', labelCn: '训练模式', desc: 'Free practice — Input display & frame data', color: '#44cc44' },
   ];
 
@@ -479,7 +479,7 @@ export function drawModeSelect(ctx: CanvasRenderingContext2D, tick: number, curs
     ctx.fillStyle = '#555566';
     ctx.fillText(mode.desc, cx + cardW / 2, cardY + 155);
 
-    // Coming soon overlay for team mode
+    // Coming soon overlay for training mode icon
     if (i === 2) {
       // Training icon — crosshair
       ctx.strokeStyle = mode.color + (isSelected ? 'cc' : '44');
@@ -491,12 +491,6 @@ export function drawModeSelect(ctx: CanvasRenderingContext2D, tick: number, curs
       ctx.moveTo(cx + cardW / 2, cardY + 55 - 28);
       ctx.lineTo(cx + cardW / 2, cardY + 55 + 28);
       ctx.stroke();
-    }
-    if (i === 1) {
-      ctx.fillStyle = 'rgba(0,0,0,0.5)';
-      roundRect(ctx, cx, cardY, cardW, cardH, 12);
-      ctx.fill();
-      drawSNKText(ctx, 'COMING SOON', cx + cardW / 2, cardY + cardH / 2, 22, '#ffcc00');
     }
   }
 

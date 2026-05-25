@@ -93,9 +93,18 @@ export enum AttackType {
   // 玛卓命令通常技 (Mature Command Normals)
   MATURE_DESPAIR = 'MATURE_DESPAIR',                 // →+A Despair (upper)
   MATURE_JAB = 'MATURE_JAB',                         // →+B Jab (low)
+  // 薇丝命令通常技 (Vice Command Normals)
+  VICE_MONSTROSITY = 'VICE_MONSTROSITY',             // →+A Monstrosity (upper)
+  VICE_OVERKILL = 'VICE_OVERKILL',                   // →+B Overkill (low)
   // 大门五郎命令通常技 (Yashiro Nanakase Command Normals)
   YASHIRO_SHUU_WANI = 'YASHIRO_SHUU_WANI',           // →+A Shuu Wani (upper)
   YASHIRO_JUU_ZUTSU = 'YASHIRO_JUU_ZUTSU',           // →+B Juu Zutsu (overhead)
+  // 克里斯命令通常技 (Chris Command Normals)
+  CHRIS_MAKASHIPPO = 'CHRIS_MAKASHIPPO',             // →+A Makashippo (upper)
+  CHRIS_KAZAGURUMA = 'CHRIS_KAZAGURUMA',             // →+B Kazaguruma (low)
+  // 夏尔美命令通常技 (Shermie Command Normals)
+  SHERMIE_STAND = 'SHERMIE_STAND',                   // →+A Shermie Stand (upper)
+  SHERMIE_CLASH = 'SHERMIE_CLASH',                   // →+B Shermie Clash (low)
   // 蹲下 (Crouch)
   CROUCH_A = 'CROUCH_A',
   CROUCH_B = 'CROUCH_B',
@@ -253,11 +262,26 @@ export enum AttackType {
   MATURE_MASSACRE_C = 'MATURE_MASSACRE_C',             // QCF+C Metal Massacre (strong)
   MATURE_HEAVENS_GATE = 'MATURE_HEAVENS_GATE',         // QCB+P Heaven's Gate
   MATURE_ECSTASY = 'MATURE_ECSTASY',                   // DP+K Ecstasy 816
+  // 薇丝必杀技 (Vice Specials)
+  VICE_OUTRAGE = 'VICE_OUTRAGE',                       // QCF+A Outrage (weak rush)
+  VICE_OUTRAGE_C = 'VICE_OUTRAGE_C',                   // QCF+C Outrage (strong rush)
+  VICE_BLACK_END = 'VICE_BLACK_END',                   // QCB+P Black End (grab slam)
+  VICE_MAYHEM = 'VICE_MAYHEM',                         // HCF+K Mayhem (low rush)
   // 大门五郎必杀技 (Yashiro Nanakase Specials)
   YASHIRO_UPPER_DU = 'YASHIRO_UPPER_DU',               // QCF+A Upper Du Bag
   YASHIRO_UPPER_DU_C = 'YASHIRO_UPPER_DU_C',           // QCF+C Upper Du Bag (strong)
   YASHIRO_NIRAAI = 'YASHIRO_NIRAAI',                   // QCB+P Niraai Kaname
   YASHIRO_MUSATSU = 'YASHIRO_MUSATSU',                 // HCF+K Musatsu Niraai
+  // 克里斯必杀技 (Chris Specials)
+  CHRIS_SHOT_WEAVE = 'CHRIS_SHOT_WEAVE',               // QCF+A Shot Weave (weak)
+  CHRIS_SHOT_WEAVE_C = 'CHRIS_SHOT_WEAVE_C',           // QCF+C Shot Weave (strong)
+  CHRIS_TWISTER_DRIVE = 'CHRIS_TWISTER_DRIVE',         // QCB+K Twister Drive (knockdown)
+  CHRIS_SCRAMBLE_DASH = 'CHRIS_SCRAMBLE_DASH',         // DP+K Scramble Dash (low)
+  // 夏尔美必杀技 (Shermie Specials)
+  SHERMIE_SHOOT = 'SHERMIE_SHOOT',                     // QCF+A Shermie Shoot (weak)
+  SHERMIE_SHOOT_C = 'SHERMIE_SHOOT_C',                 // QCF+C Shermie Shoot (strong)
+  SHERMIE_CARNIVAL = 'SHERMIE_CARNIVAL',               // QCB+P Shermie Carnival
+  SHERMIE_AXLE_SPIN = 'SHERMIE_AXLE_SPIN',             // HCF+K Axle Spin Kick (low)
   // 超必杀技 (DM)
   DM_OROCHINAGI = 'DM_OROCHINAGI',           // 大蛇薙 (Kyo)
   DM_YATAGARASU = 'DM_YATAGARASU',           // 八稚女 (Iori)
@@ -281,7 +305,10 @@ export enum AttackType {
   DM_TEKKYUU_DAI_BOUSOU = 'DM_TEKKYUU_DAI_BOUSOU',       // Tekkyuu Dai Bousou (Chang)
   DM_SHIN_CHOU_HOUYOKU = 'DM_SHIN_CHOU_HOUYOKU',         // Shin! Chou Houyoku Tenshin Sen (Choi)
   DM_NOCTURNAL_LIGHT = 'DM_NOCTURNAL_LIGHT',           // Nocturnal Light (Mature)
+  DM_NEGATIVE_GAIN = 'DM_NEGATIVE_GAIN',               // Negative Gain (Vice)
   DM_ARMAGEDDON_BUSTERS = 'DM_ARMAGEDDON_BUSTERS',     // Armageddon Busters (Yashiro)
+  DM_CHAIN_SLIDE_TOUCH = 'DM_CHAIN_SLIDE_TOUCH',       // Chain Slide Touch DM (Chris)
+  DM_SHERMIE_CARNIVAL = 'DM_SHERMIE_CARNIVAL',         // Shermie Carnival DM (Shermie)
   // 超必杀技SDM (Super Desperation Move — MAX mode only, costs extra stock)
   SDM_OROCHINAGI = 'SDM_OROCHINAGI',         // 大蛇薙SDM (Kyo)
   SDM_YATAGARASU = 'SDM_YATAGARASU',         // 八稚女SDM (Iori)
@@ -303,7 +330,10 @@ export enum AttackType {
   SDM_TEKKYUU_DAI_BOUSOU = 'SDM_TEKKYUU_DAI_BOUSOU',     // Tekkyuu Dai Bousou SDM (Chang)
   SDM_SHIN_CHOU_HOUYOKU = 'SDM_SHIN_CHOU_HOUYOKU',       // Shin! Chou Houyoku Tenshin Sen SDM (Choi)
   SDM_NOCTURNAL_LIGHT = 'SDM_NOCTURNAL_LIGHT',         // Nocturnal Light SDM (Mature)
+  SDM_NEGATIVE_GAIN = 'SDM_NEGATIVE_GAIN',             // Negative Gain SDM (Vice)
   SDM_ARMAGEDDON_BUSTERS = 'SDM_ARMAGEDDON_BUSTERS',   // Armageddon Busters SDM (Yashiro)
+  SDM_CHAIN_SLIDE_TOUCH = 'SDM_CHAIN_SLIDE_TOUCH',     // Chain Slide Touch SDM (Chris)
+  SDM_SHERMIE_CARNIVAL = 'SDM_SHERMIE_CARNIVAL',       // Shermie Carnival SDM (Shermie)
 }
 
 // ===== Hit Level (防御判定) =====
