@@ -12,7 +12,7 @@ import { FighterState } from '../core/types.js';
 import type { PowerGauge, MaxModeState } from '../core/types.js';
 import { CANVAS_WIDTH, CANVAS_HEIGHT, FRAME_DATA, STAGE_GROUND_Y } from '../core/constants.js';
 
-import { drawStage, generateStars } from './stage.js';
+import { drawStage, generateStars, getStage } from './stage.js';
 import type { Star } from './stage.js';
 import { drawFighters as drawFightersImpl } from './rendererFighter.js';
 import { drawHUD, drawPowerGauges, drawComboCounters, drawTeamOrder, type TeamDisplayInfo } from './hud.js';
@@ -83,14 +83,18 @@ export class Renderer {
       drawKO(ctx, winner, perfectPlayer, isTimeOver, fighters[0].health, fighters[1].health, fighters[0].maxHealth);
     }
 
-    // KOF2002: 暗角效果 — 聚焦中心, 边缘渐暗
+    // KOF2002: 暗角效果 — 聚焦中心, 边缘渐暗 (场景色温)
+    const stageId = getStage();
+    const vigTint = stageId === 'temple' ? '30, 15, 5'
+      : stageId === 'china' ? '40, 10, 10'
+      : '5, 15, 30';
     const vigGrad = ctx.createRadialGradient(
       CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, CANVAS_WIDTH * 0.28,
       CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, CANVAS_WIDTH * 0.65,
     );
     vigGrad.addColorStop(0, 'rgba(0, 0, 0, 0)');
-    vigGrad.addColorStop(0.6, 'rgba(0, 0, 0, 0.08)');
-    vigGrad.addColorStop(1, 'rgba(0, 0, 0, 0.35)');
+    vigGrad.addColorStop(0.6, `rgba(${vigTint}, 0.08)`);
+    vigGrad.addColorStop(1, `rgba(${vigTint}, 0.38)`);
     ctx.fillStyle = vigGrad;
     ctx.fillRect(-10, -10, CANVAS_WIDTH + 20, CANVAS_HEIGHT + 20);
 

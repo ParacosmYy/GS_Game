@@ -507,12 +507,21 @@ export function drawVictoryPose(
   // Character-specific victory VFX
   drawVictoryVFX(ctx, sx, sy, tick, charId, facing);
 
-  // Victory golden glow
+  // Victory golden glow — enhanced with radiating rings
   const glowPulse = 0.25 + Math.sin(tick / 6) * 0.1;
-  const glowGrad = ctx.createRadialGradient(sx, sy - 50, 10, sx, sy - 50, 90);
+  const glowGrad = ctx.createRadialGradient(sx, sy - 50, 10, sx, sy - 50, 110);
   glowGrad.addColorStop(0, `rgba(255, 215, 0, ${glowPulse})`);
-  glowGrad.addColorStop(0.5, `rgba(255, 180, 0, ${glowPulse * 0.4})`);
+  glowGrad.addColorStop(0.3, `rgba(255, 200, 0, ${glowPulse * 0.6})`);
+  glowGrad.addColorStop(0.6, `rgba(255, 180, 0, ${glowPulse * 0.3})`);
   glowGrad.addColorStop(1, 'rgba(255, 150, 0, 0)');
   ctx.fillStyle = glowGrad;
-  ctx.fillRect(Math.round(sx - 90), Math.round(sy - 140), 180, 140);
+  ctx.fillRect(Math.round(sx - 110), Math.round(sy - 160), 220, 170);
+  // KOF2002: 胜利光环 — 从角色中心扩展的金色光环
+  const ringPulse = (tick % 60) / 60;
+  const ringR = 30 + ringPulse * 80;
+  ctx.strokeStyle = `rgba(255, 215, 0, ${(1 - ringPulse) * 0.2})`;
+  ctx.lineWidth = 2 * (1 - ringPulse);
+  ctx.beginPath();
+  ctx.arc(sx, sy - 50, ringR, 0, Math.PI * 2);
+  ctx.stroke();
 }

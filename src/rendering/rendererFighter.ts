@@ -304,18 +304,27 @@ export function resolveFighterColors(f: Fighter, globalTick: number): { bodyColo
 
 /** Draw afterimage trail for RUN/BACKDASH/ROLL */
 function drawAfterimageTrail(ctx: CanvasRenderingContext2D, f: Fighter, sx: number, leanOffsetX: number): void {
-  const trailColor = f.state === FighterState.RUN
-    ? `rgba(255, 140, 0, ${0.15})`
+  // KOF2002: 残影色渐变 — 内层亮外层暗, RUN=橙, BACKDASH=蓝, ROLL=绿
+  const trailColors = f.state === FighterState.RUN
+    ? ['#ff8800', '#ff6600', '#ff4400']
     : f.state === FighterState.BACKDASH
-    ? `rgba(100, 180, 255, ${0.18})`
-    : `rgba(80, 255, 140, ${0.18})`;
+    ? ['#6699ff', '#4477ee', '#3355cc']
+    : ['#44ff88', '#33dd66', '#22bb44'];
   for (let i = 1; i <= 3; i++) {
     ctx.globalAlpha = 0.3 / i;
-    ctx.fillStyle = trailColor;
     const trailX = sx - leanOffsetX * i * 1.5 - f.facing * 12 * i;
+    const trailH = f.displayHeight - i * 4;
+    // 渐变残影
+    const tGrad = ctx.createLinearGradient(trailX - FIGHTER_WIDTH / 2, 0, trailX + FIGHTER_WIDTH / 2, 0);
+    tGrad.addColorStop(0, 'rgba(0,0,0,0)');
+    tGrad.addColorStop(0.2, trailColors[i - 1] + '60');
+    tGrad.addColorStop(0.5, trailColors[i - 1] + '90');
+    tGrad.addColorStop(0.8, trailColors[i - 1] + '60');
+    tGrad.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = tGrad;
     roundRect(ctx,
       trailX - FIGHTER_WIDTH / 2, f.y - f.displayHeight + i * 4,
-      FIGHTER_WIDTH, f.displayHeight - i * 4, 5);
+      FIGHTER_WIDTH, trailH, 5);
     ctx.fill();
   }
   ctx.globalAlpha = 1;

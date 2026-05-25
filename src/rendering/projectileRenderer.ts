@@ -59,6 +59,22 @@ export function drawProjectiles(ctx: CanvasRenderingContext2D, projectiles: Proj
       ctx.ellipse(sx - proj.facing * vis.trailSpacing * i, y, radius * (1 - i * 0.12) * vis.stretch, radius * (1 - i * 0.12), 0, 0, Math.PI * 2);
       ctx.fill();
     }
+    // KOF2002: 尾焰 — 飞行道具后方的渐变火焰尾迹
+    ctx.save();
+    const flameLen = radius * vis.stretch * 2;
+    const flameGrad = ctx.createLinearGradient(sx, y, sx - proj.facing * flameLen, y);
+    flameGrad.addColorStop(0, color + '60');
+    flameGrad.addColorStop(0.3, glow + '30');
+    flameGrad.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.globalAlpha = 0.4 * fadeIn;
+    ctx.fillStyle = flameGrad;
+    ctx.beginPath();
+    ctx.moveTo(sx - proj.facing * radius * vis.stretch * 0.5, y - radius * 0.6);
+    ctx.lineTo(sx - proj.facing * flameLen, y);
+    ctx.lineTo(sx - proj.facing * radius * vis.stretch * 0.5, y + radius * 0.6);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
 
     // Outer glow aura
     ctx.globalAlpha = 0.4 * fadeIn;

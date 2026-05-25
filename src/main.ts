@@ -94,8 +94,7 @@ combatSystem.onThrowEscape = (_attacker, defender, hitX, hitY) => {
   gauges[defIdx].meter = Math.min(gauges[defIdx].meter + 8, MAX_STOCKS * METER_PER_STOCK);
 };
 combatSystem.onGuardCrush = (fighter, hitX, hitY) => {
-  vfx.spawnGuardCrushSparks(hitX, hitY); vfx.spawnGuardCrushText(hitX, hitY - 60);
-  vfx.spawnHeavyDust(fighter.x, fighter.y, 14);
+  vfx.spawnGuardCrushSparks(hitX, hitY); vfx.spawnGuardCrushText(hitX, hitY - 60); vfx.spawnHeavyDust(fighter.x, fighter.y, 14);
   screenFlash.trigger('#ff4444', 0.3, 12); screenShake.trigger(12, 15);
 };
 
@@ -205,7 +204,7 @@ function update(): void {
 
   if (phase === GamePhase.INTRO) {
     phaseTimer++;
-    if (phaseTimer >= INTRO_DURATION) { phase = GamePhase.FIGHTING; tickRef.value = 0; modeIndicatorTimer = 180; firstHitTracked = false; firstAttacker = null; koGroundSlamDone = false; bgm.start(); playFight(); }
+    if (phaseTimer >= INTRO_DURATION) { phase = GamePhase.FIGHTING; tickRef.value = 0; modeIndicatorTimer = 180; firstHitTracked = false; firstAttacker = null; koGroundSlamDone = false; bgm.start(); playFight(); screenFlash.trigger('#ffffff', 0.2, 6); }
     return;
   }
 
@@ -293,13 +292,13 @@ function update(): void {
   dmMgr.checkMaxActivation(p2Input, 1);
   // MAX activation sound + screen flash + startup invincibility
   if (maxModes[0].active && maxModes[0].timer === maxModes[0].maxDuration - 1) {
-    playMAXActivation();
-    screenFlash.trigger('#44ff88', 0.3, 8);
+    playMAXActivation(); screenFlash.trigger('#44ff88', 0.3, 8);
+    vfx.spawnMAXActivationFlash(p1.x, p1.y - p1.displayHeight / 2); vfx.spawnHeavyDust(p1.x, p1.y, 8);
     p1.invincible = true; p1.throwInvulnFrames = 5; // KOF2002: MAX激活5帧无敌
   }
   if (maxModes[1].active && maxModes[1].timer === maxModes[1].maxDuration - 1) {
-    playMAXActivation();
-    screenFlash.trigger('#44ff88', 0.3, 8);
+    playMAXActivation(); screenFlash.trigger('#44ff88', 0.3, 8);
+    vfx.spawnMAXActivationFlash(p2.x, p2.y - p2.displayHeight / 2); vfx.spawnHeavyDust(p2.x, p2.y, 8);
     p2.invincible = true; p2.throwInvulnFrames = 5;
   }
   p1Cmd.record(getDirectionInput(p1Input), tickRef.value);

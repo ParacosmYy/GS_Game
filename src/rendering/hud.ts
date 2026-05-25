@@ -107,20 +107,30 @@ export function drawHUD(ctx: CanvasRenderingContext2D, fighters: Fighter[], tick
   }
   // "TIME" 标签在计时器上方 — SNK style
   drawSNKText(ctx, 'TIME', timerX, timerY - 14, 8, 'rgba(200, 168, 50, 0.7)', '#000000', 'center');
-  // Round指示器 — 圆点(最多3局)
+  // Round指示器 — 菱形(最多3局), 当前回合金色脉冲
   const maxRounds = 3;
   const dotY = timerY + 20;
-  const dotSpacing = 8;
+  const dotSpacing = 12;
   const dotsStartX = timerX - ((maxRounds - 1) * dotSpacing) / 2;
   for (let r = 1; r <= maxRounds; r++) {
     const dx = dotsStartX + (r - 1) * dotSpacing;
+    const ds = r === currentRound ? 3.5 : 2.5;
     ctx.beginPath();
-    ctx.arc(dx, dotY, 2.5, 0, Math.PI * 2);
+    ctx.moveTo(dx, dotY - ds);
+    ctx.lineTo(dx + ds, dotY);
+    ctx.lineTo(dx, dotY + ds);
+    ctx.lineTo(dx - ds, dotY);
+    ctx.closePath();
     if (r === currentRound) {
-      ctx.fillStyle = '#ffcc00';
+      // 当前回合: 金色填充 + 脉冲发光
+      const pulse = 0.7 + 0.3 * Math.sin(tick * 0.1);
+      ctx.fillStyle = `rgba(255, 204, 0, ${pulse})`;
       ctx.fill();
+      ctx.strokeStyle = '#ffd700';
+      ctx.lineWidth = 1;
+      ctx.stroke();
     } else if (r < currentRound) {
-      ctx.fillStyle = '#666';
+      ctx.fillStyle = '#555';
       ctx.fill();
     } else {
       ctx.strokeStyle = 'rgba(200, 168, 50, 0.3)';
