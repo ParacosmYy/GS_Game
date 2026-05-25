@@ -307,4 +307,15 @@ function drawThrowAttack(
   ctx.moveTo(sx + 10 * f.facing, sy - f.displayHeight * 0.5);
   ctx.lineTo(sx + (FIGHTER_WIDTH / 2 + 20) * f.facing, sy - f.displayHeight * 0.5);
   ctx.stroke();
+  // KOF2002: 投技弧线 — 手臂伸出时旋转弧形暗示
+  ctx.save();
+  ctx.globalAlpha = 0.3;
+  ctx.strokeStyle = '#ffaa66';
+  ctx.lineWidth = 8;
+  ctx.beginPath();
+  const arcCx = sx + 15 * f.facing;
+  const arcCy = sy - f.displayHeight * 0.5;
+  ctx.arc(arcCx, arcCy, 20, -Math.PI * 0.3 * f.facing, Math.PI * 0.5 * f.facing);
+  ctx.stroke();
+  ctx.restore();
 }

@@ -258,12 +258,14 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
     else if (!defender.isGrounded()) playJuggleHit(combo);
     else playHit(data.damage > 50 ? 1.2 : 1.0, combo);
 
-    // Counter Hit
+    // Counter Hit — KOF2002: CH额外顿帧+橙色爆发+冲击波
     if (counterHit) {
       deps.vfx.spawnCounterText(defender.x, defender.y - defender.displayHeight - 55);
-      deps.screenFlash.trigger('#ffaa00', 0.12, 4);
+      deps.screenFlash.trigger('#ffaa00', 0.18, 6);
       // KOF2002: CH额外橙色火花爆发 — 强调反击
       deps.vfx.spawnCharacterHitSparks(hitX, hitY, 8, '#ff8800', 1.0, 1.2, 0.4);
+      // KOF2002: CH冲击波 — 明显的双层冲击环
+      deps.vfx.spawnImpactRing(hitX, hitY, 1.5);
       playCounter();
     }
     if (counterHit && (data as { counterWire?: boolean }).counterWire) {
@@ -286,12 +288,14 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       deps.vfx.spawnProjectileExplosion(hitX, hitY, atkChar.specialColor, atkChar.specialGlow);
     }
 
-    // KOF2002: 空中命中额外特效 — 飘散粒子+小闪光+连击增强
+    // KOF2002: 空中命中额外特效 — 飘散粒子+小闪光+连击增强+浮空冲击环
     if (!defender.isGrounded() && !isDM) {
       const airBonus = combo >= 5 ? 4 : 0;
       deps.vfx.spawnCharacterHitSparks(hitX, hitY - 15, 6 + airBonus, '#aaddff', 0.8, 0.8, 0.3, true);
       // KOF2002: 空中命中额外淡蓝飘散
       deps.vfx.spawnCharacterHitSparks(hitX, hitY - 25, 3, '#ddeeff', 0.5, 0.6, 0.2, true);
+      // KOF2002: 空中命中微弱冲击环 — 悬浮感
+      if (combo >= 3) deps.vfx.spawnImpactRing(hitX, hitY, 0.5);
     }
     // KOF2002: 站立被通常技命中时脚下尘土
     if (defender.isGrounded() && !isDM && !isSpecial) {

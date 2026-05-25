@@ -188,6 +188,21 @@ export function drawFighters(
       ctx.fillRect(sx + leanOffsetX - 60, sy - 200, 120, 200);
       ctx.restore();
     }
+    // KOF2002: 防御崩坏破碎扩散 — 碎片从角色向外飞散
+    if (f.state === FighterState.GUARD_CRUSH) {
+      ctx.save();
+      const crushT = globalTick % 30;
+      for (let p = 0; p < 6; p++) {
+        const angle = (p / 6) * Math.PI * 2 + globalTick * 0.05;
+        const dist = 20 + crushT * 2.5;
+        const px = sx + Math.cos(angle) * dist;
+        const py = sy - f.displayHeight / 2 + Math.sin(angle) * dist;
+        ctx.globalAlpha = Math.max(0, 0.5 - crushT / 60);
+        ctx.fillStyle = '#ff4444';
+        ctx.fillRect(px - 2, py - 2, 4, 4);
+      }
+      ctx.restore();
+    }
 
     ctx.restore();
 
@@ -283,6 +298,7 @@ export function resolveFighterColors(f: Fighter, globalTick: number): { bodyColo
       bodyColor = globalTick % 6 < 3 ? '#ff4444' : '#ffffff';
       outlineColor = '#ff000080';
       glowColor = '#ff220040';
+      // KOF2002: 防御崩坏时角色周围破碎效果 — 扩散的碎片光环
       break;
     case FighterState.HITSTUN:
       if (f.hitFlashFrames > 0) {

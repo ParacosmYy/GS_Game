@@ -103,14 +103,15 @@ export function drawSkeletalFighter(
     p.armBack.rot += 0.3;
   }
 
-  // Height factor for crouch/roll
+  // Height factor for crouch/roll — KOF2002: 蹲下时宽度略增, 压缩感更自然
   const isCrouching = f.state === FighterState.CROUCH;
   const isRolling = f.state === FighterState.ROLL || f.state === FighterState.BACK_ROLL;
   const heightFactor = (isCrouching || isRolling) ? 0.6 : 1.0;
+  const widthFactor = (isCrouching || isRolling) ? 1.12 : 1.0;
 
   // === Per-character body dimensions ===
   const headW = prop.headW, headH = prop.headH;
-  const torsoW = prop.torsoW, torsoH = prop.torsoH;
+  const torsoW = prop.torsoW * widthFactor, torsoH = prop.torsoH;
   const armW = prop.armW, armH = prop.armH;
   const legW = prop.legW, legH = prop.legH;
 
