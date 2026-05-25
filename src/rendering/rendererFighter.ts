@@ -9,14 +9,19 @@ import { FIGHTER_WIDTH, STAGE_GROUND_Y } from '../core/constants.js';
 import { shiftColor, roundRect } from './utils.js';
 import { drawSkeletalFighter } from './skeletalFighter.js';
 import { drawAttackLimb } from './attackLimb.js';
+import type { SpriteRenderer } from './spriteRenderer.js';
+
+const fighterDebugOverlayEnabled = isFighterDebugOverlayEnabled();
 
 /** Draw all fighters with shadows, glows, trails, and attack limbs */
 export function drawFighters(
   ctx: CanvasRenderingContext2D, fighters: Fighter[], cameraX: number,
   globalTick: number, maxModes?: [MaxModeState, MaxModeState],
   hitStopDefender: number = -1, hitStopBias: number = 0,
+  spriteRenderer?: SpriteRenderer | null,
 ): void {
   const sorted = [...fighters].sort((a, b) => a.y - b.y);
+  const debugOverlayEnabled = fighterDebugOverlayEnabled;
 
   for (const f of sorted) {
     const sx = f.x - cameraX;
@@ -53,14 +58,18 @@ export function drawFighters(
       ctx.fill();
     }
     if (maxModeActive) {
-      const auraPulse = 0.08 + Math.sin(globalTick * 0.1) * 0.04;
-      ctx.fillStyle = `rgba(68, 255, 136, ${auraPulse})`;
+      const auraPulse = debugOverlayEnabled
+        ? 0.08 + Math.sin(globalTick * 0.1) * 0.04
+        : 0.03 + Math.sin(globalTick * 0.1) * 0.015;
+      ctx.fillStyle = `rgba(68, 255, 136, ${Math.max(0, auraPulse)})`;
       ctx.beginPath();
       ctx.ellipse(sx, sy - f.displayHeight / 2, hw + 25, f.displayHeight / 2 + 20, 0, 0, Math.PI * 2);
       ctx.fill();
-      const outlinePulse = Math.sin(globalTick * 0.15) * 0.3 + 0.4;
+      const outlinePulse = debugOverlayEnabled
+        ? Math.sin(globalTick * 0.15) * 0.3 + 0.4
+        : Math.sin(globalTick * 0.15) * 0.12 + 0.18;
       ctx.strokeStyle = `rgba(68, 255, 136, ${outlinePulse})`;
-      ctx.lineWidth = 3;
+      ctx.lineWidth = debugOverlayEnabled ? 3 : 1.5;
       ctx.beginPath();
       ctx.ellipse(sx, sy - f.displayHeight / 2, hw + 8, f.displayHeight / 2 + 8, 0, 0, Math.PI * 2);
       ctx.stroke();
@@ -153,7 +162,12 @@ export function drawFighters(
       ctx.translate((Math.random() - 0.5) * shakeAmt, (Math.random() - 0.5) * shakeAmt * 0.5);
     }
 
-    drawSkeletalFighter(ctx, f, sx + leanOffsetX, sy, bodyColor, outlineColor, globalTick, maxModeActive);
+    const spriteRendered = spriteRenderer?.canRender(f.charId)
+      ? spriteRenderer.render(ctx, f.charId, f.state, Math.max(0, f.attackFrame), sx + leanOffsetX, sy, f.facing, f.color)
+      : false;
+    if (!spriteRendered) {
+      drawSkeletalFighter(ctx, f, sx + leanOffsetX, sy, bodyColor, outlineColor, globalTick, maxModeActive);
+    }
 
     // Hit flash overlay
     if (f.hitFlashFrames > 0) {
@@ -188,7 +202,7 @@ export function drawFighters(
       ctx.restore();
     }
     // Guard low warning flash
-    if (guardLow && globalTick % 20 < 10) {
+    if (debugOverlayEnabled && guardLow && globalTick % 20 < 10) {
       ctx.save();
       ctx.globalCompositeOperation = 'screen';
       ctx.globalAlpha = 0.12;
@@ -234,18 +248,20 @@ export function drawFighters(
       ctx.restore();
     }
 
-    // Player label
-    ctx.fillStyle = isP1 ? '#ff5555' : '#5599ff';
-    ctx.font = 'bold 11px monospace';
-    ctx.textAlign = 'center';
-    ctx.fillText(isP1 ? 'P1' : 'P2', sx, sy - f.displayHeight - 8);
+    if (debugOverlayEnabled) {
+      // Player label
+      ctx.fillStyle = isP1 ? '#ff5555' : '#5599ff';
+      ctx.font = 'bold 11px monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText(isP1 ? 'P1' : 'P2', sx, sy - f.displayHeight - 8);
 
-    // Quick Stand hint
-    if (f.state === FighterState.KNOCKDOWN && !f.isHardKnockdown && f.knockdownTimer > 5
-      && globalTick % 16 < 10) {
-      ctx.fillStyle = '#ffcc44';
-      ctx.font = 'bold 10px monospace';
-      ctx.fillText('A+B', sx, sy - 10);
+      // Quick Stand hint
+      if (f.state === FighterState.KNOCKDOWN && !f.isHardKnockdown && f.knockdownTimer > 5
+        && globalTick % 16 < 10) {
+        ctx.fillStyle = '#ffcc44';
+        ctx.font = 'bold 10px monospace';
+        ctx.fillText('A+B', sx, sy - 10);
+      }
     }
     ctx.textAlign = 'left';
   }
@@ -352,4 +368,29 @@ function drawAfterimageTrail(ctx: CanvasRenderingContext2D, f: Fighter, sx: numb
     ctx.fill();
   }
   ctx.globalAlpha = 1;
+}
+
+function isFighterDebugOverlayEnabled(): boolean {
+  const location = globalThis.location;
+  const search = location?.search;
+
+  if (typeof search === 'string' && search.length > 1) {
+    const params = new URLSearchParams(search);
+    const queryFlags = ['fighterDebug', 'debugFighterOverlay', 'rendererDebug'];
+    for (const key of queryFlags) {
+      if (params.has(key)) {
+        const value = params.get(key);
+        if (value === null || value === '' || value === '1' || value === 'true') {
+          return true;
+        }
+      }
+    }
+  }
+
+  try {
+    const stored = globalThis.localStorage?.getItem('rendererFighterDebug');
+    return stored === '1' || stored === 'true';
+  } catch {
+    return false;
+  }
 }

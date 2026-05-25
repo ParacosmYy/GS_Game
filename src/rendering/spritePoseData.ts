@@ -17,7 +17,7 @@ export interface CharVisual {
   bodyW: number;
   legLen: number;
   hairStyle: 'spiky' | 'long' | 'short' | 'ponytail' | 'wild';
-  idleStyle: 'confident' | 'lazy' | 'fighter' | 'martial' | 'tense' | 'alert' | 'rebel' | 'cute';
+  idleStyle: 'confident' | 'lazy' | 'fighter' | 'martial' | 'tense' | 'alert' | 'rebel' | 'cute' | 'karate';
 }
 
 export const CHAR_VISUALS: Record<string, CharVisual> = {
@@ -42,9 +42,9 @@ export const CHAR_VISUALS: Record<string, CharVisual> = {
     headW: 5, bodyW: 5, legLen: 7, hairStyle: 'short', idleStyle: 'martial',
   },
   ryo: {
-    hairColor: '#2a1a0a', skinColor: '#f5d0a9', shirtColor: '#cc3333',
-    pantsColor: '#1a1a3a', shoeColor: '#3a2a1a', beltColor: '#000000',
-    headW: 5, bodyW: 7, legLen: 6, hairStyle: 'spiky', idleStyle: 'tense',
+    hairColor: '#5a3a22', skinColor: '#f5d0a9', shirtColor: '#f2efe8',
+    pantsColor: '#ddd6c5', shoeColor: '#3a2a1a', beltColor: '#111111',
+    headW: 5, bodyW: 7, legLen: 6, hairStyle: 'spiky', idleStyle: 'karate',
   },
   leona: {
     hairColor: '#1a3a8a', skinColor: '#fce4c8', shirtColor: '#3a3a5a',
@@ -123,7 +123,13 @@ export function getIdlePoses(style: string): Pose[] {
   const base = IDLE_POSES;
   switch (style) {
     case 'confident': // Kyo
-      return base.map((p, i) => ({ ...p, bodyLean: 0.5, armR: -0.6 + Math.sin(i * 0.8) * 0.1 }));
+      return base.map((p, i) => ({
+        ...p,
+        bodyLean: 0.9,
+        headOff: Math.sin(i * 0.6) * 0.25,
+        armL: 0.34 + Math.sin(i * 0.7) * 0.04,
+        armR: -0.72 + Math.sin(i * 0.8) * 0.08,
+      }));
     case 'lazy': // Iori
       return base.map((p, i) => ({ ...p, armL: 0.15 + Math.sin(i * 0.5) * 0.03, armR: -0.15 + Math.sin(i * 0.5) * 0.03 }));
     case 'fighter': // Terry
@@ -138,6 +144,15 @@ export function getIdlePoses(style: string): Pose[] {
       return base.map((p, i) => ({ ...p, bodyLean: -0.5, armL: 0.1, armR: 0.1 }));
     case 'cute': // Kula
       return base.map((p, i) => ({ ...p, headOff: Math.sin(i * 0.8) * 0.5, armL: 0.4 + Math.sin(i) * 0.1, armR: -0.4 + Math.sin(i + 1) * 0.1 }));
+    case 'karate': // Ryo
+      return base.map((p, i) => ({
+        ...p,
+        bodyLean: 1.2,
+        armL: 0.45 + Math.sin(i * 0.7) * 0.05,
+        armR: -0.7 + Math.sin(i * 0.7) * 0.08,
+        legL: -2,
+        legR: 2,
+      }));
     default:
       return base;
   }
@@ -167,8 +182,8 @@ export function getRunPoses(style: string): Pose[] {
   switch (style) {
     case 'confident':
       return RUN_BASE.map((p, i) => ({
-        ...p, bodyLean: 4, armR: -1.0 + Math.sin(i * 1.2) * 0.15,
-        legL: p.legL - 1, legR: p.legR + 1,
+        ...p, bodyLean: 4.4, armL: 0.5, armR: -1.05 + Math.sin(i * 1.2) * 0.15,
+        legL: p.legL - 1, legR: p.legR + 2,
       }));
     case 'lazy':
       return RUN_BASE.map((p, i) => ({
@@ -204,6 +219,15 @@ export function getRunPoses(style: string): Pose[] {
       return RUN_BASE.map((p, i) => ({
         ...p, bodyLean: 2, headOff: Math.sin(i * 1.2) * 0.8,
         armL: 0.6 + Math.sin(i * 1.3) * 0.15, armR: -0.6 + Math.sin(i * 1.3 + 1) * 0.15,
+      }));
+    case 'karate':
+      return RUN_BASE.map((p, i) => ({
+        ...p,
+        bodyLean: 3.6,
+        armL: 0.25 + Math.sin(i * 1.1) * 0.05,
+        armR: -0.55 + Math.sin(i * 1.1 + 0.8) * 0.08,
+        legL: p.legL - 1,
+        legR: p.legR + 1,
       }));
     default:
       return RUN_BASE;
@@ -259,7 +283,10 @@ export function getJumpPoses(style: string): Pose[] {
   switch (style) {
     case 'confident':
       return JUMP_POSES.map((p, i) => ({
-        ...p, bodyLean: i < 3 ? 1 : 0, armL: -0.2, armR: i < 3 ? -0.5 : 0.3,
+        ...p,
+        bodyLean: i < 3 ? 1.2 : 0.1,
+        armL: -0.15,
+        armR: i < 3 ? -0.55 : 0.2,
         legR: i === 2 ? 3 : p.legR,
       }));
     case 'lazy':
@@ -296,6 +323,15 @@ export function getJumpPoses(style: string): Pose[] {
         ...p, armL: -0.8 + Math.sin(i * 1.5) * 0.3, armR: 0.8 + Math.sin(i * 1.5 + 1) * 0.3,
         legL: p.legL * 1.3, legR: p.legR * 1.3,
       }));
+    case 'karate':
+      return JUMP_POSES.map((p, i) => ({
+        ...p,
+        armL: -0.25,
+        armR: i < 3 ? -0.55 : -0.25,
+        bodyLean: i < 3 ? 1.1 : 0.2,
+        legL: i === 2 ? -3 : p.legL,
+        legR: i === 2 ? 3 : p.legR,
+      }));
     default:
       return JUMP_POSES;
   }
@@ -319,7 +355,7 @@ export const BLOCK_POSES: Pose[] = [
 export function getHitPoses(style: string): Pose[] {
   switch (style) {
     case 'confident':
-      return HIT_POSES.map(p => ({ ...p, bodyLean: p.bodyLean * 0.8, legL: -1, legR: 1 }));
+      return HIT_POSES.map(p => ({ ...p, bodyLean: p.bodyLean * 0.85, legL: -1, legR: 1, armL: p.armL * 0.8 }));
     case 'lazy':
       return HIT_POSES.map(p => ({ ...p, bodyLean: p.bodyLean * 0.6, armL: p.armL * 0.5, armR: p.armR * 0.5 }));
     case 'fighter':
@@ -334,6 +370,8 @@ export function getHitPoses(style: string): Pose[] {
       return HIT_POSES.map(p => ({ ...p, bodyLean: p.bodyLean * 0.7, headOff: 0 }));
     case 'cute':
       return HIT_POSES.map(p => ({ ...p, bodyLean: p.bodyLean * 1.3, headOff: p.headOff * 1.3 }));
+    case 'karate':
+      return HIT_POSES.map(p => ({ ...p, bodyLean: p.bodyLean * 1.15, armL: p.armL * 0.8, armR: p.armR * 0.9, legL: -2, legR: 2 }));
     default:
       return HIT_POSES;
   }
@@ -343,7 +381,7 @@ export function getHitPoses(style: string): Pose[] {
 export function getBlockPoses(style: string): Pose[] {
   switch (style) {
     case 'confident':
-      return BLOCK_POSES.map(p => ({ ...p, armL: -0.6, armR: -1.0, bodyLean: 0 }));
+      return BLOCK_POSES.map(p => ({ ...p, armL: -0.7, armR: -1.05, bodyLean: 0.1 }));
     case 'lazy':
       return BLOCK_POSES.map(p => ({ ...p, armL: 0.1, armR: -1.2, bodyLean: -0.5 }));
     case 'fighter':
@@ -358,6 +396,8 @@ export function getBlockPoses(style: string): Pose[] {
       return BLOCK_POSES.map(p => ({ ...p, armL: -0.5, armR: -0.5, bodyLean: 0 }));
     case 'cute':
       return BLOCK_POSES.map(p => ({ ...p, armL: -1.2, armR: -1.2, headOff: -2 }));
+    case 'karate':
+      return BLOCK_POSES.map(p => ({ ...p, armL: -0.95, armR: -0.95, bodyLean: -0.2, legL: -2, legR: 2 }));
     default:
       return BLOCK_POSES;
   }

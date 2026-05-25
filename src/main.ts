@@ -12,7 +12,7 @@ import { Fighter } from './entities/fighter.js';
 import { Projectile } from './entities/projectile.js';
 import { FighterController, resolvePushbox } from './entities/fighterController.js';
 import { CombatSystem } from './combat/combatSystem.js';
-import { createPowerGauge, createMaxMode, tickMaxMode, tickAutoMeter, gainMeterOnHit } from './combat/meter.js';
+import { createPowerGauge, createMaxMode, tickMaxMode, tickAutoMeter, gainMeterOnHit, drainMeterByTaunt } from './combat/meter.js';
 import { Renderer } from './rendering/renderer.js';
 import { VFXSystem, ScreenShake, ScreenFlash } from './rendering/vfx.js';
 import { cycleStage, setStage, getStage, type StageId } from './rendering/stage.js';
@@ -26,7 +26,7 @@ import { SelectState } from './state/selectState.js';
 import { RoundState } from './state/roundState.js';
 import { DMManager } from './combat/dmManager.js';
 import { createHitCallback, triggerKOGroundEffect } from './combat/hitCallback.js';
-import { initAudio, playKO, playVictoryFanfare, playMAXActivation, playPerfect, playThrowEscape, playFight, playRoll, playCancel, playQuickStand } from './audio/sampler.js';
+import { initAudio, initSampler, playKO, playVictoryFanfare, playMAXActivation, playPerfect, playThrowEscape, playFight, playRoll, playCancel, playQuickStand } from './audio/sampler.js';
 import { createTeam, defeatActive, switchToNext, activeChar, teamOrderString, type TeamState } from './state/teamState.js';
 import { resolveSimplified } from './input/simplifiedInput.js';
 import { bgm } from './audio/bgm.js';
@@ -34,6 +34,10 @@ import { announcer } from './audio/announcer.js';
 import { SimpleAI } from './ai/simpleAI.js';
 import { updateMovementVfx } from './state/movementVfx.js';
 import { WIN_QUOTE_DURATION } from './rendering/screens.js';
+import { GameStateManager } from './state/gameStateManager.js';
+import { gameRandom, gameRandomInt } from './core/prng.js';
+import { InputLogger } from './core/inputLog.js';
+import { ReplaySession } from './core/replaySession.js';
 
 const canvas = document.getElementById('gameCanvas') as HTMLCanvasElement;
 const ctx = canvas.getContext('2d')!;
@@ -46,11 +50,11 @@ const inputManager = new InputManager();
 const combatSystem = new CombatSystem(inputManager);
 const renderer = new Renderer(ctx);
 const vfx = new VFXSystem();
+const gs = new GameStateManager();
 
 // ===== Sprite System =====
 const spriteManager = new SpriteManager();
 const spriteRenderer = new SpriteRenderer(spriteManager);
-// 注册所有角色的占位精灵图 (真实精灵图加载后将替换)
 for (const char of ROSTER) {
   const sheet = generatePlaceholderSpritesheet(char.color, char.id);
   spriteManager.register(char.id, '', sheet.animations);
@@ -82,9 +86,11 @@ p2Ctrl.setMaxMode(maxModes[1]);
 
 // ===== State modules =====
 const cinematic = new CinematicState();
+const inputLog = new InputLogger();
 const select = new SelectState(p1Ctrl, p2Ctrl, p1, p2, p2Cmd);
 const rounds = new RoundState({ p1, p2, p1Cmd, p2Cmd, combatSystem, projectiles, vfx, cinematic, gauges, maxModes, tickRef });
 const dmMgr = new DMManager({ gauges, maxModes, cinematic, vfx, screenShake, fighters: [p1, p2] });
+const replaySession = new ReplaySession(inputLog);
 const onHit = createHitCallback({ fighters: [p1, p2], vfx, screenShake, screenFlash, gauges, cinematic, combatSystem });
 combatSystem.onThrowEscape = (_attacker, defender, hitX, hitY) => {
   vfx.spawnThrowEscapeSparks(hitX, hitY); vfx.spawnTechText(hitX, hitY - 40);
@@ -99,43 +105,22 @@ combatSystem.onGuardCrush = (fighter, hitX, hitY) => {
   screenFlash.trigger('#ff4444', 0.3, 12); screenShake.trigger(12, 15);
 };
 
-// ===== Game state =====
-let phase: GamePhase = GamePhase.TITLE;
-let phaseTimer = 0;
-let koTimer = 0;
-let koGroundSlamDone = false;
-let winner: number | null = null;
-let continueCountdown = 0;
-const CONTINUE_DURATION = 600; // 10秒倒计时
-let continueCursorYes = true; // Continue画面光标
-let modeSelectCursor = 0; // 模式选择光标
-let isTrainingMode = false; // 训练模式标志
-let currentWinQuote = '';
-let winQuoteTimer = 0;
-let winQuoteCharName = '';
-let winQuoteCharColor = '#ffcc00';
-let firstAttacker: number | null = null;
+// ===== Derived state =====
+const CONTINUE_DURATION = 600;
+const INTRO_DURATION = 150;
+let p2AI: InstanceType<typeof import('./ai/simpleAI.js').SimpleAI> | null = null;
+let p1Team: TeamState | null = null;
+let p2Team: TeamState | null = null;
+let p1DelayedHealth = p1.maxHealth;
+let p2DelayedHealth = p2.maxHealth;
 
 function pickWinQuote(w: number | null): string {
   if (w === null) return '';
   const fighter = w === 0 ? p1 : p2;
   const charDef = ROSTER.find(c => c.id === fighter.charId);
   if (!charDef || !charDef.winQuotes.length) return '';
-  return charDef.winQuotes[Math.floor(Math.random() * charDef.winQuotes.length)];
+  return charDef.winQuotes[gameRandomInt(charDef.winQuotes.length)];
 }
-let debugMode = false;
-let simplifiedMode = false; // Tab to toggle
-let modeIndicatorTimer = 0;
-let stageIndicatorTimer = 0;
-let isTimeOver = false;
-let p2AI: InstanceType<typeof import('./ai/simpleAI.js').SimpleAI> | null = null;
-const INTRO_DURATION = 150; // 90帧(ROUND) + 60帧(FIGHT!) = 2.5秒
-let p1Team: TeamState | null = null;
-let p2Team: TeamState | null = null;
-let teamMode = false; // 3v3 team mode, enabled via mode select
-let p1DelayedHealth = p1.maxHealth;
-let p2DelayedHealth = p2.maxHealth;
-let firstHitTracked = false;
 
 // ===== Update =====
 function update(): void {
@@ -143,39 +128,37 @@ function update(): void {
   screenShake.update();
   screenFlash.update();
 
-  if (phase === GamePhase.TITLE) {
+  if (gs.phase === GamePhase.TITLE) {
     tickRef.value++;
     if (inputManager.isKeyDown('Enter') || inputManager.isKeyDown('KeyJ') || inputManager.isKeyDown('KeyR')) {
-      phase = GamePhase.MODE_SELECT;
-      modeSelectCursor = 0;
+      gs.setPhase(GamePhase.MODE_SELECT);
+      gs.modeSelectCursor = 0;
       initAudio();
     }
     return;
   }
 
-  if (phase === GamePhase.MODE_SELECT) {
+  if (gs.phase === GamePhase.MODE_SELECT) {
     tickRef.value++;
-    if (inputManager.isKeyDown('ArrowLeft') || inputManager.isKeyDown('KeyA')) modeSelectCursor = Math.max(0, modeSelectCursor - 1);
-    if (inputManager.isKeyDown('ArrowRight') || inputManager.isKeyDown('KeyD')) modeSelectCursor = Math.min(2, modeSelectCursor + 1);
+    if (inputManager.isKeyDown('ArrowLeft') || inputManager.isKeyDown('KeyA')) gs.modeSelectCursor = Math.max(0, gs.modeSelectCursor - 1);
+    if (inputManager.isKeyDown('ArrowRight') || inputManager.isKeyDown('KeyD')) gs.modeSelectCursor = Math.min(2, gs.modeSelectCursor + 1);
     if (inputManager.isKeyDown('Enter') || inputManager.isKeyDown('KeyJ')) {
-      teamMode = modeSelectCursor === 1;
-      isTrainingMode = modeSelectCursor === 2;
-      phase = GamePhase.SELECT;
+      gs.teamMode = gs.modeSelectCursor === 1;
+      gs.isTrainingMode = gs.modeSelectCursor === 2;
+      gs.setPhase(GamePhase.SELECT);
     }
     return;
   }
 
-  if (phase === GamePhase.CONTINUE) {
+  if (gs.phase === GamePhase.CONTINUE) {
     tickRef.value++;
-    continueCountdown--;
-    // 左右键切换YES/NO
-    if (inputManager.isKeyDown('ArrowLeft')) continueCursorYes = true;
-    if (inputManager.isKeyDown('ArrowRight')) continueCursorYes = false;
+    gs.continueCountdown--;
+    if (inputManager.isKeyDown('ArrowLeft')) gs.continueCursorYes = true;
+    if (inputManager.isKeyDown('ArrowRight')) gs.continueCursorYes = false;
     if (inputManager.isKeyDown('KeyJ') || inputManager.isKeyDown('Enter')) {
-      if (continueCursorYes) {
-        // Continue: restart match with same characters
-        phase = GamePhase.INTRO;
-        phaseTimer = 0;
+      if (gs.continueCursorYes) {
+        gs.setPhase(GamePhase.INTRO);
+        gs.phaseTimer = 0;
         rounds.currentRound = 1;
         rounds.fullReset();
         cinematic.reset();
@@ -186,31 +169,30 @@ function update(): void {
         announcer.roundStart(1);
         announcer.fight();
       } else {
-        // NO → back to title
-        phase = GamePhase.TITLE;
+        gs.setPhase(GamePhase.TITLE);
       }
     }
-    if (continueCountdown <= 0) {
-      // Time out → Game Over → back to title
-      phase = GamePhase.TITLE;
+    if (gs.continueCountdown <= 0) {
+      gs.setPhase(GamePhase.TITLE);
     }
     return;
   }
 
-  if (phase === GamePhase.SELECT) {
+  if (gs.phase === GamePhase.SELECT) {
     tickRef.value++;
     const result = select.update(inputManager.getP1Input(), inputManager.getP2Input(), inputManager.isKeyDown('KeyT'));
     if (result) {
-      p2AI = isTrainingMode ? null : result.p2AI;
-      // Create teams for 3v3 mode
-      if (teamMode) {
+      p2AI = gs.isTrainingMode ? null : result.p2AI;
+      if (gs.teamMode) {
         p1Team = createTeam(result.p1Team);
         p2Team = createTeam(result.p2Team);
       }
-      phase = GamePhase.INTRO;
-      phaseTimer = 0;
+      gs.setPhase(GamePhase.INTRO);
+      gs.phaseTimer = 0;
+      initAudio();
+      initSampler();
       rounds.currentRound = 1;
-      isTimeOver = false;
+      gs.isTimeOver = false;
       p1DelayedHealth = p1.maxHealth;
       p2DelayedHealth = p2.maxHealth;
       p1.savePrevState();
@@ -221,43 +203,62 @@ function update(): void {
     return;
   }
 
-  if (phase === GamePhase.INTRO) {
-    phaseTimer++;
-    if (phaseTimer >= INTRO_DURATION) { phase = GamePhase.FIGHTING; tickRef.value = 0; modeIndicatorTimer = 180; firstHitTracked = false; firstAttacker = null; koGroundSlamDone = false; bgm.start(); playFight(); screenFlash.trigger('#ffffff', 0.2, 6); }
-    return;
-  }
-
-  if (phase === GamePhase.KO) {
-    koTimer++;
-    if (koTimer > KO_DISPLAY_TIME) {
-      // KO显示结束后进入胜利台词画面
-      currentWinQuote = pickWinQuote(winner);
-      if (winner !== null) {
-        const fighter = winner === 0 ? p1 : p2;
-        const charDef = ROSTER.find(c => c.id === fighter.charId);
-        winQuoteCharName = charDef?.nameCn ?? '';
-        winQuoteCharColor = charDef?.color ?? '#ffcc00';
-      } else {
-        winQuoteCharName = '';
-        winQuoteCharColor = '#ffcc00';
-      }
-      phase = GamePhase.WIN_QUOTE;
-      winQuoteTimer = 0;
+  if (gs.phase === GamePhase.INTRO) {
+    gs.phaseTimer++;
+    if (gs.phaseTimer >= INTRO_DURATION) {
+      gs.setPhase(GamePhase.FIGHTING);
+      tickRef.value = 0;
+      const replaySeed = Date.now() & 0xFFFF;
+      const replayLabel = `${p1.charId} vs ${p2.charId} - round ${rounds.currentRound}`;
+      replaySession.beginLiveMatch({
+        seed: replaySeed,
+        label: replayLabel,
+        round: rounds.currentRound,
+        p1CharId: p1.charId,
+        p2CharId: p2.charId,
+        stageId: getStage(),
+        teamMode: gs.teamMode,
+        trainingMode: gs.isTrainingMode,
+      });
+      gs.modeIndicatorTimer = 180;
+      gs.firstHitTracked = false;
+      gs.firstAttacker = null;
+      gs.koGroundSlamDone = false;
+      bgm.start();
+      playFight();
+      screenFlash.trigger('#ffffff', 0.2, 6);
     }
-    if (koTimer <= KO_DISPLAY_TIME && inputManager.isKeyDown('KeyR')) restartGame();
     return;
   }
 
-  if (phase === GamePhase.WIN_QUOTE) {
-    winQuoteTimer++;
-    if (winQuoteTimer >= WIN_QUOTE_DURATION) {
-      // 胜利台词结束后判定比赛走向
-      // 3v3 team mode: switch to next team member if available
-      if (teamMode && p1Team && p2Team && winner !== null) {
-        const loserTeam = winner === 0 ? p2Team : p1Team;
+  if (gs.phase === GamePhase.KO) {
+    gs.koTimer++;
+    if (gs.koTimer > KO_DISPLAY_TIME) {
+      gs.currentWinQuote = pickWinQuote(gs.winner);
+      if (gs.winner !== null) {
+        const fighter = gs.winner === 0 ? p1 : p2;
+        const charDef = ROSTER.find(c => c.id === fighter.charId);
+        gs.winQuoteCharName = charDef?.nameCn ?? '';
+        gs.winQuoteCharColor = charDef?.color ?? '#ffcc00';
+      } else {
+        gs.winQuoteCharName = '';
+        gs.winQuoteCharColor = '#ffcc00';
+      }
+      gs.setPhase(GamePhase.WIN_QUOTE);
+      gs.winQuoteTimer = 0;
+    }
+    if (gs.koTimer <= KO_DISPLAY_TIME && inputManager.isKeyDown('KeyR')) restartGame();
+    return;
+  }
+
+  if (gs.phase === GamePhase.WIN_QUOTE) {
+    gs.winQuoteTimer++;
+    if (gs.winQuoteTimer >= WIN_QUOTE_DURATION) {
+      if (gs.teamMode && p1Team && p2Team && gs.winner !== null) {
+        const loserTeam = gs.winner === 0 ? p2Team : p1Team;
         const hasAlive = defeatActive(loserTeam);
         if (hasAlive && switchToNext(loserTeam)) {
-          const losingIdx = winner === 0 ? 1 : 0;
+          const losingIdx = gs.winner === 0 ? 1 : 0;
           const newChar = activeChar(loserTeam);
           const loser = losingIdx === 0 ? p1 : p2;
           const loserCtrl = losingIdx === 0 ? p1Ctrl : p2Ctrl;
@@ -270,8 +271,8 @@ function update(): void {
           }
           rounds.currentRound++;
           rounds.resetForNextRound();
-          phase = GamePhase.INTRO;
-          phaseTimer = 0;
+          gs.setPhase(GamePhase.INTRO);
+          gs.phaseTimer = 0;
           p1DelayedHealth = p1.maxHealth;
           p2DelayedHealth = p2.maxHealth;
           cinematic.reset();
@@ -280,25 +281,24 @@ function update(): void {
           return;
         }
         if (!p1Team.alive || !p2Team.alive) {
-          phase = GamePhase.MATCH_END;
-          koTimer = 0;
+          gs.setPhase(GamePhase.MATCH_END);
+          gs.koTimer = 0;
           announcer.winner();
           return;
         }
       }
-      const matchWinner = rounds.addWin(winner);
+      const matchWinner = rounds.addWin(gs.winner);
       if (matchWinner !== null) {
-        phase = GamePhase.MATCH_END;
-        koTimer = 0;
+        gs.setPhase(GamePhase.MATCH_END);
+        gs.koTimer = 0;
         announcer.winner();
       } else {
-        // 比赛未结束，进入下一回合
         rounds.currentRound++;
         rounds.resetForNextRound();
-        phase = GamePhase.INTRO;
-        phaseTimer = 0;
-        isTimeOver = false;
-        koGroundSlamDone = false;
+        gs.setPhase(GamePhase.INTRO);
+        gs.phaseTimer = 0;
+        gs.isTimeOver = false;
+        gs.koGroundSlamDone = false;
         p1DelayedHealth = p1.maxHealth;
         p2DelayedHealth = p2.maxHealth;
         announcer.roundStart(rounds.currentRound);
@@ -309,21 +309,20 @@ function update(): void {
     return;
   }
 
-  if (phase === GamePhase.MATCH_END) {
-    koTimer++;
+  if (gs.phase === GamePhase.MATCH_END) {
+    gs.koTimer++;
     if (!cinematic.victoryFanfarePlayed) { cinematic.victoryFanfarePlayed = true; playVictoryFanfare(); }
-    if (koTimer > 180 || (koTimer > 60 && (inputManager.isKeyDown('KeyR') || inputManager.isKeyDown('KeyJ') || inputManager.isKeyDown('Enter')))) {
-      phase = GamePhase.CONTINUE;
-      continueCountdown = CONTINUE_DURATION;
-      continueCursorYes = true;
+    if (gs.koTimer > 180 || (gs.koTimer > 60 && (inputManager.isKeyDown('KeyR') || inputManager.isKeyDown('KeyJ') || inputManager.isKeyDown('Enter')))) {
+      gs.setPhase(GamePhase.CONTINUE);
+      gs.continueCountdown = CONTINUE_DURATION;
+      gs.continueCursorYes = true;
     }
     return;
   }
 
   // === FIGHTING phase ===
-  // Training mode: ESC returns to select
-  if (isTrainingMode && inputManager.isKeyDown('Escape')) {
-    bgm.stop(); phase = GamePhase.SELECT; select.reset(); p2AI = null; isTrainingMode = true; return;
+  if (gs.isTrainingMode && inputManager.isKeyDown('Escape')) {
+    bgm.stop(); gs.setPhase(GamePhase.SELECT); select.reset(); p2AI = null; gs.isTrainingMode = true; return;
   }
   if (cinematic.isFrozen()) { cinematic.tickInFreeze(maxModes); return; }
   cinematic.tickMaxModes(maxModes);
@@ -333,6 +332,7 @@ function update(): void {
   if (cinematic.shouldSkipFrame()) return;
   const rawP1 = inputManager.getP1Input();
   const rawP2 = inputManager.getP2Input();
+  inputLog.record(tickRef.value, rawP1, rawP2);
   p1.updateFacing(p2);
   p2.updateFacing(p1);
   const p1Input = resolveInput(rawP1, p1.facing, combatSystem.getPrevAttack(0));
@@ -340,11 +340,10 @@ function update(): void {
   combatSystem.updateEdgeTracking(rawP1, rawP2);
   dmMgr.checkMaxActivation(p1Input, 0);
   dmMgr.checkMaxActivation(p2Input, 1);
-  // MAX activation sound + screen flash + startup invincibility
   if (maxModes[0].active && maxModes[0].timer === maxModes[0].maxDuration - 1) {
     playMAXActivation(); screenFlash.trigger('#44ff88', 0.3, 8);
     vfx.spawnMAXActivationFlash(p1.x, p1.y - p1.displayHeight / 2); vfx.spawnHeavyDust(p1.x, p1.y, 8);
-    p1.invincible = true; p1.throwInvulnFrames = 5; // KOF2002: MAX激活5帧无敌
+    p1.invincible = true; p1.throwInvulnFrames = 5;
   }
   if (maxModes[1].active && maxModes[1].timer === maxModes[1].maxDuration - 1) {
     playMAXActivation(); screenFlash.trigger('#44ff88', 0.3, 8);
@@ -361,7 +360,7 @@ function update(): void {
   if (p2Input.kickPressed) p2Cmd.recordPress('kick', tickRef.value);
   if (p2Input.punchJustReleased) p2Cmd.recordRelease('punch', tickRef.value);
   if (p2Input.kickJustReleased) p2Cmd.recordRelease('kick', tickRef.value);
-  if (simplifiedMode && !p1.currentAttack && p1.canAct()) {
+  if (gs.simplifiedMode && !p1.currentAttack && p1.canAct()) {
     const p1Char = ROSTER.find(c => c.id === p1.charId) || ROSTER[0];
     const simp = resolveSimplified(
       !!rawP1.buttonC && combatSystem.getPrevAttack(0) === null,
@@ -379,9 +378,8 @@ function update(): void {
     p2AI.maxMode = maxModes[1];
     const aiInput = p2AI.getInput();
     p2Ctrl.update(aiInput);
-    if (p2.canAct() && Math.random() < 0.02) { const s = p2AI.triggerSpecial(); if (s) p2.startAttack(s); }
-  } else if (isTrainingMode) {
-    // Training dummy: auto-block when P1 attacks nearby
+    if (p2.canAct() && gameRandom() < 0.02) { const s = p2AI.triggerSpecial(); if (s) p2.startAttack(s); }
+  } else if (gs.isTrainingMode) {
     const dummyInput = { ...p2Input };
     if (p1.attackPhase === 'active' && p2.canBlock()) {
       if (p1.x < p2.x) dummyInput.back = true;
@@ -393,20 +391,27 @@ function update(): void {
   }
 
   resolvePushbox(p1, p2);
+
+  // KOF2002: Taunt meter drain — 嘲讽峰值帧(第20帧)削减对手气槽
+  if (p1.state === FighterState.TAUNT && p1.tauntTimer === Math.floor(Fighter.TAUNT_DURATION / 2)) {
+    drainMeterByTaunt(gauges[1]); vfx.spawnTauntSparks(p1.x, p1.y - p1.displayHeight * 0.7);
+  }
+  if (p2.state === FighterState.TAUNT && p2.tauntTimer === Math.floor(Fighter.TAUNT_DURATION / 2)) {
+    drainMeterByTaunt(gauges[0]); vfx.spawnTauntSparks(p2.x, p2.y - p2.displayHeight * 0.7);
+  }
+
   for (const proj of projectiles) proj.update();
   combatSystem.resolveAttacks(p1, p2, projectiles, onHit, tickRef.value, [maxModes[0].active, maxModes[1].active]);
   combatSystem.tickComboTimeout(tickRef.value);
   combatSystem.tickThrowState(p1, p2, onHit);
 
-  // First Attack detection — KOF2002: first hit bonus meter + announcer
-  if (!firstHitTracked && (combatSystem.getComboCount(0) > 0 || combatSystem.getComboCount(1) > 0)) {
-    firstHitTracked = true;
+  if (!gs.firstHitTracked && (combatSystem.getComboCount(0) > 0 || combatSystem.getComboCount(1) > 0)) {
+    gs.firstHitTracked = true;
     const hitterIdx = combatSystem.getComboCount(0) > 0 ? 0 : 1;
-    firstAttacker = hitterIdx;
+    gs.firstAttacker = hitterIdx;
     const hitter = hitterIdx === 0 ? p1 : p2;
     vfx.spawnFirstAttackText(hitter.x, hitter.y - hitter.displayHeight - 40);
     announcer.firstAttack();
-    // First hit bonus: extra meter for the attacker
     if (gauges[hitterIdx]) {
       gainMeterOnHit(gauges[hitterIdx]);
     }
@@ -429,28 +434,23 @@ function update(): void {
         vfx.spawnComboEndText(f.x, f.y - f.displayHeight - 50, lastCombo);
         vfx.spawnComboDamageText(f.x, f.y - f.displayHeight - 50, lastDmg);
       }
-      // KOF2002: 连击中断尘埃 — 对手恢复时攻击者脚下小尘埃
       if (lastCombo >= 2) {
         const opp = i === 0 ? p2 : p1;
         vfx.spawnDust(opp.x, STAGE_GROUND_Y);
       }
       combatSystem.resetCombo(i);
     }
-    // 防御恢复尘埃
     if (f.prevState === FighterState.BLOCK && f.state === FighterState.IDLE) vfx.spawnDust(f.x, STAGE_GROUND_Y);
     if (f.prevState === FighterState.KNOCKDOWN && f.state === FighterState.IDLE && f.throwInvincibilityTimer === 0) {
       vfx.spawnDust(f.x, STAGE_GROUND_Y);
       vfx.spawnQuickStandText(f.x, f.y - f.displayHeight - 40);
       playQuickStand();
-      // KOF2002: Quick Stand立即重置对手的连击计数, 防止起身继续追打
       const oppIdx = 1 - i;
       combatSystem.resetCombo(oppIdx);
     }
 
-    // Roll音效
     if (f.prevState !== FighterState.ROLL && f.state === FighterState.ROLL) {
       playRoll();
-      // Guard Cancel Roll: 从BLOCK进入ROLL时播放Cancel音效+VFX
       if (f.prevState === FighterState.BLOCK) {
         playCancel();
         vfx.spawnGCCDText(f.x, f.y - f.displayHeight - 30);
@@ -458,17 +458,14 @@ function update(): void {
       }
     }
 
-    // Guard Cancel CD: 从BLOCK直接进入攻击时播放Cancel音效+VFX
     if (f.prevState === FighterState.BLOCK
       && (f.state === FighterState.STAND_ATTACK || f.state === FighterState.CROUCH_ATTACK)) {
       playCancel();
-      // GC CD闪光效果
       vfx.spawnCharacterHitSparks(f.x, f.y - f.displayHeight / 2, 12, '#ff8800');
       vfx.spawnGCCDText(f.x, f.y - f.displayHeight - 30);
       screenFlash.trigger('#ff8800', 0.1, 3);
     }
 
-    // Cancel VFX: 检测取消事件并触发视觉反馈
     if (f.cancelEvent) {
       const cx = f.x;
       const cy = f.y - f.displayHeight - 30;
@@ -489,12 +486,10 @@ function update(): void {
     f.savePrevState();
   });
 
-  // 移动视觉反馈
   updateMovementVfx([p1, p2], vfx, tickRef.value);
 
   for (let i = projectiles.length - 1; i >= 0; i--) { if (!projectiles[i].active) projectiles.splice(i, 1); }
 
-  // Projectile vs projectile collision
   for (let i = 0; i < projectiles.length; i++) {
     const a = projectiles[i];
     if (!a.active) continue;
@@ -518,28 +513,23 @@ function update(): void {
   }
   for (let i = projectiles.length - 1; i >= 0; i--) { if (!projectiles[i].active) projectiles.splice(i, 1); }
 
-  // ── Training mode overrides ──
-  if (isTrainingMode) {
-    // Health regeneration: refill both fighters to max after damage
+  if (gs.isTrainingMode) {
     if (p1.health < p1.maxHealth && p1.health > 0) p1.health = Math.min(p1.maxHealth, p1.health + p1.maxHealth * 0.02);
     if (p2.health < p2.maxHealth && p2.health > 0) p2.health = Math.min(p2.maxHealth, p2.health + p2.maxHealth * 0.02);
-    // Full regen on KO
     if (p1.health <= 0 || p2.health <= 0) {
       p1.health = p1.maxHealth; p2.health = p2.maxHealth;
       p1DelayedHealth = p1.maxHealth; p2DelayedHealth = p2.maxHealth;
-      cinematic.reset(); koGroundSlamDone = false;
+      cinematic.reset(); gs.koGroundSlamDone = false;
     }
   }
 
-  if (!isTrainingMode && (p1.health <= 0 || p2.health <= 0)) {
+  if (!gs.isTrainingMode && (p1.health <= 0 || p2.health <= 0)) {
     if (!cinematic.koSlowMoTriggered) {
-      // KOF2002: DM/SDM击杀时KO慢放更强(60帧, 每4帧跳1帧)
       const killer = p1.health <= 0 ? p2 : p1;
       const killerAttack = killer.currentAttack as string;
       const isDMKill = killerAttack?.startsWith('DM_') || killerAttack?.startsWith('SDM_');
       if (isDMKill) cinematic.triggerDMKOSlowMo();
       else cinematic.triggerKOSlowMo();
-      // KOF2002: KO定格 — 通常12帧, DM击杀16帧
       const koDefender = p1.health <= 0 ? 0 : 1;
       const koAttacker = p1.health <= 0 ? p2 : p1;
       cinematic.triggerHitStop(isDMKill ? 16 : 12, koDefender, koAttacker.facing);
@@ -549,23 +539,21 @@ function update(): void {
       bgm.stop();
       announcer.knockOut();
     }
-    // KO'd fighter落地时触发groundslam (KOF2002正版: 空中KO落地才震地)
-    if (!koGroundSlamDone && cinematic.koSlowMoTriggered) {
-      // KOF2002: Double KO时双方都触发落地震地效果
+    if (!gs.koGroundSlamDone && cinematic.koSlowMoTriggered) {
       const bothKO = p1.health <= 0 && p2.health <= 0;
       const loser = p1.health <= 0 ? p1 : p2;
       if (loser.isGrounded()) {
-        koGroundSlamDone = true;
+        gs.koGroundSlamDone = true;
         triggerKOGroundEffect({ vfx, screenFlash, screenShake }, loser);
         if (bothKO) triggerKOGroundEffect({ vfx, screenFlash, screenShake }, p1.health <= 0 ? p1 : p2);
       }
     }
     if (cinematic.koSlowMoTriggered && cinematic.isKOSlowMoDone()) {
-      phase = GamePhase.KO;
-      koTimer = 0;
-      winner = rounds.determineWinner();
-      if (winner !== null && cinematic.getPerfectPlayer(winner) !== null) {
-        const pw = winner === 0 ? p1 : p2;
+      gs.setPhase(GamePhase.KO);
+      gs.koTimer = 0;
+      gs.winner = rounds.determineWinner();
+      if (gs.winner !== null && cinematic.getPerfectPlayer(gs.winner) !== null) {
+        const pw = gs.winner === 0 ? p1 : p2;
         vfx.spawnPerfectFlash(pw.x, pw.y - pw.displayHeight / 2);
         screenFlash.trigger('#ffcc00', 0.25, 8);
         playPerfect();
@@ -574,24 +562,24 @@ function update(): void {
     }
   }
 
-  if (!isTrainingMode && tickRef.value >= 3600) {
-    phase = GamePhase.KO;
-    koTimer = 0;
-    isTimeOver = true;
-    winner = rounds.determineWinner();
+  if (!gs.isTrainingMode && tickRef.value >= 3600) {
+    gs.setPhase(GamePhase.KO);
+    gs.koTimer = 0;
+    gs.isTimeOver = true;
+    gs.winner = rounds.determineWinner();
     screenShake.trigger(8, 10);
     screenFlash.trigger('#ffaa00', 0.2, 8);
     bgm.stop();
     announcer.timeOver();
   }
 }
+
 // ===== Training Mode HUD =====
 function drawTrainingHUD(
   ctx: CanvasRenderingContext2D, p1: Fighter, p2: Fighter,
-  cs: CombatSystem, cmdBuf: CommandBuffer, tick: number,
+  cs: CombatSystem, inputDisplay: string, tick: number,
 ): void {
   ctx.save();
-  // Training mode banner
   ctx.fillStyle = 'rgba(0, 80, 0, 0.65)';
   ctx.fillRect(0, 0, 200, 28);
   ctx.fillStyle = '#44ff44';
@@ -599,7 +587,6 @@ function drawTrainingHUD(
   ctx.textAlign = 'left';
   ctx.fillText('TRAINING MODE', 10, 19);
 
-  // Damage display
   ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
   ctx.fillRect(CANVAS_WIDTH - 220, 0, 220, 60);
   ctx.font = '11px monospace';
@@ -616,18 +603,14 @@ function drawTrainingHUD(
   ctx.fillStyle = '#44ff44';
   ctx.fillText(`${Math.round(p1.health)} / ${p1.maxHealth}`, CANVAS_WIDTH - 155, 48);
 
-  // Input display (last 12 inputs)
   ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
   ctx.fillRect(0, CANVAS_HEIGHT - 40, 400, 40);
   ctx.font = '12px monospace';
   ctx.fillStyle = '#888';
   ctx.fillText('Input:', 8, CANVAS_HEIGHT - 20);
-  const hist = cmdBuf.getRecentHistory(16);
-  const symbols: Record<string, string> = { neutral: '·', up: '↑', down: '↓', forward: '→', back: '←', upforward: '↗', upback: '↖', downforward: '↘', downback: '↙' };
   ctx.fillStyle = '#ccffcc';
-  ctx.fillText(hist.map(h => symbols[h.direction] || '?').join(' '), 60, CANVAS_HEIGHT - 20);
+  ctx.fillText(inputDisplay, 60, CANVAS_HEIGHT - 20);
 
-  // Attack info
   if (p1.currentAttack) {
     const d = FRAME_DATA[p1.currentAttack as keyof typeof FRAME_DATA];
     if (d) {
@@ -640,21 +623,20 @@ function drawTrainingHUD(
 
 // ===== Render =====
 function render(): void {
-  if (phase === GamePhase.TITLE) {
+  if (gs.phase === GamePhase.TITLE) {
     renderer.drawTitle(tickRef.value);
     return;
   }
-  if (phase === GamePhase.MODE_SELECT) {
-    renderer.drawModeSelect(tickRef.value, modeSelectCursor);
+  if (gs.phase === GamePhase.MODE_SELECT) {
+    renderer.drawModeSelect(tickRef.value, gs.modeSelectCursor);
     return;
   }
-  if (phase === GamePhase.CONTINUE) {
-    renderer.drawContinue(Math.ceil(continueCountdown / 60), continueCursorYes);
+  if (gs.phase === GamePhase.CONTINUE) {
+    renderer.drawContinue(Math.ceil(gs.continueCountdown / 60), gs.continueCursorYes);
     return;
   }
-  if (phase === GamePhase.SELECT) {
-    renderer.drawCharacterSelect(select, tickRef.value, simplifiedMode, getStage());
-    // VS闪屏叠加层
+  if (gs.phase === GamePhase.SELECT) {
+    renderer.drawCharacterSelect(select, tickRef.value, gs.simplifiedMode, getStage());
     if (select.vsSplashTimer >= 0) {
       renderer.drawVSSplash(select, tickRef.value);
     }
@@ -662,69 +644,74 @@ function render(): void {
   }
   rounds.tickFade();
   camera.update(p1, p2);
-  const isKO = phase === GamePhase.KO || phase === GamePhase.WIN_QUOTE || phase === GamePhase.MATCH_END;
-  const perfectPlayer = (phase === GamePhase.KO) ? cinematic.getPerfectPlayer(winner) : null;
+  const perfectPlayer = (gs.phase === GamePhase.KO) ? cinematic.getPerfectPlayer(gs.winner) : null;
   const p1Char = ROSTER.find(c => c.id === p1.charId) || ROSTER[0];
   const p2Char = ROSTER.find(c => c.id === p2.charId) || ROSTER[1];
-  renderer.render([p1, p2], camera.x, tickRef.value, phase === GamePhase.KO, winner, screenShake.offsetX, screenShake.offsetY,
-    [p1DelayedHealth, p2DelayedHealth], maxModes, perfectPlayer, rounds.p1Wins, rounds.p2Wins, p1Char.nameCn, p2Char.nameCn, isTimeOver, rounds.currentRound, firstAttacker,
-    cinematic.hitStopDefender, cinematic.hitStopBias);
+  renderer.render([p1, p2], camera.x, tickRef.value, gs.phase === GamePhase.KO, gs.winner, screenShake.offsetX, screenShake.offsetY,
+    [p1DelayedHealth, p2DelayedHealth], maxModes, perfectPlayer, rounds.p1Wins, rounds.p2Wins, p1Char.nameCn, p2Char.nameCn, gs.isTimeOver, rounds.currentRound, gs.firstAttacker,
+    cinematic.hitStopDefender, cinematic.hitStopBias, [p1Char.specialColor, p2Char.specialColor]);
   renderer.drawProjectiles(projectiles, camera);
   vfx.render(ctx, camera.x);
 
   if (cinematic.superFlashTimer > 0)
     renderer.drawSuperFlash(ctx, cinematic.superFlashTimer, cinematic.superFlashX - camera.x, cinematic.superFlashY, maxModes[cinematic.superFlashAttacker].active ? 'SDM' : 'DM');
   renderer.drawPowerGauges(gauges, maxModes);
-  if (phase === GamePhase.INTRO) renderer.drawIntro(phaseTimer, rounds.currentRound, p1Char.nameCn, p2Char.nameCn);
+  if (gs.phase === GamePhase.INTRO) renderer.drawIntro(gs.phaseTimer, rounds.currentRound, p1Char.nameCn, p2Char.nameCn);
   renderer.drawComboCounters([p1, p2], [combatSystem.getComboCount(0), combatSystem.getComboCount(1)], [0, 0], camera, [combatSystem.getComboDamage(0), combatSystem.getComboDamage(1)]);
-  if (teamMode && p1Team && p2Team) {
+  if (gs.teamMode && p1Team && p2Team) {
     const toDisp = (t: TeamState): TeamDisplayInfo => ({
       members: t.members.map((m, i) => ({ name: m.charDef.nameCn, defeated: m.defeated, active: i === t.activeIndex && !m.defeated })),
     });
     renderer.drawTeamOrder(toDisp(p1Team), toDisp(p2Team));
   }
-  renderer.drawControlsHint(simplifiedMode, p1.charId);
+  renderer.drawControlsHint(gs.simplifiedMode, p1.charId);
 
-  // 胜利台词画面 — 在战斗场景上方叠加显示
-  if (phase === GamePhase.WIN_QUOTE && winner !== null) {
-    const charDef = ROSTER.find(c => c.id === (winner === 0 ? p1 : p2).charId);
+  if (gs.phase === GamePhase.WIN_QUOTE && gs.winner !== null) {
+    const winner = gs.winner === 0 ? p1 : p2;
+    // KOF2002: 胜利姿势动画显示在胜利台词背景
+    drawVictoryPose(ctx, winner.x - camera.x, winner.y, winner.facing, winner.color, '#ffffff30', tickRef.value, winner.charId);
+    const charDef = ROSTER.find(c => c.id === winner.charId);
     renderer.drawWinQuote(
-      winQuoteTimer,
-      winQuoteCharName,
-      currentWinQuote,
-      winQuoteCharColor,
+      gs.winQuoteTimer,
+      gs.winQuoteCharName,
+      gs.currentWinQuote,
+      gs.winQuoteCharColor,
       charDef?.pixelPortrait,
     );
   }
 
-  if (phase === GamePhase.MATCH_END) {
-    if (winner !== null) { const w = winner === 0 ? p1 : p2; drawVictoryPose(ctx, w.x - camera.x, w.y, w.facing, w.color, '#ffffff30', tickRef.value, w.charId); }
-    renderer.drawMatchEnd(winner, rounds.p1Wins, rounds.p2Wins, currentWinQuote || undefined, winner !== null ? (winner === 0 ? '#ff6644' : '#4488ff') : undefined, phaseTimer, winner !== null ? (winner === 0 ? p1 : p2).charId ?? undefined : undefined);
+  if (gs.phase === GamePhase.MATCH_END) {
+    if (gs.winner !== null) { const w = gs.winner === 0 ? p1 : p2; drawVictoryPose(ctx, w.x - camera.x, w.y, w.facing, w.color, '#ffffff30', tickRef.value, w.charId); }
+    renderer.drawMatchEnd(gs.winner, rounds.p1Wins, rounds.p2Wins, gs.currentWinQuote || undefined, gs.winner !== null ? (gs.winner === 0 ? '#ff6644' : '#4488ff') : undefined, gs.phaseTimer, gs.winner !== null ? (gs.winner === 0 ? p1 : p2).charId ?? undefined : undefined);
   }
   if (rounds.fadeAlpha > 0) { ctx.fillStyle = `rgba(0,0,0,${rounds.fadeAlpha})`; ctx.fillRect(0, 0, canvas.width, canvas.height); }
   screenFlash.render(ctx, canvas.width, canvas.height);
-  // Control mode indicator badge
-  if (modeIndicatorTimer > 0) {
-    renderer.drawModeIndicator(simplifiedMode, Math.min(1, modeIndicatorTimer / 60));
-    modeIndicatorTimer--;
+  if (gs.modeIndicatorTimer > 0) {
+    renderer.drawModeIndicator(gs.simplifiedMode, Math.min(1, gs.modeIndicatorTimer / 60));
+    gs.modeIndicatorTimer--;
   }
-  if (stageIndicatorTimer > 0) {
-    renderer.drawStageIndicator(getStage(), Math.min(1, stageIndicatorTimer / 60));
-    stageIndicatorTimer--;
+  if (gs.stageIndicatorTimer > 0) {
+    renderer.drawStageIndicator(getStage(), Math.min(1, gs.stageIndicatorTimer / 60));
+    gs.stageIndicatorTimer--;
   }
-  if (debugMode) renderer.drawDebug([p1, p2], projectiles, camera, tickRef.value, renderer.getFps(), vfx.count, [p1Cmd, p2Cmd]);
-  // Training mode HUD overlay
-  if (isTrainingMode && (phase === GamePhase.FIGHTING || phase === GamePhase.KO)) {
-    drawTrainingHUD(ctx, p1, p2, combatSystem, p1Cmd, tickRef.value);
+  if (gs.debugMode) {
+    const symbols: Record<string, string> = { neutral: '·', up: '↑', down: '↓', forward: '→', back: '←', upforward: '↗', upback: '↖', downforward: '↘', downback: '↙' };
+    const toHist = (cmd: CommandBuffer) => {
+      const h = cmd.getRecentHistory(10);
+      return { directionSymbols: h.map(e => symbols[e.direction] || '?'), directionAges: h.map(e => tickRef.value - e.frame) };
+    };
+    renderer.drawDebug([p1, p2], projectiles, camera, tickRef.value, renderer.getFps(), vfx.count, [toHist(p1Cmd), toHist(p2Cmd)]);
+  }
+  if (gs.isTrainingMode && (gs.phase === GamePhase.FIGHTING || gs.phase === GamePhase.KO)) {
+    const sym: Record<string, string> = { neutral: '·', up: '↑', down: '↓', forward: '→', back: '←', upforward: '↗', upback: '↖', downforward: '↘', downback: '↙' };
+    const inputStr = p1Cmd.getRecentHistory(16).map(h => sym[h.direction] || '?').join(' ');
+    drawTrainingHUD(ctx, p1, p2, combatSystem, inputStr, tickRef.value);
   }
 }
+
 function restartGame(): void {
   bgm.stop();
-  phase = GamePhase.TITLE;
-  phaseTimer = 0;
-  koTimer = 0;
-  koGroundSlamDone = false;
-  winner = null;
+  gs.resetForNewGame();
   tickRef.value = 0;
   select.reset();
   p2AI = null;
@@ -738,11 +725,11 @@ function restartGame(): void {
 let f1Down = false;
 window.addEventListener('keydown', e => {
   initAudio();
-  if (e.code === 'F1') { e.preventDefault(); if (!f1Down) { f1Down = true; debugMode = !debugMode; } }
+  if (e.code === 'F1') { e.preventDefault(); if (!f1Down) { f1Down = true; gs.debugMode = !gs.debugMode; } }
   if (e.code === 'KeyM') announcer.toggle();
   if (e.code === 'KeyB') bgm.toggle();
-  if (e.code === 'Tab') { e.preventDefault(); simplifiedMode = !simplifiedMode; modeIndicatorTimer = 120; }
-  if (e.code === 'KeyN') { const s = cycleStage(); console.log('Stage:', s); stageIndicatorTimer = 120; }
+  if (e.code === 'Tab') { e.preventDefault(); gs.simplifiedMode = !gs.simplifiedMode; gs.modeIndicatorTimer = 120; }
+  if (e.code === 'KeyN') { const s = cycleStage(); console.log('Stage:', s); gs.stageIndicatorTimer = 120; }
 });
 window.addEventListener('keyup', e => { if (e.code === 'F1') f1Down = false; });
 

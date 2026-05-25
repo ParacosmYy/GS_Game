@@ -24,6 +24,7 @@ import {
 } from '../core/constants.js';
 import { FighterState, AttackType, CLOSE_RANGE } from '../core/types.js';
 import { spendStocks, gainMeterOnWhiff } from '../combat/meter.js';
+import { isDM as isDMClassified } from '../core/attackClassifier.js';
 
 export { handleBlock, handleAirBlock, handleGuardCrush, handleCounterStance, handleHitstun, handleKnockdown } from './stunStateHandlers.js';
 
@@ -130,7 +131,7 @@ export function isSpecialMove(name: string): boolean {
 }
 
 export function isDM(name: string): boolean {
-  return name.startsWith('DM_') || name.startsWith('SDM_') || name.startsWith('HSDM_');
+  return isDMClassified(name);
 }
 
 export function isNormal(name: string): boolean {
@@ -162,6 +163,13 @@ export function handleIdleWalk(ctx: FighterCtx, input: ResolvedInput): void {
     f.vx = (f.state === FighterState.ROLL ? ROLL_SPEED : -ROLL_SPEED) * f.facing;
     f.displayHeight = 60;
     ctx.vfx.spawnDust(f.x, STAGE_GROUND_Y); return;
+  }
+  // KOF2002: Taunt — Start键，站立即可发动，削减对手气槽
+  if (input.startPressed && f.canAct() && f.isGrounded()) {
+    f.state = FighterState.TAUNT;
+    f.tauntTimer = 40;
+    f.vx = 0;
+    return;
   }
   if (input.blowbackPressed && f.canAct()) { f.startAttack(AttackType.STAND_CD); return; }
   if (dblBack(ctx, input) && f.canAct() && f.isGrounded()) {
@@ -501,4 +509,15 @@ export function handleAttack(ctx: FighterCtx, input: ResolvedInput): void {
     }
   }
   if (!f.currentAttack && !f.isGrounded()) { f.state = FighterState.JUMP; }
+}
+
+/** TAUNT state handler — Start键触发，持续约40帧，削减对手气槽 */
+export function handleTaunt(ctx: FighterCtx): void {
+  const f = ctx.fighter;
+  f.vx = 0;
+  f.tauntTimer--;
+  if (f.tauntTimer <= 0) {
+    f.state = FighterState.IDLE;
+    f.tauntTimer = 0;
+  }
 }

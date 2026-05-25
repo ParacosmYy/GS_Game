@@ -158,7 +158,11 @@ export function drawCharacterSelect(
         const ph = char.pixelPortrait.height * portraitScale;
         const px = cx + 8 + ((CARD_W - 16) - pw) / 2;
         const py = portraitY + (48 - ph) / 2;
-        drawPixelPortrait(ctx, char.pixelPortrait, px, py, portraitScale);
+        drawPixelPortrait(ctx, char.pixelPortrait, px, py, portraitScale, {
+          frameColor: char.color,
+          backdropColor: 'rgba(8, 8, 18, 0.85)',
+          scanlines: true,
+        });
       } else {
         const charGrad = ctx.createLinearGradient(cx + 10, portraitY + 3, cx + CARD_W - 10, portraitY + 45);
         charGrad.addColorStop(0, char.color);
@@ -230,7 +234,11 @@ export function drawCharacterSelect(
       ctx.lineWidth = 1;
       roundRect(ctx, ppx - 4, ppy - 4, pw + 8, ph + 8, 4);
       ctx.stroke();
-      drawPixelPortrait(ctx, hoveredChar.pixelPortrait, ppx, ppy, previewScale);
+      drawPixelPortrait(ctx, hoveredChar.pixelPortrait, ppx, ppy, previewScale, {
+        frameColor: hoveredChar.color,
+        backdropColor: 'rgba(8, 8, 18, 0.9)',
+        scanlines: true,
+      });
     }
     // 角色名大字 — 网格中央偏右
     ctx.save();
@@ -342,7 +350,11 @@ function drawPlayerInfo(
     const ppy = panelY + 2;
     ctx.fillStyle = 'rgba(10, 10, 20, 0.7)';
     roundRect(ctx, ppx, ppy, pw + 8, ph + 8, 4); ctx.fill();
-    drawPixelPortrait(ctx, char.pixelPortrait, ppx + 4, ppy + 4, pScale);
+    drawPixelPortrait(ctx, char.pixelPortrait, ppx + 4, ppy + 4, pScale, {
+      frameColor: char.color,
+      backdropColor: 'rgba(8, 8, 18, 0.85)',
+      scanlines: true,
+    });
   } else if (isRandom) {
     // 随机格 — 问号图标
     const ppx = isLeft ? 15 : CANVAS_WIDTH - 70;
@@ -574,7 +586,11 @@ function drawVSPortrait(
   roundRect(ctx, px - 12, py - 12, pw + 24, ph + 24, 8);
   ctx.stroke();
   ctx.globalAlpha = 1;
-  drawPixelPortrait(ctx, portrait, px, py, scale);
+    drawPixelPortrait(ctx, portrait, px, py, scale, {
+      frameColor: color,
+      backdropColor: 'rgba(20, 20, 40, 0.85)',
+      scanlines: true,
+    });
 }
 
 // VS闪屏中的调色板圆点
@@ -834,7 +850,11 @@ export function drawWinQuote(
     ctx.lineWidth = 2;
     roundRect(ctx, px - 10, py - 10, pw + 20, ph + 20, 8);
     ctx.stroke();
-    drawPixelPortrait(ctx, pixelPortrait, px, py, portraitScale);
+    drawPixelPortrait(ctx, pixelPortrait, px, py, portraitScale, {
+      frameColor: charColor,
+      backdropColor: 'rgba(12, 12, 24, 0.9)',
+      scanlines: true,
+    });
   }
 
   // 角色名

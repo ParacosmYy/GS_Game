@@ -189,7 +189,11 @@ export function drawMatchEnd(
       ctx.lineWidth = 2;
       roundRect(ctx, px - 8, py - 8, pw + 16, ph + 16, 8);
       ctx.stroke();
-      drawPixelPortrait(ctx, charDef.pixelPortrait, px, py, portraitScale);
+      drawPixelPortrait(ctx, charDef.pixelPortrait, px, py, portraitScale, {
+        frameColor: charDef.color,
+        backdropColor: 'rgba(8, 8, 18, 0.9)',
+        scanlines: true,
+      });
     }
   }
 

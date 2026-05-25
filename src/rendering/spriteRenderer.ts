@@ -120,8 +120,9 @@ export class SpriteRenderer {
     const frame = frames[idx];
 
     ctx.save();
-    const drawX = x + frame.ox * facing;
-    const drawY = y + frame.oy;
+    ctx.imageSmoothingEnabled = false;
+    const drawX = Math.round(x + frame.ox * facing);
+    const drawY = Math.round(y + frame.oy);
 
     if (facing < 0) {
       ctx.translate(drawX, drawY);

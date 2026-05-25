@@ -1,6 +1,6 @@
 /**
  * 坂崎亮 (Ryo Sakazaki) — SNK-style pixel portrait
- * 32x40 half-body bust shot. Orange gi, brown spiky hair.
+ * 32x40 half-body bust shot. Hard-edged martial artist portrait with a white gi.
  */
 import type { PixelPortraitData } from '../pixelPortraits.js';
 
@@ -9,19 +9,19 @@ export const ryoPortrait: PixelPortraitData = {
   height: 40,
   palette: {
     0: 'transparent',
-    1: '#1a0a00',  // dark hair
-    2: '#5a3a10',  // brown hair
-    3: '#8b6914',  // light brown highlight
-    4: '#ffd4a0',  // skin base
-    5: '#ffb880',  // skin shadow
-    6: '#e8a060',  // skin dark
-    7: '#cc8833',  // gi base
-    8: '#aa6622',  // gi shadow
-    9: '#ddaa44',  // gi highlight
-    10: '#222',    // outlines
-    11: '#4444aa', // eye color
-    12: '#ffffff', // white
-    13: '#333',    // belt dark
+    1: '#17110b',  // hair dark / contour
+    2: '#362316',  // hair mid
+    3: '#5f4026',  // hair highlight
+    4: '#e8b07d',  // skin base
+    5: '#cf8756',  // skin shadow
+    6: '#995f39',  // skin dark
+    7: '#f7f4ee',  // gi base
+    8: '#d5cec2',  // gi shadow
+    9: '#ffffff',  // gi highlight
+    10: '#0b0907',  // outlines
+    11: '#26180f', // eye / brow dark
+    12: '#fdfbf6', // bright highlight
+    13: '#191714', // belt dark
   },
   pixels: [
     [0,0,0,0,0,0,0,0,0,0,1,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0],

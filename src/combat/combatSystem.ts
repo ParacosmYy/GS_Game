@@ -1,7 +1,7 @@
 import { Fighter } from '../entities/fighter.js';
 import { Projectile } from '../entities/projectile.js';
 import type { FighterController } from '../entities/fighterController.js';
-import { InputManager } from '../input/inputManager.js';
+import type { IInputProvider } from '../input/inputProvider.js';
 import { resolveInput } from '../input/inputResolver.js';
 import type { PrevAttack, RawInput } from '../input/inputResolver.js';
 import { createPrevAttack, updatePrevAttack } from '../input/inputResolver.js';
@@ -20,6 +20,7 @@ import {
 import { CLOSE_RANGE } from '../core/types.js';
 import { FighterState, AttackType, JuggleState } from '../core/types.js';
 import type { HitLevel } from '../core/types.js';
+import { isDM, isSpecialOrDM, isCharacterSpecial } from '../core/attackClassifier.js';
 import { resolveProjectileHits } from './projectileResolver.js';
 import type { ProjectileResolverContext, HitCallback, GuardCrushCallback } from './projectileResolver.js';
 export type { HitCallback, GuardCrushCallback } from './projectileResolver.js';
@@ -35,7 +36,7 @@ export type ThrowEscapeCallback = (
 ) => void;
 
 export class CombatSystem {
-  private inputManager: InputManager;
+  private inputProvider: IInputProvider;
   private prev: [PrevAttack, PrevAttack] = [createPrevAttack(), createPrevAttack()];
   private fighters: [Fighter, Fighter] | null = null;
   defenderControllers: [FighterController, FighterController] | null = null;
@@ -52,8 +53,8 @@ export class CombatSystem {
   // MAX mode state per player (true = active, -33% damage penalty)
   private maxModes: [boolean, boolean] = [false, false];
 
-  constructor(inputManager: InputManager) {
-    this.inputManager = inputManager;
+  constructor(inputProvider: IInputProvider) {
+    this.inputProvider = inputProvider;
   }
 
   resolveAttacks(p1: Fighter, p2: Fighter, projectiles: Projectile[], onHit?: HitCallback, currentFrame: number = 0, maxModes?: [boolean, boolean]): void {
@@ -63,7 +64,7 @@ export class CombatSystem {
     this.resolveHit(p1, p2, onHit);
     this.resolveHit(p2, p1, onHit);
     const ctx: ProjectileResolverContext = {
-      inputManager: this.inputManager,
+      inputProvider: this.inputProvider,
       prev: this.prev,
       comboHits: this.comboHits,
       lastHitFrame: this.lastHitFrame,
@@ -139,7 +140,7 @@ export class CombatSystem {
       if (!defender.isBeingThrown || defender.throwEscapeTimer <= 0) continue;
 
       // Get defender input to check for throw escape
-      const raw = i === 0 ? this.inputManager.getP1Input() : this.inputManager.getP2Input();
+      const raw = i === 0 ? this.inputProvider.getP1Input() : this.inputProvider.getP2Input();
       const defInput = resolveInput(raw, defender.facing, this.prev[i]);
 
       defender.throwEscapeTimer--;
@@ -225,12 +226,9 @@ export class CombatSystem {
     const hits = this.comboHits[defIdx];
     if (hits === 0) return baseDamage;
     const name = (attackType ?? '') as string;
-    const isDM = name.startsWith('DM_') || name.startsWith('SDM_');
-    const isSpecial = isDM || name.startsWith('KYO_') || name.startsWith('IORI_') || name.startsWith('TERRY_')
-      || name.startsWith('KIM_') || name.startsWith('RYO_') || name.startsWith('LEONA_')
-      || name.startsWith('KDASH_') || name.startsWith('KULA_') || name.startsWith('SPECIAL_')
-      || name === 'STAND_CD' || name === 'JUMP_CD';
-    const minScale = isDM ? DAMAGE_SCALE_MIN_DM : isSpecial ? DAMAGE_SCALE_MIN_SPECIAL : DAMAGE_SCALE_MIN_NORMAL;
+    const _isDM = isDM(name);
+    const _isSpecial = isSpecialOrDM(name) || name === 'STAND_CD' || name === 'JUMP_CD';
+    const minScale = _isDM ? DAMAGE_SCALE_MIN_DM : _isSpecial ? DAMAGE_SCALE_MIN_SPECIAL : DAMAGE_SCALE_MIN_NORMAL;
     const scale = Math.max(minScale, 1 - hits * DAMAGE_SCALE_STEP);
     return Math.max(1, Math.round(baseDamage * scale));
   }
@@ -321,7 +319,7 @@ export class CombatSystem {
     }
 
     const defIdx = this.fighters ? (this.fighters[0] === defender ? 0 : 1) : 0;
-    const raw = defIdx === 0 ? this.inputManager.getP1Input() : this.inputManager.getP2Input();
+    const raw = defIdx === 0 ? this.inputProvider.getP1Input() : this.inputProvider.getP2Input();
     const defInput = resolveInput(raw, defender.facing, this.prev[defIdx]);
 
     const crouching = defender.state === FighterState.CROUCH;
@@ -512,7 +510,7 @@ export class CombatSystem {
     const comboHits = this.comboHits[defIdx];
     if (atkName2.startsWith('DM_') || atkName2.startsWith('SDM_')) defender.hitFlashColor = '#6688ff';
     else if (counterHit) defender.hitFlashColor = '#ffaa44';
-    else if (isSpecial(attackType))
+    else if (isSpecialMoveCheck(attackType))
       defender.hitFlashColor = '#ffee66';
     else if (comboHits >= 8) defender.hitFlashColor = '#ff4400';
     else if (comboHits >= 5) defender.hitFlashColor = '#ff8800';
@@ -531,8 +529,7 @@ export class CombatSystem {
 
     // Super Cancel: special moves on hit enable cancel into DM (costs extra stock)
     const atkName = attackType as string;
-    if (atkName.startsWith('KYO_') || atkName.startsWith('IORI_') || atkName.startsWith('TERRY_')
-      || atkName.startsWith('KIM_') || atkName.startsWith('RYO_') || atkName.startsWith('LEONA_') || atkName.startsWith('KDASH_') || atkName.startsWith('KULA_') || atkName === AttackType.SPECIAL_UPPER
+    if (isCharacterSpecial(atkName) || atkName === AttackType.SPECIAL_UPPER
       || atkName === AttackType.SPECIAL_PROJECTILE) {
       attacker.superCancelReady = true;
     }
@@ -542,28 +539,22 @@ export class CombatSystem {
 }
 
 /** Check if attack is a special move (not normal, not throw, not DM) */
-function isSpecial(at: AttackType): boolean {
+function isSpecialMoveCheck(at: AttackType): boolean {
   const name = at as string;
-  if (name.startsWith('DM_') || name.startsWith('SDM_')) return false;
+  if (isDM(name)) return false;
   if (NORMAL_ATTACKS.has(name) || COMMAND_NORMALS.has(name)) return false;
   if (at === AttackType.THROW || at === AttackType.THROW_FORWARD || at === AttackType.THROW_BACK) return false;
-  return true;
+  return isCharacterSpecial(name) || name.startsWith('SPECIAL_');
 }
 
 /** Guard gauge depletion based on attack type */
 function guardGaugeDamage(attackType: AttackType): number {
   const name = attackType as string;
-  // DMs / SDMs
-  if (name.startsWith('DM_') || name.startsWith('SDM_')) return name.startsWith('SDM_') ? 35 : 25;
-  // Specials (any character-specific move that isn't normal/throw/DM)
-  if (isSpecial(attackType)) return 15;
-  // Command normals
+  if (isDM(name)) return name.startsWith('SDM_') ? 35 : 25;
+  if (isSpecialMoveCheck(attackType)) return 15;
   if (COMMAND_NORMALS.has(name)) return 12;
-  // CD blowback
   if (attackType === AttackType.STAND_CD || attackType === AttackType.JUMP_CD) return 12;
-  // Heavy normals (C/D, CLOSE_C/D)
   if (name.endsWith('_C') || name.endsWith('_D')) return 10;
-  // Light normals (A/B)
   return 5;
 }
 
@@ -573,8 +564,8 @@ const GUARD_CRUSH_DURATION = 90;
 /** Get juggle point cost for an attack type */
 function getJuggleCost(attackType: AttackType): number {
   const name = attackType as string;
-  if (name.startsWith('DM_') || name.startsWith('SDM_')) return JUGGLE_COST_DM;
-  if (isSpecial(attackType)) return JUGGLE_COST_SPECIAL;
+  if (isDM(name)) return JUGGLE_COST_DM;
+  if (isSpecialMoveCheck(attackType)) return JUGGLE_COST_SPECIAL;
   if (name.endsWith('_C') || name.endsWith('_D')
     || COMMAND_NORMALS.has(name)
     || name.startsWith('CLOSE_C') || name.startsWith('CLOSE_D')) return JUGGLE_COST_HEAVY;

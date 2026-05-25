@@ -68,51 +68,182 @@ export function drawSkeletalFighter(
     let breathSpeed = 30;
     let breathAmp = 2;
     let headBob = 0;
-    if (charId === 'kyo') { breathSpeed = 25; breathAmp = 2.5; headBob = 1; }
-    else if (charId === 'iori') { breathSpeed = 35; breathAmp = 1.5; headBob = 0; } // iori: slower, menacing
-    else if (charId === 'terry') { breathSpeed = 28; breathAmp = 3; headBob = 1.5; }
-    else if (charId === 'kim') { breathSpeed = 22; breathAmp = 2; headBob = 0.5; } // kim: athletic, faster
-    else if (charId === 'ryo') { breathSpeed = 26; breathAmp = 2.5; headBob = 1; }
-    else if (charId === 'leona') { breathSpeed = 32; breathAmp = 1.5; headBob = 0; } // leona: controlled
-    else if (charId === 'kdash') { breathSpeed = 24; breathAmp = 2; headBob = 0.5; }
+    let chestLift = 0;
+    let shoulderTilt = 0;
+    if (charId === 'kyo') { breathSpeed = 23; breathAmp = 2.9; headBob = 1.1; chestLift = -0.6; shoulderTilt = 0.05; }
+    else if (charId === 'iori') { breathSpeed = 38; breathAmp = 1.2; headBob = -0.6; chestLift = 0.9; shoulderTilt = -0.08; }
+    else if (charId === 'terry') { breathSpeed = 27; breathAmp = 2.8; headBob = 1.1; chestLift = -0.2; }
+    else if (charId === 'kim') { breathSpeed = 22; breathAmp = 2.1; headBob = 0.6; chestLift = -0.3; }
+    else if (charId === 'ryo') { breathSpeed = 25; breathAmp = 2.1; headBob = 0.35; chestLift = 0.2; shoulderTilt = 0.03; }
+    else if (charId === 'leona') { breathSpeed = 32; breathAmp = 1.5; headBob = 0; }
+    else if (charId === 'kdash') { breathSpeed = 24; breathAmp = 1.9; headBob = 0.4; }
     else if (charId === 'kula') { breathSpeed = 28; breathAmp = 1.8; headBob = 0.8; }
-    else if (charId === 'robert') { breathSpeed = 26; breathAmp = 2.2; headBob = 1; }
-    else if (charId === 'mature') { breathSpeed = 30; breathAmp = 1.8; headBob = 0.5; } // mature: seductive, slow
-    else if (charId === 'yashiro') { breathSpeed = 22; breathAmp = 2.5; headBob = 1.2; } // yashiro: heavy, powerful
-    else if (charId === 'chris') { breathSpeed = 24; breathAmp = 2.2; headBob = 0.8; } // chris: youthful, energetic
-    else if (charId === 'shermie') { breathSpeed = 30; breathAmp = 1.6; headBob = 0.4; } // shermie: alluring, slow
-    else if (charId === 'vice') { breathSpeed = 26; breathAmp = 2.0; headBob = 0.6; } // vice: aggressive, tense
-    else if (charId === 'xiangfei') { breathSpeed = 22; breathAmp = 2.0; headBob = 0.7; } // xiangfei: energetic, kung-fu
-    else if (charId === 'yamazaki') { breathSpeed = 28; breathAmp = 1.8; headBob = 0.3; } // yamazaki: menacing, slow, one hand in pocket
-    else if (charId === 'mary') { breathSpeed = 26; breathAmp = 1.8; headBob = 0.5; } // mary: confident, athletic
-    else if (charId === 'kasumi') { breathSpeed = 28; breathAmp = 1.6; headBob = 0.4; } // kasumi: disciplined, controlled
+    else if (charId === 'robert') { breathSpeed = 26; breathAmp = 2.1; headBob = 0.9; }
+    else if (charId === 'mature') { breathSpeed = 30; breathAmp = 1.7; headBob = 0.4; }
+    else if (charId === 'yashiro') { breathSpeed = 22; breathAmp = 2.5; headBob = 1.1; }
+    else if (charId === 'chris') { breathSpeed = 24; breathAmp = 2.2; headBob = 0.8; }
+    else if (charId === 'shermie') { breathSpeed = 30; breathAmp = 1.6; headBob = 0.4; }
+    else if (charId === 'vice') { breathSpeed = 26; breathAmp = 2.0; headBob = 0.6; }
+    else if (charId === 'xiangfei') { breathSpeed = 22; breathAmp = 2.0; headBob = 0.7; }
+    else if (charId === 'yamazaki') { breathSpeed = 28; breathAmp = 1.8; headBob = 0.2; }
+    else if (charId === 'mary') { breathSpeed = 26; breathAmp = 1.8; headBob = 0.5; }
+    else if (charId === 'kasumi') { breathSpeed = 28; breathAmp = 1.6; headBob = 0.4; }
     const breathe = Math.sin(globalTick / breathSpeed) * breathAmp;
-    p.body.oy += breathe;
+    p.body.oy += breathe + chestLift;
+    p.body.rot += shoulderTilt * Math.sin(globalTick / (breathSpeed * 2));
     p.head.oy += breathe + headBob * Math.sin(globalTick / breathSpeed * 0.5);
+    if (charId === 'iori') {
+      // Iori reads better when the silhouette feels coiled instead of upright.
+      p.head.rot -= 0.05;
+      p.armFront.rot += 0.08;
+      p.armBack.rot -= 0.12;
+      p.armFront.oy += 0.6;
+    } else if (charId === 'kyo') {
+      // Kyo should feel loose and confident, with the chest carrying the motion.
+      p.head.rot += 0.03;
+      p.armFront.rot -= 0.05;
+      p.armBack.rot += 0.05;
+    } else if (charId === 'ryo') {
+      // Ryo stays compact and grounded so the torso feels disciplined, not floaty.
+      p.head.rot += 0.02;
+      p.armFront.rot -= 0.03;
+      p.armBack.rot += 0.03;
+    }
   }
 
-  // Walk cycle — character-specific stride
+  // Walk cycle — character-specific stride and body language
   if (f.state === FighterState.WALK) {
     const charId = f.charId ?? '';
-    let walkSpeed = 8, walkAmp = 5;
-    if (charId === 'kim') { walkSpeed = 7; walkAmp = 6; } // martial arts stance walk
-    else if (charId === 'iori') { walkSpeed = 10; walkAmp = 4; } // deliberate, slower
-    else if (charId === 'leona') { walkSpeed = 7; walkAmp = 5; }
-    else if (charId === 'kdash') { walkSpeed = 8; walkAmp = 4.5; }
+    let walkSpeed = 8;
+    let walkAmp = 5;
+    let bodyBob = 0;
+    let headBob = 0;
+    let armSwing = 0.3;
+    let bodyLean = 0;
+    let shoulderLead = 0;
+    if (charId === 'kim') { walkSpeed = 7; walkAmp = 5.8; armSwing = 0.18; bodyBob = 0.9; headBob = 0.5; }
+    else if (charId === 'iori') { walkSpeed = 10.5; walkAmp = 3.4; bodyBob = 1.2; headBob = 0.2; armSwing = 0.08; bodyLean = 0.08; shoulderLead = -0.8; }
+    else if (charId === 'kyo') { walkSpeed = 6.8; walkAmp = 5.2; headBob = 1.2; armSwing = 0.42; bodyBob = 0.4; bodyLean = -0.04; shoulderLead = 0.7; }
+    else if (charId === 'terry') { walkSpeed = 8; walkAmp = 5; bodyBob = 1; armSwing = 0.35; }
+    else if (charId === 'leona') { walkSpeed = 7; walkAmp = 4.8; armSwing = 0.22; bodyLean = -0.05; }
+    else if (charId === 'kdash') { walkSpeed = 8; walkAmp = 4.5; headBob = 0.45; armSwing = 0.2; bodyLean = -0.03; }
+    else if (charId === 'kula') { walkSpeed = 9; walkAmp = 4; bodyBob = 0.8; armSwing = 0.35; }
+    else if (charId === 'ryo') { walkSpeed = 7.4; walkAmp = 4.8; armSwing = 0.16; bodyBob = 0.45; headBob = 0.25; bodyLean = -0.06; shoulderLead = 0.3; }
+    else if (charId === 'robert') { walkSpeed = 7; walkAmp = 5; headBob = 1.2; armSwing = 0.3; }
+    else if (charId === 'mai') { walkSpeed = 9; walkAmp = 4.5; bodyBob = 2; armSwing = 0.4; }
+    else if (charId === 'athena') { walkSpeed = 9; walkAmp = 4; bodyBob = 1; armSwing = 0.35; }
+    else if (charId === 'yamazaki') { walkSpeed = 9; walkAmp = 3.8; headBob = 0.6; armSwing = 0.08; bodyLean = 0.06; }
     const walkCycle = Math.sin(globalTick / walkSpeed) * walkAmp;
     p.legFront.oy += walkCycle;
     p.legBack.oy -= walkCycle;
-    p.armFront.oy -= walkCycle * 0.3;
-    p.armBack.oy += walkCycle * 0.3;
+    p.armFront.oy -= walkCycle * armSwing;
+    p.armBack.oy += walkCycle * armSwing;
+    p.body.oy += Math.sin(globalTick / walkSpeed * 2) * bodyBob;
+    p.head.oy += Math.sin(globalTick / walkSpeed) * headBob;
+    p.body.rot += Math.sin(globalTick / walkSpeed) * bodyLean;
+    p.armFront.rot += shoulderLead * 0.05;
+    p.armBack.rot -= shoulderLead * 0.05;
+    if (charId === 'iori') {
+      // Iori walks like a threat: low, narrow, and slightly forward.
+      p.head.oy -= 1;
+      p.armFront.rot += 0.15;
+      p.armBack.rot -= 0.2;
+      p.body.oy += 1.5;
+    } else if (charId === 'kyo') {
+      // Kyo should feel loose and self-assured, with the chest leading the step.
+      p.body.oy -= 0.8;
+      p.head.rot += 0.05;
+      p.armFront.oy -= 0.8;
+    } else if (charId === 'ryo') {
+      // Ryo's walk is measured and rooted, not floaty or flashy.
+      p.body.oy += 0.4;
+      p.head.rot -= 0.02;
+      p.armFront.oy += 0.3;
+    }
   }
 
-  // Run cycle — more exaggerated
+  // Run cycle — character-specific running style
   if (f.state === FighterState.RUN) {
-    const runCycle = Math.sin(globalTick / 5) * 8;
+    const charId = f.charId ?? '';
+    let runSpeed = 5;
+    let runAmp = 8;
+    let bodyLean = -0.18;
+    let headDrop = 0;
+    let armPump = 0.3;
+    if (charId === 'kyo') { runSpeed = 4.5; runAmp = 8.5; bodyLean = -0.08; headDrop = -1; armPump = 0.5; }
+    else if (charId === 'iori') { runSpeed = 5.2; runAmp = 6.2; bodyLean = -0.22; headDrop = 1.2; armPump = 0.12; }
+    else if (charId === 'ryo') { runSpeed = 4.8; runAmp = 7.2; bodyLean = -0.22; headDrop = -0.5; armPump = 0.38; }
+    else if (charId === 'kim') { runSpeed = 4.4; runAmp = 7.5; bodyLean = -0.1; headDrop = -1.2; armPump = 0.28; }
+    else if (charId === 'terry') { runSpeed = 4.8; runAmp = 8; bodyLean = -0.2; headDrop = -0.8; armPump = 0.45; }
+    else if (charId === 'leona') { runSpeed = 4.6; runAmp = 7.6; bodyLean = -0.16; headDrop = -0.7; armPump = 0.34; }
+    else if (charId === 'kdash') { runSpeed = 4.5; runAmp = 7.8; bodyLean = -0.25; headDrop = -1.4; armPump = 0.42; }
+    else if (charId === 'kula') { runSpeed = 5; runAmp = 7.2; bodyLean = -0.12; headDrop = -0.6; armPump = 0.38; }
+    const runCycle = Math.sin(globalTick / runSpeed) * runAmp;
     p.legFront.oy += runCycle;
     p.legBack.oy -= runCycle;
-    p.armFront.rot -= 0.3;
-    p.armBack.rot += 0.3;
+    p.body.oy += bodyLean * 8 + Math.sin(globalTick / runSpeed * 2) * 0.8;
+    p.body.rot += bodyLean * 0.35;
+    p.head.oy += headDrop + Math.sin(globalTick / runSpeed) * 0.8;
+    p.armFront.rot -= armPump;
+    p.armBack.rot += armPump;
+    p.armFront.oy -= runCycle * 0.06;
+    p.armBack.oy += runCycle * 0.06;
+    if (charId === 'iori') {
+      // Iori's run should feel like a low glide rather than a normal sprint.
+      p.armFront.rot += 0.1;
+      p.armBack.rot -= 0.18;
+      p.body.oy += 1.5;
+      p.head.rot -= 0.08;
+    } else if (charId === 'kyo') {
+      // Kyo is the most explosive here: chest up, shoulders alive, legs punching the floor.
+      p.body.oy -= 1.5;
+      p.head.rot += 0.08;
+      p.armFront.oy -= 1;
+      p.armBack.oy += 0.5;
+    } else if (charId === 'ryo') {
+      // Ryo keeps the dash compact so the silhouette reads as disciplined karate power.
+      p.body.oy -= 0.8;
+      p.armFront.rot -= 0.08;
+      p.armBack.rot += 0.08;
+      p.head.oy -= 0.5;
+    }
+  }
+
+  // Taunt pose — character-specific gestures
+  if (f.state === FighterState.TAUNT) {
+    const progress = 1 - (f.tauntTimer / Fighter.TAUNT_DURATION);
+    const charId = f.charId ?? '';
+    // Phase 1 (0-0.4): windup, Phase 2 (0.4-0.7): gesture peak, Phase 3 (0.7-1.0): recovery
+    if (progress < 0.4) {
+      const t = progress / 0.4;
+      p.armFront.rot -= t * 1.2;
+      p.armFront.oy -= t * 8;
+      p.head.oy -= t * 3;
+    } else if (progress < 0.7) {
+      const t = (progress - 0.4) / 0.3;
+      p.armFront.rot = -1.2 + Math.sin(t * Math.PI) * 0.3;
+      p.armFront.oy = -8 + Math.sin(t * Math.PI * 2) * 3;
+      p.head.oy = -3;
+      // Character-specific taunt variations
+      if (charId === 'iori') {
+        p.armBack.rot += 0.8; // Iori: one hand forward, other behind
+        p.head.rot = 0.15; // slight head tilt
+      } else if (charId === 'kyo') {
+        p.armFront.rot = -1.5; // Kyo: arm up, confident
+        p.armBack.rot = -0.3;
+      } else if (charId === 'terry') {
+        p.armFront.rot = -0.8; // Terry: casual wave
+        p.head.rot = -0.1;
+      } else if (charId === 'kim') {
+        p.armFront.rot = -2.0; // Kim: sharp salute
+        p.body.oy -= 2;
+      }
+    } else {
+      const t = (progress - 0.7) / 0.3;
+      p.armFront.rot = -1.2 * (1 - t);
+      p.armFront.oy = -8 * (1 - t);
+      p.head.oy = -3 * (1 - t);
+    }
   }
 
   // Height factor for crouch/roll — KOF2002: 蹲下时宽度略增, 压缩感更自然
@@ -120,6 +251,113 @@ export function drawSkeletalFighter(
   const isRolling = f.state === FighterState.ROLL || f.state === FighterState.BACK_ROLL;
   const heightFactor = (isCrouching || isRolling) ? 0.6 : 1.0;
   const widthFactor = (isCrouching || isRolling) ? 1.12 : 1.0;
+
+  // KOF2002: Character-specific hitstun reactions — heavier characters resist more, lighter fly further
+  if (f.state === FighterState.HITSTUN) {
+    const charId = f.charId ?? '';
+    const stunProgress = Math.min(1, (f.hitstunTimer || 0) / 20);
+    const recoil = stunProgress * stunProgress;
+    // Weight factor: heavy characters lean less, light characters arc back more
+    let leanFactor = 1.0;
+    if (charId === 'ryo' || charId === 'ralf' || charId === 'chang' || charId === 'yashiro') leanFactor = 0.6;
+    else if (charId === 'terry' || charId === 'clark' || charId === 'billy') leanFactor = 0.75;
+    else if (charId === 'kyo' || charId === 'kim' || charId === 'andy' || charId === 'robert') leanFactor = 0.9;
+    else if (charId === 'iori' || charId === 'kdash' || charId === 'joe' || charId === 'yamazaki') leanFactor = 1.0;
+    else if (charId === 'leona' || charId === 'mai' || charId === 'mary' || charId === 'mature' || charId === 'shermie' || charId === 'vice') leanFactor = 1.1;
+    else if (charId === 'kula' || charId === 'athena' || charId === 'chris' || charId === 'kasumi' || charId === 'xiangfei' || charId === 'choi') leanFactor = 1.3;
+    p.body.rot += 0.26 * stunProgress * leanFactor;
+    p.body.oy += 1.6 * recoil * leanFactor;
+    p.head.rot += 0.18 * stunProgress * leanFactor;
+    p.head.oy -= 1.4 * recoil;
+    p.armFront.rot += 0.32 * stunProgress;
+    p.armBack.rot -= 0.2 * stunProgress;
+    p.armFront.oy -= 1.2 * recoil;
+    p.armBack.oy += 0.8 * recoil;
+    p.legFront.oy += 3 * stunProgress * leanFactor;
+    p.legBack.oy -= 1.2 * recoil * leanFactor;
+    if (charId === 'kyo') {
+      // Kyo snaps upward a little before folding back, which keeps him feeling sharp.
+      p.body.rot += 0.08 * stunProgress;
+      p.head.rot += 0.05 * stunProgress;
+      p.armFront.rot -= 0.1 * stunProgress;
+    } else if (charId === 'ryo') {
+      // Ryo should look like he absorbs impact through the core instead of flailing.
+      p.body.oy += 0.8 * recoil;
+      p.armFront.rot += 0.08 * stunProgress;
+      p.armBack.rot -= 0.08 * stunProgress;
+      p.head.oy -= 0.4 * recoil;
+    } else if (charId === 'iori') {
+      // Iori reads better with a twisted collapse, not a straight recoil.
+      p.body.rot -= 0.12 * stunProgress;
+      p.head.rot += 0.25 * stunProgress;
+      p.armFront.rot += 0.5 * stunProgress;
+      p.armBack.rot -= 0.45 * stunProgress;
+      p.body.oy += 0.6 * recoil;
+    }
+  }
+  // KOF2002: Knockdown tumble — character tumbles with rotation
+  if (f.state === FighterState.KNOCKDOWN) {
+    const charId = f.charId ?? '';
+    const vy = f.vy || 0;
+    const fall = Math.min(1, Math.abs(vy) / 18);
+    const tumbleSpeed = charId === 'kula' || charId === 'choi' || charId === 'chris' ? 0.15
+      : charId === 'ryo' || charId === 'ralf' || charId === 'chang' ? 0.06 : 0.1;
+    const tumble = tumbleSpeed * vy;
+    p.body.rot += tumble;
+    p.body.oy += 2 * fall;
+    p.head.rot += tumble * 0.45;
+    p.head.oy -= 1.4 * fall;
+    p.armFront.rot += tumble * 0.35;
+    p.armBack.rot -= tumble * 0.35;
+    p.legFront.rot -= tumble * 0.2;
+    p.legBack.rot += tumble * 0.2;
+    if (charId === 'kyo') {
+      // Kyo should topple with a broader, more readable silhouette.
+      p.armFront.oy -= 1.2 * fall;
+      p.armBack.oy += 0.8 * fall;
+      p.body.rot += 0.06 * vy;
+    } else if (charId === 'ryo') {
+      // Ryo falls more like a stiff block than a loose ragdoll.
+      p.body.rot += tumble * 0.7;
+      p.head.rot += tumble * 0.2;
+      p.armFront.rot += tumble * 0.1;
+      p.armBack.rot -= tumble * 0.1;
+    } else if (charId === 'iori') {
+      // Iori's collapse is tighter and uglier, with the limbs folding in.
+      p.body.rot -= tumble * 0.25;
+      p.head.rot += tumble * 0.6;
+      p.armFront.rot += tumble * 0.15 - 0.35 * fall;
+      p.armBack.rot -= tumble * 0.15 + 0.25 * fall;
+      p.body.oy += 0.6 * fall;
+    }
+  }
+  // KOF2002: Block stance — arms raised in guard position, slight recoil from impact
+  if (f.state === FighterState.BLOCK) {
+    const impact = Math.min(1, (f.blockstunTimer || 0) / 10);
+    p.armFront.rot -= 0.8 + impact * 0.4;
+    p.armBack.rot -= 0.6 + impact * 0.3;
+    p.armFront.oy -= 5 + impact * 3;
+    p.armBack.oy -= 4 + impact * 2;
+    p.body.oy -= impact * 2;
+  }
+  // KOF2002: Guard Crush — exaggerated stagger, arms dropped
+  if (f.state === FighterState.GUARD_CRUSH) {
+    const crushProgress = 1 - Math.min(1, (f.hitstunTimer || 0) / 40);
+    p.armFront.rot += 1.0 * (1 - crushProgress);
+    p.armBack.rot += 0.8 * (1 - crushProgress);
+    p.armFront.oy += 8 * (1 - crushProgress);
+    p.armBack.oy += 6 * (1 - crushProgress);
+    p.body.rot += 0.15 * (1 - crushProgress);
+    p.head.rot += 0.2 * (1 - crushProgress);
+  }
+  // KOF2002: Counter Stance — focused pose, slight glow shimmer
+  if (f.state === FighterState.COUNTER_STANCE) {
+    const pulse = Math.sin(globalTick / 4) * 0.1;
+    p.armFront.rot -= 0.5 + pulse;
+    p.armBack.rot -= 0.3 - pulse;
+    p.body.oy -= 2;
+    p.legFront.oy += 2;
+  }
 
   // === Per-character body dimensions ===
   const headW = prop.headW, headH = prop.headH;
@@ -283,6 +521,35 @@ export function drawSkeletalFighter(
     const fistR = armW * 0.45;
     const fistY = armH * p.armFront.scale / 2 - 2;
     drawFistGlow(ctx, f.charId ?? '', fistR, fistY, globalTick);
+    ctx.restore();
+  }
+
+  // KOF2002: Motion trail on attacking limbs — arc trail behind arm/leg during attacks
+  if (!isFlashing && (f.state === FighterState.STAND_ATTACK || f.state === FighterState.CROUCH_ATTACK
+      || f.state === FighterState.AIR_ATTACK) && f.attackPhase === 'active') {
+    const charId = f.charId ?? '';
+    const charDef = ROSTER.find(c => c.id === charId);
+    const trailColor = charDef?.specialColor ?? '#ff6600';
+    // Front arm trail
+    const trailLen = 18;
+    ctx.save();
+    ctx.globalAlpha = 0.25;
+    ctx.strokeStyle = trailColor;
+    ctx.lineWidth = 3;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    const armTipX = frontArm.x + Math.cos(frontArm.rot) * armH * p.armFront.scale * 0.5;
+    const armTipY = (shoulderY + p.armFront.oy * heightFactor) + Math.sin(frontArm.rot) * armH * p.armFront.scale * 0.5;
+    ctx.moveTo(armTipX, armTipY);
+    ctx.lineTo(armTipX - Math.cos(frontArm.rot) * trailLen * f.facing, armTipY - Math.sin(frontArm.rot) * trailLen);
+    ctx.stroke();
+    // Second lighter trail
+    ctx.globalAlpha = 0.12;
+    ctx.lineWidth = 5;
+    ctx.beginPath();
+    ctx.moveTo(armTipX, armTipY);
+    ctx.lineTo(armTipX - Math.cos(frontArm.rot) * trailLen * 1.5 * f.facing, armTipY - Math.sin(frontArm.rot) * trailLen * 1.5);
+    ctx.stroke();
     ctx.restore();
   }
 

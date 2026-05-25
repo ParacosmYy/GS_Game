@@ -33,6 +33,7 @@ import {
   spawnMAXActivationFlash,
   spawnPerfectFlash,
   spawnProjectileExplosion,
+  spawnTauntSparks,
 } from './vfxPresets.js';
 import type { Particle } from './vfxPresets.js';
 
@@ -212,6 +213,10 @@ export class VFXSystem {
     spawnProjectileExplosion(this.particles, worldX, worldY, charColor, charGlow);
   }
 
+  spawnTauntSparks(worldX: number, worldY: number): void {
+    spawnTauntSparks(this.particles, worldX, worldY);
+  }
+
   update(): void {
     for (let i = this.particles.length - 1; i >= 0; i--) {
       const p = this.particles[i];
@@ -247,7 +252,7 @@ export class VFXSystem {
           ctx.beginPath();
           ctx.arc(sx, p.y, p.size * alpha, 0, Math.PI * 2);
           ctx.fill();
-          // KOF2002: 火花前3帧白色核心闪烁, 然后渐变辉光
+          // KOF2002: 火花只保留短促白核，避免层次过多
           if (p.life > p.maxLife - 3) {
             ctx.globalAlpha = alpha * 0.7;
             ctx.fillStyle = '#ffffff';
@@ -256,10 +261,10 @@ export class VFXSystem {
             ctx.fill();
           }
           if (p.size > 3) {
-            ctx.globalAlpha = alpha * 0.3;
+            ctx.globalAlpha = alpha * 0.18;
             ctx.fillStyle = p.color;
             ctx.beginPath();
-            ctx.arc(sx, p.y, p.size * alpha * 2, 0, Math.PI * 2);
+            ctx.arc(sx, p.y, p.size * alpha * 1.2, 0, Math.PI * 2);
             ctx.fill();
           }
           ctx.restore();
@@ -272,9 +277,9 @@ export class VFXSystem {
           ctx.rotate(p.rotation || 0);
           ctx.fillStyle = p.color;
           drawStar(ctx, 0, 0, p.size * alpha, 4);
-          // KOF2002: 外层辉光 — 用径向渐变替代shadowBlur, 减少draw call
-          ctx.globalAlpha = alpha * 0.25;
-          const starGlowR = p.size * alpha * 2.5;
+          // KOF2002: 星芒只留一层很轻的外晕
+          ctx.globalAlpha = alpha * 0.16;
+          const starGlowR = p.size * alpha * 1.9;
           const starGrad = ctx.createRadialGradient(0, 0, 0, 0, 0, starGlowR);
           starGrad.addColorStop(0, p.color);
           starGrad.addColorStop(1, 'rgba(0,0,0,0)');
@@ -306,27 +311,26 @@ export class VFXSystem {
         }
         case 'superburst': {
           ctx.save();
-          const scale = 1 + progress * 0.3;
-          // KOF2002: 白色核心前5帧纯白增强
+          const scale = 1 + progress * 0.22;
+          // KOF2002: 保留一个明确的核心爆发，减少外围重复层
           const sbEarly = p.life > p.maxLife - 5 && p.color === '#ffffff';
-          // KOF2002: Superburst多层渲染 — 白色核心+角色色中段+外围光晕
-          ctx.globalAlpha = sbEarly ? Math.min(1, alpha * 0.9) : alpha * 0.7;
+          ctx.globalAlpha = sbEarly ? Math.min(1, alpha * 0.9) : alpha * 0.62;
           const sbGrad = ctx.createRadialGradient(sx, p.y, 0, sx, p.y, p.size * scale);
           sbGrad.addColorStop(0, '#ffffff');
-          sbGrad.addColorStop(0.15, '#ffffffcc');
-          sbGrad.addColorStop(0.3, p.color);
-          sbGrad.addColorStop(0.7, p.color + '44');
+          sbGrad.addColorStop(0.18, '#ffffffcc');
+          sbGrad.addColorStop(0.38, p.color);
+          sbGrad.addColorStop(0.72, p.color + '22');
           sbGrad.addColorStop(1, 'rgba(0,0,0,0)');
           ctx.fillStyle = sbGrad;
           ctx.beginPath();
           ctx.arc(sx, p.y, p.size * scale, 0, Math.PI * 2);
           ctx.fill();
-          // 外围光晕环 — 脉冲扩展
+          // 外围只保留一条薄环，避免爆发太散
           if (alpha > 0.2) {
-            ctx.globalAlpha = alpha * 0.2;
+            ctx.globalAlpha = alpha * 0.12;
             const haloR = p.size * scale * 1.4;
             ctx.strokeStyle = p.color;
-            ctx.lineWidth = 3 + alpha * 4;
+            ctx.lineWidth = 2 + alpha * 1.5;
             ctx.beginPath();
             ctx.arc(sx, p.y, haloR, 0, Math.PI * 2);
             ctx.stroke();
@@ -336,10 +340,10 @@ export class VFXSystem {
         }
         case 'groundslam': {
           ctx.save();
-          const slamRadius = p.size * (1 + progress * 0.5);
-          // KOF2002: 初始白色闪光核心(前5帧)
+          const slamRadius = p.size * (1 + progress * 0.35);
+          // KOF2002: 只保留一次性核心闪光，不铺太多层
           if (p.life > p.maxLife - 5) {
-            ctx.globalAlpha = alpha * 0.8;
+            ctx.globalAlpha = alpha * 0.7;
             const coreGrad = ctx.createRadialGradient(sx, p.y, 0, sx, p.y, slamRadius * 0.5);
             coreGrad.addColorStop(0, '#ffffff');
             coreGrad.addColorStop(0.5, '#ffddaa');
@@ -349,37 +353,37 @@ export class VFXSystem {
             ctx.arc(sx, p.y, slamRadius * 0.4, 0, Math.PI * 2);
             ctx.fill();
           }
-          ctx.globalAlpha = alpha * 0.5;
+          ctx.globalAlpha = alpha * 0.42;
           const slamGrad = ctx.createRadialGradient(sx, p.y, 0, sx, p.y, slamRadius);
           slamGrad.addColorStop(0, '#ff4400');
           slamGrad.addColorStop(0.4, p.color);
           slamGrad.addColorStop(1, 'rgba(0,0,0,0)');
           ctx.fillStyle = slamGrad;
           ctx.fillRect(sx - p.size, p.y - p.size, p.size * 2, p.size * 2);
-          // 扩展冲击波环
-          ctx.globalAlpha = alpha * 0.4;
+          // 只保留一条清晰冲击波环
+          ctx.globalAlpha = alpha * 0.26;
           const waveR = slamRadius * (0.6 + progress * 0.8);
           ctx.strokeStyle = '#ff6633';
-          ctx.lineWidth = 3 + alpha * 4;
+          ctx.lineWidth = 2 + alpha * 2;
           ctx.beginPath();
           ctx.arc(sx, p.y, waveR, 0, Math.PI * 2);
           ctx.stroke();
-          // 暗色叠加 — KOF2002: ease-out衰减, 前半段强后半段快速消失
-          ctx.globalAlpha = alpha > 0.5 ? alpha * 0.3 : alpha * alpha * 0.3;
+          // 暗色叠加压到更轻，防止画面发脏
+          ctx.globalAlpha = alpha > 0.5 ? alpha * 0.18 : alpha * alpha * 0.18;
           ctx.fillStyle = '#000';
-          ctx.fillRect(sx - p.size * 1.5, p.y - p.size * 1.5, p.size * 3, p.size * 3);
+          ctx.fillRect(sx - p.size * 1.2, p.y - p.size * 1.2, p.size * 2.4, p.size * 2.4);
           ctx.restore();
           break;
         }
         case 'ring': {
           ctx.save();
-          // KOF2002: 冲击环扩展速度差分 — 大环慢扩小环快扩, 层次感更强
-          const ringExpandSpeed = p.size > 10 ? 3 : p.size > 6 ? 5 : 7;
+          // KOF2002: 冲击环改成更直接的单层扩散
+          const ringExpandSpeed = p.size > 10 ? 2.4 : p.size > 6 ? 4.2 : 5.5;
           const ringRadius = p.size + (p.maxLife - p.life) * ringExpandSpeed;
-          // KOF2002: 冲击环初始白色核心闪光(前3帧), 之后渐变为环色
+          // 只保留很短的白核，随后迅速回到角色色
           const isEarly = p.life > p.maxLife - 3;
           if (isEarly) {
-            ctx.globalAlpha = alpha * 0.5;
+            ctx.globalAlpha = alpha * 0.36;
             const coreGrad = ctx.createRadialGradient(sx, p.y, 0, sx, p.y, ringRadius * 0.6);
             coreGrad.addColorStop(0, '#ffffff');
             coreGrad.addColorStop(1, 'rgba(255,255,255,0)');
@@ -388,20 +392,10 @@ export class VFXSystem {
             ctx.arc(sx, p.y, ringRadius * 0.6, 0, Math.PI * 2);
             ctx.fill();
           }
-          // 外发光层
-          ctx.globalAlpha = alpha * 0.25;
-          ctx.shadowColor = p.color;
-          ctx.shadowBlur = 10;
-          ctx.strokeStyle = p.color;
-          ctx.lineWidth = 4 + alpha * 3;
-          ctx.beginPath();
-          ctx.arc(sx, p.y, ringRadius, 0, Math.PI * 2);
-          ctx.stroke();
-          ctx.shadowBlur = 0;
-          // 主环 — 大环更粗
-          ctx.globalAlpha = alpha * 0.7;
+          // 只留一条主环，去掉 shadowBlur 造成的泛滥感
+          ctx.globalAlpha = alpha * 0.62;
           ctx.strokeStyle = isEarly ? '#ffffff' : p.color;
-          ctx.lineWidth = 2 + alpha * 2 + (ringRadius > 50 ? 2 : 0);
+          ctx.lineWidth = 2 + alpha * 1.3 + (ringRadius > 50 ? 1 : 0);
           ctx.beginPath();
           ctx.arc(sx, p.y, ringRadius, 0, Math.PI * 2);
           ctx.stroke();
@@ -410,23 +404,18 @@ export class VFXSystem {
         }
         case 'slash': {
           ctx.save();
-          ctx.globalAlpha = alpha * 0.8;
+          ctx.globalAlpha = alpha * 0.76;
           ctx.translate(sx, p.y);
           ctx.rotate(p.rotation || 0);
-          const slashLen = p.size * (0.5 + alpha * 0.5);
-          // KOF2002: 斩击线宽度脉冲 — 初始宽后快速变窄
-          const slashW = (2 + alpha * 3) * (0.5 + alpha * 0.5);
-          // 白色核心线
+          const slashLen = p.size * (0.45 + alpha * 0.4);
+          // 斩击线收成两层：白核 + 角色色主体
+          const slashW = (2 + alpha * 2.2) * (0.55 + alpha * 0.35);
           ctx.fillStyle = '#ffffff';
-          ctx.globalAlpha = alpha * 0.9;
+          ctx.globalAlpha = alpha * 0.88;
           ctx.fillRect(-slashLen, -slashW * 0.3, slashLen * 2, slashW * 0.6);
-          // 角色色主体
-          ctx.globalAlpha = alpha * 0.8;
+          ctx.globalAlpha = alpha * 0.72;
           ctx.fillStyle = p.color;
           ctx.fillRect(-slashLen, -slashW / 2, slashLen * 2, slashW);
-          // 外发光 — 缩窄聚焦
-          ctx.globalAlpha = alpha * 0.25;
-          ctx.fillRect(-slashLen * 1.1, -slashW * 0.8, slashLen * 2.2, slashW * 3);
           ctx.restore();
           break;
         }

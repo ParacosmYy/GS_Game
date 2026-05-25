@@ -4,9 +4,33 @@ import type { CharacterDefinition } from '../characters/types.js';
 import type { ResolvedInput, PrevAttack } from '../input/inputResolver.js';
 import { createPrevAttack } from '../input/inputResolver.js';
 import { FighterState, AttackType } from '../core/types.js';
+import { SeededRNG } from '../core/prng.js';
 import type { PowerGauge, MaxModeState } from '../core/types.js';
 import { COMBO_ROUTES, JUMP_IN_ROUTE, applyComboStep, routeComboSpecial } from './aiRoutes.js';
 import type { ComboStep } from './aiRoutes.js';
+
+const AI_RNG_OFFSET = 0x811C9DC5;
+
+function mixHash(hash: number, value: number): number {
+  hash ^= value >>> 0;
+  return Math.imul(hash, 0x01000193) >>> 0;
+}
+
+function mixString(hash: number, value: string): number {
+  let next = hash;
+  for (let i = 0; i < value.length; i++) {
+    next = mixHash(next, value.charCodeAt(i));
+  }
+  return next;
+}
+
+function mixBool(hash: number, value: boolean): number {
+  return mixHash(hash, value ? 1 : 0);
+}
+
+function mixFloat(hash: number, value: number, scale: number = 1000): number {
+  return mixHash(hash, Math.round(value * scale));
+}
 
 // ─── AI action types (expanded) ───
 type AIAction = 'idle' | 'approach' | 'retreat' | 'attack' | 'block'
@@ -54,6 +78,7 @@ export class SimpleAI {
   getInput(): ResolvedInput {
     const f = this.fighter;
     const opp = this.opponent;
+    const rng = this.createDecisionRng(1);
     this.thinkCooldown--;
     this.actionFrames--;
     if (this.comboDelay > 0) this.comboDelay--;
@@ -71,10 +96,11 @@ export class SimpleAI {
     const canAct = f.canAct();
     const isClose = dist < 80;
     // KOF2002: Whiff punish — 对手攻击recovery且未命中时, AI迅速反击
-    const oppWhiffing = oppAttacking && !opp.hasHit && (opp as any).attackPhase === 'recovery';
+    const oppAttackPhase = (opp as Fighter & { attackPhase?: string }).attackPhase;
+    const oppWhiffing = oppAttacking && !opp.hasHit && oppAttackPhase === 'recovery';
 
     // ── Throw escape: highest priority, before anything else ──
-    if (f.isBeingThrown && f.throwEscapeTimer > 0 && Math.random() < this.difficulty * 0.7) {
+    if (f.isBeingThrown && f.throwEscapeTimer > 0 && this.chance(rng, this.difficulty * 0.7)) {
       const base = this.emptyInput();
       base.throwAttack = true;
       base.throwAttackPressed = true;
@@ -83,7 +109,7 @@ export class SimpleAI {
 
     // ── Wakeup reversal: 快起身时如果对手贴身, 用必杀技/DM反击
     if (f.state === FighterState.KNOCKDOWN && f.knockdownTimer <= 5 && dist < 100
-        && Math.random() < this.difficulty * 0.6) {
+        && this.chance(rng, this.difficulty * 0.6)) {
       const base = this.emptyInput();
       if (this.gauge && this.gauge.stocks >= 1) {
         base.forward = true; base.down = true;
@@ -96,7 +122,7 @@ export class SimpleAI {
     // ── MAX activation during combo (BC cancel) ──
     if (this.inCombo && f.hasHit && canAct && this.gauge && this.gauge.stocks >= 2
       && !f.currentAttack?.toString().startsWith('DM_')
-      && Math.random() < this.difficulty * 0.5) {
+      && this.chance(rng, this.difficulty * 0.5)) {
       const base = this.emptyInput();
       base.buttonB = true; base.buttonC = true;
       base.buttonBPressed = true; base.buttonCPressed = true;
@@ -105,7 +131,7 @@ export class SimpleAI {
     }
     // ── MAX activation: close range with meter ──
     if (canAct && this.gauge && this.gauge.stocks >= 1 && dist < 100
-      && Math.random() < this.difficulty * 0.05) {
+      && this.chance(rng, this.difficulty * 0.05)) {
       const base = this.emptyInput();
       base.buttonB = true; base.buttonC = true;
       base.buttonBPressed = true; base.buttonCPressed = true;
@@ -116,7 +142,7 @@ export class SimpleAI {
       const lowGauge = f.guardGauge < 30;
       const sustainedBlock = f.blockstunTimer > 8;
       const gcProb = lowGauge ? this.difficulty * 0.5 : sustainedBlock ? this.difficulty * 0.25 : 0;
-      if (Math.random() < gcProb) {
+      if (this.chance(rng, gcProb)) {
         this.action = 'guardCancel';
         this.actionFrames = 6;
       }
@@ -124,7 +150,7 @@ export class SimpleAI {
 
     // ── Oki detection: opponent knocked down and close ──
     if (canAct && opp.state === FighterState.KNOCKDOWN && dist < 120
-      && this.action !== 'okizeme' && Math.random() < this.difficulty * 0.6) {
+      && this.action !== 'okizeme' && this.chance(rng, this.difficulty * 0.6)) {
       this.action = 'okizeme';
       this.actionFrames = 30;
       this.okiTimer = 0;
@@ -136,7 +162,7 @@ export class SimpleAI {
       this.thinkCooldown = reactionDelay;
       // Don't override if in active combo
       if (!this.inCombo && this.jumpInPhase === 0) {
-        this.action = this.decide(dist, oppAttacking, oppAirborne, isClose);
+        this.action = this.decide(dist, oppAttacking, oppAirborne, isClose, rng);
         this.actionFrames = reactionDelay;
         this.comboStep = 0;
         this.inCombo = false;
@@ -144,7 +170,7 @@ export class SimpleAI {
     }
 
     // ── Generate input based on action ──
-    const input = this.generateInput(this.action, dist, facingOpp, canAct, oppAttacking);
+    const input = this.generateInput(this.action, dist, facingOpp, canAct, oppAttacking, rng);
 
     // Track button edges
     this.prevA = input.buttonA;
@@ -167,7 +193,13 @@ export class SimpleAI {
     this.prev = createPrevAttack();
   }
 
-  private decide(dist: number, oppAttacking: boolean, oppAirborne: boolean, isClose: boolean): AIAction {
+  private decide(
+    dist: number,
+    oppAttacking: boolean,
+    oppAirborne: boolean,
+    isClose: boolean,
+    rng: SeededRNG,
+  ): AIAction {
     const lowHp = this.fighter.health < this.fighter.maxHealth * 0.25;
     // KOF2002: 对手低血量时AI更倾向使用DM终结连段
     const oppLowHp = this.opponent.health < this.opponent.maxHealth * 0.25;
@@ -178,26 +210,26 @@ export class SimpleAI {
     const oppWhiffed = oppWhiff && !this.opponent.hasHit;
 
     // Anti-air: highest priority
-    if (oppAirborne && dist < 150 && Math.random() < this.difficulty * 0.8) {
+    if (oppAirborne && dist < 150 && this.chance(rng, this.difficulty * 0.8)) {
       return 'antiair';
     }
     // Whiff punish: opponent attacked but missed → rush in
-    if (oppWhiffed && dist < 180 && Math.random() < this.difficulty * 0.7) {
+    if (oppWhiffed && dist < 180 && this.chance(rng, this.difficulty * 0.7)) {
       return dist < 90 ? 'attack' : 'approach';
     }
 
     // Counter stance: opponent attacking at mid range
     if (oppAttacking && dist < 120 && dist > 50 && this.character.getCounterConfig
-      && Math.random() < this.difficulty * 0.25) {
+      && this.chance(rng, this.difficulty * 0.25)) {
       return 'counterStance';
     }
-    if (oppAttacking && dist < 120 && Math.random() < this.difficulty * (lowHp ? 0.95 : 0.9)) {
+    if (oppAttacking && dist < 120 && this.chance(rng, this.difficulty * (lowHp ? 0.95 : 0.9))) {
       return 'block';
     }
 
     // Close range: attack combo or throw
     if (isClose) {
-      const r = Math.random();
+      const r = rng.next();
       if (lowHp) {
         if (r < 0.25) return 'retreat';
         if (r < 0.50) return 'block';
@@ -229,7 +261,7 @@ export class SimpleAI {
     // Mid range: poke, jump-in, or approach
     if (dist < 180) {
       const maxBonus = this.maxMode?.active ? 0.15 : 0;
-      const r = Math.random();
+      const r = rng.next();
       // KOF2002: 对手低血量时更多special(DM)尝试
       if (oppLowHp && hasMeter) {
         if (r < 0.30 + maxBonus) return 'approach';
@@ -245,7 +277,7 @@ export class SimpleAI {
     }
 
     // Far range: approach, jump-in, or projectile
-    const r = Math.random();
+    const r = rng.next();
     if (r < 0.40) return 'approach';
     if (r < 0.60) return 'jumpIn';
     if (r < 0.80) return 'special';
@@ -263,6 +295,7 @@ export class SimpleAI {
       punchPressed: false, kickPressed: false,
       rollPressed: false, blowbackPressed: false,
       punchJustReleased: false, kickJustReleased: false,
+      startPressed: false,
     };
   }
 
@@ -272,6 +305,7 @@ export class SimpleAI {
     facingOpp: boolean,
     canAct: boolean,
     oppAttacking: boolean,
+    rng: SeededRNG,
   ): ResolvedInput {
     const f = this.fighter;
     const base = this.emptyInput();
@@ -283,7 +317,7 @@ export class SimpleAI {
         base.forward = true;
         if (dist > 150) base.forward = true;
         // Occasionally jump in from approach
-        if (dist > 120 && Math.random() < 0.04 * this.difficulty) {
+        if (dist > 120 && this.chance(rng, 0.04 * this.difficulty)) {
           base.up = true;
           base.forward = true;
         }
@@ -291,7 +325,7 @@ export class SimpleAI {
 
       case 'retreat':
         base.back = true;
-        if (Math.random() < 0.08) base.up = true;
+        if (this.chance(rng, 0.08)) base.up = true;
         break;
 
       case 'jumpIn': {
@@ -330,7 +364,7 @@ export class SimpleAI {
         // If in an active combo, continue the route
         if (this.inCombo && this.comboStep < route.length && this.comboDelay <= 0) {
           // KOF2002: low difficulty AI drops combos sometimes (difficulty < 0.7: 30% drop rate per step)
-          const dropCombo = this.difficulty < 0.7 && Math.random() > this.difficulty;
+          const dropCombo = this.difficulty < 0.7 && this.chance(rng, 1 - this.difficulty);
           if (dropCombo) {
             this.inCombo = false;
             this.comboStep = 0;
@@ -376,18 +410,18 @@ export class SimpleAI {
           // Air attack → stand block
         } else {
           // Random mix: 60/40 stand/crouch
-          if (Math.random() < 0.4) base.down = true;
+          if (this.chance(rng, 0.4)) base.down = true;
         }
         // GC Roll when guard gauge is getting low
         if (f.guardGauge < 40 && this.gauge && this.gauge.stocks >= 1
-          && Math.random() < 0.06 * this.difficulty) {
+          && this.chance(rng, 0.06 * this.difficulty)) {
           base.buttonA = true;
           base.buttonB = true;
           base.rollPressed = true;
         }
         // GC CD (blowback) when guard gauge critical and has meter
         if (f.guardGauge < 25 && this.gauge && this.gauge.stocks >= 1
-          && Math.random() < 0.04 * this.difficulty) {
+          && this.chance(rng, 0.04 * this.difficulty)) {
           base.buttonC = true;
           base.buttonD = true;
           base.blowbackPressed = true;
@@ -397,7 +431,7 @@ export class SimpleAI {
       case 'guardCancel':
         // GC Roll (A+B) or GC CD (C+D)
         if (this.gauge && this.gauge.stocks >= 1) {
-          if (Math.random() < 0.65) {
+          if (this.chance(rng, 0.65)) {
             // GC Roll
             base.buttonA = true;
             base.buttonB = true;
@@ -439,7 +473,7 @@ export class SimpleAI {
           base.buttonCPressed = true;
           base.punchPressed = true;
           // Also hold forward for DP motion sometimes
-          if (Math.random() < 0.5) base.forward = true;
+          if (this.chance(rng, 0.5)) base.forward = true;
         } else if (f.state === FighterState.BLOCK || f.state === FighterState.HITSTUN) {
           // Can't anti-air → block
           base.back = true;
@@ -460,7 +494,7 @@ export class SimpleAI {
       case 'special':
         if (canAct) {
           if (this.inCombo && f.hasHit && this.gauge && this.gauge.stocks >= 1
-            && Math.random() < this.difficulty * 0.6) {
+            && this.chance(rng, this.difficulty * 0.6)) {
             const route = this.getCurrentRoute();
             const dmStep = route.find(s => s.attack.toLowerCase().includes('dm'));
             if (dmStep) {
@@ -469,7 +503,7 @@ export class SimpleAI {
               break;
             }
           }
-          if (Math.random() < 0.3) {
+          if (this.chance(rng, 0.3)) {
             base.buttonC = true;
             base.buttonCPressed = true;
             base.punchPressed = true;
@@ -484,8 +518,15 @@ export class SimpleAI {
       case 'okizeme':
         this.okiTimer++;
         if (dist > 50) base.forward = true;
+        // KOF2002: AI偶尔嘲讽 (对手倒地且距离较远时)
+        if (this.okiTimer === 10 && canAct && dist > 120 && this.chance(rng, 0.12 * this.difficulty)) {
+          base.startPressed = true;
+          this.okiTimer = 99;
+          this.action = 'idle';
+          break;
+        }
         if (this.okiTimer > 20 && this.okiTimer < 45 && canAct) {
-          if (Math.random() < 0.6) {
+          if (this.chance(rng, 0.6)) {
             base.buttonC = true; base.buttonCPressed = true; base.punchPressed = true;
           } else {
             base.down = true; base.buttonD = true; base.buttonDPressed = true; base.kickPressed = true;
@@ -521,13 +562,14 @@ export class SimpleAI {
   triggerSpecial(): AttackType | null {
     if (!this.fighter.canAct()) return null;
 
+    const rng = this.createDecisionRng(2);
     const input = this.getInput();
     const tick = 0; // tick doesn't matter for AI direct trigger
 
     // Check DM first — higher probability when opponent is low HP (KOF2002: DM finisher)
     const oppLowHp = this.opponent.health < this.opponent.maxHealth * 0.25;
     const dmProb = oppLowHp && this.gauge && this.gauge.stocks >= 1 ? 0.15 : 0.05;
-    if (Math.random() < dmProb) {
+    if (this.chance(rng, dmProb)) {
       const dmMap: Record<string, AttackType> = {
         kyo: AttackType.DM_OROCHINAGI,
         iori: AttackType.DM_YATAGARASU,
@@ -574,7 +616,7 @@ export class SimpleAI {
     const result = this.character.routeSpecial(input, {
       checkSpecial: () => {
         // 50% chance of fireball, 50% upper
-        return Math.random() < 0.5 ? AttackType.SPECIAL_PROJECTILE : AttackType.SPECIAL_UPPER;
+        return this.chance(rng, 0.5) ? AttackType.SPECIAL_PROJECTILE : AttackType.SPECIAL_UPPER;
       },
       checkDMMotion: () => null,
       checkKickSpecial: () => {
@@ -584,17 +626,71 @@ export class SimpleAI {
           AttackType.TERRY_CRACK_SHOT,
           AttackType.KIM_HIENZAN,
         ];
-        return kickSpecials[Math.floor(Math.random() * kickSpecials.length)];
+        return kickSpecials[this.pickIndex(rng, kickSpecials.length)];
       },
-      hasQCF: () => Math.random() < 0.7,
-      hasQCB: () => Math.random() < 0.7,
+      hasQCF: () => this.chance(rng, 0.7),
+      hasQCB: () => this.chance(rng, 0.7),
       checkRekkaFollowQCF: () => null,
       checkRekkaFollowHCB: () => null,
       checkDokugamiFollow: () => null,
       checkBatsuyomiInput: () => false,
-    } as any, tick);
+    } as unknown as Parameters<CharacterDefinition['routeSpecial']>[1], tick);
 
     return result;
+  }
+
+  private createDecisionRng(tag: number): SeededRNG {
+    return new SeededRNG(this.buildDecisionSeed(tag));
+  }
+
+  private buildDecisionSeed(tag: number): number {
+    let hash = AI_RNG_OFFSET;
+    hash = mixString(hash, this.fighter.charId);
+    hash = mixString(hash, this.opponent.charId);
+    hash = mixString(hash, this.action);
+    hash = mixHash(hash, tag);
+    hash = mixHash(hash, this.thinkCooldown);
+    hash = mixHash(hash, this.actionFrames);
+    hash = mixHash(hash, this.comboStep);
+    hash = mixHash(hash, this.comboDelay);
+    hash = mixHash(hash, this.jumpInPhase);
+    hash = mixHash(hash, this.okiTimer);
+    hash = mixBool(hash, this.inCombo);
+    hash = mixFloat(hash, this.difficulty, 1000);
+    hash = mixFloat(hash, this.fighter.x);
+    hash = mixFloat(hash, this.fighter.y);
+    hash = mixFloat(hash, this.fighter.health);
+    hash = mixFloat(hash, this.fighter.guardGauge);
+    hash = mixString(hash, String(this.fighter.state));
+    hash = mixHash(hash, this.fighter.facing);
+    hash = mixBool(hash, this.fighter.hasHit);
+    hash = mixBool(hash, this.fighter.isBeingThrown);
+    hash = mixFloat(hash, this.opponent.x);
+    hash = mixFloat(hash, this.opponent.y);
+    hash = mixFloat(hash, this.opponent.health);
+    hash = mixFloat(hash, this.opponent.guardGauge);
+    hash = mixString(hash, String(this.opponent.state));
+    hash = mixHash(hash, this.opponent.facing);
+    hash = mixBool(hash, this.opponent.hasHit);
+    hash = mixBool(hash, this.opponent.isBeingThrown);
+    hash = mixBool(hash, this.gauge !== null);
+    hash = mixHash(hash, this.gauge?.stocks ?? 0);
+    hash = mixHash(hash, this.gauge?.meter ?? 0);
+    hash = mixBool(hash, this.maxMode?.active ?? false);
+    hash = mixHash(hash, this.maxMode?.timer ?? 0);
+    hash = mixHash(hash, this.maxMode?.maxDuration ?? 0);
+    return hash === 0 ? 1 : hash;
+  }
+
+  private chance(rng: SeededRNG, probability: number): boolean {
+    if (probability <= 0) return false;
+    if (probability >= 1) return true;
+    return rng.next() < probability;
+  }
+
+  private pickIndex(rng: SeededRNG, length: number): number {
+    if (length <= 1) return 0;
+    return Math.min(length - 1, Math.floor(rng.next() * length));
   }
 
 }

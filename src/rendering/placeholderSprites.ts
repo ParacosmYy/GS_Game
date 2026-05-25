@@ -44,8 +44,15 @@ export function generatePlaceholderSpritesheet(color: string, charId: string): {
   image: HTMLImageElement;
   animations: SpriteAnimationMap;
 } {
-  const v = CHAR_VISUALS[charId] ?? getDefaultVisual();
-  v.shirtColor = color;
+  const v = { ...(CHAR_VISUALS[charId] ?? getDefaultVisual()) };
+  if (charId === 'ryo') {
+    v.shirtColor = '#f4f1e8';
+    v.pantsColor = '#ddd6c5';
+    v.beltColor = '#111111';
+    v.shoeColor = '#3a2a1a';
+  } else {
+    v.shirtColor = color;
+  }
 
   // 使用角色专属待机/跑步/跳跃/受击/防御姿态
   const idlePoses = getIdlePoses(v.idleStyle);
@@ -85,7 +92,7 @@ export function generatePlaceholderSpritesheet(color: string, charId: string): {
       frame.height = PH;
       const fc = frame.getContext('2d')!;
       fc.imageSmoothingEnabled = false;
-      drawPixelChar(fc, { ...v }, pose.headOff, pose.bodyLean, pose.armL, pose.armR, pose.legL, pose.legR, pose.crouch);
+      drawPixelChar(fc, { ...v }, pose.headOff, pose.bodyLean, pose.armL, pose.armR, pose.legL, pose.legR, pose.crouch, charId);
       actx.drawImage(frame, f * PW, row * PH);
     });
   });

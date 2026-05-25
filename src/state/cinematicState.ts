@@ -55,6 +55,12 @@ export class CinematicState {
     this.hitStopBias = bias;
   }
 
+  /** Add frames to existing hit-stop (stack, not replace) */
+  addHitStop(frames: number, defenderIdx: number = -1): void {
+    this.hitStop += frames;
+    if (defenderIdx >= 0) this.hitStopDefender = defenderIdx;
+  }
+
   /** Trigger Super Flash (dark screen freeze) on DM startup */
   triggerSuperFlash(x: number, y: number, attacker: number): void {
     this.superFlashTimer = 24;

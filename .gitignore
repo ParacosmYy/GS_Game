@@ -1,3 +1,29 @@
 node_modules
 dist
 .sisyphus
+
+# Debug/development screenshots
+*.png
+!public/**/*.png
+!src/assets/**/*.png
+
+# IDE / tool directories
+.claude/
+.vscode/
+.idea/
+
+# OS files
+Thumbs.db
+.DS_Store
+desktop.ini
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+
+# Reference materials (not part of the game)
+references/

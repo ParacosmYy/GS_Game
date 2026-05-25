@@ -22,6 +22,7 @@ export enum FighterState {
   HITSTUN = 'HITSTUN',
   KNOCKDOWN = 'KNOCKDOWN',
   MAX_MODE = 'MAX_MODE',  // MAX模式激活动画 (短暂)
+  TAUNT = 'TAUNT',        // 嘲讽 (Start键，削减对手气槽)
 }
 
 // ===== Attack Types (KOF 4-button: A=轻拳 B=轻脚 C=重拳 D=重脚) =====
@@ -399,6 +400,7 @@ export interface PlayerInput {
   buttonC: boolean;  // 重拳
   buttonD: boolean;  // 重脚
   throwAttack: boolean;
+  start: boolean;    // Start键 — 嘲讽
 }
 
 // ===== Direction =====

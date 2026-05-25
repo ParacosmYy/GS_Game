@@ -119,6 +119,10 @@ export class Fighter {
   // Normal → Command Normal cancel: set true when a normal attack hits, allows cancel into command normal
   normalCancelReady = false;
 
+  // Taunt system — KOF2002: Start键嘲讽，削减对手气槽
+  tauntTimer = 0;
+  static readonly TAUNT_DURATION = 40; // KOF2002正版: 约40帧(0.67秒)
+
   // True when current attack was cancelled into from a previous normal (not raw).
   // Cancelled-into command normals LOSE special properties (overhead/low/KD) but CAN cancel into specials.
   cancelledIntoNormal = false;

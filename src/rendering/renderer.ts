@@ -6,11 +6,16 @@
  */
 import { Fighter } from '../entities/fighter.js';
 import { Projectile } from '../entities/projectile.js';
-import { CommandBuffer } from '../input/commandBuffer.js';
 import { Camera } from '../core/camera.js';
 import { FighterState } from '../core/types.js';
 import type { PowerGauge, MaxModeState } from '../core/types.js';
 import { CANVAS_WIDTH, CANVAS_HEIGHT, FRAME_DATA, STAGE_GROUND_Y } from '../core/constants.js';
+
+/** Debug overlay input — 每个玩家的输入历史 */
+export interface DebugInputHistory {
+  directionSymbols: string[];
+  directionAges: number[];
+}
 
 import { drawStage, generateStars, getStage } from './stage.js';
 import type { Star } from './stage.js';
@@ -18,7 +23,6 @@ import { drawFighters as drawFightersImpl } from './rendererFighter.js';
 import { drawHUD, drawPowerGauges, drawComboCounters, drawTeamOrder, type TeamDisplayInfo } from './hud.js';
 import { drawCharacterSelect, drawIntro, drawKO, drawWinQuote, drawVSSplash, WIN_QUOTE_DURATION } from './screens.js';
 import { drawSuperFlash, drawMatchEnd, drawModeIndicator, drawStageIndicator, drawTitle, drawContinue, drawModeSelect } from './overlayScreens.js';
-import { ROSTER } from '../characters/index.js';
 import { drawProjectiles as drawProjectilesImpl } from './projectileRenderer.js';
 import type { SpriteRenderer } from './spriteRenderer.js';
 import type { SelectState } from '../state/selectState.js';
@@ -42,7 +46,7 @@ export class Renderer {
     this.spriteRenderer = sr;
   }
 
-  render(fighters: Fighter[], cameraX: number, tick: number, ko: boolean, winner: number | null, shakeX: number, shakeY: number, delayedHealth: [number, number], maxModes?: [MaxModeState, MaxModeState], perfectPlayer: number | null = null, p1Wins: number = 0, p2Wins: number = 0, p1Name: string = '', p2Name: string = '', isTimeOver: boolean = false, currentRound: number = 1, firstAttacker: number | null = null, hitStopDefender: number = -1, hitStopBias: number = 0): void {
+  render(fighters: Fighter[], cameraX: number, tick: number, ko: boolean, winner: number | null, shakeX: number, shakeY: number, delayedHealth: [number, number], maxModes?: [MaxModeState, MaxModeState], perfectPlayer: number | null = null, p1Wins: number = 0, p2Wins: number = 0, p1Name: string = '', p2Name: string = '', isTimeOver: boolean = false, currentRound: number = 1, firstAttacker: number | null = null, hitStopDefender: number = -1, hitStopBias: number = 0, charSpecialColors?: [string, string]): void {
     this.frameCount++;
     this.globalTick = tick;
     const now = performance.now();
@@ -60,9 +64,9 @@ export class Renderer {
     drawStage(ctx, cameraX, this.stars, this.globalTick);
 
     // KOF2002: 角色光源 — 每个角色发出微弱的环境光
-    for (const f of fighters) {
-      const charDef = ROSTER.find(c => c.id === f.charId);
-      const glowCol = charDef?.specialColor || '#ff4400';
+    for (let fi = 0; fi < fighters.length; fi++) {
+      const f = fighters[fi];
+      const glowCol = charSpecialColors?.[fi] || '#ff4400';
       const fsx = f.x - cameraX;
       // 攻击时光源增强
       const isAttacking = f.attackPhase === 'active';
@@ -78,7 +82,7 @@ export class Renderer {
       ctx.globalAlpha = 1;
     }
 
-    drawFightersImpl(ctx, fighters, cameraX, this.globalTick, maxModes, hitStopDefender, hitStopBias);
+    drawFightersImpl(ctx, fighters, cameraX, this.globalTick, maxModes, hitStopDefender, hitStopBias, this.spriteRenderer);
     drawHUD(ctx, fighters, tick, delayedHealth, p1Wins, p2Wins, p1Name, p2Name, currentRound, firstAttacker);
 
     if (ko) {
@@ -204,7 +208,7 @@ export class Renderer {
     tick: number,
     fps: number,
     vfxCount: number,
-    cmdBufs: CommandBuffer[],
+    inputHistories: DebugInputHistory[],
   ): void {
     const ctx = this.ctx;
     ctx.save();
@@ -297,17 +301,15 @@ export class Renderer {
     ctx.fillRect(560, 0, 240, 110);
     ctx.globalAlpha = 1;
     ctx.font = '9px monospace';
-    const symbols: Record<string, string> = { 'neutral': '·', 'up': '↑', 'down': '↓', 'forward': '→', 'back': '←', 'upforward': '↗', 'upback': '↖', 'downforward': '↘', 'downback': '↙' };
     for (let i = 0; i < 2; i++) {
-      const buf = cmdBufs[i];
+      const hist = inputHistories[i];
       const py = 13 + i * 48;
       ctx.fillStyle = i === 0 ? '#ff5555' : '#5599ff';
       ctx.fillText(`P${i + 1} Buffer:`, 564, py);
-      const hist = buf.getRecentHistory(10);
       ctx.fillStyle = '#aaa';
-      ctx.fillText(' ' + hist.map(h => symbols[h.direction] || '?').join(' '), 564, py + 12);
+      ctx.fillText(' ' + hist.directionSymbols.join(' '), 564, py + 12);
       ctx.fillStyle = '#555';
-      ctx.fillText(' ages:' + hist.map(h => tick - h.frame).join(','), 564, py + 24);
+      ctx.fillText(' ages:' + hist.directionAges.join(','), 564, py + 24);
     }
     ctx.restore();
   }
@@ -337,9 +339,9 @@ export class Renderer {
     let label: string;
     if (simplifiedMode) {
       const names = Renderer.SPECIAL_NAMES[charId] ?? ['技能①', '技能②'];
-      label = `[J]轻拳  [K]轻脚  [U]${names[0]}  [I]${names[1]}  [O]爆气  [L]CD`;
+      label = `[J]轻拳  [K]轻脚  [U]${names[0]}  [I]${names[1]}  [O]爆气  [L]CD  [P]嘲讽`;
     } else {
-      label = '[J]轻拳  [K]轻脚  [U]重拳  [I]重脚  [L]CD  [;]投';
+      label = '[J]轻拳  [K]轻脚  [U]重拳  [I]重脚  [L]CD  [;]投  [P]嘲讽';
     }
     ctx.fillText(label, CANVAS_WIDTH / 2, 592);
     ctx.textAlign = 'left';

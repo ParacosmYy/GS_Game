@@ -45,35 +45,35 @@ export function spawnBlockFlash(particles: Particle[], worldX: number, worldY: n
 }
 
 /** 角色专属命中火花 — KOF风格, 更大更亮. starRatio: DM 0.7, 必杀 0.5, 重攻击 0.35, 轻攻击 0.25 */
-export function spawnCharacterHitSparks(particles: Particle[], worldX: number, worldY: number, count: number, charColor: string, sizeScale: number = 1.0, speedScale: number = 1.0, starRatio: number = 0.25, lowGravity: boolean = false): void {
+export function spawnCharacterHitSparks(particles: Particle[], worldX: number, worldY: number, count: number, charColor: string, sizeScale: number = 1.0, speedScale: number = 1.0, starRatio: number = 0.2, lowGravity: boolean = false): void {
   particles.push({
     x: worldX, y: worldY, vx: 0, vy: 0,
-    life: 8, maxLife: 8, size: 30 * sizeScale,
+    life: 6, maxLife: 6, size: 24 * sizeScale,
     color: charColor, type: sizeScale >= 1.5 ? 'superburst' : 'flash',
   });
-  // KOF2002: 白色核心闪光 — 命中瞬间额外白色小flash
+  // KOF2002: 白色核心闪光收窄，避免命中过亮
   particles.push({
     x: worldX, y: worldY, vx: 0, vy: 0,
-    life: 4, maxLife: 4, size: 15 * sizeScale,
+    life: 3, maxLife: 3, size: 11 * sizeScale,
     color: '#ffffff', type: 'flash',
   });
   const grav = lowGravity ? 0.04 : 0.12;
   // KOF2002: 火花方向偏置 — 向上扩散为主(前半球偏重), 更自然
   for (let i = 0; i < count; i++) {
     const angle = -Math.PI * 0.8 + Math.random() * Math.PI * 1.6;
-    const speed = (3 + Math.random() * 7) * sizeScale * speedScale;
+    const speed = (2.5 + Math.random() * 6) * sizeScale * speedScale;
     const isStar = Math.random() < starRatio;
     particles.push({
       x: worldX, y: worldY,
       vx: Math.cos(angle) * speed,
       vy: Math.sin(angle) * speed - 3 * sizeScale,
-      life: Math.floor((14 + Math.random() * 10) * sizeScale),
-      maxLife: Math.floor(24 * sizeScale),
-      size: (isStar ? 4 + Math.random() * 5 : 2 + Math.random() * 3) * sizeScale,
-      color: Math.random() > 0.35 ? charColor : '#ffffff',
+      life: Math.floor((12 + Math.random() * 8) * sizeScale),
+      maxLife: Math.floor(20 * sizeScale),
+      size: (isStar ? 3.5 + Math.random() * 4 : 2 + Math.random() * 2.5) * sizeScale,
+      color: Math.random() > 0.2 ? charColor : '#ffffff',
       type: isStar ? 'star' : 'spark',
       gravity: grav,
-      friction: sizeScale < 0.8 ? 0.95 : 0.93,
+      friction: sizeScale < 0.8 ? 0.95 : 0.94,
       rotation: Math.random() * Math.PI * 2,
       rotSpeed: (Math.random() - 0.5) * 0.4,
     });
@@ -161,12 +161,12 @@ export function spawnThrowEscapeSparks(particles: Particle[], worldX: number, wo
 export function spawnImpactRing(particles: Particle[], worldX: number, worldY: number, scale: number = 1.0): void {
   particles.push({
     x: worldX, y: worldY, vx: 0, vy: 0,
-    life: 14, maxLife: 14, size: 8 * scale,
+    life: 12, maxLife: 12, size: 6 * scale,
     color: '#ffffff', type: 'ring',
   });
   particles.push({
     x: worldX, y: worldY, vx: 0, vy: 0,
-    life: 10, maxLife: 10, size: 5 * scale,
+    life: 8, maxLife: 8, size: 4 * scale,
     color: '#ffcc44', type: 'ring',
   });
 }
@@ -175,13 +175,13 @@ export function spawnImpactRing(particles: Particle[], worldX: number, worldY: n
 export function spawnSlashLine(particles: Particle[], worldX: number, worldY: number, _facing: number, color: string, scale: number = 1.0): void {
   particles.push({
     x: worldX, y: worldY, vx: 0, vy: 0,
-    life: 8, maxLife: 8, size: (35 + Math.random() * 20) * scale,
+    life: 7, maxLife: 7, size: (30 + Math.random() * 16) * scale,
     color, type: 'slash',
     rotation: (Math.random() - 0.5) * 0.6,
   });
   particles.push({
     x: worldX, y: worldY, vx: 0, vy: 0,
-    life: 8, maxLife: 8, size: (25 + Math.random() * 15) * scale,
+    life: 7, maxLife: 7, size: (18 + Math.random() * 10) * scale,
     color: '#ffffff', type: 'slash',
     rotation: (Math.random() - 0.5) * 0.6 - 0.3,
   });
@@ -189,40 +189,40 @@ export function spawnSlashLine(particles: Particle[], worldX: number, worldY: nu
 
 /** DM/超必杀激活时的华丽爆发 */
 export function spawnSuperBurst(particles: Particle[], worldX: number, worldY: number, color: string, glow: string, isSDM: boolean = false): void {
-  const burstCount = isSDM ? 36 : 24;
-  const burstSize = isSDM ? 120 : 100;
+  const burstCount = isSDM ? 28 : 20;
+  const burstSize = isSDM ? 96 : 84;
   particles.push({
     x: worldX, y: worldY, vx: 0, vy: 0,
-    life: isSDM ? 25 : 20, maxLife: isSDM ? 25 : 20, size: isSDM ? 100 : 80,
+    life: isSDM ? 18 : 14, maxLife: isSDM ? 18 : 14, size: isSDM ? 72 : 58,
     color: '#ffffff', type: 'superburst',
   });
   particles.push({
     x: worldX, y: worldY, vx: 0, vy: 0,
-    life: isSDM ? 30 : 25, maxLife: isSDM ? 30 : 25, size: burstSize,
+    life: isSDM ? 24 : 20, maxLife: isSDM ? 24 : 20, size: burstSize,
     color, type: 'superburst',
   });
   for (let i = 0; i < burstCount; i++) {
     const angle = (i / burstCount) * Math.PI * 2 + Math.random() * 0.2;
-    const speed = 4 + Math.random() * (isSDM ? 10 : 8);
+    const speed = 3.5 + Math.random() * (isSDM ? 8 : 6.5);
     particles.push({
       x: worldX, y: worldY,
       vx: Math.cos(angle) * speed,
       vy: Math.sin(angle) * speed - 2,
-      life: 18 + Math.floor(Math.random() * (isSDM ? 16 : 12)),
-      maxLife: isSDM ? 35 : 30,
-      size: 3 + Math.random() * (isSDM ? 9 : 5),
-      color: i % 4 === 0 ? '#ffffff' : i % 2 === 0 ? glow : color,
+      life: 14 + Math.floor(Math.random() * (isSDM ? 12 : 10)),
+      maxLife: isSDM ? 28 : 24,
+      size: 2.5 + Math.random() * (isSDM ? 6 : 4),
+      color: i % 5 === 0 ? '#ffffff' : i % 3 === 0 ? glow : color,
       type: 'star', gravity: 0.12, friction: 0.94,
       rotation: angle, rotSpeed: (Math.random() - 0.5) * 0.5,
     });
   }
-  // KOF2002: 冲击波差分扩展 — 内环快外环慢, 层次感更强
-  const ringSpeeds = isSDM ? [7, 5, 3.5] : [6, 4];
+  // KOF2002: 冲击波差分扩展 — 内环快外环慢, 但整体收紧
+  const ringSpeeds = isSDM ? [6, 4.2, 3] : [5.2, 3.6];
   for (let r = 0; r < (isSDM ? 3 : 2); r++) {
     particles.push({
       x: worldX, y: worldY, vx: 0, vy: 0,
-      life: 15 + r * 5, maxLife: 15 + r * 5, size: 4 + r * 2,
-      color: r === 0 ? '#ffffff' : glow, type: 'ring',
+      life: 12 + r * 4, maxLife: 12 + r * 4, size: 3 + r * 1.5,
+      color: r === 0 ? '#ffffff' : r === 1 ? glow : color, type: 'ring',
     });
   }
 }
@@ -231,35 +231,35 @@ export function spawnSuperBurst(particles: Particle[], worldX: number, worldY: n
 export function spawnGroundSlam(particles: Particle[], worldX: number, worldY: number): void {
   particles.push({
     x: worldX, y: worldY, vx: 0, vy: 0,
-    life: 30, maxLife: 30, size: 120,
+    life: 24, maxLife: 24, size: 104,
     color: '#ff2200', type: 'groundslam',
   });
-  for (let i = 0; i < 28; i++) {
+  for (let i = 0; i < 20; i++) {
     const angle = -Math.PI + Math.random() * Math.PI;
-    const speed = 2 + Math.random() * 5;
+    const speed = 1.8 + Math.random() * 4.2;
     particles.push({
       x: worldX + (Math.random() - 0.5) * 40,
       y: worldY - 5,
       vx: Math.cos(angle) * speed,
-      vy: -Math.random() * 4 - 1,
-      life: 20 + Math.floor(Math.random() * 15),
-      maxLife: 35,
-      size: 5 + Math.random() * 8,
-      color: '#aa8866', type: 'spark', gravity: 0.12, friction: 0.96,
+      vy: -Math.random() * 3.4 - 0.8,
+      life: 18 + Math.floor(Math.random() * 10),
+      maxLife: 30,
+      size: 4 + Math.random() * 6,
+      color: i % 2 === 0 ? '#9a7b5d' : '#bb9a73', type: 'spark', gravity: 0.12, friction: 0.96,
     });
   }
-  for (let i = 0; i < 16; i++) {
+  for (let i = 0; i < 12; i++) {
     const angle = -Math.PI * 0.2 - Math.random() * Math.PI * 0.6;
-    const speed = 3 + Math.random() * 6;
+    const speed = 2.8 + Math.random() * 4.8;
     particles.push({
       x: worldX + (Math.random() - 0.5) * 30,
       y: worldY - 5,
       vx: Math.cos(angle) * speed,
       vy: Math.sin(angle) * speed,
-      life: 15 + Math.floor(Math.random() * 10),
-      maxLife: 25,
-      size: 2 + Math.random() * 3,
-      color: i % 2 === 0 ? '#ff6644' : '#ffcc00', type: 'star',
+      life: 14 + Math.floor(Math.random() * 8),
+      maxLife: 22,
+      size: 2 + Math.random() * 2.5,
+      color: i % 3 === 0 ? '#ff8855' : i % 2 === 0 ? '#ffcc00' : '#ff5533', type: 'star',
       gravity: 0.25, friction: 0.95,
       rotation: Math.random() * Math.PI * 2, rotSpeed: (Math.random() - 0.5) * 0.6,
     });
@@ -457,22 +457,22 @@ export function spawnMAXAura(particles: Particle[], worldX: number, worldY: numb
   for (let r = 0; r < 3; r++) {
     particles.push({
       x: worldX, y: worldY - 30, vx: 0, vy: 0,
-      life: 18 + r * 6, maxLife: 18 + r * 6, size: 8 + r * 5,
-      color: r === 0 ? '#ffffff' : r === 1 ? '#44ff88' : '#22cc55', type: 'ring',
+      life: 16 + r * 5, maxLife: 16 + r * 5, size: 7 + r * 4,
+      color: r === 0 ? '#ffffff' : r === 1 ? '#55ff99' : '#22bb55', type: 'ring',
     });
   }
   for (let i = 0; i < 16; i++) {
     const angle = -Math.PI / 2 + (Math.random() - 0.5) * Math.PI * 1.2;
-    const speed = 3 + Math.random() * 6;
+    const speed = 2.8 + Math.random() * 5.2;
     particles.push({
       x: worldX + (Math.random() - 0.5) * 30,
       y: worldY - 20,
       vx: Math.cos(angle) * speed,
       vy: Math.sin(angle) * speed - 2,
-      life: 15 + Math.floor(Math.random() * 10),
-      maxLife: 25,
-      size: 2 + Math.random() * 4,
-      color: i % 3 === 0 ? '#ffffff' : i % 2 === 0 ? '#88ffaa' : '#44ff66',
+      life: 13 + Math.floor(Math.random() * 8),
+      maxLife: 22,
+      size: 2 + Math.random() * 3,
+      color: i % 4 === 0 ? '#ffffff' : i % 2 === 0 ? '#88ffaa' : '#44dd77',
       type: 'star', gravity: -0.05, friction: 0.94,
       rotation: Math.random() * Math.PI * 2, rotSpeed: (Math.random() - 0.5) * 0.4,
     });
@@ -484,26 +484,26 @@ export function spawnMAXActivationFlash(particles: Particle[], worldX: number, w
   // KOF2002: MAX激活初始白色核心爆发
   particles.push({
     x: worldX, y: worldY, vx: 0, vy: 0,
-    life: 8, maxLife: 8, size: 50,
+    life: 7, maxLife: 7, size: 42,
     color: '#ffffff', type: 'flash',
   });
-  for (let r = 0; r < 5; r++) {
+  for (let r = 0; r < 4; r++) {
     particles.push({
       x: worldX, y: worldY, vx: 0, vy: 0,
-      life: 20 + r * 4, maxLife: 20 + r * 4, size: 12 + r * 8,
-      color: r < 2 ? '#ffffff' : r < 4 ? '#44ff88' : '#22cc55', type: 'ring',
+      life: 16 + r * 4, maxLife: 16 + r * 4, size: 10 + r * 6,
+      color: r === 0 ? '#ffffff' : r === 1 ? '#ddffeb' : r === 2 ? '#44ff88' : '#22bb55', type: 'ring',
     });
   }
-  for (let i = 0; i < 24; i++) {
-    const angle = (Math.PI * 2 * i) / 24;
-    const speed = 4 + Math.random() * 6;
+  for (let i = 0; i < 18; i++) {
+    const angle = (Math.PI * 2 * i) / 18;
+    const speed = 3.5 + Math.random() * 5;
     particles.push({
       x: worldX, y: worldY,
       vx: Math.cos(angle) * speed,
       vy: Math.sin(angle) * speed,
-      life: 18 + Math.floor(Math.random() * 8),
-      maxLife: 26, size: 3 + Math.random() * 3,
-      color: i % 2 === 0 ? '#aaffcc' : '#44ff88',
+      life: 16 + Math.floor(Math.random() * 6),
+      maxLife: 22, size: 2.5 + Math.random() * 2.5,
+      color: i % 3 === 0 ? '#ffffff' : i % 2 === 0 ? '#aaffcc' : '#44ff88',
       type: 'star', gravity: 0, friction: 0.92,
       rotation: angle, rotSpeed: 0,
     });
@@ -512,30 +512,30 @@ export function spawnMAXActivationFlash(particles: Particle[], worldX: number, w
 
 /** Perfect闪光 — 金色粒子+双层辉光环 */
 export function spawnPerfectFlash(particles: Particle[], worldX: number, worldY: number): void {
-  for (let i = 0; i < 28; i++) {
+  for (let i = 0; i < 20; i++) {
     const angle = Math.random() * Math.PI * 2;
-    const speed = 3 + Math.random() * 7;
+    const speed = 2.8 + Math.random() * 6;
     particles.push({
       x: worldX, y: worldY,
       vx: Math.cos(angle) * speed,
       vy: Math.sin(angle) * speed - 3,
-      life: 20 + Math.floor(Math.random() * 15),
-      maxLife: 35,
-      size: 3 + Math.random() * 5,
-      color: i % 3 === 0 ? '#ffffff' : i % 2 === 0 ? '#ffcc00' : '#ff8800',
+      life: 18 + Math.floor(Math.random() * 10),
+      maxLife: 28,
+      size: 2.5 + Math.random() * 4,
+      color: i % 4 === 0 ? '#ffffff' : i % 2 === 0 ? '#ffcc00' : '#ff9933',
       type: 'star', gravity: 0.1, friction: 0.94,
       rotation: Math.random() * Math.PI * 2, rotSpeed: (Math.random() - 0.5) * 0.5,
     });
   }
   particles.push({
     x: worldX, y: worldY, vx: 0, vy: 0,
-    life: 25, maxLife: 25, size: 15,
+    life: 22, maxLife: 22, size: 13,
     color: '#ffcc00', type: 'ring',
   });
-  // KOF2002: Perfect额外外层白色辉光环
+  // KOF2002: Perfect保留外层白环, 但压缩铺张感
   particles.push({
     x: worldX, y: worldY, vx: 0, vy: 0,
-    life: 30, maxLife: 30, size: 10,
+    life: 24, maxLife: 24, size: 8,
     color: '#ffffff', type: 'ring',
   });
 }
@@ -543,17 +543,17 @@ export function spawnPerfectFlash(particles: Particle[], worldX: number, worldY:
 export function spawnProjectileExplosion(particles: Particle[], worldX: number, worldY: number, charColor: string, charGlow: string): void {
   particles.push({
     x: worldX, y: worldY, vx: 0, vy: 0,
-    life: 16, maxLife: 16, size: 50,
+    life: 14, maxLife: 14, size: 44,
     color: charGlow, type: 'flash',
   });
   for (let i = 0; i < 14; i++) {
     const angle = Math.random() * Math.PI * 2;
-    const speed = 3 + Math.random() * 6;
+    const speed = 2.8 + Math.random() * 5.2;
     particles.push({
       x: worldX, y: worldY,
       vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed - 2,
-      life: 12 + Math.floor(Math.random() * 8), maxLife: 20,
-      size: 3 + Math.random() * 4,
+      life: 11 + Math.floor(Math.random() * 7), maxLife: 18,
+      size: 2.5 + Math.random() * 3.5,
       color: i % 3 === 0 ? '#ffffff' : charColor,
       type: 'star', gravity: 0.2, friction: 0.94,
       rotation: Math.random() * Math.PI * 2, rotSpeed: (Math.random() - 0.5) * 0.4,
@@ -562,12 +562,35 @@ export function spawnProjectileExplosion(particles: Particle[], worldX: number, 
   // KOF2002: 飞行道具爆炸二次扩散冲击环
   particles.push({
     x: worldX, y: worldY, vx: 0, vy: 0,
-    life: 12, maxLife: 12, size: 8,
+    life: 10, maxLife: 10, size: 7,
     color: charColor, type: 'ring',
   });
   particles.push({
     x: worldX, y: worldY, vx: 0, vy: 0,
-    life: 18, maxLife: 18, size: 4,
+    life: 14, maxLife: 14, size: 3.5,
     color: '#ffffff', type: 'ring',
   });
+}
+
+/** KOF2002: Taunt sparks — small descending energy particles */
+export function spawnTauntSparks(particles: Particle[], worldX: number, worldY: number): void {
+  for (let i = 0; i < 8; i++) {
+    const angle = Math.PI * 0.3 + Math.random() * Math.PI * 0.4;
+    const speed = 1.5 + Math.random() * 2;
+    particles.push({
+      x: worldX + (Math.random() - 0.5) * 20,
+      y: worldY + (Math.random() - 0.5) * 10,
+      vx: Math.cos(angle) * speed * (Math.random() > 0.5 ? 1 : -1),
+      vy: Math.sin(angle) * speed,
+      life: 18 + Math.floor(Math.random() * 10),
+      maxLife: 28,
+      size: 2 + Math.random() * 3,
+      color: i % 2 === 0 ? '#ffcc44' : '#ff8844',
+      type: 'star',
+      gravity: 0.05,
+      friction: 0.96,
+      rotation: Math.random() * Math.PI * 2,
+      rotSpeed: (Math.random() - 0.5) * 0.3,
+    });
+  }
 }

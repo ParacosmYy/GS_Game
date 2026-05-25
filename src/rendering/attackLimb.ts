@@ -6,6 +6,7 @@ import { Fighter } from '../entities/fighter.js';
 import { AttackType } from '../core/types.js';
 import { FIGHTER_WIDTH, FRAME_DATA } from '../core/constants.js';
 import { ROSTER } from '../characters/index.js';
+import { isSpecialOrDM } from '../core/attackClassifier.js';
 import { drawSpecialAttackLimb } from './attackLimbSpecials.js';
 
 /** Draw extended arm/leg during attack active phase */
@@ -53,12 +54,9 @@ export function drawAttackLimb(
     || f.currentAttack === AttackType.STAND_CD
     || f.currentAttack === AttackType.KYO_RED_KICK;
 
-  const isSpecialMove = name.startsWith('KYO_') || name.startsWith('IORI_')
-    || name.startsWith('TERRY_') || name.startsWith('KIM_') || name.startsWith('RYO_') || name.startsWith('LEONA_') || name.startsWith('ROBERT_')
-    || name.startsWith('VICE_')
+  const isSpecialMove = isSpecialOrDM(name)
     || f.currentAttack === AttackType.SPECIAL_PROJECTILE
-    || f.currentAttack === AttackType.SPECIAL_UPPER
-    || name.startsWith('DM_');
+    || f.currentAttack === AttackType.SPECIAL_UPPER;
 
   // Get character-specific colors
   const charDef = ROSTER.find(c => c.id === f.charId);

@@ -33,7 +33,7 @@ import {
   handleIdleWalk, handleRun, handleBackdash, handleRoll,
   handleHop, handleJump, handleCrouch, handleAttack,
   handleBlock, handleAirBlock, handleGuardCrush,
-  handleCounterStance, handleHitstun, handleKnockdown,
+  handleCounterStance, handleHitstun, handleKnockdown, handleTaunt,
 } from './stateHandlers.js';
 
 /**
@@ -344,6 +344,9 @@ export class FighterController {
         break;
       case FighterState.KNOCKDOWN:
         handleKnockdown(ctx, input);
+        break;
+      case FighterState.TAUNT:
+        handleTaunt(ctx);
         break;
     }
 

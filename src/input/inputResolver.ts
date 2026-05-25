@@ -27,6 +27,8 @@ export interface ResolvedInput {
   punchJustReleased: boolean;
   /** Negative Edge: kick just released (B or D) */
   kickJustReleased: boolean;
+  /** Start键按下 (嘲讽) */
+  startPressed: boolean;
 }
 
 export interface RawInput {
@@ -39,6 +41,7 @@ export interface RawInput {
   buttonC: boolean;
   buttonD: boolean;
   throwAttack: boolean;
+  start: boolean;
 }
 
 export interface PrevAttack {
@@ -85,6 +88,7 @@ export function resolveInput(raw: RawInput, facing: Direction, prev: PrevAttack)
     blowbackPressed: raw.buttonC && raw.buttonD && (cPressed || dPressed),
     punchJustReleased: aReleased || cReleased,
     kickJustReleased: bReleased || dReleased,
+    startPressed: raw.start,
   };
 }
 

@@ -8,6 +8,7 @@ import type { CharacterDefinition } from '../characters/types.js';
 import { SimpleAI } from '../ai/simpleAI.js';
 import { FighterController } from '../entities/fighterController.js';
 import { Fighter } from '../entities/fighter.js';
+import { gameRandomInt } from '../core/prng.js';
 import { CommandBuffer } from '../input/commandBuffer.js';
 import { initAudio, playSelect } from '../audio/sampler.js';
 
@@ -137,9 +138,9 @@ export class SelectState {
     if (this.p2IsAI) {
       if (this.p1Ready && !this.p2Ready) {
         // AI随机选择 (避开P1选的角色)
-        let aiCursor = (this.p1Cursor + 1 + Math.floor(Math.random() * (TOTAL_SELECT_SLOTS - 1))) % TOTAL_SELECT_SLOTS;
+        let aiCursor = (this.p1Cursor + 1 + gameRandomInt(TOTAL_SELECT_SLOTS - 1)) % TOTAL_SELECT_SLOTS;
         this.p2Cursor = aiCursor;
-        this.p2ColorIndex = Math.floor(Math.random() * 4);
+        this.p2ColorIndex = gameRandomInt(4);
         this.p2Ready = true;
       }
     } else if (!this.p2Ready) {
@@ -193,7 +194,7 @@ export class SelectState {
   /** 解析光标位置的实际角色 (随机格→随机选一个) */
   private resolveChar(cursor: number): CharacterDefinition {
     if (cursor >= ROSTER.length) {
-      return ROSTER[Math.floor(Math.random() * ROSTER.length)];
+      return ROSTER[gameRandomInt(ROSTER.length)];
     }
     return ROSTER[cursor];
   }

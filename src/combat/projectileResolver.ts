@@ -1,6 +1,6 @@
 import { Fighter } from '../entities/fighter.js';
 import { Projectile } from '../entities/projectile.js';
-import { InputManager } from '../input/inputManager.js';
+import type { IInputProvider } from '../input/inputProvider.js';
 import { resolveInput } from '../input/inputResolver.js';
 import type { PrevAttack } from '../input/inputResolver.js';
 import {
@@ -9,6 +9,7 @@ import {
 } from '../core/constants.js';
 import { AttackType, FighterState } from '../core/types.js';
 import type { HitLevel } from '../core/types.js';
+import { isDM, isCharacterSpecial } from '../core/attackClassifier.js';
 
 export type HitCallback = (
   attacker: Fighter, defender: Fighter,
@@ -25,7 +26,7 @@ export type GuardCrushCallback = (
 const GUARD_CRUSH_DURATION = 90;
 
 export interface ProjectileResolverContext {
-  inputManager: InputManager;
+  inputProvider: IInputProvider;
   prev: [PrevAttack, PrevAttack];
   comboHits: number[];
   lastHitFrame: number[];
@@ -45,9 +46,8 @@ function canBlock(hitLevel: HitLevel, crouching: boolean): boolean {
 /** Guard gauge depletion based on attack type */
 function guardGaugeDamage(attackType: AttackType): number {
   const name = attackType as string;
-  if (name.startsWith('DM_') || name.startsWith('SDM_')) return name.startsWith('SDM_') ? 35 : 25;
-  if (name.startsWith('KYO_') || name.startsWith('IORI_') || name.startsWith('TERRY_')
-    || name.startsWith('KIM_') || name.startsWith('RYO_') || name.startsWith('LEONA_') || name.startsWith('KDASH_') || name.startsWith('KULA_') || name.startsWith('SPECIAL_')) return 15;
+  if (isDM(name)) return name.startsWith('SDM_') ? 35 : 25;
+  if (isCharacterSpecial(name) || name.startsWith('SPECIAL_')) return 15;
   if (name.startsWith('CMD_')) return 12;
   if (attackType === AttackType.STAND_CD || attackType === AttackType.JUMP_CD) return 12;
   if (name.endsWith('_C') || name.endsWith('_D')) return 10;
@@ -81,7 +81,7 @@ export function resolveProjectileHits(
       if (defender.isRollInvincible()) { proj.active = false; break; }
 
       const data = FRAME_DATA.SPECIAL_PROJECTILE;
-      const raw = i === 0 ? ctx.inputManager.getP1Input() : ctx.inputManager.getP2Input();
+      const raw = i === 0 ? ctx.inputProvider.getP1Input() : ctx.inputProvider.getP2Input();
       const defInput = resolveInput(raw, defender.facing, ctx.prev[i]);
       const crouching = defender.state === FighterState.CROUCH;
 

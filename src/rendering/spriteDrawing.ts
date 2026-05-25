@@ -8,6 +8,7 @@ export function drawPixelChar(
   c: CanvasRenderingContext2D, v: CharVisual,
   headOff: number, bodyLean: number, armLAngle: number, armRAngle: number,
   legLSpread: number, legRSpread: number, crouching: boolean,
+  charId: string = '',
 ): void {
   const scale = crouching ? 0.8 : 1;
   const baseY = crouching ? 15 : 8;
@@ -53,6 +54,13 @@ export function drawPixelChar(
   px(c, headX + 1, headY + Math.floor(hh / 2), '#ffffff');
   px(c, headX - 1, headY + Math.floor(hh / 2) + 1, '#1a1a1a');
   px(c, headX + 1, headY + Math.floor(hh / 2) + 1, '#1a1a1a');
+  if (charId === 'ryo') {
+    px(c, headX - 2, headY + Math.floor(hh / 2) - 1, darken(v.hairColor, 0.15));
+    px(c, headX + 2, headY + Math.floor(hh / 2) - 1, darken(v.hairColor, 0.15));
+    px(c, headX - 1, headY + Math.floor(hh / 2) - 2, '#2a1c10');
+    px(c, headX, headY + Math.floor(hh / 2) - 2, '#2a1c10');
+    px(c, headX + 1, headY + Math.floor(hh / 2) - 2, '#2a1c10');
+  }
   // 嘴巴
   if (hh > 4) px(c, headX, headY + hh - 1, skinDark);
 
@@ -92,6 +100,35 @@ export function drawPixelChar(
   // 腰带
   for (let dx = -Math.floor((bw - 1) / 2); dx <= Math.floor((bw - 1) / 2); dx++) {
     px(c, torsoX + dx, torsoY + torsoH - 1, v.beltColor);
+  }
+  if (charId === 'ryo') {
+    px(c, torsoX - 1, torsoY + 2, lighten(v.shirtColor, 0.22));
+    px(c, torsoX, torsoY + 2, lighten(v.shirtColor, 0.28));
+    px(c, torsoX + 1, torsoY + 2, lighten(v.shirtColor, 0.18));
+    px(c, torsoX - 2, torsoY + 1, shirtDark);
+    px(c, torsoX - 1, torsoY + 1, lighten(v.shirtColor, 0.08));
+    px(c, torsoX, torsoY + 1, v.skinColor);
+    px(c, torsoX + 1, torsoY + 1, lighten(v.shirtColor, 0.08));
+    px(c, torsoX + 2, torsoY + 1, shirtDark);
+    px(c, torsoX - 2, torsoY + 3, darken(v.shirtColor, 0.1));
+    px(c, torsoX - 1, torsoY + 3, darken(v.shirtColor, 0.05));
+    px(c, torsoX + 1, torsoY + 3, darken(v.shirtColor, 0.05));
+    px(c, torsoX + 2, torsoY + 3, darken(v.shirtColor, 0.1));
+    px(c, torsoX - 1, torsoY + torsoH - 2, darken(v.beltColor, 0.2));
+    px(c, torsoX, torsoY + torsoH - 2, darken(v.beltColor, 0.15));
+    px(c, torsoX + 1, torsoY + torsoH - 2, darken(v.beltColor, 0.2));
+  }
+  if (charId === 'kyo') {
+    px(c, torsoX - 1, torsoY + 1, '#ffffff');
+    px(c, torsoX, torsoY + 1, '#fefefe');
+    px(c, torsoX + 1, torsoY + 1, '#ffffff');
+    px(c, torsoX - 2, torsoY + 2, '#1a1a2a');
+    px(c, torsoX - 1, torsoY + 2, '#ff6600');
+    px(c, torsoX, torsoY + 2, '#ffcc44');
+    px(c, torsoX + 1, torsoY + 2, '#ff6600');
+    px(c, torsoX + 2, torsoY + 2, '#1a1a2a');
+    px(c, torsoX - 1, torsoY + 3, '#ff8800');
+    px(c, torsoX, torsoY + 3, '#ffcc66');
   }
 
   // === 手臂 ===

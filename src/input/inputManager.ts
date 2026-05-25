@@ -19,6 +19,7 @@ export class InputManager {
     buttonC: 'KeyU',
     buttonD: 'KeyI',
     throwAttack: 'KeyL',
+    start: 'KeyP',
   };
 
   private static readonly P2_MAP = {
@@ -31,6 +32,7 @@ export class InputManager {
     buttonC: 'Numpad3',
     buttonD: 'Numpad0',
     throwAttack: 'NumpadDecimal',
+    start: 'NumpadEnter',
   };
 
   constructor() {
@@ -73,6 +75,7 @@ export class InputManager {
       buttonC: this.keys[keyMap.buttonC] === true,
       buttonD: this.keys[keyMap.buttonD] === true,
       throwAttack: this.keys[keyMap.throwAttack] === true,
+      start: this.keys[keyMap.start] === true,
     };
   }
 }
