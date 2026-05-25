@@ -227,6 +227,8 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       deps.vfx.spawnImpactRing(hitX, hitY);
       deps.screenFlash.trigger('#ff6600', 0.2, 6);
       deps.screenShake.trigger(10, 10);
+      // KOF2002: Counter Wire额外顿帧 — 壁弹前明显停顿, 强调打击感
+      deps.cinematic.triggerHitStop(4);
       playWire();
     }
 

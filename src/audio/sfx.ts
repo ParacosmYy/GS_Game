@@ -100,7 +100,7 @@ export function playBlock(): void {
   noise.start(now); noise.stop(now + 0.04);
 }
 
-/** Special move — energy whoosh + impact */
+/** Special move — energy whoosh + impact + metallic edge */
 export function playSpecial(): void {
   const ctx = getCtx();
   const now = ctx.currentTime;
@@ -124,10 +124,21 @@ export function playSpecial(): void {
   nGain.gain.setValueAtTime(0.12, now);
   nGain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
 
+  // KOF2002: 必杀技金属质感边缘 — 高频三角波短闪
+  const metal = ctx.createOscillator();
+  metal.type = 'triangle';
+  metal.frequency.setValueAtTime(2400, now);
+  metal.frequency.exponentialRampToValueAtTime(600, now + 0.06);
+  const mGain = ctx.createGain();
+  mGain.gain.setValueAtTime(0.08, now);
+  mGain.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
+
   osc.connect(gain).connect(ctx.destination);
   noise.connect(nFilter).connect(nGain).connect(ctx.destination);
+  metal.connect(mGain).connect(ctx.destination);
   osc.start(now); osc.stop(now + 0.25);
   noise.start(now); noise.stop(now + 0.16);
+  metal.start(now); metal.stop(now + 0.07);
 }
 
 /** DM — massive energy explosion */
@@ -168,14 +179,25 @@ export function playDM(): void {
   subGain.gain.setValueAtTime(0.4, now);
   subGain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
 
+  // KOF2002: DM二次爆发 — 0.1s后高频碎裂声
+  const burst = noiseBuffer(ctx, 0.08, 0.2);
+  const bFilter = ctx.createBiquadFilter();
+  bFilter.type = 'highpass';
+  bFilter.frequency.value = 2000;
+  const bGain = ctx.createGain();
+  bGain.gain.setValueAtTime(0.15, now + 0.1);
+  bGain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+
   osc1.connect(gain1).connect(ctx.destination);
   osc2.connect(gain2).connect(ctx.destination);
   noise.connect(nFilter).connect(nGain).connect(ctx.destination);
   sub.connect(subGain).connect(ctx.destination);
+  burst.connect(bFilter).connect(bGain).connect(ctx.destination);
   osc1.start(now); osc1.stop(now + 0.45);
   osc2.start(now); osc2.stop(now + 0.22);
   noise.start(now); noise.stop(now + 0.25);
   sub.start(now); sub.stop(now + 0.4);
+  burst.start(now + 0.1); burst.stop(now + 0.22);
 }
 
 /** KO — dramatic final hit with sub-bass rumble + metallic ring-out */

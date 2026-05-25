@@ -262,26 +262,34 @@ export class VFXSystem {
           ctx.rotate(p.rotation || 0);
           ctx.fillStyle = p.color;
           drawStar(ctx, 0, 0, p.size * alpha, 4);
-          // 外层辉光 — 更大更亮
-          ctx.globalAlpha = alpha * 0.35;
-          ctx.shadowColor = p.color;
-          ctx.shadowBlur = 8;
+          // KOF2002: 外层辉光 — 用径向渐变替代shadowBlur, 减少draw call
+          ctx.globalAlpha = alpha * 0.3;
+          const starGlowR = p.size * alpha * 3;
+          const starGrad = ctx.createRadialGradient(0, 0, 0, 0, 0, starGlowR);
+          starGrad.addColorStop(0, p.color);
+          starGrad.addColorStop(1, 'rgba(0,0,0,0)');
+          ctx.fillStyle = starGrad;
           ctx.beginPath();
-          ctx.arc(0, 0, p.size * alpha * 3, 0, Math.PI * 2);
+          ctx.arc(0, 0, starGlowR, 0, Math.PI * 2);
           ctx.fill();
-          ctx.shadowBlur = 0;
           ctx.restore();
           break;
         }
         case 'flash': {
           ctx.save();
-          ctx.globalAlpha = alpha * 0.6;
-          const grad = ctx.createRadialGradient(sx, p.y, 0, sx, p.y, p.size * (1 - alpha * 0.5));
+          // KOF2002: 闪光前2帧纯白增强, 之后正常渐变
+          const flashEarly = p.life > p.maxLife - 2;
+          const flashAlpha = flashEarly ? Math.min(1, alpha * 1.3) : alpha * 0.6;
+          ctx.globalAlpha = flashAlpha;
+          const flashRadius = p.size * (1 - alpha * 0.5);
+          const grad = ctx.createRadialGradient(sx, p.y, 0, sx, p.y, flashRadius);
           grad.addColorStop(0, '#ffffff');
-          grad.addColorStop(0.4, p.color);
+          grad.addColorStop(flashEarly ? 0.6 : 0.4, p.color);
           grad.addColorStop(1, 'rgba(0,0,0,0)');
           ctx.fillStyle = grad;
-          ctx.fillRect(sx - p.size, p.y - p.size, p.size * 2, p.size * 2);
+          ctx.beginPath();
+          ctx.arc(sx, p.y, flashRadius, 0, Math.PI * 2);
+          ctx.fill();
           ctx.restore();
           break;
         }
@@ -391,7 +399,14 @@ export class VFXSystem {
           ctx.translate(sx, p.y);
           ctx.rotate(p.rotation || 0);
           const slashLen = p.size * (0.5 + alpha * 0.5);
-          const slashW = 2 + alpha * 3;
+          // KOF2002: 斩击线宽度脉冲 — 初始宽后快速变窄
+          const slashW = (2 + alpha * 3) * (0.5 + alpha * 0.5);
+          // 白色核心线
+          ctx.fillStyle = '#ffffff';
+          ctx.globalAlpha = alpha * 0.9;
+          ctx.fillRect(-slashLen, -slashW * 0.3, slashLen * 2, slashW * 0.6);
+          // 角色色主体
+          ctx.globalAlpha = alpha * 0.8;
           ctx.fillStyle = p.color;
           ctx.fillRect(-slashLen, -slashW / 2, slashLen * 2, slashW);
           // 外发光
@@ -403,17 +418,22 @@ export class VFXSystem {
         case 'text': {
           ctx.save();
           ctx.globalAlpha = alpha;
-          ctx.font = `bold ${p.size}px "Courier New", monospace`;
+          // KOF2002: 文字初始3帧微放大, 产生"弹出"感
+          const textScale = p.life > p.maxLife - 3 ? 1 + (p.maxLife - p.life === 0 ? 0.15 : 0) : 1;
+          ctx.font = `bold ${Math.round(p.size * textScale)}px "Courier New", monospace`;
           ctx.textAlign = 'center';
-          // KOF2002: 外层辉光 — 大文字(size>=18)加发光
-          if (p.size >= 18 && alpha > 0.3) {
-            ctx.shadowColor = p.color;
-            ctx.shadowBlur = 6;
-          }
+          // 描边层 — 黑底白边
           ctx.strokeStyle = '#000';
           ctx.lineWidth = 3;
           ctx.strokeText(p.text || '', sx, p.y);
-          ctx.shadowBlur = 0;
+          // KOF2002: 大文字(size>=18)外发光层 — 用半透明重绘替代shadowBlur
+          if (p.size >= 18 && alpha > 0.3) {
+            ctx.globalAlpha = alpha * 0.3;
+            ctx.strokeStyle = p.color;
+            ctx.lineWidth = 6;
+            ctx.strokeText(p.text || '', sx, p.y);
+            ctx.globalAlpha = alpha;
+          }
           ctx.fillStyle = p.color;
           ctx.fillText(p.text || '', sx, p.y);
           ctx.restore();

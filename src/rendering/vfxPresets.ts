@@ -19,7 +19,7 @@ export interface Particle {
 
 export function spawnHitSparks(particles: Particle[], worldX: number, worldY: number, count: number = 8): void {
   for (let i = 0; i < count; i++) {
-    const angle = Math.random() * Math.PI * 2;
+    const angle = -Math.PI * 0.8 + Math.random() * Math.PI * 1.6;
     const speed = 2 + Math.random() * 5;
     particles.push({
       x: worldX, y: worldY,
@@ -52,8 +52,9 @@ export function spawnCharacterHitSparks(particles: Particle[], worldX: number, w
     color: charColor, type: sizeScale >= 1.5 ? 'superburst' : 'flash',
   });
   const grav = lowGravity ? 0.04 : 0.12;
+  // KOF2002: 火花方向偏置 — 向上扩散为主(前半球偏重), 更自然
   for (let i = 0; i < count; i++) {
-    const angle = Math.random() * Math.PI * 2;
+    const angle = -Math.PI * 0.8 + Math.random() * Math.PI * 1.6;
     const speed = (3 + Math.random() * 7) * sizeScale * speedScale;
     const isStar = Math.random() < starRatio;
     particles.push({
