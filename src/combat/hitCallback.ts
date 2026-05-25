@@ -214,8 +214,8 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
     const dmgColor = isDM ? atkChar.specialColor : counterHit ? '#ff8800' : undefined;
     deps.vfx.spawnDamageText(defender.x, defender.y - defender.displayHeight - 20, data.damage, dmgColor);
 
-    // KOF2002: 命中确认光效 — 攻击者身上微弱白色闪光确认命中
-    attacker.hitFlashFrames = 2;
+    // KOF2002: 命中确认光效 — 攻击者身上白色闪光, 重攻击/必杀更亮更久
+    attacker.hitFlashFrames = isDM ? 6 : isSpecial ? 4 : isHeavyAttack(attackType) ? 3 : 2;
     attacker.hitFlashColor = isDM ? atkChar.specialColor : '#ffffff';
 
     // KOF2002: 重攻击(非必杀)命中微闪 — 增强打击感
