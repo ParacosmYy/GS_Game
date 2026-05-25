@@ -86,16 +86,16 @@ export function spawnGuardCrushSparks(particles: Particle[], worldX: number, wor
     life: 6, maxLife: 6, size: 35,
     color: '#ffffff', type: 'flash',
   });
-  for (let i = 0; i < 16; i++) {
+  for (let i = 0; i < 20; i++) {
     const angle = Math.random() * Math.PI * 2;
-    const speed = 3 + Math.random() * 6;
+    const speed = 3 + Math.random() * 7;
     particles.push({
       x: worldX, y: worldY,
       vx: Math.cos(angle) * speed,
       vy: Math.sin(angle) * speed - 3,
-      life: 15 + Math.floor(Math.random() * 8),
-      maxLife: 23,
-      size: 3 + Math.random() * 4,
+      life: 15 + Math.floor(Math.random() * 10),
+      maxLife: 25,
+      size: 3 + Math.random() * 5,
       color: i % 3 === 0 ? '#ffffff' : '#ff3333',
       type: 'star', gravity: 0.18, friction: 0.95,
       rotation: Math.random() * Math.PI * 2,
@@ -228,7 +228,7 @@ export function spawnGroundSlam(particles: Particle[], worldX: number, worldY: n
     life: 30, maxLife: 30, size: 120,
     color: '#ff2200', type: 'groundslam',
   });
-  for (let i = 0; i < 20; i++) {
+  for (let i = 0; i < 28; i++) {
     const angle = -Math.PI + Math.random() * Math.PI;
     const speed = 2 + Math.random() * 5;
     particles.push({
@@ -242,7 +242,7 @@ export function spawnGroundSlam(particles: Particle[], worldX: number, worldY: n
       color: '#aa8866', type: 'spark', gravity: 0.12, friction: 0.96,
     });
   }
-  for (let i = 0; i < 12; i++) {
+  for (let i = 0; i < 16; i++) {
     const angle = -Math.PI * 0.2 - Math.random() * Math.PI * 0.6;
     const speed = 3 + Math.random() * 6;
     particles.push({
@@ -427,10 +427,10 @@ export function spawnCounterWireSparks(particles: Particle[], worldX: number, wo
   });
   for (let i = 0; i < 16; i++) {
     const angle = Math.random() * Math.PI * 2;
-    const speed = 3 + Math.random() * 7;
+    const speed = 4 + Math.random() * 8;
     particles.push({
       x: worldX, y: worldY,
-      vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed - 2,
+      vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed - 3,
       life: 15 + Math.floor(Math.random() * 10), maxLife: 25,
       size: 3 + Math.random() * 5, color: i % 3 === 0 ? '#ff6622' : '#ffdd44',
       type: 'star', gravity: 0.15, friction: 0.95,
@@ -456,12 +456,12 @@ export function spawnMAXAura(particles: Particle[], worldX: number, worldY: numb
   }
   for (let i = 0; i < 16; i++) {
     const angle = -Math.PI / 2 + (Math.random() - 0.5) * Math.PI * 1.2;
-    const speed = 3 + Math.random() * 5;
+    const speed = 3 + Math.random() * 6;
     particles.push({
       x: worldX + (Math.random() - 0.5) * 30,
       y: worldY - 20,
       vx: Math.cos(angle) * speed,
-      vy: Math.sin(angle) * speed,
+      vy: Math.sin(angle) * speed - 2,
       life: 15 + Math.floor(Math.random() * 10),
       maxLife: 25,
       size: 2 + Math.random() * 4,
@@ -505,7 +505,7 @@ export function spawnMAXActivationFlash(particles: Particle[], worldX: number, w
 
 /** Perfect闪光 — 金色粒子+双层辉光环 */
 export function spawnPerfectFlash(particles: Particle[], worldX: number, worldY: number): void {
-  for (let i = 0; i < 20; i++) {
+  for (let i = 0; i < 28; i++) {
     const angle = Math.random() * Math.PI * 2;
     const speed = 3 + Math.random() * 7;
     particles.push({

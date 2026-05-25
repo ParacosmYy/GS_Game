@@ -273,8 +273,8 @@ export class VFXSystem {
           ctx.fillStyle = p.color;
           drawStar(ctx, 0, 0, p.size * alpha, 4);
           // KOF2002: 外层辉光 — 用径向渐变替代shadowBlur, 减少draw call
-          ctx.globalAlpha = alpha * 0.3;
-          const starGlowR = p.size * alpha * 3;
+          ctx.globalAlpha = alpha * 0.25;
+          const starGlowR = p.size * alpha * 2.5;
           const starGrad = ctx.createRadialGradient(0, 0, 0, 0, 0, starGlowR);
           starGrad.addColorStop(0, p.color);
           starGrad.addColorStop(1, 'rgba(0,0,0,0)');
@@ -432,8 +432,8 @@ export class VFXSystem {
         case 'text': {
           ctx.save();
           ctx.globalAlpha = alpha;
-          // KOF2002: 文字初始3帧微放大, 产生"弹出"感
-          const textScale = p.life > p.maxLife - 3 ? 1 + (p.maxLife - p.life === 0 ? 0.15 : 0) : 1;
+          // KOF2002: 文字初始2帧微放大+弹出, 产生"弹出"感
+          const textScale = p.life > p.maxLife - 2 ? 1 + (p.maxLife - p.life === 0 ? 0.18 : 0.08) : 1;
           ctx.font = `bold ${Math.round(p.size * textScale)}px "Courier New", monospace`;
           ctx.textAlign = 'center';
           // 描边层 — 黑底白边

@@ -102,7 +102,7 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       const blkFlashScale = blkDM ? 1.8 : blkSpecial ? 1.4 : blkHeavy ? 1.2 : 0.8;
       deps.vfx.spawnBlockFlash(blkX, blkY, blkFlashScale);
       if (blkDM) {
-        deps.vfx.spawnCharacterHitSparks(blkX, blkY, 14, blkColor, 1.6);
+        deps.vfx.spawnCharacterHitSparks(blkX, blkY, 18, blkColor, 1.6);
         deps.screenFlash.trigger('#4466ff', 0.15, 4);
       } else if (blkSpecial) {
         deps.vfx.spawnCharacterHitSparks(blkX, blkY, 6, blkColor, 1.2);
@@ -188,7 +188,7 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       }
       // SDM: 金色闪光+双冲击环, DM: 白色闪光
       if (isSDM) {
-        deps.screenFlash.trigger('#ffdd44', 0.55, 16);
+        deps.screenFlash.trigger('#ffdd44', 0.65, 18);
         deps.vfx.spawnImpactRing(hitX, hitY);
         deps.vfx.spawnImpactRing(hitX, hitY);
       } else {
@@ -217,8 +217,8 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
     if (isRekkaFinisher) {
       deps.vfx.spawnCharacterHitSparks(hitX, hitY, 16, atkChar.specialGlow, 1.3);
       deps.vfx.spawnImpactRing(hitX, hitY, 1.3);
-      // KOF2002: Rekka finisher额外白色火花+方向性震屏
-      deps.vfx.spawnCharacterHitSparks(hitX, hitY, 6, '#ffffff', 0.6);
+      // KOF2002: Rekka finisher额外角色色小火花+方向性震屏
+      deps.vfx.spawnCharacterHitSparks(hitX, hitY, 6, atkChar.specialColor, 0.7);
       deps.screenFlash.trigger(atkChar.specialColor, 0.15, 5);
       deps.screenShake.trigger(8, 10, attacker.facing * 6);
     }
