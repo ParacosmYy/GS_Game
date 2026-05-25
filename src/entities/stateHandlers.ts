@@ -349,7 +349,9 @@ export function handleAttack(ctx: FighterCtx, input: ResolvedInput): void {
   }
 
   // Super Cancel
-  if (f.superCancelReady && ctx.gauge && f.currentAttack) {
+  if (f.superCancelReady && ctx.gauge && f.currentAttack
+      && (f.attackPhase === 'active' || f.attackPhase === 'recovery')
+      && f.hitConfirmDelay === 0) {
     const tick = ctx.tickRef.value;
     const dmAttack = ctx.character.routeSpecial(input, ctx.cmdBuf, tick, ctx.wasChargingDown);
     if (dmAttack && isDM(dmAttack as string)
@@ -363,7 +365,9 @@ export function handleAttack(ctx: FighterCtx, input: ResolvedInput): void {
   }
 
   // Free Cancel (MAX mode only)
-  if (ctx.maxMode && ctx.maxMode.active && f.currentAttack) {
+  if (ctx.maxMode && ctx.maxMode.active && f.currentAttack
+      && (f.attackPhase === 'active' || f.attackPhase === 'recovery')
+      && f.hitConfirmDelay === 0) {
     const atkName = f.currentAttack as string;
     const isNormalAttack = isNormal(atkName);
     const canFreeCancel = isNormalAttack || f.hasHit;

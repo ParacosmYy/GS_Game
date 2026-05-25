@@ -293,26 +293,26 @@ describe('击倒 (Knockdown) 一致性', () => {
 });
 
 describe('Hit-stop 顿帧标准 (KOF2002UM)', () => {
-  // KOF2002标准: 轻攻击4F, 重攻击8F, 必杀技6F, 超必杀12F, Counter+3F
-  // 防御: 重攻击5F, 轻攻击3F
+  // KOF2002标准: 轻攻击4F, 重攻击7F, 必杀技13F, 超必杀19F, Counter+3F
+  // 防御: 重攻击4F, 轻攻击2F
   // 这些值定义在 hitCallback.ts 的 calcHitStop 函数中
   const KOF_LIGHT_HITSTOP = 4;
-  const KOF_HEAVY_HITSTOP = 8;
-  const KOF_SPECIAL_HITSTOP = 6;
-  const KOF_DM_HITSTOP = 12;
+  const KOF_HEAVY_HITSTOP = 7;
+  const KOF_SPECIAL_HITSTOP = 13;
+  const KOF_DM_HITSTOP = 19;
   const KOF_COUNTER_BONUS = 3;
-  const KOF_BLOCK_HEAVY_HITSTOP = 5;
-  const KOF_BLOCK_LIGHT_HITSTOP = 3;
+  const KOF_BLOCK_HEAVY_HITSTOP = 4;
+  const KOF_BLOCK_LIGHT_HITSTOP = 2;
 
   // --- CinematicState.isFrozen() 行为验证 ---
 
-  it('triggerHitStop(8) 后 isFrozen() 连续返回 true 共 8 次，第 9 次返回 false', () => {
+  it('triggerHitStop(7) 后 isFrozen() 连续返回 true 共 7 次，第 8 次返回 false', () => {
     const cs = new CinematicState();
-    cs.triggerHitStop(8);
-    for (let i = 0; i < 8; i++) {
+    cs.triggerHitStop(7);
+    for (let i = 0; i < 7; i++) {
       expect(cs.isFrozen(), `第 ${i + 1} 次应返回 true`).toBe(true);
     }
-    expect(cs.isFrozen(), '第 9 次应返回 false').toBe(false);
+    expect(cs.isFrozen(), '第 8 次应返回 false').toBe(false);
   });
 
   it('triggerHitStop(4) 后恰好冻结 4 帧 (轻攻击标准)', () => {
@@ -324,7 +324,7 @@ describe('Hit-stop 顿帧标准 (KOF2002UM)', () => {
     expect(cs.isFrozen()).toBe(false);
   });
 
-  it('triggerHitStop(12) 后恰好冻结 12 帧 (DM标准)', () => {
+  it('triggerHitStop(19) 后恰好冻结 19 帧 (DM标准)', () => {
     const cs = new CinematicState();
     cs.triggerHitStop(KOF_DM_HITSTOP);
     for (let i = 0; i < KOF_DM_HITSTOP; i++) {
@@ -340,36 +340,36 @@ describe('Hit-stop 顿帧标准 (KOF2002UM)', () => {
     for (let i = 0; i < 7; i++) expect(cs1.isFrozen()).toBe(true);
     expect(cs1.isFrozen()).toBe(false);
 
-    // 重攻击 CH: 8+3=11F
+    // 重攻击 CH: 7+3=10F
     const cs2 = new CinematicState();
     cs2.triggerHitStop(KOF_HEAVY_HITSTOP + KOF_COUNTER_BONUS);
-    for (let i = 0; i < 11; i++) expect(cs2.isFrozen()).toBe(true);
+    for (let i = 0; i < 10; i++) expect(cs2.isFrozen()).toBe(true);
     expect(cs2.isFrozen()).toBe(false);
 
-    // DM CH: 12+3=15F
+    // DM CH: 19+3=22F
     const cs3 = new CinematicState();
     cs3.triggerHitStop(KOF_DM_HITSTOP + KOF_COUNTER_BONUS);
-    for (let i = 0; i < 15; i++) expect(cs3.isFrozen()).toBe(true);
+    for (let i = 0; i < 22; i++) expect(cs3.isFrozen()).toBe(true);
     expect(cs3.isFrozen()).toBe(false);
   });
 
   // --- 防御顿帧 ---
 
-  it('防御重攻击: 顿帧 5F (hitCallback.ts block 分支)', () => {
+  it('防御重攻击: 顿帧 4F (hitCallback.ts block 分支)', () => {
     const cs = new CinematicState();
     cs.triggerHitStop(KOF_BLOCK_HEAVY_HITSTOP);
     for (let i = 0; i < KOF_BLOCK_HEAVY_HITSTOP; i++) expect(cs.isFrozen()).toBe(true);
     expect(cs.isFrozen()).toBe(false);
   });
 
-  it('防御轻攻击: 顿帧 3F (hitCallback.ts block 分支)', () => {
+  it('防御轻攻击: 顿帧 2F (hitCallback.ts block 分支)', () => {
     const cs = new CinematicState();
     cs.triggerHitStop(KOF_BLOCK_LIGHT_HITSTOP);
     for (let i = 0; i < KOF_BLOCK_LIGHT_HITSTOP; i++) expect(cs.isFrozen()).toBe(true);
     expect(cs.isFrozen()).toBe(false);
   });
 
-  it('防御顿帧 < 命中顿帧 (重攻击: 5 < 8, 轻攻击: 3 < 4)', () => {
+  it('防御顿帧 < 命中顿帧 (重攻击: 4 < 7, 轻攻击: 2 < 4)', () => {
     expect(KOF_BLOCK_HEAVY_HITSTOP).toBeLessThan(KOF_HEAVY_HITSTOP);
     expect(KOF_BLOCK_LIGHT_HITSTOP).toBeLessThan(KOF_LIGHT_HITSTOP);
   });
@@ -404,21 +404,21 @@ describe('Hit-stop 顿帧标准 (KOF2002UM)', () => {
   it('tickInFreeze 同时递减 superFlashTimer', () => {
     const cs = new CinematicState();
     cs.triggerSuperFlash(400, 200, 0);
-    expect(cs.superFlashTimer).toBe(24);
+    expect(cs.superFlashTimer).toBe(28);
     const maxModes: [MaxModeState, MaxModeState] = [
       { active: false, timer: 0, maxDuration: 720 },
       { active: false, timer: 0, maxDuration: 720 },
     ];
     cs.tickInFreeze(maxModes);
-    expect(cs.superFlashTimer, 'superFlashTimer 应减少 1').toBe(23);
+    expect(cs.superFlashTimer, 'superFlashTimer 应减少 1').toBe(27);
   });
 
   // --- hitStop 常数一致性验证 ---
 
-  it('顿帧递增关系: DM(12) > Heavy(8) > Special(6) > Light(4)', () => {
+  it('顿帧递增关系: DM(19) > Heavy(7) > Light(4), Special(13) > Heavy(7)', () => {
     expect(KOF_DM_HITSTOP).toBeGreaterThan(KOF_HEAVY_HITSTOP);
-    expect(KOF_HEAVY_HITSTOP).toBeGreaterThan(KOF_SPECIAL_HITSTOP);
-    expect(KOF_SPECIAL_HITSTOP).toBeGreaterThan(KOF_LIGHT_HITSTOP);
+    expect(KOF_SPECIAL_HITSTOP).toBeGreaterThan(KOF_HEAVY_HITSTOP);
+    expect(KOF_HEAVY_HITSTOP).toBeGreaterThan(KOF_LIGHT_HITSTOP);
   });
 
   it('Counter 加成与所有攻击类别兼容 (总帧数合理)', () => {
@@ -431,19 +431,19 @@ describe('Hit-stop 顿帧标准 (KOF2002UM)', () => {
     for (const c of combos) {
       const total = c.base + KOF_COUNTER_BONUS;
       expect(total, `${c.label}: ${c.base}+${KOF_COUNTER_BONUS}=${total} 应 > 基础值`).toBeGreaterThan(c.base);
-      expect(total, `${c.label}: 总顿帧 ${total} 应 <= 20 (合理性上限)`).toBeLessThanOrEqual(20);
+      expect(total, `${c.label}: 总顿帧 ${total} 应 <= 25 (合理性上限)`).toBeLessThanOrEqual(25);
     }
   });
 
   // --- Super Flash 同时设置 hitStop ---
 
-  it('triggerSuperFlash 同时设置 hitStop=24', () => {
+  it('triggerSuperFlash 同时设置 hitStop=28', () => {
     const cs = new CinematicState();
     cs.triggerSuperFlash(400, 200, 0);
-    expect(cs.superFlashTimer).toBe(24);
+    expect(cs.superFlashTimer).toBe(28);
     // isFrozen 会消耗 hitStop，验证初始值
-    expect(cs.hitStop).toBe(24);
-    for (let i = 0; i < 24; i++) expect(cs.isFrozen()).toBe(true);
+    expect(cs.hitStop).toBe(28);
+    for (let i = 0; i < 28; i++) expect(cs.isFrozen()).toBe(true);
     expect(cs.isFrozen()).toBe(false);
   });
 

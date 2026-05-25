@@ -34,6 +34,7 @@ import {
   spawnPerfectFlash,
   spawnProjectileExplosion,
   spawnTauntSparks,
+  spawnCancelFlash,
 } from './vfxPresets.js';
 import type { Particle } from './vfxPresets.js';
 
@@ -215,6 +216,11 @@ export class VFXSystem {
 
   spawnTauntSparks(worldX: number, worldY: number): void {
     spawnTauntSparks(this.particles, worldX, worldY);
+  }
+
+  /** 取消点闪光 — 命中可取消时在攻击者身上显示短暂蓝白光环 */
+  spawnCancelFlash(x: number, y: number, height: number): void {
+    spawnCancelFlash(this.particles, x, y, height);
   }
 
   update(): void {
@@ -492,17 +498,34 @@ export class ScreenShake {
   update(): void {
     if (this.duration > 0) {
       this.duration--;
-      const t = this.duration / this.maxDuration;
-      // KOF2002: 初始3帧强冲击(完整强度), 之后快速衰减
-      const isImpactFrame = this.duration >= this.maxDuration - 3;
-      const randomDecay = isImpactFrame ? 1 : t * t;
-      const biasDecay = isImpactFrame ? 1 : Math.pow(t, 1.5);
-      this.offsetX = (Math.random() - 0.5) * this.intensity * randomDecay + this.biasX * biasDecay * 0.3;
-      this.offsetY = (Math.random() - 0.5) * this.intensity * randomDecay * 0.7;
-    } else {
-      this.offsetX = 0;
-      this.offsetY = 0;
-      this.intensity = 0;
+      // elapsed = frames since trigger fired (0-based)
+      const elapsed = this.maxDuration - this.duration - 1;
+
+      if (elapsed < 3) {
+        // Phase 1 (first 3 frames): deterministic displacement along biasX direction
+        const t = elapsed / 3;
+        this.offsetX = this.biasX * this.intensity * (1 - t * 0.3);
+        this.offsetY = this.intensity * 0.5 * (1 - t);
+      } else {
+        // Phase 2 (after frame 3): damped spring rebound — no randomness
+        const remaining = this.maxDuration - 3;
+        const progress = remaining > 0 ? (elapsed - 3) / remaining : 0;
+        const decay = Math.exp(-progress * 4);
+        const frequency = 8;
+        const phase = progress * frequency * Math.PI;
+        this.offsetX = this.biasX * this.intensity * 0.5 * Math.sin(phase) * decay;
+        this.offsetY = this.intensity * 0.3 * Math.sin(phase + 0.5) * decay;
+      }
+
+      // Clamp offsets to reasonable pixel range
+      this.offsetX = Math.max(-30, Math.min(30, this.offsetX));
+      this.offsetY = Math.max(-20, Math.min(20, this.offsetY));
+
+      if (this.duration === 0) {
+        this.offsetX = 0;
+        this.offsetY = 0;
+        this.intensity = 0;
+      }
     }
   }
 }

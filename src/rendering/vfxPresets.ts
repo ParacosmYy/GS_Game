@@ -572,6 +572,31 @@ export function spawnProjectileExplosion(particles: Particle[], worldX: number, 
   });
 }
 
+/** 取消点闪光 — 命中可取消时在攻击者身上显示短暂的蓝白光环, 提示取消窗口 */
+export function spawnCancelFlash(particles: Particle[], x: number, y: number, height: number): void {
+  // 蓝白色核心闪光 — 位于身体中心
+  particles.push({
+    x, y: y - height * 0.5, vx: 0, vy: 0,
+    life: 8, maxLife: 8, size: 18,
+    color: '#88ccff', type: 'flash',
+  });
+  // 围绕身体的蓝白粒子环
+  const count = 8;
+  for (let i = 0; i < count; i++) {
+    const angle = (i / count) * Math.PI * 2;
+    particles.push({
+      x, y: y - height * 0.5,
+      vx: Math.cos(angle) * 2.5,
+      vy: Math.sin(angle) * 2.5,
+      life: 8, maxLife: 8, size: 4,
+      color: '#88ccff',
+      type: 'spark',
+      gravity: 0,
+      friction: 0.9,
+    });
+  }
+}
+
 /** KOF2002: Taunt sparks — small descending energy particles */
 export function spawnTauntSparks(particles: Particle[], worldX: number, worldY: number): void {
   for (let i = 0; i < 8; i++) {

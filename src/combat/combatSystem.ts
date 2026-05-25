@@ -538,6 +538,9 @@ export class CombatSystem {
       attacker.superCancelReady = true;
     }
 
+    // Hit confirm delay: prevent zero-frame cancel (at least 1 frame must pass before cancel is allowed)
+    attacker.hitConfirmDelay = 1;
+
     onHit?.(attacker, defender, attackType, false, counterHit);
   }
 }

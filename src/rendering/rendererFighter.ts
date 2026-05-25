@@ -6,7 +6,7 @@ import { Fighter } from '../entities/fighter.js';
 import { FighterState } from '../core/types.js';
 import type { MaxModeState } from '../core/types.js';
 import { FIGHTER_WIDTH, STAGE_GROUND_Y } from '../core/constants.js';
-import { shiftColor, roundRect } from './utils.js';
+import { shiftColor } from './utils.js';
 import { drawSkeletalFighter } from './skeletalFighter.js';
 import { drawAttackLimb } from './attackLimb.js';
 import type { SpriteRenderer } from './spriteRenderer.js';
@@ -108,7 +108,7 @@ export function drawFighters(
     // Afterimage trail
     if (f.state === FighterState.RUN || f.state === FighterState.BACKDASH
       || f.state === FighterState.ROLL || f.state === FighterState.BACK_ROLL) {
-      drawAfterimageTrail(ctx, f, sx, leanOffsetX);
+      drawAfterimageTrail(ctx, f, sx, leanOffsetX, globalTick, maxModeActive);
     }
 
     // GC Roll green aura
@@ -344,32 +344,33 @@ export function resolveFighterColors(f: Fighter, globalTick: number): { bodyColo
   return { bodyColor, outlineColor, glowColor };
 }
 
-/** Draw afterimage trail for RUN/BACKDASH/ROLL */
-function drawAfterimageTrail(ctx: CanvasRenderingContext2D, f: Fighter, sx: number, leanOffsetX: number): void {
-  // KOF2002: 残影色渐变 — 内层亮外层暗, RUN=橙, BACKDASH=蓝, ROLL=绿
-  const trailColors = f.state === FighterState.RUN
-    ? ['#ff8800', '#ff6600', '#ff4400']
+/** Draw afterimage trail for RUN/BACKDASH/ROLL — skeletal pose with per-ghost alpha */
+function drawAfterimageTrail(
+  ctx: CanvasRenderingContext2D, f: Fighter, sx: number, leanOffsetX: number,
+  globalTick: number, maxModeActive: boolean,
+): void {
+  // KOF2002: 残影色调 — RUN=橙, BACKDASH=蓝, ROLL=绿
+  const trailColor = f.state === FighterState.RUN
+    ? shiftColor(f.color, 40)
     : f.state === FighterState.BACKDASH
-    ? ['#6699ff', '#4477ee', '#3355cc']
-    : ['#44ff88', '#33dd66', '#22bb44'];
-  for (let i = 1; i <= 3; i++) {
-    ctx.globalAlpha = 0.3 / i;
+    ? shiftColor(f.color, 60)
+    : shiftColor(f.color, 50);
+  const trailOutline = f.state === FighterState.RUN
+    ? '#ff880050'
+    : f.state === FighterState.BACKDASH
+    ? '#6699ff50'
+    : '#44ff8850';
+
+  const ghostCount = 3;
+  for (let i = 1; i <= ghostCount; i++) {
+    ctx.save();
+    // 渐隐 alpha: 第一道最清晰, 越远越淡
+    ctx.globalAlpha = 0.32 / i;
     const trailX = sx - leanOffsetX * i * 1.5 - f.facing * 12 * i;
-    const trailH = f.displayHeight - i * 4;
-    // 渐变残影
-    const tGrad = ctx.createLinearGradient(trailX - FIGHTER_WIDTH / 2, 0, trailX + FIGHTER_WIDTH / 2, 0);
-    tGrad.addColorStop(0, 'rgba(0,0,0,0)');
-    tGrad.addColorStop(0.2, trailColors[i - 1] + '60');
-    tGrad.addColorStop(0.5, trailColors[i - 1] + '90');
-    tGrad.addColorStop(0.8, trailColors[i - 1] + '60');
-    tGrad.addColorStop(1, 'rgba(0,0,0,0)');
-    ctx.fillStyle = tGrad;
-    roundRect(ctx,
-      trailX - FIGHTER_WIDTH / 2, f.y - f.displayHeight + i * 4,
-      FIGHTER_WIDTH, trailH, 5);
-    ctx.fill();
+    // 用完整骨骼 pose 渲染残影，角色颜色略偏残影色调
+    drawSkeletalFighter(ctx, f, trailX, f.y, trailColor, trailOutline, globalTick, maxModeActive);
+    ctx.restore();
   }
-  ctx.globalAlpha = 1;
 }
 
 function isFighterDebugOverlayEnabled(): boolean {

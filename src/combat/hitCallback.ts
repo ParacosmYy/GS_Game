@@ -38,9 +38,10 @@ function calcHitStop(at: AttackType, isDM: boolean, isSpecial: boolean, ch: bool
   const heavy = at === AttackType.STAND_C || at === AttackType.STAND_D || at === AttackType.CLOSE_C
     || at === AttackType.CLOSE_D || at === AttackType.CROUCH_C || at === AttackType.CROUCH_D
     || at === AttackType.JUMP_C || at === AttackType.JUMP_D;
-  // 收紧命中顿帧：保留层次，但减少"拖尾感"
-  const r = isDM ? 16 : isSpecial ? 11 : heavy ? 6 : 2;
-  return ch ? r + 2 : r;
+  const s = at as string;
+  const isSDM = s.startsWith('SDM_');
+  const r = isDM ? (isSDM ? 22 : 19) : isSpecial ? 13 : heavy ? 7 : 4;
+  return ch ? r + 3 : r;
 }
 
 function calcShake(at: AttackType, isDM: boolean, isSpecial: boolean, ch: boolean, dmg: number): number {
@@ -128,8 +129,8 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       if (blkHeavy || blkDM) {
         deps.vfx.spawnDust(defender.x, defender.y);
       }
-      // 防御顿帧 — 保留层次，但不把防御反馈拉得太长
-      const blkStop = blkDM ? 5 : blkSpecial ? 3 : blkHeavy ? 3 : 2;
+      // 防御顿帧 — KOF2002: DM防御8f, 必杀技防御5f, 重攻击防御4f, 轻攻击防御2f
+      const blkStop = blkDM ? 8 : blkSpecial ? 5 : blkHeavy ? 4 : 2;
       deps.cinematic.triggerHitStop(blkStop, defIdx, attacker.facing);
       // 防御反馈更偏"硬切"而不是层层铺开
       const blkBias = (blkDM || blkSpecial || blkHeavy) ? attacker.facing * 3 : 0;
@@ -218,6 +219,11 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
     if (isHeavyAttack(attackType) && !isSpecial && !isDM) {
       deps.vfx.spawnImpactRing(hitX, hitY, 0.75);
       deps.screenFlash.trigger('#ffffcc', 0.05, 2);
+    }
+
+    // 取消点闪光 — 命中(非投技)时在攻击者身上显示可取消提示
+    if (!isThrowAttack(attackType)) {
+      deps.vfx.spawnCancelFlash(attacker.x, attacker.y, attacker.displayHeight);
     }
 
     // Rekka finisher增强
@@ -328,8 +334,8 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       deps.screenFlash.trigger('#ffffff', 0.04, 2);
     }
 
-    // 震屏收短，方向更明确，避免"平均用力"
-    const shakeDur = isDM ? 12 : isSpecial ? 10 : isHeavyAttack(attackType) ? 8 : 4;
+    // 震屏方向更明确，DM/KO层次拉开
+    const shakeDur = isDM ? 16 : isSpecial ? 10 : isHeavyAttack(attackType) ? 8 : 4;
     const comboShakeBonus = combo >= 10 ? 1 : 0;
     // 连击中震屏递减: 高连击时震屏强度逐步衰减，最低保留60%
     const comboShakeDecay = combo >= 3 ? Math.max(0.6, 1 - combo * 0.05) : 1;
@@ -359,6 +365,6 @@ export function triggerKOGroundEffect(deps: { vfx: VFXSystem; screenFlash: Scree
   deps.vfx.spawnImpactRing(defender.x, defender.y, 3.0);
   deps.vfx.spawnCharacterHitSparks(defender.x, defender.y - 20, 16, '#ff4400', 1.2, 1.5);
   deps.screenFlash.trigger('#ff2200', 0.35, 14);
-  // KOF2002: KO落地震屏42帧, 模拟地面冲击波持续感
-  deps.screenShake.trigger(22, 42);
+  // KOF2002: KO落地震屏55帧, 模拟地面冲击波持续感
+  deps.screenShake.trigger(22, 55);
 }

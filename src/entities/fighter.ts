@@ -130,6 +130,9 @@ export class Fighter {
   // Counter Wire: currently bouncing off wall from counter wire
   isCounterWire = false;
 
+  // Hit confirm delay: 1-frame gate to prevent zero-frame cancel (resolveHit sets, tickTimers decrements)
+  hitConfirmDelay: number = 0;
+
   // Hit flash: bright overlay on hit for visual feedback (counts down from 4)
   hitFlashFrames = 0;
   hitFlashColor = '#ffffff';
@@ -443,6 +446,7 @@ export class Fighter {
     if (this.landingRecovery > 0) this.landingRecovery--;
     if (this.runStopTimer > 0) this.runStopTimer--;
     if (this.throwInvincibilityTimer > 0) this.throwInvincibilityTimer--;
+    if (this.hitConfirmDelay > 0) this.hitConfirmDelay--;
     if (this.hitFlashFrames > 0) this.hitFlashFrames--;
     if (this.throwBufferTimer > 0) this.throwBufferTimer--;
     // MAX activation invincibility countdown
@@ -567,6 +571,7 @@ export class Fighter {
     this.resetCancelFlags();
     this.isCounterWire = false;
     this.hasAttackedInAir = false;
+    this.hitConfirmDelay = 0;
     this.throwInvulnFrames = 0;
     this.invincible = false;
     this.state = FighterState.IDLE;

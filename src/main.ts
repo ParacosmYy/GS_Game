@@ -566,7 +566,7 @@ function update(): void {
       else cinematic.triggerKOSlowMo();
       const koDefender = p1.health <= 0 ? 0 : 1;
       const koAttacker = p1.health <= 0 ? p2 : p1;
-      cinematic.triggerHitStop(isDMKill ? 16 : 12, koDefender, koAttacker.facing);
+      cinematic.triggerHitStop(isDMKill ? 20 : 15, koDefender, koAttacker.facing);
       screenFlash.trigger('#ff2200', 0.35, 15);
       screenShake.trigger(isDMKill ? 18 : 14, 15);
       playKO();

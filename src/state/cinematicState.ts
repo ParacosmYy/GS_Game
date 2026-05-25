@@ -63,11 +63,11 @@ export class CinematicState {
 
   /** Trigger Super Flash (dark screen freeze) on DM startup */
   triggerSuperFlash(x: number, y: number, attacker: number): void {
-    this.superFlashTimer = 24;
+    this.superFlashTimer = 28;
     this.superFlashX = x;
     this.superFlashY = y;
     this.superFlashAttacker = attacker;
-    this.hitStop = 24;
+    this.hitStop = 28;
   }
 
   /** Trigger KO slow-motion (40 frames, every 3rd frame runs) */
