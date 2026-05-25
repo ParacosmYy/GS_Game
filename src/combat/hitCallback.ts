@@ -74,21 +74,33 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
   return (attacker: Fighter, defender: Fighter, attackType: AttackType, blocked: boolean, counterHit: boolean): void => {
     const data = FRAME_DATA[attackType as keyof typeof FRAME_DATA];
     const [p1, p2] = deps.fighters;
-    const hitX = (attacker.x + defender.x) / 2;
-    const hitY = defender.y - defender.displayHeight / 2;
+    const atkName = attackType as string;
+    // KOF2002: 近距离攻击火花偏向防守方, 远距离/投射偏向中间
+    const isClose = atkName.startsWith('CLOSE_') || attackType === AttackType.THROW
+      || attackType === AttackType.THROW_FORWARD || attackType === AttackType.THROW_BACK;
+    const isAir = !defender.isGrounded();
+    const hitX = isClose ? defender.x + (attacker.x - defender.x) * 0.2 : (attacker.x + defender.x) / 2;
+    // KOF2002: 空中命中偏上, 必杀/DM偏胸部, 通常攻击偏腰部
+    const { isDM: preDM, isSpecial: preSpecial } = classifyAttack(attackType);
+    const hitY = isAir ? defender.y - defender.displayHeight * 0.6
+      : preDM ? defender.y - defender.displayHeight * 0.65
+      : preSpecial ? defender.y - defender.displayHeight * 0.6
+      : defender.y - defender.displayHeight * 0.45;
     const atkIdx = attacker === p1 ? 0 : 1;
     const defIdx = defender === p1 ? 0 : 1;
 
     if (blocked) {
-      // KOF2002: 防御火花按攻击类型着色 — 通常白色, 必杀金色, DM蓝色
+      // KOF2002: 防御火花偏向防御者面前
+      const blkX = defender.x - defender.facing * 15;
+      const blkY = defender.y - defender.displayHeight / 2;
       const { isDM: blkDM, isSpecial: blkSpecial } = classifyAttack(attackType);
       const blkColor = blkDM ? '#6688ff' : blkSpecial ? '#ffcc44' : '#ffffff';
       const blkHeavy = attackType === AttackType.STAND_C || attackType === AttackType.STAND_D
         || attackType === AttackType.CLOSE_C || attackType === AttackType.CLOSE_D
         || attackType === AttackType.CROUCH_C || attackType === AttackType.CROUCH_D;
       const blkFlashScale = blkDM ? 1.8 : blkSpecial ? 1.4 : blkHeavy ? 1.2 : 0.8;
-      deps.vfx.spawnBlockFlash(hitX, hitY, blkFlashScale);
-      if (blkSpecial) deps.vfx.spawnCharacterHitSparks(hitX, hitY, 6, blkColor, 1.2);
+      deps.vfx.spawnBlockFlash(blkX, blkY, blkFlashScale);
+      if (blkSpecial) deps.vfx.spawnCharacterHitSparks(blkX, blkY, 6, blkColor, 1.2);
       const blkStop = blkSpecial ? 5 : blkHeavy ? 5 : 3;
       deps.cinematic.triggerHitStop(blkStop);
       deps.screenShake.trigger(blkSpecial ? 5 : blkHeavy ? 4 : 2, 6);
@@ -177,8 +189,8 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
     }
     else if (isSpecial) playSpecial();
     else if (data.damage >= 70) playHeavyHit();
-    else if (!defender.isGrounded()) playJuggleHit();
-    else playHit(data.damage > 50 ? 1.2 : 1.0);
+    else if (!defender.isGrounded()) playJuggleHit(combo);
+    else playHit(data.damage > 50 ? 1.2 : 1.0, combo);
 
     // Counter Hit
     if (counterHit) {

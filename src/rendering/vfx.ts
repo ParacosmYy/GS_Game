@@ -344,13 +344,17 @@ export class VFXSystem {
         case 'text': {
           ctx.save();
           ctx.globalAlpha = alpha;
-          // 描边
-          ctx.strokeStyle = '#000';
-          ctx.lineWidth = 3;
           ctx.font = `bold ${p.size}px "Courier New", monospace`;
           ctx.textAlign = 'center';
+          // KOF2002: 外层辉光 — 大文字(size>=18)加发光
+          if (p.size >= 18 && alpha > 0.3) {
+            ctx.shadowColor = p.color;
+            ctx.shadowBlur = 6;
+          }
+          ctx.strokeStyle = '#000';
+          ctx.lineWidth = 3;
           ctx.strokeText(p.text || '', sx, p.y);
-          // 填充
+          ctx.shadowBlur = 0;
           ctx.fillStyle = p.color;
           ctx.fillText(p.text || '', sx, p.y);
           ctx.restore();

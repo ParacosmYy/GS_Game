@@ -14,15 +14,16 @@ export {
   playQuickStand, playStep,
 } from './sfxMisc.js';
 
-/** Light hit (A/B) — KOF-style snappy impact */
-export function playHit(intensity: number = 1): void {
+/** Light hit (A/B) — KOF-style snappy impact. combo: 连击数(0+), 高连击时音高递增 */
+export function playHit(intensity: number = 1, combo: number = 0): void {
   const ctx = getCtx();
   const now = ctx.currentTime;
+  const pitchShift = 1 + Math.min(combo, 15) * 0.04;
 
   const noise = noiseBuffer(ctx, 0.05, 0.12);
   const noiseFilter = ctx.createBiquadFilter();
   noiseFilter.type = 'bandpass';
-  noiseFilter.frequency.value = 1800 + intensity * 400;
+  noiseFilter.frequency.value = (1800 + intensity * 400) * pitchShift;
   noiseFilter.Q.value = 0.5;
   const noiseGain = ctx.createGain();
   noiseGain.gain.setValueAtTime(0.35 * intensity, now);
@@ -30,7 +31,7 @@ export function playHit(intensity: number = 1): void {
 
   const osc = ctx.createOscillator();
   osc.type = 'sine';
-  osc.frequency.setValueAtTime(180 * intensity, now);
+  osc.frequency.setValueAtTime(180 * intensity * pitchShift, now);
   osc.frequency.exponentialRampToValueAtTime(60, now + 0.05);
   const oscGain = ctx.createGain();
   oscGain.gain.setValueAtTime(0.3 * intensity, now);
@@ -38,7 +39,7 @@ export function playHit(intensity: number = 1): void {
 
   const snap = ctx.createOscillator();
   snap.type = 'triangle';
-  snap.frequency.setValueAtTime(1200, now);
+  snap.frequency.setValueAtTime(1200 * pitchShift, now);
   snap.frequency.exponentialRampToValueAtTime(300, now + 0.025);
   const snapGain = ctx.createGain();
   snapGain.gain.setValueAtTime(0.15 * intensity, now);
@@ -46,7 +47,7 @@ export function playHit(intensity: number = 1): void {
 
   const hi = ctx.createOscillator();
   hi.type = 'square';
-  hi.frequency.setValueAtTime(3000, now);
+  hi.frequency.setValueAtTime(3000 * pitchShift, now);
   hi.frequency.exponentialRampToValueAtTime(800, now + 0.012);
   const hiGain = ctx.createGain();
   hiGain.gain.setValueAtTime(0.05 * intensity, now);
@@ -461,22 +462,23 @@ export function playWire(): void {
   noise.start(now + 0.05); noise.stop(now + 0.13);
 }
 
-/** Juggle hit — floating impact */
-export function playJuggleHit(): void {
+/** Juggle hit — floating impact. combo: 连击数, 高连击时音高递增 */
+export function playJuggleHit(combo: number = 0): void {
   const ctx = getCtx();
   const now = ctx.currentTime;
+  const pitchShift = 1 + Math.min(combo, 15) * 0.04;
 
   const noise = noiseBuffer(ctx, 0.04, 0.12);
   const filter = ctx.createBiquadFilter();
   filter.type = 'highpass';
-  filter.frequency.value = 1500;
+  filter.frequency.value = 1500 * pitchShift;
   const nGain = ctx.createGain();
   nGain.gain.setValueAtTime(0.15, now);
   nGain.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
 
   const osc = ctx.createOscillator();
   osc.type = 'triangle';
-  osc.frequency.setValueAtTime(600, now);
+  osc.frequency.setValueAtTime(600 * pitchShift, now);
   osc.frequency.exponentialRampToValueAtTime(200, now + 0.03);
   const oGain = ctx.createGain();
   oGain.gain.setValueAtTime(0.12, now);

@@ -243,11 +243,12 @@ export function spawnGroundSlam(particles: Particle[], worldX: number, worldY: n
 
 export function spawnDamageText(particles: Particle[], worldX: number, worldY: number, value: number): void {
   const isCombo = value > 0 && value <= 50;
-  // KOF2002: 伤害越大数字越大 (DM/必杀技大字, 通常技小字)
-  const dmgSize = isCombo ? 18 + Math.min(value, 10) : value >= 80 ? 22 : value >= 50 ? 18 : 14;
-  const color = isCombo ? (value >= 10 ? '#ff8800' : '#ffcc00') : value >= 80 ? '#ff0000' : '#ff4444';
+  const dmgSize = isCombo ? 18 + Math.min(value, 10) : value >= 120 ? 24 : value >= 80 ? 22 : value >= 50 ? 18 : 14;
+  const color = isCombo ? (value >= 10 ? '#ff8800' : '#ffcc00') : value >= 120 ? '#ff0000' : value >= 80 ? '#ff4444' : '#ff4444';
+  // KOF2002: 连击数向右漂, 伤害数字向左漂, 产生视觉分离
+  const driftX = isCombo ? 1.2 : -0.8;
   particles.push({
-    x: worldX, y: worldY, vx: (Math.random() - 0.5) * 0.8, vy: -2,
+    x: worldX, y: worldY, vx: driftX + (Math.random() - 0.5) * 0.3, vy: -2,
     life: 45, maxLife: 45,
     size: dmgSize,
     color,
@@ -283,8 +284,8 @@ export function spawnFirstAttackText(particles: Particle[], worldX: number, worl
 export function spawnComboEndText(particles: Particle[], worldX: number, worldY: number, hits: number): void {
   particles.push({
     x: worldX, y: worldY, vx: 0, vy: -1.2,
-    life: 50, maxLife: 50, size: 16,
-    color: '#ff8844', type: 'text', text: `${hits} HITS`,
+    life: 50, maxLife: 50, size: hits >= 10 ? 20 : hits >= 5 ? 18 : 16,
+    color: hits >= 10 ? '#ff4444' : '#ff8844', type: 'text', text: `${hits} HITS`,
   });
 }
 
@@ -292,8 +293,8 @@ export function spawnComboEndText(particles: Particle[], worldX: number, worldY:
 export function spawnComboDamageText(particles: Particle[], worldX: number, worldY: number, totalDmg: number): void {
   particles.push({
     x: worldX, y: worldY + 18, vx: 0, vy: -0.8,
-    life: 55, maxLife: 55, size: 14,
-    color: '#ffdd44', type: 'text', text: `DMG ${totalDmg}`,
+    life: 55, maxLife: 55, size: totalDmg >= 200 ? 18 : totalDmg >= 100 ? 16 : 14,
+    color: totalDmg >= 200 ? '#ff4444' : '#ffdd44', type: 'text', text: `DMG ${totalDmg}`,
   });
 }
 
