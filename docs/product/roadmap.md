@@ -6,6 +6,7 @@
 
 ## P0 稳定与可复现
 
+- 清理冲突文档，固定 `AGENTS.md` / `CLAUDE.md` / `docs/` 的职责层级。
 - 输入链路可切换 live/replay。
 - RNG、AI、回放、match envelope 可复现。
 - `main.ts` 阶段编排继续向 `state/` 收口。
@@ -13,6 +14,7 @@
 
 ## P1 正式资产管线
 
+- 定义 portrait manifest，并让头像从 hardcode 走向可替换资源。
 - 建立 sprite atlas 数据格式。
 - 建立 frame data 与视觉帧映射。
 - 建立 hitbox/hurtbox/throwbox 随帧数据。
@@ -22,6 +24,7 @@
 ## P2 角色与打击感样板
 
 - Ryo/Kyo/Iori 三角色样板。
+- 先以 Ryo 跑通一套完整角色闭环，再复制结构到 Kyo/Iori。
 - 站姿、走路、攻击、受击、倒地、胜利动作统一气质。
 - hitstop、shake、spark、SFX 分层。
 
@@ -42,4 +45,3 @@
 - Continue
 - Training Mode
 - Replay Playback UI
-

@@ -6,12 +6,13 @@
 
 1. 用户当前明确指令
 2. `AGENTS.md`
-3. `docs/process/*`
-4. `docs/architecture/*`
-5. `docs/product/*`
-6. `docs/reference/*`
-7. `README.md`
-8. `docs/archive/*` 仅作历史参考，不参与当前约束
+3. `CLAUDE.md`
+4. `docs/process/*`
+5. `docs/architecture/*`
+6. `docs/product/*`
+7. `docs/reference/*`
+8. `README.md`
+9. `docs/archive/*` 仅作历史参考，不参与当前约束
 
 ## 1. 项目目标
 
@@ -31,7 +32,7 @@
 除非用户明确要求只讨论或只整理文档，否则每轮迭代必须闭环：
 
 1. 研究：先查 `references/` 和公开资料，记录可借鉴点。
-2. 需求：至少从 PM 视角和玩家/用户视角确认本轮目标。
+2. 需求：至少从 PM 视角和玩家/用户视角确认本轮目标；需要长期协同时按 `CLAUDE.md` 和 [角色模板](docs/process/role-prompts.md) 执行。
 3. 方案：说明职责归属、改动范围、验收标准。
 4. 实施：只改本轮范围内文件，不做无关功能扩张。
 5. 验证：按质量门禁运行测试、类型检查、构建或手测。
@@ -88,13 +89,15 @@ npx vite build
 ## 8. 文档索引
 
 - [README](README.md)：人类入口、运行方式、项目现状。
+- [CLAUDE](CLAUDE.md)：长期 AI 迭代执行手册。
 - [当前架构](docs/architecture/current-architecture.md)：当前 `src/` 真实结构。
 - [模块边界](docs/architecture/module-boundaries.md)：依赖方向、文件职责、禁止事项。
 - [未来引擎架构](docs/architecture/future-engine-architecture.md)：是否换栈和渐进迁移方案。
 - [迭代流程](docs/process/iteration-workflow.md)：长期 AI 自动迭代流程。
+- [角色模板](docs/process/role-prompts.md)：PM、玩家、研发、测试、架构师协同模板。
 - [质量门禁](docs/process/quality-gates.md)：测试、构建、手测和反退化。
 - [评分规则](docs/process/scoring.md)：千分制、+5 规则、最新分数。
 - [真实性标准](docs/product/authenticity-standard.md)：对标 KOF/QF 的验收标准。
 - [角色完整性](docs/product/character-completeness.md)：完整角色定义。
 - [公开参考源](docs/reference/public-research-sources.md)：MUGEN/IKEMEN/QF 参考边界。
-- [历史归档](docs/archive)：旧文档和长评分日志，仅作历史参考。
+- [历史评分](docs/archive/SCORE.history.md)：长评分日志，仅作历史审计。

@@ -34,9 +34,11 @@ npx vitest run
 ## 文档入口
 
 - [AGENTS.md](AGENTS.md)：AI 自动迭代最高约束。
+- [CLAUDE.md](CLAUDE.md)：长期 AI 迭代执行手册，包含每轮 PM、玩家、研发、测试、架构师模板。
 - [当前架构](docs/architecture/current-architecture.md)：当前真实代码结构。
 - [模块边界](docs/architecture/module-boundaries.md)：依赖方向和禁止事项。
 - [迭代流程](docs/process/iteration-workflow.md)：每轮闭环流程。
+- [角色协同模板](docs/process/role-prompts.md)：需求拆分、复盘和多角色评审模板。
 - [质量门禁](docs/process/quality-gates.md)：测试、构建、手测要求。
 - [评分规则](docs/process/scoring.md)：千分制和每轮 +5 规则。
 - [真实性标准](docs/product/authenticity-standard.md)：对标正版 KOF/QF 的验收标准。
