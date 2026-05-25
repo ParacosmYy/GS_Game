@@ -95,6 +95,24 @@ export function drawSuperFlash(
   }
 
   // Floating energy particles
+
+  // KOF2002: 速度线 — DM发动时从角色向外辐射的直线
+  if (timer > 12) {
+    const lineAlpha = (timer - 12) / 8 * 0.2;
+    ctx.save();
+    ctx.strokeStyle = isSDM ? `rgba(255, 200, 100, ${lineAlpha})` : `rgba(255, 255, 200, ${lineAlpha})`;
+    ctx.lineWidth = 1.5;
+    for (let i = 0; i < 24; i++) {
+      const angle = (i / 24) * Math.PI * 2;
+      const innerR = 30 + (1 - progress) * 20;
+      const outerR = 200 + (1 - progress) * 150;
+      ctx.beginPath();
+      ctx.moveTo(flashScreenX + Math.cos(angle) * innerR, flashScreenY + Math.sin(angle) * innerR);
+      ctx.lineTo(flashScreenX + Math.cos(angle) * outerR, flashScreenY + Math.sin(angle) * outerR);
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
   if (timer > 5) {
     const particleAlpha = Math.min(1, (timer - 5) / 10) * 0.8;
     for (let p = 0; p < 8; p++) {

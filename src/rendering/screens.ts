@@ -377,6 +377,20 @@ export function drawKO(ctx: CanvasRenderingContext2D, winner: number | null, per
     ctx.arc(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 20, ringR, 0, Math.PI * 2);
     ctx.stroke();
   }
+  // KOF2002: KO冲击线 — 从中心向外的放射线
+  ctx.save();
+  ctx.strokeStyle = isTimeOver ? `rgba(255, 170, 0, 0.12)` : `rgba(255, 34, 0, 0.15)`;
+  ctx.lineWidth = 2;
+  for (let i = 0; i < 32; i++) {
+    const angle = (i / 32) * Math.PI * 2;
+    const innerR = 40;
+    const outerR = 180 + (i % 3) * 30;
+    ctx.beginPath();
+    ctx.moveTo(CANVAS_WIDTH / 2 + Math.cos(angle) * innerR, CANVAS_HEIGHT / 2 - 20 + Math.sin(angle) * innerR);
+    ctx.lineTo(CANVAS_WIDTH / 2 + Math.cos(angle) * outerR, CANVAS_HEIGHT / 2 - 20 + Math.sin(angle) * outerR);
+    ctx.stroke();
+  }
+  ctx.restore();
   ctx.globalAlpha = 1;
 
   // Title text — SNK style with dramatic glow

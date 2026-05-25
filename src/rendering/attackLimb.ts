@@ -68,9 +68,29 @@ export function drawAttackLimb(
   const limbWidth = isHeavy ? 16 : 12;
 
   ctx.save();
-  // KOF2002: 重攻击/必杀技拖尾 — active帧半透明回影
+  // KOF2002: 重攻击/必杀技拖尾 — active帧半透明回影 + 弧形轨迹
   const showTrail = isHeavy || isSpecialMove;
   if (showTrail) {
+    // 弧形运动轨迹 — 扇形半透明渐变
+    ctx.save();
+    const arcCx = sx + 8 * f.facing;
+    const arcCy = sy - f.displayHeight * 0.5;
+    const arcR = limbLen * 0.9;
+    const arcStart = f.facing > 0 ? -0.6 : Math.PI - 0.4;
+    const arcEnd = f.facing > 0 ? 0.4 : Math.PI + 0.6;
+    ctx.globalAlpha = 0.12;
+    const arcGrad = ctx.createRadialGradient(arcCx, arcCy, arcR * 0.3, arcCx, arcCy, arcR);
+    arcGrad.addColorStop(0, isSpecialMove ? specialColor : (isPunch ? '#ffdd44' : '#44ddff'));
+    arcGrad.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = arcGrad;
+    ctx.beginPath();
+    ctx.moveTo(arcCx, arcCy);
+    ctx.arc(arcCx, arcCy, arcR, arcStart, arcEnd);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+
+    // 回影拖尾
     ctx.globalAlpha = 0.25;
     const trailOff = -8 * f.facing;
     ctx.save();

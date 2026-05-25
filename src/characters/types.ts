@@ -86,15 +86,15 @@ export interface BodyProportions {
   headCenterY: number;  // 头部中心Y偏移(相对refY)
 }
 
-// 默认体型（Kyo基准）
+// 默认体型（Kyo基准）— 15%增大更接近正版KOF比例
 export const DEFAULT_PROPORTIONS: BodyProportions = {
-  headW: 44, headH: 44,
-  torsoW: 56, torsoH: 68,
-  armW: 22, armH: 48,
-  legW: 26, legH: 60,
-  shoulderY: 16,
-  hipY: 60,
-  torsoCenterY: 34,
+  headW: 50, headH: 50,
+  torsoW: 64, torsoH: 78,
+  armW: 26, armH: 55,
+  legW: 30, legH: 68,
+  shoulderY: 18,
+  hipY: 68,
+  torsoCenterY: 38,
   headCenterY: 8,
 };
 

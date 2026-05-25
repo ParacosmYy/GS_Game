@@ -10,16 +10,14 @@ import { CommandBuffer } from '../input/commandBuffer.js';
 import { Camera } from '../core/camera.js';
 import { FighterState } from '../core/types.js';
 import type { PowerGauge, MaxModeState } from '../core/types.js';
-import { CANVAS_WIDTH, CANVAS_HEIGHT, STAGE_GROUND_Y, FIGHTER_WIDTH, FRAME_DATA } from '../core/constants.js';
+import { CANVAS_WIDTH, CANVAS_HEIGHT, FRAME_DATA, STAGE_GROUND_Y } from '../core/constants.js';
 
 import { drawStage, generateStars } from './stage.js';
 import type { Star } from './stage.js';
-import { drawSkeletalFighter } from './skeletalFighter.js';
-import { drawAttackLimb } from './attackLimb.js';
+import { drawFighters as drawFightersImpl } from './rendererFighter.js';
 import { drawHUD, drawPowerGauges, drawComboCounters, drawTeamOrder, type TeamDisplayInfo } from './hud.js';
 import { drawCharacterSelect, drawIntro, drawKO } from './screens.js';
 import { drawSuperFlash, drawMatchEnd, drawModeIndicator, drawStageIndicator, drawTitle, drawContinue } from './overlayScreens.js';
-import { shiftColor, roundRect } from './utils.js';
 import { ROSTER } from '../characters/index.js';
 import { drawProjectiles as drawProjectilesImpl } from './projectileRenderer.js';
 import type { SpriteRenderer } from './spriteRenderer.js';
@@ -58,324 +56,58 @@ export class Renderer {
     ctx.clearRect(-10, -10, CANVAS_WIDTH + 20, CANVAS_HEIGHT + 20);
 
     drawStage(ctx, cameraX, this.stars, this.globalTick);
-    this.drawFighters(ctx, fighters, cameraX, maxModes);
+
+    // KOF2002: 角色光源 — 每个角色发出微弱的环境光
+    for (const f of fighters) {
+      const charDef = ROSTER.find(c => c.id === f.charId);
+      const glowCol = charDef?.specialColor || '#ff4400';
+      const fsx = f.x - cameraX;
+      // 攻击时光源增强
+      const isAttacking = f.attackPhase === 'active';
+      const intensity = f.hitFlashFrames > 0 ? 0.15 : isAttacking ? 0.08 : 0.03;
+      const lightR = f.hitFlashFrames > 0 ? 140 : isAttacking ? 100 : 70;
+      const lightGrad = ctx.createRadialGradient(fsx, f.y - f.displayHeight / 2, 5, fsx, f.y - f.displayHeight / 2, lightR);
+      lightGrad.addColorStop(0, glowCol + (f.hitFlashFrames > 0 ? '25' : isAttacking ? '15' : '08'));
+      lightGrad.addColorStop(0.5, glowCol + '05');
+      lightGrad.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.globalAlpha = intensity;
+      ctx.fillStyle = lightGrad;
+      ctx.fillRect(fsx - lightR, f.y - f.displayHeight / 2 - lightR, lightR * 2, lightR * 2);
+      ctx.globalAlpha = 1;
+    }
+
+    drawFightersImpl(ctx, fighters, cameraX, this.globalTick, maxModes);
     drawHUD(ctx, fighters, tick, delayedHealth, p1Wins, p2Wins, p1Name, p2Name, currentRound, firstAttacker);
 
     if (ko) {
       drawKO(ctx, winner, perfectPlayer, isTimeOver, fighters[0].health, fighters[1].health, fighters[0].maxHealth);
     }
 
+    // KOF2002: 暗角效果 — 聚焦中心, 边缘渐暗
+    const vigGrad = ctx.createRadialGradient(
+      CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, CANVAS_WIDTH * 0.28,
+      CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, CANVAS_WIDTH * 0.65,
+    );
+    vigGrad.addColorStop(0, 'rgba(0, 0, 0, 0)');
+    vigGrad.addColorStop(0.6, 'rgba(0, 0, 0, 0.08)');
+    vigGrad.addColorStop(1, 'rgba(0, 0, 0, 0.35)');
+    ctx.fillStyle = vigGrad;
+    ctx.fillRect(-10, -10, CANVAS_WIDTH + 20, CANVAS_HEIGHT + 20);
+
+    // KOF2002: 底部地面雾气 — 地面附近半透明白色薄雾
+    const fogGrad = ctx.createLinearGradient(0, STAGE_GROUND_Y + 10, 0, STAGE_GROUND_Y + 60);
+    fogGrad.addColorStop(0, 'rgba(180, 170, 160, 0)');
+    fogGrad.addColorStop(0.3, 'rgba(160, 155, 150, 0.06)');
+    fogGrad.addColorStop(0.7, 'rgba(140, 135, 130, 0.08)');
+    fogGrad.addColorStop(1, 'rgba(120, 115, 110, 0.12)');
+    ctx.fillStyle = fogGrad;
+    ctx.fillRect(-10, STAGE_GROUND_Y + 10, CANVAS_WIDTH + 20, 60);
+
     ctx.restore();
   }
 
   getFps(): number {
     return this.currentFps;
-  }
-
-  private drawFighters(ctx: CanvasRenderingContext2D, fighters: Fighter[], cameraX: number, maxModes?: [MaxModeState, MaxModeState]): void {
-    const sorted = [...fighters].sort((a, b) => a.y - b.y);
-
-    for (const f of sorted) {
-      const sx = f.x - cameraX;
-      const sy = f.y;
-      const hw = FIGHTER_WIDTH / 2;
-      const isP1 = f === fighters[0];
-      const playerIdx = isP1 ? 0 : 1;
-      const maxModeActive = maxModes ? maxModes[playerIdx].active : false;
-      const guardLow = f.guardGauge < 30; // 防御槽低于30%闪烁警告
-
-      // Enhanced ground shadow — soft gradient with distance-based scaling
-      const airDist = Math.max(0, STAGE_GROUND_Y - f.y);
-      const shadowScale = Math.max(0.2, 1 - airDist / 250);
-      const shadowW = (hw + 8) * (0.6 + shadowScale * 0.4);
-      const shadowH = 4 + shadowScale * 3;
-      const shadowAlpha = 0.15 + 0.15 * shadowScale;
-      const shadowGrad = ctx.createRadialGradient(sx, STAGE_GROUND_Y + 2, 0, sx, STAGE_GROUND_Y + 2, shadowW);
-      shadowGrad.addColorStop(0, `rgba(0, 0, 0, ${shadowAlpha})`);
-      shadowGrad.addColorStop(0.5, `rgba(0, 0, 0, ${shadowAlpha * 0.5})`);
-      shadowGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
-      ctx.fillStyle = shadowGrad;
-      ctx.beginPath();
-      ctx.ellipse(sx, STAGE_GROUND_Y + 2, shadowW, shadowH, 0, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Resolve body colors from fighter state
-      const { bodyColor, outlineColor, glowColor } = this.resolveFighterColors(f);
-
-      // Glow behind body
-      if (glowColor) {
-        const glowPulse = maxModeActive ? 1 + Math.sin(this.globalTick * 0.12) * 0.3 : 1;
-        ctx.fillStyle = glowColor;
-        ctx.beginPath();
-        ctx.ellipse(sx, sy - f.displayHeight / 2, (hw + 15) * glowPulse, (f.displayHeight / 2 + 15) * glowPulse, 0, 0, Math.PI * 2);
-        ctx.fill();
-      }
-      // MAX模式专属绿色光环+轮廓发光
-      if (maxModeActive) {
-        const auraPulse = 0.08 + Math.sin(this.globalTick * 0.1) * 0.04;
-        ctx.fillStyle = `rgba(68, 255, 136, ${auraPulse})`;
-        ctx.beginPath();
-        ctx.ellipse(sx, sy - f.displayHeight / 2, hw + 25, f.displayHeight / 2 + 20, 0, 0, Math.PI * 2);
-        ctx.fill();
-        // KOF2002: MAX轮廓发光 — 脉动的绿色外框
-        const outlinePulse = Math.sin(this.globalTick * 0.15) * 0.3 + 0.4;
-        ctx.strokeStyle = `rgba(68, 255, 136, ${outlinePulse})`;
-        ctx.lineWidth = 3;
-        ctx.beginPath();
-        ctx.ellipse(sx, sy - f.displayHeight / 2, hw + 8, f.displayHeight / 2 + 8, 0, 0, Math.PI * 2);
-        ctx.stroke();
-      }
-
-      // Ground reflection — subtle mirrored silhouette at ground level
-      if (f.isGrounded()) {
-        ctx.save();
-        ctx.globalAlpha = 0.06;
-        ctx.translate(sx, STAGE_GROUND_Y);
-        ctx.scale(1, -0.15);
-        ctx.translate(-sx, -STAGE_GROUND_Y);
-        drawSkeletalFighter(ctx, f, sx, f.y, f.color, '#000000', this.globalTick, maxModeActive);
-        ctx.restore();
-      }
-
-      // Lean offset for RUN/BACKDASH
-      let leanOffsetX = 0;
-      let leanAngle = 0;
-      if (f.state === FighterState.RUN) {
-        leanOffsetX = 8 * f.facing;
-        leanAngle = 0.12 * f.facing;
-      } else if (f.state === FighterState.BACKDASH) {
-        leanOffsetX = -6 * f.facing;
-        leanAngle = -0.08 * f.facing;
-      }
-
-      // Afterimage trail for RUN/BACKDASH/ROLL
-      if (f.state === FighterState.RUN || f.state === FighterState.BACKDASH
-        || f.state === FighterState.ROLL || f.state === FighterState.BACK_ROLL) {
-        this.drawAfterimageTrail(ctx, f, sx, leanOffsetX);
-      }
-
-      // Guard Cancel Roll: fully invincible green aura
-      if (f.isRolling() && f.isGCRoll) {
-        ctx.save();
-        ctx.globalAlpha = 0.25 + 0.15 * Math.sin(this.globalTick * 1.2);
-        ctx.fillStyle = '#22ff88';
-        ctx.beginPath();
-        ctx.ellipse(sx, STAGE_GROUND_Y - 40, 35, 55, 0, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.restore();
-      }
-
-      // Backdash startup invincibility glow (blue flicker)
-      if (f.isBackdashInvincible()) {
-        ctx.save();
-        ctx.globalAlpha = 0.3 + 0.2 * Math.sin(this.globalTick * 0.8);
-        ctx.fillStyle = '#4488ff';
-        ctx.beginPath();
-        ctx.ellipse(sx, STAGE_GROUND_Y - 50, 40, 60, 0, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.restore();
-      }
-
-      // Roll recovery vulnerability flash (orange warning)
-      if (f.isRolling() && !f.isRollInvincible()) {
-        ctx.save();
-        ctx.globalAlpha = 0.2 + 0.15 * Math.sin(this.globalTick * 1.2);
-        ctx.fillStyle = '#ffaa00';
-        ctx.beginPath();
-        ctx.ellipse(sx, STAGE_GROUND_Y - 30, 30, 40, 0, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.restore();
-      }
-
-      ctx.save();
-      ctx.translate(sx + leanOffsetX, sy);
-      ctx.rotate(leanAngle);
-      ctx.translate(-(sx + leanOffsetX), -sy);
-
-      // KOF2002: Hitstun body shake — 受击时身体短暂抖动
-      if (f.state === FighterState.HITSTUN && f.hitstunTimer > 0) {
-        const shakeAmt = Math.min(3, f.hitstunTimer * 0.2);
-        ctx.translate((Math.random() - 0.5) * shakeAmt, (Math.random() - 0.5) * shakeAmt * 0.5);
-      }
-
-      // 优先使用骨骼渲染（含像素风格服装细节），降级到精灵图
-      let usedSkeletal = true;
-      drawSkeletalFighter(ctx, f, sx + leanOffsetX, sy, bodyColor, outlineColor, this.globalTick, maxModeActive);
-
-      // 受击闪白: 在角色上方叠加白色
-      if (f.hitFlashFrames > 0) {
-        ctx.save();
-        ctx.globalCompositeOperation = 'source-atop';
-        ctx.globalAlpha = 0.6;
-        ctx.fillStyle = '#ffffff';
-        ctx.fillRect(sx + leanOffsetX - 60, sy - 200, 120, 200);
-        ctx.restore();
-      }
-      // MAX模式发光
-      if (maxModeActive) {
-        ctx.save();
-        ctx.globalCompositeOperation = 'screen';
-        ctx.globalAlpha = 0.15 + Math.sin(this.globalTick * 0.15) * 0.1;
-        ctx.fillStyle = '#44ff88';
-        ctx.fillRect(sx + leanOffsetX - 60, sy - 200, 120, 200);
-        ctx.restore();
-      }
-      // 防御槽低警告 — 红色闪烁
-      if (guardLow && this.globalTick % 20 < 10) {
-        ctx.save();
-        ctx.globalCompositeOperation = 'screen';
-        ctx.globalAlpha = 0.12;
-        ctx.fillStyle = '#ff2222';
-        ctx.fillRect(sx + leanOffsetX - 60, sy - 200, 120, 200);
-        ctx.restore();
-      }
-
-      ctx.restore();
-
-      drawAttackLimb(ctx, f, sx, sy);
-
-      // Player label
-      ctx.fillStyle = isP1 ? '#ff5555' : '#5599ff';
-      ctx.font = 'bold 11px monospace';
-      ctx.textAlign = 'center';
-      ctx.fillText(isP1 ? 'P1' : 'P2', sx, sy - f.displayHeight - 8);
-
-      // Quick Stand提示: 软倒地时闪烁提示玩家可以按A+B快速起身
-      if (f.state === FighterState.KNOCKDOWN && !f.isHardKnockdown && f.knockdownTimer > 5
-        && this.globalTick % 16 < 10) {
-        ctx.fillStyle = '#ffcc44';
-        ctx.font = 'bold 10px monospace';
-        ctx.fillText('A+B', sx, sy - 10);
-      }
-      ctx.textAlign = 'left';
-    }
-  }
-
-  // ===== Color resolution =====
-
-  /** 计算精灵帧索引 — 不同状态使用不同的帧动画节奏 */
-  private calcSpriteFrame(f: Fighter): number {
-    const tick = this.globalTick;
-    switch (f.state) {
-      case FighterState.IDLE:
-        return Math.floor(tick / 8) % 8;
-      case FighterState.WALK:
-        return Math.floor(tick / 6) % 6;
-      case FighterState.RUN:
-        return Math.floor(tick / 4) % 6;
-      case FighterState.JUMP:
-      case FighterState.HOP:
-      case FighterState.RUN_JUMP:
-      case FighterState.HYPER_JUMP:
-      case FighterState.BACKDASH:
-        return Math.floor(tick / 8) % 6;
-      case FighterState.STAND_ATTACK:
-      case FighterState.CROUCH_ATTACK:
-      case FighterState.AIR_ATTACK:
-      case FighterState.THROW:
-        if (f.attackPhase === 'startup') return 0;
-        if (f.attackPhase === 'active') return 1;
-        return 3;
-      case FighterState.HITSTUN:
-        return Math.min(3, Math.floor(f.hitstunTimer / 5));
-      case FighterState.KNOCKDOWN:
-        return 0;
-      default:
-        return Math.floor(tick / 10) % 4;
-    }
-  }
-
-  private resolveFighterColors(f: Fighter): { bodyColor: string; outlineColor: string; glowColor: string | null } {
-    let bodyColor = f.color;
-    let outlineColor = '#ffffff30';
-    let glowColor: string | null = null;
-
-    switch (f.state) {
-      case FighterState.WALK:
-        bodyColor = shiftColor(f.color, 12);
-        break;
-      case FighterState.RUN:
-        bodyColor = shiftColor(f.color, 20);
-        outlineColor = '#ff880050';
-        glowColor = '#ff660025';
-        break;
-      case FighterState.BACKDASH:
-        bodyColor = shiftColor(f.color, 35);
-        outlineColor = '#88ccff60';
-        glowColor = '#4488ff20';
-        break;
-      case FighterState.ROLL:
-      case FighterState.BACK_ROLL:
-        bodyColor = shiftColor(f.color, 40);
-        outlineColor = '#44ff8860';
-        glowColor = '#22ff4420';
-        break;
-      case FighterState.HOP:
-        bodyColor = shiftColor(f.color, 15);
-        break;
-      case FighterState.HYPER_JUMP:
-        bodyColor = shiftColor(f.color, 30);
-        outlineColor = '#ff44ff50';
-        glowColor = '#ff22ff25';
-        break;
-      case FighterState.JUMP:
-      case FighterState.RUN_JUMP:
-        bodyColor = shiftColor(f.color, 25);
-        break;
-      case FighterState.STAND_ATTACK:
-      case FighterState.CROUCH_ATTACK:
-      case FighterState.AIR_ATTACK:
-        bodyColor = '#eebb00';
-        outlineColor = '#ffcc0060';
-        glowColor = '#ffaa0030';
-        break;
-      case FighterState.BLOCK:
-      case FighterState.AIR_BLOCK:
-        bodyColor = '#6688aa';
-        outlineColor = '#88aaff60';
-        glowColor = '#4466ff20';
-        break;
-      case FighterState.GUARD_CRUSH:
-        bodyColor = this.globalTick % 6 < 3 ? '#ff4444' : '#ffffff';
-        outlineColor = '#ff000080';
-        glowColor = '#ff220040';
-        break;
-      case FighterState.HITSTUN:
-        if (f.hitFlashFrames > 0) {
-          bodyColor = f.hitFlashColor || '#ffffff';
-          outlineColor = '#ffffffcc';
-        } else {
-          bodyColor = this.globalTick % 8 < 2 ? '#ffffff' : f.color;
-          outlineColor = '#ff505070';
-        }
-        break;
-      case FighterState.KNOCKDOWN:
-        bodyColor = shiftColor(f.color, -50);
-        outlineColor = '#88000040';
-        break;
-    }
-
-    return { bodyColor, outlineColor, glowColor };
-  }
-
-  // ===== Afterimage trail =====
-
-  private drawAfterimageTrail(ctx: CanvasRenderingContext2D, f: Fighter, sx: number, leanOffsetX: number): void {
-    const trailColor = f.state === FighterState.RUN
-      ? `rgba(255, 140, 0, ${0.15})`
-      : f.state === FighterState.BACKDASH
-      ? `rgba(100, 180, 255, ${0.18})`
-      : `rgba(80, 255, 140, ${0.18})`;
-    for (let i = 1; i <= 3; i++) {
-      ctx.globalAlpha = 0.3 / i;
-      ctx.fillStyle = trailColor;
-      const trailX = sx - leanOffsetX * i * 1.5 - f.facing * 12 * i;
-      roundRect(ctx,
-        trailX - FIGHTER_WIDTH / 2, f.y - f.displayHeight + i * 4,
-        FIGHTER_WIDTH, f.displayHeight - i * 4, 5);
-      ctx.fill();
-    }
-    ctx.globalAlpha = 1;
   }
 
   // ===== Projectile rendering (delegated) =====

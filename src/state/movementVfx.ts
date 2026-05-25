@@ -1,0 +1,46 @@
+/**
+ * 移动视觉反馈 — 从main.ts提取
+ */
+import { FighterState } from '../core/types.js';
+import { STAGE_GROUND_Y, STAGE_LEFT, STAGE_RIGHT } from '../core/constants.js';
+import type { Fighter } from '../entities/fighter.js';
+import type { VFXSystem } from '../rendering/vfx.js';
+
+/** 每帧移动视觉反馈: 跑步尘埃/着陆检测/壁弹火花 */
+export function updateMovementVfx(fighters: Fighter[], vfx: VFXSystem, tick: number): void {
+  for (const f of fighters) {
+    if (f.state === FighterState.RUN && tick % 8 === 0) {
+      vfx.spawnDust(f.x, STAGE_GROUND_Y);
+    }
+    if (f.state === FighterState.WALK && tick % 16 === 0 && f.isGrounded()) {
+      vfx.spawnDust(f.x, STAGE_GROUND_Y);
+    }
+    if (f.prevState !== FighterState.BACKDASH && f.state === FighterState.BACKDASH) {
+      vfx.spawnHeavyDust(f.x, STAGE_GROUND_Y, 4);
+    }
+    if ((f.prevState !== FighterState.ROLL && f.state === FighterState.ROLL)
+      || (f.prevState !== FighterState.BACK_ROLL && f.state === FighterState.BACK_ROLL)) {
+      vfx.spawnDust(f.x, STAGE_GROUND_Y);
+    }
+    const wasAir = f.prevState === FighterState.JUMP
+      || f.prevState === FighterState.RUN_JUMP
+      || f.prevState === FighterState.HOP
+      || f.prevState === FighterState.HYPER_JUMP
+      || f.prevState === FighterState.AIR_ATTACK
+      || f.prevState === FighterState.AIR_BLOCK;
+    const isGround = f.state === FighterState.IDLE
+      || f.state === FighterState.CROUCH
+      || f.state === FighterState.WALK;
+    if (wasAir && isGround) {
+      vfx.spawnHeavyDust(f.x, STAGE_GROUND_Y, 5);
+    }
+    const hitLeft = f.x <= STAGE_LEFT + 5;
+    const hitRight = f.x >= STAGE_RIGHT - 5;
+    if ((hitLeft || hitRight) && (f.state === FighterState.HITSTUN || f.state === FighterState.KNOCKDOWN)) {
+      const wallX = hitLeft ? STAGE_LEFT : STAGE_RIGHT;
+      if (tick % 3 === 0) {
+        vfx.spawnCharacterHitSparks(wallX, f.y - f.displayHeight / 2, 6, '#ffaa44');
+      }
+    }
+  }
+}

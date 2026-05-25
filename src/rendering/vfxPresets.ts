@@ -48,8 +48,14 @@ export function spawnBlockFlash(particles: Particle[], worldX: number, worldY: n
 export function spawnCharacterHitSparks(particles: Particle[], worldX: number, worldY: number, count: number, charColor: string, sizeScale: number = 1.0, speedScale: number = 1.0, starRatio: number = 0.25, lowGravity: boolean = false): void {
   particles.push({
     x: worldX, y: worldY, vx: 0, vy: 0,
-    life: 6, maxLife: 6, size: 25 * sizeScale,
+    life: 8, maxLife: 8, size: 30 * sizeScale,
     color: charColor, type: sizeScale >= 1.5 ? 'superburst' : 'flash',
+  });
+  // KOF2002: 白色核心闪光 — 命中瞬间额外白色小flash
+  particles.push({
+    x: worldX, y: worldY, vx: 0, vy: 0,
+    life: 4, maxLife: 4, size: 15 * sizeScale,
+    color: '#ffffff', type: 'flash',
   });
   const grav = lowGravity ? 0.04 : 0.12;
   // KOF2002: 火花方向偏置 — 向上扩散为主(前半球偏重), 更自然
