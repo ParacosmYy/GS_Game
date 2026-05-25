@@ -43,13 +43,18 @@ export function drawAttackLimb(
     || f.currentAttack === AttackType.RYO_HAOU
     || f.currentAttack === AttackType.LEONA_EAR_RING
     || f.currentAttack === AttackType.LEONA_EAR_RING_C
-    || f.currentAttack === AttackType.LEONA_GRAND_SABER;
+    || f.currentAttack === AttackType.LEONA_GRAND_SABER
+    || f.currentAttack === AttackType.ROBERT_RYU_ZAN
+    || f.currentAttack === AttackType.ROBERT_RYU_ZAN_C
+    || f.currentAttack === AttackType.ROBERT_HIEN_RYU_JIN
+    || f.currentAttack === AttackType.ROBERT_RYU_GEKI
+    || f.currentAttack === AttackType.ROBERT_RYU_GEKI_C;
   const isHeavy = name.endsWith('_C') || name.endsWith('_D')
     || f.currentAttack === AttackType.STAND_CD
     || f.currentAttack === AttackType.KYO_RED_KICK;
 
   const isSpecialMove = name.startsWith('KYO_') || name.startsWith('IORI_')
-    || name.startsWith('TERRY_') || name.startsWith('KIM_') || name.startsWith('RYO_') || name.startsWith('LEONA_')
+    || name.startsWith('TERRY_') || name.startsWith('KIM_') || name.startsWith('RYO_') || name.startsWith('LEONA_') || name.startsWith('ROBERT_')
     || f.currentAttack === AttackType.SPECIAL_PROJECTILE
     || f.currentAttack === AttackType.SPECIAL_UPPER
     || name.startsWith('DM_');

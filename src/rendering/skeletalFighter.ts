@@ -72,6 +72,7 @@ export function drawSkeletalFighter(
     else if (charId === 'leona') { breathSpeed = 32; breathAmp = 1.5; headBob = 0; } // leona: controlled
     else if (charId === 'kdash') { breathSpeed = 24; breathAmp = 2; headBob = 0.5; }
     else if (charId === 'kula') { breathSpeed = 28; breathAmp = 1.8; headBob = 0.8; }
+    else if (charId === 'robert') { breathSpeed = 26; breathAmp = 2.2; headBob = 1; }
     const breathe = Math.sin(globalTick / breathSpeed) * breathAmp;
     p.body.oy += breathe;
     p.head.oy += breathe + headBob * Math.sin(globalTick / breathSpeed * 0.5);
@@ -334,10 +335,7 @@ export function drawVictoryPose(
     legBack: { ...victoryPose.legBack },
   };
 
-  const outfit = getOutfit(charId);
   const skinColor = '#e8b88a';
-  const skinColorDark = shiftColor(skinColor, -20);
-
   const headW = 24;
   const torsoW = 32, torsoH = 38;
   const armW = 14, armH = 26;
@@ -353,26 +351,6 @@ export function drawVictoryPose(
     scale: bp.scale,
   });
 
-  const drawBone = (
-    cx: number, cy: number, w: number, h: number, rot: number,
-    fillTop: string, fillBot: string, _outline: string,
-  ) => {
-    ctx.save();
-    ctx.translate(cx, cy);
-    ctx.rotate(rot);
-    ctx.fillStyle = fillBot;
-    roundRect(ctx, -w / 2, -h / 2, w, h, 3);
-    ctx.fill();
-    ctx.fillStyle = fillTop;
-    ctx.fillRect(-w / 2 + 1, -h / 2 + 1, w - 2, h * 0.2);
-    ctx.strokeStyle = '#1a1a1a';
-    ctx.lineWidth = 2.5;
-    ctx.lineJoin = 'round';
-    roundRect(ctx, -w / 2, -h / 2, w, h, 3);
-    ctx.stroke();
-    ctx.restore();
-  };
-
   const shoulderY = refY + 10;
   const hipY = refY + 36;
 
@@ -383,20 +361,29 @@ export function drawVictoryPose(
   ctx.beginPath(); ctx.ellipse(sx, sy + 2, 40, 6, 0, 0, Math.PI * 2); ctx.fill();
   ctx.restore();
 
-  // Back arm
+  // Back arm — pixel art
   const backArm = boneScreen(p.armBack);
-  drawBone(backArm.x, shoulderY + p.armBack.oy, armW * p.armBack.scale, armH * p.armBack.scale, backArm.rot,
-    shiftColor(skinColor, 10), skinColor, skinColorDark);
+  ctx.save();
+  ctx.translate(backArm.x, shoulderY + p.armBack.oy);
+  ctx.rotate(backArm.rot);
+  drawPixelArm(ctx, charId, armW * p.armBack.scale, armH * p.armBack.scale, true);
+  ctx.restore();
 
-  // Back leg
+  // Back leg — pixel art
   const backLeg = boneScreen(p.legBack);
-  drawBone(backLeg.x, hipY + p.legBack.oy, legW * p.legBack.scale, legH * p.legBack.scale, backLeg.rot,
-    shiftColor(outfit.pants, 10), outfit.pants, shiftColor(outfit.pants, -30));
+  ctx.save();
+  ctx.translate(backLeg.x, hipY + p.legBack.oy);
+  ctx.rotate(backLeg.rot);
+  drawPixelLeg(ctx, charId, legW * p.legBack.scale, legH * p.legBack.scale, true);
+  ctx.restore();
 
-  // Torso
+  // Torso — pixel art
   const torsoCenterY = refY + 20 + p.body.oy;
-  drawBone(refX + p.body.ox * facing, torsoCenterY, torsoW, torsoH, p.body.rot * facing,
-    shiftColor(outfit.shirt, 20), outfit.shirt, shiftColor(outfit.shirt, -50));
+  ctx.save();
+  ctx.translate(refX + p.body.ox * facing, torsoCenterY);
+  ctx.rotate(p.body.rot * facing);
+  drawPixelTorso(ctx, charId, torsoW, torsoH);
+  ctx.restore();
 
   // Head
   const headPos = boneScreen(p.head);
@@ -406,15 +393,21 @@ export function drawVictoryPose(
   drawCharacterHead(ctx, charId, facing, skinColor, headW);
   ctx.restore();
 
-  // Front leg
+  // Front leg — pixel art
   const frontLeg = boneScreen(p.legFront);
-  drawBone(frontLeg.x, hipY + p.legFront.oy, legW * p.legFront.scale, legH * p.legFront.scale, frontLeg.rot,
-    shiftColor(outfit.pants, 15), outfit.pants, shiftColor(outfit.pants, -25));
+  ctx.save();
+  ctx.translate(frontLeg.x, hipY + p.legFront.oy);
+  ctx.rotate(frontLeg.rot);
+  drawPixelLeg(ctx, charId, legW * p.legFront.scale, legH * p.legFront.scale, false);
+  ctx.restore();
 
-  // Front arm
+  // Front arm — pixel art
   const frontArm = boneScreen(p.armFront);
-  drawBone(frontArm.x, shoulderY + p.armFront.oy, armW * p.armFront.scale, armH * p.armFront.scale, frontArm.rot,
-    shiftColor(skinColor, 15), skinColor, skinColorDark);
+  ctx.save();
+  ctx.translate(frontArm.x, shoulderY + p.armFront.oy);
+  ctx.rotate(frontArm.rot);
+  drawPixelArm(ctx, charId, armW * p.armFront.scale, armH * p.armFront.scale, false);
+  ctx.restore();
 
   // Victory golden glow
   const glowPulse = 0.25 + Math.sin(tick / 6) * 0.1;
