@@ -63,41 +63,55 @@ export function playHit(intensity: number = 1, combo: number = 0): void {
   hi.start(now); hi.stop(now + 0.02);
 }
 
-/** Block — KOF-style metallic clang */
-export function playBlock(): void {
+/** Block — KOF-style metallic clang with heavy variant */
+export function playBlock(heavy: boolean = false): void {
   const ctx = getCtx();
   const now = ctx.currentTime;
+  const vol = heavy ? 1.3 : 1.0;
 
   const osc = ctx.createOscillator();
   osc.type = 'square';
-  osc.frequency.setValueAtTime(1100, now);
+  osc.frequency.setValueAtTime((heavy ? 900 : 1100) * vol, now);
   osc.frequency.exponentialRampToValueAtTime(400, now + 0.08);
   const gain = ctx.createGain();
-  gain.gain.setValueAtTime(0.15, now);
+  gain.gain.setValueAtTime(0.15 * vol, now);
   gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
 
   const res = ctx.createOscillator();
   res.type = 'sine';
-  res.frequency.setValueAtTime(2200, now);
+  res.frequency.setValueAtTime(2200 * vol, now);
   res.frequency.exponentialRampToValueAtTime(600, now + 0.06);
   const resGain = ctx.createGain();
-  resGain.gain.setValueAtTime(0.06, now);
+  resGain.gain.setValueAtTime(0.06 * vol, now);
   resGain.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
 
-  const noise = noiseBuffer(ctx, 0.04, 0.2);
+  const noise = noiseBuffer(ctx, heavy ? 0.06 : 0.04, 0.2);
   const noiseGain = ctx.createGain();
-  noiseGain.gain.setValueAtTime(0.12, now);
+  noiseGain.gain.setValueAtTime(0.12 * vol, now);
   noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.03);
   const filter = ctx.createBiquadFilter();
   filter.type = 'highpass';
-  filter.frequency.value = 2500;
+  filter.frequency.value = heavy ? 2000 : 2500;
 
   osc.connect(gain).connect(ctx.destination);
   res.connect(resGain).connect(ctx.destination);
   noise.connect(filter).connect(noiseGain).connect(ctx.destination);
   osc.start(now); osc.stop(now + 0.09);
   res.start(now); res.stop(now + 0.07);
-  noise.start(now); noise.stop(now + 0.04);
+  noise.start(now); noise.stop(now + (heavy ? 0.06 : 0.04));
+
+  // KOF2002: 重攻击防御额外低频层 — 厚重感
+  if (heavy) {
+    const lo = ctx.createOscillator();
+    lo.type = 'sine';
+    lo.frequency.setValueAtTime(150, now);
+    lo.frequency.exponentialRampToValueAtTime(60, now + 0.1);
+    const loGain = ctx.createGain();
+    loGain.gain.setValueAtTime(0.12, now);
+    loGain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+    lo.connect(loGain).connect(ctx.destination);
+    lo.start(now); lo.stop(now + 0.12);
+  }
 }
 
 /** Special move — energy whoosh + impact + metallic edge */
@@ -348,7 +362,7 @@ export function playSuperFlash(isSDM: boolean = false): void {
   }
 }
 
-/** Counter — sharp alert */
+/** Counter — sharp alert with delayed second layer */
 export function playCounter(): void {
   const ctx = getCtx();
   const now = ctx.currentTime;
@@ -361,18 +375,19 @@ export function playCounter(): void {
   gain.gain.setValueAtTime(0.15, now);
   gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
 
+  // KOF2002: 第二层延迟0.05s开始 — 产生"两次打击"感
   const osc2 = ctx.createOscillator();
   osc2.type = 'sawtooth';
-  osc2.frequency.setValueAtTime(2500, now + 0.04);
-  osc2.frequency.exponentialRampToValueAtTime(800, now + 0.1);
+  osc2.frequency.setValueAtTime(2500, now + 0.05);
+  osc2.frequency.exponentialRampToValueAtTime(800, now + 0.12);
   const gain2 = ctx.createGain();
-  gain2.gain.setValueAtTime(0.1, now + 0.04);
-  gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+  gain2.gain.setValueAtTime(0.1, now + 0.05);
+  gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.14);
 
   osc.connect(gain).connect(ctx.destination);
   osc2.connect(gain2).connect(ctx.destination);
   osc.start(now); osc.stop(now + 0.1);
-  osc2.start(now + 0.04); osc2.stop(now + 0.13);
+  osc2.start(now + 0.05); osc2.stop(now + 0.15);
 }
 
 /** Guard Crush — shattering + sharp initial crack */

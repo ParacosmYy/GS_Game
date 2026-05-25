@@ -245,9 +245,17 @@ export class VFXSystem {
           ctx.beginPath();
           ctx.arc(sx, p.y, p.size * alpha, 0, Math.PI * 2);
           ctx.fill();
-          // 小辉光
+          // KOF2002: 火花前3帧白色核心闪烁, 然后渐变辉光
+          if (p.life > p.maxLife - 3) {
+            ctx.globalAlpha = alpha * 0.7;
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.arc(sx, p.y, p.size * alpha * 0.5, 0, Math.PI * 2);
+            ctx.fill();
+          }
           if (p.size > 3) {
             ctx.globalAlpha = alpha * 0.3;
+            ctx.fillStyle = p.color;
             ctx.beginPath();
             ctx.arc(sx, p.y, p.size * alpha * 2, 0, Math.PI * 2);
             ctx.fill();
@@ -489,9 +497,10 @@ export class ScreenShake {
     if (this.duration > 0) {
       this.duration--;
       const t = this.duration / this.maxDuration;
-      // KOF2002: 随机抖动快速衰减(t^2), 方向偏置稍慢(t^1.5)
-      const randomDecay = t * t;
-      const biasDecay = Math.pow(t, 1.5);
+      // KOF2002: 初始2帧强冲击(完整强度), 之后快速衰减
+      const isImpactFrame = this.duration >= this.maxDuration - 2;
+      const randomDecay = isImpactFrame ? 1 : t * t;
+      const biasDecay = isImpactFrame ? 1 : Math.pow(t, 1.5);
       this.offsetX = (Math.random() - 0.5) * this.intensity * randomDecay + this.biasX * biasDecay * 0.3;
       this.offsetY = (Math.random() - 0.5) * this.intensity * randomDecay * 0.6;
     } else {

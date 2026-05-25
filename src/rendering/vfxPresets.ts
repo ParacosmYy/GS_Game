@@ -80,6 +80,12 @@ export function spawnGuardCrushSparks(particles: Particle[], worldX: number, wor
     life: 15, maxLife: 15, size: 60,
     color: '#ff4444', type: 'flash',
   });
+  // KOF2002: 防御崩坏初始白色爆发核心
+  particles.push({
+    x: worldX, y: worldY, vx: 0, vy: 0,
+    life: 6, maxLife: 6, size: 35,
+    color: '#ffffff', type: 'flash',
+  });
   for (let i = 0; i < 16; i++) {
     const angle = Math.random() * Math.PI * 2;
     const speed = 3 + Math.random() * 6;
@@ -99,10 +105,11 @@ export function spawnGuardCrushSparks(particles: Particle[], worldX: number, wor
 }
 
 export function spawnGuardCrushText(particles: Particle[], worldX: number, worldY: number): void {
+  // KOF2002: 防御崩坏文字 — 更大更醒目, 白红交替色
   particles.push({
-    x: worldX, y: worldY, vx: 0, vy: -0.3,
-    life: 50, maxLife: 50, size: 22,
-    color: '#ff4444', type: 'text', text: 'GUARD CRUSH!',
+    x: worldX, y: worldY, vx: 0, vy: -0.8,
+    life: 55, maxLife: 55, size: 24,
+    color: '#ff3333', type: 'text', text: 'GUARD CRUSH!',
   });
 }
 
@@ -197,10 +204,12 @@ export function spawnSuperBurst(particles: Particle[], worldX: number, worldY: n
       rotation: angle, rotSpeed: (Math.random() - 0.5) * 0.5,
     });
   }
+  // KOF2002: 冲击波差分扩展 — 内环快外环慢, 层次感更强
+  const ringSpeeds = isSDM ? [7, 5, 3.5] : [6, 4];
   for (let r = 0; r < (isSDM ? 3 : 2); r++) {
     particles.push({
       x: worldX, y: worldY, vx: 0, vy: 0,
-      life: 15 + r * 5, maxLife: 15 + r * 5, size: 5 + r * 3,
+      life: 15 + r * 5, maxLife: 15 + r * 5, size: 4 + r * 2,
       color: r === 0 ? '#ffffff' : glow, type: 'ring',
     });
   }
@@ -369,15 +378,16 @@ export function spawnRecoverySpark(particles: Particle[], worldX: number, worldY
 }
 
 export function spawnDust(particles: Particle[], worldX: number, worldY: number): void {
-  for (let i = 0; i < 6; i++) {
-    const dir = (i - 3) * 1.2;
+  // KOF2002: 尘土更飘散 — 10个粒子, 更宽分布
+  for (let i = 0; i < 10; i++) {
+    const dir = (i - 5) * 1.5;
     particles.push({
       x: worldX + dir * 2, y: worldY - 2,
-      vx: dir * 0.8, vy: -Math.random() * 1.5,
+      vx: dir * 0.9, vy: -Math.random() * 1.8 - 0.3,
       life: 15 + Math.floor(Math.random() * 8),
       maxLife: 23,
-      size: 4 + Math.random() * 4,
-      color: '#888899', type: 'spark', gravity: 0.05, friction: 0.94,
+      size: 3 + Math.random() * 5,
+      color: i % 3 === 0 ? '#aaaabb' : '#888899', type: 'spark', gravity: 0.04, friction: 0.94,
     });
   }
 }
