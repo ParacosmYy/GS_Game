@@ -210,6 +210,17 @@ const FRAME_DATA_GENERIC = {
     damage: 38, hitstun: 18, blockstun: 15, pushback: 2,
     hitLevel: 'LOW' as const, knockdown: false,
   },
+  // Billy 命令通常技 — APPROX based on KOF2002UM
+  BILLY_SANDAN_GEAR: {
+    startup: 14, active: 4, recovery: 18,
+    damage: 46, hitstun: 19, blockstun: 16, pushback: 3,
+    hitLevel: 'HIGH' as const, knockdown: false,
+  },
+  BILLY_SENSHU_IKKYAKU: {
+    startup: 9, active: 4, recovery: 21,
+    damage: 40, hitstun: 18, blockstun: 15, pushback: 2,
+    hitLevel: 'LOW' as const, knockdown: false,
+  },
   // ── 蹲下攻击 (Crouch) ──
   CROUCH_A: {
     startup: 5, active: 4, recovery: 7,

@@ -686,4 +686,45 @@ export const FRAME_DATA_CHARS = {
     damage: 300, hitstun: 0, blockstun: 22, pushback: 12,
     hitLevel: 'MID' as const, knockdown: true, chipDamage: 30,
   },
+  // ── 比利必杀技 (Billy Kane) ── APPROX based on KOF2002UM
+  BILLY_SANSETSU_KON: {
+    startup: 10, active: 8, recovery: 22,
+    damage: 65, hitstun: 22, blockstun: 18, pushback: 5,
+    hitLevel: 'MID' as const, knockdown: false, chipDamage: 8,
+  },
+  BILLY_SANSETSU_KON_C: {
+    startup: 12, active: 12, recovery: 26,
+    damage: 90, hitstun: 24, blockstun: 20, pushback: 7,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 10,
+  },
+  BILLY_SENPU_KON: {
+    startup: 5, active: 6, recovery: 24,
+    damage: 80, hitstun: 22, blockstun: 18, pushback: 6,
+    hitLevel: 'MID' as const, knockdown: false, chipDamage: 10,
+  },
+  BILLY_SENPU_KON_C: {
+    startup: 7, active: 10, recovery: 28,
+    damage: 130, hitstun: 26, blockstun: 22, pushback: 8,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 14,
+  },
+  BILLY_HIEN_ZAN: {
+    startup: 10, active: 8, recovery: 20,
+    damage: 75, hitstun: 22, blockstun: 18, pushback: 5,
+    hitLevel: 'MID' as const, knockdown: true,
+  },
+  BILLY_HIEN_ZAN_D: {
+    startup: 12, active: 12, recovery: 24,
+    damage: 100, hitstun: 24, blockstun: 20, pushback: 7,
+    hitLevel: 'MID' as const, knockdown: true,
+  },
+  DM_KAEN_SENPU_JIN: {
+    startup: 10, active: 12, recovery: 40,
+    damage: 200, hitstun: 0, blockstun: 22, pushback: 10,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 18,
+  },
+  SDM_KAEN_SENPU_JIN: {
+    startup: 8, active: 20, recovery: 38,
+    damage: 300, hitstun: 0, blockstun: 22, pushback: 12,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 28,
+  },
 } as const;

@@ -43,6 +43,10 @@ import {
   ANDY_ZANEI_RYUSEI_KEN_FRAMES, ANDY_ZANEI_RYUSEI_KEN_D_FRAMES,
   ANDY_GEKI_HISHOU_KEN_FRAMES,
   DM_CHO_REPPA_DAN_FRAMES, SDM_CHO_REPPA_DAN_FRAMES,
+  BILLY_SANSETSU_KON_FRAMES, BILLY_SANSETSU_KON_C_FRAMES,
+  BILLY_SENPU_KON_FRAMES, BILLY_SENPU_KON_C_FRAMES,
+  BILLY_HIEN_ZAN_FRAMES, BILLY_HIEN_ZAN_D_FRAMES,
+  DM_KAEN_SENPU_JIN_FRAMES, SDM_KAEN_SENPU_JIN_FRAMES,
 } from './attackFramesSpecials.js';
 
 const F: (
@@ -298,6 +302,19 @@ const ANDY_GEDAN_AGITO_FRAMES: AttackFrame[] = [
   F([{ ox: 42, oy: -20, w: 50, h: 30 }]),
 ];
 
+// Billy 命令通常技
+const BILLY_SANDAN_GEAR_FRAMES: AttackFrame[] = [
+  F([{ ox: 42, oy: -72, w: 42, h: 28 }]),
+  F([{ ox: 50, oy: -70, w: 48, h: 30 }]),
+  F([{ ox: 50, oy: -70, w: 48, h: 30 }]),
+];
+
+const BILLY_SENSHU_IKKYAKU_FRAMES: AttackFrame[] = [
+  F([{ ox: 38, oy: -18, w: 48, h: 28 }]),
+  F([{ ox: 45, oy: -16, w: 55, h: 30 }]),
+  F([{ ox: 45, oy: -16, w: 55, h: 30 }]),
+];
+
 // ===== 蹲下攻击 =====
 const CROUCH_A_FRAMES: AttackFrame[] = [
   F([{ ox: 35, oy: -30, w: 32, h: 20 }]),
@@ -538,4 +555,14 @@ export const ATTACK_FRAMES: AttackFrameTable = {
   [AttackType.ANDY_GEKI_HISHOU_KEN]: ANDY_GEKI_HISHOU_KEN_FRAMES,
   [AttackType.DM_CHO_REPPA_DAN]: DM_CHO_REPPA_DAN_FRAMES,
   [AttackType.SDM_CHO_REPPA_DAN]: SDM_CHO_REPPA_DAN_FRAMES,
+  [AttackType.BILLY_SANDAN_GEAR]: BILLY_SANDAN_GEAR_FRAMES,
+  [AttackType.BILLY_SENSHU_IKKYAKU]: BILLY_SENSHU_IKKYAKU_FRAMES,
+  [AttackType.BILLY_SANSETSU_KON]: BILLY_SANSETSU_KON_FRAMES,
+  [AttackType.BILLY_SANSETSU_KON_C]: BILLY_SANSETSU_KON_C_FRAMES,
+  [AttackType.BILLY_SENPU_KON]: BILLY_SENPU_KON_FRAMES,
+  [AttackType.BILLY_SENPU_KON_C]: BILLY_SENPU_KON_C_FRAMES,
+  [AttackType.BILLY_HIEN_ZAN]: BILLY_HIEN_ZAN_FRAMES,
+  [AttackType.BILLY_HIEN_ZAN_D]: BILLY_HIEN_ZAN_D_FRAMES,
+  [AttackType.DM_KAEN_SENPU_JIN]: DM_KAEN_SENPU_JIN_FRAMES,
+  [AttackType.SDM_KAEN_SENPU_JIN]: SDM_KAEN_SENPU_JIN_FRAMES,
 };

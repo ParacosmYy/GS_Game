@@ -4,7 +4,7 @@
  */
 import { GameLoop } from './core/gameLoop.js';
 import { Camera } from './core/camera.js';
-import { CANVAS_WIDTH, CANVAS_HEIGHT, STAGE_WIDTH, STAGE_GROUND_Y, KO_DISPLAY_TIME, MAX_STOCKS, METER_PER_STOCK } from './core/constants.js';
+import { CANVAS_WIDTH, CANVAS_HEIGHT, STAGE_WIDTH, STAGE_GROUND_Y, KO_DISPLAY_TIME, MAX_STOCKS, METER_PER_STOCK, FRAME_DATA } from './core/constants.js';
 import { GamePhase, FighterState } from './core/types.js';
 import type { PowerGauge, MaxModeState } from './core/types.js';
 import { InputManager, CommandBuffer, resolveInput, getDirectionInput } from './input/index.js';
@@ -108,6 +108,7 @@ let continueCountdown = 0;
 const CONTINUE_DURATION = 600; // 10秒倒计时
 let continueCursorYes = true; // Continue画面光标
 let modeSelectCursor = 0; // 模式选择光标
+let isTrainingMode = false; // 训练模式标志
 let currentWinQuote = '';
 let firstAttacker: number | null = null;
 
@@ -150,9 +151,13 @@ function update(): void {
 
   if (phase === GamePhase.MODE_SELECT) {
     tickRef.value++;
-    if (inputManager.isKeyDown('ArrowLeft') || inputManager.isKeyDown('KeyA')) modeSelectCursor = 0;
-    if (inputManager.isKeyDown('ArrowRight') || inputManager.isKeyDown('KeyD')) modeSelectCursor = 1;
-    if (inputManager.isKeyDown('Enter') || inputManager.isKeyDown('KeyJ')) phase = GamePhase.SELECT;
+    if (inputManager.isKeyDown('ArrowLeft') || inputManager.isKeyDown('KeyA')) modeSelectCursor = Math.max(0, modeSelectCursor - 1);
+    if (inputManager.isKeyDown('ArrowRight') || inputManager.isKeyDown('KeyD')) modeSelectCursor = Math.min(2, modeSelectCursor + 1);
+    if (inputManager.isKeyDown('Enter') || inputManager.isKeyDown('KeyJ')) {
+      if (modeSelectCursor === 1) return; // Team mode not ready
+      isTrainingMode = modeSelectCursor === 2;
+      phase = GamePhase.SELECT;
+    }
     return;
   }
 
@@ -470,7 +475,20 @@ function update(): void {
   }
   for (let i = projectiles.length - 1; i >= 0; i--) { if (!projectiles[i].active) projectiles.splice(i, 1); }
 
-  if (p1.health <= 0 || p2.health <= 0) {
+  // ── Training mode overrides ──
+  if (isTrainingMode) {
+    // Health regeneration: refill both fighters to max after damage
+    if (p1.health < p1.maxHealth && p1.health > 0) p1.health = Math.min(p1.maxHealth, p1.health + p1.maxHealth * 0.02);
+    if (p2.health < p2.maxHealth && p2.health > 0) p2.health = Math.min(p2.maxHealth, p2.health + p2.maxHealth * 0.02);
+    // Full regen on KO
+    if (p1.health <= 0 || p2.health <= 0) {
+      p1.health = p1.maxHealth; p2.health = p2.maxHealth;
+      p1DelayedHealth = p1.maxHealth; p2DelayedHealth = p2.maxHealth;
+      cinematic.reset(); koGroundSlamDone = false;
+    }
+  }
+
+  if (!isTrainingMode && (p1.health <= 0 || p2.health <= 0)) {
     if (!cinematic.koSlowMoTriggered) {
       // KOF2002: DM/SDM击杀时KO慢放更强(60帧, 每4帧跳1帧)
       const killer = p1.health <= 0 ? p2 : p1;
@@ -511,7 +529,7 @@ function update(): void {
     }
   }
 
-  if (tickRef.value >= 3600) {
+  if (!isTrainingMode && tickRef.value >= 3600) {
     phase = GamePhase.KO;
     koTimer = 0;
     isTimeOver = true;
@@ -522,6 +540,59 @@ function update(): void {
     announcer.timeOver();
   }
 }
+// ===== Training Mode HUD =====
+function drawTrainingHUD(
+  ctx: CanvasRenderingContext2D, p1: Fighter, p2: Fighter,
+  cs: CombatSystem, cmdBuf: CommandBuffer, tick: number,
+): void {
+  ctx.save();
+  // Training mode banner
+  ctx.fillStyle = 'rgba(0, 80, 0, 0.65)';
+  ctx.fillRect(0, 0, 200, 28);
+  ctx.fillStyle = '#44ff44';
+  ctx.font = 'bold 14px monospace';
+  ctx.textAlign = 'left';
+  ctx.fillText('TRAINING MODE', 10, 19);
+
+  // Damage display
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+  ctx.fillRect(CANVAS_WIDTH - 220, 0, 220, 60);
+  ctx.font = '11px monospace';
+  ctx.fillStyle = '#aaa';
+  ctx.fillText('Combo:', CANVAS_WIDTH - 210, 16);
+  ctx.fillStyle = '#ffcc00';
+  ctx.fillText(`${cs.getComboCount(0)}`, CANVAS_WIDTH - 150, 16);
+  ctx.fillStyle = '#aaa';
+  ctx.fillText('Damage:', CANVAS_WIDTH - 210, 32);
+  ctx.fillStyle = '#ff6644';
+  ctx.fillText(`${cs.getComboDamage(0)}`, CANVAS_WIDTH - 140, 32);
+  ctx.fillStyle = '#aaa';
+  ctx.fillText('P1 HP:', CANVAS_WIDTH - 210, 48);
+  ctx.fillStyle = '#44ff44';
+  ctx.fillText(`${Math.round(p1.health)} / ${p1.maxHealth}`, CANVAS_WIDTH - 155, 48);
+
+  // Input display (last 12 inputs)
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+  ctx.fillRect(0, CANVAS_HEIGHT - 40, 400, 40);
+  ctx.font = '12px monospace';
+  ctx.fillStyle = '#888';
+  ctx.fillText('Input:', 8, CANVAS_HEIGHT - 20);
+  const hist = cmdBuf.getRecentHistory(16);
+  const symbols: Record<string, string> = { neutral: '·', up: '↑', down: '↓', forward: '→', back: '←', upforward: '↗', upback: '↖', downforward: '↘', downback: '↙' };
+  ctx.fillStyle = '#ccffcc';
+  ctx.fillText(hist.map(h => symbols[h.direction] || '?').join(' '), 60, CANVAS_HEIGHT - 20);
+
+  // Attack info
+  if (p1.currentAttack) {
+    const d = FRAME_DATA[p1.currentAttack as keyof typeof FRAME_DATA];
+    if (d) {
+      ctx.fillStyle = '#aaccff';
+      ctx.fillText(`${p1.currentAttack} [${p1.attackPhase}] f${p1.attackFrame}  S:${d.startup} A:${d.active} R:${d.recovery} dmg:${d.damage}`, 8, CANVAS_HEIGHT - 6);
+    }
+  }
+  ctx.restore();
+}
+
 // ===== Render =====
 function render(): void {
   if (phase === GamePhase.TITLE) {
@@ -580,6 +651,10 @@ function render(): void {
     stageIndicatorTimer--;
   }
   if (debugMode) renderer.drawDebug([p1, p2], projectiles, camera, tickRef.value, renderer.getFps(), vfx.count, [p1Cmd, p2Cmd]);
+  // Training mode HUD overlay
+  if (isTrainingMode && (phase === GamePhase.FIGHTING || phase === GamePhase.KO)) {
+    drawTrainingHUD(ctx, p1, p2, combatSystem, p1Cmd, tickRef.value);
+  }
 }
 function restartGame(): void {
   bgm.stop();

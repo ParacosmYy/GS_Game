@@ -410,11 +410,12 @@ export function drawModeSelect(ctx: CanvasRenderingContext2D, tick: number, curs
   const modes = [
     { label: 'SINGLE BATTLE', labelCn: '单人模式', desc: '1P vs CPU/AI — Best of 3 rounds', color: '#ff4444' },
     { label: 'TEAM BATTLE', labelCn: '组队模式 3v3', desc: '3v3 Team KOF — Coming soon!', color: '#4488ff' },
+    { label: 'TRAINING', labelCn: '训练模式', desc: 'Free practice — Input display & frame data', color: '#44cc44' },
   ];
 
-  const cardW = 280;
+  const cardW = 195;
   const cardH = 180;
-  const gap = 40;
+  const gap = 25;
   const startX = (CANVAS_WIDTH - (modes.length * cardW + (modes.length - 1) * gap)) / 2;
   const cardY = 180;
 
@@ -479,6 +480,18 @@ export function drawModeSelect(ctx: CanvasRenderingContext2D, tick: number, curs
     ctx.fillText(mode.desc, cx + cardW / 2, cardY + 155);
 
     // Coming soon overlay for team mode
+    if (i === 2) {
+      // Training icon — crosshair
+      ctx.strokeStyle = mode.color + (isSelected ? 'cc' : '44');
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(cx + cardW / 2, cardY + 55, 20, 0, Math.PI * 2);
+      ctx.moveTo(cx + cardW / 2 - 28, cardY + 55);
+      ctx.lineTo(cx + cardW / 2 + 28, cardY + 55);
+      ctx.moveTo(cx + cardW / 2, cardY + 55 - 28);
+      ctx.lineTo(cx + cardW / 2, cardY + 55 + 28);
+      ctx.stroke();
+    }
     if (i === 1) {
       ctx.fillStyle = 'rgba(0,0,0,0.5)';
       roundRect(ctx, cx, cardY, cardW, cardH, 12);

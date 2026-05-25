@@ -849,3 +849,122 @@ export const SDM_CHO_REPPA_DAN_FRAMES: AttackFrame[] = [
     F([{ ox: 18 - i, oy: -88 + i * 3, w: 28 - i * 2, h: 25 - i }])
   ),
 ];
+
+// ===== 比利·凯恩 (Billy Kane) ===== APPROX based on KOF2002UM
+// Sansetsu Kon (A) — fast staff thrust
+export const BILLY_SANSETSU_KON_FRAMES: AttackFrame[] = [
+  F([{ ox: 42, oy: -55, w: 52, h: 28 }]),
+  F([{ ox: 50, oy: -52, w: 60, h: 32 }]),
+  F([{ ox: 55, oy: -50, w: 65, h: 34 }]),
+  F([{ ox: 55, oy: -50, w: 65, h: 34 }]),
+  F([{ ox: 52, oy: -52, w: 60, h: 32 }]),
+  F([{ ox: 48, oy: -55, w: 55, h: 30 }]),
+  F([{ ox: 45, oy: -58, w: 50, h: 28 }]),
+  F([{ ox: 42, oy: -60, w: 45, h: 26 }]),
+];
+
+// Sansetsu Kon (C) — strong staff thrust, more range
+export const BILLY_SANSETSU_KON_C_FRAMES: AttackFrame[] = [
+  F([{ ox: 42, oy: -55, w: 55, h: 30 }]),
+  F([{ ox: 52, oy: -52, w: 65, h: 34 }]),
+  F([{ ox: 58, oy: -48, w: 72, h: 38 }]),
+  F([{ ox: 62, oy: -46, w: 78, h: 40 }]),
+  F([{ ox: 62, oy: -46, w: 78, h: 40 }]),
+  F([{ ox: 58, oy: -48, w: 72, h: 38 }]),
+  F([{ ox: 55, oy: -50, w: 68, h: 36 }]),
+  F([{ ox: 52, oy: -52, w: 62, h: 34 }]),
+  F([{ ox: 48, oy: -55, w: 58, h: 32 }]),
+  F([{ ox: 45, oy: -58, w: 52, h: 30 }]),
+  F([{ ox: 42, oy: -60, w: 48, h: 28 }]),
+  F([{ ox: 40, oy: -62, w: 44, h: 26 }]),
+];
+
+// Senpu Kon (A) — anti-air spinning staff, 1-hit
+export const BILLY_SENPU_KON_FRAMES: AttackFrame[] = [
+  F([{ ox: 28, oy: -78, w: 42, h: 44 }], { ox: 5, oy: -10, w: -15, h: -28 }),
+  F([{ ox: 34, oy: -85, w: 46, h: 48 }], { ox: 5, oy: -10, w: -15, h: -28 }),
+  F([{ ox: 36, oy: -88, w: 48, h: 50 }]),
+  F([{ ox: 34, oy: -80, w: 44, h: 45 }]),
+  F([{ ox: 30, oy: -70, w: 40, h: 40 }]),
+];
+
+// Senpu Kon (C) — anti-air spinning staff, 2-hit
+export const BILLY_SENPU_KON_C_FRAMES: AttackFrame[] = [
+  F([{ ox: 28, oy: -78, w: 42, h: 44 }], { ox: 5, oy: -10, w: -15, h: -28 }),
+  F([{ ox: 34, oy: -85, w: 46, h: 48 }], { ox: 5, oy: -10, w: -15, h: -28 }),
+  F([{ ox: 36, oy: -88, w: 48, h: 50 }], { ox: 5, oy: -10, w: -15, h: -28 }),
+  F([{ ox: 36, oy: -88, w: 48, h: 50 }]),
+  F([{ ox: 34, oy: -85, w: 46, h: 48 }]),
+  F([{ ox: 34, oy: -80, w: 44, h: 45 }]),
+  F([{ ox: 30, oy: -70, w: 40, h: 40 }]),
+  F([{ ox: 26, oy: -58, w: 36, h: 35 }]),
+  F([{ ox: 24, oy: -48, w: 32, h: 30 }]),
+  F([{ ox: 22, oy: -40, w: 28, h: 28 }]),
+];
+
+// Kyousoku Hien Zan (B) — short flying swallow slash
+export const BILLY_HIEN_ZAN_FRAMES: AttackFrame[] = [
+  F([{ ox: 38, oy: -50, w: 48, h: 38 }]),
+  F([{ ox: 45, oy: -45, w: 55, h: 42 }]),
+  F([{ ox: 50, oy: -40, w: 60, h: 45 }]),
+  F([{ ox: 50, oy: -40, w: 60, h: 45 }]),
+  F([{ ox: 48, oy: -42, w: 55, h: 42 }]),
+  F([{ ox: 45, oy: -45, w: 50, h: 38 }]),
+  F([{ ox: 42, oy: -48, w: 48, h: 36 }]),
+  F([{ ox: 38, oy: -52, w: 45, h: 34 }]),
+];
+
+// Kyousoku Hien Zan (D) — long flying swallow slash
+export const BILLY_HIEN_ZAN_D_FRAMES: AttackFrame[] = [
+  F([{ ox: 38, oy: -50, w: 52, h: 40 }]),
+  F([{ ox: 48, oy: -45, w: 60, h: 44 }]),
+  F([{ ox: 55, oy: -38, w: 68, h: 48 }]),
+  F([{ ox: 58, oy: -35, w: 72, h: 50 }]),
+  F([{ ox: 58, oy: -35, w: 72, h: 50 }]),
+  F([{ ox: 55, oy: -38, w: 68, h: 48 }]),
+  F([{ ox: 52, oy: -40, w: 62, h: 44 }]),
+  F([{ ox: 48, oy: -42, w: 58, h: 42 }]),
+  F([{ ox: 45, oy: -45, w: 52, h: 38 }]),
+  F([{ ox: 42, oy: -48, w: 48, h: 36 }]),
+  F([{ ox: 38, oy: -52, w: 45, h: 34 }]),
+  F([{ ox: 35, oy: -55, w: 42, h: 32 }]),
+];
+
+// DM: Chou Kaen Senpu Jin (super spinning staff fire)
+export const DM_KAEN_SENPU_JIN_FRAMES: AttackFrame[] = [
+  F([{ ox: 30, oy: -65, w: 55, h: 45 }]),
+  F([{ ox: 36, oy: -62, w: 65, h: 50 }]),
+  F([{ ox: 40, oy: -60, w: 72, h: 52 }]),
+  F([{ ox: 40, oy: -60, w: 78, h: 55 }]),
+  F([{ ox: 40, oy: -60, w: 80, h: 58 }]),
+  F([{ ox: 40, oy: -60, w: 80, h: 58 }]),
+  F([{ ox: 38, oy: -62, w: 75, h: 55 }]),
+  F([{ ox: 35, oy: -65, w: 68, h: 50 }]),
+  F([{ ox: 32, oy: -68, w: 60, h: 45 }]),
+  F([{ ox: 30, oy: -70, w: 55, h: 42 }]),
+  F([{ ox: 28, oy: -72, w: 50, h: 38 }]),
+];
+
+// SDM: Chou Kaen Senpu Jin SDM
+export const SDM_KAEN_SENPU_JIN_FRAMES: AttackFrame[] = [
+  F([{ ox: 30, oy: -65, w: 60, h: 48 }]),
+  F([{ ox: 36, oy: -62, w: 70, h: 52 }]),
+  F([{ ox: 42, oy: -58, w: 80, h: 56 }]),
+  F([{ ox: 45, oy: -55, w: 88, h: 60 }]),
+  F([{ ox: 45, oy: -55, w: 92, h: 62 }]),
+  F([{ ox: 45, oy: -55, w: 92, h: 62 }]),
+  F([{ ox: 45, oy: -55, w: 92, h: 62 }]),
+  F([{ ox: 42, oy: -58, w: 85, h: 58 }]),
+  F([{ ox: 40, oy: -60, w: 78, h: 55 }]),
+  F([{ ox: 38, oy: -62, w: 72, h: 52 }]),
+  F([{ ox: 35, oy: -65, w: 65, h: 48 }]),
+  F([{ ox: 32, oy: -68, w: 58, h: 44 }]),
+  F([{ ox: 30, oy: -72, w: 52, h: 40 }]),
+  F([{ ox: 28, oy: -75, w: 48, h: 36 }]),
+  F([{ ox: 26, oy: -78, w: 42, h: 32 }]),
+  F([{ ox: 24, oy: -80, w: 38, h: 28 }]),
+  F([{ ox: 22, oy: -82, w: 35, h: 26 }]),
+  F([{ ox: 20, oy: -85, w: 32, h: 24 }]),
+  F([{ ox: 18, oy: -88, w: 30, h: 22 }]),
+  F([{ ox: 16, oy: -90, w: 28, h: 20 }]),
+];

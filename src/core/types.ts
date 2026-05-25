@@ -81,6 +81,9 @@ export enum AttackType {
   // 安迪命令通常技 (Andy Bogard Command Normals)
   ANDY_UWA_AGITO = 'ANDY_UWA_AGITO',                 // →+A 上顎 (overhead)
   ANDY_GEDAN_AGITO = 'ANDY_GEDAN_AGITO',             // →+B 下顎 (low)
+  // 比利命令通常技 (Billy Kane Command Normals)
+  BILLY_SANDAN_GEAR = 'BILLY_SANDAN_GEAR',           // →+A Sandan Gear (upper)
+  BILLY_SENSHU_IKKYAKU = 'BILLY_SENSHU_IKKYAKU',     // →+B Senshu Ikkyaku (low)
   // 蹲下 (Crouch)
   CROUCH_A = 'CROUCH_A',
   CROUCH_B = 'CROUCH_B',
@@ -215,6 +218,13 @@ export enum AttackType {
   ANDY_ZANEI_RYUSEI_KEN = 'ANDY_ZANEI_RYUSEI_KEN',         // HCF+B 斬影流星拳 (short dash punch)
   ANDY_ZANEI_RYUSEI_KEN_D = 'ANDY_ZANEI_RYUSEI_KEN_D',     // HCF+D 斬影流星拳 (long dash punch)
   ANDY_GEKI_HISHOU_KEN = 'ANDY_GEKI_HISHOU_KEN',           // QCB+K 激飛翔拳 (air dive)
+  // 比利必杀技 (Billy Kane Specials)
+  BILLY_SANSETSU_KON = 'BILLY_SANSETSU_KON',           // QCF+A Sansetsu Kon (fast staff)
+  BILLY_SANSETSU_KON_C = 'BILLY_SANSETSU_KON_C',       // QCF+C Sansetsu Kon (strong staff)
+  BILLY_SENPU_KON = 'BILLY_SENPU_KON',                 // QCB+A Senpu Kon (anti-air)
+  BILLY_SENPU_KON_C = 'BILLY_SENPU_KON_C',             // QCB+C Senpu Kon (strong anti-air)
+  BILLY_HIEN_ZAN = 'BILLY_HIEN_ZAN',                   // QCB+B Kyousoku Hien Zan (short)
+  BILLY_HIEN_ZAN_D = 'BILLY_HIEN_ZAN_D',               // QCB+D Kyousoku Hien Zan (long)
   // 超必杀技 (DM)
   DM_OROCHINAGI = 'DM_OROCHINAGI',           // 大蛇薙 (Kyo)
   DM_YATAGARASU = 'DM_YATAGARASU',           // 八稚女 (Iori)
@@ -234,6 +244,7 @@ export enum AttackType {
   DM_GALACTICA_PHANTOM = 'DM_GALACTICA_PHANTOM',   // Galactica Phantom (Ralf)
   DM_SCREW_UPPER = 'DM_SCREW_UPPER',               // Screw Upper (Joe)
   DM_CHO_REPPA_DAN = 'DM_CHO_REPPA_DAN',           // 超裂破弾 (Andy)
+  DM_KAEN_SENPU_JIN = 'DM_KAEN_SENPU_JIN',             // Chou Kaen Senpu Jin (Billy)
   // 超必杀技SDM (Super Desperation Move — MAX mode only, costs extra stock)
   SDM_OROCHINAGI = 'SDM_OROCHINAGI',         // 大蛇薙SDM (Kyo)
   SDM_YATAGARASU = 'SDM_YATAGARASU',         // 八稚女SDM (Iori)
@@ -251,6 +262,7 @@ export enum AttackType {
   SDM_GALACTICA_PHANTOM = 'SDM_GALACTICA_PHANTOM', // Galactica Phantom SDM (Ralf)
   SDM_SCREW_UPPER = 'SDM_SCREW_UPPER',             // Screw Upper SDM (Joe)
   SDM_CHO_REPPA_DAN = 'SDM_CHO_REPPA_DAN',         // 超裂破弾SDM (Andy)
+  SDM_KAEN_SENPU_JIN = 'SDM_KAEN_SENPU_JIN',           // Chou Kaen Senpu Jin SDM (Billy)
 }
 
 // ===== Hit Level (防御判定) =====
@@ -390,9 +402,10 @@ export enum GamePhase {
   KO = 'KO',           // KO state
   MATCH_END = 'MATCH_END', // Match complete (best of 3)
   CONTINUE = 'CONTINUE', // Continue? countdown
+  TRAINING = 'TRAINING', // Training mode (no timer, health regen, input display)
 }
 
-export type BattleMode = 'single' | 'team';
+export type BattleMode = 'single' | 'team' | 'training';
 
 // ===== Game State (for window.__gameState) =====
 export interface PlayerState {

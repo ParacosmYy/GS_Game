@@ -224,4 +224,16 @@ export const HITBOX_OFFSETS = {
   ANDY_GEKI_HISHOU_KEN: { offsetX: 50, offsetY: -80, width: 68, height: 52 },
   DM_CHO_REPPA_DAN: { offsetX: 45, offsetY: -130, width: 95, height: 75 },
   SDM_CHO_REPPA_DAN: { offsetX: 45, offsetY: -140, width: 105, height: 80 },
+  // Billy 命令通常技 (Billy Kane Command Normals)
+  BILLY_SANDAN_GEAR: { offsetX: 58, offsetY: -110, width: 75, height: 42 },
+  BILLY_SENSHU_IKKYAKU: { offsetX: 65, offsetY: -20, width: 78, height: 25 },
+  // 比利必杀技 (Billy Kane Specials)
+  BILLY_SANSETSU_KON: { offsetX: 65, offsetY: -105, width: 72, height: 35 },
+  BILLY_SANSETSU_KON_C: { offsetX: 68, offsetY: -100, width: 80, height: 40 },
+  BILLY_SENPU_KON: { offsetX: 40, offsetY: -155, width: 65, height: 70 },
+  BILLY_SENPU_KON_C: { offsetX: 40, offsetY: -155, width: 70, height: 80 },
+  BILLY_HIEN_ZAN: { offsetX: 55, offsetY: -100, width: 70, height: 50 },
+  BILLY_HIEN_ZAN_D: { offsetX: 55, offsetY: -100, width: 78, height: 55 },
+  DM_KAEN_SENPU_JIN: { offsetX: 45, offsetY: -130, width: 100, height: 75 },
+  SDM_KAEN_SENPU_JIN: { offsetX: 45, offsetY: -140, width: 110, height: 80 },
 } as const;

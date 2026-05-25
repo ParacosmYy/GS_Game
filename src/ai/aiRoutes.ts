@@ -94,6 +94,25 @@ export const COMBO_ROUTES: Record<string, ComboStep[]> = {
     { type: 'special', attack: 'clarkFlashElbow', delay: 3 },
     { type: 'special', attack: 'dmArgentine',  delay: 4 },
   ],
+  joe: [
+    { type: 'button',  attack: 'closeC',     delay: 0 },
+    { type: 'button',  attack: 'joeKneeKick', delay: 2 },
+    { type: 'special', attack: 'joeHurricane', delay: 3 },
+    { type: 'special', attack: 'joeBakuretsuken', delay: 3 },
+    { type: 'special', attack: 'dmScrewUpper', delay: 4 },
+  ],
+  andy: [
+    { type: 'button',  attack: 'closeC',     delay: 0 },
+    { type: 'button',  attack: 'andyUwaAgito', delay: 2 },
+    { type: 'special', attack: 'andyShouryuuDan', delay: 3 },
+    { type: 'special', attack: 'dmChoReppaDan',  delay: 4 },
+  ],
+  billy: [
+    { type: 'button',  attack: 'closeC',     delay: 0 },
+    { type: 'button',  attack: 'billySandanGear', delay: 2 },
+    { type: 'special', attack: 'billySenpuKon', delay: 3 },
+    { type: 'special', attack: 'dmKaenSenpuJin', delay: 4 },
+  ],
   _default: [
     { type: 'button',  attack: 'closeC', delay: 0 },
     { type: 'button',  attack: 'standA',  delay: 2 },
@@ -141,6 +160,12 @@ export function applyComboStep(step: ComboStep, base: ResolvedInput): void {
         base.forward = true; base.buttonA = true; base.buttonAPressed = true; base.punchPressed = true; break;
       case 'clarkDeathLake':
         base.forward = true; base.buttonA = true; base.buttonAPressed = true; base.punchPressed = true; break;
+      case 'joeKneeKick':
+        base.forward = true; base.buttonA = true; base.buttonAPressed = true; base.punchPressed = true; break;
+      case 'andyUwaAgito':
+        base.forward = true; base.buttonA = true; base.buttonAPressed = true; base.punchPressed = true; break;
+      case 'billySandanGear':
+        base.forward = true; base.buttonA = true; base.buttonAPressed = true; base.punchPressed = true; break;
       case 'jumpC':
         base.buttonC = true; base.buttonCPressed = true; base.punchPressed = true; break;
     }
@@ -182,6 +207,9 @@ export function routeComboSpecial(
     case 'mai': return routeMai(attack);
     case 'ralf': return routeRalf(attack);
     case 'clark': return routeClark(attack);
+    case 'joe': return routeJoe(attack);
+    case 'andy': return routeAndy(attack);
+    case 'billy': return routeBilly(attack);
     default: return null;
   }
 }
@@ -302,5 +330,40 @@ function routeClark(attack: string): AttackType | null {
     case 'clarkVulcan': return AttackType.CLARK_VULCAN;
     case 'dmArgentine': return AttackType.DM_ARGENTINE_DM;
     default: return AttackType.CLARK_ARGENTINE;
+  }
+}
+
+function routeJoe(attack: string): AttackType | null {
+  switch (attack) {
+    case 'joeHurricane': return AttackType.JOE_HURRICANE;
+    case 'joeTigerKick': return AttackType.JOE_TIGER_KICK;
+    case 'joeBakuretsuken': return AttackType.JOE_BAKURETSUKEN;
+    case 'joeOugonKakato': return AttackType.JOE_OUGON_KAKATO;
+    case 'dmScrewUpper': return AttackType.DM_SCREW_UPPER;
+    default: return AttackType.JOE_HURRICANE;
+  }
+}
+
+function routeAndy(attack: string): AttackType | null {
+  switch (attack) {
+    case 'andyShouryuuDan': return AttackType.ANDY_SHOURYUU_DAN;
+    case 'andyHishouKen': return AttackType.ANDY_HISHOU_KEN;
+    case 'andyZaneiRyuseiKen': return AttackType.ANDY_ZANEI_RYUSEI_KEN;
+    case 'andyGekiHishouKen': return AttackType.ANDY_GEKI_HISHOU_KEN;
+    case 'dmChoReppaDan': return AttackType.DM_CHO_REPPA_DAN;
+    default: return AttackType.ANDY_SHOURYUU_DAN;
+  }
+}
+
+function routeBilly(attack: string): AttackType | null {
+  switch (attack) {
+    case 'billySansetsuKon': return AttackType.BILLY_SANSETSU_KON;
+    case 'billySansetsuKonC': return AttackType.BILLY_SANSETSU_KON_C;
+    case 'billySenpuKon': return AttackType.BILLY_SENPU_KON;
+    case 'billySenpuKonC': return AttackType.BILLY_SENPU_KON_C;
+    case 'billyHienZan': return AttackType.BILLY_HIEN_ZAN;
+    case 'billyHienZanD': return AttackType.BILLY_HIEN_ZAN_D;
+    case 'dmKaenSenpuJin': return AttackType.DM_KAEN_SENPU_JIN;
+    default: return AttackType.BILLY_SENPU_KON;
   }
 }
