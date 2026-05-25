@@ -727,4 +727,83 @@ export const FRAME_DATA_CHARS = {
     damage: 300, hitstun: 0, blockstun: 22, pushback: 12,
     hitLevel: 'MID' as const, knockdown: true, chipDamage: 28,
   },
+  // ── 陈可汗必杀技 (Chang Koehan) ── APPROX based on KOF2002UM
+  CHANG_TEKKYUU_KAITEN: {
+    startup: 10, active: 14, recovery: 26,
+    damage: 65, hitstun: 22, blockstun: 18, pushback: 5,
+    hitLevel: 'MID' as const, knockdown: false, chipDamage: 8,
+  },
+  CHANG_TEKKYUU_KAITEN_C: {
+    startup: 12, active: 20, recovery: 30,
+    damage: 100, hitstun: 26, blockstun: 22, pushback: 8,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 12,
+  },
+  CHANG_TEKKYUU_FASSHU: {
+    startup: 14, active: 8, recovery: 28,
+    damage: 90, hitstun: 24, blockstun: 20, pushback: 7,
+    hitLevel: 'HIGH' as const, knockdown: true, chipDamage: 10,
+  },
+  CHANG_TEKKYUU_HIEN_ZAN: {
+    startup: 8, active: 10, recovery: 24,
+    damage: 85, hitstun: 22, blockstun: 18, pushback: 6,
+    hitLevel: 'MID' as const, knockdown: true,
+  },
+  DM_TEKKYUU_DAI_BOUSOU: {
+    startup: 10, active: 12, recovery: 42,
+    damage: 220, hitstun: 0, blockstun: 22, pushback: 12,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 20,
+  },
+  SDM_TEKKYUU_DAI_BOUSOU: {
+    startup: 8, active: 18, recovery: 40,
+    damage: 320, hitstun: 0, blockstun: 22, pushback: 14,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 32,
+  },
+  // ── 蔡宝奇命令通常技 (Choi Bounge) ── APPROX based on KOF2002UM
+  CHOI_SOUTEN_MEKKYAKU: {
+    startup: 12, active: 5, recovery: 18,
+    damage: 48, hitstun: 19, blockstun: 17, pushback: 3,
+    hitLevel: 'HIGH' as const, knockdown: false,
+  },
+  CHOI_SAN_REN_GEKI: {
+    startup: 8, active: 5, recovery: 16,
+    damage: 40, hitstun: 18, blockstun: 15, pushback: 2,
+    hitLevel: 'LOW' as const, knockdown: false,
+  },
+  // ── 蔡宝奇必杀技 (Choi Bounge) ── APPROX based on KOF2002UM
+  CHOI_HISHOU_KYAKU: {
+    startup: 8, active: 8, recovery: 18,
+    damage: 65, hitstun: 20, blockstun: 16, pushback: 5,
+    hitLevel: 'MID' as const, knockdown: true,
+  },
+  CHOI_HISHOU_KYAKU_C: {
+    startup: 10, active: 12, recovery: 22,
+    damage: 95, hitstun: 24, blockstun: 20, pushback: 7,
+    hitLevel: 'MID' as const, knockdown: true,
+  },
+  CHOI_KAITEN_HIEN_ZAN: {
+    startup: 5, active: 6, recovery: 22,
+    damage: 75, hitstun: 22, blockstun: 18, pushback: 5,
+    hitLevel: 'MID' as const, knockdown: false, chipDamage: 8,
+  },
+  CHOI_KAITEN_HIEN_ZAN_C: {
+    startup: 7, active: 10, recovery: 28,
+    damage: 120, hitstun: 26, blockstun: 22, pushback: 8,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 12,
+  },
+  CHOI_HOUYOKU_TENSHIN: {
+    startup: 6, active: 10, recovery: 24,
+    damage: 90, hitstun: 22, blockstun: 18, pushback: 6,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 10,
+  },
+  // ── 蔡宝奇DM/SDM (Choi) ──
+  DM_SHIN_CHOU_HOUYOKU: {
+    startup: 8, active: 12, recovery: 40,
+    damage: 200, hitstun: 0, blockstun: 22, pushback: 10,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 18,
+  },
+  SDM_SHIN_CHOU_HOUYOKU: {
+    startup: 8, active: 18, recovery: 38,
+    damage: 300, hitstun: 0, blockstun: 22, pushback: 12,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 28,
+  },
 } as const;

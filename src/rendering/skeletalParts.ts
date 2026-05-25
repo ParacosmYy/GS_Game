@@ -22,6 +22,7 @@ export const CHAR_OUTFIT: Record<string, { shirt: string; pants: string; belt: s
   joe: { shirt: '#3366aa', pants: '#cc4400', belt: '#ffcc00', shoes: '#aa8866' },
   andy: { shirt: '#dd6622', pants: '#f0f0f0', belt: '#884422', shoes: '#443322' },
   billy: { shirt: '#3366aa', pants: '#e8e8e8', belt: '#884422', shoes: '#664422' },
+  chang: { shirt: '#885522', pants: '#cc8833', belt: '#553311', shoes: '#442211' },
 };
 
 const DEFAULT_OUTFIT = { shirt: '#888', pants: '#556', belt: '#444', shoes: '#333' };
@@ -36,7 +37,7 @@ export function getHairColor(charId: string): string {
     kim: '#1a1a1a', ryo: '#8B6914', leona: '#DAA520',
     kdash: '#C0C0C0', kula: '#cc8855', robert: '#2a1a0a',
     athena: '#7744cc', mai: '#7a4828', andy: '#ccaa44',
-    ralf: '#ccaa44', clark: '#ccaa44', joe: '#ddbb44', billy: '#ccaa44',
+    ralf: '#ccaa44', clark: '#ccaa44', joe: '#ddbb44', billy: '#ccaa44', chang: '#222222',
   };
   return colors[charId] ?? '#333';
 }
@@ -47,7 +48,7 @@ export function getEyeColor(charId: string): string {
     kim: '#1a1a1a', ryo: '#4169E1', leona: '#4169E1',
     kdash: '#ff4400', kula: '#4488ff', robert: '#4169E1',
     athena: '#6644cc', mai: '#4488aa', andy: '#4466cc',
-    ralf: '#4466aa', clark: '#664422', joe: '#664422', billy: '#4466cc',
+    ralf: '#4466aa', clark: '#664422', joe: '#664422', billy: '#4466cc', chang: '#664422',
   };
   return colors[charId] ?? '#444';
 }
@@ -617,6 +618,21 @@ function drawHair(ctx: CanvasRenderingContext2D, charId: string, facing: number,
     ctx.lineTo(-2, -r + 4);
     ctx.closePath();
     ctx.fill();
+  } else if (charId === 'chang') {
+    // Chang: bald head with small topknot
+    ctx.fillStyle = '#222222';
+    // Small topknot on top of head
+    ctx.beginPath();
+    ctx.moveTo(-3, -r + 2);
+    ctx.lineTo(0, -r - 10);
+    ctx.lineTo(3, -r + 2);
+    ctx.closePath();
+    ctx.fill();
+    // Slight hair stubble texture on top
+    ctx.fillStyle = '#333333';
+    for (let i = -3; i <= 3; i++) {
+      ctx.fillRect(i * 4 - 1, -r + 1, 2, 2);
+    }
   }
 }
 

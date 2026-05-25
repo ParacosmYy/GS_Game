@@ -113,6 +113,12 @@ export const COMBO_ROUTES: Record<string, ComboStep[]> = {
     { type: 'special', attack: 'billySenpuKon', delay: 3 },
     { type: 'special', attack: 'dmKaenSenpuJin', delay: 4 },
   ],
+  chang: [
+    { type: 'button',  attack: 'closeC',     delay: 0 },
+    { type: 'button',  attack: 'changHikiNage', delay: 2 },
+    { type: 'special', attack: 'changTekkyuuKaiten', delay: 3 },
+    { type: 'special', attack: 'dmTekkyuuDaiBousou', delay: 4 },
+  ],
   _default: [
     { type: 'button',  attack: 'closeC', delay: 0 },
     { type: 'button',  attack: 'standA',  delay: 2 },
@@ -166,6 +172,8 @@ export function applyComboStep(step: ComboStep, base: ResolvedInput): void {
         base.forward = true; base.buttonA = true; base.buttonAPressed = true; base.punchPressed = true; break;
       case 'billySandanGear':
         base.forward = true; base.buttonA = true; base.buttonAPressed = true; base.punchPressed = true; break;
+      case 'changHikiNage':
+        base.forward = true; base.buttonA = true; base.buttonAPressed = true; base.punchPressed = true; break;
       case 'jumpC':
         base.buttonC = true; base.buttonCPressed = true; base.punchPressed = true; break;
     }
@@ -210,6 +218,7 @@ export function routeComboSpecial(
     case 'joe': return routeJoe(attack);
     case 'andy': return routeAndy(attack);
     case 'billy': return routeBilly(attack);
+    case 'chang': return routeChang(attack);
     default: return null;
   }
 }

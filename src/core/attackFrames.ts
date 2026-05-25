@@ -47,6 +47,14 @@ import {
   BILLY_SENPU_KON_FRAMES, BILLY_SENPU_KON_C_FRAMES,
   BILLY_HIEN_ZAN_FRAMES, BILLY_HIEN_ZAN_D_FRAMES,
   DM_KAEN_SENPU_JIN_FRAMES, SDM_KAEN_SENPU_JIN_FRAMES,
+  CHANG_TEKKYUU_KAITEN_FRAMES, CHANG_TEKKYUU_KAITEN_C_FRAMES,
+  CHANG_TEKKYUU_FASSHU_FRAMES, CHANG_TEKKYUU_HIEN_ZAN_FRAMES,
+  DM_TEKKYUU_DAI_BOUSOU_FRAMES, SDM_TEKKYUU_DAI_BOUSOU_FRAMES,
+  CHOI_SOUTEN_MEKKYAKU_FRAMES, CHOI_SAN_REN_GEKI_FRAMES,
+  CHOI_HISHOU_KYAKU_FRAMES, CHOI_HISHOU_KYAKU_C_FRAMES,
+  CHOI_KAITEN_HIEN_ZAN_FRAMES, CHOI_KAITEN_HIEN_ZAN_C_FRAMES,
+  CHOI_HOUYOKU_TENSHIN_FRAMES,
+  DM_SHIN_CHOU_HOUYOKU_FRAMES, SDM_SHIN_CHOU_HOUYOKU_FRAMES,
 } from './attackFramesSpecials.js';
 
 const F: (
@@ -315,6 +323,35 @@ const BILLY_SENSHU_IKKYAKU_FRAMES: AttackFrame[] = [
   F([{ ox: 45, oy: -16, w: 55, h: 30 }]),
 ];
 
+// Chang 命令通常技
+const CHANG_HIKI_NAGE_FRAMES: AttackFrame[] = [
+  F([{ ox: 45, oy: -60, w: 52, h: 35 }]),
+  F([{ ox: 52, oy: -58, w: 58, h: 38 }]),
+  F([{ ox: 52, oy: -58, w: 58, h: 38 }]),
+  F([{ ox: 48, oy: -60, w: 55, h: 35 }]),
+];
+
+const CHANG_KYUUSHUU_FRAMES: AttackFrame[] = [
+  F([{ ox: 40, oy: -18, w: 55, h: 28 }]),
+  F([{ ox: 48, oy: -16, w: 62, h: 30 }]),
+  F([{ ox: 50, oy: -16, w: 65, h: 32 }]),
+  F([{ ox: 48, oy: -18, w: 60, h: 30 }]),
+  F([{ ox: 45, oy: -18, w: 55, h: 28 }]),
+];
+
+// Choi 命令通常技
+const CHOI_SOUTEN_MEKKYAKU_FRAMES_L: AttackFrame[] = [
+  F([{ ox: 38, oy: -68, w: 40, h: 28 }]),
+  F([{ ox: 46, oy: -65, w: 48, h: 30 }]),
+  F([{ ox: 46, oy: -65, w: 48, h: 30 }]),
+];
+
+const CHOI_SAN_REN_GEKI_FRAMES_L: AttackFrame[] = [
+  F([{ ox: 35, oy: -22, w: 45, h: 25 }]),
+  F([{ ox: 42, oy: -20, w: 52, h: 28 }]),
+  F([{ ox: 42, oy: -20, w: 52, h: 28 }]),
+];
+
 // ===== 蹲下攻击 =====
 const CROUCH_A_FRAMES: AttackFrame[] = [
   F([{ ox: 35, oy: -30, w: 32, h: 20 }]),
@@ -565,4 +602,12 @@ export const ATTACK_FRAMES: AttackFrameTable = {
   [AttackType.BILLY_HIEN_ZAN_D]: BILLY_HIEN_ZAN_D_FRAMES,
   [AttackType.DM_KAEN_SENPU_JIN]: DM_KAEN_SENPU_JIN_FRAMES,
   [AttackType.SDM_KAEN_SENPU_JIN]: SDM_KAEN_SENPU_JIN_FRAMES,
+  [AttackType.CHANG_HIKI_NAGE]: CHANG_HIKI_NAGE_FRAMES,
+  [AttackType.CHANG_KYUUSHUU]: CHANG_KYUUSHUU_FRAMES,
+  [AttackType.CHANG_TEKKYUU_KAITEN]: CHANG_TEKKYUU_KAITEN_FRAMES,
+  [AttackType.CHANG_TEKKYUU_KAITEN_C]: CHANG_TEKKYUU_KAITEN_C_FRAMES,
+  [AttackType.CHANG_TEKKYUU_FASSHU]: CHANG_TEKKYUU_FASSHU_FRAMES,
+  [AttackType.CHANG_TEKKYUU_HIEN_ZAN]: CHANG_TEKKYUU_HIEN_ZAN_FRAMES,
+  [AttackType.DM_TEKKYUU_DAI_BOUSOU]: DM_TEKKYUU_DAI_BOUSOU_FRAMES,
+  [AttackType.SDM_TEKKYUU_DAI_BOUSOU]: SDM_TEKKYUU_DAI_BOUSOU_FRAMES,
 };

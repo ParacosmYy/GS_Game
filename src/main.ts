@@ -197,7 +197,7 @@ function update(): void {
     tickRef.value++;
     const result = select.update(inputManager.getP1Input(), inputManager.getP2Input(), inputManager.isKeyDown('KeyT'));
     if (result) {
-      p2AI = result.p2AI;
+      p2AI = isTrainingMode ? null : result.p2AI;
       // Create teams for 3v3 mode
       if (teamMode) {
         p1Team = createTeam(result.p1Team);
@@ -290,6 +290,10 @@ function update(): void {
   }
 
   // === FIGHTING phase ===
+  // Training mode: ESC returns to select
+  if (isTrainingMode && inputManager.isKeyDown('Escape')) {
+    bgm.stop(); phase = GamePhase.SELECT; select.reset(); p2AI = null; isTrainingMode = true; return;
+  }
   if (cinematic.isFrozen()) { cinematic.tickInFreeze(maxModes); return; }
   cinematic.tickMaxModes(maxModes);
   cinematic.tickSuperFlash();
@@ -345,6 +349,14 @@ function update(): void {
     const aiInput = p2AI.getInput();
     p2Ctrl.update(aiInput);
     if (p2.canAct() && Math.random() < 0.02) { const s = p2AI.triggerSpecial(); if (s) p2.startAttack(s); }
+  } else if (isTrainingMode) {
+    // Training dummy: auto-block when P1 attacks nearby
+    const dummyInput = { ...p2Input };
+    if (p1.attackPhase === 'active' && p2.canBlock()) {
+      if (p1.x < p2.x) dummyInput.back = true;
+      else dummyInput.forward = true;
+    }
+    p2Ctrl.update(dummyInput);
   } else {
     p2Ctrl.update(p2Input);
   }

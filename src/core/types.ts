@@ -84,6 +84,12 @@ export enum AttackType {
   // 比利命令通常技 (Billy Kane Command Normals)
   BILLY_SANDAN_GEAR = 'BILLY_SANDAN_GEAR',           // →+A Sandan Gear (upper)
   BILLY_SENSHU_IKKYAKU = 'BILLY_SENSHU_IKKYAKU',     // →+B Senshu Ikkyaku (low)
+  // 陈可汗命令通常技 (Chang Koehan Command Normals)
+  CHANG_HIKI_NAGE = 'CHANG_HIKI_NAGE',               // →+A Hiki Nage (throw-like)
+  CHANG_KYUUSHUU = 'CHANG_KYUUSHUU',                 // →+B Kyuushuu Geri (low)
+  // 蔡宝奇命令通常技 (Choi Bounge Command Normals)
+  CHOI_SOUTEN_MEKKYAKU = 'CHOI_SOUTEN_MEKKYAKU',     // →+A Souten Mekkyaku (upper)
+  CHOI_SAN_REN_GEKI = 'CHOI_SAN_REN_GEKI',           // →+B San Ren Geki (low)
   // 蹲下 (Crouch)
   CROUCH_A = 'CROUCH_A',
   CROUCH_B = 'CROUCH_B',
@@ -225,6 +231,17 @@ export enum AttackType {
   BILLY_SENPU_KON_C = 'BILLY_SENPU_KON_C',             // QCB+C Senpu Kon (strong anti-air)
   BILLY_HIEN_ZAN = 'BILLY_HIEN_ZAN',                   // QCB+B Kyousoku Hien Zan (short)
   BILLY_HIEN_ZAN_D = 'BILLY_HIEN_ZAN_D',               // QCB+D Kyousoku Hien Zan (long)
+  // 陈可汗必杀技 (Chang Koehan Specials)
+  CHANG_TEKKYUU_KAITEN = 'CHANG_TEKKYUU_KAITEN',         // QCF+A Tekkyuu Dai Kaiten
+  CHANG_TEKKYUU_KAITEN_C = 'CHANG_TEKKYUU_KAITEN_C',     // QCF+C Tekkyuu Dai Kaiten (strong)
+  CHANG_TEKKYUU_FASSHU = 'CHANG_TEKKYUU_FASSHU',         // QCB+P Tekkyuu Fasshu
+  CHANG_TEKKYUU_HIEN_ZAN = 'CHANG_TEKKYUU_HIEN_ZAN',     // QCF+K Tekkyuu Hien Zan
+  // 蔡宝奇必杀技 (Choi Bounge Specials)
+  CHOI_HISHOU_KYAKU = 'CHOI_HISHOU_KYAKU',               // QCF+A Hishou Kyaku
+  CHOI_HISHOU_KYAKU_C = 'CHOI_HISHOU_KYAKU_C',           // QCF+C Hishou Kyaku (strong)
+  CHOI_KAITEN_HIEN_ZAN = 'CHOI_KAITEN_HIEN_ZAN',         // QCB+A Kaiten Hien Zan
+  CHOI_KAITEN_HIEN_ZAN_C = 'CHOI_KAITEN_HIEN_ZAN_C',     // QCB+C Kaiten Hien Zan (strong)
+  CHOI_HOUYOKU_TENSHIN = 'CHOI_HOUYOKU_TENSHIN',         // DP+K Houyoku Tenshin Sen
   // 超必杀技 (DM)
   DM_OROCHINAGI = 'DM_OROCHINAGI',           // 大蛇薙 (Kyo)
   DM_YATAGARASU = 'DM_YATAGARASU',           // 八稚女 (Iori)
@@ -245,6 +262,8 @@ export enum AttackType {
   DM_SCREW_UPPER = 'DM_SCREW_UPPER',               // Screw Upper (Joe)
   DM_CHO_REPPA_DAN = 'DM_CHO_REPPA_DAN',           // 超裂破弾 (Andy)
   DM_KAEN_SENPU_JIN = 'DM_KAEN_SENPU_JIN',             // Chou Kaen Senpu Jin (Billy)
+  DM_TEKKYUU_DAI_BOUSOU = 'DM_TEKKYUU_DAI_BOUSOU',       // Tekkyuu Dai Bousou (Chang)
+  DM_SHIN_CHOU_HOUYOKU = 'DM_SHIN_CHOU_HOUYOKU',         // Shin! Chou Houyoku Tenshin Sen (Choi)
   // 超必杀技SDM (Super Desperation Move — MAX mode only, costs extra stock)
   SDM_OROCHINAGI = 'SDM_OROCHINAGI',         // 大蛇薙SDM (Kyo)
   SDM_YATAGARASU = 'SDM_YATAGARASU',         // 八稚女SDM (Iori)
@@ -263,6 +282,8 @@ export enum AttackType {
   SDM_SCREW_UPPER = 'SDM_SCREW_UPPER',             // Screw Upper SDM (Joe)
   SDM_CHO_REPPA_DAN = 'SDM_CHO_REPPA_DAN',         // 超裂破弾SDM (Andy)
   SDM_KAEN_SENPU_JIN = 'SDM_KAEN_SENPU_JIN',           // Chou Kaen Senpu Jin SDM (Billy)
+  SDM_TEKKYUU_DAI_BOUSOU = 'SDM_TEKKYUU_DAI_BOUSOU',     // Tekkyuu Dai Bousou SDM (Chang)
+  SDM_SHIN_CHOU_HOUYOKU = 'SDM_SHIN_CHOU_HOUYOKU',       // Shin! Chou Houyoku Tenshin Sen SDM (Choi)
 }
 
 // ===== Hit Level (防御判定) =====

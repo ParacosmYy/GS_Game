@@ -21,6 +21,8 @@ import { AndyDef } from './andy.js';
 import { ClarkDef } from './clark.js';
 import { JoeDef } from './joe.js';
 import { BillyDef } from './billy.js';
+import { ChoiDef } from './choi.js';
+import { ChangDef } from './chang.js';
 export type { CharacterDefinition } from './types.js';
 
 /** 全角色列表 — 选人界面和游戏初始化都从这里读取 */
@@ -41,4 +43,6 @@ export const ROSTER: CharacterDefinition[] = [
   ClarkDef,
   JoeDef,
   BillyDef,
+  ChoiDef,
+  ChangDef,
 ];

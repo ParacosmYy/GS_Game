@@ -968,3 +968,213 @@ export const SDM_KAEN_SENPU_JIN_FRAMES: AttackFrame[] = [
   F([{ ox: 18, oy: -88, w: 30, h: 22 }]),
   F([{ ox: 16, oy: -90, w: 28, h: 20 }]),
 ];
+
+// ===== 陈可汗 (Chang Koehan) ===== APPROX based on KOF2002UM
+// Tekkyuu Dai Kaiten (A) — iron ball spin, fast
+export const CHANG_TEKKYUU_KAITEN_FRAMES: AttackFrame[] = [
+  F([{ ox: 38, oy: -55, w: 52, h: 35 }]),
+  F([{ ox: 45, oy: -52, w: 58, h: 38 }]),
+  F([{ ox: 52, oy: -48, w: 62, h: 42 }]),
+  F([{ ox: 52, oy: -48, w: 62, h: 42 }]),
+  F([{ ox: 48, oy: -52, w: 58, h: 38 }]),
+  F([{ ox: 42, oy: -55, w: 52, h: 35 }]),
+  F([{ ox: 38, oy: -58, w: 48, h: 32 }]),
+  F([{ ox: 35, oy: -60, w: 45, h: 30 }]),
+  F([{ ox: 32, oy: -62, w: 42, h: 28 }]),
+  F([{ ox: 30, oy: -65, w: 40, h: 26 }]),
+  F([{ ox: 28, oy: -68, w: 38, h: 24 }]),
+  F([{ ox: 26, oy: -70, w: 35, h: 22 }]),
+  F([{ ox: 24, oy: -72, w: 32, h: 20 }]),
+  F([{ ox: 22, oy: -74, w: 30, h: 18 }]),
+];
+
+// Tekkyuu Dai Kaiten (C) — iron ball spin, strong multi-hit
+export const CHANG_TEKKYUU_KAITEN_C_FRAMES: AttackFrame[] = [
+  F([{ ox: 38, oy: -55, w: 55, h: 38 }]),
+  F([{ ox: 48, oy: -52, w: 62, h: 42 }]),
+  F([{ ox: 55, oy: -48, w: 68, h: 45 }]),
+  F([{ ox: 58, oy: -45, w: 72, h: 48 }]),
+  F([{ ox: 58, oy: -45, w: 72, h: 48 }]),
+  F([{ ox: 55, oy: -48, w: 68, h: 45 }]),
+  F([{ ox: 52, oy: -50, w: 62, h: 42 }]),
+  F([{ ox: 48, oy: -52, w: 58, h: 38 }]),
+  F([{ ox: 45, oy: -55, w: 55, h: 36 }]),
+  F([{ ox: 42, oy: -58, w: 52, h: 34 }]),
+  F([{ ox: 40, oy: -60, w: 48, h: 32 }]),
+  F([{ ox: 38, oy: -62, w: 45, h: 30 }]),
+  F([{ ox: 36, oy: -64, w: 42, h: 28 }]),
+  F([{ ox: 34, oy: -66, w: 40, h: 26 }]),
+  F([{ ox: 32, oy: -68, w: 38, h: 24 }]),
+  F([{ ox: 30, oy: -70, w: 35, h: 22 }]),
+  F([{ ox: 28, oy: -72, w: 32, h: 20 }]),
+  F([{ ox: 26, oy: -74, w: 30, h: 18 }]),
+  F([{ ox: 24, oy: -76, w: 28, h: 16 }]),
+  F([{ ox: 22, oy: -78, w: 26, h: 14 }]),
+];
+
+// Tekkyuu Fasshu — iron ball swing, overhead
+export const CHANG_TEKKYUU_FASSHU_FRAMES: AttackFrame[] = [
+  F([{ ox: 35, oy: -60, w: 48, h: 35 }]),
+  F([{ ox: 42, oy: -55, w: 55, h: 38 }]),
+  F([{ ox: 50, oy: -50, w: 62, h: 42 }]),
+  F([{ ox: 55, oy: -48, w: 68, h: 45 }]),
+  F([{ ox: 55, oy: -48, w: 68, h: 45 }]),
+  F([{ ox: 52, oy: -50, w: 62, h: 42 }]),
+  F([{ ox: 48, oy: -52, w: 58, h: 40 }]),
+  F([{ ox: 42, oy: -55, w: 52, h: 38 }]),
+];
+
+// Tekkyuu Hien Zan — flying iron ball attack
+export const CHANG_TEKKYUU_HIEN_ZAN_FRAMES: AttackFrame[] = [
+  F([{ ox: 35, oy: -55, w: 48, h: 38 }]),
+  F([{ ox: 42, oy: -50, w: 55, h: 42 }]),
+  F([{ ox: 48, oy: -45, w: 62, h: 45 }]),
+  F([{ ox: 52, oy: -42, w: 65, h: 48 }]),
+  F([{ ox: 52, oy: -42, w: 65, h: 48 }]),
+  F([{ ox: 48, oy: -45, w: 60, h: 45 }]),
+  F([{ ox: 45, oy: -48, w: 55, h: 42 }]),
+  F([{ ox: 42, oy: -52, w: 50, h: 38 }]),
+  F([{ ox: 38, oy: -55, w: 45, h: 35 }]),
+  F([{ ox: 35, oy: -58, w: 42, h: 32 }]),
+];
+
+// DM: Tekkyuu Dai Bousou — massive iron ball rush
+export const DM_TEKKYUU_DAI_BOUSOU_FRAMES: AttackFrame[] = [
+  F([{ ox: 30, oy: -65, w: 58, h: 48 }]),
+  F([{ ox: 38, oy: -62, w: 68, h: 52 }]),
+  F([{ ox: 45, oy: -58, w: 78, h: 56 }]),
+  F([{ ox: 50, oy: -55, w: 88, h: 60 }]),
+  F([{ ox: 52, oy: -52, w: 95, h: 62 }]),
+  F([{ ox: 52, oy: -52, w: 95, h: 62 }]),
+  F([{ ox: 52, oy: -52, w: 95, h: 62 }]),
+  F([{ ox: 50, oy: -55, w: 88, h: 58 }]),
+  F([{ ox: 48, oy: -58, w: 82, h: 55 }]),
+  F([{ ox: 45, oy: -60, w: 75, h: 52 }]),
+  F([{ ox: 42, oy: -62, w: 68, h: 48 }]),
+  F([{ ox: 38, oy: -65, w: 60, h: 44 }]),
+];
+
+// SDM: Tekkyuu Dai Bousou SDM — bigger, more devastating
+export const SDM_TEKKYUU_DAI_BOUSOU_FRAMES: AttackFrame[] = [
+  F([{ ox: 30, oy: -65, w: 62, h: 50 }]),
+  F([{ ox: 38, oy: -62, w: 72, h: 55 }]),
+  F([{ ox: 45, oy: -58, w: 82, h: 58 }]),
+  F([{ ox: 52, oy: -54, w: 92, h: 62 }]),
+  F([{ ox: 55, oy: -52, w: 100, h: 65 }]),
+  F([{ ox: 55, oy: -52, w: 100, h: 65 }]),
+  F([{ ox: 55, oy: -52, w: 100, h: 65 }]),
+  F([{ ox: 55, oy: -52, w: 100, h: 65 }]),
+  F([{ ox: 52, oy: -55, w: 92, h: 62 }]),
+  F([{ ox: 50, oy: -58, w: 85, h: 58 }]),
+  F([{ ox: 48, oy: -60, w: 78, h: 55 }]),
+  F([{ ox: 45, oy: -62, w: 72, h: 52 }]),
+  F([{ ox: 42, oy: -65, w: 65, h: 48 }]),
+  F([{ ox: 38, oy: -68, w: 58, h: 44 }]),
+  F([{ ox: 35, oy: -70, w: 52, h: 40 }]),
+  F([{ ox: 32, oy: -72, w: 48, h: 36 }]),
+  F([{ ox: 30, oy: -75, w: 42, h: 32 }]),
+  F([{ ox: 28, oy: -78, w: 38, h: 28 }]),
+];
+
+// ===== 蔡宝奇 (Choi Bounge) ===== APPROX based on KOF2002UM
+
+// Souten Mekkyaku (→+A) — upper claw slash
+export const CHOI_SOUTEN_MEKKYAKU_FRAMES: AttackFrame[] = [
+  F([{ ox: 38, oy: -68, w: 40, h: 28 }]),
+  F([{ ox: 46, oy: -65, w: 48, h: 30 }]),
+  F([{ ox: 46, oy: -65, w: 48, h: 30 }]),
+];
+
+// San Ren Geki (→+B) — low claw sweep
+export const CHOI_SAN_REN_GEKI_FRAMES: AttackFrame[] = [
+  F([{ ox: 35, oy: -22, w: 45, h: 25 }]),
+  F([{ ox: 42, oy: -20, w: 52, h: 28 }]),
+  F([{ ox: 42, oy: -20, w: 52, h: 28 }]),
+];
+
+// Hishou Kyaku (QCF+A) — diving claw attack, fast
+export const CHOI_HISHOU_KYAKU_FRAMES: AttackFrame[] = [
+  F([{ ox: 32, oy: -55, w: 45, h: 35 }]),
+  F([{ ox: 40, oy: -50, w: 52, h: 38 }]),
+  F([{ ox: 45, oy: -48, w: 58, h: 42 }]),
+  F([{ ox: 45, oy: -48, w: 58, h: 42 }]),
+  F([{ ox: 42, oy: -50, w: 52, h: 38 }]),
+  F([{ ox: 38, oy: -52, w: 48, h: 35 }]),
+];
+
+// Hishou Kyaku C (QCF+C) — diving claw attack, strong
+export const CHOI_HISHOU_KYAKU_C_FRAMES: AttackFrame[] = [
+  F([{ ox: 35, oy: -52, w: 50, h: 38 }]),
+  F([{ ox: 42, oy: -48, w: 58, h: 42 }]),
+  F([{ ox: 48, oy: -45, w: 65, h: 45 }]),
+  F([{ ox: 48, oy: -45, w: 65, h: 45 }]),
+  F([{ ox: 48, oy: -45, w: 65, h: 45 }]),
+  F([{ ox: 45, oy: -48, w: 58, h: 42 }]),
+  F([{ ox: 40, oy: -50, w: 52, h: 38 }]),
+  F([{ ox: 36, oy: -52, w: 48, h: 35 }]),
+];
+
+// Kaiten Hien Zan (QCB+A) — spinning claw, 1-hit anti-air
+export const CHOI_KAITEN_HIEN_ZAN_FRAMES: AttackFrame[] = [
+  F([{ ox: 25, oy: -70, w: 42, h: 40 }], { ox: 3, oy: -5, w: -10, h: -20 }),
+  F([{ ox: 30, oy: -78, w: 48, h: 45 }], { ox: 3, oy: -5, w: -10, h: -20 }),
+  F([{ ox: 32, oy: -82, w: 50, h: 48 }]),
+  F([{ ox: 30, oy: -78, w: 48, h: 45 }]),
+  F([{ ox: 28, oy: -72, w: 45, h: 42 }]),
+  F([{ ox: 25, oy: -65, w: 40, h: 38 }]),
+];
+
+// Kaiten Hien Zan C (QCB+C) — spinning claw, 2-hit anti-air
+export const CHOI_KAITEN_HIEN_ZAN_C_FRAMES: AttackFrame[] = [
+  F([{ ox: 28, oy: -72, w: 48, h: 42 }], { ox: 3, oy: -5, w: -10, h: -20 }),
+  F([{ ox: 35, oy: -80, w: 55, h: 48 }], { ox: 3, oy: -5, w: -10, h: -20 }),
+  F([{ ox: 38, oy: -85, w: 58, h: 52 }]),
+  F([{ ox: 38, oy: -85, w: 58, h: 52 }]),
+  F([{ ox: 35, oy: -82, w: 55, h: 48 }]),
+  F([{ ox: 32, oy: -78, w: 52, h: 45 }]),
+  F([{ ox: 30, oy: -72, w: 48, h: 42 }]),
+  F([{ ox: 28, oy: -65, w: 42, h: 38 }]),
+];
+
+// Houyoku Tenshin Sen (DP+K) — upward spinning attack
+export const CHOI_HOUYOKU_TENSHIN_FRAMES: AttackFrame[] = [
+  F([{ ox: 30, oy: -75, w: 48, h: 45 }], { ox: 3, oy: -5, w: -10, h: -20 }),
+  F([{ ox: 38, oy: -82, w: 55, h: 50 }], { ox: 3, oy: -5, w: -10, h: -20 }),
+  F([{ ox: 42, oy: -88, w: 60, h: 55 }]),
+  F([{ ox: 42, oy: -88, w: 60, h: 55 }]),
+  F([{ ox: 40, oy: -85, w: 58, h: 52 }]),
+  F([{ ox: 38, oy: -80, w: 55, h: 48 }]),
+  F([{ ox: 35, oy: -75, w: 50, h: 45 }]),
+  F([{ ox: 32, oy: -68, w: 45, h: 40 }]),
+];
+
+// DM: Shin! Chou Houyoku Tenshin Sen
+export const DM_SHIN_CHOU_HOUYOKU_FRAMES: AttackFrame[] = [
+  F([{ ox: 28, oy: -78, w: 55, h: 48 }]),
+  F([{ ox: 36, oy: -85, w: 65, h: 55 }]),
+  F([{ ox: 42, oy: -90, w: 72, h: 58 }]),
+  F([{ ox: 42, oy: -90, w: 75, h: 60 }]),
+  F([{ ox: 42, oy: -90, w: 75, h: 60 }]),
+  F([{ ox: 42, oy: -90, w: 75, h: 60 }]),
+  F([{ ox: 40, oy: -88, w: 70, h: 58 }]),
+  F([{ ox: 38, oy: -85, w: 65, h: 55 }]),
+  F([{ ox: 35, oy: -80, w: 58, h: 50 }]),
+  F([{ ox: 32, oy: -75, w: 52, h: 45 }]),
+];
+
+// SDM: Shin! Chou Houyoku Tenshin Sen SDM
+export const SDM_SHIN_CHOU_HOUYOKU_FRAMES: AttackFrame[] = [
+  F([{ ox: 28, oy: -80, w: 60, h: 50 }]),
+  F([{ ox: 38, oy: -88, w: 72, h: 58 }]),
+  F([{ ox: 45, oy: -92, w: 80, h: 62 }]),
+  F([{ ox: 48, oy: -92, w: 85, h: 65 }]),
+  F([{ ox: 48, oy: -92, w: 88, h: 68 }]),
+  F([{ ox: 48, oy: -92, w: 88, h: 68 }]),
+  F([{ ox: 48, oy: -92, w: 88, h: 68 }]),
+  F([{ ox: 45, oy: -90, w: 82, h: 62 }]),
+  F([{ ox: 42, oy: -88, w: 75, h: 58 }]),
+  F([{ ox: 38, oy: -85, w: 68, h: 55 }]),
+  F([{ ox: 35, oy: -80, w: 60, h: 50 }]),
+  F([{ ox: 32, oy: -78, w: 55, h: 45 }]),
+  F([{ ox: 30, oy: -75, w: 50, h: 42 }]),
+];

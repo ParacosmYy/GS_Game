@@ -236,4 +236,23 @@ export const HITBOX_OFFSETS = {
   BILLY_HIEN_ZAN_D: { offsetX: 55, offsetY: -100, width: 78, height: 55 },
   DM_KAEN_SENPU_JIN: { offsetX: 45, offsetY: -130, width: 100, height: 75 },
   SDM_KAEN_SENPU_JIN: { offsetX: 45, offsetY: -140, width: 110, height: 80 },
+  // 陈可汗 (Chang Koehan)
+  CHANG_HIKI_NAGE: { offsetX: 55, offsetY: -100, width: 80, height: 45 },
+  CHANG_KYUUSHUU: { offsetX: 65, offsetY: -20, width: 82, height: 28 },
+  CHANG_TEKKYUU_KAITEN: { offsetX: 55, offsetY: -85, width: 85, height: 55 },
+  CHANG_TEKKYUU_KAITEN_C: { offsetX: 55, offsetY: -85, width: 90, height: 60 },
+  CHANG_TEKKYUU_FASSHU: { offsetX: 60, offsetY: -100, width: 80, height: 50 },
+  CHANG_TEKKYUU_HIEN_ZAN: { offsetX: 50, offsetY: -90, width: 75, height: 55 },
+  DM_TEKKYUU_DAI_BOUSOU: { offsetX: 40, offsetY: -120, width: 105, height: 80 },
+  SDM_TEKKYUU_DAI_BOUSOU: { offsetX: 40, offsetY: -130, width: 115, height: 85 },
+  // 蔡宝奇 (Choi Bounge)
+  CHOI_SOUTEN_MEKKYAKU: { offsetX: 50, offsetY: -100, width: 65, height: 40 },
+  CHOI_SAN_REN_GEKI: { offsetX: 58, offsetY: -18, width: 70, height: 25 },
+  CHOI_HISHOU_KYAKU: { offsetX: 50, offsetY: -80, width: 60, height: 45 },
+  CHOI_HISHOU_KYAKU_C: { offsetX: 52, offsetY: -78, width: 65, height: 50 },
+  CHOI_KAITEN_HIEN_ZAN: { offsetX: 38, offsetY: -120, width: 55, height: 60 },
+  CHOI_KAITEN_HIEN_ZAN_C: { offsetX: 38, offsetY: -120, width: 60, height: 70 },
+  CHOI_HOUYOKU_TENSHIN: { offsetX: 42, offsetY: -130, width: 60, height: 65 },
+  DM_SHIN_CHOU_HOUYOKU: { offsetX: 42, offsetY: -130, width: 85, height: 70 },
+  SDM_SHIN_CHOU_HOUYOKU: { offsetX: 42, offsetY: -140, width: 95, height: 75 },
 } as const;

@@ -221,6 +221,17 @@ const FRAME_DATA_GENERIC = {
     damage: 40, hitstun: 18, blockstun: 15, pushback: 2,
     hitLevel: 'LOW' as const, knockdown: false,
   },
+  // 陈可汗命令通常技 — APPROX based on KOF2002UM
+  CHANG_HIKI_NAGE: {
+    startup: 10, active: 4, recovery: 22,
+    damage: 55, hitstun: 20, blockstun: 17, pushback: 4,
+    hitLevel: 'MID' as const, knockdown: false,
+  },
+  CHANG_KYUUSHUU: {
+    startup: 9, active: 5, recovery: 24,
+    damage: 45, hitstun: 18, blockstun: 15, pushback: 3,
+    hitLevel: 'LOW' as const, knockdown: false,
+  },
   // ── 蹲下攻击 (Crouch) ──
   CROUCH_A: {
     startup: 5, active: 4, recovery: 7,
