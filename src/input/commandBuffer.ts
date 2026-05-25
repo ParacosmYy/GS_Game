@@ -2,7 +2,7 @@ import { DirectionInput, AttackType } from '../core/types.js';
 import { COMMAND_WINDOW, HCF_WINDOW, DOUBLE_QCF_WINDOW } from '../core/constants.js';
 
 /** DM motion types detected from command buffer — characters map these to their own DM */
-export type DMMotion = 'QCFx2_P' | 'QCFx2_K' | 'QCBx2_K' | null;
+export type DMMotion = 'QCFx2_P' | 'QCFx2_K' | 'QCBx2_K' | 'QCBx2_P' | null;
 
 interface DirectionRecord {
   direction: DirectionInput;
@@ -118,6 +118,7 @@ export class CommandBuffer {
       || this.matchSequence(wideRecent, ['down', 'back', 'down', 'downback', 'back']);
 
     if (hasDoubleQCB && kickEdge) return 'QCBx2_K';
+    if (hasDoubleQCB && punchEdge) return 'QCBx2_P';
 
     return null;
   }

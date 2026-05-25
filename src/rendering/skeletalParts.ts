@@ -29,6 +29,10 @@ export const CHAR_OUTFIT: Record<string, { shirt: string; pants: string; belt: s
   chris: { shirt: '#ff8844', pants: '#cc6622', belt: '#aa4422', shoes: '#883322' },
   shermie: { shirt: '#cc44aa', pants: '#cc44aa', belt: '#dd55bb', shoes: '#992288' },
   vice: { shirt: '#3366aa', pants: '#3366aa', belt: '#4488cc', shoes: '#224488' },
+  yamazaki: { shirt: '#556622', pants: '#3a4418', belt: '#886633', shoes: '#332211' },
+  xiangfei: { shirt: '#ee6688', pants: '#cc4466', belt: '#ffcc44', shoes: '#aa3355' },
+  mary: { shirt: '#5588cc', pants: '#4477bb', belt: '#88bbee', shoes: '#336699' },
+  kasumi: { shirt: '#dd4466', pants: '#cc3355', belt: '#ee6688', shoes: '#aa2244' },
 };
 
 const DEFAULT_OUTFIT = { shirt: '#888', pants: '#556', belt: '#444', shoes: '#333' };
@@ -50,6 +54,10 @@ export function getHairColor(charId: string): string {
     chris: '#c88848',
     shermie: '#8b4a6a',
     vice: '#a0a0b0',
+    yamazaki: '#1a1a1a',
+    xiangfei: '#1a1a2e',
+    mary: '#ddbb44',
+    kasumi: '#1a1a2a',
   };
   return colors[charId] ?? '#333';
 }
@@ -67,6 +75,10 @@ export function getEyeColor(charId: string): string {
     chris: '#cc6622',
     shermie: '#663399',
     vice: '#cc2222',
+    yamazaki: '#553311',
+    xiangfei: '#cc3355',
+    mary: '#4466aa',
+    kasumi: '#331122',
   };
   return colors[charId] ?? '#444';
 }
@@ -816,6 +828,112 @@ function drawHair(ctx: CanvasRenderingContext2D, charId: string, facing: number,
     ctx.moveTo(r, -r + 4);
     ctx.lineTo(r + 3, -r + 12);
     ctx.lineTo(r - 2, -r + 8);
+    ctx.closePath();
+    ctx.fill();
+  } else if (charId === 'yamazaki') {
+    // Yamazaki: slicked-back black hair, menacing
+    ctx.fillStyle = '#1a1a1a';
+    ctx.beginPath();
+    ctx.moveTo(-r + 2, -r + 3);
+    ctx.quadraticCurveTo(-r + 4, -r - 8, 0, -r - 6);
+    ctx.quadraticCurveTo(r - 4, -r - 8, r + 2, -r + 3);
+    ctx.lineTo(r, -r + 6);
+    ctx.lineTo(-r, -r + 6);
+    ctx.closePath();
+    ctx.fill();
+    // Slicked-back volume — dark top
+    ctx.fillStyle = '#0a0a0a';
+    ctx.beginPath();
+    ctx.moveTo(-r + 4, -r + 1);
+    ctx.quadraticCurveTo(0, -r - 4, r - 4, -r + 1);
+    ctx.lineTo(r - 5, -r + 4);
+    ctx.lineTo(-r + 5, -r + 4);
+    ctx.closePath();
+    ctx.fill();
+    // Sideburns
+    ctx.fillStyle = '#1a1a1a';
+    ctx.beginPath();
+    ctx.moveTo(-r, -r + 4);
+    ctx.lineTo(-r - 2, -r + 10);
+    ctx.lineTo(-r + 2, -r + 8);
+    ctx.closePath();
+    ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(r, -r + 4);
+    ctx.lineTo(r + 2, -r + 10);
+    ctx.lineTo(r - 2, -r + 8);
+    ctx.closePath();
+    ctx.fill();
+  } else if (charId === 'mary') {
+    // Mary: blonde medium-length hair, confident
+    ctx.fillStyle = '#ddbb44';
+    ctx.beginPath();
+    ctx.moveTo(-r + 1, -r + 2);
+    ctx.lineTo(-r - 2, -r - 6);
+    ctx.quadraticCurveTo(0, -r - 10, r + 2, -r - 6);
+    ctx.lineTo(r - 1, -r + 2);
+    ctx.closePath();
+    ctx.fill();
+    // Soft bangs
+    ctx.fillStyle = '#ccaa33';
+    const bangs = [[-10, -14], [-4, -17], [2, -16], [8, -13]];
+    for (const [bx, by] of bangs) {
+      ctx.beginPath();
+      ctx.moveTo(bx - 4, -r + 2);
+      ctx.lineTo(bx, -r + by);
+      ctx.lineTo(bx + 4, -r + 2);
+      ctx.closePath();
+      ctx.fill();
+    }
+    // Side hair — medium length framing face
+    ctx.fillStyle = '#ddbb44';
+    ctx.beginPath();
+    ctx.moveTo(-r, -r + 4);
+    ctx.lineTo(-r - 4, -r + 18);
+    ctx.lineTo(-r + 3, -r + 10);
+    ctx.closePath();
+    ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(r, -r + 4);
+    ctx.lineTo(r + 4, -r + 18);
+    ctx.lineTo(r - 3, -r + 10);
+    ctx.closePath();
+    ctx.fill();
+  } else if (charId === 'kasumi') {
+    // Kasumi: black hair with ponytail, disciplined
+    ctx.fillStyle = '#1a1a2a';
+    ctx.beginPath();
+    ctx.moveTo(-r + 1, -r + 2);
+    ctx.lineTo(-r - 1, -r - 6);
+    ctx.quadraticCurveTo(0, -r - 8, r + 1, -r - 6);
+    ctx.lineTo(r - 1, -r + 2);
+    ctx.closePath();
+    ctx.fill();
+    // Neat bangs — straight across
+    ctx.fillStyle = '#222238';
+    ctx.beginPath();
+    ctx.moveTo(-r + 2, -r + 2);
+    ctx.lineTo(-r, -r - 4);
+    ctx.lineTo(r, -r - 4);
+    ctx.lineTo(r - 2, -r + 2);
+    ctx.closePath();
+    ctx.fill();
+    // Ponytail extending back
+    ctx.fillStyle = '#1a1a2a';
+    ctx.beginPath();
+    ctx.moveTo(r - 2, -r + 2);
+    ctx.lineTo(r + 6, -r - 2);
+    ctx.lineTo(r + 10, -r + 8);
+    ctx.lineTo(r + 6, -r + 14);
+    ctx.lineTo(r - 1, -r + 8);
+    ctx.closePath();
+    ctx.fill();
+    // Hair ribbon
+    ctx.fillStyle = '#dd4466';
+    ctx.beginPath();
+    ctx.moveTo(r, -r + 3);
+    ctx.lineTo(r + 4, -r + 0);
+    ctx.lineTo(r + 2, -r + 6);
     ctx.closePath();
     ctx.fill();
   }

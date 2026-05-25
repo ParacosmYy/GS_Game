@@ -79,6 +79,10 @@ export function drawSkeletalFighter(
     else if (charId === 'chris') { breathSpeed = 24; breathAmp = 2.2; headBob = 0.8; } // chris: youthful, energetic
     else if (charId === 'shermie') { breathSpeed = 30; breathAmp = 1.6; headBob = 0.4; } // shermie: alluring, slow
     else if (charId === 'vice') { breathSpeed = 26; breathAmp = 2.0; headBob = 0.6; } // vice: aggressive, tense
+    else if (charId === 'xiangfei') { breathSpeed = 22; breathAmp = 2.0; headBob = 0.7; } // xiangfei: energetic, kung-fu
+    else if (charId === 'yamazaki') { breathSpeed = 28; breathAmp = 1.8; headBob = 0.3; } // yamazaki: menacing, slow, one hand in pocket
+    else if (charId === 'mary') { breathSpeed = 26; breathAmp = 1.8; headBob = 0.5; } // mary: confident, athletic
+    else if (charId === 'kasumi') { breathSpeed = 28; breathAmp = 1.6; headBob = 0.4; } // kasumi: disciplined, controlled
     const breathe = Math.sin(globalTick / breathSpeed) * breathAmp;
     p.body.oy += breathe;
     p.head.oy += breathe + headBob * Math.sin(globalTick / breathSpeed * 0.5);

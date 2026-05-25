@@ -155,6 +155,30 @@ export const COMBO_ROUTES: Record<string, ComboStep[]> = {
     { type: 'special', attack: 'viceOutrage', delay: 3 },
     { type: 'special', attack: 'dmNegativeGain', delay: 4 },
   ],
+  yamazaki: [
+    { type: 'button',  attack: 'closeC', delay: 0 },
+    { type: 'button',  attack: 'yamazakiSashi', delay: 2 },
+    { type: 'special', attack: 'yamazakiSnakeArm', delay: 3 },
+    { type: 'special', attack: 'dmGuillotine', delay: 4 },
+  ],
+  xiangfei: [
+    { type: 'button',  attack: 'closeC', delay: 0 },
+    { type: 'button',  attack: 'xiangfeiKyuHo', delay: 2 },
+    { type: 'special', attack: 'xiangfeiNanpa', delay: 3 },
+    { type: 'special', attack: 'dmChouKaRinga', delay: 4 },
+  ],
+  kasumi: [
+    { type: 'button',  attack: 'closeC', delay: 0 },
+    { type: 'button',  attack: 'kasumiKouU', delay: 2 },
+    { type: 'special', attack: 'kasumiKoouKen', delay: 3 },
+    { type: 'special', attack: 'dmChouMukigenzan', delay: 4 },
+  ],
+  mary: [
+    { type: 'button',  attack: 'closeC', delay: 0 },
+    { type: 'button',  attack: 'maryHammerPunch', delay: 2 },
+    { type: 'special', attack: 'maryStraightSlicer', delay: 3 },
+    { type: 'special', attack: 'dmMaryTyphoon', delay: 4 },
+  ],
   _default: [
     { type: 'button',  attack: 'closeC', delay: 0 },
     { type: 'button',  attack: 'standA',  delay: 2 },
@@ -222,6 +246,14 @@ export function applyComboStep(step: ComboStep, base: ResolvedInput): void {
         base.forward = true; base.buttonA = true; base.buttonAPressed = true; base.punchPressed = true; break;
       case 'viceMonstrosity':
         base.forward = true; base.buttonA = true; base.buttonAPressed = true; base.punchPressed = true; break;
+      case 'yamazakiSashi':
+        base.forward = true; base.buttonA = true; base.buttonAPressed = true; base.punchPressed = true; break;
+      case 'xiangfeiKyuHo':
+        base.forward = true; base.buttonA = true; base.buttonAPressed = true; base.punchPressed = true; break;
+      case 'kasumiKouU':
+        base.forward = true; base.buttonA = true; base.buttonAPressed = true; base.punchPressed = true; break;
+      case 'maryHammerPunch':
+        base.forward = true; base.buttonA = true; base.buttonAPressed = true; base.punchPressed = true; break;
       case 'jumpC':
         base.buttonC = true; base.buttonCPressed = true; base.punchPressed = true; break;
     }
@@ -273,6 +305,10 @@ export function routeComboSpecial(
     case 'chris': return routeChris(attack);
     case 'shermie': return routeShermie(attack);
     case 'vice': return routeVice(attack);
+    case 'yamazaki': return routeYamazaki(attack);
+    case 'xiangfei': return routeXiangfei(attack);
+    case 'kasumi': return routeKasumi(attack);
+    case 'mary': return routeMary(attack);
     default: return null;
   }
 }
@@ -506,5 +542,49 @@ function routeVice(attack: string): AttackType | null {
     case 'viceMayhem': return AttackType.VICE_MAYHEM;
     case 'dmNegativeGain': return AttackType.DM_NEGATIVE_GAIN;
     default: return AttackType.VICE_OUTRAGE;
+  }
+}
+
+function routeYamazaki(attack: string): AttackType | null {
+  switch (attack) {
+    case 'yamazakiSnakeArm': return AttackType.YAMAZAKI_SNAKE_ARM;
+    case 'yamazakiSnakeArmC': return AttackType.YAMAZAKI_SNAKE_ARM_C;
+    case 'yamazakiSandstorm': return AttackType.YAMAZAKI_SANDSTORM;
+    case 'yamazakiBaiGaSe': return AttackType.YAMAZAKI_BAI_GA_SE;
+    case 'dmGuillotine': return AttackType.DM_GUILLOTINE;
+    default: return AttackType.YAMAZAKI_SNAKE_ARM;
+  }
+}
+
+function routeXiangfei(attack: string): AttackType | null {
+  switch (attack) {
+    case 'xiangfeiNanpa': return AttackType.XIANGFEI_NANPA;
+    case 'xiangfeiNanpaC': return AttackType.XIANGFEI_NANPA_C;
+    case 'xiangfeiTenpatsu': return AttackType.XIANGFEI_TENPATSU;
+    case 'xiangfeiMahoHisha': return AttackType.XIANGFEI_MAHO_HISHA;
+    case 'dmChouKaRinga': return AttackType.DM_CHO_KA_RINGA;
+    default: return AttackType.XIANGFEI_NANPA;
+  }
+}
+
+function routeKasumi(attack: string): AttackType | null {
+  switch (attack) {
+    case 'kasumiKoouKen': return AttackType.KASUMI_KOOU_KEN;
+    case 'kasumiKoouKenC': return AttackType.KASUMI_KOOU_KEN_C;
+    case 'kasumiKasaneAte': return AttackType.KASUMI_KASANE_ATE;
+    case 'kasumiMukigenzan': return AttackType.KASUMI_MUKIGENZAN;
+    case 'dmChouMukigenzan': return AttackType.DM_CHO_MUKIGENZAN;
+    default: return AttackType.KASUMI_KOOU_KEN;
+  }
+}
+
+function routeMary(attack: string): AttackType | null {
+  switch (attack) {
+    case 'maryStraightSlicer': return AttackType.MARY_STRAIGHT_SLICER;
+    case 'maryStraightSlicerC': return AttackType.MARY_STRAIGHT_SLICER_C;
+    case 'maryBackdropReal': return AttackType.MARY_BACKDROP_REAL;
+    case 'marySpider': return AttackType.MARY_SPIDER;
+    case 'dmMaryTyphoon': return AttackType.DM_MARY_TYPHOON;
+    default: return AttackType.MARY_STRAIGHT_SLICER;
   }
 }

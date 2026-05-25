@@ -30,9 +30,10 @@ function calcHitStop(at: AttackType, isDM: boolean, isSpecial: boolean, ch: bool
   const heavy = at === AttackType.STAND_C || at === AttackType.STAND_D || at === AttackType.CLOSE_C
     || at === AttackType.CLOSE_D || at === AttackType.CROUCH_C || at === AttackType.CROUCH_D
     || at === AttackType.JUMP_C || at === AttackType.JUMP_D;
-  // KOF2002: 轻攻击4F, 重攻击8F, 必杀技8F, 超必杀16F, Counter+3F
-  const r = isDM ? 16 : isSpecial ? 8 : heavy ? 8 : 4;
-  return ch ? r + 3 : r;
+  // KOF2002正版: 轻攻击8F, 重攻击12F, 必杀技12F, 超必杀22F, Counter+4F
+  // 参考: MUGEN标准轻10/中12/重14, SF系列统一14F, SNK以更长的hitstop著称
+  const r = isDM ? 22 : isSpecial ? 12 : heavy ? 12 : 8;
+  return ch ? r + 4 : r;
 }
 
 function calcShake(at: AttackType, ch: boolean, dmg: number): number {

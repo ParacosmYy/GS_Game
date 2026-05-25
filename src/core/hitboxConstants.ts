@@ -306,4 +306,48 @@ export const HITBOX_OFFSETS = {
   // 薇丝DM/SDM (Vice)
   DM_NEGATIVE_GAIN: { offsetX: 42, offsetY: -125, width: 92, height: 70 },
   SDM_NEGATIVE_GAIN: { offsetX: 42, offsetY: -135, width: 100, height: 78 },
+  // 李香绯命令通常技 (Li Xiangfei Command Normals)
+  XIANGFEI_KYU_HO: { offsetX: 52, offsetY: -95, width: 65, height: 38 },
+  XIANGFEI_KAKU_DA: { offsetX: 58, offsetY: -18, width: 68, height: 24 },
+  // 李香绯必杀技 (Li Xiangfei Specials)
+  XIANGFEI_NANPA: { offsetX: 55, offsetY: -85, width: 70, height: 45 },
+  XIANGFEI_NANPA_C: { offsetX: 55, offsetY: -82, width: 80, height: 50 },
+  XIANGFEI_TENPATSU: { offsetX: 48, offsetY: -110, width: 72, height: 55 },
+  XIANGFEI_MAHO_HISHA: { offsetX: 58, offsetY: -18, width: 75, height: 28 },
+  // 李香绯DM/SDM (Xiangfei)
+  DM_CHO_KA_RINGA: { offsetX: 42, offsetY: -105, width: 92, height: 65 },
+  SDM_CHO_KA_RINGA: { offsetX: 42, offsetY: -115, width: 105, height: 75 },
+  // 山崎龙二命令通常技 (Yamazaki Command Normals)
+  YAMAZAKI_SASHI: { offsetX: 55, offsetY: -100, width: 70, height: 40 },
+  YAMAZAKI_BOKKAI: { offsetX: 60, offsetY: -18, width: 72, height: 25 },
+  // 山崎龙二必杀技 (Yamazaki Specials)
+  YAMAZAKI_SNAKE_ARM: { offsetX: 62, offsetY: -95, width: 80, height: 42 },
+  YAMAZAKI_SNAKE_ARM_C: { offsetX: 65, offsetY: -92, width: 88, height: 48 },
+  YAMAZAKI_SANDSTORM: { offsetX: 50, offsetY: -115, width: 75, height: 55 },
+  YAMAZAKI_BAI_GA_SE: { offsetX: 58, offsetY: -20, width: 78, height: 28 },
+  // 山崎龙二DM/SDM (Yamazaki)
+  DM_GUILLOTINE: { offsetX: 42, offsetY: -110, width: 95, height: 70 },
+  SDM_GUILLOTINE: { offsetX: 42, offsetY: -120, width: 105, height: 80 },
+  // 布鲁·玛丽命令通常技 (Blue Mary Command Normals)
+  MARY_HAMMER_PUNCH: { offsetX: 55, offsetY: -105, width: 70, height: 40 },
+  MARY_DOUBLE_ROLLING: { offsetX: 60, offsetY: -20, width: 70, height: 25 },
+  // 布鲁·玛丽必杀技 (Blue Mary Specials)
+  MARY_STRAIGHT_SLICER: { offsetX: 58, offsetY: -55, width: 78, height: 45 },
+  MARY_STRAIGHT_SLICER_C: { offsetX: 58, offsetY: -55, width: 85, height: 50 },
+  MARY_BACKDROP_REAL: { offsetX: 48, offsetY: -115, width: 72, height: 58 },
+  MARY_SPIDER: { offsetX: 55, offsetY: -22, width: 78, height: 28 },
+  // 布鲁·玛丽DM/SDM (Blue Mary)
+  DM_MARY_TYPHOON: { offsetX: 42, offsetY: -80, width: 92, height: 70 },
+  SDM_MARY_TYPHOON: { offsetX: 42, offsetY: -85, width: 100, height: 78 },
+  // 藤堂香澄命令通常技 (Kasumi Todoh Command Normals)
+  KASUMI_KOU_U: { offsetX: 52, offsetY: -100, width: 68, height: 38 },
+  KASUMI_GESHIKI: { offsetX: 58, offsetY: -18, width: 70, height: 24 },
+  // 藤堂香澄必杀技 (Kasumi Todoh Specials)
+  KASUMI_KOOU_KEN: { offsetX: 70, offsetY: -105, width: 55, height: 40 },
+  KASUMI_KOOU_KEN_C: { offsetX: 70, offsetY: -105, width: 60, height: 45 },
+  KASUMI_KASANE_ATE: { offsetX: 55, offsetY: -100, width: 72, height: 48 },
+  KASUMI_MUKIGENZAN: { offsetX: 58, offsetY: -20, width: 75, height: 28 },
+  // 藤堂香澄DM/SDM (Kasumi Todoh)
+  DM_CHO_MUKIGENZAN: { offsetX: 42, offsetY: -115, width: 95, height: 70 },
+  SDM_CHO_MUKIGENZAN: { offsetX: 42, offsetY: -125, width: 105, height: 80 },
 } as const;

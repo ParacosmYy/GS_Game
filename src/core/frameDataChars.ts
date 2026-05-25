@@ -1022,4 +1022,179 @@ export const FRAME_DATA_CHARS = {
     damage: 320, hitstun: 0, blockstun: 24, pushback: 14,
     hitLevel: 'MID' as const, knockdown: true, chipDamage: 32,
   },
+  // ── 布鲁·玛丽命令通常技 (Blue Mary) ── APPROX based on KOF2002UM
+  MARY_HAMMER_PUNCH: {
+    startup: 12, active: 4, recovery: 20,
+    damage: 42, hitstun: 18, blockstun: 15, pushback: 3,
+    hitLevel: 'MID' as const, knockdown: false,
+  },
+  MARY_DOUBLE_ROLLING: {
+    startup: 8, active: 4, recovery: 22,
+    damage: 38, hitstun: 16, blockstun: 14, pushback: 2,
+    hitLevel: 'LOW' as const, knockdown: false,
+  },
+  // ── 布鲁·玛丽必杀技 (Blue Mary) ── APPROX based on KOF2002UM
+  MARY_STRAIGHT_SLICER: {
+    startup: 9, active: 6, recovery: 22,
+    damage: 68, hitstun: 20, blockstun: 16, pushback: 5,
+    hitLevel: 'MID' as const, knockdown: false, chipDamage: 8,
+  },
+  MARY_STRAIGHT_SLICER_C: {
+    startup: 12, active: 8, recovery: 26,
+    damage: 85, hitstun: 22, blockstun: 18, pushback: 7,
+    hitLevel: 'MID' as const, knockdown: false, chipDamage: 10,
+  },
+  MARY_BACKDROP_REAL: {
+    startup: 10, active: 5, recovery: 24,
+    damage: 72, hitstun: 20, blockstun: 16, pushback: 5,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 8,
+  },
+  MARY_SPIDER: {
+    startup: 12, active: 6, recovery: 28,
+    damage: 75, hitstun: 22, blockstun: 18, pushback: 6,
+    hitLevel: 'LOW' as const, knockdown: true, chipDamage: 10,
+  },
+  // ── 布鲁·玛丽DM/SDM (Blue Mary) ── APPROX based on KOF2002UM
+  DM_MARY_TYPHOON: {
+    startup: 8, active: 16, recovery: 38,
+    damage: 200, hitstun: 0, blockstun: 22, pushback: 12,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 20,
+  },
+  SDM_MARY_TYPHOON: {
+    startup: 6, active: 22, recovery: 40,
+    damage: 310, hitstun: 0, blockstun: 24, pushback: 14,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 30,
+  },
+  // ── 李香绯命令通常技 (Li Xiangfei) ── APPROX based on KOF2002UM
+  XIANGFEI_KYU_HO: {
+    startup: 10, active: 4, recovery: 18,
+    damage: 38, hitstun: 16, blockstun: 14, pushback: 3,
+    hitLevel: 'MID' as const, knockdown: false,
+  },
+  XIANGFEI_KAKU_DA: {
+    startup: 8, active: 4, recovery: 20,
+    damage: 35, hitstun: 14, blockstun: 12, pushback: 2,
+    hitLevel: 'LOW' as const, knockdown: false,
+  },
+  // ── 李香绯必杀技 (Li Xiangfei) ── APPROX based on KOF2002UM
+  XIANGFEI_NANPA: {
+    startup: 7, active: 5, recovery: 18,
+    damage: 58, hitstun: 18, blockstun: 14, pushback: 4,
+    hitLevel: 'MID' as const, knockdown: false,
+  },
+  XIANGFEI_NANPA_C: {
+    startup: 10, active: 8, recovery: 24,
+    damage: 78, hitstun: 22, blockstun: 18, pushback: 6,
+    hitLevel: 'MID' as const, knockdown: false,
+  },
+  XIANGFEI_TENPATSU: {
+    startup: 12, active: 5, recovery: 26,
+    damage: 70, hitstun: 20, blockstun: 16, pushback: 5,
+    hitLevel: 'HIGH' as const, knockdown: true, chipDamage: 8,
+  },
+  XIANGFEI_MAHO_HISHA: {
+    startup: 10, active: 6, recovery: 24,
+    damage: 68, hitstun: 18, blockstun: 14, pushback: 5,
+    hitLevel: 'LOW' as const, knockdown: true, chipDamage: 8,
+  },
+  // ── 李香绯DM (Li Xiangfei) ── APPROX based on KOF2002UM
+  DM_CHO_KA_RINGA: {
+    startup: 7, active: 14, recovery: 36,
+    damage: 190, hitstun: 0, blockstun: 20, pushback: 10,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 18,
+  },
+  // ── 李香绯SDM (Li Xiangfei) ── APPROX based on KOF2002UM
+  SDM_CHO_KA_RINGA: {
+    startup: 5, active: 20, recovery: 38,
+    damage: 295, hitstun: 0, blockstun: 22, pushback: 12,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 28,
+  },
+  // ── 山崎龙二命令通常技 (Yamazaki) ── APPROX based on KOF2002UM
+  YAMAZAKI_SASHI: {
+    startup: 14, active: 4, recovery: 22,
+    damage: 45, hitstun: 18, blockstun: 16, pushback: 4,
+    hitLevel: 'MID' as const, knockdown: false,
+  },
+  YAMAZAKI_BOKKAI: {
+    startup: 10, active: 4, recovery: 24,
+    damage: 40, hitstun: 16, blockstun: 14, pushback: 3,
+    hitLevel: 'LOW' as const, knockdown: false,
+  },
+  // ── 山崎龙二必杀技 (Yamazaki) ── APPROX based on KOF2002UM
+  YAMAZAKI_SNAKE_ARM: {
+    startup: 8, active: 6, recovery: 20,
+    damage: 65, hitstun: 20, blockstun: 16, pushback: 5,
+    hitLevel: 'MID' as const, knockdown: false, chipDamage: 8,
+  },
+  YAMAZAKI_SNAKE_ARM_C: {
+    startup: 12, active: 10, recovery: 26,
+    damage: 88, hitstun: 24, blockstun: 20, pushback: 7,
+    hitLevel: 'MID' as const, knockdown: false, chipDamage: 12,
+  },
+  YAMAZAKI_SANDSTORM: {
+    startup: 16, active: 5, recovery: 28,
+    damage: 78, hitstun: 22, blockstun: 18, pushback: 6,
+    hitLevel: 'HIGH' as const, knockdown: true, chipDamage: 10,
+  },
+  YAMAZAKI_BAI_GA_SE: {
+    startup: 10, active: 6, recovery: 24,
+    damage: 72, hitstun: 20, blockstun: 16, pushback: 5,
+    hitLevel: 'LOW' as const, knockdown: true, chipDamage: 8,
+  },
+  // ── 山崎龙二DM (Yamazaki) ── APPROX based on KOF2002UM
+  DM_GUILLOTINE: {
+    startup: 8, active: 14, recovery: 38,
+    damage: 220, hitstun: 0, blockstun: 22, pushback: 12,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 22,
+  },
+  // ── 山崎龙二SDM (Yamazaki) ── APPROX based on KOF2002UM
+  SDM_GUILLOTINE: {
+    startup: 6, active: 20, recovery: 40,
+    damage: 340, hitstun: 0, blockstun: 24, pushback: 14,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 32,
+  },
+  // ── 藤堂香澄命令通常技 (Kasumi Todoh) ── APPROX based on KOF2002UM
+  KASUMI_KOU_U: {
+    startup: 12, active: 4, recovery: 18,
+    damage: 40, hitstun: 16, blockstun: 14, pushback: 3,
+    hitLevel: 'MID' as const, knockdown: false,
+  },
+  KASUMI_GESHIKI: {
+    startup: 8, active: 4, recovery: 20,
+    damage: 36, hitstun: 14, blockstun: 12, pushback: 2,
+    hitLevel: 'LOW' as const, knockdown: false,
+  },
+  // ── 藤堂香澄必杀技 (Kasumi Todoh) ── APPROX based on KOF2002UM
+  KASUMI_KOOU_KEN: {
+    startup: 8, active: 6, recovery: 22,
+    damage: 65, hitstun: 20, blockstun: 16, pushback: 5,
+    hitLevel: 'MID' as const, knockdown: false, chipDamage: 8,
+  },
+  KASUMI_KOOU_KEN_C: {
+    startup: 11, active: 8, recovery: 26,
+    damage: 82, hitstun: 22, blockstun: 18, pushback: 7,
+    hitLevel: 'MID' as const, knockdown: false, chipDamage: 10,
+  },
+  KASUMI_KASANE_ATE: {
+    startup: 10, active: 5, recovery: 24,
+    damage: 70, hitstun: 20, blockstun: 16, pushback: 5,
+    hitLevel: 'MID' as const, knockdown: false, chipDamage: 8,
+  },
+  KASUMI_MUKIGENZAN: {
+    startup: 12, active: 6, recovery: 26,
+    damage: 75, hitstun: 22, blockstun: 18, pushback: 6,
+    hitLevel: 'LOW' as const, knockdown: true, chipDamage: 10,
+  },
+  // ── 藤堂香澄DM (Kasumi Todoh) ── APPROX based on KOF2002UM
+  DM_CHO_MUKIGENZAN: {
+    startup: 7, active: 14, recovery: 36,
+    damage: 195, hitstun: 0, blockstun: 22, pushback: 12,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 20,
+  },
+  // ── 藤堂香澄SDM (Kasumi Todoh) ── APPROX based on KOF2002UM
+  SDM_CHO_MUKIGENZAN: {
+    startup: 5, active: 20, recovery: 38,
+    damage: 300, hitstun: 0, blockstun: 24, pushback: 14,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 30,
+  },
 } as const;
