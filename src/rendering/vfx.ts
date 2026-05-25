@@ -306,8 +306,10 @@ export class VFXSystem {
         case 'superburst': {
           ctx.save();
           const scale = 1 + progress * 0.3;
+          // KOF2002: 白色核心前5帧纯白增强
+          const sbEarly = p.life > p.maxLife - 5 && p.color === '#ffffff';
           // KOF2002: Superburst多层渲染 — 白色核心+角色色中段+外围光晕
-          ctx.globalAlpha = alpha * 0.7;
+          ctx.globalAlpha = sbEarly ? Math.min(1, alpha * 0.9) : alpha * 0.7;
           const sbGrad = ctx.createRadialGradient(sx, p.y, 0, sx, p.y, p.size * scale);
           sbGrad.addColorStop(0, '#ffffff');
           sbGrad.addColorStop(0.15, '#ffffffcc');
@@ -361,8 +363,8 @@ export class VFXSystem {
           ctx.beginPath();
           ctx.arc(sx, p.y, waveR, 0, Math.PI * 2);
           ctx.stroke();
-          // 暗色叠加
-          ctx.globalAlpha = alpha * 0.3;
+          // 暗色叠加 — KOF2002: ease-out衰减, 前半段强后半段快速消失
+          ctx.globalAlpha = alpha > 0.5 ? alpha * 0.3 : alpha * alpha * 0.3;
           ctx.fillStyle = '#000';
           ctx.fillRect(sx - p.size * 1.5, p.y - p.size * 1.5, p.size * 3, p.size * 3);
           ctx.restore();
@@ -370,7 +372,9 @@ export class VFXSystem {
         }
         case 'ring': {
           ctx.save();
-          const ringRadius = p.size + (p.maxLife - p.life) * 5;
+          // KOF2002: 冲击环扩展速度差分 — 大环慢扩小环快扩, 层次感更强
+          const ringExpandSpeed = p.size > 10 ? 3 : p.size > 6 ? 5 : 7;
+          const ringRadius = p.size + (p.maxLife - p.life) * ringExpandSpeed;
           // KOF2002: 冲击环初始白色核心闪光(前3帧), 之后渐变为环色
           const isEarly = p.life > p.maxLife - 3;
           if (isEarly) {

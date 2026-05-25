@@ -114,7 +114,9 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       // KOF2002: 防御顿帧 — DM 8F, 必杀/重攻击 5F, 轻攻击 3F
       const blkStop = blkDM ? 8 : blkSpecial ? 5 : blkHeavy ? 5 : 3;
       deps.cinematic.triggerHitStop(blkStop);
-      deps.screenShake.trigger(blkDM ? 8 : blkSpecial ? 5 : blkHeavy ? 4 : 2, blkDM ? 10 : 6);
+      // KOF2002: 重攻击/必杀被防时震屏有方向偏移
+      const blkBias = (blkDM || blkSpecial || blkHeavy) ? attacker.facing * 4 : 0;
+      deps.screenShake.trigger(blkDM ? 8 : blkSpecial ? 5 : blkHeavy ? 4 : 2, blkDM ? 10 : 6, blkBias);
       gainMeterOnBlock(deps.gauges[atkIdx], attackType);
       gainMeterOnHitstun(deps.gauges[defIdx], attackType);
       // Chip伤害数字: 必杀技/DM防御时显示灰色小数字
@@ -181,6 +183,8 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       // KOF2002: DM命中额外尘土效果 — 地面冲击感
       if (defender.isGrounded()) {
         deps.vfx.spawnHeavyDust(hitX, defender.y, 8);
+        // KOF2002: DM命中地面冲击波环 — 扩散感
+        deps.vfx.spawnImpactRing(hitX, defender.y, 2.5);
       }
       // SDM: 金色闪光+双冲击环, DM: 白色闪光
       if (isSDM) {
@@ -229,6 +233,8 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       deps.vfx.spawnCharacterHitSparks(hitX, hitY, 6, '#ffffff', 0.7, 0.8);
       // KOF2002: 投技额外向上飘散蓝色小火花
       deps.vfx.spawnCharacterHitSparks(hitX, hitY - 20, 4, '#aaddff', 0.5, 0.6);
+      // KOF2002: 投技命中冲击环 — 物理冲击感
+      deps.vfx.spawnImpactRing(hitX, hitY, 1.2);
       deps.screenFlash.trigger('#aaddff', 0.15, 5);
       // KOF2002: 投技命中地面扬尘
       if (defender.isGrounded()) {
@@ -245,6 +251,8 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
     if (counterHit) {
       deps.vfx.spawnCounterText(defender.x, defender.y - defender.displayHeight - 55);
       deps.screenFlash.trigger('#ffaa00', 0.12, 4);
+      // KOF2002: CH额外橙色火花爆发 — 强调反击
+      deps.vfx.spawnCharacterHitSparks(hitX, hitY, 8, '#ff8800', 1.0, 1.2, 0.4);
       playCounter();
     }
     if (counterHit && (data as { counterWire?: boolean }).counterWire) {
@@ -286,6 +294,10 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
 
     // 连击数显示 + 高连击冲击环
     if (combo >= 2) deps.vfx.spawnDamageText(defender.x, defender.y - defender.displayHeight - 40, combo);
+    // KOF2002: 5+hits中等冲击环 — 填充10hits和0hits之间的视觉空白
+    if (combo >= 5 && combo < 10) {
+      deps.vfx.spawnImpactRing(hitX, hitY, 1.3);
+    }
     if (combo >= 10) {
       deps.vfx.spawnImpactRing(hitX, hitY, 2.0);
       deps.vfx.spawnCharacterHitSparks(hitX, hitY, 6, '#ffffff', 0.5, 2.0);
@@ -315,6 +327,8 @@ export function triggerKOGroundEffect(deps: { vfx: VFXSystem; screenFlash: Scree
   deps.vfx.spawnHeavyDust(defender.x, defender.y, 16);
   // KOF2002: KO落地冲击环+白色火花
   deps.vfx.spawnImpactRing(defender.x, defender.y, 2.0);
+  // KOF2002: KO落地暗红色脉冲环 — 最终终结感
+  deps.vfx.spawnImpactRing(defender.x, defender.y, 3.0);
   deps.vfx.spawnCharacterHitSparks(defender.x, defender.y - 20, 10, '#ff4400', 1.2, 1.5);
   deps.screenFlash.trigger('#ff2200', 0.35, 14);
   deps.screenShake.trigger(18, 18);

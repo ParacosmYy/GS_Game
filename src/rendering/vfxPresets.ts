@@ -536,7 +536,7 @@ export function spawnPerfectFlash(particles: Particle[], worldX: number, worldY:
 export function spawnProjectileExplosion(particles: Particle[], worldX: number, worldY: number, charColor: string, charGlow: string): void {
   particles.push({
     x: worldX, y: worldY, vx: 0, vy: 0,
-    life: 12, maxLife: 12, size: 50,
+    life: 16, maxLife: 16, size: 50,
     color: charGlow, type: 'flash',
   });
   for (let i = 0; i < 14; i++) {
