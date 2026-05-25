@@ -57,11 +57,11 @@ export function drawCharacterSelect(
   drawSNKText(ctx, 'SELECT YOUR FIGHTER', CANVAS_WIDTH / 2, 35, 34, '#ffcc00');
   drawSNKText(ctx, 'P1: A/D select  J confirm  |  T: toggle AI  |  Tab: toggle mode', CANVAS_WIDTH / 2, 72, 11, '#999999');
 
-  // Character cards — 2-row grid layout for 9 characters
-  const cardW = 82;
-  const cardH = 140;
-  const gap = 10;
-  const maxCols = 5;
+  // Character cards — 适应24+角色的紧凑网格
+  const cardW = 68;
+  const cardH = 80;
+  const gap = 6;
+  const maxCols = 8;
   const rows = Math.ceil(ROSTER.length / maxCols);
   const gridH = rows * cardH + (rows - 1) * gap;
   const startY = 95;
@@ -94,42 +94,41 @@ export function drawCharacterSelect(
 
     // Character accent color bar at top
     ctx.fillStyle = char.color + '44';
-    ctx.fillRect(cx + 8, cy + 8, cardW - 16, 3);
+    ctx.fillRect(cx + 6, cy + 6, cardW - 12, 2);
 
     // Portrait area
-    const portraitY = cy + 18;
+    const portraitY = cy + 12;
     ctx.fillStyle = '#0a0a18';
-    roundRect(ctx, cx + 12, portraitY, cardW - 24, 80, 6);
+    roundRect(ctx, cx + 8, portraitY, cardW - 16, 48, 4);
     ctx.fill();
 
     if (char.pixelPortrait) {
-      const portraitScale = 2;
+      const portraitScale = 1.2;
       const pw = char.pixelPortrait.width * portraitScale;
       const ph = char.pixelPortrait.height * portraitScale;
-      const px = cx + 12 + ((cardW - 24) - pw) / 2;
-      const py = portraitY + (80 - ph) / 2;
+      const px = cx + 8 + ((cardW - 16) - pw) / 2;
+      const py = portraitY + (48 - ph) / 2;
       drawPixelPortrait(ctx, char.pixelPortrait, px, py, portraitScale);
     } else {
-      const charGrad = ctx.createLinearGradient(cx + 18, portraitY + 5, cx + cardW - 18, portraitY + 75);
+      const charGrad = ctx.createLinearGradient(cx + 10, portraitY + 3, cx + cardW - 10, portraitY + 45);
       charGrad.addColorStop(0, char.color);
       charGrad.addColorStop(1, char.accentColor);
       ctx.fillStyle = charGrad;
-      roundRect(ctx, cx + 18, portraitY + 5, cardW - 36, 70, 4);
+      roundRect(ctx, cx + 10, portraitY + 3, cardW - 20, 42, 3);
       ctx.fill();
-      ctx.font = '36px serif';
+      ctx.font = '22px serif';
       ctx.textAlign = 'center';
       ctx.fillStyle = '#fff';
-      ctx.fillText(char.portrait, cx + cardW / 2, portraitY + 48);
+      ctx.fillText(char.portrait, cx + cardW / 2, portraitY + 30);
     }
 
     // Character name — SNK style
-    drawSNKText(ctx, char.nameCn, cx + cardW / 2, cy + 120, 15, '#eeeeee');
-    drawSNKText(ctx, char.name, cx + cardW / 2, cy + 136, 9, '#777777');
+    drawSNKText(ctx, char.nameCn, cx + cardW / 2, cy + 68, 12, '#eeeeee');
 
     // Ready indicator — SNK style
     if ((p1Ready && isP1Here) || (p2Ready && isP2Here)) {
       const label = p1Ready && isP1Here ? 'P1 OK!' : 'P2 OK!';
-      drawSNKText(ctx, label, cx + cardW / 2, cy + cardH - 25, 13, '#ffcc00');
+      drawSNKText(ctx, label, cx + cardW / 2, cy + cardH - 6, 9, '#ffcc00');
     }
 
     // Selection highlight — animated corner bracket + trailing glow
@@ -138,46 +137,42 @@ export function drawCharacterSelect(
       const color = p1Ready ? '#ffcc00' : '#ff4444';
       // Full glowing border
       ctx.strokeStyle = p1Ready ? `rgba(255, 204, 0, ${pulse})` : `rgba(255, 68, 68, ${pulse})`;
-      ctx.lineWidth = 3;
-      roundRect(ctx, cx - 3, cy - 3, cardW + 6, cardH + 6, 12);
+      ctx.lineWidth = 2;
+      roundRect(ctx, cx - 2, cy - 2, cardW + 4, cardH + 4, 8);
       ctx.stroke();
-      // Corner brackets — animated highlight
+      // Corner brackets
       ctx.strokeStyle = color;
       ctx.lineWidth = 2;
-      const bLen = 12;
-      const bOff = 6 + Math.sin(tick * 0.15) * 2;
-      // Top-left
+      const bLen = 8;
+      const bOff = 4 + Math.sin(tick * 0.15) * 1;
       ctx.beginPath(); ctx.moveTo(cx - bOff, cy - bOff + bLen); ctx.lineTo(cx - bOff, cy - bOff); ctx.lineTo(cx - bOff + bLen, cy - bOff); ctx.stroke();
-      // Top-right
       ctx.beginPath(); ctx.moveTo(cx + cardW + bOff - bLen, cy - bOff); ctx.lineTo(cx + cardW + bOff, cy - bOff); ctx.lineTo(cx + cardW + bOff, cy - bOff + bLen); ctx.stroke();
-      // Bottom-left
       ctx.beginPath(); ctx.moveTo(cx - bOff, cy + cardH + bOff - bLen); ctx.lineTo(cx - bOff, cy + cardH + bOff); ctx.lineTo(cx - bOff + bLen, cy + cardH + bOff); ctx.stroke();
-      // Bottom-right
       ctx.beginPath(); ctx.moveTo(cx + cardW + bOff - bLen, cy + cardH + bOff); ctx.lineTo(cx + cardW + bOff, cy + cardH + bOff); ctx.lineTo(cx + cardW + bOff, cy + cardH + bOff - bLen); ctx.stroke();
-      drawSNKText(ctx, 'P1', cx + cardW / 2, cy - 10, 11, '#ff4444');
+      drawSNKText(ctx, 'P1', cx + cardW / 2, cy - 6, 9, '#ff4444');
     }
     if (isP2Here) {
       const pulse = 0.5 + Math.sin(tick * 0.1 + 1) * 0.3;
       const color = p2Ready ? '#ffcc00' : '#4488ff';
       ctx.strokeStyle = p2Ready ? `rgba(255, 204, 0, ${pulse})` : `rgba(68, 136, 255, ${pulse})`;
-      ctx.lineWidth = 3;
-      roundRect(ctx, cx - 3, cy - 3, cardW + 6, cardH + 6, 12);
+      ctx.lineWidth = 2;
+      roundRect(ctx, cx - 2, cy - 2, cardW + 4, cardH + 4, 8);
       ctx.stroke();
       // Corner brackets
       ctx.strokeStyle = color;
       ctx.lineWidth = 2;
-      const bLen = 12;
-      const bOff = 6 + Math.sin(tick * 0.15 + 1) * 2;
+      const bLen = 8;
+      const bOff = 4 + Math.sin(tick * 0.15 + 1) * 1;
       ctx.beginPath(); ctx.moveTo(cx - bOff, cy - bOff + bLen); ctx.lineTo(cx - bOff, cy - bOff); ctx.lineTo(cx - bOff + bLen, cy - bOff); ctx.stroke();
       ctx.beginPath(); ctx.moveTo(cx + cardW + bOff - bLen, cy - bOff); ctx.lineTo(cx + cardW + bOff, cy - bOff); ctx.lineTo(cx + cardW + bOff, cy - bOff + bLen); ctx.stroke();
       ctx.beginPath(); ctx.moveTo(cx - bOff, cy + cardH + bOff - bLen); ctx.lineTo(cx - bOff, cy + cardH + bOff); ctx.lineTo(cx - bOff + bLen, cy + cardH + bOff); ctx.stroke();
       ctx.beginPath(); ctx.moveTo(cx + cardW + bOff - bLen, cy + cardH + bOff); ctx.lineTo(cx + cardW + bOff, cy + cardH + bOff); ctx.lineTo(cx + cardW + bOff, cy + cardH + bOff - bLen); ctx.stroke();
-      drawSNKText(ctx, 'P2', cx + cardW / 2, cy + cardH + 14, 11, '#4488ff');
+      drawSNKText(ctx, 'P2', cx + cardW / 2, cy + cardH + 10, 9, '#4488ff');
     }
   }
 
   // Bottom panel — player info + VS
-  const panelY = 340;
+  const panelY = 280;
   ctx.fillStyle = 'rgba(0,0,0,0.5)';
   ctx.fillRect(0, panelY - 10, CANVAS_WIDTH, 130);
   // Divider
@@ -192,7 +187,7 @@ export function drawCharacterSelect(
   // P1 info — SNK style with portrait preview
   const p1Char = ROSTER[p1Cursor];
   if (p1Char.pixelPortrait) {
-    const pScale = 2.5;
+    const pScale = 2;
     const pw = p1Char.pixelPortrait.width * pScale;
     const ph = p1Char.pixelPortrait.height * pScale;
     const ppx = 10;
@@ -201,18 +196,17 @@ export function drawCharacterSelect(
     roundRect(ctx, ppx, ppy, pw + 8, ph + 8, 4); ctx.fill();
     drawPixelPortrait(ctx, p1Char.pixelPortrait, ppx + 4, ppy + 4, pScale);
   }
-  drawSNKText(ctx, 'P1', 105, panelY + 10, 14, '#ff4444', '#000000', 'left');
-  drawSNKText(ctx, p1Char.nameCn, 105, panelY + 40, 24, p1Char.color, '#000000', 'left');
-  drawSNKText(ctx, p1Char.name, 105, panelY + 58, 10, '#888888', '#000000', 'left');
-  drawSNKText(ctx, p1Ready ? 'READY!' : 'J to confirm', 105, panelY + 78, 12, p1Ready ? '#ffcc00' : '#666666', '#000000', 'left');
+  drawSNKText(ctx, 'P1', 90, panelY + 8, 12, '#ff4444', '#000000', 'left');
+  drawSNKText(ctx, p1Char.nameCn, 90, panelY + 30, 20, p1Char.color, '#000000', 'left');
+  drawSNKText(ctx, p1Ready ? 'READY!' : 'J to confirm', 90, panelY + 50, 11, p1Ready ? '#ffcc00' : '#666666', '#000000', 'left');
   // P1 color accent bar
   ctx.fillStyle = p1Char.color;
-  ctx.fillRect(100, panelY - 5, 120, 2);
+  ctx.fillRect(85, panelY - 4, 100, 2);
 
   // P2 info — SNK style with portrait preview
   const p2Char = ROSTER[p2Cursor];
   if (p2Char.pixelPortrait) {
-    const pScale = 2.5;
+    const pScale = 2;
     const pw = p2Char.pixelPortrait.width * pScale;
     const ph = p2Char.pixelPortrait.height * pScale;
     const ppx = CANVAS_WIDTH - pw - 18;
@@ -221,25 +215,24 @@ export function drawCharacterSelect(
     roundRect(ctx, ppx, ppy, pw + 8, ph + 8, 4); ctx.fill();
     drawPixelPortrait(ctx, p2Char.pixelPortrait, ppx + 4, ppy + 4, pScale);
   }
-  drawSNKText(ctx, 'P2', CANVAS_WIDTH - 105, panelY + 10, 14, '#4488ff', '#000000', 'right');
-  drawSNKText(ctx, p2Char.nameCn, CANVAS_WIDTH - 105, panelY + 40, 24, p2Char.color, '#000000', 'right');
-  drawSNKText(ctx, p2Char.name, CANVAS_WIDTH - 105, panelY + 58, 10, '#888888', '#000000', 'right');
-  drawSNKText(ctx, p2Ready ? 'READY!' : p2IsAI ? '[AI]' : 'Numpad to confirm', CANVAS_WIDTH - 105, panelY + 78, 12, p2Ready ? '#ffcc00' : '#666666', '#000000', 'right');
+  drawSNKText(ctx, 'P2', CANVAS_WIDTH - 90, panelY + 8, 12, '#4488ff', '#000000', 'right');
+  drawSNKText(ctx, p2Char.nameCn, CANVAS_WIDTH - 90, panelY + 30, 20, p2Char.color, '#000000', 'right');
+  drawSNKText(ctx, p2Ready ? 'READY!' : p2IsAI ? '[AI]' : 'Numpad to confirm', CANVAS_WIDTH - 90, panelY + 50, 11, p2Ready ? '#ffcc00' : '#666666', '#000000', 'right');
   // P2 color accent bar
   ctx.fillStyle = p2Char.color;
-  ctx.fillRect(CANVAS_WIDTH - 220, panelY - 5, 120, 2);
+  ctx.fillRect(CANVAS_WIDTH - 185, panelY - 4, 100, 2);
 
   // VS in center — SNK style
-  drawSNKText(ctx, 'VS', CANVAS_WIDTH / 2, panelY + 40, 56, 'rgba(255,255,255,0.08)');
+  drawSNKText(ctx, 'VS', CANVAS_WIDTH / 2, panelY + 28, 44, 'rgba(255,255,255,0.08)');
 
   // AI toggle
   ctx.fillStyle = p2IsAI ? '#44ff88' : '#ff6644';
-  ctx.font = 'bold 12px "Courier New", monospace';
-  ctx.fillText(p2IsAI ? 'AI ON' : 'P2 Human', CANVAS_WIDTH / 2, panelY + 78);
+  ctx.font = 'bold 11px "Courier New", monospace';
+  ctx.fillText(p2IsAI ? 'AI ON' : 'P2 Human', CANVAS_WIDTH / 2, panelY + 58);
 
   // Mode tabs
   if (!p1Ready || !p2Ready) {
-    const modeY = 495;
+    const modeY = 420;
     const tabs = [
       { label: 'Standard', desc: 'QCF motions', active: !simplifiedMode, x: 330 },
       { label: 'Simplified', desc: 'U/I/O buttons', active: simplifiedMode, x: 470 },
@@ -268,7 +261,7 @@ export function drawCharacterSelect(
       ctx.shadowBlur = 10;
       ctx.fillStyle = '#ffcc00';
       ctx.font = 'bold 20px "Courier New", monospace';
-      ctx.fillText('GAME START!', CANVAS_WIDTH / 2, 530);
+      ctx.fillText('GAME START!', CANVAS_WIDTH / 2, 470);
       ctx.shadowBlur = 0;
     }
   }
