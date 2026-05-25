@@ -288,9 +288,11 @@ export class VFXSystem {
         case 'superburst': {
           ctx.save();
           const scale = 1 + progress * 0.3;
+          // KOF2002: Superburst多层渲染 — 白色核心+角色色中段+外围光晕
           ctx.globalAlpha = alpha * 0.7;
           const sbGrad = ctx.createRadialGradient(sx, p.y, 0, sx, p.y, p.size * scale);
           sbGrad.addColorStop(0, '#ffffff');
+          sbGrad.addColorStop(0.15, '#ffffffcc');
           sbGrad.addColorStop(0.3, p.color);
           sbGrad.addColorStop(0.7, p.color + '44');
           sbGrad.addColorStop(1, 'rgba(0,0,0,0)');
@@ -298,18 +300,49 @@ export class VFXSystem {
           ctx.beginPath();
           ctx.arc(sx, p.y, p.size * scale, 0, Math.PI * 2);
           ctx.fill();
+          // 外围光晕环 — 脉冲扩展
+          if (alpha > 0.3) {
+            ctx.globalAlpha = alpha * 0.2;
+            const haloR = p.size * scale * 1.4;
+            ctx.strokeStyle = p.color;
+            ctx.lineWidth = 3 + alpha * 4;
+            ctx.beginPath();
+            ctx.arc(sx, p.y, haloR, 0, Math.PI * 2);
+            ctx.stroke();
+          }
           ctx.restore();
           break;
         }
         case 'groundslam': {
           ctx.save();
+          const slamRadius = p.size * (1 + progress * 0.5);
+          // KOF2002: 初始白色闪光核心(前5帧)
+          if (p.life > p.maxLife - 5) {
+            ctx.globalAlpha = alpha * 0.8;
+            const coreGrad = ctx.createRadialGradient(sx, p.y, 0, sx, p.y, slamRadius * 0.4);
+            coreGrad.addColorStop(0, '#ffffff');
+            coreGrad.addColorStop(0.5, '#ffddaa');
+            coreGrad.addColorStop(1, 'rgba(255,68,0,0)');
+            ctx.fillStyle = coreGrad;
+            ctx.beginPath();
+            ctx.arc(sx, p.y, slamRadius * 0.4, 0, Math.PI * 2);
+            ctx.fill();
+          }
           ctx.globalAlpha = alpha * 0.5;
-          const slamGrad = ctx.createRadialGradient(sx, p.y, 0, sx, p.y, p.size * (1 + progress * 0.5));
+          const slamGrad = ctx.createRadialGradient(sx, p.y, 0, sx, p.y, slamRadius);
           slamGrad.addColorStop(0, '#ff4400');
           slamGrad.addColorStop(0.4, p.color);
           slamGrad.addColorStop(1, 'rgba(0,0,0,0)');
           ctx.fillStyle = slamGrad;
           ctx.fillRect(sx - p.size, p.y - p.size, p.size * 2, p.size * 2);
+          // 扩展冲击波环
+          ctx.globalAlpha = alpha * 0.4;
+          const waveR = slamRadius * (0.6 + progress * 0.8);
+          ctx.strokeStyle = '#ff6633';
+          ctx.lineWidth = 3 + alpha * 4;
+          ctx.beginPath();
+          ctx.arc(sx, p.y, waveR, 0, Math.PI * 2);
+          ctx.stroke();
           // 暗色叠加
           ctx.globalAlpha = alpha * 0.3;
           ctx.fillStyle = '#000';
@@ -319,12 +352,35 @@ export class VFXSystem {
         }
         case 'ring': {
           ctx.save();
-          ctx.globalAlpha = alpha * 0.7;
-          const radius = p.size + (p.maxLife - p.life) * 5;
+          const ringRadius = p.size + (p.maxLife - p.life) * 5;
+          // KOF2002: 冲击环初始白色核心闪光(前3帧), 之后渐变为环色
+          const isEarly = p.life > p.maxLife - 3;
+          if (isEarly) {
+            ctx.globalAlpha = alpha * 0.5;
+            const coreGrad = ctx.createRadialGradient(sx, p.y, 0, sx, p.y, ringRadius * 0.6);
+            coreGrad.addColorStop(0, '#ffffff');
+            coreGrad.addColorStop(1, 'rgba(255,255,255,0)');
+            ctx.fillStyle = coreGrad;
+            ctx.beginPath();
+            ctx.arc(sx, p.y, ringRadius * 0.6, 0, Math.PI * 2);
+            ctx.fill();
+          }
+          // 外发光层
+          ctx.globalAlpha = alpha * 0.25;
+          ctx.shadowColor = p.color;
+          ctx.shadowBlur = 10;
           ctx.strokeStyle = p.color;
+          ctx.lineWidth = 4 + alpha * 3;
+          ctx.beginPath();
+          ctx.arc(sx, p.y, ringRadius, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.shadowBlur = 0;
+          // 主环
+          ctx.globalAlpha = alpha * 0.7;
+          ctx.strokeStyle = isEarly ? '#ffffff' : p.color;
           ctx.lineWidth = 2 + alpha * 2;
           ctx.beginPath();
-          ctx.arc(sx, p.y, radius, 0, Math.PI * 2);
+          ctx.arc(sx, p.y, ringRadius, 0, Math.PI * 2);
           ctx.stroke();
           ctx.restore();
           break;

@@ -178,7 +178,7 @@ export function playDM(): void {
   sub.start(now); sub.stop(now + 0.4);
 }
 
-/** KO — dramatic final hit */
+/** KO — dramatic final hit with sub-bass rumble + metallic ring-out */
 export function playKO(): void {
   const ctx = getCtx();
   const now = ctx.currentTime;
@@ -196,10 +196,32 @@ export function playKO(): void {
   nGain.gain.setValueAtTime(0.2, now);
   nGain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
 
+  // KOF2002: KO落地低频隆隆声
+  const sub = ctx.createOscillator();
+  sub.type = 'sine';
+  sub.frequency.setValueAtTime(50, now);
+  sub.frequency.exponentialRampToValueAtTime(15, now + 0.5);
+  const subGain = ctx.createGain();
+  subGain.gain.setValueAtTime(0.35, now);
+  subGain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+
+  // KOF2002: 金属质感回响
+  const ring = ctx.createOscillator();
+  ring.type = 'triangle';
+  ring.frequency.setValueAtTime(1800, now + 0.1);
+  ring.frequency.exponentialRampToValueAtTime(400, now + 0.4);
+  const ringGain = ctx.createGain();
+  ringGain.gain.setValueAtTime(0.06, now + 0.1);
+  ringGain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+
   osc.connect(gain).connect(ctx.destination);
   noise.connect(nGain).connect(ctx.destination);
+  sub.connect(subGain).connect(ctx.destination);
+  ring.connect(ringGain).connect(ctx.destination);
   osc.start(now); osc.stop(now + 0.65);
   noise.start(now); noise.stop(now + 0.4);
+  sub.start(now); sub.stop(now + 0.55);
+  ring.start(now + 0.1); ring.stop(now + 0.55);
 }
 
 /** Heavy hit (C/D) — KOF-style deep meaty impact. intensity: 1.0-1.8, 按伤害值缩放 */
