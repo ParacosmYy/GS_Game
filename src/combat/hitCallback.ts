@@ -185,6 +185,13 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
         deps.vfx.spawnHeavyDust(hitX, defender.y, 8);
         // KOF2002: DM命中地面冲击波环 — 扩散感
         deps.vfx.spawnImpactRing(hitX, defender.y, 2.5);
+      } else {
+        // KOF2002: DM空中命中额外飘散
+        deps.vfx.spawnCharacterHitSparks(hitX, hitY - 20, 8, atkChar.specialGlow, 0.7, 0.8, 0.3, true);
+      }
+      // KOF2002: 低血量DM命中额外冲击环 — 终局打击感
+      if (defender.health < defender.maxHealth * 0.25) {
+        deps.vfx.spawnImpactRing(hitX, hitY, 2.0);
       }
       // SDM: 金色闪光+双冲击环, DM: 白色闪光
       if (isSDM) {
@@ -284,6 +291,10 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
     }
     // KOF2002: 站立被通常技命中时脚下尘土
     if (defender.isGrounded() && !isDM && !isSpecial) {
+      deps.vfx.spawnDust(defender.x, defender.y);
+    }
+    // KOF2002: 必杀技地面命中额外微尘
+    if (defender.isGrounded() && isSpecial && !isDM) {
       deps.vfx.spawnDust(defender.x, defender.y);
     }
 

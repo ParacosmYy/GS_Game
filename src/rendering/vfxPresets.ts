@@ -83,7 +83,7 @@ export function spawnGuardCrushSparks(particles: Particle[], worldX: number, wor
   // KOF2002: 防御崩坏初始白色爆发核心
   particles.push({
     x: worldX, y: worldY, vx: 0, vy: 0,
-    life: 6, maxLife: 6, size: 35,
+    life: 8, maxLife: 8, size: 45,
     color: '#ffffff', type: 'flash',
   });
   for (let i = 0; i < 20; i++) {
@@ -108,7 +108,7 @@ export function spawnGuardCrushText(particles: Particle[], worldX: number, world
   // KOF2002: 防御崩坏文字 — 更大更醒目, 白红交替色
   particles.push({
     x: worldX, y: worldY, vx: 0, vy: -0.8,
-    life: 55, maxLife: 55, size: 24,
+    life: 55, maxLife: 55, size: 28,
     color: '#ff3333', type: 'text', text: 'GUARD CRUSH!',
   });
 }
@@ -169,13 +169,13 @@ export function spawnImpactRing(particles: Particle[], worldX: number, worldY: n
 export function spawnSlashLine(particles: Particle[], worldX: number, worldY: number, _facing: number, color: string, scale: number = 1.0): void {
   particles.push({
     x: worldX, y: worldY, vx: 0, vy: 0,
-    life: 8, maxLife: 8, size: (30 + Math.random() * 20) * scale,
+    life: 8, maxLife: 8, size: (35 + Math.random() * 20) * scale,
     color, type: 'slash',
     rotation: (Math.random() - 0.5) * 0.6,
   });
   particles.push({
     x: worldX, y: worldY, vx: 0, vy: 0,
-    life: 8, maxLife: 8, size: (20 + Math.random() * 15) * scale,
+    life: 8, maxLife: 8, size: (25 + Math.random() * 15) * scale,
     color: '#ffffff', type: 'slash',
     rotation: (Math.random() - 0.5) * 0.6 - 0.3,
   });
@@ -204,7 +204,7 @@ export function spawnSuperBurst(particles: Particle[], worldX: number, worldY: n
       vy: Math.sin(angle) * speed - 2,
       life: 18 + Math.floor(Math.random() * (isSDM ? 16 : 12)),
       maxLife: isSDM ? 35 : 30,
-      size: 3 + Math.random() * (isSDM ? 7 : 5),
+      size: 3 + Math.random() * (isSDM ? 9 : 5),
       color: i % 4 === 0 ? '#ffffff' : i % 2 === 0 ? glow : color,
       type: 'star', gravity: 0.12, friction: 0.94,
       rotation: angle, rotSpeed: (Math.random() - 0.5) * 0.5,
@@ -292,7 +292,7 @@ export function spawnDamageText(particles: Particle[], worldX: number, worldY: n
 
 export function spawnCounterText(particles: Particle[], worldX: number, worldY: number): void {
   particles.push({
-    x: worldX, y: worldY, vx: 0, vy: -2,
+    x: worldX, y: worldY, vx: 0, vy: -2.8,
     life: 50, maxLife: 50, size: 20,
     color: '#ff8800', type: 'text', text: 'COUNTER!',
   });
@@ -379,8 +379,8 @@ export function spawnRecoverySpark(particles: Particle[], worldX: number, worldY
     life: 8, maxLife: 8, size: 20,
     color: '#ffffff', type: 'flash',
   });
-  for (let i = 0; i < 4; i++) {
-    const angle = Math.PI / 2 * i + Math.random() * 0.5;
+  for (let i = 0; i < 6; i++) {
+    const angle = Math.PI / 3 * i + Math.random() * 0.4;
     particles.push({
       x: worldX, y: worldY,
       vx: Math.cos(angle) * 1.5, vy: Math.sin(angle) * 1.5,
@@ -441,7 +441,7 @@ export function spawnCounterWireSparks(particles: Particle[], worldX: number, wo
   // 壁弹冲击环
   particles.push({
     x: worldX, y: worldY, vx: 0, vy: 0,
-    life: 15, maxLife: 15, size: 40,
+    life: 15, maxLife: 15, size: 50,
     color: '#ffaa22', type: 'ring',
   });
 }
