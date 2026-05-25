@@ -149,10 +149,12 @@ export function drawFighters(
     ctx.rotate(leanAngle);
     ctx.translate(-(sx + leanOffsetX), -sy);
 
-    // KOF2002: Hit-stop defender jitter — 冻结期间防守方朝攻击方向微小震动
+    // KOF2002: Hit-stop defender jitter — 确定性正弦抖动产生稳定震动感
     if (hitStopDefender >= 0 && playerIdx === hitStopDefender) {
-      const jitterX = hitStopBias * 0.8 * (0.5 + Math.random() * 0.5);
-      const jitterY = (Math.random() - 0.5) * 1.5;
+      const phase = performance.now() * 0.05;
+      const amplitude = Math.abs(hitStopBias) * 0.6;
+      const jitterX = hitStopBias > 0 ? amplitude * Math.sin(phase) : -amplitude * Math.sin(phase);
+      const jitterY = Math.sin(phase * 1.7) * 2.5;
       ctx.translate(jitterX, jitterY);
     }
 

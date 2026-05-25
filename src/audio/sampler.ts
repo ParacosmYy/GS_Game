@@ -15,7 +15,8 @@ type SampleId =
   | 'round_call' | 'time_over' | 'perfect' | 'fight'
   | 'quick_stand' | 'step'
   | 'hit_crit' | 'dust' | 'air_hit' | 'wall_bounce_heavy'
-  | 'guard_break' | 'charge_up';
+  | 'guard_break' | 'charge_up'
+  | 'block_special' | 'block_dm' | 'special_light' | 'special_heavy';
 
 const samples = new Map<SampleId, AudioBuffer>();
 let initialized = false;
@@ -735,6 +736,73 @@ function renderChargeUp(sr: number): Float32Array {
   ));
 }
 
+
+// 必杀技防御：在block基础上增加能量散射噪声层
+function renderBlockSpecial(sr: number): Float32Array {
+  const dur = 0.14;
+  const metal = renderOsc(sr, dur, 'square', t => 1000 - 6000 * t, t => expDecay(t, 0.18, 15));
+  const res = renderOsc(sr, dur, 'sine', t => 2000 - 2500 * t, t => expDecay(t, 0.07, 22));
+  const noise = highPass(renderNoise(sr, dur, t => expDecay(t, 0.15, 20)), sr, 2500);
+  const scatterNoise = highPass(renderNoise(sr, dur * 0.8, t => expDecay(t, 0.12, 16)), sr, 4000);
+  const scatterSine = renderOsc(sr, dur * 0.6, 'sine', t => 600 - 4000 * t, t => expDecay(t, 0.15, 18));
+  const scatterNoiseP = padTo(scatterNoise, Math.ceil(sr * dur));
+  const scatterSineP = padTo(scatterSine, Math.ceil(sr * dur));
+  return normalize(mixLayers([metal, res, noise, scatterNoiseP, scatterSineP], [1, 0.35, 0.6, 0.5, 0.45]));
+}
+
+// DM防御：在block_heavy基础上增加子低音冲击 + 宽频爆发噪声
+function renderBlockDM(sr: number): Float32Array {
+  const dur = 0.25;
+  const metal = renderOsc(sr, dur, 'square', t => 900 - 5400 * t, t => expDecay(t, 0.2, 10));
+  const res = renderOsc(sr, dur, 'sine', t => 2200 - 3000 * t, t => expDecay(t, 0.08, 16));
+  const noise = highPass(renderNoise(sr, dur, t => expDecay(t, 0.2, 14)), sr, 2000);
+  const res2 = renderOsc(sr, dur * 0.6, 'triangle', t => 3500 - 15000 * t, t => expDecay(t, 0.04, 18));
+  const res2P = padTo(res2, Math.ceil(sr * dur));
+  const lo = renderOsc(sr, dur * 0.8, 'sine', t => 150 - 1000 * t, t => expDecay(t, 0.14, 10));
+  const tail = renderOsc(sr, dur, 'sine', _t => 800, t => expDecay(t, 0.05, 10));
+  const tailP = padTo(tail, Math.ceil(sr * dur), Math.floor(sr * 0.05));
+  const subImpact = renderOsc(sr, 0.2, 'sine', t => 45 - 30 * t, t => expDecay(t, 0.4, 5));
+  const subImpactP = padTo(subImpact, Math.ceil(sr * dur));
+  const burstNoise = renderNoise(sr, 0.1, t => expDecay(t, 0.3, 10));
+  const burstNoiseP = padTo(burstNoise, Math.ceil(sr * dur), Math.floor(sr * 0.03));
+  return normalize(mixLayers([metal, res, noise, res2P, lo, tailP, subImpactP, burstNoiseP], [1, 0.4, 0.8, 0.15, 0.8, 0.2, 1.2, 0.6]));
+}
+
+// 弱必杀命中：更轻更短的必杀技音效
+function renderSpecialLight(sr: number): Float32Array {
+  const dur = 0.22;
+  const sweep = renderOsc(sr, 0.08, 'sawtooth', t => 200 + 8000 * t, t => expDecay(t, 0.15, 20));
+  const noiseBp = bandPass(renderNoise(sr, 0.12, t => expDecay(t, 0.12, 12)), sr, 500, 2500);
+  const metal = renderOsc(sr, 0.06, 'triangle', _t => 2000, t => expDecay(t, 0.08, 25));
+  const impact = renderOsc(sr, 0.1, 'sine', t => 120 - 800 * t, t => expDecay(t, 0.2, 15));
+  const total = Math.ceil(sr * dur);
+  const sweepP = padTo(sweep, total);
+  const noiseBpP = padTo(noiseBp, total);
+  const metalP = padTo(metal, total, Math.floor(sr * 0.02));
+  const impactP = padTo(impact, total, Math.floor(sr * 0.04));
+  return normalize(mixLayers([sweepP, noiseBpP, metalP, impactP], [0.8, 1, 0.45, 0.7]));
+}
+
+// 强必杀命中：在renderSpecial基础上增加子低音层
+function renderSpecialHeavy(sr: number): Float32Array {
+  const dur = 0.35;
+  const whoosh = renderOsc(sr, dur, 'sawtooth',
+    t => t < 0.1 ? 200 + 8000 * t : 1000 - 3500 * (t - 0.1),
+    t => t < 0.1 ? 0.15 + t * 0.8 : expDecay(t - 0.1, 0.25, 7));
+  const noiseMid = bandPass(renderNoise(sr, dur * 0.7, t => expDecay(t, 0.14, 8)), sr, 400, 3500);
+  const noiseHi = highPass(renderNoise(sr, dur * 0.4, t => expDecay(t, 0.1, 12)), sr, 4000);
+  const metal = renderOsc(sr, 0.08, 'triangle', t => 2400 - 28000 * t, t => expDecay(t, 0.09, 30));
+  const impact = renderOsc(sr, 0.15, 'sine', t => 120 - 1000 * t, t => expDecay(t, 0.3, 12));
+  const sub = renderOsc(sr, 0.2, 'sine', t => 50 - 40 * t, t => expDecay(t, 0.35, 4));
+  const total = Math.ceil(sr * dur);
+  const nMidP = padTo(noiseMid, total);
+  const nHiP = padTo(noiseHi, total);
+  const metalP = padTo(metal, total);
+  const impactP = padTo(impact, total, Math.floor(sr * 0.06));
+  const subP = padTo(sub, total);
+  return normalize(mixLayers([whoosh, nMidP, nHiP, metalP, impactP, subP], [1, 0.6, 0.3, 0.5, 0.7, 1.0]));
+}
+
 // === 初始化：预渲染所有采样 ===
 
 export function initSampler(): void {
@@ -780,6 +848,11 @@ export function initSampler(): void {
     ['wall_bounce_heavy', renderWallBounceHeavy],
     ['guard_break', renderGuardBreak],
     ['charge_up', renderChargeUp],
+    // 打击音效分层
+    ['block_special', renderBlockSpecial],
+    ['block_dm', renderBlockDM],
+    ['special_light', renderSpecialLight],
+    ['special_heavy', renderSpecialHeavy],
   ];
 
   for (const [id, renderer] of renderers) {
@@ -857,3 +930,9 @@ export function playAirHit(): void { initSampler(); play('air_hit', 0.8); }
 export function playWallBounceHeavy(): void { initSampler(); play('wall_bounce_heavy'); }
 export function playGuardBreak(): void { initSampler(); play('guard_break'); }
 export function playChargeUp(): void { initSampler(); play('charge_up', 0.6); }
+
+// 打击音效分层公开API
+export function playBlockSpecial(): void { initSampler(); play('block_special'); }
+export function playBlockDM(): void { initSampler(); play('block_dm'); }
+export function playSpecialLight(): void { initSampler(); play('special_light'); }
+export function playSpecialHeavy(): void { initSampler(); play('special_heavy'); }

@@ -403,7 +403,7 @@ export class Fighter {
     this.hitstunTimer = frames;
     this.hitFlashFrames = 4;
     // KOF2002: pushback as gradual velocity over hitstun duration
-    this.vx = pushback * (this.facing === 1 ? -1 : 1) * 0.6;
+    this.vx = pushback * (this.facing === 1 ? -1 : 1) * 0.85;
     this.resetAttackState();
     this.resetCancelFlags();
   }

@@ -71,7 +71,7 @@ export const CHIP_DAMAGE_RATIO = 0.1;
 
 // ===== Counter Hit =====
 export const CH_HITSTUN_BONUS = 1.5;   // Counter Hit 硬直x1.5
-export const CH_DAMAGE_BONUS = 1.25;   // Counter Hit 伤害x1.25
+export const CH_DAMAGE_BONUS = 1.0;    // KOF2002正版: CH无伤害加成, 奖励是额外hitstun
 
 // ===== Juggle Points (KOF2002 authentic: juggle budget per launch) =====
 export const JUGGLE_POINTS_MAX = 5;           // total juggle points per launch

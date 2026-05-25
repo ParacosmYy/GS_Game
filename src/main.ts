@@ -26,7 +26,7 @@ import { SelectState } from './state/selectState.js';
 import { RoundState } from './state/roundState.js';
 import { DMManager } from './combat/dmManager.js';
 import { createHitCallback, triggerKOGroundEffect } from './combat/hitCallback.js';
-import { initAudio, initSampler, playKO, playVictoryFanfare, playMAXActivation, playPerfect, playThrowEscape, playFight, playRoll, playCancel, playQuickStand } from './audio/sampler.js';
+import { initAudio, initSampler, playKO, playVictoryFanfare, playMAXActivation, playPerfect, playThrowEscape, playFight, playRoll, playCancel, playQuickStand, playGuardCrush } from './audio/sampler.js';
 import { createTeam, defeatActive, switchToNext, activeChar, teamOrderString, type TeamState } from './state/teamState.js';
 import { resolveSimplified } from './input/simplifiedInput.js';
 import { bgm } from './audio/bgm.js';
@@ -102,7 +102,7 @@ combatSystem.onThrowEscape = (_attacker, defender, hitX, hitY) => {
 };
 combatSystem.onGuardCrush = (fighter, hitX, hitY) => {
   vfx.spawnGuardCrushSparks(hitX, hitY); vfx.spawnGuardCrushText(hitX, hitY - 60); vfx.spawnHeavyDust(fighter.x, fighter.y, 14);
-  screenFlash.trigger('#ff4444', 0.3, 12); screenShake.trigger(12, 15);
+  screenFlash.trigger('#ff4444', 0.3, 12); screenShake.trigger(12, 15); playGuardCrush();
 };
 
 // ===== Derived state =====
@@ -534,7 +534,7 @@ function update(): void {
       const koAttacker = p1.health <= 0 ? p2 : p1;
       cinematic.triggerHitStop(isDMKill ? 16 : 12, koDefender, koAttacker.facing);
       screenFlash.trigger('#ff2200', 0.35, 15);
-      screenShake.trigger(16, 15);
+      screenShake.trigger(isDMKill ? 18 : 14, 15);
       playKO();
       bgm.stop();
       announcer.knockOut();

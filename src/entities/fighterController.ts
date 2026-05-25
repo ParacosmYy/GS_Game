@@ -159,7 +159,7 @@ export class FighterController {
     } else if (f.state === FighterState.HITSTUN || f.state === FighterState.BLOCK
         || f.state === FighterState.KNOCKDOWN || f.state === FighterState.GUARD_CRUSH) {
       f.x += f.vx;
-      f.vx *= 0.85;
+      f.vx *= 0.75;
       if (Math.abs(f.vx) < 0.1) f.vx = 0;
       f.y += f.vy;
     } else {

@@ -26,7 +26,7 @@ type FrameDataEntry = {
 const KOF_LIGHT_HITSTUN = 11;
 const KOF_LIGHT_BLOCKSTUN = 9;
 const KOF_HEAVY_GROUND_HITSTUN = 19;
-const KOF_HEAVY_GROUND_BLOCKSTUN = 17;
+const KOF_HEAVY_GROUND_BLOCKSTUN = 15;
 const KOF_HEAVY_AIR_HITSTUN = 11;
 const KOF_HEAVY_AIR_BLOCKSTUN = 17;
 
@@ -267,8 +267,8 @@ describe('Counter Hit 增益常数', () => {
     expect(CH_HITSTUN_BONUS).toBe(1.5);
   });
 
-  it('CH_DAMAGE_BONUS 应为 1.25 (KOF2002标准)', () => {
-    expect(CH_DAMAGE_BONUS).toBe(1.25);
+  it('CH_DAMAGE_BONUS 应为 1.0 (KOF2002正版CH无伤害加成)', () => {
+    expect(CH_DAMAGE_BONUS).toBe(1.0);
   });
 });
 
@@ -404,13 +404,13 @@ describe('Hit-stop 顿帧标准 (KOF2002UM)', () => {
   it('tickInFreeze 同时递减 superFlashTimer', () => {
     const cs = new CinematicState();
     cs.triggerSuperFlash(400, 200, 0);
-    expect(cs.superFlashTimer).toBe(20);
+    expect(cs.superFlashTimer).toBe(24);
     const maxModes: [MaxModeState, MaxModeState] = [
       { active: false, timer: 0, maxDuration: 720 },
       { active: false, timer: 0, maxDuration: 720 },
     ];
     cs.tickInFreeze(maxModes);
-    expect(cs.superFlashTimer, 'superFlashTimer 应减少 1').toBe(19);
+    expect(cs.superFlashTimer, 'superFlashTimer 应减少 1').toBe(23);
   });
 
   // --- hitStop 常数一致性验证 ---
@@ -437,13 +437,13 @@ describe('Hit-stop 顿帧标准 (KOF2002UM)', () => {
 
   // --- Super Flash 同时设置 hitStop ---
 
-  it('triggerSuperFlash 同时设置 hitStop=20', () => {
+  it('triggerSuperFlash 同时设置 hitStop=24', () => {
     const cs = new CinematicState();
     cs.triggerSuperFlash(400, 200, 0);
-    expect(cs.superFlashTimer).toBe(20);
+    expect(cs.superFlashTimer).toBe(24);
     // isFrozen 会消耗 hitStop，验证初始值
-    expect(cs.hitStop).toBe(20);
-    for (let i = 0; i < 20; i++) expect(cs.isFrozen()).toBe(true);
+    expect(cs.hitStop).toBe(24);
+    for (let i = 0; i < 24; i++) expect(cs.isFrozen()).toBe(true);
     expect(cs.isFrozen()).toBe(false);
   });
 

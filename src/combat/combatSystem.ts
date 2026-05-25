@@ -221,16 +221,24 @@ export class CombatSystem {
     return false;
   }
 
-  /** KOF2002 damage scaling: scale by combo count, minimum varies by attack type */
+  /** KOF2002 damage scaling: single-layer scaling by combo count, DM always full */
   private scaledDamage(baseDamage: number, defIdx: number, attackType?: AttackType): number {
-    const hits = this.comboHits[defIdx];
-    if (hits === 0) return baseDamage;
+    const minDamage = 1;
+    const comboHits = this.comboHits[defIdx];
+    if (comboHits <= 0) return baseDamage;
     const name = (attackType ?? '') as string;
+    // KOF2002: DM/SDM always deal full damage in combos
     const _isDM = isDM(name);
     const _isSpecial = isSpecialOrDM(name) || name === 'STAND_CD' || name === 'JUMP_CD';
-    const minScale = _isDM ? DAMAGE_SCALE_MIN_DM : _isSpecial ? DAMAGE_SCALE_MIN_SPECIAL : DAMAGE_SCALE_MIN_NORMAL;
-    const scale = Math.max(minScale, 1 - hits * DAMAGE_SCALE_STEP);
-    return Math.max(1, Math.round(baseDamage * scale));
+    if (_isDM) return Math.max(minDamage, baseDamage);
+    if (_isSpecial) {
+      // 必杀技：每击 -3%，最低 60%
+      const scale = Math.max(0.60, 1 - comboHits * 0.03);
+      return Math.max(minDamage, Math.round(baseDamage * scale));
+    }
+    // 通常技：每击 -5%，最低 30%
+    const scale = Math.max(0.30, 1 - comboHits * 0.05);
+    return Math.max(minDamage, Math.round(baseDamage * scale));
   }
 
   private resolveHit(attacker: Fighter, defender: Fighter, onHit?: HitCallback): void {
@@ -423,8 +431,8 @@ export class CombatSystem {
     }
 
     if (counterHit) {
-      damage = Math.round(damage * CH_DAMAGE_BONUS);
-      // KOF2002: ground heavy/special CH = extra hitstun (+3-5F) for combo punishment
+      // KOF2002正版: CH无伤害加成, 奖励是额外hitstun (+3F通常 / +5F必杀) 以延长连击窗口
+      // ground heavy/special CH = extra hitstun (+3-5F) for combo punishment
       if (defender.isGrounded() && !LIGHT_NORMALS.has(attackType as string)) {
         const isSpecial = !NORMAL_ATTACKS.has(attackType as string) && !COMMAND_NORMALS.has(attackType as string);
         hitstunFrames += isSpecial ? 5 : 3;
@@ -446,11 +454,7 @@ export class CombatSystem {
     }
 
     this.comboHits[defIdx]++;
-    // KOF2002: 连击伤害缩放 — 第2击起伤害递减 (第2击90%, 第3击80%, 第4击70%, 最低50%)
-    if (this.comboHits[defIdx] > 1) {
-      const scale = Math.max(0.5, 1 - (this.comboHits[defIdx] - 1) * 0.1);
-      damage = Math.round(damage * scale);
-    }
+    // 单层缩放已由 scaledDamage() 处理, 不再叠加第二层连击递减
     this.comboDamage[defIdx] += damage;
     this.lastHitFrame[defIdx] = this.currentFrame;
 

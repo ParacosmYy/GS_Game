@@ -14,43 +14,43 @@ const FRAME_DATA_GENERIC = {
   // ── 远距离站立 (Far Stand) ── SuperCombo Wiki KOF2002 average
   STAND_A: {
     startup: 6, active: 3, recovery: 5,
-    damage: 33, hitstun: 11, blockstun: 9, pushback: 2,
+    damage: 33, hitstun: 11, blockstun: 9, pushback: 4,
     hitLevel: 'MID' as const, knockdown: false,
   },
   STAND_B: {
     startup: 7, active: 3, recovery: 14,
-    damage: 42, hitstun: 11, blockstun: 9, pushback: 2,
+    damage: 42, hitstun: 11, blockstun: 9, pushback: 4,
     hitLevel: 'MID' as const, knockdown: false,
   },
   STAND_C: {
     startup: 7, active: 3, recovery: 20,
-    damage: 100, hitstun: 19, blockstun: 17, pushback: 6,
+    damage: 100, hitstun: 19, blockstun: 15, pushback: 8,
     hitLevel: 'MID' as const, knockdown: false,
   },
   STAND_D: {
     startup: 10, active: 8, recovery: 20,
-    damage: 75, hitstun: 19, blockstun: 17, pushback: 5,
+    damage: 75, hitstun: 19, blockstun: 15, pushback: 7,
     hitLevel: 'MID' as const, knockdown: false,
   },
   // ── 近距离站立 (Close Stand) ── SuperCombo Wiki KOF2002
   CLOSE_A: {
     startup: 4, active: 5, recovery: 5,
-    damage: 25, hitstun: 11, blockstun: 9, pushback: 1,
+    damage: 25, hitstun: 11, blockstun: 9, pushback: 3,
     hitLevel: 'MID' as const, knockdown: false,
   },
   CLOSE_B: {
     startup: 5, active: 3, recovery: 5,
-    damage: 25, hitstun: 11, blockstun: 9, pushback: 2,
+    damage: 25, hitstun: 11, blockstun: 9, pushback: 4,
     hitLevel: 'LOW' as const, knockdown: false,
   },
   CLOSE_C: {
     startup: 2, active: 5, recovery: 11,
-    damage: 100, hitstun: 19, blockstun: 17, pushback: 4,
+    damage: 100, hitstun: 19, blockstun: 15, pushback: 6,
     hitLevel: 'MID' as const, knockdown: false,
   },
   CLOSE_D: {
     startup: 5, active: 6, recovery: 13,
-    damage: 25, hitstun: 11, blockstun: 9, pushback: 4,
+    damage: 25, hitstun: 11, blockstun: 9, pushback: 5,
     hitLevel: 'MID' as const, knockdown: false,
   },
   // ── 命令通常技 (Command Normals) ──
@@ -246,43 +246,43 @@ const FRAME_DATA_GENERIC = {
   // ── 蹲下攻击 (Crouch) ──
   CROUCH_A: {
     startup: 5, active: 4, recovery: 7,
-    damage: 17, hitstun: 11, blockstun: 9, pushback: 1,
+    damage: 17, hitstun: 11, blockstun: 9, pushback: 3,
     hitLevel: 'MID' as const, knockdown: false,
   },
   CROUCH_B: {
     startup: 5, active: 5, recovery: 5,
-    damage: 25, hitstun: 11, blockstun: 9, pushback: 2,
+    damage: 25, hitstun: 11, blockstun: 9, pushback: 3,
     hitLevel: 'LOW' as const, knockdown: false,
   },
   CROUCH_C: {
     startup: 7, active: 5, recovery: 16,
-    damage: 90, hitstun: 19, blockstun: 17, pushback: 4,
+    damage: 90, hitstun: 19, blockstun: 15, pushback: 6,
     hitLevel: 'MID' as const, knockdown: false,
   },
   CROUCH_D: {
     startup: 5, active: 6, recovery: 31,
-    damage: 75, hitstun: 0, blockstun: 17, pushback: 3,
+    damage: 75, hitstun: 0, blockstun: 15, pushback: 5,
     hitLevel: 'LOW' as const, knockdown: true,
   },
   // ── 跳跃攻击 (Jump) ──
   JUMP_A: {
     startup: 3, active: 9, recovery: 0,
-    damage: 33, hitstun: 11, blockstun: 9, pushback: 3,
+    damage: 33, hitstun: 11, blockstun: 9, pushback: 5,
     hitLevel: 'HIGH' as const, knockdown: false,
   },
   JUMP_B: {
     startup: 4, active: 7, recovery: 0,
-    damage: 33, hitstun: 11, blockstun: 9, pushback: 3,
+    damage: 33, hitstun: 11, blockstun: 9, pushback: 5,
     hitLevel: 'HIGH' as const, knockdown: false,
   },
   JUMP_C: {
     startup: 8, active: 3, recovery: 0,
-    damage: 58, hitstun: 11, blockstun: 17, pushback: 5,
+    damage: 58, hitstun: 11, blockstun: 17, pushback: 7,
     hitLevel: 'HIGH' as const, knockdown: false,
   },
   JUMP_D: {
     startup: 5, active: 5, recovery: 0,
-    damage: 25, hitstun: 11, blockstun: 17, pushback: 4,
+    damage: 25, hitstun: 11, blockstun: 17, pushback: 7,
     hitLevel: 'HIGH' as const, knockdown: false,
   },
   // ── 投技 ──
@@ -315,12 +315,12 @@ const FRAME_DATA_GENERIC = {
   // ── CD击飞攻击 ──
   STAND_CD: {
     startup: 11, active: 5, recovery: 24,
-    damage: 83, hitstun: 0, blockstun: 21, pushback: 8,
+    damage: 83, hitstun: 0, blockstun: 21, pushback: 12,
     hitLevel: 'MID' as const, knockdown: true, counterWire: true as const,
   },
   JUMP_CD: {
     startup: 12, active: 4, recovery: 0,
-    damage: 33, hitstun: 0, blockstun: 21, pushback: 6,
+    damage: 33, hitstun: 0, blockstun: 21, pushback: 10,
     hitLevel: 'HIGH' as const, knockdown: true, counterWire: true as const,
   },
   // ── DM_OROCHINAGI (shared) ──

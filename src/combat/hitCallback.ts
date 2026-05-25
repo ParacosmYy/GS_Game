@@ -10,7 +10,7 @@ import { FRAME_DATA, STAGE_WIDTH, MAX_STOCKS, METER_PER_STOCK } from '../core/co
 import { ROSTER } from '../characters/index.js';
 import { isDM as isDMCheck } from '../core/attackClassifier.js';
 import { gainMeterOnHit, gainMeterOnBlock, gainMeterOnHitstun } from './meter.js';
-import { playHit, playBlock, playSpecial, playDM, playThrow, playCounter, playHeavyHit, playSuperFlash, playWire, playJuggleHit } from '../audio/sampler.js';
+import { playHit, playBlock, playSpecial, playDM, playThrow, playCounter, playHeavyHit, playSuperFlash, playWire, playJuggleHit, playBlockSpecial, playBlockDM, playSpecialLight, playSpecialHeavy } from '../audio/sampler.js';
 import type { CinematicState } from '../state/cinematicState.js';
 
 function classifyAttack(at: AttackType) {
@@ -37,22 +37,22 @@ function calcHitStop(at: AttackType, isDM: boolean, isSpecial: boolean, ch: bool
   const heavy = at === AttackType.STAND_C || at === AttackType.STAND_D || at === AttackType.CLOSE_C
     || at === AttackType.CLOSE_D || at === AttackType.CROUCH_C || at === AttackType.CROUCH_D
     || at === AttackType.JUMP_C || at === AttackType.JUMP_D;
-  // 收紧命中顿帧：保留层次，但减少“拖尾感”
+  // 收紧命中顿帧：保留层次，但减少"拖尾感"
   const r = isDM ? 16 : isSpecial ? 11 : heavy ? 6 : 2;
   return ch ? r + 2 : r;
 }
 
 function calcShake(at: AttackType, isDM: boolean, isSpecial: boolean, ch: boolean, dmg: number): number {
   const s = at as string;
-  if (isDM) return 12;
-  if (isSpecial) return 7;
-  if (at === AttackType.THROW) return 7;
+  if (isDM) return 14;
+  if (isSpecial) return 8;
+  if (at === AttackType.THROW) return 8;
   if (ch) return 6;
   if (at === AttackType.STAND_C || at === AttackType.STAND_D
     || at === AttackType.CLOSE_C || at === AttackType.CLOSE_D
-    || at === AttackType.CROUCH_C || at === AttackType.CROUCH_D) return 4;
-  if (dmg > 50) return 3;
-  return 2;
+    || at === AttackType.CROUCH_C || at === AttackType.CROUCH_D) return 6;
+  if (dmg > 50) return 4;
+  return 3;
 }
 
 /** 判断是否为重攻击(需要斩击线特效) */
@@ -130,9 +130,9 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       // 防御顿帧 — 保留层次，但不把防御反馈拉得太长
       const blkStop = blkDM ? 5 : blkSpecial ? 3 : blkHeavy ? 3 : 2;
       deps.cinematic.triggerHitStop(blkStop, defIdx, attacker.facing);
-      // 防御反馈更偏“硬切”而不是层层铺开
+      // 防御反馈更偏"硬切"而不是层层铺开
       const blkBias = (blkDM || blkSpecial || blkHeavy) ? attacker.facing * 3 : 0;
-      deps.screenShake.trigger(blkDM ? 6 : blkSpecial ? 4 : blkHeavy ? 3 : 2, blkDM ? 8 : 5, blkBias);
+      deps.screenShake.trigger(blkDM ? 8 : blkSpecial ? 5 : blkHeavy ? 4 : 3, blkDM ? 10 : blkSpecial ? 7 : blkHeavy ? 6 : 5, blkBias);
       gainMeterOnBlock(deps.gauges[atkIdx], attackType);
       gainMeterOnHitstun(deps.gauges[defIdx], attackType);
       // Chip伤害数字: 必杀技/DM防御时显示灰色小数字
@@ -142,7 +142,9 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
         // KOF2002: Chip伤害微闪 — 防守方感受到持续压力
         deps.screenFlash.trigger(blkDM ? '#2244aa' : '#443300', 0.04, 2);
       }
-      playBlock(blkDM || blkHeavy);
+      if (blkDM) playBlockDM();
+      else if (blkSpecial) playBlockSpecial();
+      else playBlock(blkHeavy);
       return;
     }
 
@@ -168,12 +170,14 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
     const lowHpBonus = defender.health < defender.maxHealth * 0.25 ? 2 : 0;
     const sparks = (isSDM ? 18 : isDM ? 14 : isSpecial ? 10 : counterHit ? 8 : 6) + comboSparkBonus + lowHpBonus;
     const sparkColor = isSpecial ? atkChar.specialColor : isPunch ? '#ffdd44' : '#44ddff';
-    const sparkSize = isSDM ? 1.4 : isDM ? 1.2 : isSpecial ? 1.05 : isHeavyAttack(attackType) ? 0.9 : 0.65;
+    const sparkSize = isSDM ? 1.5 : isDM ? 1.3 : isSpecial ? 1.1 : isHeavyAttack(attackType) ? 0.85 : 0.55;
+    // 连击中VFX递减: 高连击时火花逐步缩小，避免画面过于密集
+    const comboSparkScale = combo >= 6 ? 0.8 : combo >= 3 ? 0.9 : 1.0;
     const sparkSpeed = isDM ? 1.15 : isSpecial ? 1.05 : 0.95;
-    // 星体比例收紧，避免画面太“烟花化”
+    // 星体比例收紧，避免画面太"烟花化"
     const sparkStarRatio = isSDM ? 0.55 : isDM ? 0.45 : isSpecial ? 0.3 : isHeavyAttack(attackType) ? 0.2 : 0.15;
     const sparkLowGrav = !defender.isGrounded() && !isDM;
-    deps.vfx.spawnCharacterHitSparks(hitX, hitY, sparks, sparkColor, sparkSize, sparkSpeed, sparkStarRatio, sparkLowGrav);
+    deps.vfx.spawnCharacterHitSparks(hitX, hitY, sparks, sparkColor, sparkSize * comboSparkScale, sparkSpeed, sparkStarRatio, sparkLowGrav);
     // 冲击环只保留主环，连击只轻微放大，不再堆双环
     const ringScale = sparkSize + (combo >= 5 ? 0.2 : 0);
     deps.vfx.spawnImpactRing(hitX, hitY, ringScale);
@@ -205,7 +209,7 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
     const dmgColor = isDM ? atkChar.specialColor : counterHit ? '#ff8800' : undefined;
     deps.vfx.spawnDamageText(defender.x, defender.y - defender.displayHeight - 20, data.damage, dmgColor);
 
-    // 命中确认光效收短，强调“硬切”而不是长时间白闪
+    // 命中确认光效收短，强调"硬切"而不是长时间白闪
     attacker.hitFlashFrames = isDM ? 4 : isSpecial ? 3 : isHeavyAttack(attackType) ? 2 : 1;
     attacker.hitFlashColor = isDM ? atkChar.specialColor : '#ffffff';
 
@@ -246,7 +250,7 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       }
       deps.screenShake.trigger(7, 8, getAttackDirectionBias(attacker, defender, attackType, counterHit));
     }
-    else if (isSpecial) { playSpecial(); if (combo > 0) playHit(0.6, combo); }
+    else if (isSpecial) { if (data.damage >= 90) playSpecialHeavy(); else playSpecialLight(); if (combo > 0) playHit(0.6, combo); }
     else if (data.damage >= 70) playHeavyHit(1 + Math.min(data.damage - 70, 50) / 62.5);
     else if (!defender.isGrounded()) playJuggleHit(combo);
     else playHit(data.damage > 50 ? 1.2 : 1.0, combo);
@@ -315,11 +319,13 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       deps.screenFlash.trigger('#ffffff', 0.04, 2);
     }
 
-    // 震屏收短，方向更明确，避免“平均用力”
-    const shakeDur = isDM ? 10 : isSpecial ? 8 : isHeavyAttack(attackType) ? 6 : 4;
-    const comboShake = combo >= 10 ? 1 : 0;
+    // 震屏收短，方向更明确，避免"平均用力"
+    const shakeDur = isDM ? 12 : isSpecial ? 10 : isHeavyAttack(attackType) ? 8 : 4;
+    const comboShakeBonus = combo >= 10 ? 1 : 0;
+    // 连击中震屏递减: 高连击时震屏强度逐步衰减，最低保留60%
+    const comboShakeDecay = combo >= 3 ? Math.max(0.6, 1 - combo * 0.05) : 1;
     deps.screenShake.trigger(
-      calcShake(attackType, isDM, isSpecial, counterHit, data.damage) + comboShake,
+      Math.round(calcShake(attackType, isDM, isSpecial, counterHit, data.damage) * comboShakeDecay) + comboShakeBonus,
       shakeDur,
       getAttackDirectionBias(attacker, defender, attackType, counterHit),
     );
@@ -344,6 +350,6 @@ export function triggerKOGroundEffect(deps: { vfx: VFXSystem; screenFlash: Scree
   deps.vfx.spawnImpactRing(defender.x, defender.y, 3.0);
   deps.vfx.spawnCharacterHitSparks(defender.x, defender.y - 20, 16, '#ff4400', 1.2, 1.5);
   deps.screenFlash.trigger('#ff2200', 0.35, 14);
-  // KOF2002: KO落地震屏35帧, 比之前18帧更长, 模拟地面冲击波持续感
-  deps.screenShake.trigger(18, 35);
+  // KOF2002: KO落地震屏42帧, 模拟地面冲击波持续感
+  deps.screenShake.trigger(22, 42);
 }
