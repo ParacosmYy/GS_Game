@@ -556,9 +556,17 @@ export function playWire(): void { initSampler(); play('wire'); }
 export function playJuggleHit(combo: number = 0): void { initSampler(); playPitched('juggle', combo); }
 
 export { initAudio } from './audioCtx.js';
-export {
-  playThrow, playSelect, playVictoryFanfare, playRoll,
-  playThrowEscape, playLanding, playProjectileLaunch, playMAXActivation,
-  playRoundCall, playTimeOver, playPerfect, playFight,
-  playQuickStand, playStep,
-} from './sfxMisc.js';
+export function playThrow(): void { initSampler(); play('throw'); }
+export function playSelect(): void { initSampler(); play('select'); }
+export function playVictoryFanfare(): void { initSampler(); play('victory'); }
+export function playRoll(): void { initSampler(); play('roll'); }
+export function playThrowEscape(): void { initSampler(); play('throw_escape'); }
+export function playLanding(): void { initSampler(); play('landing'); }
+export function playProjectileLaunch(): void { initSampler(); play('projectile'); }
+export function playMAXActivation(): void { initSampler(); play('max_activation'); }
+export function playRoundCall(): void { initSampler(); play('round_call'); }
+export function playTimeOver(): void { initSampler(); play('time_over'); }
+export function playPerfect(): void { initSampler(); play('perfect'); }
+export function playFight(): void { initSampler(); play('fight'); }
+export function playQuickStand(): void { initSampler(); play('quick_stand'); }
+export function playStep(): void { initSampler(); play('step'); }
