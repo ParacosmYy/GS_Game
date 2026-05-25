@@ -515,7 +515,10 @@ export function drawComboCounters(
     drawSNKText(ctx, 'HIT', sx, sy + 16, 11, comboColor);
     // Combo damage total display — SNK style
     if (comboDamage && comboDamage[i] > 0) {
-      drawSNKText(ctx, `${comboDamage[i]}`, sx, sy + 30, 13, '#ff6644');
+      // KOF2002: 连击总伤害颜色分级 — 高伤害红, 中伤害橙, 低伤害黄
+      const totalDmg = comboDamage[i];
+      const dmgCol = totalDmg >= 200 ? '#ff2222' : totalDmg >= 100 ? '#ff6644' : '#ffcc44';
+      drawSNKText(ctx, `${totalDmg}`, sx, sy + 30, totalDmg >= 200 ? 15 : 13, dmgCol);
     }
     // Combo timer bar — shows remaining combo window
     const ctRatio = Math.max(0, comboTimer[i] / 60);

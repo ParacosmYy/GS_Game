@@ -107,6 +107,10 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       } else if (blkSpecial) {
         deps.vfx.spawnCharacterHitSparks(blkX, blkY, 6, blkColor, 1.2);
       }
+      // KOF2002: 重攻击/必杀防御时脚下尘土
+      if (blkHeavy || blkDM) {
+        deps.vfx.spawnDust(defender.x, defender.y);
+      }
       // KOF2002: 防御顿帧 — DM 8F, 必杀/重攻击 5F, 轻攻击 3F
       const blkStop = blkDM ? 8 : blkSpecial ? 5 : blkHeavy ? 5 : 3;
       deps.cinematic.triggerHitStop(blkStop);
@@ -189,7 +193,8 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       || attackType === AttackType.KIM_HIENZAN
       || attackType === AttackType.RYO_HIEN;
     if (isRekkaFinisher) {
-      deps.vfx.spawnCharacterHitSparks(hitX, hitY, 16, atkChar.specialGlow);
+      deps.vfx.spawnCharacterHitSparks(hitX, hitY, 16, atkChar.specialGlow, 1.3);
+      deps.vfx.spawnImpactRing(hitX, hitY, 1.3);
       deps.screenFlash.trigger(atkChar.specialColor, 0.15, 5);
       deps.screenShake.trigger(8, 10);
     }
@@ -268,6 +273,9 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
 export function triggerKOGroundEffect(deps: { vfx: VFXSystem; screenFlash: ScreenFlash; screenShake: ScreenShake }, defender: Fighter): void {
   deps.vfx.spawnGroundSlam(defender.x, defender.y);
   deps.vfx.spawnHeavyDust(defender.x, defender.y, 16);
-  deps.screenFlash.trigger('#ff2200', 0.3, 12);
-  deps.screenShake.trigger(16, 15);
+  // KOF2002: KO落地冲击环+白色火花
+  deps.vfx.spawnImpactRing(defender.x, defender.y, 2.0);
+  deps.vfx.spawnCharacterHitSparks(defender.x, defender.y - 20, 10, '#ff4400', 1.2, 1.5);
+  deps.screenFlash.trigger('#ff2200', 0.35, 14);
+  deps.screenShake.trigger(18, 18);
 }

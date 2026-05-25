@@ -59,7 +59,10 @@ export class ScreenFlash {
 
   render(ctx: CanvasRenderingContext2D, canvasW: number, canvasH: number): void {
     if (this.timer <= 0) return;
-    const alpha = (this.timer / this.maxTimer) * this.intensity;
+    // KOF2002: 闪光先快后慢衰减 (ease-out cubic)
+    const linear = this.timer / this.maxTimer;
+    const eased = 1 - (1 - linear) * (1 - linear) * (1 - linear);
+    const alpha = eased * this.intensity;
     ctx.save();
     ctx.globalAlpha = alpha;
     ctx.fillStyle = this.color;
@@ -410,9 +413,11 @@ export class ScreenShake {
     if (this.duration > 0) {
       this.duration--;
       const t = this.duration / this.maxDuration;
-      const decay = t * t;
-      this.offsetX = (Math.random() - 0.5) * this.intensity * decay + this.biasX * decay * 0.3;
-      this.offsetY = (Math.random() - 0.5) * this.intensity * decay * 0.6;
+      // KOF2002: 随机抖动快速衰减(t^2), 方向偏置稍慢(t^1.5)
+      const randomDecay = t * t;
+      const biasDecay = Math.pow(t, 1.5);
+      this.offsetX = (Math.random() - 0.5) * this.intensity * randomDecay + this.biasX * biasDecay * 0.3;
+      this.offsetY = (Math.random() - 0.5) * this.intensity * randomDecay * 0.6;
     } else {
       this.offsetX = 0;
       this.offsetY = 0;

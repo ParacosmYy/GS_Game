@@ -49,7 +49,7 @@ export function spawnCharacterHitSparks(particles: Particle[], worldX: number, w
   particles.push({
     x: worldX, y: worldY, vx: 0, vy: 0,
     life: 6, maxLife: 6, size: 25 * sizeScale,
-    color: charColor, type: 'flash',
+    color: charColor, type: sizeScale >= 1.5 ? 'superburst' : 'flash',
   });
   const grav = lowGravity ? 0.04 : 0.12;
   for (let i = 0; i < count; i++) {
@@ -264,8 +264,8 @@ export function spawnDamageText(particles: Particle[], worldX: number, worldY: n
   }
   const driftX = isCombo ? 1.2 : -0.8;
   particles.push({
-    x: worldX, y: worldY, vx: driftX + (Math.random() - 0.5) * 0.3, vy: -2,
-    life: 45, maxLife: 45,
+    x: worldX, y: worldY, vx: driftX + (Math.random() - 0.5) * 0.3, vy: -1.5,
+    life: 50, maxLife: 50,
     size: dmgSize,
     color,
     type: 'text',

@@ -331,7 +331,7 @@ export function playCounter(): void {
   osc2.start(now + 0.04); osc2.stop(now + 0.13);
 }
 
-/** Guard Crush — shattering */
+/** Guard Crush — shattering + sharp initial crack */
 export function playGuardCrush(): void {
   const ctx = getCtx();
   const now = ctx.currentTime;
@@ -360,12 +360,23 @@ export function playGuardCrush(): void {
   rGain.gain.setValueAtTime(0.08, now);
   rGain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
 
+  // 初始尖锐裂纹
+  const crack = ctx.createOscillator();
+  crack.type = 'sawtooth';
+  crack.frequency.setValueAtTime(3500, now);
+  crack.frequency.exponentialRampToValueAtTime(600, now + 0.04);
+  const cGain = ctx.createGain();
+  cGain.gain.setValueAtTime(0.15, now);
+  cGain.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
+
   noise.connect(filter).connect(nGain).connect(ctx.destination);
   osc.connect(oGain).connect(ctx.destination);
   ring.connect(rGain).connect(ctx.destination);
+  crack.connect(cGain).connect(ctx.destination);
   noise.start(now); noise.stop(now + 0.18);
   osc.start(now); osc.stop(now + 0.15);
   ring.start(now); ring.stop(now + 0.12);
+  crack.start(now); crack.stop(now + 0.05);
 }
 
 /** Chip damage — weak hit */
