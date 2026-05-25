@@ -216,12 +216,15 @@ function drawHealthBar(ctx: CanvasRenderingContext2D, x: number, y: number, w: n
   healthGrad.addColorStop(0.3, shiftColor(healthColor, 20));
   healthGrad.addColorStop(0.7, healthColor);
   healthGrad.addColorStop(1, shiftColor(healthColor, -30));
-  // Low health glow
+  // Low health glow — KOF2002: <10%极速红色脉冲, <25%橙色脉冲
   if (isLowHealth) {
     ctx.save();
-    const pulseAlpha = 0.3 + 0.2 * Math.sin(frameCount * 0.1);
-    ctx.shadowColor = `rgba(255, 100, 0, ${pulseAlpha + 0.3})`;
-    ctx.shadowBlur = 10 + 5 * Math.sin(frameCount * 0.15);
+    const isCritical = ratio < 0.1;
+    const pulseSpeed = isCritical ? 0.3 : 0.1;
+    const pulseAlpha = isCritical ? 0.5 + 0.3 * Math.sin(frameCount * pulseSpeed) : 0.3 + 0.2 * Math.sin(frameCount * pulseSpeed);
+    const glowColor = isCritical ? `rgba(255, 30, 0, ${pulseAlpha})` : `rgba(255, 100, 0, ${pulseAlpha + 0.3})`;
+    ctx.shadowColor = glowColor;
+    ctx.shadowBlur = isCritical ? 16 + 8 * Math.sin(frameCount * 0.25) : 10 + 5 * Math.sin(frameCount * 0.15);
     ctx.fillStyle = healthGrad;
     if (leftAligned) {
       roundRect(ctx, x, y, fillW, h, 3);
@@ -356,13 +359,18 @@ export function drawPowerGauges(ctx: CanvasRenderingContext2D, gauges: [PowerGau
         ctx.fillStyle = 'rgba(255,255,255,0.15)';
         ctx.fillRect(segX, gaugeY, segW, 2);
       } else if (isCharging) {
-        // Partial fill
-        const fillW = (gauge.meter / gauge.maxMeter) * segW;
+        const fillRatio = gauge.meter / gauge.maxMeter;
+        const fillW = fillRatio * segW;
+        // KOF2002: 充电中渐变 — 接近充满时脉冲更亮
+        const nearFull = fillRatio > 0.75;
+        const brightPulse = nearFull ? 0.7 + 0.3 * Math.sin(Date.now() / 100) : 1.0;
         const partialGrad = ctx.createLinearGradient(segX, gaugeY, segX + fillW, gaugeY);
-        partialGrad.addColorStop(0, '#cc8844');
-        partialGrad.addColorStop(1, '#ffaa55');
+        partialGrad.addColorStop(0, nearFull ? '#ff9933' : '#cc8844');
+        partialGrad.addColorStop(1, nearFull ? '#ffcc44' : '#ffaa55');
+        ctx.globalAlpha = brightPulse;
         ctx.fillStyle = partialGrad;
         ctx.fillRect(segX, gaugeY, fillW, gaugeH);
+        ctx.globalAlpha = 1;
       }
       // Segment border
       ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';

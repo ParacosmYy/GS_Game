@@ -146,8 +146,15 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
     const sparkColor = isSpecial ? atkChar.specialColor : isPunch ? '#ffdd44' : '#44ddff';
     const sparkSize = isSDM ? 1.8 : isDM ? 1.5 : isSpecial ? 1.3 : isHeavyAttack(attackType) ? 1.0 : 0.7;
     const sparkSpeed = isDM ? 1.4 : isSpecial ? 1.2 : 1.0;
-    deps.vfx.spawnCharacterHitSparks(hitX, hitY, sparks, sparkColor, sparkSize, sparkSpeed);
-    deps.vfx.spawnImpactRing(hitX, hitY, sparkSize);
+    // KOF2002: DM火花70%星形, 必杀50%, 重攻击35%, 轻攻击25%
+    const sparkStarRatio = isSDM ? 0.8 : isDM ? 0.7 : isSpecial ? 0.5 : isHeavyAttack(attackType) ? 0.35 : 0.25;
+    // KOF2002: 空中命中火花低重力, 延长悬浮效果
+    const sparkLowGrav = !defender.isGrounded() && !isDM;
+    deps.vfx.spawnCharacterHitSparks(hitX, hitY, sparks, sparkColor, sparkSize, sparkSpeed, sparkStarRatio, sparkLowGrav);
+    // KOF2002: 连击数增强冲击环 — 5+hits稍大, 10+hits双环
+    const ringScale = sparkSize + (combo >= 5 ? 0.3 : 0);
+    deps.vfx.spawnImpactRing(hitX, hitY, ringScale);
+    if (combo >= 10) deps.vfx.spawnImpactRing(hitX, hitY, ringScale * 0.6);
 
     // 重攻击斩击线
     if (isHeavyAttack(attackType) || isSpecial) {
@@ -157,7 +164,7 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
 
     // DM: 超必杀华丽爆发 + 全屏闪光
     if (isDM) {
-      deps.vfx.spawnSuperBurst(hitX, hitY, atkChar.specialColor, atkChar.specialGlow);
+      deps.vfx.spawnSuperBurst(hitX, hitY, atkChar.specialColor, atkChar.specialGlow, isSDM);
       // SDM: 金色闪光+双冲击环, DM: 白色闪光
       if (isSDM) {
         deps.screenFlash.trigger('#ffdd44', 0.55, 16);
@@ -168,8 +175,8 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       }
     }
 
-    // 伤害数字 — KOF2002: DM用角色色, 通常/必杀用默认分级色
-    const dmgColor = isDM ? atkChar.specialColor : undefined;
+    // 伤害数字 — KOF2002: DM用角色色, CH用橙色, 通常用默认分级色
+    const dmgColor = isDM ? atkChar.specialColor : counterHit ? '#ff8800' : undefined;
     deps.vfx.spawnDamageText(defender.x, defender.y - defender.displayHeight - 20, data.damage, dmgColor);
 
     // Rekka finisher增强
@@ -188,13 +195,15 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
     }
 
     // SFX
-    if (isDM) { playSuperFlash(); playDM(); }
+    if (isDM) { playSuperFlash(isSDM); playDM(); }
     else if (attackType === AttackType.THROW || attackType === AttackType.THROW_FORWARD || attackType === AttackType.THROW_BACK) {
       playThrow();
-      // 投技火花+弧线特效
-      deps.vfx.spawnCharacterHitSparks(hitX, hitY, 10, '#aaddff');
-      deps.screenFlash.trigger('#aaddff', 0.12, 4);
-      deps.screenShake.trigger(6, 8);
+      // 投技火花+弧线特效 — 角色专属色混合蓝白
+      const throwColor = atkChar.specialColor;
+      deps.vfx.spawnCharacterHitSparks(hitX, hitY, 10, throwColor, 1.0, 1.0, 0.4);
+      deps.vfx.spawnCharacterHitSparks(hitX, hitY, 6, '#ffffff', 0.7, 0.8);
+      deps.screenFlash.trigger('#aaddff', 0.15, 5);
+      deps.screenShake.trigger(7, 9);
     }
     else if (isSpecial) { playSpecial(); if (combo > 0) playHit(0.6, combo); }
     else if (data.damage >= 70) playHeavyHit(1 + Math.min(data.damage - 70, 50) / 62.5);
@@ -234,8 +243,12 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       deps.screenFlash.trigger('#ffcc44', 0.15, 4);
     }
 
-    // 连击数显示
+    // 连击数显示 + 高连击冲击环
     if (combo >= 2) deps.vfx.spawnDamageText(defender.x, defender.y - defender.displayHeight - 40, combo);
+    if (combo >= 10) {
+      deps.vfx.spawnImpactRing(hitX, hitY, 2.0);
+      deps.vfx.spawnCharacterHitSparks(hitX, hitY, 6, '#ffffff', 0.5, 2.0);
+    }
 
     // 震屏时长: 轻攻击5帧, 重攻击8帧, 必杀10帧, DM 14帧
     const shakeDur = isDM ? 14 : isSpecial ? 10 : isHeavyAttack(attackType) ? 8 : 5;

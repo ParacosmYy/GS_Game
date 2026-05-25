@@ -84,8 +84,8 @@ export class VFXSystem {
   }
 
   /** 角色专属命中火花 — KOF风格, 更大更亮 */
-  spawnCharacterHitSparks(worldX: number, worldY: number, count: number, charColor: string, sizeScale?: number, speedScale?: number): void {
-    spawnCharacterHitSparks(this.particles, worldX, worldY, count, charColor, sizeScale, speedScale);
+  spawnCharacterHitSparks(worldX: number, worldY: number, count: number, charColor: string, sizeScale?: number, speedScale?: number, starRatio?: number, lowGravity?: boolean): void {
+    spawnCharacterHitSparks(this.particles, worldX, worldY, count, charColor, sizeScale, speedScale, starRatio, lowGravity);
   }
 
   spawnGuardCrushSparks(worldX: number, worldY: number): void {
@@ -118,8 +118,8 @@ export class VFXSystem {
   }
 
   /** DM/超必杀激活时的华丽爆发 */
-  spawnSuperBurst(worldX: number, worldY: number, color: string, glow: string): void {
-    spawnSuperBurst(this.particles, worldX, worldY, color, glow);
+  spawnSuperBurst(worldX: number, worldY: number, color: string, glow: string, isSDM?: boolean): void {
+    spawnSuperBurst(this.particles, worldX, worldY, color, glow, isSDM);
   }
 
   /** KO落地时的震撼效果 */

@@ -44,17 +44,18 @@ export function spawnBlockFlash(particles: Particle[], worldX: number, worldY: n
   });
 }
 
-/** 角色专属命中火花 — KOF风格, 更大更亮. sizeScale: 轻攻击0.7, 重攻击1.0, 必杀1.3, DM1.8 */
-export function spawnCharacterHitSparks(particles: Particle[], worldX: number, worldY: number, count: number, charColor: string, sizeScale: number = 1.0, speedScale: number = 1.0): void {
+/** 角色专属命中火花 — KOF风格, 更大更亮. starRatio: DM 0.7, 必杀 0.5, 重攻击 0.35, 轻攻击 0.25 */
+export function spawnCharacterHitSparks(particles: Particle[], worldX: number, worldY: number, count: number, charColor: string, sizeScale: number = 1.0, speedScale: number = 1.0, starRatio: number = 0.25, lowGravity: boolean = false): void {
   particles.push({
     x: worldX, y: worldY, vx: 0, vy: 0,
     life: 6, maxLife: 6, size: 25 * sizeScale,
     color: charColor, type: 'flash',
   });
+  const grav = lowGravity ? 0.04 : 0.12;
   for (let i = 0; i < count; i++) {
     const angle = Math.random() * Math.PI * 2;
     const speed = (3 + Math.random() * 7) * sizeScale * speedScale;
-    const isStar = Math.random() > 0.25;
+    const isStar = Math.random() < starRatio;
     particles.push({
       x: worldX, y: worldY,
       vx: Math.cos(angle) * speed,
@@ -64,7 +65,7 @@ export function spawnCharacterHitSparks(particles: Particle[], worldX: number, w
       size: (isStar ? 4 + Math.random() * 5 : 2 + Math.random() * 3) * sizeScale,
       color: Math.random() > 0.35 ? charColor : '#ffffff',
       type: isStar ? 'star' : 'spark',
-      gravity: 0.12,
+      gravity: grav,
       friction: 0.94,
       rotation: Math.random() * Math.PI * 2,
       rotSpeed: (Math.random() - 0.5) * 0.4,
@@ -167,33 +168,35 @@ export function spawnSlashLine(particles: Particle[], worldX: number, worldY: nu
 }
 
 /** DM/超必杀激活时的华丽爆发 */
-export function spawnSuperBurst(particles: Particle[], worldX: number, worldY: number, color: string, glow: string): void {
+export function spawnSuperBurst(particles: Particle[], worldX: number, worldY: number, color: string, glow: string, isSDM: boolean = false): void {
+  const burstCount = isSDM ? 36 : 24;
+  const burstSize = isSDM ? 120 : 100;
   particles.push({
     x: worldX, y: worldY, vx: 0, vy: 0,
-    life: 20, maxLife: 20, size: 80,
+    life: isSDM ? 25 : 20, maxLife: isSDM ? 25 : 20, size: isSDM ? 100 : 80,
     color: '#ffffff', type: 'superburst',
   });
   particles.push({
     x: worldX, y: worldY, vx: 0, vy: 0,
-    life: 25, maxLife: 25, size: 100,
+    life: isSDM ? 30 : 25, maxLife: isSDM ? 30 : 25, size: burstSize,
     color, type: 'superburst',
   });
-  for (let i = 0; i < 24; i++) {
-    const angle = (i / 24) * Math.PI * 2 + Math.random() * 0.2;
-    const speed = 4 + Math.random() * 8;
+  for (let i = 0; i < burstCount; i++) {
+    const angle = (i / burstCount) * Math.PI * 2 + Math.random() * 0.2;
+    const speed = 4 + Math.random() * (isSDM ? 10 : 8);
     particles.push({
       x: worldX, y: worldY,
       vx: Math.cos(angle) * speed,
       vy: Math.sin(angle) * speed - 2,
-      life: 18 + Math.floor(Math.random() * 12),
-      maxLife: 30,
-      size: 3 + Math.random() * 5,
+      life: 18 + Math.floor(Math.random() * (isSDM ? 16 : 12)),
+      maxLife: isSDM ? 35 : 30,
+      size: 3 + Math.random() * (isSDM ? 7 : 5),
       color: i % 4 === 0 ? '#ffffff' : i % 2 === 0 ? glow : color,
       type: 'star', gravity: 0.12, friction: 0.94,
       rotation: angle, rotSpeed: (Math.random() - 0.5) * 0.5,
     });
   }
-  for (let r = 0; r < 2; r++) {
+  for (let r = 0; r < (isSDM ? 3 : 2); r++) {
     particles.push({
       x: worldX, y: worldY, vx: 0, vy: 0,
       life: 15 + r * 5, maxLife: 15 + r * 5, size: 5 + r * 3,

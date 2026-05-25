@@ -261,8 +261,8 @@ export function playHeavyHit(intensity: number = 1): void {
   hi.start(now); hi.stop(now + 0.03);
 }
 
-/** Super Flash — DM startup shimmer */
-export function playSuperFlash(): void {
+/** Super Flash — DM startup shimmer. isSDM: 金色谐振增强 */
+export function playSuperFlash(isSDM: boolean = false): void {
   const ctx = getCtx();
   const now = ctx.currentTime;
 
@@ -272,22 +272,36 @@ export function playSuperFlash(): void {
   osc.frequency.exponentialRampToValueAtTime(2000, now + 0.12);
   osc.frequency.exponentialRampToValueAtTime(600, now + 0.25);
   const gain = ctx.createGain();
-  gain.gain.setValueAtTime(0.15, now);
-  gain.gain.setValueAtTime(0.25, now + 0.1);
-  gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+  gain.gain.setValueAtTime(isSDM ? 0.2 : 0.15, now);
+  gain.gain.setValueAtTime(isSDM ? 0.35 : 0.25, now + 0.1);
+  gain.gain.exponentialRampToValueAtTime(0.001, now + (isSDM ? 0.4 : 0.3));
 
   const shimmer = noiseBuffer(ctx, 0.15, 0.3);
   const sFilter = ctx.createBiquadFilter();
   sFilter.type = 'highpass';
   sFilter.frequency.value = 4000;
   const sGain = ctx.createGain();
-  sGain.gain.setValueAtTime(0.08, now);
+  sGain.gain.setValueAtTime(isSDM ? 0.14 : 0.08, now);
   sGain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
 
   osc.connect(gain).connect(ctx.destination);
   shimmer.connect(sFilter).connect(sGain).connect(ctx.destination);
-  osc.start(now); osc.stop(now + 0.35);
-  shimmer.start(now); shimmer.stop(now + 0.16);
+  osc.start(now); osc.stop(now + (isSDM ? 0.45 : 0.35));
+  shimmer.start(now); shimmer.stop(now + (isSDM ? 0.2 : 0.16));
+
+  // SDM: 额外金色谐振层
+  if (isSDM) {
+    const chime = ctx.createOscillator();
+    chime.type = 'sine';
+    chime.frequency.setValueAtTime(880, now + 0.05);
+    chime.frequency.exponentialRampToValueAtTime(1760, now + 0.15);
+    chime.frequency.exponentialRampToValueAtTime(440, now + 0.35);
+    const chGain = ctx.createGain();
+    chGain.gain.setValueAtTime(0.1, now + 0.05);
+    chGain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+    chime.connect(chGain).connect(ctx.destination);
+    chime.start(now + 0.05); chime.stop(now + 0.4);
+  }
 }
 
 /** Counter — sharp alert */
