@@ -63,6 +63,12 @@ export const COMBO_ROUTES: Record<string, ComboStep[]> = {
     { type: 'special', attack: 'specialUpper', delay: 3 },
     { type: 'special', attack: 'dmVSlasher',  delay: 4 },
   ],
+  robert: [
+    { type: 'button',  attack: 'closeC',     delay: 0 },
+    { type: 'button',  attack: 'robertGeneiKyaku', delay: 2 },
+    { type: 'special', attack: 'robertRyuZan', delay: 3 },
+    { type: 'special', attack: 'dmRyuKoRyu',  delay: 4 },
+  ],
   _default: [
     { type: 'button',  attack: 'closeC', delay: 0 },
     { type: 'button',  attack: 'standA',  delay: 2 },
@@ -100,6 +106,8 @@ export function applyComboStep(step: ComboStep, base: ResolvedInput): void {
         base.forward = true; base.buttonB = true; base.buttonBPressed = true; base.kickPressed = true; break;
       case 'leonaStrikeArc':
         base.forward = true; base.buttonB = true; base.buttonBPressed = true; base.kickPressed = true; break;
+      case 'robertGeneiKyaku':
+        base.forward = true; base.buttonA = true; base.buttonAPressed = true; base.punchPressed = true; break;
       case 'jumpC':
         base.buttonC = true; base.buttonCPressed = true; base.punchPressed = true; break;
     }
@@ -136,6 +144,7 @@ export function routeComboSpecial(
     case 'kdash': return routeKdash(attack);
     case 'kula': return routeKula(attack);
     case 'leona': return routeLeona(attack);
+    case 'robert': return routeRobert(attack);
     default: return null;
   }
 }
@@ -208,5 +217,14 @@ function routeLeona(attack: string): AttackType | null {
   switch (attack) {
     case 'dmVSlasher': return AttackType.DM_V_SLASHER;
     default: return AttackType.LEONA_EAR_RING;
+  }
+}
+
+function routeRobert(attack: string): AttackType | null {
+  switch (attack) {
+    case 'robertRyuZan': return AttackType.ROBERT_RYU_ZAN;
+    case 'dmRyuKoRyu': return AttackType.DM_RYU_KO_RYU;
+    case 'dmHaouShokou': return AttackType.DM_HAOU_SHOKOU;
+    default: return AttackType.ROBERT_RYU_ZAN;
   }
 }

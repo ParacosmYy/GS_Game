@@ -204,6 +204,20 @@ function drawTorsoDetail(
       ctx.lineTo(ww - 3, yy);
       ctx.stroke();
     }
+  } else if (charId === 'robert') {
+    ctx.strokeStyle = shiftColor(outfit.shirt, -25);
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(-PX * 2, -hh + PX);
+    ctx.lineTo(0, -hh + PX * 4);
+    ctx.lineTo(PX * 2, -hh + PX);
+    ctx.stroke();
+    ctx.fillStyle = '#884422';
+    ctx.fillRect(-PX, hh * 0.3, PX * 2, PX);
+    ctx.strokeStyle = shiftColor(outfit.shirt, -12);
+    ctx.lineWidth = 0.8;
+    ctx.beginPath(); ctx.moveTo(-PX * 1.5, -hh + PX * 3); ctx.lineTo(-PX * 2, hh * 0.4); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(PX * 1.5, -hh + PX * 3); ctx.lineTo(PX * 2, hh * 0.4); ctx.stroke();
   }
 }
 

@@ -13,6 +13,7 @@ import { RyoDef } from './ryo.js';
 import { LeonaDef } from './leona.js';
 import { KulaDef } from './kula.js';
 import { KdashDef } from './kdash.js';
+import { RobertDef } from './robert.js';
 
 export type { CharacterDefinition } from './types.js';
 
@@ -26,4 +27,5 @@ export const ROSTER: CharacterDefinition[] = [
   LeonaDef,
   KulaDef,
   KdashDef,
+  RobertDef,
 ];

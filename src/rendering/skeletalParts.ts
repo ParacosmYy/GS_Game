@@ -14,6 +14,7 @@ export const CHAR_OUTFIT: Record<string, { shirt: string; pants: string; belt: s
   leona: { shirt: '#335588', pants: '#335588', belt: '#888', shoes: '#223344' },
   kdash: { shirt: '#333344', pants: '#2a2a3a', belt: '#666', shoes: '#222233' },
   kula: { shirt: '#4488cc', pants: '#336699', belt: '#88ccff', shoes: '#335588' },
+  robert: { shirt: '#226633', pants: '#226633', belt: '#884422', shoes: '#443322' },
 };
 
 const DEFAULT_OUTFIT = { shirt: '#888', pants: '#556', belt: '#444', shoes: '#333' };
@@ -26,7 +27,7 @@ export function getHairColor(charId: string): string {
   const colors: Record<string, string> = {
     kyo: '#8B4513', iori: '#8B0000', terry: '#C6A355',
     kim: '#1a1a1a', ryo: '#8B6914', leona: '#DAA520',
-    kdash: '#C0C0C0', kula: '#cc8855',
+    kdash: '#C0C0C0', kula: '#cc8855', robert: '#2a1a0a',
   };
   return colors[charId] ?? '#333';
 }
@@ -35,7 +36,7 @@ export function getEyeColor(charId: string): string {
   const colors: Record<string, string> = {
     kyo: '#6B4226', iori: '#8B0000', terry: '#4169E1',
     kim: '#1a1a1a', ryo: '#4169E1', leona: '#4169E1',
-    kdash: '#ff4400', kula: '#4488ff',
+    kdash: '#ff4400', kula: '#4488ff', robert: '#4169E1',
   };
   return colors[charId] ?? '#444';
 }
@@ -305,6 +306,40 @@ function drawHair(ctx: CanvasRenderingContext2D, charId: string, facing: number,
     ctx.quadraticCurveTo(0, -r - 6, 3, -r + 1);
     ctx.lineTo(2, -r + 4);
     ctx.lineTo(-2, -r + 4);
+    ctx.closePath();
+    ctx.fill();
+  } else if (charId === 'robert') {
+    // Robert: slicked-back dark hair
+    ctx.fillStyle = '#2a1a0a';
+    ctx.beginPath();
+    ctx.moveTo(-r + 2, -r + 3);
+    ctx.quadraticCurveTo(-r + 4, -r - 8, 0, -r - 6);
+    ctx.quadraticCurveTo(r - 4, -r - 8, r + 2, -r + 3);
+    ctx.lineTo(r, -r + 6);
+    ctx.lineTo(-r, -r + 6);
+    ctx.closePath();
+    ctx.fill();
+    // Slicked-back volume
+    ctx.fillStyle = '#1a0a00';
+    ctx.beginPath();
+    ctx.moveTo(-r + 4, -r + 1);
+    ctx.quadraticCurveTo(0, -r - 4, r - 4, -r + 1);
+    ctx.lineTo(r - 5, -r + 4);
+    ctx.lineTo(-r + 5, -r + 4);
+    ctx.closePath();
+    ctx.fill();
+    // Sideburns
+    ctx.fillStyle = '#2a1a0a';
+    ctx.beginPath();
+    ctx.moveTo(-r, -r + 4);
+    ctx.lineTo(-r - 2, -r + 10);
+    ctx.lineTo(-r + 2, -r + 8);
+    ctx.closePath();
+    ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(r, -r + 4);
+    ctx.lineTo(r + 2, -r + 10);
+    ctx.lineTo(r - 2, -r + 8);
     ctx.closePath();
     ctx.fill();
   }

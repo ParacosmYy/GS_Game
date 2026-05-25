@@ -62,6 +62,9 @@ export enum AttackType {
   // Leona 命令通常技
   LEONA_STRIKE_ARC = 'LEONA_STRIKE_ARC',   // →+B Strike Arc (overhead)
   LEONA_STRIKE_DASH = 'LEONA_STRIKE_DASH', // 空中↓+D Strike Dash (air dive)
+  // Robert 命令通常技
+  ROBERT_GENEI_KYAKU_CMD = 'ROBERT_GENEI_KYAKU_CMD', // →+A 幻影脚 (overhead)
+  ROBERT_KOU_SHUTAI = 'ROBERT_KOU_SHUTAI',           // ↘+B 龍舞脚 (low)
   // 蹲下 (Crouch)
   CROUCH_A = 'CROUCH_A',
   CROUCH_B = 'CROUCH_B',
@@ -136,6 +139,14 @@ export enum AttackType {
   LEONA_EAR_RING_C = 'LEONA_EAR_RING_C',     // 威光 →↓↘+C (strong upper)
   LEONA_GRAND_SABER = 'LEONA_GRAND_SABER',   // 手刀 ←↙↓+P (rush)
   LEONA_BALTIC = 'LEONA_BALTIC',             // X标 ↓↘→+K (low)
+  // 罗伯特必杀技 (Robert Specials)
+  ROBERT_RYU_GEKI = 'ROBERT_RYU_GEKI',             // 龍撃拳 ↓↘→+A (weak projectile)
+  ROBERT_RYU_GEKI_C = 'ROBERT_RYU_GEKI_C',         // 龍撃拳 ↓↘→+C (strong projectile)
+  ROBERT_RYU_ZAN = 'ROBERT_RYU_ZAN',               // 龍斬 →↓↘+A (weak upper)
+  ROBERT_RYU_ZAN_C = 'ROBERT_RYU_ZAN_C',           // 龍斬 →↓↘+C (strong upper, invincible)
+  ROBERT_HIEN_RYU_JIN = 'ROBERT_HIEN_RYU_JIN',     // 飛燕龍神脚 空中↓↘→+K (air dive)
+  ROBERT_GENEI_KYAKU = 'ROBERT_GENEI_KYAKU',       // 幻影脚 ←↙↓+K (overhead kick)
+  ROBERT_HIEN_RYU_KYAKU = 'ROBERT_HIEN_RYU_KYAKU', // 飛燕疾風龍脚 ↓↘→+K (rush kick)
   // K'必杀技 (K' Specials)
   KDASH_EINS = 'KDASH_EINS',                 // Eins Trigger ↓↘→+A (weak projectile)
   KDASH_EINS_C = 'KDASH_EINS_C',             // Eins Trigger ↓↘→+C (strong projectile)
@@ -161,6 +172,8 @@ export enum AttackType {
   DM_V_SLASHER = 'DM_V_SLASHER',             // V字金锯 (Leona)
   DM_CHAIN_SHOT = 'DM_CHAIN_SHOT',           // Chain Shot (K')
   DM_FREEZE = 'DM_FREEZE',                   // Freeze Execution (Kula)
+  DM_RYU_KO_RYU = 'DM_RYU_KO_RYU',           // 龍虎乱舞 (Robert)
+  DM_HAOU_SHOKOU = 'DM_HAOU_SHOKOU',         // 霸王翔吼拳 (Robert)
   // 超必杀技SDM (Super Desperation Move — MAX mode only, costs extra stock)
   SDM_OROCHINAGI = 'SDM_OROCHINAGI',         // 大蛇薙SDM (Kyo)
   SDM_YATAGARASU = 'SDM_YATAGARASU',         // 八稚女SDM (Iori)
@@ -170,6 +183,8 @@ export enum AttackType {
   SDM_V_SLASHER = 'SDM_V_SLASHER',           // V字金锯SDM (Leona)
   SDM_CHAIN_SHOT = 'SDM_CHAIN_SHOT',         // Chain Shot SDM (K')
   SDM_FREEZE = 'SDM_FREEZE',                 // Freeze Execution SDM (Kula)
+  SDM_RYU_KO_RYU = 'SDM_RYU_KO_RYU',         // 龍虎乱舞SDM (Robert)
+  SDM_HAOU_SHOKOU = 'SDM_HAOU_SHOKOU',       // 霸王翔吼拳SDM (Robert)
 }
 
 // ===== Hit Level (防御判定) =====

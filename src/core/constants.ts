@@ -150,6 +150,8 @@ export const COMMAND_NORMALS: ReadonlySet<string> = new Set([
   'KULA_SLIDER',
   'LEONA_STRIKE_ARC',
   'LEONA_STRIKE_DASH',
+  'ROBERT_GENEI_KYAKU_CMD',
+  'ROBERT_KOU_SHUTAI',
 ]);
 
 // ===== Throw Invincibility (KOF 2002 authentic) =====

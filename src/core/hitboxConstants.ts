@@ -147,4 +147,18 @@ export const HITBOX_OFFSETS = {
   SDM_V_SLASHER: { offsetX: 45, offsetY: -140, width: 95, height: 85 },
   SDM_CHAIN_SHOT: { offsetX: 50, offsetY: -130, width: 95, height: 80 },
   SDM_FREEZE: { offsetX: 50, offsetY: -130, width: 100, height: 80 },
+  // 罗伯特 (Robert)
+  ROBERT_GENEI_KYAKU_CMD: { offsetX: 55, offsetY: -110, width: 75, height: 45 },
+  ROBERT_KOU_SHUTAI: { offsetX: 65, offsetY: -20, width: 80, height: 25 },
+  ROBERT_RYU_GEKI: { offsetX: 70, offsetY: -110, width: 58, height: 40 },
+  ROBERT_RYU_GEKI_C: { offsetX: 70, offsetY: -110, width: 60, height: 42 },
+  ROBERT_RYU_ZAN: { offsetX: 40, offsetY: -160, width: 60, height: 70 },
+  ROBERT_RYU_ZAN_C: { offsetX: 40, offsetY: -160, width: 65, height: 80 },
+  ROBERT_HIEN_RYU_JIN: { offsetX: 45, offsetY: -150, width: 60, height: 65 },
+  ROBERT_GENEI_KYAKU: { offsetX: 60, offsetY: -110, width: 70, height: 50 },
+  ROBERT_HIEN_RYU_KYAKU: { offsetX: 55, offsetY: -100, width: 75, height: 50 },
+  DM_RYU_KO_RYU: { offsetX: 45, offsetY: -130, width: 90, height: 70 },
+  DM_HAOU_SHOKOU: { offsetX: 50, offsetY: -120, width: 100, height: 75 },
+  SDM_RYU_KO_RYU: { offsetX: 45, offsetY: -140, width: 95, height: 80 },
+  SDM_HAOU_SHOKOU: { offsetX: 50, offsetY: -130, width: 100, height: 80 },
 } as const;

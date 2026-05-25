@@ -280,6 +280,52 @@ export const FRAME_DATA_CHARS = {
     damage: 210, hitstun: 0, blockstun: 22, pushback: 10,
     hitLevel: 'MID' as const, knockdown: true, chipDamage: 16,
   },
+  // ── 罗伯特必杀技 (Robert Garcia) ──
+  ROBERT_RYU_GEKI: {
+    startup: 12, active: 20, recovery: 28,
+    damage: 70, hitstun: 24, blockstun: 22, pushback: 4,
+    hitLevel: 'MID' as const, knockdown: false, chipDamage: 8,
+  },
+  ROBERT_RYU_GEKI_C: {
+    startup: 14, active: 24, recovery: 26,
+    damage: 95, hitstun: 26, blockstun: 24, pushback: 5,
+    hitLevel: 'MID' as const, knockdown: false, chipDamage: 10,
+  },
+  ROBERT_RYU_ZAN: {
+    startup: 5, active: 6, recovery: 24,
+    damage: 80, hitstun: 22, blockstun: 18, pushback: 6,
+    hitLevel: 'MID' as const, knockdown: true,
+  },
+  ROBERT_RYU_ZAN_C: {
+    startup: 7, active: 10, recovery: 28,
+    damage: 130, hitstun: 28, blockstun: 22, pushback: 10,
+    hitLevel: 'MID' as const, knockdown: true,
+  },
+  ROBERT_HIEN_RYU_JIN: {
+    startup: 8, active: 8, recovery: 18,
+    damage: 85, hitstun: 22, blockstun: 18, pushback: 5,
+    hitLevel: 'MID' as const, knockdown: true,
+  },
+  ROBERT_GENEI_KYAKU: {
+    startup: 10, active: 6, recovery: 22,
+    damage: 75, hitstun: 20, blockstun: 16, pushback: 4,
+    hitLevel: 'HIGH' as const, knockdown: false,
+  },
+  ROBERT_HIEN_RYU_KYAKU: {
+    startup: 8, active: 10, recovery: 22,
+    damage: 90, hitstun: 22, blockstun: 18, pushback: 5,
+    hitLevel: 'MID' as const, knockdown: false,
+  },
+  DM_RYU_KO_RYU: {
+    startup: 8, active: 6, recovery: 36,
+    damage: 220, hitstun: 0, blockstun: 22, pushback: 10,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 18,
+  },
+  DM_HAOU_SHOKOU: {
+    startup: 10, active: 8, recovery: 38,
+    damage: 200, hitstun: 0, blockstun: 22, pushback: 10,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 20,
+  },
   // K' 必杀技
   KDASH_EINS: {
     startup: 12, active: 25, recovery: 18,
@@ -392,5 +438,16 @@ export const FRAME_DATA_CHARS = {
     startup: 8, active: 12, recovery: 36,
     damage: 300, hitstun: 0, blockstun: 22, pushback: 12,
     hitLevel: 'MID' as const, knockdown: true, chipDamage: 28,
+  },
+  // ── 罗伯特SDM (Robert Garcia) ──
+  SDM_RYU_KO_RYU: {
+    startup: 8, active: 12, recovery: 36,
+    damage: 320, hitstun: 0, blockstun: 22, pushback: 12,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 30,
+  },
+  SDM_HAOU_SHOKOU: {
+    startup: 10, active: 14, recovery: 38,
+    damage: 300, hitstun: 0, blockstun: 22, pushback: 12,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 32,
   },
 } as const;
