@@ -24,6 +24,7 @@ import type { CommandBuffer } from '../input/commandBuffer.js';
 import { FighterState, AttackType } from '../core/types.js';
 import { Projectile } from '../entities/projectile.js';
 import { FRAME_DATA } from '../core/constants.js';
+import { robertPortrait } from '../rendering/portraits/robertPortrait.js';
 
 export const RobertDef: CharacterDefinition = {
   id: 'robert',
@@ -34,7 +35,7 @@ export const RobertDef: CharacterDefinition = {
   specialColor: '#44ff88',
   specialGlow: '#22dd66',
   portrait: '🥋',
-  pixelPortrait: undefined,
+  pixelPortrait: robertPortrait,
   winQuotes: ['極限流、見せてやるよ！', 'まだまだ修行が足りないな', '龍虎の拳、恐るべし！'],
 
   stats: {

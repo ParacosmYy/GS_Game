@@ -57,19 +57,24 @@ export function drawCharacterSelect(
   drawSNKText(ctx, 'SELECT YOUR FIGHTER', CANVAS_WIDTH / 2, 35, 34, '#ffcc00');
   drawSNKText(ctx, 'P1: A/D select  J confirm  |  T: toggle AI  |  Tab: toggle mode', CANVAS_WIDTH / 2, 72, 11, '#999999');
 
-  // Character cards
-  const cols = ROSTER.length;
-  const cardW = 130;
-  const cardH = 190;
-  const gap = 16;
-  const totalW = cols * cardW + (cols - 1) * gap;
-  const startX = (CANVAS_WIDTH - totalW) / 2;
-  const startY = 110;
+  // Character cards — 2-row grid layout for 9 characters
+  const cardW = 82;
+  const cardH = 140;
+  const gap = 10;
+  const maxCols = 5;
+  const rows = Math.ceil(ROSTER.length / maxCols);
+  const gridH = rows * cardH + (rows - 1) * gap;
+  const startY = 95;
 
-  for (let i = 0; i < cols; i++) {
+  for (let i = 0; i < ROSTER.length; i++) {
     const char = ROSTER[i];
-    const cx = startX + i * (cardW + gap);
-    const cy = startY;
+    const row = Math.floor(i / maxCols);
+    const col = i % maxCols;
+    const colsInRow = Math.min(maxCols, ROSTER.length - row * maxCols);
+    const rowW = colsInRow * cardW + (colsInRow - 1) * gap;
+    const rowStartX = (CANVAS_WIDTH - rowW) / 2;
+    const cx = rowStartX + col * (cardW + gap);
+    const cy = startY + row * (cardH + gap);
     const isP1Here = p1Cursor === i;
     const isP2Here = p2Cursor === i;
 
