@@ -196,17 +196,17 @@ function drawHealthBar(ctx: CanvasRenderingContext2D, x: number, y: number, w: n
   ctx.fillStyle = '#0f0f18';
   roundRect(ctx, x, y, w, h, 3);
   ctx.fill();
-  // Tick marks
-  ctx.strokeStyle = 'rgba(255,255,255,0.04)';
+  // Tick marks — KOF2002正版: 10等分刻度线
+  ctx.strokeStyle = 'rgba(255,255,255,0.06)';
   ctx.lineWidth = 1;
-  for (let t = 0.25; t < 1; t += 0.25) {
+  for (let t = 0.1; t < 1; t += 0.1) {
     const tx = leftAligned ? x + w * t : x + w * (1 - t);
     ctx.beginPath(); ctx.moveTo(tx, y); ctx.lineTo(tx, y + h); ctx.stroke();
   }
-  // White ghost bar (delayed health)
+  // Ghost bar (delayed health) — KOF2002: 红色残影显示受伤前血量
   const delayedFillW = Math.round(w * delayedRatio);
   if (delayedFillW > 0 && delayedRatio > ratio) {
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+    ctx.fillStyle = 'rgba(200, 60, 40, 0.6)';
     if (leftAligned) {
       roundRect(ctx, x, y, delayedFillW, h, 3);
       ctx.fill();
@@ -218,9 +218,9 @@ function drawHealthBar(ctx: CanvasRenderingContext2D, x: number, y: number, w: n
   // Health fill
   const fillW = Math.round(w * ratio);
   if (fillW <= 0) return;
-  // Color: green >50%, yellow 25-50%, orange <=25%
-  const isLowHealth = ratio <= 0.25;
-  const healthColor = ratio > 0.50 ? '#22cc55' : ratio > 0.25 ? '#FFD700' : '#FF8C00';
+  // Color: KOF2002正版: 金黄色满血, 低血量30%以下变橙色
+  const isLowHealth = ratio <= 0.30;
+  const healthColor = ratio > 0.30 ? '#e8b820' : '#FF8C00';
   const healthGrad = ctx.createLinearGradient(x, y, x, y + h);
   healthGrad.addColorStop(0, shiftColor(healthColor, 50));
   healthGrad.addColorStop(0.3, shiftColor(healthColor, 20));
