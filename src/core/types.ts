@@ -62,9 +62,16 @@ export enum AttackType {
   // Leona 命令通常技
   LEONA_STRIKE_ARC = 'LEONA_STRIKE_ARC',   // →+B Strike Arc (overhead)
   LEONA_STRIKE_DASH = 'LEONA_STRIKE_DASH', // 空中↓+D Strike Dash (air dive)
+  // Mai 命令通常技
+  MAI_HISSATSU_SHINOBIBACHI = 'MAI_HISSATSU_SHINOBIBACHI', // →+B 必殺忍蜂 (overhead)
+  MAI_YUSURA_UMA = 'MAI_YUSURA_UMA',                     // ↘+B 夕櫻舞 (low)
   // Robert 命令通常技
   ROBERT_GENEI_KYAKU_CMD = 'ROBERT_GENEI_KYAKU_CMD', // →+A 幻影脚 (overhead)
   ROBERT_KOU_SHUTAI = 'ROBERT_KOU_SHUTAI',           // ↘+B 龍舞脚 (low)
+  // Athena 命令通常技
+  ATHENA_PHOENIX_REFLECT = 'ATHENA_PHOENIX_REFLECT', // →+B Psycho Reflect (overhead)
+  ATHENA_LOW_B = 'ATHENA_LOW_B',                     // ↘+B (low)
+  ATHENA_AIR_B = 'ATHENA_AIR_B',                     // 空中↓+B (air crossup)
   // 蹲下 (Crouch)
   CROUCH_A = 'CROUCH_A',
   CROUCH_B = 'CROUCH_B',
@@ -139,6 +146,11 @@ export enum AttackType {
   LEONA_EAR_RING_C = 'LEONA_EAR_RING_C',     // 威光 →↓↘+C (strong upper)
   LEONA_GRAND_SABER = 'LEONA_GRAND_SABER',   // 手刀 ←↙↓+P (rush)
   LEONA_BALTIC = 'LEONA_BALTIC',             // X标 ↓↘→+K (low)
+  // 不知火舞必杀技 (Mai Shiranui Specials)
+  MAI_KA_CHO_SEN = 'MAI_KA_CHO_SEN',               // 花蝶扇 ↓↘→+A (weak fan projectile)
+  MAI_KA_CHO_SEN_C = 'MAI_KA_CHO_SEN_C',           // 花蝶扇 ↓↘→+C (strong fan projectile)
+  MAI_HISHO_RYU_EN_JIN = 'MAI_HISHO_RYU_EN_JIN',   // 飛翔龍炎陣 →↓↘+K (fan lift upper)
+  MAI_RYU_EN_BU = 'MAI_RYU_EN_BU',                 // 龍炎舞 ←↙↓+K (flame kick)
   // 罗伯特必杀技 (Robert Specials)
   ROBERT_RYU_GEKI = 'ROBERT_RYU_GEKI',             // 龍撃拳 ↓↘→+A (weak projectile)
   ROBERT_RYU_GEKI_C = 'ROBERT_RYU_GEKI_C',         // 龍撃拳 ↓↘→+C (strong projectile)
@@ -161,6 +173,12 @@ export enum AttackType {
   KULA_SHELL_C = 'KULA_SHELL_C',             // Counter Shell →↓↘+C (strong upper)
   KULA_LAY = 'KULA_LAY',                     // Lay On ←↙↓+K (sliding)
   KULA_EDGE = 'KULA_EDGE',                   // Diamond Edge ↓↘→+K (low)
+  // 雅典娜必杀技 (Athena Specials)
+  ATHENA_PSYCHO_BALL = 'ATHENA_PSYCHO_BALL',         // Psycho Ball ↓↙←+A (weak projectile)
+  ATHENA_PSYCHO_BALL_C = 'ATHENA_PSYCHO_BALL_C',     // Psycho Ball ↓↙←+C (strong projectile)
+  ATHENA_PSYCHO_SWORD = 'ATHENA_PSYCHO_SWORD',       // Psycho Sword →↓↘+A (weak upper)
+  ATHENA_PSYCHO_SWORD_C = 'ATHENA_PSYCHO_SWORD_C',   // Psycho Sword →↓↘+C (strong upper)
+  ATHENA_PHOENIX_ARROW = 'ATHENA_PHOENIX_ARROW',     // Phoenix Arrow ↓↘→+K (air dive)
   // 超必杀技 (DM)
   DM_OROCHINAGI = 'DM_OROCHINAGI',           // 大蛇薙 (Kyo)
   DM_YATAGARASU = 'DM_YATAGARASU',           // 八稚女 (Iori)
@@ -174,6 +192,8 @@ export enum AttackType {
   DM_FREEZE = 'DM_FREEZE',                   // Freeze Execution (Kula)
   DM_RYU_KO_RYU = 'DM_RYU_KO_RYU',           // 龍虎乱舞 (Robert)
   DM_HAOU_SHOKOU = 'DM_HAOU_SHOKOU',         // 霸王翔吼拳 (Robert)
+  DM_HAKA_OTOSHI = 'DM_HAKA_OTOSHI',         // 蜂巢落とし (Mai)
+  DM_SHINING_CRYSTAL_BIT = 'DM_SHINING_CRYSTAL_BIT', // Shining Crystal Bit (Athena)
   // 超必杀技SDM (Super Desperation Move — MAX mode only, costs extra stock)
   SDM_OROCHINAGI = 'SDM_OROCHINAGI',         // 大蛇薙SDM (Kyo)
   SDM_YATAGARASU = 'SDM_YATAGARASU',         // 八稚女SDM (Iori)
@@ -185,6 +205,8 @@ export enum AttackType {
   SDM_FREEZE = 'SDM_FREEZE',                 // Freeze Execution SDM (Kula)
   SDM_RYU_KO_RYU = 'SDM_RYU_KO_RYU',         // 龍虎乱舞SDM (Robert)
   SDM_HAOU_SHOKOU = 'SDM_HAOU_SHOKOU',       // 霸王翔吼拳SDM (Robert)
+  SDM_HAKA_OTOSHI = 'SDM_HAKA_OTOSHI',       // 蜂巢落としSDM (Mai)
+  SDM_SHINING_CRYSTAL_BIT = 'SDM_SHINING_CRYSTAL_BIT', // Shining Crystal Bit SDM (Athena)
 }
 
 // ===== Hit Level (防御判定) =====
@@ -317,6 +339,7 @@ export interface CounterConfig {
 // ===== Game Phase =====
 export enum GamePhase {
   TITLE = 'TITLE',     // Title screen (KOF2002 logo + PRESS START)
+  MODE_SELECT = 'MODE_SELECT', // Single vs Team battle mode
   SELECT = 'SELECT',   // Character select
   INTRO = 'INTRO',     // "ROUND 1... FIGHT!" text
   FIGHTING = 'FIGHTING', // Active gameplay
@@ -324,6 +347,8 @@ export enum GamePhase {
   MATCH_END = 'MATCH_END', // Match complete (best of 3)
   CONTINUE = 'CONTINUE', // Continue? countdown
 }
+
+export type BattleMode = 'single' | 'team';
 
 // ===== Game State (for window.__gameState) =====
 export interface PlayerState {

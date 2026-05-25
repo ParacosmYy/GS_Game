@@ -15,6 +15,8 @@ export const CHAR_OUTFIT: Record<string, { shirt: string; pants: string; belt: s
   kdash: { shirt: '#333344', pants: '#2a2a3a', belt: '#666', shoes: '#222233' },
   kula: { shirt: '#4488cc', pants: '#336699', belt: '#88ccff', shoes: '#335588' },
   robert: { shirt: '#226633', pants: '#226633', belt: '#884422', shoes: '#443322' },
+  athena: { shirt: '#cc2222', pants: '#cc2222', belt: '#fff', shoes: '#ff6688' },
+  mai: { shirt: '#cc2244', pants: '#cc2244', belt: '#fff', shoes: '#cc2244' },
 };
 
 const DEFAULT_OUTFIT = { shirt: '#888', pants: '#556', belt: '#444', shoes: '#333' };
@@ -28,6 +30,7 @@ export function getHairColor(charId: string): string {
     kyo: '#8B4513', iori: '#8B0000', terry: '#C6A355',
     kim: '#1a1a1a', ryo: '#8B6914', leona: '#DAA520',
     kdash: '#C0C0C0', kula: '#cc8855', robert: '#2a1a0a',
+    athena: '#7744cc', mai: '#7a4828',
   };
   return colors[charId] ?? '#333';
 }
@@ -37,6 +40,7 @@ export function getEyeColor(charId: string): string {
     kyo: '#6B4226', iori: '#8B0000', terry: '#4169E1',
     kim: '#1a1a1a', ryo: '#4169E1', leona: '#4169E1',
     kdash: '#ff4400', kula: '#4488ff', robert: '#4169E1',
+    athena: '#6644cc', mai: '#4488aa',
   };
   return colors[charId] ?? '#444';
 }
@@ -340,6 +344,102 @@ function drawHair(ctx: CanvasRenderingContext2D, charId: string, facing: number,
     ctx.moveTo(r, -r + 4);
     ctx.lineTo(r + 2, -r + 10);
     ctx.lineTo(r - 2, -r + 8);
+    ctx.closePath();
+    ctx.fill();
+  } else if (charId === 'athena') {
+    // Athena: long purple hair with ponytail
+    ctx.fillStyle = '#7744cc';
+    // Top volume — full rounded bangs
+    ctx.beginPath();
+    ctx.moveTo(-r - 2, -r + 3);
+    ctx.quadraticCurveTo(-r + 2, -r - 10, 0, -r - 8);
+    ctx.quadraticCurveTo(r - 2, -r - 10, r + 2, -r + 3);
+    ctx.lineTo(r, -r + 6);
+    ctx.lineTo(-r, -r + 6);
+    ctx.closePath();
+    ctx.fill();
+    // Side bangs — flowing down on both sides
+    ctx.fillStyle = '#6633bb';
+    ctx.beginPath();
+    ctx.moveTo(-r, -r + 4);
+    ctx.quadraticCurveTo(-r - 5, -r + 12, -r - 3, -r + 22);
+    ctx.lineTo(-r + 2, -r + 14);
+    ctx.closePath();
+    ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(r, -r + 4);
+    ctx.quadraticCurveTo(r + 5, -r + 12, r + 3, -r + 22);
+    ctx.lineTo(r - 2, -r + 14);
+    ctx.closePath();
+    ctx.fill();
+    // Ponytail flowing to the back
+    ctx.fillStyle = '#7744cc';
+    const ptX = -r * facing * 0.5;
+    ctx.beginPath();
+    ctx.moveTo(ptX, -r + 2);
+    ctx.quadraticCurveTo(ptX - 6 * facing, -r + 8, ptX - 10 * facing, -r + 20);
+    ctx.quadraticCurveTo(ptX - 8 * facing, -r + 12, ptX, -r + 5);
+    ctx.closePath();
+    ctx.fill();
+    // Hair ribbon (star-shaped accessory)
+    ctx.fillStyle = '#ffcc00';
+    ctx.beginPath();
+    ctx.arc(ptX - 2 * facing, -r + 5, 2.5, 0, Math.PI * 2);
+    ctx.fill();
+    // Light purple highlight
+    ctx.fillStyle = 'rgba(170, 120, 255, 0.2)';
+    ctx.beginPath();
+    ctx.moveTo(-3, -r + 1);
+    ctx.quadraticCurveTo(0, -r - 6, 3, -r + 1);
+    ctx.lineTo(2, -r + 4);
+    ctx.lineTo(-2, -r + 4);
+    ctx.closePath();
+    ctx.fill();
+  } else if (charId === 'mai') {
+    // Mai: long brown hair with ponytail and hair band
+    ctx.fillStyle = '#7a4828';
+    // Top volume — full flowing hair
+    ctx.beginPath();
+    ctx.moveTo(-r - 2, -r + 3);
+    ctx.quadraticCurveTo(-r + 2, -r - 10, 0, -r - 8);
+    ctx.quadraticCurveTo(r - 2, -r - 10, r + 2, -r + 3);
+    ctx.lineTo(r, -r + 6);
+    ctx.lineTo(-r, -r + 6);
+    ctx.closePath();
+    ctx.fill();
+    // Side bangs — flowing down
+    ctx.fillStyle = '#5a3018';
+    ctx.beginPath();
+    ctx.moveTo(-r, -r + 4);
+    ctx.quadraticCurveTo(-r - 4, -r + 12, -r - 2, -r + 22);
+    ctx.lineTo(-r + 2, -r + 14);
+    ctx.closePath();
+    ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(r, -r + 4);
+    ctx.quadraticCurveTo(r + 4, -r + 12, r + 2, -r + 22);
+    ctx.lineTo(r - 2, -r + 14);
+    ctx.closePath();
+    ctx.fill();
+    // Long ponytail flowing to the back
+    ctx.fillStyle = '#7a4828';
+    const ptX = -r * facing * 0.5;
+    ctx.beginPath();
+    ctx.moveTo(ptX, -r + 2);
+    ctx.quadraticCurveTo(ptX - 8 * facing, -r + 10, ptX - 14 * facing, -r + 28);
+    ctx.quadraticCurveTo(ptX - 10 * facing, -r + 14, ptX, -r + 5);
+    ctx.closePath();
+    ctx.fill();
+    // Hair band
+    ctx.fillStyle = '#ff4488';
+    ctx.fillRect(-r + 1, -r + 5, headW - 2, 3);
+    // Brown highlight
+    ctx.fillStyle = 'rgba(160, 100, 50, 0.2)';
+    ctx.beginPath();
+    ctx.moveTo(-3, -r + 1);
+    ctx.quadraticCurveTo(0, -r - 6, 3, -r + 1);
+    ctx.lineTo(2, -r + 4);
+    ctx.lineTo(-2, -r + 4);
     ctx.closePath();
     ctx.fill();
   }

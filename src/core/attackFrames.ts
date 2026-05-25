@@ -23,6 +23,13 @@ import {
   LEONA_EAR_RING_FRAMES, LEONA_EAR_RING_C_FRAMES,
   LEONA_GRAND_SABER_FRAMES, LEONA_BALTIC_FRAMES, DM_V_SLASHER_FRAMES,
   DM_OROCHINAGI_FRAMES, DM_YATAGARASU_FRAMES, DM_POWER_GEYSER_FRAMES, DM_PHOENIX_KICK_FRAMES,
+  ATHENA_PSYCHO_BALL_FRAMES, ATHENA_PSYCHO_BALL_C_FRAMES,
+  ATHENA_PSYCHO_SWORD_FRAMES, ATHENA_PSYCHO_SWORD_C_FRAMES,
+  ATHENA_PHOENIX_ARROW_FRAMES,
+  DM_SHINING_CRYSTAL_BIT_FRAMES,
+  MAI_KA_CHO_SEN_FRAMES, MAI_KA_CHO_SEN_C_FRAMES,
+  MAI_HISHO_RYU_EN_JIN_FRAMES, MAI_RYU_EN_BU_FRAMES,
+  DM_HAKA_OTOSHI_FRAMES,
 } from './attackFramesSpecials.js';
 
 const F: (
@@ -195,6 +202,37 @@ const LEONA_STRIKE_DASH_FRAMES: AttackFrame[] = [
   F([{ ox: 38, oy: -42, w: 48, h: 38 }]),
 ];
 
+// Athena 命令通常技
+const ATHENA_PHOENIX_REFLECT_FRAMES: AttackFrame[] = [
+  F([{ ox: 38, oy: -42, w: 44, h: 30 }]),
+  F([{ ox: 45, oy: -40, w: 50, h: 32 }]),
+  F([{ ox: 45, oy: -40, w: 50, h: 32 }]),
+];
+
+const ATHENA_LOW_B_FRAMES: AttackFrame[] = [
+  F([{ ox: 35, oy: -22, w: 42, h: 28 }]),
+  F([{ ox: 42, oy: -20, w: 50, h: 30 }]),
+  F([{ ox: 42, oy: -20, w: 50, h: 30 }]),
+];
+
+const ATHENA_AIR_B_FRAMES: AttackFrame[] = [
+  F([{ ox: 30, oy: -45, w: 40, h: 35 }]),
+  F([{ ox: 38, oy: -42, w: 48, h: 38 }]),
+];
+
+// Mai 命令通常技
+const MAI_HISSATSU_SHINOBIBACHI_FRAMES: AttackFrame[] = [
+  F([{ ox: 38, oy: -40, w: 44, h: 30 }]),
+  F([{ ox: 45, oy: -38, w: 50, h: 32 }]),
+  F([{ ox: 45, oy: -38, w: 50, h: 32 }]),
+];
+
+const MAI_YUSURA_UMA_FRAMES: AttackFrame[] = [
+  F([{ ox: 35, oy: -22, w: 42, h: 28 }]),
+  F([{ ox: 42, oy: -20, w: 50, h: 30 }]),
+  F([{ ox: 42, oy: -20, w: 50, h: 30 }]),
+];
+
 // ===== 蹲下攻击 =====
 const CROUCH_A_FRAMES: AttackFrame[] = [
   F([{ ox: 35, oy: -30, w: 32, h: 20 }]),
@@ -316,6 +354,11 @@ export const ATTACK_FRAMES: AttackFrameTable = {
   [AttackType.KULA_SLIDER]: KULA_SLIDER_FRAMES,
   [AttackType.LEONA_STRIKE_ARC]: LEONA_STRIKE_ARC_FRAMES,
   [AttackType.LEONA_STRIKE_DASH]: LEONA_STRIKE_DASH_FRAMES,
+  [AttackType.ATHENA_PHOENIX_REFLECT]: ATHENA_PHOENIX_REFLECT_FRAMES,
+  [AttackType.ATHENA_LOW_B]: ATHENA_LOW_B_FRAMES,
+  [AttackType.ATHENA_AIR_B]: ATHENA_AIR_B_FRAMES,
+  [AttackType.MAI_HISSATSU_SHINOBIBACHI]: MAI_HISSATSU_SHINOBIBACHI_FRAMES,
+  [AttackType.MAI_YUSURA_UMA]: MAI_YUSURA_UMA_FRAMES,
   [AttackType.CROUCH_A]: CROUCH_A_FRAMES,
   [AttackType.CROUCH_B]: CROUCH_B_FRAMES,
   [AttackType.CROUCH_C]: CROUCH_C_FRAMES,
@@ -384,4 +427,15 @@ export const ATTACK_FRAMES: AttackFrameTable = {
   [AttackType.LEONA_GRAND_SABER]: LEONA_GRAND_SABER_FRAMES,
   [AttackType.LEONA_BALTIC]: LEONA_BALTIC_FRAMES,
   [AttackType.DM_V_SLASHER]: DM_V_SLASHER_FRAMES,
+  [AttackType.ATHENA_PSYCHO_BALL]: ATHENA_PSYCHO_BALL_FRAMES,
+  [AttackType.ATHENA_PSYCHO_BALL_C]: ATHENA_PSYCHO_BALL_C_FRAMES,
+  [AttackType.ATHENA_PSYCHO_SWORD]: ATHENA_PSYCHO_SWORD_FRAMES,
+  [AttackType.ATHENA_PSYCHO_SWORD_C]: ATHENA_PSYCHO_SWORD_C_FRAMES,
+  [AttackType.ATHENA_PHOENIX_ARROW]: ATHENA_PHOENIX_ARROW_FRAMES,
+  [AttackType.DM_SHINING_CRYSTAL_BIT]: DM_SHINING_CRYSTAL_BIT_FRAMES,
+  [AttackType.MAI_KA_CHO_SEN]: MAI_KA_CHO_SEN_FRAMES,
+  [AttackType.MAI_KA_CHO_SEN_C]: MAI_KA_CHO_SEN_C_FRAMES,
+  [AttackType.MAI_HISHO_RYU_EN_JIN]: MAI_HISHO_RYU_EN_JIN_FRAMES,
+  [AttackType.MAI_RYU_EN_BU]: MAI_RYU_EN_BU_FRAMES,
+  [AttackType.DM_HAKA_OTOSHI]: DM_HAKA_OTOSHI_FRAMES,
 };

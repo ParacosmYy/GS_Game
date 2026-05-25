@@ -107,6 +107,7 @@ let winner: number | null = null;
 let continueCountdown = 0;
 const CONTINUE_DURATION = 600; // 10秒倒计时
 let continueCursorYes = true; // Continue画面光标
+let modeSelectCursor = 0; // 模式选择光标
 let currentWinQuote = '';
 let firstAttacker: number | null = null;
 
@@ -140,9 +141,18 @@ function update(): void {
   if (phase === GamePhase.TITLE) {
     tickRef.value++;
     if (inputManager.isKeyDown('Enter') || inputManager.isKeyDown('KeyJ') || inputManager.isKeyDown('KeyR')) {
-      phase = GamePhase.SELECT;
+      phase = GamePhase.MODE_SELECT;
+      modeSelectCursor = 0;
       initAudio();
     }
+    return;
+  }
+
+  if (phase === GamePhase.MODE_SELECT) {
+    tickRef.value++;
+    if (inputManager.isKeyDown('ArrowLeft') || inputManager.isKeyDown('KeyA')) modeSelectCursor = 0;
+    if (inputManager.isKeyDown('ArrowRight') || inputManager.isKeyDown('KeyD')) modeSelectCursor = 1;
+    if (inputManager.isKeyDown('Enter') || inputManager.isKeyDown('KeyJ')) phase = GamePhase.SELECT;
     return;
   }
 
@@ -516,6 +526,10 @@ function update(): void {
 function render(): void {
   if (phase === GamePhase.TITLE) {
     renderer.drawTitle(tickRef.value);
+    return;
+  }
+  if (phase === GamePhase.MODE_SELECT) {
+    renderer.drawModeSelect(tickRef.value, modeSelectCursor);
     return;
   }
   if (phase === GamePhase.CONTINUE) {

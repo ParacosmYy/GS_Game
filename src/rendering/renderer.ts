@@ -17,7 +17,7 @@ import type { Star } from './stage.js';
 import { drawFighters as drawFightersImpl } from './rendererFighter.js';
 import { drawHUD, drawPowerGauges, drawComboCounters, drawTeamOrder, type TeamDisplayInfo } from './hud.js';
 import { drawCharacterSelect, drawIntro, drawKO } from './screens.js';
-import { drawSuperFlash, drawMatchEnd, drawModeIndicator, drawStageIndicator, drawTitle, drawContinue } from './overlayScreens.js';
+import { drawSuperFlash, drawMatchEnd, drawModeIndicator, drawStageIndicator, drawTitle, drawContinue, drawModeSelect } from './overlayScreens.js';
 import { ROSTER } from '../characters/index.js';
 import { drawProjectiles as drawProjectilesImpl } from './projectileRenderer.js';
 import type { SpriteRenderer } from './spriteRenderer.js';
@@ -178,6 +178,10 @@ export class Renderer {
 
   drawTitle(tick: number): void {
     drawTitle(this.ctx, tick);
+  }
+
+  drawModeSelect(tick: number, cursor: number): void {
+    drawModeSelect(this.ctx, tick, cursor);
   }
 
   drawContinue(secondsLeft: number, cursorYes: boolean): void {

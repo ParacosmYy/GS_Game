@@ -359,6 +359,140 @@ export function drawTitle(ctx: CanvasRenderingContext2D, tick: number): void {
   ctx.restore();
 }
 
+// ===== Mode Select Screen =====
+
+export function drawModeSelect(ctx: CanvasRenderingContext2D, tick: number, cursor: number): void {
+  ctx.save();
+
+  // Background — dark with subtle pattern
+  const grad = ctx.createLinearGradient(0, 0, 0, CANVAS_HEIGHT);
+  grad.addColorStop(0, '#08081a');
+  grad.addColorStop(0.5, '#0c0c28');
+  grad.addColorStop(1, '#060614');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+  // Animated particles
+  for (let i = 0; i < 40; i++) {
+    const x = ((i * 137 + tick * 0.2) % CANVAS_WIDTH);
+    const y = ((i * 97 + tick * 0.08) % CANVAS_HEIGHT);
+    const a = 0.15 + Math.sin(tick * 0.03 + i * 0.5) * 0.1;
+    ctx.fillStyle = `rgba(255,255,255,${a})`;
+    ctx.beginPath();
+    ctx.arc(x, y, 0.5, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // Title
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+
+  ctx.shadowColor = '#ff6600';
+  ctx.shadowBlur = 20;
+  drawSNKText(ctx, 'SELECT MODE', CANVAS_WIDTH / 2, 100, 40, '#ffcc00');
+  ctx.shadowBlur = 0;
+
+  // Decorative line
+  const lineGrad = ctx.createLinearGradient(CANVAS_WIDTH / 2 - 200, 0, CANVAS_WIDTH / 2 + 200, 0);
+  lineGrad.addColorStop(0, '#ff440000');
+  lineGrad.addColorStop(0.3, '#ff440088');
+  lineGrad.addColorStop(0.5, '#ffcc4466');
+  lineGrad.addColorStop(0.7, '#ff440088');
+  lineGrad.addColorStop(1, '#ff440000');
+  ctx.strokeStyle = lineGrad;
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(CANVAS_WIDTH / 2 - 200, 130);
+  ctx.lineTo(CANVAS_WIDTH / 2 + 200, 130);
+  ctx.stroke();
+
+  // Mode cards
+  const modes = [
+    { label: 'SINGLE BATTLE', labelCn: '单人模式', desc: '1P vs CPU/AI — Best of 3 rounds', color: '#ff4444' },
+    { label: 'TEAM BATTLE', labelCn: '组队模式 3v3', desc: '3v3 Team KOF — Coming soon!', color: '#4488ff' },
+  ];
+
+  const cardW = 280;
+  const cardH = 180;
+  const gap = 40;
+  const startX = (CANVAS_WIDTH - (modes.length * cardW + (modes.length - 1) * gap)) / 2;
+  const cardY = 180;
+
+  for (let i = 0; i < modes.length; i++) {
+    const mode = modes[i];
+    const cx = startX + i * (cardW + gap);
+    const isSelected = cursor === i;
+
+    // Card background
+    const cardGrad = ctx.createLinearGradient(cx, cardY, cx, cardY + cardH);
+    cardGrad.addColorStop(0, '#14142e');
+    cardGrad.addColorStop(1, '#0e0e20');
+    ctx.fillStyle = cardGrad;
+    roundRect(ctx, cx, cardY, cardW, cardH, 12);
+    ctx.fill();
+
+    // Selection highlight
+    if (isSelected) {
+      const pulse = 0.5 + Math.sin(tick * 0.1) * 0.3;
+      ctx.strokeStyle = mode.color;
+      ctx.lineWidth = 3;
+      ctx.globalAlpha = pulse;
+      roundRect(ctx, cx - 4, cardY - 4, cardW + 8, cardH + 8, 14);
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+
+      // Glow
+      const glowGrad = ctx.createRadialGradient(cx + cardW / 2, cardY + cardH / 2, 10, cx + cardW / 2, cardY + cardH / 2, cardW * 0.6);
+      glowGrad.addColorStop(0, mode.color + '15');
+      glowGrad.addColorStop(1, mode.color + '00');
+      ctx.fillStyle = glowGrad;
+      ctx.fillRect(cx, cardY, cardW, cardH);
+    } else {
+      ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+      ctx.lineWidth = 1;
+      roundRect(ctx, cx, cardY, cardW, cardH, 12);
+      ctx.stroke();
+    }
+
+    // Mode icon
+    ctx.fillStyle = mode.color + (isSelected ? 'cc' : '44');
+    ctx.beginPath();
+    if (i === 0) {
+      // Single icon — circle
+      ctx.arc(cx + cardW / 2, cardY + 55, 25, 0, Math.PI * 2);
+    } else {
+      // Team icon — three circles
+      for (let j = -1; j <= 1; j++) {
+        ctx.moveTo(cx + cardW / 2 + j * 22 + 12, cardY + 55);
+        ctx.arc(cx + cardW / 2 + j * 22, cardY + 55, 12, 0, Math.PI * 2);
+      }
+    }
+    ctx.fill();
+
+    // Mode label
+    drawSNKText(ctx, mode.label, cx + cardW / 2, cardY + 100, 18, isSelected ? mode.color : '#888888');
+    drawSNKText(ctx, mode.labelCn, cx + cardW / 2, cardY + 125, 14, isSelected ? '#ffffff' : '#666666');
+
+    // Description
+    ctx.font = '11px monospace';
+    ctx.fillStyle = '#555566';
+    ctx.fillText(mode.desc, cx + cardW / 2, cardY + 155);
+
+    // Coming soon overlay for team mode
+    if (i === 1) {
+      ctx.fillStyle = 'rgba(0,0,0,0.5)';
+      roundRect(ctx, cx, cardY, cardW, cardH, 12);
+      ctx.fill();
+      drawSNKText(ctx, 'COMING SOON', cx + cardW / 2, cardY + cardH / 2, 22, '#ffcc00');
+    }
+  }
+
+  // Instructions
+  drawSNKText(ctx, 'A/D or Arrow Keys: Select  |  Enter/J: Confirm', CANVAS_WIDTH / 2, 420, 12, '#444455');
+
+  ctx.restore();
+}
+
 // ===== Continue Screen =====
 
 export function drawContinue(ctx: CanvasRenderingContext2D, secondsLeft: number, cursorYes: boolean): void {

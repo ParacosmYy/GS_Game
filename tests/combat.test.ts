@@ -518,12 +518,12 @@ describe('Counter Wire + Guard Crush Systems', () => {
     expect(f.guardCrushTimer).toBe(0);
   });
 
-  it('Guard Crush: guardGauge非防御时每帧恢复0.5', () => {
+  it('Guard Crush: guardGauge非防御时每帧恢复0.25', () => {
     const f = new Fighter(400, '#ff6600', 1);
     f.guardGauge = 80;
     f.state = FighterState.IDLE;
     f.tickTimers();
-    expect(f.guardGauge).toBe(80.5);
+    expect(f.guardGauge).toBe(80.25);
   });
 
   it('Counter Wire: isCounterWire标志可以在reset中清除', () => {

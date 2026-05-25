@@ -145,6 +145,17 @@ const FRAME_DATA_GENERIC = {
     damage: 48, hitstun: 20, blockstun: 17, pushback: 5,
     hitLevel: 'HIGH' as const, knockdown: true,
   },
+  // Mai 命令通常技
+  MAI_HISSATSU_SHINOBIBACHI: {
+    startup: 16, active: 4, recovery: 20,
+    damage: 46, hitstun: 19, blockstun: 16, pushback: 3,
+    hitLevel: 'HIGH' as const, knockdown: false,
+  },
+  MAI_YUSURA_UMA: {
+    startup: 9, active: 4, recovery: 21,
+    damage: 40, hitstun: 18, blockstun: 15, pushback: 2,
+    hitLevel: 'LOW' as const, knockdown: false,
+  },
   ROBERT_GENEI_KYAKU_CMD: {
     startup: 14, active: 4, recovery: 18,
     damage: 44, hitstun: 19, blockstun: 16, pushback: 3,

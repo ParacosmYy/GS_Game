@@ -40,6 +40,9 @@ export const HITBOX_OFFSETS = {
   // Leona 命令通常技
   LEONA_STRIKE_ARC: { offsetX: 55, offsetY: -110, width: 75, height: 40 },
   LEONA_STRIKE_DASH: { offsetX: 40, offsetY: -80, width: 60, height: 55 },
+  // Mai 命令通常技
+  MAI_HISSATSU_SHINOBIBACHI: { offsetX: 55, offsetY: -110, width: 75, height: 45 },
+  MAI_YUSURA_UMA: { offsetX: 65, offsetY: -20, width: 75, height: 25 },
   // 蹲下 — 低位置
   CROUCH_A: { offsetX: 65, offsetY: -70, width: 55, height: 30 },
   CROUCH_B: { offsetX: 65, offsetY: -30, width: 75, height: 30 },
@@ -138,6 +141,12 @@ export const HITBOX_OFFSETS = {
   KULA_LAY: { offsetX: 60, offsetY: -50, width: 75, height: 40 },
   KULA_EDGE: { offsetX: 62, offsetY: -50, width: 65, height: 38 },
   DM_FREEZE: { offsetX: 45, offsetY: -130, width: 90, height: 70 },
+  // 不知火舞 (Mai)
+  MAI_KA_CHO_SEN: { offsetX: 70, offsetY: -110, width: 55, height: 40 },
+  MAI_KA_CHO_SEN_C: { offsetX: 70, offsetY: -110, width: 58, height: 42 },
+  MAI_HISHO_RYU_EN_JIN: { offsetX: 40, offsetY: -160, width: 60, height: 70 },
+  MAI_RYU_EN_BU: { offsetX: 60, offsetY: -100, width: 70, height: 50 },
+  DM_HAKA_OTOSHI: { offsetX: 50, offsetY: -120, width: 95, height: 75 },
   // ── SDM hitboxes (larger than DM) ──
   SDM_OROCHINAGI: { offsetX: 50, offsetY: -120, width: 100, height: 80 },
   SDM_YATAGARASU: { offsetX: 45, offsetY: -140, width: 95, height: 85 },
@@ -161,4 +170,17 @@ export const HITBOX_OFFSETS = {
   DM_HAOU_SHOKOU: { offsetX: 50, offsetY: -120, width: 100, height: 75 },
   SDM_RYU_KO_RYU: { offsetX: 45, offsetY: -140, width: 95, height: 80 },
   SDM_HAOU_SHOKOU: { offsetX: 50, offsetY: -130, width: 100, height: 80 },
+  // 不知火舞SDM (Mai)
+  SDM_HAKA_OTOSHI: { offsetX: 50, offsetY: -130, width: 100, height: 80 },
+  // 雅典娜 (Athena)
+  ATHENA_PHOENIX_REFLECT: { offsetX: 60, offsetY: -100, width: 55, height: 45 },
+  ATHENA_LOW_B: { offsetX: 55, offsetY: -45, width: 60, height: 40 },
+  ATHENA_AIR_B: { offsetX: 50, offsetY: -70, width: 55, height: 45 },
+  ATHENA_PSYCHO_BALL: { offsetX: 65, offsetY: -100, width: 50, height: 40 },
+  ATHENA_PSYCHO_BALL_C: { offsetX: 65, offsetY: -100, width: 55, height: 45 },
+  ATHENA_PSYCHO_SWORD: { offsetX: 40, offsetY: -140, width: 60, height: 65 },
+  ATHENA_PSYCHO_SWORD_C: { offsetX: 40, offsetY: -140, width: 65, height: 70 },
+  ATHENA_PHOENIX_ARROW: { offsetX: 55, offsetY: -80, width: 70, height: 55 },
+  DM_SHINING_CRYSTAL_BIT: { offsetX: 50, offsetY: -130, width: 100, height: 80 },
+  SDM_SHINING_CRYSTAL_BIT: { offsetX: 50, offsetY: -140, width: 105, height: 85 },
 } as const;

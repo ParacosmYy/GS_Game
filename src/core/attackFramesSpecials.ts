@@ -438,3 +438,107 @@ export const DM_V_SLASHER_FRAMES: AttackFrame[] = [
     F([{ ox: 28 - i * 0.3, oy: -68 + i * 0.5, w: 58 - i * 1.5, h: 46 - i }])
   ),
 ];
+
+// ===== 雅典娜 (Athena Asamiya) =====
+export const ATHENA_PSYCHO_BALL_FRAMES: AttackFrame[] = [
+  F([{ ox: 48, oy: -58, w: 36, h: 28 }]),
+];
+
+export const ATHENA_PSYCHO_BALL_C_FRAMES: AttackFrame[] = [
+  F([{ ox: 48, oy: -58, w: 40, h: 32 }]),
+];
+
+export const ATHENA_PSYCHO_SWORD_FRAMES: AttackFrame[] = [
+  F([{ ox: 28, oy: -78, w: 42, h: 44 }], { ox: 5, oy: -10, w: -15, h: -28 }),
+  F([{ ox: 34, oy: -85, w: 46, h: 48 }], { ox: 5, oy: -10, w: -15, h: -28 }),
+  F([{ ox: 36, oy: -88, w: 48, h: 50 }]),
+  F([{ ox: 34, oy: -80, w: 44, h: 45 }]),
+  F([{ ox: 30, oy: -70, w: 40, h: 40 }]),
+];
+
+export const ATHENA_PSYCHO_SWORD_C_FRAMES: AttackFrame[] = [
+  F([{ ox: 28, oy: -78, w: 42, h: 44 }], { ox: 5, oy: -10, w: -15, h: -28 }),
+  F([{ ox: 34, oy: -85, w: 46, h: 48 }], { ox: 5, oy: -10, w: -15, h: -28 }),
+  F([{ ox: 36, oy: -88, w: 48, h: 50 }], { ox: 5, oy: -10, w: -15, h: -28 }),
+  F([{ ox: 36, oy: -88, w: 48, h: 50 }]),
+  F([{ ox: 34, oy: -85, w: 46, h: 48 }]),
+  F([{ ox: 34, oy: -80, w: 44, h: 45 }]),
+  F([{ ox: 30, oy: -70, w: 40, h: 40 }]),
+  F([{ ox: 26, oy: -58, w: 36, h: 35 }]),
+  F([{ ox: 24, oy: -48, w: 32, h: 30 }]),
+  F([{ ox: 22, oy: -40, w: 28, h: 28 }]),
+];
+
+export const ATHENA_PHOENIX_ARROW_FRAMES: AttackFrame[] = [
+  F([{ ox: 35, oy: -45, w: 45, h: 38 }]),
+  F([{ ox: 42, oy: -42, w: 52, h: 42 }]),
+  F([{ ox: 48, oy: -38, w: 58, h: 45 }]),
+  F([{ ox: 48, oy: -38, w: 58, h: 45 }]),
+  F([{ ox: 45, oy: -42, w: 52, h: 42 }]),
+  F([{ ox: 42, oy: -45, w: 48, h: 38 }]),
+  F([{ ox: 38, oy: -48, w: 45, h: 36 }]),
+  F([{ ox: 35, oy: -50, w: 42, h: 34 }]),
+];
+
+export const DM_SHINING_CRYSTAL_BIT_FRAMES: AttackFrame[] = [
+  F([{ ox: 30, oy: -65, w: 55, h: 45 }]),
+  F([{ ox: 36, oy: -62, w: 65, h: 50 }]),
+  F([{ ox: 40, oy: -60, w: 72, h: 52 }]),
+  F([{ ox: 40, oy: -60, w: 78, h: 55 }]),
+  F([{ ox: 40, oy: -60, w: 80, h: 58 }]),
+  F([{ ox: 40, oy: -60, w: 80, h: 58 }]),
+  F([{ ox: 38, oy: -62, w: 75, h: 55 }]),
+  ...Array.from({ length: 18 }, (_, i) =>
+    F([{ ox: 30 - i * 0.3, oy: -65 + i * 0.5, w: 55 - i * 1.5, h: 44 - i }])
+  ),
+];
+
+// ===== 不知火舞 (Mai Shiranui) =====
+export const MAI_KA_CHO_SEN_FRAMES: AttackFrame[] = [
+  F([{ ox: 50, oy: -58, w: 35, h: 28 }]),
+  F([{ ox: 55, oy: -56, w: 38, h: 30 }]),
+  ...Array.from({ length: 16 }, (_, i) =>
+    F([{ ox: 55 + i * 2, oy: -56, w: 35, h: 28 }])
+  ),
+];
+
+export const MAI_KA_CHO_SEN_C_FRAMES: AttackFrame[] = [
+  F([{ ox: 50, oy: -58, w: 38, h: 30 }]),
+  F([{ ox: 55, oy: -56, w: 42, h: 32 }]),
+  ...Array.from({ length: 20 }, (_, i) =>
+    F([{ ox: 55 + i * 2, oy: -56, w: 38, h: 30 }])
+  ),
+];
+
+export const MAI_HISHO_RYU_EN_JIN_FRAMES: AttackFrame[] = [
+  F([{ ox: 25, oy: -80, w: 40, h: 45 }], { ox: 5, oy: -10, w: -15, h: -30 }),
+  F([{ ox: 30, oy: -85, w: 42, h: 48 }], { ox: 5, oy: -10, w: -15, h: -30 }),
+  F([{ ox: 28, oy: -75, w: 38, h: 40 }]),
+  F([{ ox: 25, oy: -65, w: 35, h: 35 }]),
+  F([{ ox: 22, oy: -55, w: 30, h: 30 }]),
+  F([{ ox: 20, oy: -50, w: 28, h: 28 }]),
+];
+
+export const MAI_RYU_EN_BU_FRAMES: AttackFrame[] = [
+  F([{ ox: 35, oy: -50, w: 45, h: 35 }]),
+  F([{ ox: 42, oy: -48, w: 52, h: 38 }]),
+  F([{ ox: 48, oy: -45, w: 58, h: 40 }]),
+  F([{ ox: 48, oy: -45, w: 58, h: 40 }]),
+  F([{ ox: 45, oy: -48, w: 52, h: 38 }]),
+  F([{ ox: 40, oy: -50, w: 48, h: 35 }]),
+  F([{ ox: 35, oy: -52, w: 42, h: 32 }]),
+  F([{ ox: 30, oy: -55, w: 38, h: 30 }]),
+];
+
+export const DM_HAKA_OTOSHI_FRAMES: AttackFrame[] = [
+  F([{ ox: 30, oy: -65, w: 55, h: 45 }]),
+  F([{ ox: 36, oy: -62, w: 65, h: 50 }]),
+  F([{ ox: 40, oy: -60, w: 72, h: 52 }]),
+  F([{ ox: 40, oy: -60, w: 78, h: 55 }]),
+  F([{ ox: 40, oy: -60, w: 80, h: 58 }]),
+  F([{ ox: 40, oy: -60, w: 80, h: 58 }]),
+  F([{ ox: 38, oy: -62, w: 75, h: 55 }]),
+  F([{ ox: 35, oy: -65, w: 68, h: 50 }]),
+  F([{ ox: 32, oy: -68, w: 60, h: 45 }]),
+  F([{ ox: 30, oy: -70, w: 55, h: 42 }]),
+];

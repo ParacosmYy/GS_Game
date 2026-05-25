@@ -69,6 +69,18 @@ export const COMBO_ROUTES: Record<string, ComboStep[]> = {
     { type: 'special', attack: 'robertRyuZan', delay: 3 },
     { type: 'special', attack: 'dmRyuKoRyu',  delay: 4 },
   ],
+  athena: [
+    { type: 'button',  attack: 'closeC',     delay: 0 },
+    { type: 'button',  attack: 'athenaPhoenixReflect', delay: 2 },
+    { type: 'special', attack: 'athenaPsychoBall', delay: 3 },
+    { type: 'special', attack: 'dmShiningCrystalBit', delay: 4 },
+  ],
+  mai: [
+    { type: 'button',  attack: 'closeC',     delay: 0 },
+    { type: 'button',  attack: 'maiShinobibachi', delay: 2 },
+    { type: 'special', attack: 'maiKaChoSen', delay: 3 },
+    { type: 'special', attack: 'dmHakaOtoshi', delay: 4 },
+  ],
   _default: [
     { type: 'button',  attack: 'closeC', delay: 0 },
     { type: 'button',  attack: 'standA',  delay: 2 },
@@ -108,6 +120,10 @@ export function applyComboStep(step: ComboStep, base: ResolvedInput): void {
         base.forward = true; base.buttonB = true; base.buttonBPressed = true; base.kickPressed = true; break;
       case 'robertGeneiKyaku':
         base.forward = true; base.buttonA = true; base.buttonAPressed = true; base.punchPressed = true; break;
+      case 'athenaPhoenixReflect':
+        base.forward = true; base.buttonB = true; base.buttonBPressed = true; base.kickPressed = true; break;
+      case 'maiShinobibachi':
+        base.forward = true; base.buttonB = true; base.buttonBPressed = true; base.kickPressed = true; break;
       case 'jumpC':
         base.buttonC = true; base.buttonCPressed = true; base.punchPressed = true; break;
     }
@@ -145,6 +161,8 @@ export function routeComboSpecial(
     case 'kula': return routeKula(attack);
     case 'leona': return routeLeona(attack);
     case 'robert': return routeRobert(attack);
+    case 'athena': return routeAthena(attack);
+    case 'mai': return routeMai(attack);
     default: return null;
   }
 }
@@ -226,5 +244,24 @@ function routeRobert(attack: string): AttackType | null {
     case 'dmRyuKoRyu': return AttackType.DM_RYU_KO_RYU;
     case 'dmHaouShokou': return AttackType.DM_HAOU_SHOKOU;
     default: return AttackType.ROBERT_RYU_ZAN;
+  }
+}
+
+function routeAthena(attack: string): AttackType | null {
+  switch (attack) {
+    case 'athenaPsychoBall': return AttackType.ATHENA_PSYCHO_BALL;
+    case 'athenaPsychoSword': return AttackType.ATHENA_PSYCHO_SWORD;
+    case 'dmShiningCrystalBit': return AttackType.DM_SHINING_CRYSTAL_BIT;
+    default: return AttackType.ATHENA_PSYCHO_SWORD;
+  }
+}
+
+function routeMai(attack: string): AttackType | null {
+  switch (attack) {
+    case 'maiKaChoSen': return AttackType.MAI_KA_CHO_SEN;
+    case 'maiHishoRyuEnJin': return AttackType.MAI_HISHO_RYU_EN_JIN;
+    case 'maiRyuEnBu': return AttackType.MAI_RYU_EN_BU;
+    case 'dmHakaOtoshi': return AttackType.DM_HAKA_OTOSHI;
+    default: return AttackType.MAI_HISHO_RYU_EN_JIN;
   }
 }

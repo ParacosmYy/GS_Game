@@ -14,7 +14,8 @@ import { LeonaDef } from './leona.js';
 import { KulaDef } from './kula.js';
 import { KdashDef } from './kdash.js';
 import { RobertDef } from './robert.js';
-
+import { AthenaDef } from './athena.js';
+import { MaiDef } from './mai.js';
 export type { CharacterDefinition } from './types.js';
 
 /** 全角色列表 — 选人界面和游戏初始化都从这里读取 */
@@ -28,4 +29,6 @@ export const ROSTER: CharacterDefinition[] = [
   KulaDef,
   KdashDef,
   RobertDef,
+  AthenaDef,
+  MaiDef,
 ];

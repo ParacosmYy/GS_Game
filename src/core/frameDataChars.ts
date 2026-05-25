@@ -326,6 +326,32 @@ export const FRAME_DATA_CHARS = {
     damage: 200, hitstun: 0, blockstun: 22, pushback: 10,
     hitLevel: 'MID' as const, knockdown: true, chipDamage: 20,
   },
+  // ── 不知火舞必杀技 (Mai Shiranui) ──
+  MAI_KA_CHO_SEN: {
+    startup: 12, active: 18, recovery: 30,
+    damage: 70, hitstun: 28, blockstun: 26, pushback: 4,
+    hitLevel: 'MID' as const, knockdown: false, chipDamage: 8,
+  },
+  MAI_KA_CHO_SEN_C: {
+    startup: 14, active: 22, recovery: 28,
+    damage: 100, hitstun: 30, blockstun: 28, pushback: 5,
+    hitLevel: 'MID' as const, knockdown: false, chipDamage: 10,
+  },
+  MAI_HISHO_RYU_EN_JIN: {
+    startup: 5, active: 6, recovery: 24,
+    damage: 80, hitstun: 22, blockstun: 18, pushback: 6,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 10,
+  },
+  MAI_RYU_EN_BU: {
+    startup: 10, active: 8, recovery: 22,
+    damage: 85, hitstun: 22, blockstun: 18, pushback: 5,
+    hitLevel: 'MID' as const, knockdown: true,
+  },
+  DM_HAKA_OTOSHI: {
+    startup: 8, active: 10, recovery: 40,
+    damage: 200, hitstun: 0, blockstun: 22, pushback: 10,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 18,
+  },
   // K' 必杀技
   KDASH_EINS: {
     startup: 12, active: 25, recovery: 18,
@@ -449,5 +475,65 @@ export const FRAME_DATA_CHARS = {
     startup: 10, active: 14, recovery: 38,
     damage: 300, hitstun: 0, blockstun: 22, pushback: 12,
     hitLevel: 'MID' as const, knockdown: true, chipDamage: 32,
+  },
+  // ── 不知火舞SDM (Mai Shiranui) ──
+  SDM_HAKA_OTOSHI: {
+    startup: 8, active: 15, recovery: 40,
+    damage: 300, hitstun: 0, blockstun: 22, pushback: 12,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 28,
+  },
+  // ── 雅典娜命令通常技 (Athena Asamiya) ──
+  ATHENA_PHOENIX_REFLECT: {
+    startup: 16, active: 4, recovery: 20,
+    damage: 45, hitstun: 19, blockstun: 17, pushback: 3,
+    hitLevel: 'HIGH' as const, knockdown: false,
+  },
+  ATHENA_LOW_B: {
+    startup: 8, active: 4, recovery: 20,
+    damage: 40, hitstun: 18, blockstun: 15, pushback: 2,
+    hitLevel: 'LOW' as const, knockdown: false,
+  },
+  ATHENA_AIR_B: {
+    startup: 7, active: 6, recovery: 3,
+    damage: 42, hitstun: 19, blockstun: 17, pushback: 4,
+    hitLevel: 'HIGH' as const, knockdown: false,
+  },
+  // ── 雅典娜必杀技 (Athena Asamiya) ── APPROX based on KOF2002UM frame data
+  ATHENA_PSYCHO_BALL: {
+    startup: 12, active: 22, recovery: 32,
+    damage: 70, hitstun: 28, blockstun: 26, pushback: 4,
+    hitLevel: 'MID' as const, knockdown: false, chipDamage: 8,
+  },
+  ATHENA_PSYCHO_BALL_C: {
+    startup: 14, active: 26, recovery: 30,
+    damage: 100, hitstun: 30, blockstun: 28, pushback: 5,
+    hitLevel: 'MID' as const, knockdown: false, chipDamage: 10,
+  },
+  ATHENA_PSYCHO_SWORD: {
+    startup: 5, active: 5, recovery: 26,
+    damage: 80, hitstun: 22, blockstun: 18, pushback: 6,
+    hitLevel: 'MID' as const, knockdown: false, chipDamage: 10,
+  },
+  ATHENA_PSYCHO_SWORD_C: {
+    startup: 7, active: 10, recovery: 30,
+    damage: 140, hitstun: 28, blockstun: 22, pushback: 10,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 14,
+  },
+  ATHENA_PHOENIX_ARROW: {
+    startup: 6, active: 10, recovery: 18,
+    damage: 75, hitstun: 22, blockstun: 18, pushback: 5,
+    hitLevel: 'MID' as const, knockdown: true,
+  },
+  // ── 雅典娜DM (Athena) ──
+  DM_SHINING_CRYSTAL_BIT: {
+    startup: 8, active: 12, recovery: 40,
+    damage: 200, hitstun: 0, blockstun: 22, pushback: 10,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 18,
+  },
+  // ── 雅典娜SDM (Athena) ──
+  SDM_SHINING_CRYSTAL_BIT: {
+    startup: 8, active: 18, recovery: 38,
+    damage: 300, hitstun: 0, blockstun: 22, pushback: 12,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 30,
   },
 } as const;

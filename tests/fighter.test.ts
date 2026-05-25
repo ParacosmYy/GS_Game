@@ -72,7 +72,7 @@ describe('Fighter', () => {
       const f = createFighter();
       f.startAttack(AttackType.STAND_A);
 
-      // STAND_A startup=5 (KOF2002UM Kyo, Dream Cancel Wiki)
+      // STAND_A startup=6 (KOF2002UM average, SuperCombo Wiki)
       expect(f.attackPhase).toBe('startup');
       expect(f.attackFrame).toBe(0);
       f.tickAttack(); // frame 0 → 1
@@ -83,12 +83,13 @@ describe('Fighter', () => {
       expect(f.attackFrame).toBe(3);
       f.tickAttack(); // frame 3 → 4
       expect(f.attackFrame).toBe(4);
-      f.tickAttack(); // frame 4 → startup done, active starts, frame reset to 0
+      f.tickAttack(); // frame 4 → 5
+      expect(f.attackFrame).toBe(5);
+      f.tickAttack(); // frame 5 → startup done, active starts, frame reset to 0
       expect(f.attackPhase).toBe('active');
       expect(f.attackFrame).toBe(0);
 
-      // active: 4帧
-      f.tickAttack();
+      // active: 3帧
       f.tickAttack();
       f.tickAttack();
       f.tickAttack(); // active done, recovery starts
@@ -287,10 +288,10 @@ describe('Fighter', () => {
       expect(f.isThrowVulnerable()).toBe(false);
     });
 
-    it('ROLL 状态下 isThrowVulnerable() 应该返回 false', () => {
+    it('ROLL 状态下 isThrowVulnerable() 应该返回 true (KOF2002: 普通滚动任何时候都可以被抓)', () => {
       const f = createFighter();
       f.state = FighterState.ROLL;
-      expect(f.isThrowVulnerable()).toBe(false);
+      expect(f.isThrowVulnerable()).toBe(true);
     });
 
     it('throwInvulnFrames > 0 时 isThrowVulnerable() 应该返回 false', () => {
@@ -381,8 +382,8 @@ describe('Fighter', () => {
       expect(THROW_INVINCIBILITY_WAKEUP).toBe(9);
     });
 
-    it('POST_STUN 投技无敌应为 9 帧', () => {
-      expect(THROW_INVINCIBILITY_POST_STUN).toBe(9);
+    it('POST_STUN 投技无敌应为 7 帧 (KOF2002: 7F)', () => {
+      expect(THROW_INVINCIBILITY_POST_STUN).toBe(7);
     });
 
     it('POST_ESCAPE 投技无敌应为 6 帧', () => {
