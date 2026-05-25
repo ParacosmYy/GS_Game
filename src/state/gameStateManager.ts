@@ -30,6 +30,7 @@ export class GameStateManager {
   koGroundSlamDone = false;
   firstHitTracked = false;
   announceSequence: AnnounceSequence = new AnnounceSequence();
+  titleBgmStarted = false;
 
   setPhase(p: GamePhase): void {
     this.phase = p;
@@ -47,6 +48,7 @@ export class GameStateManager {
     this.currentWinQuote = '';
     this.winQuoteTimer = 0;
     this.debugMode = false;
+    this.titleBgmStarted = false;
   }
 
   resetForNextRound(): void {

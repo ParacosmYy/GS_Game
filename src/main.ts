@@ -39,7 +39,7 @@ import { GameStateManager } from './state/gameStateManager.js';
 import { gameRandom, gameRandomInt } from './core/prng.js';
 import { InputLogger } from './core/inputLog.js';
 import { ReplaySession } from './core/replaySession.js';
-import { createRoundStartSequence, createKOSequence, createTimeOverSequence } from './state/announcePresets.js';
+import { createRoundStartSequence, createKOSequence, createTimeOverSequence, createWinnerSequence } from './state/announcePresets.js';
 
 const canvas = document.getElementById('gameCanvas') as HTMLCanvasElement;
 const ctx = canvas.getContext('2d')!;
@@ -133,7 +133,14 @@ function update(): void {
 
   if (gs.phase === GamePhase.TITLE) {
     tickRef.value++;
+    // Start title BGM on first frame of TITLE phase
+    if (!gs.titleBgmStarted) {
+      gs.titleBgmStarted = true;
+      bgm.start('title');
+    }
     if (inputManager.isKeyDown('Enter') || inputManager.isKeyDown('KeyJ') || inputManager.isKeyDown('KeyR')) {
+      bgm.stop();
+      gs.titleBgmStarted = false;
       gs.setPhase(GamePhase.MODE_SELECT);
       gs.modeSelectCursor = 0;
       initAudio();
@@ -317,6 +324,12 @@ function update(): void {
           gs.setPhase(GamePhase.MATCH_END);
           gs.koTimer = 0;
           announcer.winner();
+          {
+            const matchWinner = !p1Team.alive ? 1 : 0;
+            const wf = matchWinner === 0 ? p1 : p2;
+            const wc = ROSTER.find(c => c.id === wf.charId);
+            gs.announceSequence.setSteps(createWinnerSequence(wc?.nameCn ?? ''));
+          }
           return;
         }
       }
@@ -325,6 +338,11 @@ function update(): void {
         gs.setPhase(GamePhase.MATCH_END);
         gs.koTimer = 0;
         announcer.winner();
+        {
+          const wf = matchWinner === 0 ? p1 : p2;
+          const wc = ROSTER.find(c => c.id === wf.charId);
+          gs.announceSequence.setSteps(createWinnerSequence(wc?.nameCn ?? ''));
+        }
       } else {
         rounds.currentRound++;
         rounds.resetForNextRound();
@@ -346,7 +364,15 @@ function update(): void {
   if (gs.phase === GamePhase.MATCH_END) {
     gs.koTimer++;
     if (!cinematic.victoryFanfarePlayed) { cinematic.victoryFanfarePlayed = true; playVictoryFanfare(); }
+    // Tick announce sequence for winner name animation
+    if (gs.announceSequence.isRunning()) {
+      const sfxId = gs.announceSequence.tick();
+      if (sfxId === 'victory') {
+        // Victory fanfare already played above, announce sequence is visual only
+      }
+    }
     if (gs.koTimer > 180 || (gs.koTimer > 60 && (inputManager.isKeyDown('KeyR') || inputManager.isKeyDown('KeyJ') || inputManager.isKeyDown('Enter')))) {
+      gs.announceSequence.reset();
       gs.setPhase(GamePhase.CONTINUE);
       gs.continueCountdown = CONTINUE_DURATION;
       gs.continueCursorYes = true;
@@ -729,6 +755,9 @@ function render(): void {
   if (gs.phase === GamePhase.MATCH_END) {
     if (gs.winner !== null) { const w = gs.winner === 0 ? p1 : p2; drawVictoryPose(ctx, w.x - camera.x, w.y, w.facing, w.color, '#ffffff30', tickRef.value, w.charId); }
     renderer.drawMatchEnd(gs.winner, rounds.p1Wins, rounds.p2Wins, gs.currentWinQuote || undefined, gs.winner !== null ? (gs.winner === 0 ? '#ff6644' : '#4488ff') : undefined, gs.phaseTimer, gs.winner !== null ? (gs.winner === 0 ? p1 : p2).charId ?? undefined : undefined);
+    if (gs.announceSequence.isRunning()) {
+      drawAnnounceSequence(ctx, gs.announceSequence, canvas.width, canvas.height);
+    }
   }
   if (rounds.fadeAlpha > 0) { ctx.fillStyle = `rgba(0,0,0,${rounds.fadeAlpha})`; ctx.fillRect(0, 0, canvas.width, canvas.height); }
   screenFlash.render(ctx, canvas.width, canvas.height);

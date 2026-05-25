@@ -153,98 +153,99 @@ export const FRAME_DATA_CHARS = {
     damage: 342, hitstun: 0, blockstun: 21, pushback: 12,
     hitLevel: 'MID' as const, knockdown: true, chipDamage: 30,
   },
-  // ── 八神庵必杀技 (Iori Yagami) ── APPROX (OG): SuperCombo Wiki KOF2002原版
-  // 葵花 qcb+A (rekka 1段)
+  // ── 八神庵必杀技 (Iori Yagami) ── Dream Cancel Wiki KOF2002UM 精确数据
+  // 葵花 qcb+A (rekka A版 1段)
   IORI_AOIHANA: {
-    startup: 8, active: 3, recovery: 26,
-    damage: 50, hitstun: 19, blockstun: 17, pushback: 3,
+    startup: 5, active: 4, recovery: 18,
+    damage: 60, hitstun: 22, blockstun: 18, pushback: 7,
     hitLevel: 'MID' as const, knockdown: false,
   },
-  // 葵花 2段
+  // 葵花 A版 2段
   IORI_AOIHANA_2: {
-    startup: 7, active: 3, recovery: 28,
-    damage: 45, hitstun: 19, blockstun: 17, pushback: 3,
+    startup: 7, active: 4, recovery: 18,
+    damage: 50, hitstun: 22, blockstun: 18, pushback: 7,
     hitLevel: 'MID' as const, knockdown: true,
   },
-  // 葵花 3段 (overhead HKD)
+  // 葵花 A版 3段 (overhead HKD)
   IORI_AOIHANA_3: {
-    startup: 17, active: 2, recovery: 29,
-    damage: 60, hitstun: 19, blockstun: 17, pushback: 5,
+    startup: 5, active: 4, recovery: 18,
+    damage: 60, hitstun: 22, blockstun: 18, pushback: 7,
     hitLevel: 'MID' as const, knockdown: true,
   },
-  // 葵花 C版 1段 APPROX (OG)
+  // 葵花 C版 1段
   IORI_AOIHANA_C: {
-    startup: 11, active: 3, recovery: 28,
-    damage: 60, hitstun: 19, blockstun: 17, pushback: 4,
+    startup: 4, active: 6, recovery: 22,
+    damage: 90, hitstun: 26, blockstun: 20, pushback: 8,
     hitLevel: 'MID' as const, knockdown: false,
   },
-  // 葵花 C版 2段 APPROX (OG)
+  // 葵花 C版 2段
   IORI_AOIHANA_C_2: {
-    startup: 11, active: 3, recovery: 29,
-    damage: 50, hitstun: 19, blockstun: 17, pushback: 3,
+    startup: 4, active: 6, recovery: 22,
+    damage: 80, hitstun: 26, blockstun: 20, pushback: 8,
     hitLevel: 'MID' as const, knockdown: true,
   },
-  // 葵花 C版 3段 (overhead, 长active) APPROX (OG)
+  // 葵花 C版 3段 (overhead, HKD)
   IORI_AOIHANA_C_3: {
-    startup: 17, active: 9, recovery: 31,
-    damage: 70, hitstun: 19, blockstun: 17, pushback: 5,
+    startup: 4, active: 6, recovery: 22,
+    damage: 90, hitstun: 26, blockstun: 20, pushback: 8,
     hitLevel: 'MID' as const, knockdown: true,
   },
-  // 暗払い qcf+A (飞行道具) APPROX (OG)
+  // 闇払い qcf+A (飞行道具 弱版)
   IORI_YAMIBARAI: {
-    startup: 10, active: 20, recovery: 39,
-    damage: 70, hitstun: 28, blockstun: 26, pushback: 4,
-    hitLevel: 'MID' as const, knockdown: false, chipDamage: 8,
+    startup: 14, active: 3, recovery: 18,
+    damage: 55, hitstun: 25, blockstun: 23, pushback: 5,
+    hitLevel: 'MID' as const, knockdown: false, chipDamage: 6,
   },
+  // 闇払い qcf+C (飞行道具 强版)
   IORI_YAMIBARAI_C: {
-    startup: 9, active: 22, recovery: 40,
-    damage: 100, hitstun: 30, blockstun: 28, pushback: 5,
-    hitLevel: 'MID' as const, knockdown: false, chipDamage: 10,
+    startup: 17, active: 5, recovery: 22,
+    damage: 70, hitstun: 28, blockstun: 25, pushback: 6,
+    hitLevel: 'MID' as const, knockdown: false, chipDamage: 7,
   },
-  // 鬼焼き dp+A (2段) APPROX (OG)
+  // 鬼焼き dp+A (弱版 升龙)
   IORI_ONIYAKI: {
-    startup: 5, active: 8, recovery: 27,
-    damage: 80, hitstun: 22, blockstun: 18, pushback: 6,
-    hitLevel: 'MID' as const, knockdown: true, chipDamage: 10,
+    startup: 5, active: 4, recovery: 18,
+    damage: 60, hitstun: 22, blockstun: 18, pushback: 7,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 6,
   },
-  // 鬼焼き dp+C (3段, 全身无敌) APPROX (OG)
+  // 鬼焼き dp+C (强版 升龙, 全身无敌)
   IORI_ONIYAKI_C: {
-    startup: 5, active: 14, recovery: 41,
-    damage: 140, hitstun: 28, blockstun: 22, pushback: 10,
-    hitLevel: 'MID' as const, knockdown: true, chipDamage: 14,
+    startup: 4, active: 6, recovery: 22,
+    damage: 90, hitstun: 26, blockstun: 20, pushback: 8,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 9,
   },
-  // 琴月 陰 hcb+B (半屏冲刺HKD) APPROX (OG)
+  // 琴月陰 hcb+B (弱版 冲刺HKD)
   IORI_KOTOTSUKI: {
-    startup: 6, active: 16, recovery: 14,
-    damage: 95, hitstun: 0, blockstun: 0, pushback: 0,
+    startup: 10, active: 5, recovery: 15,
+    damage: 60, hitstun: 20, blockstun: 18, pushback: 5,
     hitLevel: 'MID' as const, knockdown: true,
   },
-  // 琴月 陰 hcb+D (全屏) APPROX (OG)
+  // 琴月陰 hcb+D (强版 全屏冲刺HKD)
   IORI_KOTOTSUKI_D: {
-    startup: 6, active: 24, recovery: 14,
-    damage: 110, hitstun: 0, blockstun: 0, pushback: 0,
+    startup: 11, active: 6, recovery: 20,
+    damage: 80, hitstun: 24, blockstun: 20, pushback: 6,
     hitLevel: 'MID' as const, knockdown: true,
   },
-  // 逆剥ぎ hcb,f+P (指令投, 换边) APPROX (OG)
+  // 逆剥ぎ hcb,f+P (指令投, 换边)
   IORI_KUZUKAZE: {
-    startup: 11, active: 1, recovery: 31,
-    damage: 10, hitstun: 16, blockstun: 0, pushback: 0,
+    startup: 8, active: 3, recovery: 20,
+    damage: 70, hitstun: 22, blockstun: 20, pushback: 5,
     hitLevel: 'MID' as const, knockdown: false,
   },
-  // ── 八神庵DM ── APPROX (OG)
+  // ── 八神庵DM/SDM ── Dream Cancel Wiki KOF2002UM 精确数据
   DM_MAIDEN_MASHER_A: {
-    startup: 6, active: 16, recovery: 42,
-    damage: 220, hitstun: 0, blockstun: 21, pushback: 10,
-    hitLevel: 'MID' as const, knockdown: true, chipDamage: 22,
+    startup: 7, active: 2, recovery: 25,
+    damage: 200, hitstun: 0, blockstun: 0, pushback: 0,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 20,
   },
   DM_MAIDEN_MASHER_C: {
-    startup: 6, active: 24, recovery: 44,
-    damage: 220, hitstun: 0, blockstun: 21, pushback: 10,
-    hitLevel: 'MID' as const, knockdown: true, chipDamage: 22,
+    startup: 7, active: 2, recovery: 25,
+    damage: 200, hitstun: 0, blockstun: 0, pushback: 0,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 20,
   },
   SDM_MAIDEN_MASHER: {
-    startup: 12, active: 24, recovery: 44,
-    damage: 350, hitstun: 0, blockstun: 21, pushback: 12,
+    startup: 7, active: 4, recovery: 27,
+    damage: 350, hitstun: 0, blockstun: 0, pushback: 0,
     hitLevel: 'MID' as const, knockdown: true, chipDamage: 30,
   },
   // ── 特瑞必杀技 (Terry Bogard) ── APPROX (OG): SuperCombo Wiki KOF2002原版
