@@ -9,7 +9,7 @@ import { AttackType, FighterState } from '../core/types.js';
 import { FRAME_DATA, STAGE_WIDTH, MAX_STOCKS, METER_PER_STOCK } from '../core/constants.js';
 import { ROSTER } from '../characters/index.js';
 import { gainMeterOnHit, gainMeterOnBlock, gainMeterOnHitstun } from './meter.js';
-import { playHit, playBlock, playSpecial, playDM, playThrow, playCounter, playHeavyHit, playSuperFlash, playWire, playJuggleHit } from '../audio/sfx.js';
+import { playHit, playBlock, playSpecial, playDM, playThrow, playCounter, playHeavyHit, playSuperFlash, playWire, playJuggleHit } from '../audio/sampler.js';
 import type { CinematicState } from '../state/cinematicState.js';
 
 function classifyAttack(at: AttackType) {

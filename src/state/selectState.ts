@@ -9,7 +9,7 @@ import { SimpleAI } from '../ai/simpleAI.js';
 import { FighterController } from '../entities/fighterController.js';
 import { Fighter } from '../entities/fighter.js';
 import { CommandBuffer } from '../input/commandBuffer.js';
-import { initAudio, playSelect } from '../audio/sfx.js';
+import { initAudio, playSelect } from '../audio/sampler.js';
 
 export interface SelectResult {
   p1Char: CharacterDefinition;
