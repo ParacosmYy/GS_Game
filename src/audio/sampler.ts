@@ -863,6 +863,37 @@ export function initSampler(): void {
 
 // === 播放接口 ===
 
+/** Add EQ boost for hit-type samples (3kHz peaking, +3dB). */
+function addHitEQ(ctx: AudioContext, sampleId: string, destination: AudioNode): AudioNode {
+  if (sampleId.startsWith('hit_')) {
+    const eq = ctx.createBiquadFilter();
+    eq.type = 'peaking';
+    eq.frequency.value = 3000;
+    eq.Q.value = 1.5;
+    eq.gain.value = 3;
+    eq.connect(destination);
+    return eq;
+  }
+  return destination;
+}
+
+/** Add a short sub-bass resonance pulse for dm-type samples. */
+function addSubBassPulse(ctx: AudioContext, sampleId: string, now: number): void {
+  if (sampleId === 'dm' || sampleId === 'ko' || sampleId === 'guard_break'
+    || sampleId === 'wall_bounce_heavy' || sampleId === 'super_flash'
+    || sampleId === 'super_flash_sdm' || sampleId === 'max_activation') {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.value = 60;
+    gain.gain.setValueAtTime(0.25, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+    osc.connect(gain).connect(ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.2);
+  }
+}
+
 function play(id: SampleId, volume: number = 1.0, playbackRate: number = 1.0): void {
   const buf = samples.get(id);
   if (!buf) return;
@@ -872,14 +903,20 @@ function play(id: SampleId, volume: number = 1.0, playbackRate: number = 1.0): v
   src.playbackRate.value = playbackRate;
   const gain = ctx.createGain();
   gain.gain.value = volume;
-  src.connect(gain).connect(ctx.destination);
+  // Post-processing: EQ for hit samples
+  const output = addHitEQ(ctx, id, ctx.destination);
+  src.connect(gain).connect(output);
   src.start();
+  // Post-processing: sub-bass resonance for heavy samples
+  addSubBassPulse(ctx, id, ctx.currentTime);
 }
 
 // 带变调的播放（用于连击音高递增）
+// playbackRate randomized ±2% to avoid identical timbre on repeated hits
 function playPitched(id: SampleId, combo: number, volume: number = 1.0): void {
-  const rate = 1 + Math.min(combo, 15) * 0.04;
-  play(id, volume, rate);
+  const baseRate = 1 + Math.min(combo, 15) * 0.04;
+  const randomization = 0.98 + Math.random() * 0.04; // 0.98 ~ 1.02
+  play(id, volume, baseRate * randomization);
 }
 
 // === 公开API — 直接替换原sfx.ts函数签名 ===

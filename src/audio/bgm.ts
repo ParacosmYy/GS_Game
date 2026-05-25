@@ -1,13 +1,21 @@
 /**
  * BGM — KOF2002-style chiptune battle music
  * Stage-aware tracks with rock/metal energy
- * v2: 行走低音模式、更丰富的鼓点加花、更丰富的和弦进行
+ * v3: 每个舞台独立的旋律/低音/和弦/Pad，舞台专属音阶与调性
+ *
+ * 舞台调性：
+ *   temple  — C 大调五声 (C-D-E-G-A)，方波 lead，钟声点缀
+ *   china   — G 大调五声高八度 (G-A-B-D-E)，三角波 lead，锣/笛点缀
+ *   factory — E 小调 (E-F#-G-A-B-C-D)，锯齿波 lead，金属撞击
+ *   street  — A 布鲁斯 (A-C-D-Eb-E-G)，失真锯齿 lead，硬摇滚节奏
+ *   orochi  — 减音阶 (C-D-Eb-F#-G-A-Bb-B)，方波+低通 lead，暗黑压迫
  */
 
 export class BGMPlayer {
   private ctx: AudioContext | null = null;
   private masterGain: GainNode | null = null;
   private compGain: GainNode | null = null;
+  private sidechainGain: GainNode | null = null;
   private isPlaying = false;
   private loopTimer: ReturnType<typeof setInterval> | null = null;
   private volume = 0.25;
@@ -15,12 +23,31 @@ export class BGMPlayer {
   private track: 'title' | 'battle' = 'battle';
   private stageId: string = 'temple';
 
+  /** Create a procedurally generated impulse response for reverb. */
+  private createReverbIR(duration: number = 1.5, decay: number = 2.0): AudioBuffer {
+    const rate = this.ctx!.sampleRate;
+    const length = Math.ceil(rate * duration);
+    const ir = this.ctx!.createBuffer(2, length, rate);
+    for (let ch = 0; ch < 2; ch++) {
+      const data = ir.getChannelData(ch);
+      for (let i = 0; i < length; i++) {
+        data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / length, decay);
+      }
+    }
+    return ir;
+  }
+
   start(track: 'title' | 'battle' = 'battle'): void {
     if (this.isPlaying) this.stop();
     this.track = track;
     this.ctx = new AudioContext();
     this.masterGain = this.ctx.createGain();
     this.masterGain.gain.value = this.volume;
+
+    // Sidechain gain: allows SFX to temporarily dip BGM volume
+    this.sidechainGain = this.ctx.createGain();
+    this.sidechainGain.gain.value = 1.0;
+
     this.compGain = this.ctx.createGain();
     this.compGain.gain.value = 1;
     const comp = this.ctx.createDynamicsCompressor();
@@ -28,7 +55,24 @@ export class BGMPlayer {
     comp.ratio.value = 4;
     comp.attack.value = 0.003;
     comp.release.value = 0.15;
-    this.masterGain.connect(comp).connect(this.compGain).connect(this.ctx.destination);
+
+    // Reverb: convolver + wet gain
+    const convolver = this.ctx.createConvolver();
+    convolver.buffer = this.createReverbIR(1.5, 2.0);
+    const reverbGain = this.ctx.createGain();
+    reverbGain.gain.value = 0.15;
+
+    // Dry path: masterGain -> sidechainGain -> comp -> compGain -> destination
+    this.masterGain.connect(this.sidechainGain);
+    this.sidechainGain.connect(comp);
+    comp.connect(this.compGain);
+    this.compGain.connect(this.ctx.destination);
+
+    // Wet path: masterGain -> convolver -> reverbGain -> comp
+    this.masterGain.connect(convolver);
+    convolver.connect(reverbGain);
+    reverbGain.connect(comp);
+
     this.isPlaying = true;
     this.beat = 0;
     this.scheduleLoop();
@@ -42,6 +86,7 @@ export class BGMPlayer {
     if (this.ctx) { this.ctx.close(); this.ctx = null; }
     this.masterGain = null;
     this.compGain = null;
+    this.sidechainGain = null;
   }
 
   toggle(): boolean {
@@ -52,6 +97,15 @@ export class BGMPlayer {
   setVolume(v: number): void {
     this.volume = Math.max(0, Math.min(1, v));
     if (this.masterGain) this.masterGain.gain.value = this.volume;
+  }
+
+  /** SFX-triggered sidechain dip: briefly lowers BGM volume for clarity. */
+  duck(dipDb: number = 0.7, recoveryMs: number = 150): void {
+    if (!this.sidechainGain || !this.isPlaying) return;
+    const now = this.ctx!.currentTime;
+    this.sidechainGain.gain.setValueAtTime(this.sidechainGain.gain.value, now);
+    this.sidechainGain.gain.linearRampToValueAtTime(dipDb, now + 0.01);
+    this.sidechainGain.gain.linearRampToValueAtTime(1.0, now + recoveryMs / 1000);
   }
 
   get playing(): boolean { return this.isPlaying; }
@@ -80,148 +134,673 @@ export class BGMPlayer {
     const b = this.beat;
     const b8 = b % 8;
     const section = Math.floor(b / 32);
+    const stage = this.stageId;
 
     // ── Drums ──
-    // Kick模式：不同乐段不同模式
     if (section === 0 || section === 2) {
       if (b8 === 0 || b8 === 4) this.playKick(now, 0.55);
       if (b8 === 6) this.playKick(now, 0.3);
-      // 加花：16分音符连击
       if (b8 === 7 && b % 32 >= 28) this.playKick(now, 0.25);
     } else if (section === 1) {
-      // B段：更密集的kick
       if (b8 === 0 || b8 === 3 || b8 === 4) this.playKick(now, 0.5);
       if (b8 === 7) this.playKick(now, 0.25);
-      // 16分音符double kick
       if (b8 === 5 && b % 16 === 13) this.playKick(now, 0.2);
     } else {
-      // D段：最密集
       if (b8 === 0 || b8 === 3 || b8 === 4 || b8 === 6) this.playKick(now, 0.5);
       if (b8 === 7) this.playKick(now, 0.3);
     }
 
-    // Snare: 2和6为主，段尾加花
     if (b8 === 2 || b8 === 6) this.playSnare(now, 0.22);
-    // 段末加花
     if (b === 30 || b === 31) this.playSnare(now, 0.18);
     if (b === 62 || b === 63) this.playSnare(now, 0.22);
     if (b === 94) this.playSnare(now, 0.15);
     if (b === 126 || b === 127) this.playSnare(now, 0.22);
-    // 额外snare ghost notes — 更密的节奏感
     if (section >= 2 && b8 === 1) this.playSnare(now, 0.08);
     if (section >= 2 && b8 === 5) this.playSnare(now, 0.08);
 
-    // Hi-hat: 更丰富的节奏模式
     if (b % 2 === 0) this.playHihat(now, 0.07, false);
     if (b % 2 === 1) this.playHihat(now, 0.04, false);
-    // 开镲在乐句边界
     if (b8 === 7 && (section === 0 || section === 2)) this.playHihat(now, 0.1, true);
     if (b8 === 3 && section >= 2) this.playHihat(now, 0.06, true);
-    // 段末加速hi-hat
     if (b >= 124 && b <= 127 && b % 2 === 0) this.playHihat(now, 0.08, false);
 
-    // Tom加花 — 段过渡
     if (b >= 28 && b <= 31) this.playTom(now, 180 - (b - 28) * 20);
     if (b >= 60 && b <= 63) this.playTom(now, 200 - (b - 60) * 25);
     if (b >= 92 && b <= 95) this.playTom(now, 220 - (b - 92) * 20);
-    // 额外tom fill: 4小节分界
     if (b === 44 || b === 45) this.playTom(now, 160);
     if (b === 108 || b === 109) this.playTom(now, 200);
 
-    // Crash at section start
     if (b === 0 || b === 32 || b === 64 || b === 96) this.playCrash(now);
-    // 半程crash
     if (b === 16 || b === 48 || b === 80 || b === 112) this.playCrash(now, 0.06);
 
-    // ── Bass: 行走低音模式 ──
-    const bassPattern = this.getBassPattern(section);
+    // ── Bass: 舞台感知行走低音 ──
+    const bassPattern = this.getBassPattern(stage, section);
     const bassIdx = b % 32;
     if (bassPattern[bassIdx] > 0) {
       this.playBass(now, bassPattern[bassIdx], 0.13);
     }
 
-    // ── Lead melody (stage-specific) ──
-    const leadNote = this.getLeadNote(b, section);
-    if (leadNote > 0) this.playGuitarLead(now, leadNote);
+    // ── Lead melody: 舞台专属旋律 ──
+    const leadNote = this.getLeadNote(stage, b, section);
+    if (leadNote > 0) this.playStageLead(now, stage, leadNote);
 
-    // ── Rhythm guitar / power chords ──
+    // ── Rhythm guitar / power chords: 舞台感知 ──
     if (b % 4 === 0) {
-      const chords = this.getChords(section);
+      const chords = this.getChords(stage, section);
       const ci = Math.floor(b / 8) % 4;
       this.playPowerChord(now, chords[ci]);
     }
-    // 段2+：额外的节奏吉他16分音符
     if (section >= 2 && b % 2 === 1) {
-      const chords = this.getChords(section);
+      const chords = this.getChords(stage, section);
       const ci = Math.floor(b / 8) % 4;
       this.playPowerChord(now, chords[ci], 0.015);
     }
 
+    // ── Pad 层: 每 16 拍触发，营造空间感 ──
+    if (b % 16 === 0) {
+      const padChords = this.getPadChords(stage, section);
+      const pi = Math.floor(b / 16) % padChords.length;
+      this.playBattlePad(now, padChords[pi], 0.6);
+    }
+
     // ── Arp fill ──
     if (b === 29 || b === 61 || b === 93 || b === 125) this.playArpFill(now);
-    // 段末额外arp
     if (section >= 2 && (b === 14 || b === 46)) this.playArpFill(now, 0.04);
 
-    // ── Stage-specific accent ──
-    if (this.stageId === 'factory' && b % 16 === 8) this.playMetalHit(now);
-    if (this.stageId === 'china' && b % 32 === 16) this.playGongAccent(now);
-    if (this.stageId === 'temple' && b % 24 === 12) this.playBellAccent(now);
+    // ── Section transition fill: ascending arp at section boundaries ──
+    if (b === 31 || b === 63 || b === 95) this.playTransitionFill(now);
+
+    // ── Stage-specific accent: 每 8 拍触发 ──
+    if (b % 8 === 0) {
+      if (stage === 'temple') this.playBellAccent(now);
+      else if (stage === 'china') this.playGongAccent(now);
+      else if (stage === 'factory') this.playMetalHit(now);
+      else if (stage === 'street') this.playStreetAccent(now);
+      else if (stage === 'orochi') this.playDarkAccent(now);
+    }
+    // 额外变体：拍 4 上的次要点缀
+    if (b8 === 4 && b % 16 === 12) {
+      if (stage === 'temple') this.playBellAccent(now, 0.02);
+      else if (stage === 'china') this.playFluteAccent(now);
+      else if (stage === 'orochi') this.playDarkAccent(now, 0.03);
+    }
   }
 
-  // 行走低音模式：更多音符运动
-  private getBassPattern(section: number): number[] {
-    // E2=82.4, A2=110, B2=123.5, C3=130.8, D3=146.8, G2=98, F2=87.3, Bb2=116.5
-    const patterns: number[][] = [
-      // Section A: E小调行走低音
-      [82.4,0,82.4,98, 110,0,82.4,0, 82.4,0,123.5,0, 110,0,82.4,0,
-       82.4,0,98,0, 110,0,82.4,98, 123.5,0,110,82.4, 130.8,0,0,0],
-      // Section B: 更多运动 — 带经过音
-      [110,0,110,123.5, 130.8,0,116.5,110, 123.5,0,123.5,130.8, 110,0,98,0,
-       87.3,0,98,0, 110,0,123.5,116.5, 130.8,0,110,98, 82.4,0,0,0],
-    ];
-    return patterns[section % 2];
-  }
+  // ─── 舞台专属旋律 ───
 
-  private getLeadNote(b: number, section: number): number {
-    const melodyA: number[] = [
-      // Phrase 1 (bars 1-4): 主旋律
-      659.3,0,784,0, 659.3,587.3,0,0, 523.3,0,587.3,659.3, 0,0,784,0,
-      // Phrase 2 (bars 5-8): 问答
-      659.3,0,523.3,0, 440,0,0,523.3, 587.3,0,659.3,0, 784,0,0,0,
-      // Phrase 3 (bars 9-12): 发展
-      880,0,784,659.3, 523.3,0,587.3,0, 659.3,784,0,880, 784,659.3,0,0,
-      // Phrase 4 (bars 13-16): 解决
-      523.3,0,440,0, 392,0,440,523.3, 587.3,0,523.3,0, 440,0,0,0,
-    ];
-    const melodyB: number[] = [
-      // 高能量变奏
-      1046.5,0,880,0, 784,0,659.3,0, 784,880,0,1046.5, 880,784,0,0,
-      659.3,0,784,0, 880,0,1046.5,0, 1174.7,0,1046.5,880, 784,0,0,0,
-      880,0,1046.5,0, 1174.7,1046.5,880,0, 784,0,659.3,0, 784,880,0,0,
-      1046.5,880,784,0, 659.3,0,784,880, 1046.5,0,880,0, 659.3,0,0,0,
-    ];
-    const melody = section < 2 ? melodyA : melodyB;
+  private getLeadNote(stage: string, b: number, section: number): number {
+    const melodies = this.getStageMelody(stage);
+    const melody = section < 2 ? melodies[0] : melodies[1];
     return melody[b % melody.length];
   }
 
-  private getChords(section: number): number[][] {
-    // 更丰富的和弦进行：加入小三度音
-    if (section < 2) {
-      // Em - Am - G - Em (i - iv - III - i)
-      return [
-        [82.4, 123.5, 98],   // Em: E + B + G
-        [110, 164.8, 130.8], // Am: A + E + C
-        [98, 146.8, 116.5],  // G:  G + D + Bb
-        [82.4, 123.5, 98],   // Em
-      ];
+  private getStageMelody(stage: string): [number[], number[]] {
+    switch (stage) {
+      case 'temple':
+        return [
+          // A段: C 大调五声 — 宁静的日本寺庙
+          // C5=523.3, D5=587.3, E5=659.3, G5=784, A5=880
+          [523.3,0,659.3,0, 784,0,659.3,587.3, 523.3,0,587.3,0, 659.3,0,0,0,
+           784,0,880,0, 784,659.3,587.3,0, 523.3,0,659.3,587.3, 523.3,0,0,0,
+           880,0,784,659.3, 784,0,659.3,0, 587.3,0,523.3,0, 587.3,659.3,0,0,
+           523.3,0,587.3,0, 659.3,0,784,0, 659.3,587.3,523.3,0, 0,0,0,0],
+          // B段: 更活跃的五声变奏
+          [880,0,784,659.3, 784,0,880,0, 1046.5,0,880,784, 659.3,0,0,0,
+           784,0,659.3,587.3, 523.3,0,587.3,659.3, 784,0,880,784, 659.3,0,0,0,
+           1046.5,0,880,0, 784,659.3,587.3,0, 659.3,0,784,880, 784,659.3,0,0,
+           523.3,0,659.3,784, 880,0,784,659.3, 587.3,0,523.3,0, 0,0,0,0],
+        ];
+      case 'china':
+        return [
+          // A段: G 大调五声高八度 — 明亮穿透的中国风
+          // G5=784, A5=880, B5=987.8, D6=1174.7, E6=1318.5
+          [784,0,880,0, 987.8,0,1174.7,0, 1318.5,0,1174.7,987.8, 880,0,0,0,
+           784,0,987.8,0, 1174.7,0,880,784, 880,0,987.8,0, 784,0,0,0,
+           1174.7,0,1318.5,0, 1174.7,987.8,880,0, 784,0,880,987.8, 1174.7,0,0,0,
+           987.8,0,880,784, 880,0,784,0, 987.8,880,784,0, 0,0,0,0],
+          // B段: 高音区华丽变奏
+          [1318.5,0,1174.7,987.8, 1174.7,0,1318.5,0, 1568,0,1318.5,1174.7, 987.8,0,0,0,
+           1174.7,0,987.8,880, 784,0,880,987.8, 1174.7,0,1318.5,0, 987.8,880,0,0,
+           1568,0,1318.5,1174.7, 1318.5,0,987.8,880, 1174.7,0,1318.5,1568, 1318.5,1174.7,0,0,
+           987.8,0,880,784, 880,987.8,1174.7,0, 1318.5,0,987.8,0, 784,0,0,0],
+        ];
+      case 'factory':
+        return [
+          // A段: E 小调 — 工业摇滚
+          // E5=659.3, F#5=740, G5=784, A5=880, B5=987.8, C6=1046.5, D6=1174.7
+          [659.3,0,740,0, 784,0,880,0, 987.8,0,880,784, 740,0,0,0,
+           659.3,0,784,659.3, 740,0,880,740, 659.3,0,0,784, 880,0,0,0,
+           1174.7,0,1046.5,987.8, 880,0,784,0, 880,0,987.8,1046.5, 880,784,0,0,
+           659.3,0,740,784, 880,0,784,740, 659.3,0,0,0, 0,0,0,0],
+          // B段: 更激烈的摇滚
+          [1174.7,0,1046.5,880, 784,0,880,1046.5, 1174.7,0,1318.5,0, 1174.7,1046.5,0,0,
+           880,0,784,740, 659.3,0,740,880, 987.8,0,1046.5,1174.7, 1046.5,880,0,0,
+           1318.5,0,1174.7,1046.5, 987.8,880,784,0, 880,987.8,1046.5,0, 1174.7,0,0,0,
+           1046.5,880,784,659.3, 740,0,880,987.8, 1174.7,0,1046.5,0, 659.3,0,0,0],
+        ];
+      case 'street':
+        return [
+          // A段: A 布鲁斯 — 硬摇滚
+          // A4=440, C5=523.3, D5=587.3, Eb5=622.3, E5=659.3, G5=784, A5=880
+          [440,0,523.3,0, 587.3,0,622.3,659.3, 587.3,0,523.3,0, 440,0,0,0,
+           659.3,0,587.3,523.3, 440,0,523.3,587.3, 659.3,0,784,0, 659.3,587.3,0,0,
+           880,0,784,659.3, 622.3,0,587.3,523.3, 587.3,659.3,784,0, 659.3,0,0,0,
+           523.3,0,587.3,622.3, 659.3,0,587.3,523.3, 440,0,523.3,0, 0,0,0,0],
+          // B段: 更硬核的布鲁斯摇滚
+          [880,0,784,659.3, 784,0,622.3,587.3, 659.3,0,784,880, 784,659.3,0,0,
+           622.3,0,587.3,523.3, 440,0,523.3,587.3, 659.3,622.3,587.3,0, 659.3,0,0,0,
+           880,784,659.3,587.3, 622.3,659.3,784,880, 1046.5,0,880,784, 659.3,587.3,0,0,
+           784,659.3,587.3,523.3, 587.3,659.3,784,0, 880,0,659.3,0, 440,0,0,0],
+        ];
+      case 'orochi':
+      default:
+        return [
+          // A段: 减音阶 — 暗黑压迫
+          // C5=523.3, D5=587.3, Eb5=622.3, F#5=740, G5=784, A5=880, Bb5=932.3, B5=987.8
+          [523.3,0,622.3,0, 740,0,622.3,587.3, 523.3,0,587.3,622.3, 740,0,0,0,
+           784,0,880,740, 622.3,0,587.3,523.3, 587.3,0,622.3,740, 880,0,0,0,
+           932.3,0,880,784, 740,0,622.3,587.3, 523.3,0,587.3,622.3, 740,784,0,0,
+           880,0,740,622.3, 587.3,0,523.3,587.3, 622.3,0,523.3,0, 0,0,0,0],
+          // B段: 更深沉的暗黑变奏
+          [987.8,0,932.3,880, 784,0,740,622.3, 740,0,880,932.3, 987.8,880,0,0,
+           784,0,622.3,587.3, 523.3,0,587.3,622.3, 740,0,784,880, 932.3,784,0,0,
+           1046.5,0,987.8,932.3, 880,0,784,740, 880,932.3,987.8,0, 1046.5,932.3,0,0,
+           880,0,740,622.3, 587.3,622.3,740,880, 987.8,0,784,0, 523.3,0,0,0],
+        ];
     }
-    // B段: Am - C - B - Am
-    return [
-      [110, 164.8, 130.8],  // Am
-      [130.8, 196, 164.8],  // C
-      [123.5, 185, 146.8],  // B
-      [110, 164.8, 130.8],  // Am
-    ];
+  }
+
+  // ─── 舞台专属低音线 ───
+
+  private getBassPattern(stage: string, section: number): number[] {
+    switch (stage) {
+      case 'temple': {
+        // C 大调五声根音: C2=65.4, D2=73.4, E2=82.4, G2=98, A2=110
+        const pA: number[] = [
+          65.4,0,65.4,82.4, 98,0,65.4,0, 82.4,0,98,0, 110,0,82.4,0,
+          65.4,0,73.4,0, 82.4,0,98,82.4, 110,0,98,82.4, 65.4,0,0,0];
+        const pB: number[] = [
+          110,0,98,82.4, 65.4,0,73.4,65.4, 82.4,0,98,110, 98,0,82.4,0,
+          65.4,0,82.4,0, 98,0,110,98, 82.4,0,65.4,73.4, 65.4,0,0,0];
+        return section % 2 === 0 ? pA : pB;
+      }
+      case 'china': {
+        // G 大调五声根音: G2=98, A2=110, B2=123.5, D3=146.8, E3=164.8
+        const pA: number[] = [
+          98,0,98,123.5, 146.8,0,110,0, 123.5,0,146.8,0, 164.8,0,123.5,0,
+          98,0,110,0, 123.5,0,146.8,123.5, 164.8,0,146.8,123.5, 98,0,0,0];
+        const pB: number[] = [
+          146.8,0,123.5,110, 98,0,110,123.5, 146.8,0,164.8,146.8, 123.5,0,98,0,
+          110,0,123.5,0, 146.8,0,164.8,146.8, 123.5,0,110,98, 98,0,0,0];
+        return section % 2 === 0 ? pA : pB;
+      }
+      case 'factory': {
+        // E 小调: E2=82.4, F#2=92.5, G2=98, A2=110, B2=123.5, C3=130.8, D3=146.8
+        const pA: number[] = [
+          82.4,0,82.4,98, 110,0,82.4,0, 82.4,0,123.5,0, 110,0,82.4,0,
+          82.4,0,92.5,0, 110,0,82.4,98, 123.5,0,110,82.4, 130.8,0,0,0];
+        const pB: number[] = [
+          110,0,110,123.5, 130.8,0,110,92.5, 123.5,0,123.5,130.8, 110,0,98,0,
+          82.4,0,98,0, 110,0,123.5,110, 130.8,0,110,92.5, 82.4,0,0,0];
+        return section % 2 === 0 ? pA : pB;
+      }
+      case 'street': {
+        // A 布鲁斯: A2=110, C3=130.8, D3=146.8, Eb3=155.6, E3=164.8, G2=98
+        const pA: number[] = [
+          110,0,110,130.8, 146.8,0,110,0, 130.8,0,146.8,155.6, 164.8,0,130.8,0,
+          110,0,98,0, 110,0,130.8,110, 146.8,0,155.6,146.8, 110,0,0,0];
+        const pB: number[] = [
+          146.8,0,130.8,110, 98,0,110,130.8, 146.8,0,155.6,164.8, 146.8,130.8,0,0,
+          110,0,130.8,146.8, 155.6,0,146.8,130.8, 110,0,98,110, 110,0,0,0];
+        return section % 2 === 0 ? pA : pB;
+      }
+      case 'orochi':
+      default: {
+        // 减音阶根音: C2=65.4, D2=73.4, Eb2=77.8, F#2=92.5, G2=98, A2=110, Bb2=116.5, B2=123.5
+        const pA: number[] = [
+          65.4,0,65.4,77.8, 92.5,0,65.4,0, 73.4,0,92.5,0, 98,0,73.4,0,
+          65.4,0,77.8,0, 92.5,0,98,77.8, 110,0,92.5,73.4, 65.4,0,0,0];
+        const pB: number[] = [
+          110,0,98,92.5, 77.8,0,73.4,65.4, 77.8,0,92.5,98, 116.5,0,110,0,
+          98,0,77.8,73.4, 65.4,0,73.4,77.8, 92.5,0,98,110, 65.4,0,0,0];
+        return section % 2 === 0 ? pA : pB;
+      }
+    }
+  }
+
+  // ─── 舞台专属和弦进行 ───
+
+  private getChords(stage: string, section: number): number[][] {
+    switch (stage) {
+      case 'temple': {
+        // C - Am - F - G (I - vi - IV - V)
+        if (section < 2) return [
+          [65.4, 98, 130.8],   // C:  C + G + E(高)
+          [55, 82.4, 130.8],   // Am: A + E + C(高)
+          [87.3, 130.8, 174.6],// F:  F + C + A(高)
+          [98, 123.5, 146.8],  // G:  G + D + D(高)
+        ];
+        return [
+          [65.4, 82.4, 98],
+          [55, 65.4, 82.4],
+          [87.3, 110, 130.8],
+          [98, 123.5, 146.8],
+        ];
+      }
+      case 'china': {
+        // G - Em - C - D (I - vi - IV - V)
+        if (section < 2) return [
+          [98, 123.5, 146.8],  // G:  G + D + D(高)
+          [82.4, 123.5, 164.8],// Em: E + B + E(高)
+          [65.4, 98, 130.8],   // C:  C + G + E(高)
+          [73.4, 110, 146.8],  // D:  D + A + D(高)
+        ];
+        return [
+          [98, 123.5, 164.8],
+          [82.4, 98, 123.5],
+          [65.4, 82.4, 98],
+          [73.4, 98, 123.5],
+        ];
+      }
+      case 'factory': {
+        // Em - C - G - D (i - VI - III - VII)
+        if (section < 2) return [
+          [82.4, 123.5, 164.8],// Em
+          [65.4, 98, 130.8],   // C
+          [98, 146.8, 196],    // G
+          [73.4, 110, 146.8],  // D
+        ];
+        return [
+          [82.4, 98, 123.5],
+          [65.4, 82.4, 98],
+          [98, 123.5, 146.8],
+          [73.4, 92.5, 110],
+        ];
+      }
+      case 'street': {
+        // A - D - E - A (I - IV - V - I) 布鲁斯
+        if (section < 2) return [
+          [110, 164.8, 220],   // A
+          [73.4, 110, 146.8],  // D
+          [82.4, 123.5, 164.8],// E
+          [110, 164.8, 220],   // A
+        ];
+        return [
+          [110, 130.8, 164.8],
+          [73.4, 92.5, 110],
+          [82.4, 110, 130.8],
+          [110, 146.8, 164.8],
+        ];
+      }
+      case 'orochi':
+      default: {
+        // Co - F#o - Go - Abo (减和弦循环)
+        if (section < 2) return [
+          [65.4, 77.8, 92.5],  // Cdim
+          [92.5, 110, 130.8],  // F#dim
+          [98, 116.5, 138.6],  // Gdim
+          [116.5, 138.6, 164.8],// Abdim
+        ];
+        return [
+          [65.4, 77.8, 98],
+          [92.5, 116.5, 138.6],
+          [98, 116.5, 130.8],
+          [110, 130.8, 155.6],
+        ];
+      }
+    }
+  }
+
+  // ─── Pad 和弦数据 (微失谐正弦波叠层) ───
+
+  private getPadChords(stage: string, _section: number): number[][] {
+    switch (stage) {
+      case 'temple':
+        // Cmaj7 和弦音: C4, E4, G4, B4
+        return [[261.6, 329.6, 392, 493.9], [220, 261.6, 329.6, 392]];
+      case 'china':
+        // Gmaj7 和弦音: G4, B4, D5, F#5
+        return [[196, 246.9, 293.7, 370], [164.8, 196, 246.9, 293.7]];
+      case 'factory':
+        // Em7 和弦音: E4, G4, B4, D5
+        return [[164.8, 196, 246.9, 293.7], [130.8, 164.8, 196, 246.9]];
+      case 'street':
+        // Am7 和弦音: A3, C4, E4, G4
+        return [[220, 261.6, 329.6, 392], [196, 220, 261.6, 329.6]];
+      case 'orochi':
+      default:
+        // 减七和弦: C4, Eb4, F#4, A4
+        return [[261.6, 311.1, 370, 440], [220, 261.6, 311.1, 370]];
+    }
+  }
+
+  // ─── 舞台专属 Lead 音色 ───
+
+  private playStageLead(time: number, stage: string, freq: number): void {
+    switch (stage) {
+      case 'temple':
+        // 方波 + 轻微 vibrato，清澈的寺庙感
+        this.playTempleLead(time, freq);
+        break;
+      case 'china':
+        // 三角波 + 泛音层，明亮穿透的笛/竹感
+        this.playChinaLead(time, freq);
+        break;
+      case 'factory':
+        // 锯齿波 + 失真低通，工业摇滚
+        this.playFactoryLead(time, freq);
+        break;
+      case 'street':
+        // 粗锯齿 + 布鲁斯微弯音，硬摇滚
+        this.playStreetLead(time, freq);
+        break;
+      case 'orochi':
+        // 方波 + 深低通，暗黑压迫
+        this.playOrochiLead(time, freq);
+        break;
+      default:
+        this.playGuitarLead(time, freq);
+    }
+  }
+
+  private playTempleLead(time: number, freq: number): void {
+    if (!this.ctx || !this.masterGain) return;
+    const vol = 0.05;
+    // 方波主音
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    osc.type = 'square';
+    osc.frequency.value = freq;
+    // 轻微 vibrato
+    const lfo = this.ctx.createOscillator();
+    const lfoG = this.ctx.createGain();
+    lfo.type = 'sine';
+    lfo.frequency.value = 4;
+    lfoG.gain.value = 2;
+    lfo.connect(lfoG);
+    lfoG.connect(osc.frequency);
+    lfo.start(time); lfo.stop(time + 0.22);
+    gain.gain.setValueAtTime(0, time);
+    gain.gain.linearRampToValueAtTime(vol, time + 0.01);
+    gain.gain.setValueAtTime(vol * 0.8, time + 0.06);
+    gain.gain.exponentialRampToValueAtTime(0.001, time + 0.18);
+    // 低通柔化
+    const lp = this.ctx.createBiquadFilter();
+    lp.type = 'lowpass';
+    lp.frequency.value = 1800;
+    lp.Q.value = 0.5;
+    osc.connect(lp).connect(gain).connect(this.masterGain);
+    osc.start(time); osc.stop(time + 0.22);
+    // 五度泛音点缀
+    const harm = this.ctx.createOscillator();
+    const hg = this.ctx.createGain();
+    harm.type = 'sine';
+    harm.frequency.value = freq * 1.5;
+    hg.gain.setValueAtTime(0, time);
+    hg.gain.linearRampToValueAtTime(vol * 0.1, time + 0.02);
+    hg.gain.exponentialRampToValueAtTime(0.001, time + 0.12);
+    harm.connect(hg).connect(this.masterGain);
+    harm.start(time); harm.stop(time + 0.15);
+  }
+
+  private playChinaLead(time: number, freq: number): void {
+    if (!this.ctx || !this.masterGain) return;
+    const vol = 0.055;
+    // 三角波主音
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    osc.type = 'triangle';
+    osc.frequency.value = freq;
+    // 快速颤音 (竹笛风格)
+    const lfo = this.ctx.createOscillator();
+    const lfoG = this.ctx.createGain();
+    lfo.type = 'sine';
+    lfo.frequency.value = 6;
+    lfoG.gain.value = 5;
+    lfo.connect(lfoG);
+    lfoG.connect(osc.frequency);
+    lfo.start(time); lfo.stop(time + 0.22);
+    gain.gain.setValueAtTime(0, time);
+    gain.gain.linearRampToValueAtTime(vol, time + 0.008);
+    gain.gain.setValueAtTime(vol * 0.85, time + 0.05);
+    gain.gain.exponentialRampToValueAtTime(0.001, time + 0.2);
+    osc.connect(gain).connect(this.masterGain);
+    osc.start(time); osc.stop(time + 0.22);
+    // 高八度泛音 (竹笛泛音感)
+    const harm = this.ctx.createOscillator();
+    const hg = this.ctx.createGain();
+    harm.type = 'sine';
+    harm.frequency.value = freq * 2;
+    hg.gain.setValueAtTime(0, time);
+    hg.gain.linearRampToValueAtTime(vol * 0.18, time + 0.015);
+    hg.gain.exponentialRampToValueAtTime(0.001, time + 0.15);
+    harm.connect(hg).connect(this.masterGain);
+    harm.start(time); harm.stop(time + 0.18);
+  }
+
+  private playFactoryLead(time: number, freq: number): void {
+    if (!this.ctx || !this.masterGain) return;
+    const vol = 0.06;
+    // 锯齿波 + 失真低通
+    const saw = this.ctx.createOscillator();
+    const sqr = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    saw.type = 'sawtooth';
+    saw.frequency.value = freq;
+    sqr.type = 'square';
+    sqr.frequency.value = freq;
+    // Vibrato
+    const lfo = this.ctx.createOscillator();
+    const lfoG = this.ctx.createGain();
+    lfo.type = 'sine';
+    lfo.frequency.value = 5.5;
+    lfoG.gain.value = 4;
+    lfo.connect(lfoG);
+    lfoG.connect(saw.frequency);
+    lfoG.connect(sqr.frequency);
+    lfo.start(time); lfo.stop(time + 0.2);
+    gain.gain.setValueAtTime(0, time);
+    gain.gain.linearRampToValueAtTime(vol, time + 0.005);
+    gain.gain.setValueAtTime(vol * 0.75, time + 0.04);
+    gain.gain.exponentialRampToValueAtTime(0.001, time + 0.17);
+    // 失真滤波
+    const lp = this.ctx.createBiquadFilter();
+    lp.type = 'lowpass';
+    lp.frequency.value = 2200;
+    lp.Q.value = 2;
+    const mix = this.ctx.createGain();
+    mix.gain.value = 0.55;
+    saw.connect(mix);
+    sqr.connect(mix);
+    mix.connect(lp).connect(gain).connect(this.masterGain);
+    saw.start(time); saw.stop(time + 0.2);
+    sqr.start(time); sqr.stop(time + 0.2);
+  }
+
+  private playStreetLead(time: number, freq: number): void {
+    if (!this.ctx || !this.masterGain) return;
+    const vol = 0.065;
+    // 粗锯齿 + 布鲁斯微弯音
+    const saw = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    saw.type = 'sawtooth';
+    saw.frequency.setValueAtTime(freq, time);
+    // 布鲁斯弯音: 起音微升
+    saw.frequency.linearRampToValueAtTime(freq * 1.03, time + 0.01);
+    saw.frequency.linearRampToValueAtTime(freq, time + 0.04);
+    gain.gain.setValueAtTime(0, time);
+    gain.gain.linearRampToValueAtTime(vol, time + 0.005);
+    gain.gain.setValueAtTime(vol * 0.8, time + 0.05);
+    gain.gain.exponentialRampToValueAtTime(0.001, time + 0.18);
+    const lp = this.ctx.createBiquadFilter();
+    lp.type = 'lowpass';
+    lp.frequency.value = 2800;
+    lp.Q.value = 1;
+    saw.connect(lp).connect(gain).connect(this.masterGain);
+    saw.start(time); saw.stop(time + 0.22);
+    // 低八度层增加粗犷感
+    const sub = this.ctx.createOscillator();
+    const sg = this.ctx.createGain();
+    sub.type = 'sawtooth';
+    sub.frequency.value = freq / 2;
+    sg.gain.setValueAtTime(0, time);
+    sg.gain.linearRampToValueAtTime(vol * 0.15, time + 0.008);
+    sg.gain.exponentialRampToValueAtTime(0.001, time + 0.15);
+    const slp = this.ctx.createBiquadFilter();
+    slp.type = 'lowpass';
+    slp.frequency.value = 800;
+    sub.connect(slp).connect(sg).connect(this.masterGain);
+    sub.start(time); sub.stop(time + 0.18);
+  }
+
+  private playOrochiLead(time: number, freq: number): void {
+    if (!this.ctx || !this.masterGain) return;
+    const vol = 0.05;
+    // 方波 + 深低通，暗黑感
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    osc.type = 'square';
+    osc.frequency.value = freq;
+    // 慢速颤音 (不祥的起伏)
+    const lfo = this.ctx.createOscillator();
+    const lfoG = this.ctx.createGain();
+    lfo.type = 'sine';
+    lfo.frequency.value = 3;
+    lfoG.gain.value = 6;
+    lfo.connect(lfoG);
+    lfoG.connect(osc.frequency);
+    lfo.start(time); lfo.stop(time + 0.25);
+    gain.gain.setValueAtTime(0, time);
+    gain.gain.linearRampToValueAtTime(vol, time + 0.015);
+    gain.gain.setValueAtTime(vol * 0.7, time + 0.08);
+    gain.gain.exponentialRampToValueAtTime(0.001, time + 0.22);
+    // 深低通
+    const lp = this.ctx.createBiquadFilter();
+    lp.type = 'lowpass';
+    lp.frequency.value = 1200;
+    lp.Q.value = 3;
+    osc.connect(lp).connect(gain).connect(this.masterGain);
+    osc.start(time); osc.stop(time + 0.25);
+    // 三全音泛音 (减五度 = 暗黑感核心)
+    const tritone = this.ctx.createOscillator();
+    const tg = this.ctx.createGain();
+    tritone.type = 'sine';
+    tritone.frequency.value = freq * 1.414; // 三全音比率
+    tg.gain.setValueAtTime(0, time);
+    tg.gain.linearRampToValueAtTime(vol * 0.12, time + 0.02);
+    tg.gain.exponentialRampToValueAtTime(0.001, time + 0.15);
+    tritone.connect(tg).connect(this.masterGain);
+    tritone.start(time); tritone.stop(time + 0.18);
+  }
+
+  // ─── 战斗 Pad: 微失谐正弦波叠层 ───
+
+  private playBattlePad(time: number, freqs: number[], duration: number = 0.6): void {
+    if (!this.ctx || !this.masterGain) return;
+    for (const freq of freqs) {
+      // 主正弦
+      this.playPadVoice(time, freq, 0.018, duration);
+      // 微失谐 +3 cents
+      this.playPadVoice(time, freq * 1.0017, 0.012, duration);
+      // 微失谐 -3 cents
+      this.playPadVoice(time, freq * 0.9983, 0.012, duration);
+    }
+  }
+
+  private playPadVoice(time: number, freq: number, vol: number, duration: number): void {
+    if (!this.ctx || !this.masterGain) return;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.value = freq;
+    gain.gain.setValueAtTime(0, time);
+    gain.gain.linearRampToValueAtTime(vol, time + duration * 0.25);
+    gain.gain.setValueAtTime(vol * 0.9, time + duration * 0.6);
+    gain.gain.linearRampToValueAtTime(0, time + duration);
+    osc.connect(gain).connect(this.masterGain);
+    osc.start(time); osc.stop(time + duration + 0.05);
+  }
+
+  // ─── 舞台新增特色音色 ───
+
+  private playStreetAccent(time: number): void {
+    if (!this.ctx || !this.masterGain) return;
+    // 街头电吉他刮弦
+    const size = Math.floor(this.ctx.sampleRate * 0.06);
+    const buf = this.ctx.createBuffer(1, size, this.ctx.sampleRate);
+    const data = buf.getChannelData(0);
+    for (let i = 0; i < size; i++) data[i] = Math.random() * 2 - 1;
+    const noise = this.ctx.createBufferSource();
+    noise.buffer = buf;
+    const ng = this.ctx.createGain();
+    ng.gain.setValueAtTime(0.05, time);
+    ng.gain.exponentialRampToValueAtTime(0.001, time + 0.06);
+    const bp = this.ctx.createBiquadFilter();
+    bp.type = 'bandpass';
+    bp.frequency.value = 1200;
+    bp.Q.value = 2;
+    noise.connect(bp).connect(ng).connect(this.masterGain);
+    noise.start(time); noise.stop(time + 0.08);
+    // 低频冲击
+    const osc = this.ctx.createOscillator();
+    const og = this.ctx.createGain();
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(150, time);
+    osc.frequency.exponentialRampToValueAtTime(50, time + 0.08);
+    og.gain.setValueAtTime(0.04, time);
+    og.gain.exponentialRampToValueAtTime(0.001, time + 0.1);
+    const lp = this.ctx.createBiquadFilter();
+    lp.type = 'lowpass';
+    lp.frequency.value = 500;
+    osc.connect(lp).connect(og).connect(this.masterGain);
+    osc.start(time); osc.stop(time + 0.12);
+  }
+
+  private playDarkAccent(time: number, vol: number = 0.04): void {
+    if (!this.ctx || !this.masterGain) return;
+    // 大蛇暗黑脉冲: 低频方波 + 高频泛音
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    osc.type = 'square';
+    osc.frequency.setValueAtTime(55, time);
+    osc.frequency.exponentialRampToValueAtTime(30, time + 0.3);
+    gain.gain.setValueAtTime(vol, time);
+    gain.gain.exponentialRampToValueAtTime(0.001, time + 0.35);
+    const lp = this.ctx.createBiquadFilter();
+    lp.type = 'lowpass';
+    lp.frequency.value = 200;
+    lp.Q.value = 5;
+    osc.connect(lp).connect(gain).connect(this.masterGain);
+    osc.start(time); osc.stop(time + 0.38);
+    // 高频不和谐泛音
+    const harm = this.ctx.createOscillator();
+    const hg = this.ctx.createGain();
+    harm.type = 'sine';
+    harm.frequency.setValueAtTime(440, time);
+    harm.frequency.exponentialRampToValueAtTime(220, time + 0.15);
+    hg.gain.setValueAtTime(vol * 0.5, time);
+    hg.gain.exponentialRampToValueAtTime(0.001, time + 0.2);
+    harm.connect(hg).connect(this.masterGain);
+    harm.start(time); harm.stop(time + 0.22);
+  }
+
+  private playFluteAccent(time: number): void {
+    if (!this.ctx || !this.masterGain) return;
+    // 中国笛子短装饰音
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    osc.type = 'triangle';
+    // 快速上行装饰: D6 -> G6
+    osc.frequency.setValueAtTime(1174.7, time);
+    osc.frequency.linearRampToValueAtTime(1568, time + 0.04);
+    gain.gain.setValueAtTime(0.03, time);
+    gain.gain.exponentialRampToValueAtTime(0.001, time + 0.2);
+    const bp = this.ctx.createBiquadFilter();
+    bp.type = 'bandpass';
+    bp.frequency.value = 1400;
+    bp.Q.value = 3;
+    osc.connect(bp).connect(gain).connect(this.masterGain);
+    osc.start(time); osc.stop(time + 0.25);
   }
 
   // ─── Title Theme (100 BPM, 64 sub-beats) ───
@@ -231,14 +810,11 @@ export class BGMPlayer {
     const b = this.beat;
     const b8 = b % 8;
 
-    // 更有氛围的鼓点
     if (b8 === 0) this.playKick(now, 0.35);
     if (b8 === 4) this.playSnare(now, 0.12);
     if (b % 2 === 0) this.playHihat(now, 0.025, false);
-    // 偶尔的rim click
     if (b8 === 3 && b % 16 >= 8) this.playRim(now, 0.06);
 
-    // 慢速琶音pad
     if (b % 2 === 0) {
       const arpNotes = [261.6, 329.6, 392, 523.3, 493.9, 392, 329.6, 261.6,
                         220, 277.2, 329.6, 440, 392, 329.6, 277.2, 220,
@@ -248,14 +824,12 @@ export class BGMPlayer {
       this.playSoftLead(now, n, 0.035);
     }
 
-    // 行走低音 — 更多的音调运动
     if (b % 4 === 0) {
       const bassNotes = [65.4, 65.4, 73.4, 65.4, 55, 55, 61.7, 65.4,
                          73.4, 73.4, 65.4, 73.4, 61.7, 61.7, 55, 65.4];
       this.playBass(now, bassNotes[(b / 4) % bassNotes.length], 0.08);
     }
 
-    // 更丰富的旋律
     if (b % 4 === 2) {
       const melody = [523.3, 0, 659.3, 0, 587.3, 523.3, 0, 440,
                       392, 0, 440, 0, 523.3, 493.9, 440, 392];
@@ -263,19 +837,17 @@ export class BGMPlayer {
       if (n > 0) this.playSoftLead(now, n, 0.05);
     }
 
-    // Pad和弦每16拍
     if (b % 16 === 0) {
       const chords = [[261.6, 329.6, 392], [220, 277.2, 329.6], [246.9, 311.1, 370], [261.6, 329.6, 392]];
       this.playPad(now, chords[(b / 16) % 4], 1.8);
     }
 
-    // 额外低频pad — 氛围感
     if (b % 32 === 0) {
       this.playSubPad(now, 65.4, 3.5);
     }
   }
 
-  // ─── Enhanced Synthesis ──
+  // ─── Core Synthesis Primitives ──
 
   private playKick(time: number, vol: number): void {
     if (!this.ctx || !this.masterGain) return;
@@ -298,7 +870,7 @@ export class BGMPlayer {
     cg.gain.exponentialRampToValueAtTime(0.001, time + 0.03);
     click.connect(cg).connect(this.masterGain);
     click.start(time); click.stop(time + 0.05);
-    // 额外的sub层 — 更深沉的kick
+    // Sub层
     const sub = this.ctx.createOscillator();
     const sg = this.ctx.createGain();
     sub.type = 'sine';
@@ -312,7 +884,6 @@ export class BGMPlayer {
 
   private playSnare(time: number, vol: number): void {
     if (!this.ctx || !this.masterGain) return;
-    // Noise burst
     const size = Math.floor(this.ctx.sampleRate * 0.08);
     const buf = this.ctx.createBuffer(1, size, this.ctx.sampleRate);
     const data = buf.getChannelData(0);
@@ -328,7 +899,6 @@ export class BGMPlayer {
     bp.Q.value = 0.7;
     noise.connect(bp).connect(ng).connect(this.masterGain);
     noise.start(time); noise.stop(time + 0.15);
-    // Body tone
     const osc = this.ctx.createOscillator();
     const og = this.ctx.createGain();
     osc.type = 'triangle';
@@ -379,7 +949,6 @@ export class BGMPlayer {
 
   private playBass(time: number, freq: number, vol: number): void {
     if (!this.ctx || !this.masterGain || freq === 0) return;
-    // 主低音：锯齿波
     const osc = this.ctx.createOscillator();
     const gain = this.ctx.createGain();
     osc.type = 'sawtooth';
@@ -394,7 +963,6 @@ export class BGMPlayer {
     lp.Q.value = 2;
     osc.connect(lp).connect(gain).connect(this.masterGain);
     osc.start(time); osc.stop(time + 0.25);
-    // 子低音层：正弦波低八度
     const sub = this.ctx.createOscillator();
     const sg = this.ctx.createGain();
     sub.type = 'sine';
@@ -411,12 +979,10 @@ export class BGMPlayer {
     const saw = this.ctx.createOscillator();
     const sqr = this.ctx.createOscillator();
     const gain = this.ctx.createGain();
-    const mix = this.ctx.createGain();
     saw.type = 'sawtooth';
     saw.frequency.value = freq;
     sqr.type = 'square';
     sqr.frequency.value = freq;
-    // Vibrato
     const lfo = this.ctx.createOscillator();
     const lfoG = this.ctx.createGain();
     lfo.type = 'sine';
@@ -426,12 +992,10 @@ export class BGMPlayer {
     lfoG.connect(saw.frequency);
     lfoG.connect(sqr.frequency);
     lfo.start(time); lfo.stop(time + 0.2);
-    // ADSR
     gain.gain.setValueAtTime(0, time);
     gain.gain.linearRampToValueAtTime(vol, time + 0.008);
     gain.gain.setValueAtTime(vol * 0.75, time + 0.04);
     gain.gain.exponentialRampToValueAtTime(0.001, time + 0.17);
-    // Distortion-like filtering
     const lp = this.ctx.createBiquadFilter();
     lp.type = 'lowpass';
     lp.frequency.value = 2500;
@@ -457,7 +1021,6 @@ export class BGMPlayer {
     gain.gain.exponentialRampToValueAtTime(0.001, time + 0.35);
     osc.connect(gain).connect(this.masterGain);
     osc.start(time); osc.stop(time + 0.38);
-    // 泛音层 — 更丰富的音色
     const harm = this.ctx.createOscillator();
     const hg = this.ctx.createGain();
     harm.type = 'triangle';
@@ -547,6 +1110,25 @@ export class BGMPlayer {
     });
   }
 
+  /** Section-transition fill: ascending arp (triangle wave, 3-4 quick notes). */
+  private playTransitionFill(time: number): void {
+    if (!this.ctx || !this.masterGain) return;
+    const notes = [523.3, 659.3, 784, 1046.5];
+    const vol = 0.04;
+    notes.forEach((freq, i) => {
+      const osc = this.ctx!.createOscillator();
+      const gain = this.ctx!.createGain();
+      osc.type = 'triangle';
+      osc.frequency.value = freq;
+      const t = time + i * 0.05;
+      gain.gain.setValueAtTime(0, t);
+      gain.gain.linearRampToValueAtTime(vol, t + 0.005);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.06);
+      osc.connect(gain).connect(this.masterGain!);
+      osc.start(t); osc.stop(t + 0.07);
+    });
+  }
+
   private playMetalHit(time: number): void {
     if (!this.ctx || !this.masterGain) return;
     const osc = this.ctx.createOscillator();
@@ -576,21 +1158,19 @@ export class BGMPlayer {
     osc.start(time); osc.stop(time + 0.65);
   }
 
-  // 新增：寺庙钟声
-  private playBellAccent(time: number): void {
+  private playBellAccent(time: number, vol: number = 0.04): void {
     if (!this.ctx || !this.masterGain) return;
     const osc = this.ctx.createOscillator();
     const gain = this.ctx.createGain();
     osc.type = 'sine';
     osc.frequency.value = 880;
-    gain.gain.setValueAtTime(0.04, time);
+    gain.gain.setValueAtTime(vol, time);
     gain.gain.exponentialRampToValueAtTime(0.001, time + 0.5);
-    // 共鸣泛音
     const osc2 = this.ctx.createOscillator();
     const gain2 = this.ctx.createGain();
     osc2.type = 'sine';
     osc2.frequency.value = 1760;
-    gain2.gain.setValueAtTime(0.015, time);
+    gain2.gain.setValueAtTime(vol * 0.38, time);
     gain2.gain.exponentialRampToValueAtTime(0.001, time + 0.3);
     osc.connect(gain).connect(this.masterGain);
     osc2.connect(gain2).connect(this.masterGain);
@@ -598,7 +1178,6 @@ export class BGMPlayer {
     osc2.start(time); osc2.stop(time + 0.35);
   }
 
-  // 新增：rim click — 标题界面节奏
   private playRim(time: number, vol: number): void {
     if (!this.ctx || !this.masterGain) return;
     const osc = this.ctx.createOscillator();

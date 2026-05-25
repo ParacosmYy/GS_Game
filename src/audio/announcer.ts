@@ -1,144 +1,198 @@
 /**
- * Web Speech API Fight Announcer
- * Zero-dependency voice callouts using browser-native SpeechSynthesis
- * v2: 更清晰的语音、更戏剧性的节奏、更好的音素选择
+ * Announcer -- 合成播报系统
+ * 使用 Web Audio API 合成短促音调序列替代 Web Speech API
+ * 每个播报事件对应一段 2-6 个音符的序列，方波 + 三角波混合产生 8-bit/arcade 风格
  */
 
-export interface AnnouncerConfig {
-  /** Speech pitch (0-2). Default 0.6 for deep announcer voice */
-  pitch: number;
-  /** Speech rate (0.1-10). Default 0.75 for dramatic pacing */
-  rate: number;
-  /** Volume (0-1). Default 0.9 */
-  volume: number;
+import { getCtx } from './audioCtx.js';
+
+// 播报音符定义
+interface NoteEvent {
+  freq: number;       // 频率 Hz
+  duration: number;   // 持续时间 ms
+  gap: number;        // 与下一个音符间隔 ms
 }
 
-const DEFAULT_CONFIG: AnnouncerConfig = {
-  pitch: 0.6,
-  rate: 0.75,
-  volume: 0.9,
-};
+const SQUARE = 'square' as OscillatorType;
+const SAWTOOTH = 'sawtooth' as OscillatorType;
+const SINE = 'sine' as OscillatorType;
 
-class FightAnnouncer {
-  private config: AnnouncerConfig;
-  private enabled: boolean = true;
-  private voice: SpeechSynthesisVoice | null = null;
+// 播报音序定义
+const ROUND_NOTES: NoteEvent[] = [
+  { freq: 440, duration: 120, gap: 150 },
+  { freq: 523, duration: 180, gap: 0 },
+];
 
-  constructor(config: Partial<AnnouncerConfig> = {}) {
-    this.config = { ...DEFAULT_CONFIG, ...config };
-    // 尝试选择英文男声
-    this.selectBestVoice();
-  }
+const FIGHT_NOTES: NoteEvent[] = [
+  { freq: 330, duration: 80, gap: 80 },
+  { freq: 440, duration: 80, gap: 80 },
+  { freq: 880, duration: 300, gap: 0 },
+];
 
-  private selectBestVoice(): void {
-    if (typeof speechSynthesis === 'undefined') return;
-    const trySelect = (): void => {
-      const voices = speechSynthesis.getVoices();
-      // 优先选择英文男声
-      const englishMale = voices.find(v =>
-        v.lang.startsWith('en') && (v.name.toLowerCase().includes('male') || v.name.toLowerCase().includes('daniel'))
-      );
-      const englishAny = voices.find(v => v.lang.startsWith('en-'));
-      const anyEnglish = voices.find(v => v.lang.startsWith('en'));
-      this.voice = englishMale || englishAny || anyEnglish || null;
-    };
-    trySelect();
-    // 某些浏览器异步加载voice列表
-    if (typeof speechSynthesis.onvoiceschanged !== 'undefined') {
-      speechSynthesis.onvoiceschanged = trySelect;
+const KO_NOTES: NoteEvent[] = [
+  { freq: 880, duration: 150, gap: 100 },
+  { freq: 440, duration: 350, gap: 0 },
+];
+
+const PERFECT_NOTES: NoteEvent[] = [
+  { freq: 523, duration: 80, gap: 80 },
+  { freq: 659, duration: 80, gap: 80 },
+  { freq: 784, duration: 80, gap: 80 },
+  { freq: 1047, duration: 80, gap: 80 },
+  { freq: 1319, duration: 200, gap: 0 },
+];
+
+const TIME_OVER_NOTES: NoteEvent[] = [
+  { freq: 440, duration: 100, gap: 150 },
+  { freq: 440, duration: 100, gap: 150 },
+  { freq: 440, duration: 200, gap: 0 },
+];
+
+const WINNER_NOTES: NoteEvent[] = [
+  { freq: 523, duration: 120, gap: 150 },
+  { freq: 659, duration: 120, gap: 150 },
+  { freq: 784, duration: 400, gap: 0 },
+];
+
+const FIRST_ATTACK_NOTES: NoteEvent[] = [
+  { freq: 1047, duration: 80, gap: 100 },
+  { freq: 1319, duration: 250, gap: 0 },
+];
+
+const COUNTER_NOTES: NoteEvent[] = [
+  { freq: 1319, duration: 50, gap: 60 },
+  { freq: 1047, duration: 50, gap: 60 },
+  { freq: 1319, duration: 200, gap: 0 },
+];
+
+const GUARD_CRUSH_NOTES: NoteEvent[] = [
+  { freq: 220, duration: 80, gap: 100 },
+  { freq: 440, duration: 80, gap: 100 },
+  { freq: 880, duration: 300, gap: 0 },
+];
+
+const DOUBLE_KO_NOTES: NoteEvent[] = [
+  { freq: 880, duration: 100, gap: 120 },
+  { freq: 440, duration: 100, gap: 120 },
+  { freq: 220, duration: 400, gap: 0 },
+];
+
+const SUPER_CANCEL_NOTES: NoteEvent[] = [
+  { freq: 523, duration: 50, gap: 60 },
+  { freq: 659, duration: 50, gap: 60 },
+  { freq: 784, duration: 50, gap: 60 },
+  { freq: 1047, duration: 300, gap: 0 },
+];
+
+const NEW_CHALLENGER_NOTES: NoteEvent[] = [
+  { freq: 440, duration: 60, gap: 80 },
+  { freq: 523, duration: 60, gap: 80 },
+  { freq: 659, duration: 60, gap: 80 },
+  { freq: 880, duration: 60, gap: 80 },
+  { freq: 1047, duration: 300, gap: 0 },
+];
+
+export class Announcer {
+  private enabled = true;
+
+  setEnabled(v: boolean): void { this.enabled = v; }
+
+  isEnabled(): boolean { return this.enabled; }
+
+  toggle(): void { this.enabled = !this.enabled; }
+
+  private playSequence(notes: NoteEvent[], waveType: OscillatorType = SQUARE, volume: number = 0.15): void {
+    if (!this.enabled) return;
+    const ctx = getCtx();
+    if (ctx.state === 'suspended') return;
+
+    let offset = 0;
+    for (const note of notes) {
+      const startTime = ctx.currentTime + offset / 1000;
+      const endTime = startTime + note.duration / 1000;
+
+      // 主音
+      const osc = ctx.createOscillator();
+      osc.type = waveType;
+      osc.frequency.value = note.freq;
+      const gain = ctx.createGain();
+      gain.gain.setValueAtTime(0, startTime);
+      gain.gain.linearRampToValueAtTime(volume, startTime + 0.005);
+      gain.gain.setValueAtTime(volume, endTime - 0.01);
+      gain.gain.linearRampToValueAtTime(0, endTime);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(startTime);
+      osc.stop(endTime + 0.01);
+
+      // 泛音层 (triangle, 高八度, 音量 20%)
+      const osc2 = ctx.createOscillator();
+      osc2.type = 'triangle';
+      osc2.frequency.value = note.freq * 2;
+      const gain2 = ctx.createGain();
+      gain2.gain.setValueAtTime(0, startTime);
+      gain2.gain.linearRampToValueAtTime(volume * 0.2, startTime + 0.005);
+      gain2.gain.setValueAtTime(volume * 0.2, endTime - 0.01);
+      gain2.gain.linearRampToValueAtTime(0, endTime);
+      osc2.connect(gain2);
+      gain2.connect(ctx.destination);
+      osc2.start(startTime);
+      osc2.stop(endTime + 0.01);
+
+      offset += note.duration + note.gap;
     }
   }
 
-  /** Speak a phrase. Cancels any currently playing speech. */
-  private speak(text: string, pitchOverride?: number, rateOverride?: number): void {
-    if (!this.enabled || typeof speechSynthesis === 'undefined') return;
-    speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.pitch = pitchOverride ?? this.config.pitch;
-    utterance.rate = rateOverride ?? this.config.rate;
-    utterance.volume = this.config.volume;
-    utterance.lang = 'en-US';
-    if (this.voice) utterance.voice = this.voice;
-    speechSynthesis.speak(utterance);
+  roundStart(n: number): void {
+    // 根据回合数调整结尾音高
+    const base = ROUND_NOTES.map(note => ({ ...note }));
+    base[1].freq = 523 + (n - 1) * 65; // ROUND 1=523, 2=587, 3=659, 4+=721
+    this.playSequence(base);
   }
 
-  // ── Fight Events ──
-
-  /** Called at round start: "Round X" */
-  roundStart(roundNumber: number): void {
-    // 更慢、更低沉的round call
-    this.speak(`Round ${roundNumber}`, 0.55, 0.7);
-  }
-
-  /** Called after round announcement: "Fight!" */
   fight(): void {
-    // 短促有力的 "Fight!"
-    setTimeout(() => this.speak('Fight!', 0.65, 0.8), 800);
+    this.playSequence(FIGHT_NOTES, SAWTOOTH, 0.18);
   }
 
-  /** Called on KO */
   knockOut(): void {
-    // K.O. — 拆分两个字母，更有戏剧性
-    this.speak('K ... O!', 0.5, 0.6);
+    this.playSequence(KO_NOTES, SQUARE, 0.2);
   }
 
-  /** Called on perfect victory (no damage taken) */
   perfect(): void {
-    setTimeout(() => this.speak('Perfect!', 0.7, 0.85), 600);
+    this.playSequence(PERFECT_NOTES, SINE, 0.15);
   }
 
-  /** Called on time over */
   timeOver(): void {
-    this.speak('Time Over!', 0.55, 0.8);
+    this.playSequence(TIME_OVER_NOTES);
   }
 
-  /** Called on first hit of the round */
-  firstAttack(): void {
-    this.speak('First Attack!', 0.65, 0.9);
-  }
-
-  /** Called on match winner */
   winner(): void {
-    setTimeout(() => this.speak('Winner!', 0.6, 0.75), 1200);
+    this.playSequence(WINNER_NOTES, SINE, 0.15);
   }
 
-  /** Called on counter hit */
+  firstAttack(): void {
+    this.playSequence(FIRST_ATTACK_NOTES);
+  }
+
   counter(): void {
-    this.speak('Counter!', 0.7, 1.0);
+    this.playSequence(COUNTER_NOTES);
   }
 
-  /** Called on guard crush */
   guardCrush(): void {
-    this.speak('Guard Crush!', 0.55, 0.85);
+    this.playSequence(GUARD_CRUSH_NOTES, SAWTOOTH, 0.15);
   }
 
-  /** Called on super cancel */
   superCancel(): void {
-    this.speak('Super Cancel!', 0.7, 1.0);
+    this.playSequence(SUPER_CANCEL_NOTES);
   }
 
-  /** Called on double KO */
   doubleKO(): void {
-    this.speak('Double K O!', 0.5, 0.65);
+    this.playSequence(DOUBLE_KO_NOTES);
   }
 
-  /** Called on new challenger */
   newChallenger(): void {
-    this.speak('Here comes a new challenger!', 0.65, 0.85);
-  }
-
-  /** Toggle announcer on/off */
-  toggle(): void {
-    this.enabled = !this.enabled;
-  }
-
-  setEnabled(enabled: boolean): void {
-    this.enabled = enabled;
-  }
-
-  isEnabled(): boolean {
-    return this.enabled;
+    this.playSequence(NEW_CHALLENGER_NOTES);
   }
 }
 
-export const announcer = new FightAnnouncer();
+export const announcer = new Announcer();

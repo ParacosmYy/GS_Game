@@ -30,14 +30,16 @@ import { initAudio, initSampler, playKO, playVictoryFanfare, playMAXActivation, 
 import { createTeam, defeatActive, switchToNext, activeChar, teamOrderString, type TeamState } from './state/teamState.js';
 import { resolveSimplified } from './input/simplifiedInput.js';
 import { bgm } from './audio/bgm.js';
+import { AmbientSoundPlayer } from './audio/ambient.js';
 import { announcer } from './audio/announcer.js';
 import { SimpleAI } from './ai/simpleAI.js';
 import { updateMovementVfx } from './state/movementVfx.js';
-import { WIN_QUOTE_DURATION } from './rendering/screens.js';
+import { WIN_QUOTE_DURATION, drawAnnounceSequence } from './rendering/screens.js';
 import { GameStateManager } from './state/gameStateManager.js';
 import { gameRandom, gameRandomInt } from './core/prng.js';
 import { InputLogger } from './core/inputLog.js';
 import { ReplaySession } from './core/replaySession.js';
+import { createRoundStartSequence, createKOSequence, createTimeOverSequence } from './state/announcePresets.js';
 
 const canvas = document.getElementById('gameCanvas') as HTMLCanvasElement;
 const ctx = canvas.getContext('2d')!;
@@ -91,6 +93,7 @@ const select = new SelectState(p1Ctrl, p2Ctrl, p1, p2, p2Cmd);
 const rounds = new RoundState({ p1, p2, p1Cmd, p2Cmd, combatSystem, projectiles, vfx, cinematic, gauges, maxModes, tickRef });
 const dmMgr = new DMManager({ gauges, maxModes, cinematic, vfx, screenShake, fighters: [p1, p2] });
 const replaySession = new ReplaySession(inputLog);
+const ambient = new AmbientSoundPlayer();
 const onHit = createHitCallback({ fighters: [p1, p2], vfx, screenShake, screenFlash, gauges, cinematic, combatSystem });
 combatSystem.onThrowEscape = (_attacker, defender, hitX, hitY) => {
   vfx.spawnThrowEscapeSparks(hitX, hitY); vfx.spawnTechText(hitX, hitY - 40);
@@ -166,6 +169,7 @@ function update(): void {
         p2DelayedHealth = p2.maxHealth;
         p1.savePrevState();
         p2.savePrevState();
+        gs.announceSequence.setSteps(createRoundStartSequence(1));
         announcer.roundStart(1);
         announcer.fight();
       } else {
@@ -197,6 +201,7 @@ function update(): void {
       p2DelayedHealth = p2.maxHealth;
       p1.savePrevState();
       p2.savePrevState();
+      gs.announceSequence.setSteps(createRoundStartSequence(1));
       announcer.roundStart(1);
       announcer.fight();
     }
@@ -205,7 +210,19 @@ function update(): void {
 
   if (gs.phase === GamePhase.INTRO) {
     gs.phaseTimer++;
-    if (gs.phaseTimer >= INTRO_DURATION) {
+    // Tick announce sequence, play SFX on trigger frames
+    if (gs.announceSequence.isRunning()) {
+      const sfxId = gs.announceSequence.tick();
+      if (sfxId === 'fight') {
+        playFight();
+        screenFlash.trigger('#ffffff', 0.2, 6);
+      } else if (sfxId === 'round_call') {
+        announcer.roundStart(rounds.currentRound);
+      }
+    }
+    // Transition to FIGHTING when announce sequence completes (or fallback timer)
+    const announceDone = gs.announceSequence.isComplete();
+    if (announceDone || gs.phaseTimer >= INTRO_DURATION) {
       gs.setPhase(GamePhase.FIGHTING);
       tickRef.value = 0;
       const replaySeed = Date.now() & 0xFFFF;
@@ -225,15 +242,30 @@ function update(): void {
       gs.firstAttacker = null;
       gs.koGroundSlamDone = false;
       bgm.start();
-      playFight();
-      screenFlash.trigger('#ffffff', 0.2, 6);
+      ambient.start(getStage());
     }
     return;
   }
 
   if (gs.phase === GamePhase.KO) {
     gs.koTimer++;
-    if (gs.koTimer > KO_DISPLAY_TIME) {
+    // Tick announce sequence for KO/TIME OVER text animation
+    if (gs.announceSequence.isRunning()) {
+      const sfxId = gs.announceSequence.tick();
+      if (sfxId === 'ko') {
+        // KO SFX already played during cinematic slow-mo, no replay needed
+      } else if (sfxId === 'time_over') {
+        // TIME OVER SFX already played on phase entry, no replay needed
+      } else if (sfxId === 'perfect') {
+        playPerfect();
+        announcer.perfect();
+      }
+    }
+    // Transition to WIN_QUOTE when announce sequence completes (or fallback timer)
+    const announceDone = gs.announceSequence.isComplete();
+    if (announceDone || gs.koTimer > KO_DISPLAY_TIME) {
+      // Reset announce sequence so it doesn't render in next phase
+      gs.announceSequence.reset();
       gs.currentWinQuote = pickWinQuote(gs.winner);
       if (gs.winner !== null) {
         const fighter = gs.winner === 0 ? p1 : p2;
@@ -276,6 +308,7 @@ function update(): void {
           p1DelayedHealth = p1.maxHealth;
           p2DelayedHealth = p2.maxHealth;
           cinematic.reset();
+          gs.announceSequence.setSteps(createRoundStartSequence(rounds.currentRound));
           announcer.roundStart(rounds.currentRound);
           announcer.fight();
           return;
@@ -301,6 +334,7 @@ function update(): void {
         gs.koGroundSlamDone = false;
         p1DelayedHealth = p1.maxHealth;
         p2DelayedHealth = p2.maxHealth;
+        gs.announceSequence.setSteps(createRoundStartSequence(rounds.currentRound));
         announcer.roundStart(rounds.currentRound);
         announcer.fight();
       }
@@ -322,7 +356,7 @@ function update(): void {
 
   // === FIGHTING phase ===
   if (gs.isTrainingMode && inputManager.isKeyDown('Escape')) {
-    bgm.stop(); gs.setPhase(GamePhase.SELECT); select.reset(); p2AI = null; gs.isTrainingMode = true; return;
+    bgm.stop(); ambient.stop(); gs.setPhase(GamePhase.SELECT); select.reset(); p2AI = null; gs.isTrainingMode = true; return;
   }
   if (cinematic.isFrozen()) { cinematic.tickInFreeze(maxModes); return; }
   cinematic.tickMaxModes(maxModes);
@@ -537,6 +571,7 @@ function update(): void {
       screenShake.trigger(isDMKill ? 18 : 14, 15);
       playKO();
       bgm.stop();
+      ambient.stop();
       announcer.knockOut();
     }
     if (!gs.koGroundSlamDone && cinematic.koSlowMoTriggered) {
@@ -552,12 +587,12 @@ function update(): void {
       gs.setPhase(GamePhase.KO);
       gs.koTimer = 0;
       gs.winner = rounds.determineWinner();
-      if (gs.winner !== null && cinematic.getPerfectPlayer(gs.winner) !== null) {
+      const isPerfect = gs.winner !== null && cinematic.getPerfectPlayer(gs.winner) !== null;
+      gs.announceSequence.setSteps(createKOSequence(isPerfect));
+      if (isPerfect) {
         const pw = gs.winner === 0 ? p1 : p2;
         vfx.spawnPerfectFlash(pw.x, pw.y - pw.displayHeight / 2);
         screenFlash.trigger('#ffcc00', 0.25, 8);
-        playPerfect();
-        announcer.perfect();
       }
     }
   }
@@ -567,9 +602,11 @@ function update(): void {
     gs.koTimer = 0;
     gs.isTimeOver = true;
     gs.winner = rounds.determineWinner();
+    gs.announceSequence.setSteps(createTimeOverSequence());
     screenShake.trigger(8, 10);
     screenFlash.trigger('#ffaa00', 0.2, 8);
     bgm.stop();
+    ambient.stop();
     announcer.timeOver();
   }
 }
@@ -656,7 +693,16 @@ function render(): void {
   if (cinematic.superFlashTimer > 0)
     renderer.drawSuperFlash(ctx, cinematic.superFlashTimer, cinematic.superFlashX - camera.x, cinematic.superFlashY, maxModes[cinematic.superFlashAttacker].active ? 'SDM' : 'DM');
   renderer.drawPowerGauges(gauges, maxModes);
-  if (gs.phase === GamePhase.INTRO) renderer.drawIntro(gs.phaseTimer, rounds.currentRound, p1Char.nameCn, p2Char.nameCn);
+  if (gs.phase === GamePhase.INTRO) {
+    if (gs.announceSequence.isRunning()) {
+      drawAnnounceSequence(ctx, gs.announceSequence, canvas.width, canvas.height);
+    } else {
+      renderer.drawIntro(gs.phaseTimer, rounds.currentRound, p1Char.nameCn, p2Char.nameCn);
+    }
+  }
+  if (gs.phase === GamePhase.KO && gs.announceSequence.isRunning()) {
+    drawAnnounceSequence(ctx, gs.announceSequence, canvas.width, canvas.height);
+  }
   renderer.drawComboCounters([p1, p2], [combatSystem.getComboCount(0), combatSystem.getComboCount(1)], [0, 0], camera, [combatSystem.getComboDamage(0), combatSystem.getComboDamage(1)]);
   if (gs.teamMode && p1Team && p2Team) {
     const toDisp = (t: TeamState): TeamDisplayInfo => ({
@@ -711,6 +757,7 @@ function render(): void {
 
 function restartGame(): void {
   bgm.stop();
+  ambient.stop();
   gs.resetForNewGame();
   tickRef.value = 0;
   select.reset();

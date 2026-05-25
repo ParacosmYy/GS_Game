@@ -5,6 +5,7 @@
  * 逐步将阶段逻辑提取到独立 handler 中。
  */
 import { GamePhase } from '../core/types.js';
+import { AnnounceSequence } from './announceSequence.js';
 
 export class GameStateManager {
   phase: GamePhase = GamePhase.TITLE;
@@ -28,6 +29,7 @@ export class GameStateManager {
   stageIndicatorTimer = 0;
   koGroundSlamDone = false;
   firstHitTracked = false;
+  announceSequence: AnnounceSequence = new AnnounceSequence();
 
   setPhase(p: GamePhase): void {
     this.phase = p;

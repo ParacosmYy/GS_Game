@@ -11,6 +11,7 @@ import { ROSTER } from '../characters/index.js';
 import { isDM as isDMCheck } from '../core/attackClassifier.js';
 import { gainMeterOnHit, gainMeterOnBlock, gainMeterOnHitstun } from './meter.js';
 import { playHit, playBlock, playSpecial, playDM, playThrow, playCounter, playHeavyHit, playSuperFlash, playWire, playJuggleHit, playBlockSpecial, playBlockDM, playSpecialLight, playSpecialHeavy } from '../audio/sampler.js';
+import { bgm } from '../audio/bgm.js';
 import type { CinematicState } from '../state/cinematicState.js';
 
 function classifyAttack(at: AttackType) {
@@ -255,6 +256,13 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
     else if (!defender.isGrounded()) playJuggleHit(combo);
     else playHit(data.damage > 50 ? 1.2 : 1.0, combo);
 
+    // Sidechain duck: lower BGM briefly so SFX cuts through
+    if (isDM) bgm.duck(0.55, 200);
+    else if (isSpecial) bgm.duck(0.65, 150);
+    else if (isThrowAttack(attackType) || counterHit) bgm.duck(0.65, 150);
+    else if (isHeavyAttack(attackType)) bgm.duck(0.72, 120);
+    else bgm.duck(0.78, 100);
+
     // Counter Hit — KOF2002: CH额外顿帧+橙色爆发+冲击波
     if (counterHit) {
       deps.vfx.spawnCounterText(defender.x, defender.y - defender.displayHeight - 55);
@@ -263,6 +271,7 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       deps.vfx.spawnCharacterHitSparks(hitX, hitY, 6, '#ff8800', 0.9, 1.0, 0.22);
       deps.vfx.spawnImpactRing(hitX, hitY, 1.15);
       playCounter();
+      bgm.duck(0.6, 180);
     }
     if (counterHit && (data as { counterWire?: boolean }).counterWire) {
       deps.vfx.spawnWireText(defender.x, defender.y - defender.displayHeight - 55);

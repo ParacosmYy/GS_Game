@@ -12,6 +12,7 @@ import {
 } from '../state/selectState.js';
 import type { SelectState } from '../state/selectState.js';
 import type { StageId } from './stage.js';
+import type { AnnounceSequence } from '../state/announceSequence.js';
 
 // ===== 舞台名称映射 =====
 const STAGE_NAMES: Record<StageId, string> = {
@@ -898,6 +899,74 @@ export function drawWinQuote(
     ctx.beginPath();
     ctx.arc(CANVAS_WIDTH / 2 + quoteWidth / 2 + 15, quoteY, 3, 0, Math.PI * 2);
     ctx.fill();
+  }
+
+  ctx.globalAlpha = 1;
+  ctx.restore();
+}
+
+// ===== Announce Sequence Overlay =====
+
+export function drawAnnounceSequence(
+  ctx: CanvasRenderingContext2D,
+  seq: AnnounceSequence,
+  canvasWidth: number,
+  canvasHeight: number,
+): void {
+  const render = seq.getCurrentRender();
+  if (!render) return;
+  const { step, progress } = render;
+
+  ctx.save();
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+
+  // 冲击波环
+  if (step.shockwaveRings > 0 && progress < 0.5) {
+    for (let r = 0; r < step.shockwaveRings; r++) {
+      const ringProgress = Math.min(1, Math.max(0, progress * 2 - r * 0.08));
+      if (ringProgress <= 0) continue;
+      const ringRadius = 20 + ringProgress * (150 - r * 20);
+      const ringAlpha = Math.max(0, 1 - ringProgress) * (1 - r * 0.2);
+      if (ringAlpha > 0) {
+        ctx.beginPath();
+        ctx.arc(canvasWidth / 2, canvasHeight / 2, ringRadius, 0, Math.PI * 2);
+        ctx.strokeStyle = `rgba(255, ${100 + r * 40}, 0, ${ringAlpha * 0.5})`;
+        ctx.lineWidth = (3 - Math.min(r, 2)) * (1 - ringProgress) + 1;
+        ctx.stroke();
+      }
+    }
+  }
+
+  // 全屏闪光
+  if (step.flash && progress < step.flash.frames / step.duration) {
+    const flashAlpha = step.flash.alpha * (1 - progress * step.duration / step.flash.frames);
+    ctx.fillStyle = step.flash.color;
+    ctx.globalAlpha = Math.max(0, flashAlpha);
+    ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+    ctx.globalAlpha = 1;
+  }
+
+  // 文字
+  const alpha = step.alphaCurve(progress);
+  const scale = step.scaleCurve(progress);
+  ctx.globalAlpha = Math.max(0, Math.min(1, alpha));
+
+  const text = seq.getText();
+  if (text && step.fontSize > 0) {
+    const fontSize = Math.round(step.fontSize * scale);
+    // 双层文字：先画描边再画填充
+    ctx.font = `bold ${fontSize}px "Courier New", monospace`;
+    ctx.shadowColor = step.glowColor;
+    ctx.shadowBlur = 25 + (scale > 1 ? (scale - 1) * 20 : 0);
+    // 描边层
+    ctx.strokeStyle = 'rgba(0,0,0,0.8)';
+    ctx.lineWidth = 3;
+    ctx.strokeText(text, canvasWidth / 2, canvasHeight / 2);
+    // 填充层
+    ctx.fillStyle = step.fillColor;
+    ctx.fillText(text, canvasWidth / 2, canvasHeight / 2);
+    ctx.shadowBlur = 0;
   }
 
   ctx.globalAlpha = 1;
