@@ -67,7 +67,7 @@ export function spawnCharacterHitSparks(particles: Particle[], worldX: number, w
       color: Math.random() > 0.35 ? charColor : '#ffffff',
       type: isStar ? 'star' : 'spark',
       gravity: grav,
-      friction: 0.94,
+      friction: sizeScale < 0.8 ? 0.95 : 0.93,
       rotation: Math.random() * Math.PI * 2,
       rotSpeed: (Math.random() - 0.5) * 0.4,
     });
@@ -138,7 +138,7 @@ export function spawnThrowEscapeSparks(particles: Particle[], worldX: number, wo
   });
   for (let i = 0; i < 10; i++) {
     const angle = Math.random() * Math.PI * 2;
-    const speed = 2 + Math.random() * 4;
+    const speed = 3 + Math.random() * 3;
     particles.push({
       x: worldX, y: worldY,
       vx: Math.cos(angle) * speed,
@@ -279,8 +279,9 @@ export function spawnDamageText(particles: Particle[], worldX: number, worldY: n
     color = '#ffffff';
   }
   const driftX = isCombo ? 1.2 : -0.8;
+  const driftY = value >= 120 ? -2.2 : value >= 80 ? -1.8 : -1.2;
   particles.push({
-    x: worldX, y: worldY, vx: driftX + (Math.random() - 0.5) * 0.3, vy: -1.5,
+    x: worldX, y: worldY, vx: driftX + (Math.random() - 0.5) * 0.3, vy: driftY,
     life: 50, maxLife: 50,
     size: dmgSize,
     color,

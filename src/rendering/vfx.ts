@@ -59,14 +59,14 @@ export class ScreenFlash {
 
   render(ctx: CanvasRenderingContext2D, canvasW: number, canvasH: number): void {
     if (this.timer <= 0) return;
-    // KOF2002: 闪光先快后慢衰减 (ease-out cubic)
+    // KOF2002: 闪光先快后慢衰减 (ease-out quartic) — 首帧更突出
     const linear = this.timer / this.maxTimer;
-    const eased = 1 - (1 - linear) * (1 - linear) * (1 - linear);
+    const eased = 1 - Math.pow(1 - linear, 4);
     const alpha = eased * this.intensity;
     // KOF2002: 首帧纯白闪光, 更强的初始冲击
     const isFirstFrame = this.timer === this.maxTimer;
     ctx.save();
-    ctx.globalAlpha = isFirstFrame ? Math.min(1, alpha * 1.5) : alpha;
+    ctx.globalAlpha = isFirstFrame ? Math.min(1, alpha * 1.7) : alpha;
     ctx.fillStyle = isFirstFrame ? '#ffffff' : this.color;
     ctx.fillRect(0, 0, canvasW, canvasH);
     ctx.restore();
@@ -504,12 +504,12 @@ export class ScreenShake {
     if (this.duration > 0) {
       this.duration--;
       const t = this.duration / this.maxDuration;
-      // KOF2002: 初始2帧强冲击(完整强度), 之后快速衰减
-      const isImpactFrame = this.duration >= this.maxDuration - 2;
+      // KOF2002: 初始3帧强冲击(完整强度), 之后快速衰减
+      const isImpactFrame = this.duration >= this.maxDuration - 3;
       const randomDecay = isImpactFrame ? 1 : t * t;
       const biasDecay = isImpactFrame ? 1 : Math.pow(t, 1.5);
       this.offsetX = (Math.random() - 0.5) * this.intensity * randomDecay + this.biasX * biasDecay * 0.3;
-      this.offsetY = (Math.random() - 0.5) * this.intensity * randomDecay * 0.6;
+      this.offsetY = (Math.random() - 0.5) * this.intensity * randomDecay * 0.7;
     } else {
       this.offsetX = 0;
       this.offsetY = 0;

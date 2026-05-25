@@ -192,7 +192,7 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
         deps.vfx.spawnImpactRing(hitX, hitY);
         deps.vfx.spawnImpactRing(hitX, hitY);
       } else {
-        deps.screenFlash.trigger('#ffffff', 0.35, 10);
+        deps.screenFlash.trigger('#fffde8', 0.38, 10);
       }
     }
 
@@ -240,7 +240,7 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       if (defender.isGrounded()) {
         deps.vfx.spawnDust(defender.x, defender.y);
       }
-      deps.screenShake.trigger(7, 9);
+      deps.screenShake.trigger(9, 9);
     }
     else if (isSpecial) { playSpecial(); if (combo > 0) playHit(0.6, combo); }
     else if (data.damage >= 70) playHeavyHit(1 + Math.min(data.damage - 70, 50) / 62.5);
@@ -335,7 +335,7 @@ export function triggerKOGroundEffect(deps: { vfx: VFXSystem; screenFlash: Scree
   deps.vfx.spawnImpactRing(defender.x, defender.y, 2.0);
   // KOF2002: KO落地暗红色脉冲环 — 最终终结感
   deps.vfx.spawnImpactRing(defender.x, defender.y, 3.0);
-  deps.vfx.spawnCharacterHitSparks(defender.x, defender.y - 20, 10, '#ff4400', 1.2, 1.5);
+  deps.vfx.spawnCharacterHitSparks(defender.x, defender.y - 20, 16, '#ff4400', 1.2, 1.5);
   deps.screenFlash.trigger('#ff2200', 0.35, 14);
   deps.screenShake.trigger(18, 18);
 }
