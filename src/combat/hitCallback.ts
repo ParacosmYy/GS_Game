@@ -114,7 +114,7 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       }
       // KOF2002: 防御顿帧 — DM 8F, 必杀/重攻击 5F, 轻攻击 3F
       const blkStop = blkDM ? 8 : blkSpecial ? 5 : blkHeavy ? 5 : 3;
-      deps.cinematic.triggerHitStop(blkStop);
+      deps.cinematic.triggerHitStop(blkStop, defIdx, attacker.facing);
       // KOF2002: 重攻击/必杀被防时震屏有方向偏移
       const blkBias = (blkDM || blkSpecial || blkHeavy) ? attacker.facing * 4 : 0;
       deps.screenShake.trigger(blkDM ? 8 : blkSpecial ? 5 : blkHeavy ? 4 : 2, blkDM ? 10 : 6, blkBias);
@@ -138,7 +138,7 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
     const comboStop = combo >= 10 ? 2 : combo >= 5 ? 1 : 0;
     // KOF2002: 防守方低血量(<15%)额外+2F顿帧, 终局打击感更强
     const criticalStop = defender.health < defender.maxHealth * 0.15 ? 2 : 0;
-    deps.cinematic.triggerHitStop(baseStop + comboStop + criticalStop);
+    deps.cinematic.triggerHitStop(baseStop + comboStop + criticalStop, defIdx, attacker.facing);
     gainMeterOnHitstun(deps.gauges[defIdx], attackType);
     // 风云再起特色: 第一次命中奖励 — 每回合首次命中额外+30气槽
     if (!deps.combatSystem.wasFirstHitAwarded(defIdx)) {
@@ -280,7 +280,7 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
         deps.vfx.spawnHeavyDust(defender.x, defender.y, 8);
       }
       // KOF2002: Counter Wire额外顿帧 — 壁弹前明显停顿, 强调打击感
-      deps.cinematic.triggerHitStop(4);
+      deps.cinematic.triggerHitStop(4, defIdx, attacker.facing);
       playWire();
     }
 
@@ -341,7 +341,7 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
     // KO检测 — 角色倒地时触发震撼效果
     if (defender.health <= 0 && !defender.isGrounded()) {
       // KOF2002: KO前最后一击额外顿帧+微闪
-      deps.cinematic.triggerHitStop(2);
+      deps.cinematic.triggerHitStop(2, defIdx, attacker.facing);
       deps.screenFlash.trigger('#ff4400', 0.08, 3);
     }
   };
@@ -357,5 +357,6 @@ export function triggerKOGroundEffect(deps: { vfx: VFXSystem; screenFlash: Scree
   deps.vfx.spawnImpactRing(defender.x, defender.y, 3.0);
   deps.vfx.spawnCharacterHitSparks(defender.x, defender.y - 20, 16, '#ff4400', 1.2, 1.5);
   deps.screenFlash.trigger('#ff2200', 0.35, 14);
-  deps.screenShake.trigger(18, 18);
+  // KOF2002: KO落地震屏35帧, 比之前18帧更长, 模拟地面冲击波持续感
+  deps.screenShake.trigger(18, 35);
 }

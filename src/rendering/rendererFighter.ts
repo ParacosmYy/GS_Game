@@ -14,6 +14,7 @@ import { drawAttackLimb } from './attackLimb.js';
 export function drawFighters(
   ctx: CanvasRenderingContext2D, fighters: Fighter[], cameraX: number,
   globalTick: number, maxModes?: [MaxModeState, MaxModeState],
+  hitStopDefender: number = -1, hitStopBias: number = 0,
 ): void {
   const sorted = [...fighters].sort((a, b) => a.y - b.y);
 
@@ -138,6 +139,13 @@ export function drawFighters(
     ctx.translate(sx + leanOffsetX, sy);
     ctx.rotate(leanAngle);
     ctx.translate(-(sx + leanOffsetX), -sy);
+
+    // KOF2002: Hit-stop defender jitter — 冻结期间防守方朝攻击方向微小震动
+    if (hitStopDefender >= 0 && playerIdx === hitStopDefender) {
+      const jitterX = hitStopBias * 0.8 * (0.5 + Math.random() * 0.5);
+      const jitterY = (Math.random() - 0.5) * 1.5;
+      ctx.translate(jitterX, jitterY);
+    }
 
     // Hitstun body shake
     if (f.state === FighterState.HITSTUN && f.hitstunTimer > 0) {

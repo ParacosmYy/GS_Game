@@ -14,48 +14,67 @@ export function drawSuperFlash(
   flashType: 'DM' | 'SDM' = 'DM',
 ): void {
   ctx.save();
-  const progress = timer / 20;
+  // KOF2002 Super Flash 4阶段: FLASH(24-19) → DARKEN(18-13) → HOLD(12-5) → RELEASE(4-0)
   const isSDM = flashType === 'SDM';
+  const isFlash = timer > 19;
+  const isDarken = timer > 13;
+  const isHold = timer > 4;
 
-  // Dark overlay
-  const alpha = 0.65 * progress;
-  ctx.fillStyle = isSDM ? `rgba(80, 0, 0, ${alpha})` : `rgba(0, 0, 80, ${alpha})`;
-  ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+  // Phase 1: FLASH — 全屏白/金色闪烁 (帧24-20)
+  if (isFlash) {
+    const flashT = (timer - 19) / 5;
+    const flashAlpha = flashT * 0.95;
+    ctx.fillStyle = isSDM
+      ? `rgba(255, 200, 100, ${flashAlpha})`
+      : `rgba(255, 255, 255, ${flashAlpha})`;
+    ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+  }
 
-  // Flash burst — initial bright white flash
+  // Phase 2: DARKEN — 背景变暗 (帧18起, 持续)
+  if (isDarken) {
+    const darkT = Math.min(1, (timer - 13) / 6);
+    const alpha = 0.7 * darkT;
+    ctx.fillStyle = isSDM ? `rgba(80, 0, 0, ${alpha})` : `rgba(0, 0, 80, ${alpha})`;
+    ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+  }
+
+  // Phase 2-3: 角色周围爆发光晕
   if (timer > 14) {
-    const flashAlpha = (timer - 14) / 6 * 0.9;
+    const burstAlpha = Math.min(1, (timer - 14) / 4) * 0.9;
     const flashGrad = ctx.createRadialGradient(flashScreenX, flashScreenY, 0, flashScreenX, flashScreenY, 180);
     if (isSDM) {
-      flashGrad.addColorStop(0, `rgba(255, 220, 160, ${flashAlpha})`);
-      flashGrad.addColorStop(0.2, `rgba(255, 160, 50, ${flashAlpha * 0.7})`);
-      flashGrad.addColorStop(0.5, `rgba(255, 80, 20, ${flashAlpha * 0.3})`);
+      flashGrad.addColorStop(0, `rgba(255, 220, 160, ${burstAlpha})`);
+      flashGrad.addColorStop(0.2, `rgba(255, 160, 50, ${burstAlpha * 0.7})`);
+      flashGrad.addColorStop(0.5, `rgba(255, 80, 20, ${burstAlpha * 0.3})`);
       flashGrad.addColorStop(1, `rgba(255, 60, 10, 0)`);
     } else {
-      flashGrad.addColorStop(0, `rgba(255, 255, 220, ${flashAlpha})`);
-      flashGrad.addColorStop(0.2, `rgba(255, 230, 100, ${flashAlpha * 0.7})`);
-      flashGrad.addColorStop(0.5, `rgba(255, 200, 50, ${flashAlpha * 0.3})`);
+      flashGrad.addColorStop(0, `rgba(255, 255, 220, ${burstAlpha})`);
+      flashGrad.addColorStop(0.2, `rgba(255, 230, 100, ${burstAlpha * 0.7})`);
+      flashGrad.addColorStop(0.5, `rgba(255, 200, 50, ${burstAlpha * 0.3})`);
       flashGrad.addColorStop(1, `rgba(255, 180, 30, 0)`);
     }
     ctx.fillStyle = flashGrad;
     ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
   }
 
-  // Lingering glow
-  const glowAlpha = progress * 0.5;
-  const glowSize = 90 + (1 - progress) * 50;
-  const glowGrad = ctx.createRadialGradient(flashScreenX, flashScreenY, 0, flashScreenX, flashScreenY, glowSize);
-  if (isSDM) {
-    glowGrad.addColorStop(0, `rgba(255, 160, 60, ${glowAlpha})`);
-    glowGrad.addColorStop(0.4, `rgba(255, 100, 30, ${glowAlpha * 0.4})`);
-    glowGrad.addColorStop(1, 'rgba(255, 80, 20, 0)');
-  } else {
-    glowGrad.addColorStop(0, `rgba(255, 255, 100, ${glowAlpha})`);
-    glowGrad.addColorStop(0.4, `rgba(255, 200, 50, ${glowAlpha * 0.4})`);
-    glowGrad.addColorStop(1, 'rgba(255, 200, 50, 0)');
+  // 持久光晕 — HOLD阶段核心光球
+  if (isHold) {
+    const holdT = (timer - 4) / 16;
+    const glowAlpha = holdT * 0.5;
+    const glowSize = 90 + (1 - holdT) * 50;
+    const glowGrad = ctx.createRadialGradient(flashScreenX, flashScreenY, 0, flashScreenX, flashScreenY, glowSize);
+    if (isSDM) {
+      glowGrad.addColorStop(0, `rgba(255, 160, 60, ${glowAlpha})`);
+      glowGrad.addColorStop(0.4, `rgba(255, 100, 30, ${glowAlpha * 0.4})`);
+      glowGrad.addColorStop(1, 'rgba(255, 80, 20, 0)');
+    } else {
+      glowGrad.addColorStop(0, `rgba(255, 255, 100, ${glowAlpha})`);
+      glowGrad.addColorStop(0.4, `rgba(255, 200, 50, ${glowAlpha * 0.4})`);
+      glowGrad.addColorStop(1, 'rgba(255, 200, 50, 0)');
+    }
+    ctx.fillStyle = glowGrad;
+    ctx.fillRect(flashScreenX - 200, flashScreenY - 200, 400, 400);
   }
-  ctx.fillStyle = glowGrad;
-  ctx.fillRect(flashScreenX - 200, flashScreenY - 200, 400, 400);
 
   // Ground shockwave ring
   if (timer > 8 && timer < 18) {
@@ -71,12 +90,13 @@ export function drawSuperFlash(
 
   // Radiating energy lines — 16 lines
   if (timer > 10) {
-    const lineAlpha = (timer - 10) / 10 * 0.3;
+    const lineT = (timer - 10) / 14;
+    const lineAlpha = lineT * 0.3;
     ctx.strokeStyle = isSDM ? `rgba(255, 180, 60, ${lineAlpha})` : `rgba(255, 255, 100, ${lineAlpha})`;
     ctx.lineWidth = 2;
     for (let a = 0; a < 16; a++) {
       const angle = (a / 16) * Math.PI * 2 + timer * 0.1;
-      const len = 60 + (1 - progress) * 100;
+      const len = 60 + lineT * 100;
       ctx.beginPath();
       ctx.moveTo(flashScreenX + Math.cos(angle) * 20, flashScreenY + Math.sin(angle) * 20);
       ctx.lineTo(flashScreenX + Math.cos(angle) * len, flashScreenY + Math.sin(angle) * len);
@@ -86,7 +106,7 @@ export function drawSuperFlash(
     ctx.lineWidth = 1.5;
     for (let a = 0; a < 8; a++) {
       const angle = (a / 8) * Math.PI * 2 - timer * 0.15;
-      const len = 30 + (1 - progress) * 40;
+      const len = 30 + lineT * 40;
       ctx.beginPath();
       ctx.moveTo(flashScreenX + Math.cos(angle) * 15, flashScreenY + Math.sin(angle) * 15);
       ctx.lineTo(flashScreenX + Math.cos(angle) * len, flashScreenY + Math.sin(angle) * len);
@@ -98,14 +118,15 @@ export function drawSuperFlash(
 
   // KOF2002: 速度线 — DM发动时从角色向外辐射的直线
   if (timer > 12) {
-    const lineAlpha = (timer - 12) / 8 * 0.2;
+    const speedLineT = (timer - 12) / 12;
+    const lineAlpha = speedLineT * 0.2;
     ctx.save();
     ctx.strokeStyle = isSDM ? `rgba(255, 200, 100, ${lineAlpha})` : `rgba(255, 255, 200, ${lineAlpha})`;
     ctx.lineWidth = 1.5;
     for (let i = 0; i < 24; i++) {
       const angle = (i / 24) * Math.PI * 2;
-      const innerR = 30 + (1 - progress) * 20;
-      const outerR = 200 + (1 - progress) * 150;
+      const innerR = 30 + (1 - speedLineT) * 20;
+      const outerR = 200 + (1 - speedLineT) * 150;
       ctx.beginPath();
       ctx.moveTo(flashScreenX + Math.cos(angle) * innerR, flashScreenY + Math.sin(angle) * innerR);
       ctx.lineTo(flashScreenX + Math.cos(angle) * outerR, flashScreenY + Math.sin(angle) * outerR);

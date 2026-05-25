@@ -509,7 +509,9 @@ function update(): void {
       if (isDMKill) cinematic.triggerDMKOSlowMo();
       else cinematic.triggerKOSlowMo();
       // KOF2002: KO定格 — 通常12帧, DM击杀16帧
-      cinematic.triggerHitStop(isDMKill ? 16 : 12);
+      const koDefender = p1.health <= 0 ? 0 : 1;
+      const koAttacker = p1.health <= 0 ? p2 : p1;
+      cinematic.triggerHitStop(isDMKill ? 16 : 12, koDefender, koAttacker.facing);
       screenFlash.trigger('#ff2200', 0.35, 15);
       screenShake.trigger(16, 15);
       playKO();
@@ -630,7 +632,8 @@ function render(): void {
   const p1Char = ROSTER.find(c => c.id === p1.charId) || ROSTER[0];
   const p2Char = ROSTER.find(c => c.id === p2.charId) || ROSTER[1];
   renderer.render([p1, p2], camera.x, tickRef.value, phase === GamePhase.KO, winner, screenShake.offsetX, screenShake.offsetY,
-    [p1DelayedHealth, p2DelayedHealth], maxModes, perfectPlayer, rounds.p1Wins, rounds.p2Wins, p1Char.nameCn, p2Char.nameCn, isTimeOver, rounds.currentRound, firstAttacker);
+    [p1DelayedHealth, p2DelayedHealth], maxModes, perfectPlayer, rounds.p1Wins, rounds.p2Wins, p1Char.nameCn, p2Char.nameCn, isTimeOver, rounds.currentRound, firstAttacker,
+    cinematic.hitStopDefender, cinematic.hitStopBias);
   renderer.drawProjectiles(projectiles, camera);
   vfx.render(ctx, camera.x);
 

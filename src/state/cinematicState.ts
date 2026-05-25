@@ -8,6 +8,10 @@ export class CinematicState {
   superFlashX = 0;
   superFlashY = 0;
   superFlashAttacker = 0; // 0=p1, 1=p2
+  /** Defender index during hit-stop (for jitter rendering). -1 = none */
+  hitStopDefender = -1;
+  /** Directional bias for defender jitter (attacker's facing direction) */
+  hitStopBias = 0;
   koSlowMo = 0;
   koSlowMoTriggered = false;
   koSlowMoFrameCounter = 0;
@@ -44,8 +48,12 @@ export class CinematicState {
     this.tickSuperFlash();
   }
 
-  /** Set hit-stop freeze for N frames */
-  triggerHitStop(frames: number): void { this.hitStop = frames; }
+  /** Set hit-stop freeze for N frames, with defender info for jitter rendering */
+  triggerHitStop(frames: number, defenderIdx: number = -1, bias: number = 0): void {
+    this.hitStop = frames;
+    this.hitStopDefender = defenderIdx;
+    this.hitStopBias = bias;
+  }
 
   /** Trigger Super Flash (dark screen freeze) on DM startup */
   triggerSuperFlash(x: number, y: number, attacker: number): void {
@@ -103,6 +111,8 @@ export class CinematicState {
   /** Full reset: back to match-select / character-select state */
   reset(): void {
     this.hitStop = 0;
+    this.hitStopDefender = -1;
+    this.hitStopBias = 0;
     this.superFlashTimer = 0;
     this.superFlashX = 0;
     this.superFlashY = 0;
@@ -118,6 +128,8 @@ export class CinematicState {
   /** Reset between rounds: slow-mo + hit-stop + superFlash + damage, keep victory fanfare */
   resetForNewRound(): void {
     this.hitStop = 0;
+    this.hitStopDefender = -1;
+    this.hitStopBias = 0;
     this.superFlashTimer = 0;
     this.koSlowMoTriggered = false;
     this.koSlowMo = 0;

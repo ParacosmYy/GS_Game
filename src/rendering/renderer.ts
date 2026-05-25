@@ -40,7 +40,7 @@ export class Renderer {
     this.spriteRenderer = sr;
   }
 
-  render(fighters: Fighter[], cameraX: number, tick: number, ko: boolean, winner: number | null, shakeX: number, shakeY: number, delayedHealth: [number, number], maxModes?: [MaxModeState, MaxModeState], perfectPlayer: number | null = null, p1Wins: number = 0, p2Wins: number = 0, p1Name: string = '', p2Name: string = '', isTimeOver: boolean = false, currentRound: number = 1, firstAttacker: number | null = null): void {
+  render(fighters: Fighter[], cameraX: number, tick: number, ko: boolean, winner: number | null, shakeX: number, shakeY: number, delayedHealth: [number, number], maxModes?: [MaxModeState, MaxModeState], perfectPlayer: number | null = null, p1Wins: number = 0, p2Wins: number = 0, p1Name: string = '', p2Name: string = '', isTimeOver: boolean = false, currentRound: number = 1, firstAttacker: number | null = null, hitStopDefender: number = -1, hitStopBias: number = 0): void {
     this.frameCount++;
     this.globalTick = tick;
     const now = performance.now();
@@ -76,7 +76,7 @@ export class Renderer {
       ctx.globalAlpha = 1;
     }
 
-    drawFightersImpl(ctx, fighters, cameraX, this.globalTick, maxModes);
+    drawFightersImpl(ctx, fighters, cameraX, this.globalTick, maxModes, hitStopDefender, hitStopBias);
     drawHUD(ctx, fighters, tick, delayedHealth, p1Wins, p2Wins, p1Name, p2Name, currentRound, firstAttacker);
 
     if (ko) {
