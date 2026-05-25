@@ -211,16 +211,41 @@ export function drawCharacterSelect(
     }
   }
 
-  // ===== 悬停角色名大字显示 (网格下方) =====
+  // ===== 悬停角色名大字显示 + 放大肖像预览 (网格下方) =====
   const hoveredChar = selectState.getCharAtCursor(p1Ready ? p2Cursor : p1Cursor);
   const hoverY = startY + gridH + 8;
   if (hoveredChar) {
+    // 放大肖像预览 — 网格左侧
+    if (hoveredChar.pixelPortrait) {
+      const previewScale = 4;
+      const pw = hoveredChar.pixelPortrait.width * previewScale;
+      const ph = hoveredChar.pixelPortrait.height * previewScale;
+      const ppx = CANVAS_WIDTH / 2 - pw / 2 - 100;
+      const ppy = hoverY - ph / 2 - 5;
+      // 肖像背景
+      ctx.fillStyle = 'rgba(0,0,0,0.5)';
+      roundRect(ctx, ppx - 4, ppy - 4, pw + 8, ph + 8, 4);
+      ctx.fill();
+      ctx.strokeStyle = hoveredChar.color + '88';
+      ctx.lineWidth = 1;
+      roundRect(ctx, ppx - 4, ppy - 4, pw + 8, ph + 8, 4);
+      ctx.stroke();
+      drawPixelPortrait(ctx, hoveredChar.pixelPortrait, ppx, ppy, previewScale);
+    }
+    // 角色名大字 — 网格中央偏右
     ctx.save();
     ctx.shadowColor = hoveredChar.color;
-    ctx.shadowBlur = 8;
-    drawSNKText(ctx, hoveredChar.nameCn, CANVAS_WIDTH / 2, hoverY, 28, hoveredChar.color);
+    ctx.shadowBlur = 12;
+    drawSNKText(ctx, hoveredChar.nameCn, CANVAS_WIDTH / 2 + 60, hoverY - 5, 32, hoveredChar.color);
     ctx.shadowBlur = 0;
     ctx.restore();
+    // 角色英文名
+    if (hoveredChar.name) {
+      ctx.fillStyle = '#888';
+      ctx.font = '10px "Courier New", monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText(hoveredChar.name, CANVAS_WIDTH / 2 + 60, hoverY + 12);
+    }
   } else if (p1Ready ? selectState.isRandomSlot(p2Cursor) : selectState.isRandomSlot(p1Cursor)) {
     drawSNKText(ctx, '???', CANVAS_WIDTH / 2, hoverY, 28, '#ffcc00');
   }

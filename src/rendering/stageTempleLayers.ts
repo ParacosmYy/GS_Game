@@ -862,6 +862,9 @@ export function drawGround(ctx: CanvasRenderingContext2D, cameraX: number): void
   // 栏杆
   drawRailing(ctx, cameraX);
 
+  // KOF2002: 远景观众剪影 — 栏杆后方的暗色人影增加氛围
+  drawSpectators(ctx, cameraX);
+
   // 地面边缘蓝色辉光 — 更强
   const edgeGrad = ctx.createLinearGradient(0, STAGE_GROUND_Y - 5, 0, STAGE_GROUND_Y + 10);
   edgeGrad.addColorStop(0, 'rgba(100, 140, 255, 0.6)');
@@ -926,4 +929,34 @@ function drawRailing(ctx: CanvasRenderingContext2D, cameraX: number): void {
   // 下横梁
   ctx.fillStyle = '#3a2518';
   ctx.fillRect(0, railY - 8, CANVAS_WIDTH, 3);
+}
+
+// KOF2002: 远景观众剪影 — 栏杆后方的暗色人影, 增加格斗赛氛围
+function drawSpectators(ctx: CanvasRenderingContext2D, cameraX: number): void {
+  // 观众数据: [世界X位置, 身高, 体宽, 头大小, 微摆相位]
+  const specs: number[][] = [
+    [60, 38, 14, 6, 0], [120, 42, 16, 7, 1.2], [200, 35, 12, 5.5, 2.4],
+    [280, 40, 15, 6.5, 0.8], [350, 44, 17, 7, 3.1], [420, 36, 13, 5.5, 1.5],
+    [500, 41, 15, 6.5, 0.3], [580, 38, 14, 6, 2.7], [650, 43, 16, 7, 1.8],
+    [730, 37, 13, 5.5, 0.6], [800, 40, 15, 6.5, 3.5], [870, 35, 12, 5, 2.2],
+    [950, 42, 16, 7, 1.0], [1020, 39, 14, 6, 0.4], [1100, 36, 13, 5.5, 2.9],
+    [1180, 44, 17, 7, 1.6], [1260, 38, 14, 6, 3.3], [1340, 41, 15, 6.5, 0.9],
+  ];
+  const baseY = STAGE_GROUND_Y - 42; // 栏杆后方
+  ctx.save();
+  for (const [wx, h, w, headR, phase] of specs) {
+    const sx = wx - cameraX * 0.85; // 视差: 观众滚动比前景慢
+    if (sx < -30 || sx > CANVAS_WIDTH + 30) continue;
+    const sway = Math.sin(Date.now() * 0.001 + phase) * 1.5; // 微摆
+    ctx.globalAlpha = 0.25 + Math.sin(phase * 2.3) * 0.08;
+    // 身体
+    ctx.fillStyle = '#1a1520';
+    ctx.fillRect(sx - w / 2 + sway, baseY - h + headR * 2, w, h - headR * 2);
+    // 头
+    ctx.beginPath();
+    ctx.arc(sx + sway, baseY - h + headR, headR, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+  ctx.restore();
 }
