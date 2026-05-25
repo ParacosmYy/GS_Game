@@ -99,7 +99,7 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       const blkHeavy = attackType === AttackType.STAND_C || attackType === AttackType.STAND_D
         || attackType === AttackType.CLOSE_C || attackType === AttackType.CLOSE_D
         || attackType === AttackType.CROUCH_C || attackType === AttackType.CROUCH_D;
-      const blkFlashScale = blkDM ? 1.8 : blkSpecial ? 1.4 : blkHeavy ? 1.2 : 0.8;
+      const blkFlashScale = blkDM ? 1.8 : blkSpecial ? 1.4 : blkHeavy ? 1.2 : 1.0;
       deps.vfx.spawnBlockFlash(blkX, blkY, blkFlashScale);
       if (blkDM) {
         deps.vfx.spawnCharacterHitSparks(blkX, blkY, 18, blkColor, 1.6);
@@ -232,7 +232,7 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       deps.vfx.spawnCharacterHitSparks(hitX, hitY, 10, throwColor, 1.0, 1.0, 0.4);
       deps.vfx.spawnCharacterHitSparks(hitX, hitY, 6, '#ffffff', 0.7, 0.8);
       // KOF2002: 投技额外向上飘散蓝色小火花
-      deps.vfx.spawnCharacterHitSparks(hitX, hitY - 20, 4, '#aaddff', 0.5, 0.6);
+      deps.vfx.spawnCharacterHitSparks(hitX, hitY - 30, 4, '#aaddff', 0.5, 0.6);
       // KOF2002: 投技命中冲击环 — 物理冲击感
       deps.vfx.spawnImpactRing(hitX, hitY, 1.2);
       deps.screenFlash.trigger('#aaddff', 0.15, 5);
@@ -261,6 +261,10 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       deps.vfx.spawnImpactRing(hitX, hitY);
       deps.screenFlash.trigger('#ff6600', 0.2, 6);
       deps.screenShake.trigger(10, 10);
+      // KOF2002: 壁弹命中额外地面尘土
+      if (defender.isGrounded()) {
+        deps.vfx.spawnHeavyDust(defender.x, defender.y, 8);
+      }
       // KOF2002: Counter Wire额外顿帧 — 壁弹前明显停顿, 强调打击感
       deps.cinematic.triggerHitStop(4);
       playWire();
@@ -275,6 +279,8 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
     if (!defender.isGrounded() && !isDM) {
       const airBonus = combo >= 5 ? 4 : 0;
       deps.vfx.spawnCharacterHitSparks(hitX, hitY - 15, 6 + airBonus, '#aaddff', 0.8, 0.8, 0.3, true);
+      // KOF2002: 空中命中额外淡蓝飘散
+      deps.vfx.spawnCharacterHitSparks(hitX, hitY - 25, 3, '#ddeeff', 0.5, 0.6, 0.2, true);
     }
     // KOF2002: 站立被通常技命中时脚下尘土
     if (defender.isGrounded() && !isDM && !isSpecial) {
@@ -287,7 +293,7 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       deps.vfx.spawnImpactRing(hitX, hitY);
       deps.vfx.spawnImpactRing(hitX, hitY);
       // KOF2002: CD攻击额外白色爆发核心+方向性震屏
-      deps.vfx.spawnCharacterHitSparks(hitX, hitY, 8, '#ffffff', 0.8);
+      deps.vfx.spawnCharacterHitSparks(hitX, hitY, 12, '#ffffff', 0.9);
       deps.screenFlash.trigger('#ffcc44', 0.15, 4);
       deps.screenShake.trigger(6, 8, attacker.facing * 5);
     }

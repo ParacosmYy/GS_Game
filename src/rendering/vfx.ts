@@ -287,9 +287,10 @@ export class VFXSystem {
         }
         case 'flash': {
           ctx.save();
-          // KOF2002: 闪光前2帧纯白增强, 之后正常渐变
+          // KOF2002: 闪光前2帧纯白增强, 之后ease-out衰减
           const flashEarly = p.life > p.maxLife - 2;
-          const flashAlpha = flashEarly ? Math.min(1, alpha * 1.3) : alpha * 0.6;
+          const flashDecay = flashEarly ? alpha : alpha * alpha;
+          const flashAlpha = flashEarly ? Math.min(1, flashDecay * 1.3) : flashDecay * 0.7;
           ctx.globalAlpha = flashAlpha;
           const flashRadius = p.size * (1 - alpha * 0.5);
           const grad = ctx.createRadialGradient(sx, p.y, 0, sx, p.y, flashRadius);
@@ -321,7 +322,7 @@ export class VFXSystem {
           ctx.arc(sx, p.y, p.size * scale, 0, Math.PI * 2);
           ctx.fill();
           // 外围光晕环 — 脉冲扩展
-          if (alpha > 0.3) {
+          if (alpha > 0.2) {
             ctx.globalAlpha = alpha * 0.2;
             const haloR = p.size * scale * 1.4;
             ctx.strokeStyle = p.color;
@@ -339,7 +340,7 @@ export class VFXSystem {
           // KOF2002: 初始白色闪光核心(前5帧)
           if (p.life > p.maxLife - 5) {
             ctx.globalAlpha = alpha * 0.8;
-            const coreGrad = ctx.createRadialGradient(sx, p.y, 0, sx, p.y, slamRadius * 0.4);
+            const coreGrad = ctx.createRadialGradient(sx, p.y, 0, sx, p.y, slamRadius * 0.5);
             coreGrad.addColorStop(0, '#ffffff');
             coreGrad.addColorStop(0.5, '#ffddaa');
             coreGrad.addColorStop(1, 'rgba(255,68,0,0)');
@@ -397,10 +398,10 @@ export class VFXSystem {
           ctx.arc(sx, p.y, ringRadius, 0, Math.PI * 2);
           ctx.stroke();
           ctx.shadowBlur = 0;
-          // 主环
+          // 主环 — 大环更粗
           ctx.globalAlpha = alpha * 0.7;
           ctx.strokeStyle = isEarly ? '#ffffff' : p.color;
-          ctx.lineWidth = 2 + alpha * 2;
+          ctx.lineWidth = 2 + alpha * 2 + (ringRadius > 50 ? 2 : 0);
           ctx.beginPath();
           ctx.arc(sx, p.y, ringRadius, 0, Math.PI * 2);
           ctx.stroke();
@@ -423,9 +424,9 @@ export class VFXSystem {
           ctx.globalAlpha = alpha * 0.8;
           ctx.fillStyle = p.color;
           ctx.fillRect(-slashLen, -slashW / 2, slashLen * 2, slashW);
-          // 外发光
-          ctx.globalAlpha = alpha * 0.3;
-          ctx.fillRect(-slashLen * 1.2, -slashW, slashLen * 2.4, slashW * 4);
+          // 外发光 — 缩窄聚焦
+          ctx.globalAlpha = alpha * 0.25;
+          ctx.fillRect(-slashLen * 1.1, -slashW * 0.8, slashLen * 2.2, slashW * 3);
           ctx.restore();
           break;
         }
