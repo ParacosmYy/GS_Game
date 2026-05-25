@@ -30,6 +30,19 @@ import {
   MAI_KA_CHO_SEN_FRAMES, MAI_KA_CHO_SEN_C_FRAMES,
   MAI_HISHO_RYU_EN_JIN_FRAMES, MAI_RYU_EN_BU_FRAMES,
   DM_HAKA_OTOSHI_FRAMES,
+  CLARK_ARGENTINE_FRAMES, CLARK_ARGENTINE_C_FRAMES, CLARK_FLASH_ELBOW_FRAMES,
+  CLARK_VULCAN_FRAMES, DM_ARGENTINE_DM_FRAMES, SDM_ARGENTINE_DM_FRAMES,
+  RALF_VULCAN_FRAMES, RALF_VULCAN_C_FRAMES, RALF_BACKBREAKER_FRAMES,
+  RALF_KICK_FRAMES, DM_GALACTICA_PHANTOM_FRAMES,
+  JOE_HURRICANE_FRAMES, JOE_HURRICANE_C_FRAMES,
+  JOE_TIGER_KICK_FRAMES, JOE_TIGER_KICK_D_FRAMES,
+  JOE_BAKURETSUKEN_FRAMES, JOE_OUGON_KAKATO_FRAMES,
+  DM_SCREW_UPPER_FRAMES,
+  ANDY_HISHOU_KEN_FRAMES, ANDY_HISHOU_KEN_C_FRAMES,
+  ANDY_SHOURYUU_DAN_FRAMES, ANDY_SHOURYUU_DAN_C_FRAMES,
+  ANDY_ZANEI_RYUSEI_KEN_FRAMES, ANDY_ZANEI_RYUSEI_KEN_D_FRAMES,
+  ANDY_GEKI_HISHOU_KEN_FRAMES,
+  DM_CHO_REPPA_DAN_FRAMES, SDM_CHO_REPPA_DAN_FRAMES,
 } from './attackFramesSpecials.js';
 
 const F: (
@@ -233,6 +246,58 @@ const MAI_YUSURA_UMA_FRAMES: AttackFrame[] = [
   F([{ ox: 42, oy: -20, w: 50, h: 30 }]),
 ];
 
+// Clark 命令通常技
+const CLARK_DEATH_LAKE_FRAMES: AttackFrame[] = [
+  F([{ ox: 40, oy: -62, w: 42, h: 26 }]),
+  F([{ ox: 48, oy: -60, w: 48, h: 28 }]),
+  F([{ ox: 48, oy: -60, w: 48, h: 28 }]),
+];
+
+const CLARK_STOMP_FRAMES: AttackFrame[] = [
+  F([{ ox: 38, oy: -18, w: 48, h: 28 }]),
+  F([{ ox: 45, oy: -16, w: 55, h: 30 }]),
+];
+
+// Ralf 命令通常技
+const RALF_SABRE_PUNCH_FRAMES: AttackFrame[] = [
+  F([{ ox: 42, oy: -60, w: 45, h: 28 }]),
+  F([{ ox: 50, oy: -58, w: 52, h: 30 }]),
+  F([{ ox: 50, oy: -58, w: 52, h: 30 }]),
+];
+
+const RALF_SABRE_KICK_FRAMES: AttackFrame[] = [
+  F([{ ox: 38, oy: -20, w: 50, h: 28 }]),
+  F([{ ox: 45, oy: -18, w: 58, h: 30 }]),
+  F([{ ox: 45, oy: -18, w: 58, h: 30 }]),
+];
+
+// Joe 命令通常技
+const JOE_KNEE_KICK_FRAMES: AttackFrame[] = [
+  F([{ ox: 40, oy: -55, w: 45, h: 30 }]),
+  F([{ ox: 48, oy: -52, w: 52, h: 32 }]),
+  F([{ ox: 48, oy: -52, w: 52, h: 32 }]),
+];
+
+const JOE_SLIDE_FRAMES: AttackFrame[] = [
+  F([{ ox: 35, oy: -18, w: 50, h: 26 }]),
+  F([{ ox: 42, oy: -15, w: 58, h: 28 }]),
+  F([{ ox: 42, oy: -15, w: 58, h: 28 }]),
+  F([{ ox: 45, oy: -14, w: 60, h: 28 }]),
+];
+
+// Andy 命令通常技
+const ANDY_UWA_AGITO_FRAMES: AttackFrame[] = [
+  F([{ ox: 40, oy: -68, w: 38, h: 24 }]),
+  F([{ ox: 48, oy: -66, w: 44, h: 26 }]),
+  F([{ ox: 48, oy: -66, w: 44, h: 26 }]),
+];
+
+const ANDY_GEDAN_AGITO_FRAMES: AttackFrame[] = [
+  F([{ ox: 35, oy: -22, w: 42, h: 28 }]),
+  F([{ ox: 42, oy: -20, w: 50, h: 30 }]),
+  F([{ ox: 42, oy: -20, w: 50, h: 30 }]),
+];
+
 // ===== 蹲下攻击 =====
 const CROUCH_A_FRAMES: AttackFrame[] = [
   F([{ ox: 35, oy: -30, w: 32, h: 20 }]),
@@ -359,6 +424,8 @@ export const ATTACK_FRAMES: AttackFrameTable = {
   [AttackType.ATHENA_AIR_B]: ATHENA_AIR_B_FRAMES,
   [AttackType.MAI_HISSATSU_SHINOBIBACHI]: MAI_HISSATSU_SHINOBIBACHI_FRAMES,
   [AttackType.MAI_YUSURA_UMA]: MAI_YUSURA_UMA_FRAMES,
+  [AttackType.CLARK_DEATH_LAKE]: CLARK_DEATH_LAKE_FRAMES,
+  [AttackType.CLARK_STOMP]: CLARK_STOMP_FRAMES,
   [AttackType.CROUCH_A]: CROUCH_A_FRAMES,
   [AttackType.CROUCH_B]: CROUCH_B_FRAMES,
   [AttackType.CROUCH_C]: CROUCH_C_FRAMES,
@@ -438,4 +505,37 @@ export const ATTACK_FRAMES: AttackFrameTable = {
   [AttackType.MAI_HISHO_RYU_EN_JIN]: MAI_HISHO_RYU_EN_JIN_FRAMES,
   [AttackType.MAI_RYU_EN_BU]: MAI_RYU_EN_BU_FRAMES,
   [AttackType.DM_HAKA_OTOSHI]: DM_HAKA_OTOSHI_FRAMES,
+  [AttackType.CLARK_ARGENTINE]: CLARK_ARGENTINE_FRAMES,
+  [AttackType.CLARK_ARGENTINE_C]: CLARK_ARGENTINE_C_FRAMES,
+  [AttackType.CLARK_FLASH_ELBOW]: CLARK_FLASH_ELBOW_FRAMES,
+  [AttackType.CLARK_VULCAN]: CLARK_VULCAN_FRAMES,
+  [AttackType.DM_ARGENTINE_DM]: DM_ARGENTINE_DM_FRAMES,
+  [AttackType.SDM_ARGENTINE_DM]: SDM_ARGENTINE_DM_FRAMES,
+  [AttackType.RALF_SABRE_PUNCH]: RALF_SABRE_PUNCH_FRAMES,
+  [AttackType.RALF_SABRE_KICK]: RALF_SABRE_KICK_FRAMES,
+  [AttackType.RALF_VULCAN]: RALF_VULCAN_FRAMES,
+  [AttackType.RALF_VULCAN_C]: RALF_VULCAN_C_FRAMES,
+  [AttackType.RALF_BACKBREAKER]: RALF_BACKBREAKER_FRAMES,
+  [AttackType.RALF_KICK]: RALF_KICK_FRAMES,
+  [AttackType.DM_GALACTICA_PHANTOM]: DM_GALACTICA_PHANTOM_FRAMES,
+  [AttackType.JOE_KNEE_KICK]: JOE_KNEE_KICK_FRAMES,
+  [AttackType.JOE_SLIDE]: JOE_SLIDE_FRAMES,
+  [AttackType.JOE_HURRICANE]: JOE_HURRICANE_FRAMES,
+  [AttackType.JOE_HURRICANE_C]: JOE_HURRICANE_C_FRAMES,
+  [AttackType.JOE_TIGER_KICK]: JOE_TIGER_KICK_FRAMES,
+  [AttackType.JOE_TIGER_KICK_D]: JOE_TIGER_KICK_D_FRAMES,
+  [AttackType.JOE_BAKURETSUKEN]: JOE_BAKURETSUKEN_FRAMES,
+  [AttackType.JOE_OUGON_KAKATO]: JOE_OUGON_KAKATO_FRAMES,
+  [AttackType.DM_SCREW_UPPER]: DM_SCREW_UPPER_FRAMES,
+  [AttackType.ANDY_UWA_AGITO]: ANDY_UWA_AGITO_FRAMES,
+  [AttackType.ANDY_GEDAN_AGITO]: ANDY_GEDAN_AGITO_FRAMES,
+  [AttackType.ANDY_HISHOU_KEN]: ANDY_HISHOU_KEN_FRAMES,
+  [AttackType.ANDY_HISHOU_KEN_C]: ANDY_HISHOU_KEN_C_FRAMES,
+  [AttackType.ANDY_SHOURYUU_DAN]: ANDY_SHOURYUU_DAN_FRAMES,
+  [AttackType.ANDY_SHOURYUU_DAN_C]: ANDY_SHOURYUU_DAN_C_FRAMES,
+  [AttackType.ANDY_ZANEI_RYUSEI_KEN]: ANDY_ZANEI_RYUSEI_KEN_FRAMES,
+  [AttackType.ANDY_ZANEI_RYUSEI_KEN_D]: ANDY_ZANEI_RYUSEI_KEN_D_FRAMES,
+  [AttackType.ANDY_GEKI_HISHOU_KEN]: ANDY_GEKI_HISHOU_KEN_FRAMES,
+  [AttackType.DM_CHO_REPPA_DAN]: DM_CHO_REPPA_DAN_FRAMES,
+  [AttackType.SDM_CHO_REPPA_DAN]: SDM_CHO_REPPA_DAN_FRAMES,
 };

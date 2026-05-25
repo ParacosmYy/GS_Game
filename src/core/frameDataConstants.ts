@@ -166,6 +166,50 @@ const FRAME_DATA_GENERIC = {
     damage: 40, hitstun: 18, blockstun: 15, pushback: 2,
     hitLevel: 'LOW' as const, knockdown: false,
   },
+  // Clark 命令通常技 — APPROX based on KOF2002UM
+  CLARK_DEATH_LAKE: {
+    startup: 15, active: 4, recovery: 19,
+    damage: 46, hitstun: 19, blockstun: 16, pushback: 3,
+    hitLevel: 'HIGH' as const, knockdown: false,
+  },
+  CLARK_STOMP: {
+    startup: 8, active: 4, recovery: 22,
+    damage: 38, hitstun: 18, blockstun: 15, pushback: 2,
+    hitLevel: 'LOW' as const, knockdown: false,
+  },
+  // Ralf 命令通常技 — APPROX based on KOF2002UM
+  RALF_SABRE_PUNCH: {
+    startup: 13, active: 4, recovery: 20,
+    damage: 50, hitstun: 19, blockstun: 17, pushback: 4,
+    hitLevel: 'MID' as const, knockdown: false,
+  },
+  RALF_SABRE_KICK: {
+    startup: 10, active: 4, recovery: 22,
+    damage: 42, hitstun: 18, blockstun: 15, pushback: 3,
+    hitLevel: 'LOW' as const, knockdown: false,
+  },
+  // Joe 命令通常技 — APPROX based on KOF2002UM
+  JOE_KNEE_KICK: {
+    startup: 13, active: 4, recovery: 19,
+    damage: 48, hitstun: 19, blockstun: 16, pushback: 3,
+    hitLevel: 'MID' as const, knockdown: false,
+  },
+  JOE_SLIDE: {
+    startup: 9, active: 5, recovery: 22,
+    damage: 42, hitstun: 18, blockstun: 15, pushback: 2,
+    hitLevel: 'LOW' as const, knockdown: false,
+  },
+  // Andy 命令通常技 — APPROX based on KOF2002UM
+  ANDY_UWA_AGITO: {
+    startup: 14, active: 4, recovery: 18,
+    damage: 44, hitstun: 19, blockstun: 16, pushback: 3,
+    hitLevel: 'HIGH' as const, knockdown: false,
+  },
+  ANDY_GEDAN_AGITO: {
+    startup: 8, active: 4, recovery: 20,
+    damage: 38, hitstun: 18, blockstun: 15, pushback: 2,
+    hitLevel: 'LOW' as const, knockdown: false,
+  },
   // ── 蹲下攻击 (Crouch) ──
   CROUCH_A: {
     startup: 5, active: 4, recovery: 7,

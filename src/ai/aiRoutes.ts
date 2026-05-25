@@ -81,6 +81,19 @@ export const COMBO_ROUTES: Record<string, ComboStep[]> = {
     { type: 'special', attack: 'maiKaChoSen', delay: 3 },
     { type: 'special', attack: 'dmHakaOtoshi', delay: 4 },
   ],
+  ralf: [
+    { type: 'button',  attack: 'closeC',     delay: 0 },
+    { type: 'button',  attack: 'ralfSabrePunch', delay: 2 },
+    { type: 'special', attack: 'ralfVulcan',  delay: 3 },
+    { type: 'special', attack: 'dmGalacticaPhantom', delay: 4 },
+  ],
+  clark: [
+    { type: 'button',  attack: 'closeC',     delay: 0 },
+    { type: 'button',  attack: 'clarkDeathLake', delay: 2 },
+    { type: 'special', attack: 'clarkArgentine', delay: 3 },
+    { type: 'special', attack: 'clarkFlashElbow', delay: 3 },
+    { type: 'special', attack: 'dmArgentine',  delay: 4 },
+  ],
   _default: [
     { type: 'button',  attack: 'closeC', delay: 0 },
     { type: 'button',  attack: 'standA',  delay: 2 },
@@ -124,6 +137,10 @@ export function applyComboStep(step: ComboStep, base: ResolvedInput): void {
         base.forward = true; base.buttonB = true; base.buttonBPressed = true; base.kickPressed = true; break;
       case 'maiShinobibachi':
         base.forward = true; base.buttonB = true; base.buttonBPressed = true; base.kickPressed = true; break;
+      case 'ralfSabrePunch':
+        base.forward = true; base.buttonA = true; base.buttonAPressed = true; base.punchPressed = true; break;
+      case 'clarkDeathLake':
+        base.forward = true; base.buttonA = true; base.buttonAPressed = true; base.punchPressed = true; break;
       case 'jumpC':
         base.buttonC = true; base.buttonCPressed = true; base.punchPressed = true; break;
     }
@@ -163,6 +180,8 @@ export function routeComboSpecial(
     case 'robert': return routeRobert(attack);
     case 'athena': return routeAthena(attack);
     case 'mai': return routeMai(attack);
+    case 'ralf': return routeRalf(attack);
+    case 'clark': return routeClark(attack);
     default: return null;
   }
 }
@@ -263,5 +282,25 @@ function routeMai(attack: string): AttackType | null {
     case 'maiRyuEnBu': return AttackType.MAI_RYU_EN_BU;
     case 'dmHakaOtoshi': return AttackType.DM_HAKA_OTOSHI;
     default: return AttackType.MAI_HISHO_RYU_EN_JIN;
+  }
+}
+
+function routeRalf(attack: string): AttackType | null {
+  switch (attack) {
+    case 'ralfVulcan': return AttackType.RALF_VULCAN;
+    case 'ralfBackbreaker': return AttackType.RALF_BACKBREAKER;
+    case 'ralfKick': return AttackType.RALF_KICK;
+    case 'dmGalacticaPhantom': return AttackType.DM_GALACTICA_PHANTOM;
+    default: return AttackType.RALF_VULCAN;
+  }
+}
+
+function routeClark(attack: string): AttackType | null {
+  switch (attack) {
+    case 'clarkArgentine': return AttackType.CLARK_ARGENTINE;
+    case 'clarkFlashElbow': return AttackType.CLARK_FLASH_ELBOW;
+    case 'clarkVulcan': return AttackType.CLARK_VULCAN;
+    case 'dmArgentine': return AttackType.DM_ARGENTINE_DM;
+    default: return AttackType.CLARK_ARGENTINE;
   }
 }

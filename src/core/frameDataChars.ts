@@ -536,4 +536,154 @@ export const FRAME_DATA_CHARS = {
     damage: 300, hitstun: 0, blockstun: 22, pushback: 12,
     hitLevel: 'MID' as const, knockdown: true, chipDamage: 30,
   },
+  // ── 克拉克必杀技 (Clark Still) ── APPROX based on KOF2002UM
+  CLARK_ARGENTINE: {
+    startup: 5, active: 2, recovery: 30,
+    damage: 120, hitstun: 0, blockstun: 0, pushback: 0,
+    hitLevel: 'MID' as const, knockdown: true,
+  },
+  CLARK_ARGENTINE_C: {
+    startup: 7, active: 2, recovery: 34,
+    damage: 150, hitstun: 0, blockstun: 0, pushback: 0,
+    hitLevel: 'MID' as const, knockdown: true,
+  },
+  CLARK_FLASH_ELBOW: {
+    startup: 8, active: 5, recovery: 20,
+    damage: 65, hitstun: 20, blockstun: 16, pushback: 4,
+    hitLevel: 'MID' as const, knockdown: true,
+  },
+  CLARK_VULCAN: {
+    startup: 10, active: 12, recovery: 24,
+    damage: 80, hitstun: 20, blockstun: 16, pushback: 5,
+    hitLevel: 'MID' as const, knockdown: false,
+  },
+  // ── 克拉克DM/SDM (Clark) ──
+  DM_ARGENTINE_DM: {
+    startup: 6, active: 4, recovery: 40,
+    damage: 200, hitstun: 0, blockstun: 22, pushback: 10,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 18,
+  },
+  SDM_ARGENTINE_DM: {
+    startup: 6, active: 8, recovery: 38,
+    damage: 300, hitstun: 0, blockstun: 22, pushback: 12,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 30,
+  },
+  // ── 拉尔夫必杀技 (Ralf Jones) ── APPROX based on KOF2002UM
+  RALF_VULCAN: {
+    startup: 8, active: 12, recovery: 24,
+    damage: 55, hitstun: 22, blockstun: 18, pushback: 5,
+    hitLevel: 'MID' as const, knockdown: false, chipDamage: 8,
+  },
+  RALF_VULCAN_C: {
+    startup: 10, active: 18, recovery: 28,
+    damage: 90, hitstun: 26, blockstun: 22, pushback: 8,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 12,
+  },
+  RALF_BACKBREAKER: {
+    startup: 6, active: 2, recovery: 30,
+    damage: 120, hitstun: 0, blockstun: 0, pushback: 0,
+    hitLevel: 'MID' as const, knockdown: true,
+  },
+  RALF_KICK: {
+    startup: 12, active: 8, recovery: 22,
+    damage: 85, hitstun: 22, blockstun: 18, pushback: 6,
+    hitLevel: 'MID' as const, knockdown: true,
+  },
+  DM_GALACTICA_PHANTOM: {
+    startup: 12, active: 8, recovery: 40,
+    damage: 220, hitstun: 0, blockstun: 22, pushback: 12,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 20,
+  },
+  SDM_GALACTICA_PHANTOM: {
+    startup: 10, active: 14, recovery: 38,
+    damage: 320, hitstun: 0, blockstun: 22, pushback: 14,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 32,
+  },
+  // ── 乔·东必杀技 (Joe Higashi) ── APPROX based on KOF2002UM
+  JOE_HURRICANE: {
+    startup: 12, active: 22, recovery: 30,
+    damage: 75, hitstun: 28, blockstun: 26, pushback: 4,
+    hitLevel: 'MID' as const, knockdown: false, chipDamage: 8,
+  },
+  JOE_HURRICANE_C: {
+    startup: 14, active: 28, recovery: 28,
+    damage: 105, hitstun: 30, blockstun: 28, pushback: 5,
+    hitLevel: 'MID' as const, knockdown: false, chipDamage: 10,
+  },
+  JOE_TIGER_KICK: {
+    startup: 5, active: 6, recovery: 24,
+    damage: 85, hitstun: 22, blockstun: 18, pushback: 6,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 10,
+  },
+  JOE_TIGER_KICK_D: {
+    startup: 7, active: 10, recovery: 28,
+    damage: 130, hitstun: 28, blockstun: 22, pushback: 10,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 14,
+  },
+  JOE_BAKURETSUKEN: {
+    startup: 8, active: 12, recovery: 22,
+    damage: 65, hitstun: 22, blockstun: 18, pushback: 4,
+    hitLevel: 'MID' as const, knockdown: false,
+  },
+  JOE_OUGON_KAKATO: {
+    startup: 10, active: 8, recovery: 20,
+    damage: 90, hitstun: 22, blockstun: 18, pushback: 5,
+    hitLevel: 'MID' as const, knockdown: true,
+  },
+  DM_SCREW_UPPER: {
+    startup: 10, active: 14, recovery: 40,
+    damage: 200, hitstun: 0, blockstun: 22, pushback: 10,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 18,
+  },
+  SDM_SCREW_UPPER: {
+    startup: 8, active: 22, recovery: 38,
+    damage: 300, hitstun: 0, blockstun: 22, pushback: 12,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 30,
+  },
+  // ── 安迪必杀技 (Andy Bogard) ── APPROX based on KOF2002UM
+  ANDY_HISHOU_KEN: {
+    startup: 12, active: 20, recovery: 30,
+    damage: 70, hitstun: 28, blockstun: 26, pushback: 4,
+    hitLevel: 'MID' as const, knockdown: false, chipDamage: 8,
+  },
+  ANDY_HISHOU_KEN_C: {
+    startup: 14, active: 24, recovery: 28,
+    damage: 100, hitstun: 30, blockstun: 28, pushback: 5,
+    hitLevel: 'MID' as const, knockdown: false, chipDamage: 10,
+  },
+  ANDY_SHOURYUU_DAN: {
+    startup: 5, active: 5, recovery: 25,
+    damage: 85, hitstun: 22, blockstun: 18, pushback: 6,
+    hitLevel: 'MID' as const, knockdown: false, chipDamage: 10,
+  },
+  ANDY_SHOURYUU_DAN_C: {
+    startup: 7, active: 10, recovery: 30,
+    damage: 140, hitstun: 28, blockstun: 22, pushback: 10,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 14,
+  },
+  ANDY_ZANEI_RYUSEI_KEN: {
+    startup: 8, active: 8, recovery: 22,
+    damage: 90, hitstun: 22, blockstun: 18, pushback: 6,
+    hitLevel: 'MID' as const, knockdown: true,
+  },
+  ANDY_ZANEI_RYUSEI_KEN_D: {
+    startup: 10, active: 12, recovery: 26,
+    damage: 110, hitstun: 26, blockstun: 20, pushback: 8,
+    hitLevel: 'MID' as const, knockdown: true,
+  },
+  ANDY_GEKI_HISHOU_KEN: {
+    startup: 6, active: 8, recovery: 16,
+    damage: 80, hitstun: 22, blockstun: 18, pushback: 5,
+    hitLevel: 'MID' as const, knockdown: true,
+  },
+  DM_CHO_REPPA_DAN: {
+    startup: 8, active: 14, recovery: 38,
+    damage: 200, hitstun: 0, blockstun: 22, pushback: 10,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 18,
+  },
+  SDM_CHO_REPPA_DAN: {
+    startup: 8, active: 22, recovery: 36,
+    damage: 300, hitstun: 0, blockstun: 22, pushback: 12,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 30,
+  },
 } as const;

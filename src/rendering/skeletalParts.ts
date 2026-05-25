@@ -17,6 +17,10 @@ export const CHAR_OUTFIT: Record<string, { shirt: string; pants: string; belt: s
   robert: { shirt: '#226633', pants: '#226633', belt: '#884422', shoes: '#443322' },
   athena: { shirt: '#cc2222', pants: '#cc2222', belt: '#fff', shoes: '#ff6688' },
   mai: { shirt: '#cc2244', pants: '#cc2244', belt: '#fff', shoes: '#cc2244' },
+  ralf: { shirt: '#cc3322', pants: '#664422', belt: '#333', shoes: '#222' },
+  clark: { shirt: '#556b2f', pants: '#887744', belt: '#444', shoes: '#333' },
+  joe: { shirt: '#3366aa', pants: '#cc4400', belt: '#ffcc00', shoes: '#aa8866' },
+  andy: { shirt: '#dd6622', pants: '#f0f0f0', belt: '#884422', shoes: '#443322' },
 };
 
 const DEFAULT_OUTFIT = { shirt: '#888', pants: '#556', belt: '#444', shoes: '#333' };
@@ -30,7 +34,8 @@ export function getHairColor(charId: string): string {
     kyo: '#8B4513', iori: '#8B0000', terry: '#C6A355',
     kim: '#1a1a1a', ryo: '#8B6914', leona: '#DAA520',
     kdash: '#C0C0C0', kula: '#cc8855', robert: '#2a1a0a',
-    athena: '#7744cc', mai: '#7a4828',
+    athena: '#7744cc', mai: '#7a4828', andy: '#ccaa44',
+    ralf: '#ccaa44', clark: '#ccaa44', joe: '#ddbb44',
   };
   return colors[charId] ?? '#333';
 }
@@ -41,6 +46,7 @@ export function getEyeColor(charId: string): string {
     kim: '#1a1a1a', ryo: '#4169E1', leona: '#4169E1',
     kdash: '#ff4400', kula: '#4488ff', robert: '#4169E1',
     athena: '#6644cc', mai: '#4488aa',
+    ralf: '#4466aa', clark: '#664422', joe: '#664422',
   };
   return colors[charId] ?? '#444';
 }
@@ -438,6 +444,108 @@ function drawHair(ctx: CanvasRenderingContext2D, charId: string, facing: number,
     ctx.beginPath();
     ctx.moveTo(-3, -r + 1);
     ctx.quadraticCurveTo(0, -r - 6, 3, -r + 1);
+    ctx.lineTo(2, -r + 4);
+    ctx.lineTo(-2, -r + 4);
+    ctx.closePath();
+    ctx.fill();
+  } else if (charId === 'ralf') {
+    // Ralf: blonde bandana + short spiky hair underneath
+    ctx.fillStyle = '#ccaa44';
+    ctx.beginPath();
+    ctx.moveTo(-r + 2, -r + 3);
+    ctx.quadraticCurveTo(-r + 4, -r - 6, 0, -r - 4);
+    ctx.quadraticCurveTo(r - 4, -r - 6, r - 2, -r + 3);
+    ctx.lineTo(r - 3, -r + 6);
+    ctx.lineTo(-r + 3, -r + 6);
+    ctx.closePath();
+    ctx.fill();
+    // Bandana
+    ctx.fillStyle = '#cc8844';
+    ctx.fillRect(-r, -r + 2, headW, 6);
+    // Bandana knot on the back side
+    ctx.fillStyle = '#aa6622';
+    const knotX = -r * facing * 0.3;
+    ctx.beginPath();
+    ctx.moveTo(knotX, -r + 2);
+    ctx.lineTo(knotX - 4 * facing, -r - 2);
+    ctx.lineTo(knotX - 2 * facing, -r + 5);
+    ctx.closePath();
+    ctx.fill();
+  } else if (charId === 'clark') {
+    // Clark: blonde crew cut + sunglasses + dog tags
+    ctx.fillStyle = '#ccaa44';
+    ctx.beginPath();
+    ctx.moveTo(-r + 2, -r + 3);
+    ctx.quadraticCurveTo(-r + 4, -r - 6, 0, -r - 4);
+    ctx.quadraticCurveTo(r - 4, -r - 6, r - 2, -r + 3);
+    ctx.lineTo(r - 3, -r + 6);
+    ctx.lineTo(-r + 3, -r + 6);
+    ctx.closePath();
+    ctx.fill();
+    // Crew cut texture — short bristles
+    ctx.fillStyle = '#b89838';
+    for (let i = -2; i <= 2; i++) {
+      ctx.fillRect(i * 5 - 2, -r + 1, 4, 3);
+    }
+    // Sunglasses — dark band across eyes
+    ctx.fillStyle = '#222';
+    ctx.fillRect(-r + 3, -4, headW - 6, 6);
+    // Lens highlights
+    ctx.fillStyle = 'rgba(80,80,120,0.3)';
+    ctx.fillRect(-r + 5, -3, 6, 4);
+    ctx.fillRect(r - 11, -3, 6, 4);
+    // Dog tag strap hint on neck area
+    ctx.fillStyle = '#887744';
+    ctx.fillRect(-3, r - 2, 6, 2);
+    ctx.fillStyle = '#cc9933';
+    ctx.beginPath();
+    ctx.arc(0, r + 2, 2, 0, Math.PI * 2);
+    ctx.fill();
+  } else if (charId === 'joe') {
+    // Joe: short spiky blonde hair + red headband
+    ctx.fillStyle = '#ddbb44';
+    const spikes = [[-8, -14], [-3, -18], [2, -16], [7, -12]];
+    for (const [sx, sy] of spikes) {
+      ctx.beginPath();
+      ctx.moveTo(sx - 4, -r + 2);
+      ctx.lineTo(sx, -r + sy);
+      ctx.lineTo(sx + 4, -r + 2);
+      ctx.closePath();
+      ctx.fill();
+    }
+    // Hair base
+    ctx.fillStyle = '#ddbb44';
+    ctx.beginPath();
+    ctx.moveTo(-r + 2, -r + 3);
+    ctx.quadraticCurveTo(-r + 4, -r - 4, 0, -r - 2);
+    ctx.quadraticCurveTo(r - 4, -r - 4, r - 2, -r + 3);
+    ctx.lineTo(r - 3, -r + 7);
+    ctx.lineTo(-r + 3, -r + 7);
+    ctx.closePath();
+    ctx.fill();
+    // Headband (red)
+    ctx.fillStyle = '#ff4400';
+    ctx.fillRect(-r + 1, -r + 2, headW - 2, 5);
+    // Headband knot on the back
+    const knotX = -r * facing * 0.6;
+    ctx.fillStyle = '#cc3300';
+    ctx.beginPath();
+    ctx.moveTo(knotX, -r + 2);
+    ctx.lineTo(knotX - 5 * facing, -r - 3);
+    ctx.lineTo(knotX - 2 * facing, -r + 2);
+    ctx.closePath();
+    ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(knotX, -r + 4);
+    ctx.lineTo(knotX - 4 * facing, -r + 8);
+    ctx.lineTo(knotX - 1 * facing, -r + 5);
+    ctx.closePath();
+    ctx.fill();
+    // Blonde highlight
+    ctx.fillStyle = 'rgba(240, 220, 100, 0.3)';
+    ctx.beginPath();
+    ctx.moveTo(-3, -r + 1);
+    ctx.quadraticCurveTo(0, -r - 5, 3, -r + 1);
     ctx.lineTo(2, -r + 4);
     ctx.lineTo(-2, -r + 4);
     ctx.closePath();
