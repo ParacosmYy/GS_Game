@@ -171,6 +171,10 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
     // DM: 超必杀华丽爆发 + 全屏闪光
     if (isDM) {
       deps.vfx.spawnSuperBurst(hitX, hitY, atkChar.specialColor, atkChar.specialGlow, isSDM);
+      // KOF2002: DM命中额外尘土效果 — 地面冲击感
+      if (defender.isGrounded()) {
+        deps.vfx.spawnHeavyDust(hitX, defender.y, 8);
+      }
       // SDM: 金色闪光+双冲击环, DM: 白色闪光
       if (isSDM) {
         deps.screenFlash.trigger('#ffdd44', 0.55, 16);
@@ -243,9 +247,10 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       deps.vfx.spawnProjectileExplosion(hitX, hitY, atkChar.specialColor, atkChar.specialGlow);
     }
 
-    // KOF2002: 空中命中额外特效 — 飘散粒子+小闪光
+    // KOF2002: 空中命中额外特效 — 飘散粒子+小闪光+连击增强
     if (!defender.isGrounded() && !isDM) {
-      deps.vfx.spawnCharacterHitSparks(hitX, hitY - 15, 6, '#aaddff');
+      const airBonus = combo >= 5 ? 4 : 0;
+      deps.vfx.spawnCharacterHitSparks(hitX, hitY - 15, 6 + airBonus, '#aaddff', 0.8, 0.8, 0.3, true);
     }
 
     // CD击飞攻击: 更强的冲击反馈

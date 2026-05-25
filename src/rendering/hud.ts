@@ -503,9 +503,10 @@ export function drawComboCounters(
     const baseFontSize = 20 + Math.min(combo, 15);
     const pulseScale = comboTimer[i] > 50 ? 1.15 : 1.0;
     const fontSize = baseFontSize * pulseScale;
-    // KOF2002: 连击即将消失时闪烁白色
-    const flashCol = comboTimer[i] < 8 && comboTimer[i] % 3 < 2 ? '#ffffff' : comboColor;
-    const flashGlow = comboTimer[i] < 8 ? '#ffffff' : glowColor;
+    // KOF2002: 连击即将消失时闪烁白色+放大
+    const isFading = comboTimer[i] < 12;
+    const flashCol = isFading && comboTimer[i] % 3 < 2 ? '#ffffff' : comboColor;
+    const flashGlow = isFading ? '#ffffff' : glowColor;
     ctx.save();
     ctx.shadowColor = flashGlow;
     ctx.shadowBlur = 12 + Math.min(combo, 10);

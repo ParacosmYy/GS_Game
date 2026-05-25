@@ -456,6 +456,12 @@ export function spawnMAXAura(particles: Particle[], worldX: number, worldY: numb
 
 /** MAX mode activation flash — dramatic screen-wide energy burst */
 export function spawnMAXActivationFlash(particles: Particle[], worldX: number, worldY: number): void {
+  // KOF2002: MAX激活初始白色核心爆发
+  particles.push({
+    x: worldX, y: worldY, vx: 0, vy: 0,
+    life: 8, maxLife: 8, size: 50,
+    color: '#ffffff', type: 'flash',
+  });
   for (let r = 0; r < 5; r++) {
     particles.push({
       x: worldX, y: worldY, vx: 0, vy: 0,
@@ -479,7 +485,7 @@ export function spawnMAXActivationFlash(particles: Particle[], worldX: number, w
   }
 }
 
-/** Perfect闪光 */
+/** Perfect闪光 — 金色粒子+双层辉光环 */
 export function spawnPerfectFlash(particles: Particle[], worldX: number, worldY: number): void {
   for (let i = 0; i < 20; i++) {
     const angle = Math.random() * Math.PI * 2;
@@ -500,6 +506,12 @@ export function spawnPerfectFlash(particles: Particle[], worldX: number, worldY:
     x: worldX, y: worldY, vx: 0, vy: 0,
     life: 25, maxLife: 25, size: 15,
     color: '#ffcc00', type: 'ring',
+  });
+  // KOF2002: Perfect额外外层白色辉光环
+  particles.push({
+    x: worldX, y: worldY, vx: 0, vy: 0,
+    life: 30, maxLife: 30, size: 10,
+    color: '#ffffff', type: 'ring',
   });
 }
 
