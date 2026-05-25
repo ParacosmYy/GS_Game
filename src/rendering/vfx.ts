@@ -63,9 +63,11 @@ export class ScreenFlash {
     const linear = this.timer / this.maxTimer;
     const eased = 1 - (1 - linear) * (1 - linear) * (1 - linear);
     const alpha = eased * this.intensity;
+    // KOF2002: 首帧纯白闪光, 更强的初始冲击
+    const isFirstFrame = this.timer === this.maxTimer;
     ctx.save();
-    ctx.globalAlpha = alpha;
-    ctx.fillStyle = this.color;
+    ctx.globalAlpha = isFirstFrame ? Math.min(1, alpha * 1.5) : alpha;
+    ctx.fillStyle = isFirstFrame ? '#ffffff' : this.color;
     ctx.fillRect(0, 0, canvasW, canvasH);
     ctx.restore();
   }

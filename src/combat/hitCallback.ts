@@ -131,7 +131,9 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
     const baseStop = calcHitStop(attackType, isDM, isSpecial, counterHit);
     // KOF2002: 高连击数额外hitstop (5+hits +1F, 10+hits +2F), 连段越久节奏感越强
     const comboStop = combo >= 10 ? 2 : combo >= 5 ? 1 : 0;
-    deps.cinematic.triggerHitStop(baseStop + comboStop);
+    // KOF2002: 防守方低血量(<15%)额外+2F顿帧, 终局打击感更强
+    const criticalStop = defender.health < defender.maxHealth * 0.15 ? 2 : 0;
+    deps.cinematic.triggerHitStop(baseStop + comboStop + criticalStop);
     gainMeterOnHitstun(deps.gauges[defIdx], attackType);
     // 风云再起特色: 第一次命中奖励 — 每回合首次命中额外+30气槽
     if (!deps.combatSystem.wasFirstHitAwarded(defIdx)) {
@@ -251,7 +253,10 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       deps.vfx.spawnCharacterHitSparks(hitX, hitY, 16, '#ffaa00');
       deps.vfx.spawnImpactRing(hitX, hitY);
       deps.vfx.spawnImpactRing(hitX, hitY);
+      // KOF2002: CD攻击额外白色爆发核心+方向性震屏
+      deps.vfx.spawnCharacterHitSparks(hitX, hitY, 8, '#ffffff', 0.8);
       deps.screenFlash.trigger('#ffcc44', 0.15, 4);
+      deps.screenShake.trigger(6, 8, attacker.facing * 5);
     }
 
     // 连击数显示 + 高连击冲击环

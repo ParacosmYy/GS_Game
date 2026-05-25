@@ -464,7 +464,7 @@ export function playChip(): void {
   osc.start(now); osc.stop(now + 0.04);
 }
 
-/** Wall bounce — metallic impact */
+/** Wall bounce — metallic impact + debris crunch */
 export function playWallBounce(): void {
   const ctx = getCtx();
   const now = ctx.currentTime;
@@ -486,13 +486,24 @@ export function playWallBounce(): void {
   filter.frequency.value = 2000;
   filter.Q.value = 1.2;
 
+  // KOF2002: 壁弹碎石质感 — 高频噪声短爆
+  const debris = noiseBuffer(ctx, 0.04, 0.15);
+  const dFilter = ctx.createBiquadFilter();
+  dFilter.type = 'highpass';
+  dFilter.frequency.value = 3000;
+  const dGain = ctx.createGain();
+  dGain.gain.setValueAtTime(0.1, now + 0.03);
+  dGain.gain.exponentialRampToValueAtTime(0.001, now + 0.07);
+
   osc.connect(gain).connect(ctx.destination);
   noise.connect(filter).connect(nGain).connect(ctx.destination);
+  debris.connect(dFilter).connect(dGain).connect(ctx.destination);
   osc.start(now); osc.stop(now + 0.15);
   noise.start(now); noise.stop(now + 0.1);
+  debris.start(now + 0.03); debris.stop(now + 0.08);
 }
 
-/** Cancel — Super Cancel/Free Cancel */
+/** Cancel — Super Cancel/Free Cancel with sparkle */
 export function playCancel(): void {
   const ctx = getCtx();
   const now = ctx.currentTime;
@@ -513,10 +524,21 @@ export function playCancel(): void {
   cGain.gain.setValueAtTime(0.08, now + 0.03);
   cGain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
 
+  // KOF2002: 取消闪亮质感 — 高频短闪
+  const sparkle = ctx.createOscillator();
+  sparkle.type = 'triangle';
+  sparkle.frequency.setValueAtTime(3200, now);
+  sparkle.frequency.exponentialRampToValueAtTime(800, now + 0.03);
+  const sGain = ctx.createGain();
+  sGain.gain.setValueAtTime(0.06, now);
+  sGain.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
+
   osc.connect(gain).connect(ctx.destination);
   chime.connect(cGain).connect(ctx.destination);
+  sparkle.connect(sGain).connect(ctx.destination);
   osc.start(now); osc.stop(now + 0.13);
   chime.start(now + 0.03); chime.stop(now + 0.1);
+  sparkle.start(now); sparkle.stop(now + 0.05);
 }
 
 /** Wire — Counter Wire wall bounce */

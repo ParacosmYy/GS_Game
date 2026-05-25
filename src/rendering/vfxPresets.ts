@@ -522,4 +522,15 @@ export function spawnProjectileExplosion(particles: Particle[], worldX: number, 
       rotation: Math.random() * Math.PI * 2, rotSpeed: (Math.random() - 0.5) * 0.4,
     });
   }
+  // KOF2002: 飞行道具爆炸二次扩散冲击环
+  particles.push({
+    x: worldX, y: worldY, vx: 0, vy: 0,
+    life: 12, maxLife: 12, size: 8,
+    color: charColor, type: 'ring',
+  });
+  particles.push({
+    x: worldX, y: worldY, vx: 0, vy: 0,
+    life: 18, maxLife: 18, size: 4,
+    color: '#ffffff', type: 'ring',
+  });
 }
