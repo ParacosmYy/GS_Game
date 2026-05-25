@@ -9,7 +9,8 @@ import { bone, pose } from '../characters/types.js';
 import type { Pose, BonePose, BodyProportions } from '../characters/types.js';
 import { DEFAULT_PROPORTIONS } from '../characters/types.js';
 import { shiftColor, roundRect } from './utils.js';
-import { getOutfit, drawCharacterHead, drawShoe } from './skeletalParts.js';
+import { getOutfit, drawCharacterHead } from './skeletalParts.js';
+import { drawPixelTorso, drawPixelArm, drawPixelLeg } from './bodyPartRenderer.js';
 
 /** Draw skeletal body using 6-bone pose system — enhanced rendering */
 export function drawSkeletalFighter(
@@ -127,39 +128,6 @@ export function drawSkeletalFighter(
   const skinColor = '#e8b88a';
   const skinColorDark = shiftColor(skinColor, -20);
 
-  // Draw a bone with gradient, outline, and optional detail stripe
-  const drawBone = (
-    cx: number, cy: number, w: number, h: number, rot: number,
-    fillTop: string, fillBot: string, outline: string,
-    detailStripe?: string,
-  ) => {
-    ctx.save();
-    ctx.translate(cx, cy);
-    ctx.rotate(rot);
-    const grad = ctx.createLinearGradient(-w / 2, -h / 2, w / 2, h / 2);
-    grad.addColorStop(0, fillTop);
-    grad.addColorStop(0.5, fillBot);
-    grad.addColorStop(1, shiftColor(fillBot, -15));
-    ctx.fillStyle = grad;
-    roundRect(ctx, -w / 2, -h / 2, w, h, 5);
-    ctx.fill();
-    // Detail stripe (clothing seam line)
-    if (detailStripe) {
-      ctx.strokeStyle = detailStripe;
-      ctx.lineWidth = 0.8;
-      ctx.beginPath();
-      ctx.moveTo(0, -h / 2 + 3);
-      ctx.lineTo(0, h / 2 - 3);
-      ctx.stroke();
-    }
-    // Outline
-    ctx.strokeStyle = outline;
-    ctx.lineWidth = 2;
-    roundRect(ctx, -w / 2, -h / 2, w, h, 5);
-    ctx.stroke();
-    ctx.restore();
-  };
-
   // Draw shadow on ground
   const shadowY = sy + 2;
   const shadowW = 60;
@@ -171,16 +139,9 @@ export function drawSkeletalFighter(
   ctx.fill();
   ctx.restore();
 
-  // Hit flash overlay — color varies by attack type (DM=blue, special=gold, CH=orange, normal=white)
+  // Hit flash overlay
   const isFlashing = f.hitFlashFrames > 0;
   const flashOverride = isFlashing ? f.hitFlashColor : undefined;
-  const flashOutline = isFlashing ? '#ddd' : undefined;
-
-  // Effective colors (may be overridden by flash)
-  const effBodyColor = flashOverride ?? outfit.shirt;
-  const effLegColor = flashOverride ?? outfit.pants;
-  const effSkinColor = flashOverride ?? skinColor;
-  const effOutline = flashOutline ?? shiftColor(outfit.shirt, -50);
 
   const shoulderY = refY + prop.shoulderY * heightFactor;
   const hipY = refY + prop.hipY * heightFactor;
@@ -189,53 +150,62 @@ export function drawSkeletalFighter(
 
   // 1. Back arm (behind body)
   const backArm = boneScreen(p.armBack);
-  drawBone(
-    backArm.x, shoulderY + p.armBack.oy * heightFactor,
-    armW * p.armBack.scale, armH * p.armBack.scale, backArm.rot,
-    flashOverride ?? shiftColor(skinColor, 10), effSkinColor, flashOutline ?? skinColorDark,
-  );
+  ctx.save();
+  ctx.translate(backArm.x, shoulderY + p.armBack.oy * heightFactor);
+  ctx.rotate(backArm.rot);
+  if (isFlashing) {
+    ctx.fillStyle = flashOverride!;
+    roundRect(ctx, -armW * p.armBack.scale / 2, -armH * p.armBack.scale / 2,
+      armW * p.armBack.scale, armH * p.armBack.scale, 3);
+    ctx.fill();
+    ctx.strokeStyle = '#1a1a1a';
+    ctx.lineWidth = 2.5;
+    ctx.lineJoin = 'round';    roundRect(ctx, -armW * p.armBack.scale / 2, -armH * p.armBack.scale / 2,
+      armW * p.armBack.scale, armH * p.armBack.scale, 3);
+    ctx.stroke();
+  } else {
+    drawPixelArm(ctx, f.charId, armW * p.armBack.scale, armH * p.armBack.scale, true);
+  }
+  ctx.restore();
 
   // 2. Back leg (behind body)
   const backLeg = boneScreen(p.legBack);
-  drawBone(
-    backLeg.x, hipY + p.legBack.oy * heightFactor,
-    legW * p.legBack.scale, legH * p.legBack.scale, backLeg.rot,
-    flashOverride ?? shiftColor(outfit.pants, 10), effLegColor, flashOutline ?? shiftColor(outfit.pants, -30),
-    flashOverride ? undefined : shiftColor(outfit.pants, -10),
-  );
-  // Shoe on back leg
-  if (!isFlashing) {
-    drawShoe(ctx, backLeg.x, hipY + p.legBack.oy * heightFactor + legH * p.legBack.scale * 0.4,
-      legW * p.legBack.scale * 0.7, 8, backLeg.rot, outfit.shoes, f.facing);
+  ctx.save();
+  ctx.translate(backLeg.x, hipY + p.legBack.oy * heightFactor);
+  ctx.rotate(backLeg.rot);
+  if (isFlashing) {
+    ctx.fillStyle = flashOverride!;
+    roundRect(ctx, -legW * p.legBack.scale / 2, -legH * p.legBack.scale / 2,
+      legW * p.legBack.scale, legH * p.legBack.scale, 3);
+    ctx.fill();
+    ctx.strokeStyle = '#1a1a1a';
+    ctx.lineWidth = 2.5;
+    ctx.lineJoin = 'round';    roundRect(ctx, -legW * p.legBack.scale / 2, -legH * p.legBack.scale / 2,
+      legW * p.legBack.scale, legH * p.legBack.scale, 3);
+    ctx.stroke();
+  } else {
+    drawPixelLeg(ctx, f.charId, legW * p.legBack.scale, legH * p.legBack.scale, true);
   }
+  ctx.restore();
 
-  // 3. Torso (body) — shirt color with collar detail
+  // 3. Torso (body)
   const torsoCenterY = refY + prop.torsoCenterY * heightFactor + p.body.oy * heightFactor;
   const torsoX = refX + p.body.ox * f.facing;
-  drawBone(
-    torsoX, torsoCenterY,
-    torsoW, torsoH * heightFactor, p.body.rot * f.facing,
-    flashOverride ?? shiftColor(outfit.shirt, 20), effBodyColor, effOutline,
-    flashOverride ? undefined : shiftColor(outfit.shirt, -15),
-  );
-
-  // Collar/neckline detail on torso
-  if (!isFlashing) {
-    ctx.save();
-    ctx.translate(torsoX, torsoCenterY);
-    ctx.rotate(p.body.rot * f.facing);
-    ctx.strokeStyle = shiftColor(outfit.shirt, -25);
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(-6, -torsoH * heightFactor / 2 + 3);
-    ctx.lineTo(0, -torsoH * heightFactor / 2 + 7);
-    ctx.lineTo(6, -torsoH * heightFactor / 2 + 3);
+  ctx.save();
+  ctx.translate(torsoX, torsoCenterY);
+  ctx.rotate(p.body.rot * f.facing);
+  if (isFlashing) {
+    ctx.fillStyle = flashOverride!;
+    roundRect(ctx, -torsoW / 2, -torsoH * heightFactor / 2, torsoW, torsoH * heightFactor, 5);
+    ctx.fill();
+    ctx.strokeStyle = '#1a1a1a';
+    ctx.lineWidth = 2.5;
+    ctx.lineJoin = 'round';    roundRect(ctx, -torsoW / 2, -torsoH * heightFactor / 2, torsoW, torsoH * heightFactor, 5);
     ctx.stroke();
-    // Belt line
-    ctx.fillStyle = outfit.belt;
-    ctx.fillRect(-torsoW / 2 + 2, torsoH * heightFactor / 2 - 5, torsoW - 4, 4);
-    ctx.restore();
+  } else {
+    drawPixelTorso(ctx, f.charId, torsoW, torsoH * heightFactor);
   }
+  ctx.restore();
 
   // 4. Head
   const headPos = boneScreen(p.head);
@@ -253,32 +223,49 @@ export function drawSkeletalFighter(
 
   // 5. Front leg (in front of body)
   const frontLeg = boneScreen(p.legFront);
-  drawBone(
-    frontLeg.x, hipY + p.legFront.oy * heightFactor,
-    legW * p.legFront.scale, legH * p.legFront.scale, frontLeg.rot,
-    flashOverride ?? shiftColor(outfit.pants, 15), effLegColor, flashOutline ?? shiftColor(outfit.pants, -25),
-    flashOverride ? undefined : shiftColor(outfit.pants, -8),
-  );
-  // Shoe on front leg
-  if (!isFlashing) {
-    drawShoe(ctx, frontLeg.x, hipY + p.legFront.oy * heightFactor + legH * p.legFront.scale * 0.4,
-      legW * p.legFront.scale * 0.7, 8, frontLeg.rot, outfit.shoes, f.facing);
+  ctx.save();
+  ctx.translate(frontLeg.x, hipY + p.legFront.oy * heightFactor);
+  ctx.rotate(frontLeg.rot);
+  if (isFlashing) {
+    ctx.fillStyle = flashOverride!;
+    roundRect(ctx, -legW * p.legFront.scale / 2, -legH * p.legFront.scale / 2,
+      legW * p.legFront.scale, legH * p.legFront.scale, 3);
+    ctx.fill();
+    ctx.strokeStyle = '#1a1a1a';
+    ctx.lineWidth = 2.5;
+    ctx.lineJoin = 'round';    roundRect(ctx, -legW * p.legFront.scale / 2, -legH * p.legFront.scale / 2,
+      legW * p.legFront.scale, legH * p.legFront.scale, 3);
+    ctx.stroke();
+  } else {
+    drawPixelLeg(ctx, f.charId, legW * p.legFront.scale, legH * p.legFront.scale, false);
   }
+  ctx.restore();
 
-  // 6. Front arm (in front of body) — skin colored (bare hands)
+  // 6. Front arm (in front of body)
   const frontArm = boneScreen(p.armFront);
-  drawBone(
-    frontArm.x, shoulderY + p.armFront.oy * heightFactor,
-    armW * p.armFront.scale, armH * p.armFront.scale, frontArm.rot,
-    flashOverride ?? shiftColor(skinColor, 15), effSkinColor, flashOutline ?? skinColorDark,
-  );
+  ctx.save();
+  ctx.translate(frontArm.x, shoulderY + p.armFront.oy * heightFactor);
+  ctx.rotate(frontArm.rot);
+  if (isFlashing) {
+    ctx.fillStyle = flashOverride!;
+    roundRect(ctx, -armW * p.armFront.scale / 2, -armH * p.armFront.scale / 2,
+      armW * p.armFront.scale, armH * p.armFront.scale, 3);
+    ctx.fill();
+    ctx.strokeStyle = '#1a1a1a';
+    ctx.lineWidth = 2.5;
+    ctx.lineJoin = 'round';    roundRect(ctx, -armW * p.armFront.scale / 2, -armH * p.armFront.scale / 2,
+      armW * p.armFront.scale, armH * p.armFront.scale, 3);
+    ctx.stroke();
+  } else {
+    drawPixelArm(ctx, f.charId, armW * p.armFront.scale, armH * p.armFront.scale, false);
+  }
+  ctx.restore();
 
-  // Fist detail on front arm when attacking
+  // Fist glow on front arm when attacking
   if (!isFlashing && (f.state === FighterState.STAND_ATTACK || f.state === FighterState.CROUCH_ATTACK || f.state === FighterState.AIR_ATTACK)) {
     ctx.save();
     ctx.translate(frontArm.x, shoulderY + p.armFront.oy * heightFactor);
     ctx.rotate(frontArm.rot);
-    // Fist — slightly larger circle at end of arm
     ctx.fillStyle = skinColor;
     ctx.strokeStyle = skinColorDark;
     ctx.lineWidth = 1;
@@ -368,20 +355,20 @@ export function drawVictoryPose(
 
   const drawBone = (
     cx: number, cy: number, w: number, h: number, rot: number,
-    fillTop: string, fillBot: string, outline: string,
+    fillTop: string, fillBot: string, _outline: string,
   ) => {
     ctx.save();
     ctx.translate(cx, cy);
     ctx.rotate(rot);
-    const grad = ctx.createLinearGradient(0, -h / 2, 0, h / 2);
-    grad.addColorStop(0, fillTop);
-    grad.addColorStop(1, fillBot);
-    ctx.fillStyle = grad;
-    roundRect(ctx, -w / 2, -h / 2, w, h, 5);
+    ctx.fillStyle = fillBot;
+    roundRect(ctx, -w / 2, -h / 2, w, h, 3);
     ctx.fill();
-    ctx.strokeStyle = outline;
-    ctx.lineWidth = 2;
-    roundRect(ctx, -w / 2, -h / 2, w, h, 5);
+    ctx.fillStyle = fillTop;
+    ctx.fillRect(-w / 2 + 1, -h / 2 + 1, w - 2, h * 0.2);
+    ctx.strokeStyle = '#1a1a1a';
+    ctx.lineWidth = 2.5;
+    ctx.lineJoin = 'round';
+    roundRect(ctx, -w / 2, -h / 2, w, h, 3);
     ctx.stroke();
     ctx.restore();
   };

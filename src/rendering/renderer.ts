@@ -189,44 +189,36 @@ export class Renderer {
         ctx.translate((Math.random() - 0.5) * shakeAmt, (Math.random() - 0.5) * shakeAmt * 0.5);
       }
 
-      // 优先使用精灵图渲染, 降级到骨骼渲染
-      let usedSprite = false;
-      if (this.spriteRenderer) {
-        const frameIdx = this.calcSpriteFrame(f);
-        usedSprite = this.spriteRenderer.render(
-          ctx, f.charId, f.state, frameIdx,
-          sx + leanOffsetX, sy, f.facing, bodyColor,
-        );
-        // 受击闪白: 在精灵上方叠加白色
-        if (usedSprite && f.hitFlashFrames > 0) {
-          ctx.save();
-          ctx.globalCompositeOperation = 'source-atop';
-          ctx.globalAlpha = 0.6;
-          ctx.fillStyle = '#ffffff';
-          ctx.fillRect(sx + leanOffsetX - 60, sy - 200, 120, 200);
-          ctx.restore();
-        }
-        // MAX模式发光
-        if (usedSprite && maxModeActive) {
-          ctx.save();
-          ctx.globalCompositeOperation = 'screen';
-          ctx.globalAlpha = 0.15 + Math.sin(this.globalTick * 0.15) * 0.1;
-          ctx.fillStyle = '#44ff88';
-          ctx.fillRect(sx + leanOffsetX - 60, sy - 200, 120, 200);
-          ctx.restore();
-        }
-        // 防御槽低警告 — 红色闪烁
-        if (usedSprite && guardLow && this.globalTick % 20 < 10) {
-          ctx.save();
-          ctx.globalCompositeOperation = 'screen';
-          ctx.globalAlpha = 0.12;
-          ctx.fillStyle = '#ff2222';
-          ctx.fillRect(sx + leanOffsetX - 60, sy - 200, 120, 200);
-          ctx.restore();
-        }
+      // 优先使用骨骼渲染（含像素风格服装细节），降级到精灵图
+      let usedSkeletal = true;
+      drawSkeletalFighter(ctx, f, sx + leanOffsetX, sy, bodyColor, outlineColor, this.globalTick, maxModeActive);
+
+      // 受击闪白: 在角色上方叠加白色
+      if (f.hitFlashFrames > 0) {
+        ctx.save();
+        ctx.globalCompositeOperation = 'source-atop';
+        ctx.globalAlpha = 0.6;
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(sx + leanOffsetX - 60, sy - 200, 120, 200);
+        ctx.restore();
       }
-      if (!usedSprite) {
-        drawSkeletalFighter(ctx, f, sx + leanOffsetX, sy, bodyColor, outlineColor, this.globalTick, maxModeActive);
+      // MAX模式发光
+      if (maxModeActive) {
+        ctx.save();
+        ctx.globalCompositeOperation = 'screen';
+        ctx.globalAlpha = 0.15 + Math.sin(this.globalTick * 0.15) * 0.1;
+        ctx.fillStyle = '#44ff88';
+        ctx.fillRect(sx + leanOffsetX - 60, sy - 200, 120, 200);
+        ctx.restore();
+      }
+      // 防御槽低警告 — 红色闪烁
+      if (guardLow && this.globalTick % 20 < 10) {
+        ctx.save();
+        ctx.globalCompositeOperation = 'screen';
+        ctx.globalAlpha = 0.12;
+        ctx.fillStyle = '#ff2222';
+        ctx.fillRect(sx + leanOffsetX - 60, sy - 200, 120, 200);
+        ctx.restore();
       }
 
       ctx.restore();
