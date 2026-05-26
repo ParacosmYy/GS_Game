@@ -385,3 +385,9 @@
 ## H112: gameSpeed测试—9项验证SLOWMO常量+GameSpeedController — 84→85
 
 **commit:** <hash> | gameSpeed测试—9项验证SLOWMO常量+GameSpeedController
+
+---
+
+## H113: hitboxConstants测试—9项验证HITBOX_OFFSETS字段+width/height正值+拳脚偏移 — 85→86
+
+**commit:** <hash> | hitboxConstants测试—9项验证HITBOX_OFFSETS字段+width/height正值+拳脚偏移
