@@ -62,16 +62,16 @@ function clone(src: number[][]): number[][] {
 // F0: powerup stance — crouch base with energy gathering
 const THO_F0 = clone(CROUCH_BASE);
 // Both fists at chest level, energy gathering between them
-THO_F0[58] = r('..........................1eeeeeeeeeeeeeeeeeeeeeeee1k.........................');
-THO_F0[59] = r('.........................1eeeeeeeeeeeeeeeeeeeeeeeee1k........................');
+THO_F0[58] = r('..........................1eeeeeeefeeeeeefeeeeeee1k.........................');
+THO_F0[59] = r('.........................1eeeeeeefeeeeeefeeeeeeee1k........................');
 THO_F0[60] = r('........................1eefeeeeeegeeeeeeeeefee1d81k.......................');
-THO_F0[61] = r('.......................1eeeeeeeeeeeeeeeeeeeeee1d8d1k........................');
+THO_F0[61] = r('.......................1eeeeeeefeeeeefeeeeee1d8d1k........................');
 THO_F0[62] = r('......................1eeeeeeeemm22meeeeeeeee1d8d1.........................');
 THO_F0[63] = r('.....................1eeeeeeem2222222meeeeeee1d81..........................');
 THO_F0[64] = r('....................1eeeeeeem22222222meeeeee1d1..........................');
 THO_F0[65] = r('...................1eeeeeeeemm2222meeeeeee11............................');
-THO_F0[66] = r('..................1eeeeeeeeeeeee1k1...................................');
-THO_F0[67] = r('.................1eeeeeeeeeeeee1k1....................................');
+THO_F0[66] = r('..................1eeeeefeeeeee1k1...................................');
+THO_F0[67] = r('.................1eeeeefeeeeee1k1....................................');
 THO_F0[68] = r('................kkkkkkkkkkkkkkkkk1.....................................');
 
 // F1: energy gathering — idle base rising, energy ball between hands
@@ -97,27 +97,27 @@ THO_F1[30] = r('..........11........................1eeee1..m22m................
 // F2: massive blast release — both arms thrust forward, huge energy wave
 const THO_F2 = clone(IDLE_BASE);
 // Both arms extended forward with massive energy wave
-THO_F2[18] = r('...................12mn21..........12mn2.1111eeeeeeeeeeeeeeeeeeeeeeee1......');
-THO_F2[19] = r('..................128921...........12891.111eeeeeeeeeeeeeeeeeeeeeeee1d1.....');
-THO_F2[20] = r('.................1289la1...........189a1.111eeeeeeeeeeeeeeeeeeeeeeemm22m....');
-THO_F2[21] = r('................1289ka1............18ka1111eeeeeeeeeeeeeeeeeeeeem222222m....');
-THO_F2[22] = r('...............12899a1.............1891.1eeeeeeeeeeeeeeeeeeeeem2222222m....');
-THO_F2[23] = r('..............12899a1..............18d1eeeeeeeeeeeeeeeeeeeeeem2222222m....');
-THO_F2[24] = r('.............12899b21..............1d8eeeeeeeeeeeeeeeeeeeeeeem222222m.....');
-THO_F2[25] = r('............1289b1................1d8eeeeeeeeeeeeeeeeeeeeeeeem2222m......');
-THO_F2[26] = r('...........1289b1.................1d8eeeeeeeeeeeeeeeeeeeeeeeemm22m.......');
-THO_F2[27] = r('..........128b1...................1deeeeeeeeeeeeeeeeeeeeeeeeeemm1.........');
-THO_F2[28] = r('.........128b1....................11eeeeeeeeeeeeeeeeeeeeeeeee1d1..........');
+THO_F2[18] = r('...................12mn21..........12mn2.1111eeeeeeefeeeeeefeeeeeee1......');
+THO_F2[19] = r('..................128921...........12891.111eeeeeeefeeeeeefeeeeeee1d1.....');
+THO_F2[20] = r('.................1289la1...........189a1.111eeeeeeefeeeeefeeeeeemm22m....');
+THO_F2[21] = r('................1289ka1............18ka1111eeeeeeefeeeeeeeeeeeem222222m....');
+THO_F2[22] = r('...............12899a1.............1891.1eeeeeeefeeeeeeeeeeeem2222222m....');
+THO_F2[23] = r('..............12899a1..............18d1eeeeeeefeeeeefeeeeeem2222222m....');
+THO_F2[24] = r('.............12899b21..............1d8eeeeeeefeeeeefeeeeeem222222m.....');
+THO_F2[25] = r('............1289b1................1d8eeeeeeefeeeeeefeeeeeeem2222m......');
+THO_F2[26] = r('...........1289b1.................1d8eeeeeeefeeeeeefeeeeeeemm22m.......');
+THO_F2[27] = r('..........128b1...................1deeeeeeefeeeeeefeeeeeeeeemm1.........');
+THO_F2[28] = r('.........128b1....................11eeeeeeefeeeeeefeeeeeeee1d1..........');
 // Energy wave tip
-THO_F2[20] = r('.................1289la1...........189a1.111eeeeeeeeeeeeeeeeeeeeem2222m1...');
-THO_F2[21] = r('................1289ka1............18ka1111eeeeeeeeeeeeeeeeeeeem222222m1...');
-THO_F2[22] = r('...............12899a1.............1891.1eeeeeeeeeeeeeeeeeeeem22222222m...');
-THO_F2[23] = r('..............12899a1..............18d1eeeeeeeeeeeeeeeeeeeem2222222222m...');
-THO_F2[24] = r('.............12899b21..............1d8eeeeeeeeeeeeeeeeeeem2222222222m....');
-THO_F2[25] = r('............1289b1................1d8eeeeeeeeeeeeeeeeeeem222222222m.....');
-THO_F2[26] = r('...........1289b1.................1d8eeeeeeeeeeeeeeeeeem22222222m......');
-THO_F2[27] = r('..........128b1...................1deeeeeeeeeeeeeeeeeeem222222m........');
-THO_F2[28] = r('.........128b1....................11eeeeeeeeeeeeeeeeeemm2222m.........');
+THO_F2[20] = r('.................1289la1...........189a1.111eeeeeeefeeeeeeeeeeeem2222m1...');
+THO_F2[21] = r('................1289ka1............18ka1111eeeeeeefeeeeeeeeeeem222222m1...');
+THO_F2[22] = r('...............12899a1.............1891.1eeeeeeefeeeeeeeeeeem22222222m...');
+THO_F2[23] = r('..............12899a1..............18d1eeeeeeefeeeeeeeeeeem2222222222m...');
+THO_F2[24] = r('.............12899b21..............1d8eeeeeeefeeeeeeeeeem2222222222m....');
+THO_F2[25] = r('............1289b1................1d8eeeeeeefeeeeeeeeeem222222222m.....');
+THO_F2[26] = r('...........1289b1.................1d8eeeeeeefeeeeeeeeem22222222m......');
+THO_F2[27] = r('..........128b1...................1deeeeeeefeeeeeeeeeem222222m........');
+THO_F2[28] = r('.........128b1....................11eeeeeeefeeeeeeeeemm2222m.........');
 
 // F3: recovery — arms drop, body exhausted
 const THO_F3 = clone(IDLE_BASE);
@@ -171,12 +171,12 @@ RR_F1[19] = r('..................128921...........12891.111.1eefeeeeeeegeeeeeeee
 RR_F1[20] = r('.................1289la1...........189a1.111eefeeeeeeegeeeeeeeeefee1d81....');
 RR_F1[21] = r('................1289ka1............18ka1111eefeeeeeegeeeeeeeeefee1d81.....');
 RR_F1[22] = r('...............12899a1.............1891.1eefeeeeeegeeeeeeeefee1d81.......');
-RR_F1[23] = r('..............12899a1..............18d1eeeeeeeeeeeeeeeeeeeee1d1.........');
-RR_F1[24] = r('.............12899b21..............1d8eeeeeeeeeeeeeeeeeeee1d1..........');
-RR_F1[25] = r('............1289b1................1d8eeeeeeeeeeeeeeeeee1d1............');
-RR_F1[26] = r('...........1289b1.................1d8eeeeeeeeeeeeeeee1d1..............');
-RR_F1[27] = r('..........128b1...................1deeeeeeeeeeeeeeee1d1...............');
-RR_F1[28] = r('.........128b1....................11eeeeeeeeeeeeee1d1................');
+RR_F1[23] = r('..............12899a1..............18d1eeeeeeefeeeeeeeeeeee1d1.........');
+RR_F1[24] = r('.............12899b21..............1d8eeeeeeefeeeeeeeeeee1d1..........');
+RR_F1[25] = r('............1289b1................1d8eeeeeeefeeeeeeeee1d1............');
+RR_F1[26] = r('...........1289b1.................1d8eeeeeeefeeeeeee1d1..............');
+RR_F1[27] = r('..........128b1...................1deeeeeeefeeeeeee1d1...............');
+RR_F1[28] = r('.........128b1....................11eeeeefeeeeee1d1................');
 
 // F2: hook punch (hit 2) — arm at different angle
 const RR_F2 = clone(IDLE_BASE);
@@ -301,15 +301,15 @@ STO_F1[21] = r('................1289ka1............18ka1111eefeeeeeegeeeeeeefee1
 STO_F1[22] = r('...............12899a1.............1891.1eefeeeeegeeeeeeefee1d81.........');
 STO_F1[23] = r('..............12899a1..............18d1eefeeeeegeeeeeefee1d81...........');
 STO_F1[24] = r('.............12899b21..............1d8eefeeeegeeeeeefee1d81.............');
-STO_F1[25] = r('............1289b1................1d8eeeeeeeeeeeeee1d81................');
+STO_F1[25] = r('............1289b1................1d8eeeeefeeeeee1d81................');
 STO_F1[26] = r('...........1289b1.................1d8eeeeeeeeee1d81...................');
 STO_F1[27] = r('..........128b1...................1deeeeeee1d81......................');
 STO_F1[28] = r('.........128b1....................11eeeee1d81.........................');
 // Golden energy wave tip — much bigger than DM
 STO_F1[18] = r('...161514..............12mn21..........12mn2.1111eefeeeegeeeeefee1d81.......');
 STO_F1[19] = r('..1415161414..........128921...........12891.111eefeeeegeeeeefee1d81.......');
-STO_F1[20] = r('.141615161414........1289la1...........189a1.111eeeeeeeeeeeeee1d81.........');
-STO_F1[21] = r('.141516151614.......1289ka1............18ka1111eeeeeeeeeeeee1d81..........');
+STO_F1[20] = r('.141615161414........1289la1...........189a1.111eeeeefeeeeee1d81.........');
+STO_F1[21] = r('.141516151614.......1289ka1............18ka1111eeeeefeeeeee1d81..........');
 STO_F1[22] = r('.141615161414.......12899a1.............1891.1eeeeeeeeeee1d81............');
 STO_F1[23] = r('.141516151614.......12899a1..............18d1eeeeeeee1d81..............');
 STO_F1[24] = r('..14151614..........12899b21..............1d8eeeee1d81................');
@@ -412,7 +412,7 @@ const HRR_F2 = clone(IDLE_BASE);
 HRR_F2[18] = r('...................12mn21..........12mn2.111..1eefeeeeegeeeeeefee1d81......');
 HRR_F2[19] = r('..................128921...........12891.111.1eefeeeegeeeeeefee1d81........');
 HRR_F2[20] = r('.................1289la1...........189a1.111eefeeeegeeeeefee1d81..........');
-HRR_F2[21] = r('................1289ka1............18ka1111eeeeeeeeeeeee1d81.............');
+HRR_F2[21] = r('................1289ka1............18ka1111eeeeefeeeeee1d81.............');
 HRR_F2[22] = r('...............12899a1.............1891.1eeeeefeeeee1d81...............');
 HRR_F2[23] = r('..............12899a1..............18d1eeeeeeeeeee1d81................');
 HRR_F2[24] = r('.............12899b21..............1d8eeeeeeeee1d81..................');

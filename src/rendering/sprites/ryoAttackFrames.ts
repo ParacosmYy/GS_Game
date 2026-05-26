@@ -125,9 +125,9 @@ SC_F0[20] = r('...1d81..............1289la1...........189a1.111d1..........1eeee
 SC_F0[21] = r('....1d81.............1289ka1............18ka111d1..........1eeeeeee1.......');
 SC_F0[22] = r('....1d1..............12899a1.............1891.d1...........1eeeeeeeee1......');
 SC_F0[23] = r('.....1d1............12899a1..............18d1d1..........1eeeeeeeeeee1.....');
-SC_F0[24] = r('.....1d8d1..........12899b21..............1d8d1..........1eeeeeeeeeeeee1...');
-SC_F0[25] = r('......1d8d1........1289b1................1d8d1..........1eeeeeeeeeeeeeeee1..');
-SC_F0[26] = r('.......1d81.......1289b1.................1d81..........1eeeeeeeeeeeeeeeeeee1');
+SC_F0[24] = r('.....1d8d1..........12899b21..............1d8d1..........1eeeeefeeeeee1...');
+SC_F0[25] = r('......1d8d1........1289b1................1d8d1..........1eeeeeeefeeeeeee1..');
+SC_F0[26] = r('.......1d81.......1289b1.................1d81..........1eeeeeeefeeeeeeeeee1');
 
 // SC_F1: arm extending, fist at ~x=70
 const SC_F1 = clone(BASE);
@@ -169,17 +169,17 @@ SC_F2[15] = r('....................mn1mmn21mn.11.1..12nm.1.111..................
 SC_F2[16] = r('...................mn1mmn221........12nm21.111..................................................');
 SC_F2[17] = r('..................mn1mmn2.1mn....1.2nm21.111....................................11............');
 // y=18-28: fully extended arm, fist at ~x=82-85 (188d81 = larger fist)
-SC_F2[18] = r('...................12mn21..........12mn2.1111.1eefeeeeeeeeeeeegeeeeeeeeeeeeeeefee188d81..');
-SC_F2[19] = r('..................128921...........12891.111.1eefeeeeeeeeeeeegeeeeeeeeeeeeeeefee188d81...');
-SC_F2[20] = r('.................1289la1...........189a1.111eefeeeeeeeeeeeegeeeeeeeeeeeeeeeefee188d81....');
-SC_F2[21] = r('................1289ka1............18ka111eefeeeeeeeeeeeegeeeeeeeeeeeeeeefee188d81.....');
-SC_F2[22] = r('...............12899a1.............1891.1eefeeeeeeeeeeeegeeeeeeeeeeeeeeefee188d81......');
-SC_F2[23] = r('..............12899a1..............18d1eefeeeeeeeeeeeegeeeeeeeeeeeeeeeefee188d81.......');
-SC_F2[24] = r('.............12899b21..............1d8eefeeeeeeeeeeeegeeeeeeeeeeeeeeefee188d81........');
-SC_F2[25] = r('............1289b1................1d8eefeeeeeeeeeeegeeeeeeeeeeeeeeefee188d81.........');
-SC_F2[26] = r('...........1289b1.................1d8eefeeeeeeeeeeegeeeeeeeeeeeeeefee188d81..........');
-SC_F2[27] = r('..........128b1...................1deefeeeeeeeeeeegeeeeeeeeeeeeeefee188d81...........');
-SC_F2[28] = r('.........128b1....................11eefeeeeeeeeeeegeeeeeeeeeeeeeefee188d81............');
+SC_F2[18] = r('...................12mn21..........12mn2.1111.1eefeeeeeeeeeeeegeeeeeefeeeeeeefee188d81..');
+SC_F2[19] = r('..................128921...........12891.111.1eefeeeeeeeeeeeegeeeeeefeeeeeeefee188d81...');
+SC_F2[20] = r('.................1289la1...........189a1.111eefeeeeeeeeeeeegeeeeeeefeeeeeeefee188d81....');
+SC_F2[21] = r('................1289ka1............18ka111eefeeeeeeeeeeeegeeeeeefeeeeeeefee188d81.....');
+SC_F2[22] = r('...............12899a1.............1891.1eefeeeeeeeeeeeegeeeeeefeeeeeeefee188d81......');
+SC_F2[23] = r('..............12899a1..............18d1eefeeeeeeeeeeeegeeeeeeefeeeeeeefee188d81.......');
+SC_F2[24] = r('.............12899b21..............1d8eefeeeeeeeeeeeegeeeeeefeeeeeeefee188d81........');
+SC_F2[25] = r('............1289b1................1d8eefeeeeeeeeeeegeeeeeefeeeeeeefee188d81.........');
+SC_F2[26] = r('...........1289b1.................1d8eefeeeeeeeeeeegeeeeefeeeeeefee188d81..........');
+SC_F2[27] = r('..........128b1...................1deefeeeeeeeeeeegeeeeefeeeeeefee188d81...........');
+SC_F2[28] = r('.........128b1....................11eefeeeeeeeeeeegeeeeefeeeeeefee188d81............');
 
 // SC_F3 & SC_F4: recovery — same as guard stance
 const SC_F3 = clone(SA_F0);
