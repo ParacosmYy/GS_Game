@@ -359,17 +359,25 @@ export class Renderer {
   // ===== Controls hint =====
 
   private static readonly SPECIAL_NAMES: Record<string, [string, string]> = {
-    kyo: ['荒咬み', '鬼焼き'],
-    iori: ['暗拂', '鬼焼き'],
-    terry: ['Power Wave', 'Burn Knuckle'],
-    kim: ['飛燕斬', '空斬'],
+    // U (SPECIAL1 / 普通版) → I (SPECIAL2 / 普通版)
+    // 暴气后: U变强化版 → I变强化版
+    kyo: ['荒咬み', '鬼焼き'],        // MAX: 大蛇薙 / 鬼焼き
+    iori: ['暗拂', '鬼焼き'],         // MAX: 八稚女 / 葵花
+    ryo: ['虎煌', '虎咆'],           // MAX: 天地霸煌拳 / 虎咆
+    terry: ['Power Wave', 'Burn Knuckle'], // MAX: Power Geyser / Rising Tackle
+    kim: ['飛燕斬', '半月斬'],         // MAX: 鳳凰脚 / 飛燕斬
+    leona: ['月光', '威光'],         // MAX: V字金锯 / 手刀
+    mai: ['花蝶扇', '飛翔龍炎陣'],     // MAX: 蜂巢落とし / 龍炎舞
+    robert: ['龍舞脚', 'DP'],        // MAX: 龍虎乱舞 / 霸王翔吼拳
+    clark: ['投技①', '投技②'],       // MAX: Argentine DM / Galactica DM
+    ralf: ['DP技', 'DP技'],          // MAX: Galactica / Screw Upper
   };
 
   drawControlsHint(simplifiedMode: boolean, charId: string): void {
     const ctx = this.ctx;
     // Semi-transparent dark bar at bottom
     ctx.fillStyle = 'rgba(0, 0, 0, 0.55)';
-    ctx.fillRect(0, 575, CANVAS_WIDTH, 25);
+    ctx.fillRect(0, 575, CANVAS_WIDTH, simplifiedMode ? 35 : 25);
     // Subtle top border
     ctx.fillStyle = 'rgba(255, 255, 255, 0.08)';
     ctx.fillRect(0, 575, CANVAS_WIDTH, 1);
@@ -379,13 +387,22 @@ export class Renderer {
     ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
 
     let label: string;
+    let subLabel: string = '';
     if (simplifiedMode) {
       const names = Renderer.SPECIAL_NAMES[charId] ?? ['技能①', '技能②'];
       label = `[J]轻拳  [K]轻脚  [U]${names[0]}  [I]${names[1]}  [O]爆气  [L]CD  [P]嘲讽`;
+      subLabel = '┗ 爆气激活后，U和I的技能替换为强化版本（DM/大招）';
     } else {
       label = '[J]轻拳  [K]轻脚  [U]重拳  [I]重脚  [L]CD  [;]投  [P]嘲讽';
     }
     ctx.fillText(label, CANVAS_WIDTH / 2, 592);
+    
+    if (subLabel) {
+      ctx.font = '9px monospace';
+      ctx.fillStyle = 'rgba(200, 255, 200, 0.7)';
+      ctx.fillText(subLabel, CANVAS_WIDTH / 2, 606);
+    }
+    
     ctx.textAlign = 'left';
   }
 
