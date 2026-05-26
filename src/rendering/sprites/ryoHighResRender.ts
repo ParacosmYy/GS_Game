@@ -9,6 +9,8 @@
  * - Type bridging between source PixelFrame and pixelFrameRenderer.PixelFrame
  * - Walk direction resolution (forward/backward from velocity + facing)
  * - Attack type resolution (STAND_A vs STAND_C from currentAttack)
+ * - Crouch attack type resolution (CROUCH_A vs CROUCH_C from currentAttack)
+ * - Air attack type resolution (AIR_A vs AIR_C vs AIR_D from currentAttack)
  * - Cycle timing for animation frames
  */
 
@@ -153,6 +155,26 @@ function resolveFrameKey(
       }
       // Default to STAND_A for STAND_A, CLOSE_A, and any other stand attack
       return 'STAND_A';
+
+    case FighterState.CROUCH:
+      return 'CROUCH';
+
+    case FighterState.CROUCH_ATTACK:
+      // Resolve crouch attack type: CROUCH_C/CROUCH_D -> heavy, else light
+      if (currentAttack === AttackType.CROUCH_C || currentAttack === AttackType.CROUCH_D) {
+        return 'CROUCH_C';
+      }
+      return 'CROUCH_A';
+
+    case FighterState.AIR_ATTACK:
+      // Resolve air attack type: JUMP_C -> AIR_C, JUMP_D -> AIR_D, else AIR_A
+      if (currentAttack === AttackType.JUMP_C || currentAttack === AttackType.JUMP_CD) {
+        return 'AIR_C';
+      }
+      if (currentAttack === AttackType.JUMP_D) {
+        return 'AIR_D';
+      }
+      return 'AIR_A';
 
     case FighterState.HITSTUN:
       return 'HURT';
