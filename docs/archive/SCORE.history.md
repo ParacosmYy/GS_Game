@@ -331,3 +331,9 @@
 ## H103: team state测试—12项验证createTeam+defeat+switch+order — 75→76
 
 **commit:** <hash> | team state测试—12项验证createTeam+defeat+switch+order
+
+---
+
+## H104: combo trial测试—21项验证cancel+damage+runtime+eval+validate — 76→77
+
+**commit:** <hash> | combo trial测试—21项验证cancel+damage+runtime+eval+validate
