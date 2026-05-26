@@ -959,3 +959,9 @@
 ## H195: pixelPortraits—4项验证PixelPortraitData结构(width/height/palette/pixels) — 167→168
 
 **commit:** <hash> | pixelPortraits—4项验证PixelPortraitData结构(width/height/palette/pixels)
+
+---
+
+## H196: spritePoseDataFuncs—5项验证getIdlePoses/getRunPoses/getJumpPoses/getHitPoses/getBlockPoses — 168→169
+
+**commit:** <hash> | spritePoseDataFuncs—5项验证getIdlePoses/getRunPoses/getJumpPoses/getHitPoses/getBlockPoses
