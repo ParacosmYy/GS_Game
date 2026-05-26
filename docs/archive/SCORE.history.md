@@ -133,3 +133,9 @@
 ## H70: portrait manifest测试+Ryo像素肖像数据完整性验证 — 42→43
 
 **commit:** <hash> | 23测试覆盖manifest结构+查询函数+便捷getter+Ryo 64x80像素数据
+
+---
+
+## H71: hitbox constants Ryo完整性测试—8项验证覆盖30个攻击 — 43→44
+
+**commit:** <hash> | 攻击存在性+字段完整性+正向offset+DM>specials+SDM>DM+C版>A版+蹲位低位+throw
