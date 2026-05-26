@@ -796,3 +796,9 @@
 ## H171: manifestRenderData—5项验证getCharacterRenderData/getCharacterColors/hasPortraitForSize — 143→144
 
 **commit:** <hash> | manifestRenderData—5项验证getCharacterRenderData/getCharacterColors/hasPortraitForSize
+
+---
+
+## H172: skeletalParts—5项验证CHAR_OUTFIT+RYO_PALETTES+getOutfit — 144→145
+
+**commit:** <hash> | skeletalParts—5项验证CHAR_OUTFIT+RYO_PALETTES+getOutfit
