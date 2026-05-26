@@ -5,6 +5,7 @@ import type { IInputProvider } from '../input/inputProvider.js';
 import { resolveInput } from '../input/inputResolver.js';
 import type { PrevAttack, RawInput } from '../input/inputResolver.js';
 import { createPrevAttack, updatePrevAttack } from '../input/inputResolver.js';
+import { getActiveConfig } from '../core/gameConfig.js';
 import {
   FRAME_DATA, THROW_RANGE, THROW_DISTANCE,
   CHIP_DAMAGE_RATIO,
@@ -256,6 +257,9 @@ export class CombatSystem {
       || name === AttackType.THROW_BACK;
     if (isThrow) return baseDamage;
 
+    // Read scaling config from gameConfig runtime
+    const config = getActiveConfig();
+
     // 确定分段缩放率
     let scale = COMBO_MIN_SCALE;
     const thresholds = Object.keys(COMBO_DAMAGE_SCALE).map(Number).sort((a, b) => a - b);
@@ -270,6 +274,15 @@ export class CombatSystem {
     const _isDM = isDM(name);
     if (_isDM) {
       scale = Math.max(COMBO_MIN_SCALE, scale - DM_COMBO_PENALTY);
+    }
+
+    // Apply config-driven minimum scaling floors
+    if (_isDM) {
+      scale = Math.max(config.damage.comboScaleMinDM, scale);
+    } else if (attackType && isSpecialMoveCheck(attackType)) {
+      scale = Math.max(config.damage.comboScaleMinSpecial, scale);
+    } else {
+      scale = Math.max(config.damage.comboScaleMinNormal, scale);
     }
 
     return Math.max(minDamage, Math.round(baseDamage * scale));
@@ -448,7 +461,8 @@ export class CombatSystem {
         defender.applyBlockstun(data.blockstun, data.pushback * pushblockMult * fb.blockPushbackScale);
       }
       const chipData = data as { chipDamage?: number };
-      const chip = chipData.chipDamage ?? Math.round(data.damage * CHIP_DAMAGE_RATIO);
+      const chipRatio = getActiveConfig().damage.chipDamageRatio;
+      const chip = chipData.chipDamage ?? Math.round(data.damage * chipRatio);
       // A6: Chip damage cannot kill (leave at least 1 HP)
       defender.health = Math.max(1, defender.health - chip);
       this.comboHits[defIdx] = 0; // Block resets combo
@@ -476,7 +490,8 @@ export class CombatSystem {
       defender.guardGauge = Math.max(0, defender.guardGauge - guardGaugeDamage(attackType) * 1.3);
       // Chip damage on wrong block is the same as normal block (cannot kill)
       const chipData = data as { chipDamage?: number };
-      const chip = chipData.chipDamage ?? Math.round(data.damage * CHIP_DAMAGE_RATIO);
+      const chipRatio2 = getActiveConfig().damage.chipDamageRatio;
+      const chip = chipData.chipDamage ?? Math.round(data.damage * chipRatio2);
       defender.health = Math.max(1, defender.health - chip);
       this.comboHits[defIdx] = 0;
       const defNearCorner = defender.x < STAGE_LEFT + 60 || defender.x > STAGE_RIGHT - 60;

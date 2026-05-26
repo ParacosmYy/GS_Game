@@ -410,15 +410,23 @@ export class TrainingModeState {
   // Dummy
   dummyBehavior: DummyBehavior = DummyBehavior.STAND;
 
+  // Auto-recover settings
+  autoRecoverHP = true;
+  infiniteMeter = true;
+
   // HUD toggles
   showInputHistory = true;
   showFrameData = true;
+  showHitboxes = false;
 
   // Input history (last 20 entries)
   inputHistory: InputHistoryEntry[] = [];
 
   // Frame data of last completed or active attack
   lastFrameData: FrameDataDisplay | null = null;
+
+  // Ticks since P2 was last hit (for auto-recover delay)
+  private _p2LastHitTick = -999;
 
   // Keyboard debounce for F-keys
   private fKeyDebounce: Record<string, boolean> = {};
@@ -607,13 +615,7 @@ export class TrainingModeState {
 
       case 'F2':
         this.fKeyDebounce[code] = true;
-        // Reset positions to center
-        p1.x = STAGE_WIDTH * 0.33;
-        p2.x = STAGE_WIDTH * 0.67;
-        p1.vx = 0;
-        p2.vx = 0;
-        p1.vy = 0;
-        p2.vy = 0;
+        this.showHitboxes = !this.showHitboxes;
         return true;
 
       case 'F3':
@@ -632,15 +634,57 @@ export class TrainingModeState {
   }
 
   /**
+   * Apply training mode auto-recovery each tick.
+   * - P2 HP recovers to 100% over 60 ticks after last hit.
+   * - P2 meter stays at max (if infiniteMeter).
+   * - P2 stun gauge resets immediately (if autoRecoverHP).
+   * - P2 guard gauge recovers quickly.
+   */
+  applyAutoRecovery(
+    p2: Fighter,
+    p2Gauge: { meter: number; stocks: number; maxMeter: number },
+    tick: number,
+  ): void {
+    // Track when P2 was last hit
+    if (p2.hitstunTimer > 0 || p2.isKnockedDown) {
+      this._p2LastHitTick = tick;
+    }
+
+    // Auto-recover HP after 60-tick delay
+    if (this.autoRecoverHP) {
+      const ticksSinceHit = tick - this._p2LastHitTick;
+      if (ticksSinceHit >= 60 && p2.health > 0 && p2.health < p2.maxHealth) {
+        // Recover ~2% per tick (full in ~50 ticks after delay)
+        p2.health = Math.min(p2.maxHealth, p2.health + p2.maxHealth * 0.02);
+      }
+    }
+
+    // Infinite meter: keep P2 gauge at max
+    if (this.infiniteMeter) {
+      p2Gauge.meter = p2Gauge.maxMeter;
+      p2Gauge.stocks = 5;
+    }
+
+    // Immediately reset stun gauge
+    if (this.autoRecoverHP && p2.stunGauge > 0 && p2.state !== 'DIZZY' as any) {
+      p2.stunGauge = 0;
+    }
+  }
+
+  /**
    * Reset training mode state (on entering training).
    */
   reset(): void {
     this.dummyBehavior = DummyBehavior.STAND;
+    this.autoRecoverHP = true;
+    this.infiniteMeter = true;
     this.showInputHistory = true;
     this.showFrameData = true;
+    this.showHitboxes = false;
     this.inputHistory = [];
     this.lastFrameData = null;
     this.fKeyDebounce = {};
     this._reversalPending = false;
+    this._p2LastHitTick = -999;
   }
 }

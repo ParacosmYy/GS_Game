@@ -51,6 +51,19 @@ export {
   RYO_FEEDBACK_SUMMARY,
 } from './feedback.js';
 
+// Cancel paths (normal -> special -> DM routes)
+export {
+  RYO_CANCEL_PATHS,
+  findCancelRoute,
+  getCancelTargets,
+  validateCancel,
+  getCancelRoutesByType,
+  isCancelSource,
+  getBestCancelRoute,
+  type CancelType,
+  type CancelRoute,
+} from './cancelPaths.js';
+
 // Completeness reporting
 export {
   generateRyoReport,

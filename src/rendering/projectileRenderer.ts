@@ -277,6 +277,82 @@ export function drawProjectiles(ctx: CanvasRenderingContext2D, projectiles: Proj
       default: break;
     }
 
+    // ===== EX / MAX Mode Enhanced Visuals =====
+    if (proj.isEX) {
+      // EX outer ring pulse — double layered ring with spin
+      const exPulse = 1 + Math.sin(proj.currentFrame * 0.25) * 0.15;
+      const exRingR = radius * 2.0 * exPulse * vis.stretch;
+      ctx.globalAlpha = 0.35 * fadeIn;
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.ellipse(sx, y, exRingR, exRingR * 0.7, proj.currentFrame * 0.08, 0, Math.PI * 2);
+      ctx.stroke();
+      // Second ring offset
+      ctx.globalAlpha = 0.2 * fadeIn;
+      ctx.strokeStyle = glow;
+      ctx.beginPath();
+      ctx.ellipse(sx, y, exRingR * 1.15, exRingR * 0.85, -proj.currentFrame * 0.06, 0, Math.PI * 2);
+      ctx.stroke();
+      // EX sparkle particles (4 orbiting sparkles)
+      ctx.globalAlpha = 0.6 * fadeIn;
+      ctx.fillStyle = '#ffffff';
+      for (let s = 0; s < 4; s++) {
+        const sAngle = proj.currentFrame * 0.2 + s * Math.PI * 0.5;
+        const sR = radius * 1.6;
+        const sparkX = sx + Math.cos(sAngle) * sR * vis.stretch;
+        const sparkY = y + Math.sin(sAngle) * sR;
+        ctx.beginPath();
+        ctx.arc(sparkX, sparkY, 2, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    // ===== Super Level Visuals (DM projectiles) =====
+    if (proj.level === 'super') {
+      // Super: larger body, screen-wide energy distortion rings
+      const superPulse = 1 + Math.sin(proj.currentFrame * 0.3) * 0.2;
+      ctx.globalAlpha = 0.25 * fadeIn;
+      ctx.strokeStyle = '#ff4466';
+      ctx.lineWidth = 3;
+      for (let r = 0; r < 3; r++) {
+        const ringR = radius * (1.5 + r * 0.5) * superPulse * vis.stretch;
+        const ringAngle = proj.currentFrame * 0.1 + r * 0.4;
+        ctx.beginPath();
+        ctx.ellipse(sx, y, ringR, ringR * 0.75, ringAngle, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+      // Super: trailing energy streaks
+      ctx.globalAlpha = 0.4 * fadeIn;
+      ctx.strokeStyle = '#ffaa22';
+      ctx.lineWidth = 2;
+      for (let streak = 0; streak < 3; streak++) {
+        const sOff = (streak - 1) * 8;
+        const sLen = radius * vis.stretch * 2;
+        ctx.beginPath();
+        ctx.moveTo(sx - proj.facing * radius * vis.stretch, y + sOff);
+        ctx.lineTo(sx - proj.facing * sLen, y + sOff + Math.sin(proj.currentFrame * 0.3 + streak) * 5);
+        ctx.stroke();
+      }
+    }
+
+    // ===== Trail Enhancement for Strong/EX/Super =====
+    if (proj.level === 'strong' || proj.isEX || proj.level === 'super') {
+      // Use stored trail positions for motion-blur afterimages
+      const trailAlpha = proj.level === 'super' ? 0.25 : proj.isEX ? 0.2 : 0.15;
+      for (let t = 0; t < proj.trail.length; t++) {
+        const tp = proj.trail[t];
+        const tScreen = camera.worldToScreen(tp.x);
+        const tAlpha = trailAlpha * ((t + 1) / proj.trail.length) * fadeIn;
+        const tScale = 0.4 + 0.6 * (t / proj.trail.length);
+        ctx.globalAlpha = tAlpha;
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        ctx.ellipse(tScreen, y, radius * vis.stretch * tScale, radius * tScale, 0, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
     // 生成时爆发环 (前6帧)
     if (proj.currentFrame < 6) {
       const prog = proj.currentFrame / 6;
@@ -286,6 +362,15 @@ export function drawProjectiles(ctx: CanvasRenderingContext2D, projectiles: Proj
       ctx.beginPath();
       ctx.arc(sx, y, 10 + prog * 40, 0, Math.PI * 2);
       ctx.stroke();
+      // EX: larger burst ring
+      if (proj.isEX) {
+        ctx.globalAlpha = (1 - prog) * 0.3;
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 3 * (1 - prog) + 1;
+        ctx.beginPath();
+        ctx.arc(sx, y, 15 + prog * 60, 0, Math.PI * 2);
+        ctx.stroke();
+      }
     }
 
     // KOF2002: 飞行道具地面阴影

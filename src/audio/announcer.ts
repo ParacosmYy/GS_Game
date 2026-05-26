@@ -587,6 +587,54 @@ export class Announcer {
     if (this.playSample('newChallenger', 0.5)) return;
     this.playPhrase(NEW_CHALLENGER_SYLLABLES, 0.17);
   }
+
+  /** MAX activation -- bright rising fanfare */
+  maxActivation(): void {
+    if (this.playSample('maxActivation', 0.5)) return;
+    this.playPhrase(MAX_ACTIVATION_SYLLABLES, 0.18);
+  }
 }
+
+// ─── MAX Activation phrase ──────────────────────────────────────
+const MAX_ACTIVATION_SYLLABLES: Syllable[] = [
+  { vowels: VOWEL_AH, freq: 300, duration: 70, gap: 55, pitchEnd: 380 },
+  { vowels: VOWEL_AH, freq: 380, duration: 70, gap: 55, pitchEnd: 460 },
+  { vowels: VOWEL_IH, freq: 460, duration: 70, gap: 55, pitchEnd: 550 },
+  { vowels: VOWEL_IH, freq: 550, duration: 320, gap: 0,  vibrato: true, releaseMs: 50 },
+];
+
+// ─── Announcer event types ──────────────────────────────────────
+
+export type AnnouncerEventType =
+  | 'round_start'
+  | 'fight'
+  | 'ko'
+  | 'perfect'
+  | 'time_up'
+  | 'you_win'
+  | 'counter_hit'
+  | 'max_activation';
+
+/** Event-to-text mapping with display parameters */
+export interface AnnouncerEventConfig {
+  text: string;
+  duration: number;       // frames
+  fillColor: string;
+  glowColor: string;
+  fontSize: number;
+  /** Optional sound to play on trigger */
+  soundId: string;
+}
+
+export const ANNOUNCER_EVENTS: Record<AnnouncerEventType, AnnouncerEventConfig> = {
+  round_start:    { text: 'ROUND',        duration: 80,  fillColor: '#ffcc00', glowColor: '#ff8800', fontSize: 52, soundId: 'round_call' },
+  fight:          { text: 'FIGHT!',       duration: 50,  fillColor: '#ff4400', glowColor: '#ff2200', fontSize: 72, soundId: 'fight' },
+  ko:             { text: 'K.O.!',        duration: 100, fillColor: '#ff2200', glowColor: '#ff0000', fontSize: 100, soundId: 'ko' },
+  perfect:        { text: 'PERFECT!',     duration: 80,  fillColor: '#ffcc00', glowColor: '#ffaa00', fontSize: 42, soundId: 'perfect' },
+  time_up:        { text: 'TIME OVER',    duration: 100, fillColor: '#ffaa00', glowColor: '#ff8800', fontSize: 72, soundId: 'time_over' },
+  you_win:        { text: 'YOU WIN!',     duration: 120, fillColor: '#ffcc00', glowColor: '#ffaa00', fontSize: 52, soundId: 'victory' },
+  counter_hit:    { text: 'COUNTER HIT!', duration: 50,  fillColor: '#ff8800', glowColor: '#ff6600', fontSize: 36, soundId: 'counter' },
+  max_activation: { text: 'MAX!',         duration: 40,  fillColor: '#44ff88', glowColor: '#22cc66', fontSize: 42, soundId: 'maxActivation' },
+};
 
 export const announcer = new Announcer();

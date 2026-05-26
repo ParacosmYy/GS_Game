@@ -4,6 +4,7 @@
  */
 import { GameLoop } from './core/gameLoop.js';
 import { Camera } from './core/camera.js';
+import { GameSpeedController, SLOWMO_SUPER_FLASH, SLOWMO_KO } from './core/gameSpeed.js';
 import { CANVAS_WIDTH, CANVAS_HEIGHT, STAGE_WIDTH, STAGE_GROUND_Y, KO_DISPLAY_TIME, MAX_STOCKS, METER_PER_STOCK, FRAME_DATA } from './core/constants.js';
 import { GamePhase, FighterState } from './core/types.js';
 import type { PowerGauge, MaxModeState } from './core/types.js';
@@ -35,6 +36,7 @@ import { resolveSimplified } from './input/simplifiedInput.js';
 import { bgm } from './audio/bgm.js';
 import { AmbientSoundPlayer } from './audio/ambient.js';
 import { announcer } from './audio/announcer.js';
+import { announcerOverlay } from './rendering/announcerOverlay.js';
 import { AdvancedAI } from './ai/advancedAI.js';
 import { updateMovementVfx } from './state/movementVfx.js';
 import { WIN_QUOTE_DURATION, drawAnnounceSequence } from './rendering/screens.js';
@@ -58,6 +60,7 @@ const renderer = new Renderer(ctx);
 const vfx = new VFXSystem();
 const gs = new GameStateManager();
 const training = new TrainingModeState();
+const gameSpeed = new GameSpeedController();
 
 // ===== Sprite System =====
 const spriteManager = new SpriteManager();
@@ -549,8 +552,14 @@ function update(): void {
   if (cinematic.isFrozen()) { cinematic.tickInFreeze(maxModes); return; }
   cinematic.tickMaxModes(maxModes);
   cinematic.tickSuperFlash();
+
+  // GameSpeed slow-motion integration: skip frames when slow-mo is active
+  const speedFactor = gameSpeed.update();
   tickRef.value++;
   tickAutoMeter(gauges);
+  // Slow-mo frame skip: probabilistic skip based on speed factor
+  if (gameSpeed.isSlowMo() && Math.random() > speedFactor) return;
+
   if (cinematic.shouldSkipFrame()) return;
   const rawP1 = inputManager.getP1Input();
   const rawP2 = inputManager.getP2Input();
@@ -565,11 +574,15 @@ function update(): void {
   if (maxModes[0].active && maxModes[0].timer === maxModes[0].maxDuration - 1) {
     playMAXActivation(); screenFlash.trigger('#44ff88', 0.3, 8);
     vfx.spawnMAXActivationFlash(p1.x, p1.y - p1.displayHeight / 2); vfx.spawnHeavyDust(p1.x, p1.y, 8);
+    try { announcer.maxActivation(); } catch { /* audio unavailable in test env */ }
+    announcerOverlay.trigger('max_activation');
     p1.invincible = true; p1.throwInvulnFrames = 5;
   }
   if (maxModes[1].active && maxModes[1].timer === maxModes[1].maxDuration - 1) {
     playMAXActivation(); screenFlash.trigger('#44ff88', 0.3, 8);
     vfx.spawnMAXActivationFlash(p2.x, p2.y - p2.displayHeight / 2); vfx.spawnHeavyDust(p2.x, p2.y, 8);
+    try { announcer.maxActivation(); } catch { /* audio unavailable in test env */ }
+    announcerOverlay.trigger('max_activation');
     p2.invincible = true; p2.throwInvulnFrames = 5;
   }
   p1Cmd.record(getDirectionInput(p1Input), tickRef.value);
@@ -682,6 +695,10 @@ function update(): void {
   if (p2DelayedHealth > p2.health) p2DelayedHealth = Math.max(p2.health, p2DelayedHealth - healthDecay);
 
   dmMgr.checkDMActivation();
+  // GameSpeed slow-mo on super flash: 8 ticks at 0.3x (after hitstop ends, residual slow-mo)
+  if (cinematic.superFlashTimer > 0 && !gameSpeed.isSlowMo()) {
+    gameSpeed.triggerSlowMo(SLOWMO_SUPER_FLASH.slowMoDuration, SLOWMO_SUPER_FLASH.slowMoSpeed);
+  }
   p1Ctrl.applyPhysics();
   p2Ctrl.applyPhysics();
 
@@ -759,6 +776,9 @@ function update(): void {
 
   updateMovementVfx([p1, p2], vfx, tickRef.value);
 
+  // Tick announcer overlay animations
+  announcerOverlay.tick();
+
   // Motion SFX: footstep, jump, landing sounds based on state transitions
   tickMotionSFX([p1, p2], tickRef.value);
 
@@ -800,7 +820,7 @@ function update(): void {
     if (p1.health <= 0 || p2.health <= 0) {
       p1.health = p1.maxHealth; p2.health = p2.maxHealth;
       p1DelayedHealth = p1.maxHealth; p2DelayedHealth = p2.maxHealth;
-      cinematic.reset(); gs.koGroundSlamDone = false;
+      cinematic.reset(); gameSpeed.reset(); gs.koGroundSlamDone = false;
     }
   }
 
@@ -812,6 +832,8 @@ function update(): void {
       const isDMKill = killerAttack?.startsWith('DM_') || killerAttack?.startsWith('SDM_');
       if (isDMKill) cinematic.triggerDMKOSlowMo();
       else cinematic.triggerKOSlowMo();
+      // GameSpeed slow-mo on KO: 15 ticks at 0.2x
+      gameSpeed.triggerSlowMo(SLOWMO_KO.slowMoDuration, SLOWMO_KO.slowMoSpeed);
       const koDefender = p1.health <= 0 ? 0 : 1;
       const koAttacker = p1.health <= 0 ? p2 : p1;
       cinematic.triggerHitStop(isDMKill ? 20 : 15, koDefender, koAttacker.facing);
@@ -1099,6 +1121,9 @@ function render(): void {
     })() : { attackName: null, startup: 0, active: 0, recovery: 0, advantageHit: 0, advantageBlock: 0, lastComboDamage: 0, wasHit: false, wasBlocked: false };
     renderer.drawHUDTrainingInfo(atkInfo);
   }
+
+  // Announcer overlay (counter hit, MAX activation, etc.)
+  announcerOverlay.draw(ctx, canvas.width, canvas.height);
 }
 
 function restartGame(): void {
@@ -1109,6 +1134,7 @@ function restartGame(): void {
   select.reset();
   p2AI = null;
   cinematic.reset();
+  gameSpeed.reset();
   rounds.fullReset();
   p1DelayedHealth = p1.maxHealth;
   p2DelayedHealth = p2.maxHealth;

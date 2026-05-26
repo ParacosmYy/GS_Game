@@ -871,6 +871,26 @@ export const RyoDef: CharacterDefinition = {
       fighter.vy = -8;
       return true;
     }
+    // DM 天地霸煌拳: super-level projectile (goes through other projectiles)
+    if (attackType === AttackType.DM_TEN_HA_OU && fighter.attackFrame === 0) {
+      projectiles.push(new Projectile(
+        fighter.x + 60 * fighter.facing, fighter.y - 100, fighter.facing,
+        80, playerIndex, fighter.charId,
+        35, 25, 10, 'DM',
+        'super', 200, false,
+      ));
+      return true;
+    }
+    // SDM 天地霸煌拳: larger, faster super projectile
+    if (attackType === AttackType.SDM_TEN_HA_OU && fighter.attackFrame === 0) {
+      projectiles.push(new Projectile(
+        fighter.x + 60 * fighter.facing, fighter.y - 100, fighter.facing,
+        90, playerIndex, fighter.charId,
+        40, 30, 12, 'SDM',
+        'super', 280, false,
+      ));
+      return true;
+    }
     // 龍虎乱舞 DM/SDM/HSDM: 前冲 — 攻击活跃期间每帧前移
     if (attackType === AttackType.DM_RYUKO_RANBU) {
       fighter.vx = fighter.facing * 4.5;

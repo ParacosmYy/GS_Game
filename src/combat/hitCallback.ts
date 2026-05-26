@@ -17,6 +17,8 @@ import { gainMeterOnHit, gainMeterOnBlock, gainMeterOnHitstun } from './meter.js
 import { playHit, playBlock, playSpecial, playDM, playThrow, playCounter, playHeavyHit, playSuperFlash, playWire, playJuggleHit, playBlockSpecial, playBlockDM, playSpecialLight, playSpecialHeavy, playKOHit, playHitAccent, playLandingHeavy, playDizzyHit, playGroundBounce, playWallBounce, playGuardCrush, playKoouken, playKoHou, playHien, playHaou } from '../audio/sampler.js';
 import { spawnTierSparks } from '../rendering/vfxPresets.js';
 import { bgm } from '../audio/bgm.js';
+import { announcer } from '../audio/announcer.js';
+import { announcerOverlay } from '../rendering/announcerOverlay.js';
 import type { CinematicState } from '../state/cinematicState.js';
 
 // ===== KOF2002: 命中招式名映射 =====
@@ -464,6 +466,8 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       deps.vfx.spawnCharacterHitSparks(hitX, hitY, 6, '#ff8800', 0.9 * 2, 1.0, 0.22, false, attacker.facing);
       deps.vfx.spawnImpactRing(hitX, hitY, 1.15);
       playCounter();
+      try { announcer.counter(); } catch { /* audio unavailable in test env */ }
+      announcerOverlay.trigger('counter_hit');
       bgm.duck(0.6, 180);
     }
     if (counterHit && (data as { counterWire?: boolean }).counterWire) {
