@@ -427,3 +427,9 @@
 ## H119: animationManifest测试—9项验证getSequence+getSequenceNames+hasSequence — 91→92
 
 **commit:** <hash> | animationManifest测试—9项验证getSequence+getSequenceNames+hasSequence
+
+---
+
+## H120: spriteFrameCache测试—5项验证SpriteFrameCache has/get/clear/size — 92→93
+
+**commit:** <hash> | spriteFrameCache测试—5项验证SpriteFrameCache has/get/clear/size
