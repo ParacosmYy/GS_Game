@@ -52,7 +52,8 @@ export function closeRange(ctx: FighterCtx): boolean {
 
 export function defaultAttack(ctx: FighterCtx, input: ResolvedInput): AttackType | null {
   const f = ctx.fighter;
-  const air = f.state === FighterState.JUMP || f.state === FighterState.RUN_JUMP
+  const air = !f.isGrounded()
+    || f.state === FighterState.JUMP || f.state === FighterState.RUN_JUMP
     || f.state === FighterState.HOP || f.state === FighterState.HYPER_JUMP;
   if (air) {
     if (input.buttonAPressed) return AttackType.JUMP_A;
@@ -146,6 +147,14 @@ export function isNormal(name: string): boolean {
 export function handleIdleWalk(ctx: FighterCtx, input: ResolvedInput): void {
   const f = ctx.fighter;
   f.displayHeight = 100; f.vx = 0;
+
+  // State is occasionally restored to IDLE/WALK while y is still airborne
+  // (for example after an air attack ends). Keep action routing tied to
+  // physical position so fighters cannot walk or start grounded normals in air.
+  if (!f.isGrounded()) {
+    f.state = FighterState.JUMP;
+    return;
+  }
 
   // 投技输入缓冲消费: blockstun结束→IDLE时立即执行缓冲的投技
   if (f.throwBufferTimer > 0 && f.canAct()) {
