@@ -541,3 +541,9 @@
 ## H133: vfxPresets测试—6项验证spawnHitSparks+spawnBlockFlash+getSparkSizeScaleFromDamage — 105→106
 
 **commit:** <hash> | vfxPresets测试—6项验证spawnHitSparks+spawnBlockFlash+getSparkSizeScaleFromDamage
+
+---
+
+## H134: gameStateManager测试—8项验证phase+phaseTimer+winner+isTrainingMode初始值 — 106→107
+
+**commit:** <hash> | gameStateManager测试—8项验证phase+phaseTimer+winner+isTrainingMode初始值
