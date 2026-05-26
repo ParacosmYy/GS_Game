@@ -31,6 +31,7 @@ import {
   DIZZY_MASH_RECOVERY,
 } from '../core/constants.js';
 import { ATTACK_FRAMES } from '../core/attackFrames.js';
+import { getHurtboxDef } from '../core/hurtboxManifest.js';
 import type { CharacterStats } from '../characters/types.js';
 
 export class Fighter {
@@ -200,13 +201,14 @@ export class Fighter {
     this.facing = opponent.x > this.x ? 1 : -1;
   }
 
-  /** Get the world-space hurtbox (the fighter's body) */
+  /** Get the world-space hurtbox (the fighter's body), driven by hurtbox manifest */
   getHurtbox(): { x: number; y: number; width: number; height: number } {
+    const def = getHurtboxDef(this.state);
     return {
-      x: this.x - FIGHTER_WIDTH / 2,
-      y: this.y - this.displayHeight,
-      width: FIGHTER_WIDTH,
-      height: this.displayHeight,
+      x: this.x - def.width / 2 + def.offsetX,
+      y: this.y - def.height + def.offsetY,
+      width: def.width,
+      height: def.height,
     };
   }
 

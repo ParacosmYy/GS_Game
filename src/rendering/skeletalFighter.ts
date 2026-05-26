@@ -87,7 +87,7 @@ export function drawSkeletalFighter(
     else if (charId === 'iori') { breathSpeed = 38; breathAmp = 1.2; headBob = -0.6; chestLift = 0.9; shoulderTilt = -0.08; }
     else if (charId === 'terry') { breathSpeed = 27; breathAmp = 2.8; headBob = 1.1; chestLift = -0.2; }
     else if (charId === 'kim') { breathSpeed = 22; breathAmp = 2.1; headBob = 0.6; chestLift = -0.3; }
-    else if (charId === 'ryo') { breathSpeed = 25; breathAmp = 2.1; headBob = 0.35; chestLift = 0.2; shoulderTilt = 0.03; }
+    else if (charId === 'ryo') { breathSpeed = 25; breathAmp = 2.1; headBob = 0.4; chestLift = 0.3; shoulderTilt = 0.03; }
     else if (charId === 'leona') { breathSpeed = 32; breathAmp = 1.5; headBob = 0; }
     else if (charId === 'kdash') { breathSpeed = 24; breathAmp = 1.9; headBob = 0.4; }
     else if (charId === 'kula') { breathSpeed = 28; breathAmp = 1.8; headBob = 0.8; }
@@ -225,6 +225,17 @@ export function drawSkeletalFighter(
     else if (charId === 'mai') { walkSpeed = 9; walkAmp = 4.5; bodyBob = 2; armSwing = 0.4; }
     else if (charId === 'athena') { walkSpeed = 9; walkAmp = 4; bodyBob = 1; armSwing = 0.35; }
     else if (charId === 'yamazaki') { walkSpeed = 9; walkAmp = 3.8; headBob = 0.6; armSwing = 0.08; bodyLean = 0.06; }
+    // KOF2002: backward walk detection — vx sign opposes facing when retreating
+    const isWalkingBack = (f.vx * f.facing) < 0;
+
+    // Backward walk modifiers: cautious retreat, smaller stride, body leans away
+    if (isWalkingBack) {
+      armSwing *= 0.55;        // arms swing much less when retreating
+      walkAmp *= 0.65;         // shorter stride
+      bodyLean = -bodyLean * 0.4; // reverse and reduce body lean (lean away)
+      headBob *= 0.7;
+    }
+
     const walkCycle = Math.sin(globalTick / walkSpeed) * walkAmp;
     p.legFront.oy += walkCycle;
     p.legBack.oy -= walkCycle;
@@ -235,6 +246,13 @@ export function drawSkeletalFighter(
     p.body.rot += Math.sin(globalTick / walkSpeed) * bodyLean;
     p.armFront.rot += shoulderLead * 0.05;
     p.armBack.rot -= shoulderLead * 0.05;
+
+    // Backward walk: body tilts back, head tilts back — universal retreat posture
+    if (isWalkingBack) {
+      p.body.oy += 1;           // body shifts upward slightly (leaning back)
+      p.head.rot += 0.03;       // head tilts back cautiously
+    }
+
     if (charId === 'iori') {
       // Iori walks like a threat: low, narrow, and slightly forward.
       p.head.oy -= 1;
@@ -251,6 +269,12 @@ export function drawSkeletalFighter(
       p.body.oy += 0.4;
       p.head.rot -= 0.02;
       p.armFront.oy += 0.3;
+      // Ryo's backward walk: even more guarded, karate retreat stance
+      if (isWalkingBack) {
+        p.armFront.rot += 0.06;  // guard raised slightly higher
+        p.armBack.rot += 0.04;   // back arm covers more
+        p.body.oy += 0.5;        // lower center of gravity
+      }
     }
   }
 
@@ -264,7 +288,7 @@ export function drawSkeletalFighter(
     let armPump = 0.3;
     if (charId === 'kyo') { runSpeed = 4.5; runAmp = 8.5; bodyLean = -0.08; headDrop = -1; armPump = 0.5; }
     else if (charId === 'iori') { runSpeed = 5.2; runAmp = 6.2; bodyLean = -0.22; headDrop = 1.2; armPump = 0.12; }
-    else if (charId === 'ryo') { runSpeed = 4.8; runAmp = 7.2; bodyLean = -0.22; headDrop = -0.5; armPump = 0.38; }
+    else if (charId === 'ryo') { runSpeed = 4.8; runAmp = 7.2; bodyLean = -0.24; headDrop = -0.5; armPump = 0.42; }
     else if (charId === 'kim') { runSpeed = 4.4; runAmp = 7.5; bodyLean = -0.1; headDrop = -1.2; armPump = 0.28; }
     else if (charId === 'terry') { runSpeed = 4.8; runAmp = 8; bodyLean = -0.2; headDrop = -0.8; armPump = 0.45; }
     else if (charId === 'leona') { runSpeed = 4.6; runAmp = 7.6; bodyLean = -0.16; headDrop = -0.7; armPump = 0.34; }
@@ -294,10 +318,11 @@ export function drawSkeletalFighter(
       p.armBack.oy += 0.5;
     } else if (charId === 'ryo') {
       // Ryo keeps the dash compact so the silhouette reads as disciplined karate power.
-      p.body.oy -= 0.8;
-      p.armFront.rot -= 0.08;
-      p.armBack.rot += 0.08;
+      p.body.oy -= 1.0;
+      p.armFront.rot -= 0.1;
+      p.armBack.rot += 0.1;
       p.head.oy -= 0.5;
+      p.legFront.oy += 0.5;   // driving legs harder into the ground
     }
   }
 

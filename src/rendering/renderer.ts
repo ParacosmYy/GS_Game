@@ -302,8 +302,10 @@ export class Renderer {
         ctx.fillStyle = 'rgba(255,200,0,0.15)'; ctx.fillRect(throwbox.x - camera.x, throwbox.y, throwbox.width, throwbox.height);
         ctx.strokeStyle = 'rgba(255,200,0,0.6)'; ctx.lineWidth = 1; ctx.strokeRect(throwbox.x - camera.x, throwbox.y, throwbox.width, throwbox.height);
       }
-      const hb = f.getHurtbox();
-      ctx.strokeStyle = 'rgba(0,100,255,0.5)'; ctx.lineWidth = 1; ctx.strokeRect(hb.x - camera.x, hb.y, hb.width, hb.height);
+      const hb = f.getEffectiveHurtbox();
+      if (hb) {
+        ctx.strokeStyle = 'rgba(0,100,255,0.5)'; ctx.lineWidth = 1; ctx.strokeRect(hb.x - camera.x, hb.y, hb.width, hb.height);
+      }
       const pb = f.getPushbox();
       ctx.strokeStyle = 'rgba(0,255,0,0.3)'; ctx.setLineDash([3, 3]); ctx.strokeRect(pb.x - camera.x, pb.y, pb.width, pb.height); ctx.setLineDash([]);
       const sx = camera.worldToScreen(f.x);
