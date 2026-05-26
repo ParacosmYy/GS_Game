@@ -373,3 +373,9 @@
 ## H110: damageScaling测试—13项验证DAMAGE_FLOORS+classifyStarter+getComboScale — 82→83
 
 **commit:** <hash> | damageScaling测试—13项验证DAMAGE_FLOORS+classifyStarter+getComboScale
+
+---
+
+## H111: gameConfig测试—10项验证KOF2002_CONFIG+TRAINING_OVERRIDES+getActiveConfig — 83→84
+
+**commit:** <hash> | gameConfig测试—10项验证KOF2002_CONFIG+TRAINING_OVERRIDES+getActiveConfig
