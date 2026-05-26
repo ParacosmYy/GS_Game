@@ -320,11 +320,9 @@ describe('Feedback Manifest - Ryo Attack Type Mapping', () => {
     }
   });
 
-  it('Ryo HSDM maps to sdm tier (HSDM_ prefix not handled separately, treated as non-SDM/DM)', () => {
-    // HSDM_ prefix: does not start with SDM_ or DM_, but contains RYUKO_RANBU
-    // which does not match any character prefix -- this is a design note
+  it('Ryo HSDM maps to sdm tier (HSDM_ prefix → highest tier)', () => {
     const tier = inferTier(ryoHSDM);
-    expect(ALL_TIERS).toContain(tier);
+    expect(tier).toBe('sdm');
   });
 
   it('STAND_CD maps to heavy tier (ends with _CD)', () => {
@@ -502,11 +500,14 @@ describe('Feedback Manifest - Query Function Consistency', () => {
 
   it('attackTierMap contains Ryo explicit mappings', () => {
     const keys = Object.keys(FEEDBACK_MANIFEST.attackTierMap);
-    // Ryo 通常技(6) + 重攻击(10) + 必杀技(8) + DM/SDM(2) = 26
-    expect(keys).toHaveLength(26);
+    // Ryo 通常技(6) + 重攻击(10) + 必杀技(8) + DM/SDM/HSDM(5) = 29
+    expect(keys).toHaveLength(29);
     expect(FEEDBACK_MANIFEST.attackTierMap[AttackType.RYO_KOOU]).toBe('special');
     expect(FEEDBACK_MANIFEST.attackTierMap[AttackType.DM_TEN_HA_OU]).toBe('dm');
     expect(FEEDBACK_MANIFEST.attackTierMap[AttackType.SDM_TEN_HA_OU]).toBe('sdm');
+    expect(FEEDBACK_MANIFEST.attackTierMap[AttackType.DM_RYUKO_RANBU]).toBe('dm');
+    expect(FEEDBACK_MANIFEST.attackTierMap[AttackType.SDM_RYUKO_RANBU]).toBe('sdm');
+    expect(FEEDBACK_MANIFEST.attackTierMap[AttackType.HSDM_RYUKO_RANBU]).toBe('sdm');
   });
 });
 

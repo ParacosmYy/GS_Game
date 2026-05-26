@@ -365,7 +365,7 @@ describe('DM Ten Ha Ou (天地霸煌拳) SFX', () => {
     const data = FRAME_DATA[AttackType.DM_TEN_HA_OU as keyof typeof FRAME_DATA];
     expect(data.startup).toBe(18);
     expect(data.active).toBe(10);
-    expect(data.recovery).toBe(35);
+    expect(data.recovery).toBe(40);
     expect(data.damage).toBe(200);
   });
 });

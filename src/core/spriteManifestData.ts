@@ -427,12 +427,12 @@ export const RYO_ANIMATIONS: Record<string, SpriteAnimation> = {
 
   // ── 超必杀技 (DM) ───────────────────────────────────────────────
 
-  /** 天地霸煌拳 (Ten Ha Ou) DM — dm_ten_ha_ou: startup=18 + active=10 + recovery=35 = 63帧 */
+  /** 天地霸煌拳 (Ten Ha Ou) DM — dm_ten_ha_ou: startup=18 + active=10 + recovery=40 = 68帧 */
   dm_ten_ha_ou: {
     name: 'dm_ten_ha_ou',
     loop: false,
     cancelStartFrame: 28, // startup(18) + active(10) 后可取消
-    frames: attackFrames(18, 10, 35, STD_W + 80, STD_H + 40),
+    frames: attackFrames(18, 10, 40, STD_W + 80, STD_H + 40),
   },
   /** @deprecated 使用 dm_ten_ha_ou */
   dm_haou: {

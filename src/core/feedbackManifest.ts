@@ -146,7 +146,7 @@ function isSpecial(at: string): boolean {
     || at.includes('MATURE_') || at.includes('VICE_') || at.includes('SHERMIE_')
     || at.includes('CHRIS_') || at.includes('YASHIRO_') || at.includes('MARY_')
     || at.includes('YAMAZAKI_') || at.includes('KASUMI_') || at.includes('XIANGFEI_')
-    || at.includes('KULA_') || at.includes('KDAISH_') || at === 'SPECIAL_PROJECTILE'
+    || at.includes('KULA_') || at === 'SPECIAL_PROJECTILE'
     || at.startsWith('ROBERT_') || at.startsWith('KDASH_');
 }
 function isHeavy(at: string): boolean {
@@ -160,6 +160,7 @@ function isHeavy(at: string): boolean {
  */
 export function inferTier(attackType: AttackType): FeedbackTier {
   const at = attackType as string;
+  if (at.startsWith('HSDM_')) return 'sdm';
   if (at.startsWith('SDM_')) return 'sdm';
   if (at.startsWith('DM_')) return 'dm';
   if (isSpecial(at) && !isDm(at)) return 'special';
@@ -203,9 +204,12 @@ export const FEEDBACK_MANIFEST: FeedbackManifest = {
     RYO_TSURIZAO: 'special',
     RYO_ORISHI: 'special',
 
-    // ===== Ryo DM / SDM =====
+    // ===== Ryo DM / SDM / HSDM =====
     DM_TEN_HA_OU: 'dm',
     SDM_TEN_HA_OU: 'sdm',
+    DM_RYUKO_RANBU: 'dm',
+    SDM_RYUKO_RANBU: 'sdm',
+    HSDM_RYUKO_RANBU: 'sdm',
   } as Partial<Record<AttackType, FeedbackTier>>,
 };
 

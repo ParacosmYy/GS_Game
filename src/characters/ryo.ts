@@ -250,7 +250,12 @@ export const RyoDef: CharacterDefinition = {
       pose({ head: bone(1, 0, 0.01), body: bone(0, 0, 0.02), armFront: bone(14, 4, 0.45, 1.0), armBack: bone(-4, 2, -0.6, 0.97), legFront: bone(10, 0, 0.08), legBack: bone(-8, 1, -0.06) }),
       pose({ head: bone(1, 0, 0.01), body: bone(0, 0, 0.02), armFront: bone(14, 4, 0.45, 1.0), armBack: bone(-4, 2, -0.6, 0.97), legFront: bone(10, 0, 0.08), legBack: bone(-8, 1, -0.06) }),
       pose({ head: bone(1, 0, 0.01), body: bone(0, 0, 0.02), armFront: bone(14, 4, 0.45, 1.0), armBack: bone(-4, 2, -0.6, 0.97), legFront: bone(10, 0, 0.08), legBack: bone(-8, 1, -0.06) }),
-      // F31-F34: final recovery (DM_TEN_HA_OU recovery=35, SDM_TEN_HA_OU recovery=35)
+      // F31-F39: final recovery (DM_TEN_HA_OU recovery=40, SDM_TEN_HA_OU recovery=35)
+      pose({ head: bone(1, 0, 0.01), body: bone(0, 0, 0.02), armFront: bone(14, 4, 0.45, 1.0), armBack: bone(-4, 2, -0.6, 0.97), legFront: bone(10, 0, 0.08), legBack: bone(-8, 1, -0.06) }),
+      pose({ head: bone(1, 0, 0.01), body: bone(0, 0, 0.02), armFront: bone(14, 4, 0.45, 1.0), armBack: bone(-4, 2, -0.6, 0.97), legFront: bone(10, 0, 0.08), legBack: bone(-8, 1, -0.06) }),
+      pose({ head: bone(1, 0, 0.01), body: bone(0, 0, 0.02), armFront: bone(14, 4, 0.45, 1.0), armBack: bone(-4, 2, -0.6, 0.97), legFront: bone(10, 0, 0.08), legBack: bone(-8, 1, -0.06) }),
+      pose({ head: bone(1, 0, 0.01), body: bone(0, 0, 0.02), armFront: bone(14, 4, 0.45, 1.0), armBack: bone(-4, 2, -0.6, 0.97), legFront: bone(10, 0, 0.08), legBack: bone(-8, 1, -0.06) }),
+      pose({ head: bone(1, 0, 0.01), body: bone(0, 0, 0.02), armFront: bone(14, 4, 0.45, 1.0), armBack: bone(-4, 2, -0.6, 0.97), legFront: bone(10, 0, 0.08), legBack: bone(-8, 1, -0.06) }),
       pose({ head: bone(1, 0, 0.01), body: bone(0, 0, 0.02), armFront: bone(14, 4, 0.45, 1.0), armBack: bone(-4, 2, -0.6, 0.97), legFront: bone(10, 0, 0.08), legBack: bone(-8, 1, -0.06) }),
       pose({ head: bone(1, 0, 0.01), body: bone(0, 0, 0.02), armFront: bone(14, 4, 0.45, 1.0), armBack: bone(-4, 2, -0.6, 0.97), legFront: bone(10, 0, 0.08), legBack: bone(-8, 1, -0.06) }),
       pose({ head: bone(1, 0, 0.01), body: bone(0, 0, 0.02), armFront: bone(14, 4, 0.45, 1.0), armBack: bone(-4, 2, -0.6, 0.97), legFront: bone(10, 0, 0.08), legBack: bone(-8, 1, -0.06) }),

@@ -1207,7 +1207,7 @@ export const FRAME_DATA_CHARS = {
   DM_TEN_HA_OU: {
     startup: 18,
     active: 10,
-    recovery: 35,
+    recovery: 40,
     damage: 200,
     hitstun: 0,
     blockstun: 22,

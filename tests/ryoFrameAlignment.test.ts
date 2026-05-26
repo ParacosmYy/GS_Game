@@ -153,7 +153,7 @@ describe('Ryo special move frame alignment', () => {
     expect((poses as unknown[]).length).toBeGreaterThanOrEqual(fd.recovery);
   });
 
-  it('DM_TEN_HA_OU (DM) pose array covers startup=18 and recovery=35', () => {
+  it('DM_TEN_HA_OU (DM) pose array covers startup=18 and recovery=40', () => {
     const poses = RyoDef.poses[FighterState.STAND_ATTACK];
     const fd = getFrameData('DM_TEN_HA_OU');
     expect((poses as unknown[]).length).toBeGreaterThanOrEqual(fd.startup);
