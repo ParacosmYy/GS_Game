@@ -868,3 +868,9 @@
 ## H183: ryoSpriteBatch1—6项验证idle/walk/run/jump/crouch像素帧 — 155→156
 
 **commit:** <hash> | ryoSpriteBatch1—6项验证idle/walk/run/jump/crouch像素帧
+
+---
+
+## H184: ryoSpriteBatch2—6项验证攻击/踢/空中/近身像素帧 — 156→157
+
+**commit:** <hash> | ryoSpriteBatch2—6项验证攻击/踢/空中/近身像素帧
