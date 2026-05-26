@@ -5571,3 +5571,40 @@
 **下一轮最小任务:** Ryo hitbox/hurtbox可视化来自数据而非渲染计算;角色skeletalFighter微调;手测
 
 **commit: 5c864c3 | 下一目标: 603 (hitbox数据驱动+手测)**
+
+---
+
+## H54: hitbox数据驱动+walk_backward区分+idle微调 — 598→603
+
+**日期:** 2026-05-26
+**commit:** 09df681
+
+**本轮类型:** 产品体验迭代 — Ryo样板
+
+**实质性改变:**
+- 新增hurtboxManifest.ts：按状态的hurtbox定义(站立80×200, 蹲下90×130, 跳跃70×160, 倒地120×40等)
+- fighter.ts getHurtbox()从manifest读取而非硬编码
+- renderer.ts调试框改用getEffectiveHurtbox()与战斗系统一致
+- walk_backward通用检测：armSwing 55%, walkAmp 65%, body后仰+1
+- Ryo专属walk_backward：前臂护架, 后臂保护, 重心微降
+- Ryo idle呼吸增强：chestLift 0.3, headBob 0.4
+- Ryo run增强：bodyLean -0.24, armPump 0.42
+
+| 维度 | 诚实分 | 变化 | 备注 |
+|------|--------|------|------|
+| 角色美术 | 78/200 | +3 | walk_backward区分+idle/run微调 |
+| 战斗手感 | 150/150 | = | 已满分 |
+| 帧数据精度 | 100/100 | = | 已满分 |
+| 音频品质 | 65/150 | = | 本轮未改音效 |
+| 角色内容 | 118/150 | +3 | hurtbox按状态数据驱动 |
+| UI/HUD品质 | 35/50 | = | 本轮未改HUD |
+
+**本轮提升了哪个维度？** 角色美术(+3), 角色内容(+3)
+
+**更像KOF在哪里？** 后退时身体后仰+护手姿态；蹲下hurtbox变矮宽；倒地hurtbox变扁平(真实地面判定)
+
+**仍不像KOF在哪里？** 骨骼仍是方块；需要更多sfx种类；需要手测整体观感
+
+**下一轮最小任务:** Ryo肖像manifest完善+选人界面Ryo portrait闭环+bodyPartRenderer细节
+
+**commit: 09df681 | 下一目标: 608 (肖像闭环+渲染细节)**
