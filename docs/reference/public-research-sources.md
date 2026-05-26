@@ -29,6 +29,8 @@
 - hit event 如何触发反馈。
 - 工具如何生成 atlas 和 manifest。
 
+更完整的工程架构参考见 [格斗游戏工程架构参考](fighting-game-architecture-reference.md)。
+
 ## 4. references 目录
 
 `references/mugen/` 是研究资料目录。

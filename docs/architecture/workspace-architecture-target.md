@@ -6,7 +6,98 @@
 
 当前项目已经能运行，但还不像大型项目。目标是把代码、内容、工具、测试、文档分成可替换、可测试、可交接的层。
 
-最终结构应接近：
+最终工作区结构应接近：
+
+```text
+apps/
+  web/                    # 浏览器版壳：Vite、Canvas挂载、输入适配
+  tools-viewer/           # 本地资产/动画/碰撞盒查看器
+
+packages/
+  engine/                 # 可复用通用运行时
+  simulation/             # 纯游戏模拟包
+  content-schema/         # manifest、Frame Contract、校验 schema
+  renderer-canvas2d/      # Canvas2D 渲染后端
+  audio-runtime/          # 音频运行时
+
+src/                      # 当前旧结构过渡区，逐步迁出到 apps/packages/content
+  app/
+  engine/
+  simulation/
+  content/
+  rendering/
+  audio/
+  toolsRuntime/
+
+content/
+  characters/
+    ryo/
+    kyo/
+    iori/
+  stages/
+  system/
+
+assets/
+  source/
+    characters/
+    stages/
+    ui/
+    audio/
+  generated/
+    atlases/
+    manifests/
+    reports/
+
+data/
+  frame-data/
+  hitboxes/
+  feedback/
+  balance/
+  localization/
+
+tools/
+  asset-pipeline/
+  validators/
+  reports/
+  importers/
+  exporters/
+  dev-viewers/
+
+tests/
+  unit/
+  integration/
+  regression/
+  content/
+  visual/
+
+docs/
+  architecture/
+  process/
+  product/
+  reference/
+  archive/
+
+reports/
+  completeness/
+  performance/
+  bundle/
+  asset-license/
+
+scripts/
+  ci/
+  local/
+  release/
+
+config/
+  eslint/
+  vite/
+  vitest/
+  tsconfig/
+```
+
+当前代码不需要一次性变成上面结构，但所有新目录和迁移都必须朝这个方向靠拢。
+
+运行时代码内部结构应接近：
 
 ```text
 src/
@@ -37,6 +128,20 @@ tests/
   regression/
   content/
 ```
+
+## 1.1 关于 SNK / 正版架构参考
+
+正版 SNK 商业游戏的内部工程结构不是公开资料，不能声称已经知道其源码目录或私有工具链。
+
+本项目只能参考这些可合理推断或公开可见的成熟格斗工程模式：
+
+- 街机格斗通常有独立的角色内容包。
+- 角色动作、判定、音效、特效、脚本通常由工具链离线产出。
+- 运行时通常消费压缩后的资源包、动作表、碰撞表和事件表。
+- 调试工具通常能查看当前 state、frame、hitbox、hurtbox、axis、input buffer。
+- MUGEN/IKEMEN 等公开工程证明了 data-driven character package 的价值。
+
+因此本项目目标不是“复刻 SNK 源码结构”，而是建立类似成熟商业格斗项目需要的内容生产线和运行时边界。
 
 ## 2. 当前到目标的迁移原则
 
@@ -186,6 +291,45 @@ src/rendering/
 
 - 被浏览器运行时直接导入。
 
+### 3.8 `content/characters/<id>/`
+
+职责：
+
+- 一个角色一个目录。
+- 角色目录内只放该角色数据、manifest、动作定义和完整度声明。
+- Ryo 达标后，Kyo/Iori 复制目录模板，不复制具体动作。
+
+目标结构：
+
+```text
+content/characters/ryo/
+  character.json
+  portraits.manifest.json
+  sprites.manifest.json
+  animations.manifest.json
+  hitboxes.manifest.json
+  feedback.manifest.json
+  commands.ts
+  definition.ts
+  completeness.ts
+  README.md
+```
+
+### 3.9 `reports/`
+
+职责：
+
+- 生成给 AI 和人看的审计结果。
+- 不参与运行时。
+
+关键报告：
+
+- 角色完整度。
+- manifest 校验。
+- 资源授权。
+- bundle 体积。
+- 性能预算。
+
 ## 4. 迁移阶段
 
 ### 阶段 A：文档和边界
@@ -196,9 +340,15 @@ src/rendering/
 
 ### 阶段 B：Ryo content package
 
-- 新建 `src/content/characters/ryo/`。
+- 新建 `src/content/characters/ryo/` 或 `content/characters/ryo/` 的过渡目录。
 - 先迁移数据，不迁移行为。
 - 从 `characters/ryo.ts` 中抽出 stats、frameData、pose/animation、feedback。
+
+### 阶段 B.5：工作区根目录扩充
+
+- 建立 `content/`、`assets/`、`data/`、`tools/`、`reports/`、`scripts/`、`config/` 的空目录或 README。
+- 每个目录必须有职责说明。
+- 不允许创建没有用途说明的空文件夹。
 
 ### 阶段 C：Frame Contract
 
