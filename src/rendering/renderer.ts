@@ -49,7 +49,7 @@ export class Renderer {
     this.spriteRenderer = sr;
   }
 
-  render(fighters: Fighter[], cameraX: number, tick: number, ko: boolean, winner: number | null, shakeX: number, shakeY: number, delayedHealth: [number, number], maxModes?: [MaxModeState, MaxModeState], perfectPlayer: number | null = null, p1Wins: number = 0, p2Wins: number = 0, p1Name: string = '', p2Name: string = '', isTimeOver: boolean = false, currentRound: number = 1, firstAttacker: number | null = null, hitStopDefender: number = -1, hitStopBias: number = 0, charSpecialColors?: [string, string], koTimer: number = 0, koDustParticles: KODustParticle[] = []): void {
+  render(fighters: Fighter[], cameraX: number, tick: number, ko: boolean, winner: number | null, shakeX: number, shakeY: number, delayedHealth: [number, number], maxModes?: [MaxModeState, MaxModeState], perfectPlayer: number | null = null, p1Wins: number = 0, p2Wins: number = 0, p1Name: string = '', p2Name: string = '', isTimeOver: boolean = false, currentRound: number = 1, firstAttacker: number | null = null, hitStopDefender: number = -1, hitStopBias: number = 0, charSpecialColors?: [string, string], koTimer: number = 0, koDustParticles: KODustParticle[] = [], cameraZoom: number = 1.0): void {
     this.frameCount++;
     this.globalTick = tick;
     const now = performance.now();
@@ -63,6 +63,14 @@ export class Renderer {
     ctx.save();
     ctx.translate(shakeX, shakeY);
     ctx.clearRect(-10, -10, CANVAS_WIDTH + 20, CANVAS_HEIGHT + 20);
+
+    // Apply camera zoom — scale around center
+    if (cameraZoom !== 1.0) {
+      ctx.save();
+      ctx.translate(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2);
+      ctx.scale(cameraZoom, cameraZoom);
+      ctx.translate(-CANVAS_WIDTH / 2, -CANVAS_HEIGHT / 2);
+    }
 
     drawStage(ctx, cameraX, this.stars, this.globalTick);
 
@@ -86,6 +94,10 @@ export class Renderer {
     }
 
     drawFightersImpl(ctx, fighters, cameraX, this.globalTick, maxModes, hitStopDefender, hitStopBias, this.spriteRenderer);
+
+    // End zoom before HUD — HUD always renders at normal scale
+    if (cameraZoom !== 1.0) ctx.restore();
+
     drawHUD(ctx, fighters, tick, delayedHealth, p1Wins, p2Wins, p1Name, p2Name, currentRound, firstAttacker);
 
     if (ko) {
