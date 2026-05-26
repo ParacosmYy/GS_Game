@@ -941,3 +941,9 @@
 ## H192: aiRoutesExt—5项验证AIR_COMBO_ROUTES+applyComboStep输入映射 — 164→165
 
 **commit:** <hash> | aiRoutesExt—5项验证AIR_COMBO_ROUTES+applyComboStep输入映射
+
+---
+
+## H193: ryoSpriteBatch5—5项验证backdash/crouchD/standD/airC/walkBack帧 — 165→166
+
+**commit:** <hash> | ryoSpriteBatch5—5项验证backdash/crouchD/standD/airC/walkBack帧
