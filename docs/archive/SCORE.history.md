@@ -451,3 +451,9 @@
 ## H123: camera测试—5项验证Camera实例化+update+默认值 — 95→96
 
 **commit:** <hash> | camera测试—5项验证Camera实例化+update+默认值
+
+---
+
+## H124: portraitManifest测试—8项验证PORTRAIT_SIZES+getPortrait+getSelect+getHUD+getVS — 96→97
+
+**commit:** <hash> | portraitManifest测试—8项验证PORTRAIT_SIZES+getPortrait+getSelect+getHUD+getVS
