@@ -289,3 +289,9 @@
 ## H96: state handlers helper测试—16项验证 — 68→69
 
 **commit:** <hash> | state handlers helper测试—16项验证
+
+---
+
+## H97: attack classifier测试—34项验证isDM+classify全类别 — 69→70
+
+**commit:** <hash> | attack classifier测试—34项验证isDM+classify全类别
