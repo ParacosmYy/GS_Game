@@ -181,3 +181,9 @@
 ## H78: Ryo stats定义测试—11项验证角色数值 — 50→51
 
 **commit:** <hash> | walkSpeed/runSpeed/jumpVelocity/maxHealth/pushWidth+合理性范围
+
+---
+
+## H79: animation manifest查询函数测试—29项验证 — 51→52
+
+**commit:** <hash> | getSequence+hasSequence+cancelFrame+invincibleFrame+12关键序列存在性
