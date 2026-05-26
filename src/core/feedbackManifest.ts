@@ -43,6 +43,16 @@ export interface FeedbackParams {
   bgmDuckVolume: number;
   /** BGM侧链持续时间(ms) */
   bgmDuckDuration: number;
+  /** 火花颜色方案 */
+  sparkPalette: string[];
+  /** 火花类型 */
+  sparkType: 'small' | 'medium' | 'large' | 'burst' | 'mega';
+  /** 火花速度缩放 */
+  sparkSpeed: number;
+  /** 命中推退力度乘数 */
+  hitPushbackScale: number;
+  /** 防御推退力度乘数 */
+  blockPushbackScale: number;
 }
 
 /** 反馈 manifest */
@@ -69,6 +79,11 @@ export const FEEDBACK_TIERS: Record<FeedbackTier, FeedbackParams> = {
     hitFlashFrames: 1,
     bgmDuckVolume: 0.78,
     bgmDuckDuration: 100,
+    sparkPalette: ['#fff', '#ffcc00'],
+    sparkType: 'small',
+    sparkSpeed: 1.0,
+    hitPushbackScale: 1.0,
+    blockPushbackScale: 0.8,
   },
   heavy: {
     tier: 'heavy',
@@ -84,6 +99,11 @@ export const FEEDBACK_TIERS: Record<FeedbackTier, FeedbackParams> = {
     hitFlashFrames: 2,
     bgmDuckVolume: 0.72,
     bgmDuckDuration: 120,
+    sparkPalette: ['#ffcc00', '#ff6600'],
+    sparkType: 'medium',
+    sparkSpeed: 1.3,
+    hitPushbackScale: 1.5,
+    blockPushbackScale: 1.2,
   },
   special: {
     tier: 'special',
@@ -99,6 +119,11 @@ export const FEEDBACK_TIERS: Record<FeedbackTier, FeedbackParams> = {
     hitFlashFrames: 3,
     bgmDuckVolume: 0.68,
     bgmDuckDuration: 150,
+    sparkPalette: ['#88ccff', '#ffffff', '#4488ff'],
+    sparkType: 'large',
+    sparkSpeed: 1.6,
+    hitPushbackScale: 2.0,
+    blockPushbackScale: 1.5,
   },
   dm: {
     tier: 'dm',
@@ -114,6 +139,11 @@ export const FEEDBACK_TIERS: Record<FeedbackTier, FeedbackParams> = {
     hitFlashFrames: 4,
     bgmDuckVolume: 0.6,
     bgmDuckDuration: 200,
+    sparkPalette: ['#ffffff', '#ffff00', '#ff8800'],
+    sparkType: 'burst',
+    sparkSpeed: 2.0,
+    hitPushbackScale: 3.0,
+    blockPushbackScale: 2.0,
   },
   sdm: {
     tier: 'sdm',
@@ -129,6 +159,11 @@ export const FEEDBACK_TIERS: Record<FeedbackTier, FeedbackParams> = {
     hitFlashFrames: 4,
     bgmDuckVolume: 0.55,
     bgmDuckDuration: 250,
+    sparkPalette: ['#ffffff', '#ffcc00', '#ff4400'],
+    sparkType: 'mega',
+    sparkSpeed: 2.5,
+    hitPushbackScale: 3.5,
+    blockPushbackScale: 2.5,
   },
 };
 

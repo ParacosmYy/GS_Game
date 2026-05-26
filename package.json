@@ -13,7 +13,10 @@
     "test:combat": "vitest run tests/combat*.test.ts tests/cancel*.test.ts tests/hit*.test.ts tests/guard*.test.ts tests/juggle*.test.ts",
     "test:content": "vitest run tests/*Manifest*.test.ts tests/*FrameData*.test.ts tests/ryoFrameContract.test.ts",
     "test:full": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "tools:validate:ryo": "npx tsx src/tools/validateManifest.ts ryo",
+    "tools:report:ryo": "npx tsx src/tools/ryoCompletenessReport.ts",
+    "tools:authenticity:ryo": "npx tsx src/tools/ryoAuthenticityCheck.ts"
   },
   "devDependencies": {
     "typescript": "^6.0.3",

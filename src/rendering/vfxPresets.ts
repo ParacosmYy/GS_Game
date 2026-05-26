@@ -17,6 +17,202 @@ export interface Particle {
   rotSpeed?: number;
 }
 
+/** Tier-aware spark spawning — each sparkType produces a distinct pattern */
+export function spawnTierSparks(
+  particles: Particle[],
+  x: number, y: number,
+  count: number,
+  sparkType: 'small' | 'medium' | 'large' | 'burst' | 'mega',
+  sparkPalette: string[],
+  sparkSpeed: number,
+): void {
+  const pick = () => sparkPalette[Math.floor(Math.random() * sparkPalette.length)];
+
+  switch (sparkType) {
+    case 'small': {
+      // Same as existing spawnHitSparks behavior: random velocity, short life
+      for (let i = 0; i < count; i++) {
+        const angle = -Math.PI * 0.8 + Math.random() * Math.PI * 1.6;
+        const speed = (2 + Math.random() * 5) * sparkSpeed;
+        particles.push({
+          x, y,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed - 2 * sparkSpeed,
+          life: 10 + Math.floor(Math.random() * 10),
+          maxLife: 20,
+          size: 2 + Math.random() * 3,
+          color: pick(),
+          type: 'spark',
+          gravity: 0.15,
+          friction: 0.96,
+        });
+      }
+      break;
+    }
+    case 'medium': {
+      // Larger particles, more spread, slightly longer life
+      particles.push({
+        x, y, vx: 0, vy: 0,
+        life: 8, maxLife: 8, size: 18,
+        color: pick(), type: 'flash',
+      });
+      for (let i = 0; i < count; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const speed = (2.5 + Math.random() * 6) * sparkSpeed;
+        particles.push({
+          x, y,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed - 3,
+          life: 12 + Math.floor(Math.random() * 8),
+          maxLife: 22,
+          size: 2.5 + Math.random() * 3,
+          color: pick(),
+          type: Math.random() < 0.2 ? 'star' : 'spark',
+          gravity: 0.12,
+          friction: 0.95,
+          rotation: Math.random() * Math.PI * 2,
+          rotSpeed: (Math.random() - 0.5) * 0.3,
+        });
+      }
+      break;
+    }
+    case 'large': {
+      // Radial burst pattern, star-shaped particles with higher sparkSpeed
+      particles.push({
+        x, y, vx: 0, vy: 0,
+        life: 10, maxLife: 10, size: 28,
+        color: '#ffffff', type: 'flash',
+      });
+      particles.push({
+        x, y, vx: 0, vy: 0,
+        life: 6, maxLife: 6, size: 16,
+        color: pick(), type: 'flash',
+      });
+      for (let i = 0; i < count; i++) {
+        const angle = (i / count) * Math.PI * 2 + Math.random() * 0.3;
+        const speed = (3 + Math.random() * 5) * sparkSpeed;
+        particles.push({
+          x, y,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed - 2,
+          life: 14 + Math.floor(Math.random() * 8),
+          maxLife: 24,
+          size: 3 + Math.random() * 4,
+          color: pick(),
+          type: 'star',
+          gravity: 0.1,
+          friction: 0.94,
+          rotation: angle,
+          rotSpeed: (Math.random() - 0.5) * 0.4,
+        });
+      }
+      break;
+    }
+    case 'burst': {
+      // Ring pattern + center flash particles, wide spread
+      particles.push({
+        x, y, vx: 0, vy: 0,
+        life: 12, maxLife: 12, size: 40,
+        color: '#ffffff', type: 'superburst',
+      });
+      particles.push({
+        x, y, vx: 0, vy: 0,
+        life: 16, maxLife: 16, size: 55,
+        color: pick(), type: 'superburst',
+      });
+      // Ring particles
+      for (let i = 0; i < count; i++) {
+        const angle = (i / count) * Math.PI * 2;
+        const speed = (3 + Math.random() * 6) * sparkSpeed;
+        particles.push({
+          x, y,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed - 2.5,
+          life: 14 + Math.floor(Math.random() * 10),
+          maxLife: 26,
+          size: 2.5 + Math.random() * 4,
+          color: pick(),
+          type: 'star',
+          gravity: 0.12,
+          friction: 0.94,
+          rotation: angle,
+          rotSpeed: (Math.random() - 0.5) * 0.5,
+        });
+      }
+      // Center flash particles (extra scatter)
+      for (let i = 0; i < 6; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const speed = (1.5 + Math.random() * 3) * sparkSpeed;
+        particles.push({
+          x, y,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed,
+          life: 8 + Math.floor(Math.random() * 6),
+          maxLife: 14,
+          size: 3 + Math.random() * 3,
+          color: '#ffffff',
+          type: 'spark',
+          gravity: 0,
+          friction: 0.92,
+        });
+      }
+      break;
+    }
+    case 'mega': {
+      // Double ring + center superburst, largest spread
+      particles.push({
+        x, y, vx: 0, vy: 0,
+        life: 14, maxLife: 14, size: 55,
+        color: '#ffffff', type: 'superburst',
+      });
+      particles.push({
+        x, y, vx: 0, vy: 0,
+        life: 20, maxLife: 20, size: 75,
+        color: pick(), type: 'superburst',
+      });
+      // Outer ring — wide spread
+      const outerCount = Math.ceil(count * 0.6);
+      for (let i = 0; i < outerCount; i++) {
+        const angle = (i / outerCount) * Math.PI * 2;
+        const speed = (4 + Math.random() * 7) * sparkSpeed;
+        particles.push({
+          x, y,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed - 3,
+          life: 16 + Math.floor(Math.random() * 12),
+          maxLife: 30,
+          size: 3 + Math.random() * 5,
+          color: pick(),
+          type: 'star',
+          gravity: 0.1,
+          friction: 0.93,
+          rotation: angle,
+          rotSpeed: (Math.random() - 0.5) * 0.5,
+        });
+      }
+      // Inner ring — tighter, faster decay
+      const innerCount = count - outerCount;
+      for (let i = 0; i < innerCount; i++) {
+        const angle = (i / innerCount) * Math.PI * 2;
+        const speed = (2 + Math.random() * 4) * sparkSpeed;
+        particles.push({
+          x, y,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed,
+          life: 10 + Math.floor(Math.random() * 8),
+          maxLife: 18,
+          size: 2 + Math.random() * 3,
+          color: '#ffffff',
+          type: 'spark',
+          gravity: 0.05,
+          friction: 0.92,
+        });
+      }
+      break;
+    }
+  }
+}
+
 export function spawnHitSparks(particles: Particle[], worldX: number, worldY: number, count: number = 8): void {
   for (let i = 0; i < count; i++) {
     const angle = -Math.PI * 0.8 + Math.random() * Math.PI * 1.6;
