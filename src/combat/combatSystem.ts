@@ -10,6 +10,8 @@ import {
   CHIP_DAMAGE_RATIO,
   CH_DAMAGE_BONUS,
   DAMAGE_SCALE_STEP, DAMAGE_SCALE_MIN_NORMAL, DAMAGE_SCALE_MIN_SPECIAL, DAMAGE_SCALE_MIN_DM, COMBO_TIMEOUT,
+  COMBO_DAMAGE_SCALE, COMBO_MIN_SCALE, DM_COMBO_PENALTY,
+  CANCEL_WINDOW_NORMAL, CANCEL_WINDOW_RAPID, CANCEL_WINDOW_SUPER, CANCEL_WINDOW_FREE,
   COUNTER_WIRE_BOUNCE_VX, COUNTER_WIRE_BOUNCE_VY,
   LIGHT_NORMALS, NORMAL_ATTACKS, COMMAND_NORMALS,
   STAGE_LEFT, STAGE_RIGHT,
@@ -234,24 +236,51 @@ export class CombatSystem {
     return false;
   }
 
-  /** KOF2002 damage scaling: single-layer scaling by combo count, DM always full */
+  /** KOF2002 damage scaling: tiered scaling by combo count.
+   *  - comboCount 1-3: 100%, 4-6: 85%, 7-9: 70%, 10+: 60% (min)
+   *  - 投技不参与缩放
+   *  - DM在连段中缩放率额外-10%
+   */
   private scaledDamage(baseDamage: number, defIdx: number, attackType?: AttackType): number {
     const minDamage = 1;
     const comboHits = this.comboHits[defIdx];
     if (comboHits <= 0) return baseDamage;
     const name = (attackType ?? '') as string;
-    // KOF2002: DM/SDM always deal full damage in combos
-    const _isDM = isDM(name);
-    const _isSpecial = isSpecialOrDM(name) || name === 'STAND_CD' || name === 'JUMP_CD';
-    if (_isDM) return Math.max(minDamage, baseDamage);
-    if (_isSpecial) {
-      // 必杀技：每击 -3%，最低 60%
-      const scale = Math.max(0.60, 1 - comboHits * 0.03);
-      return Math.max(minDamage, Math.round(baseDamage * scale));
+
+    // 投技不参与缩放
+    const isThrow = name === AttackType.THROW || name === AttackType.THROW_FORWARD
+      || name === AttackType.THROW_BACK;
+    if (isThrow) return baseDamage;
+
+    // 确定分段缩放率
+    let scale = COMBO_MIN_SCALE;
+    const thresholds = Object.keys(COMBO_DAMAGE_SCALE).map(Number).sort((a, b) => a - b);
+    for (const threshold of thresholds) {
+      if (comboHits <= threshold) {
+        scale = COMBO_DAMAGE_SCALE[threshold];
+        break;
+      }
     }
-    // 通常技：每击 -5%，最低 30%
-    const scale = Math.max(0.30, 1 - comboHits * 0.05);
+
+    // DM在连段中额外-10%
+    const _isDM = isDM(name);
+    if (_isDM) {
+      scale = Math.max(COMBO_MIN_SCALE, scale - DM_COMBO_PENALTY);
+    }
+
     return Math.max(minDamage, Math.round(baseDamage * scale));
+  }
+
+  /** Get the cancel window (in frames) for a given cancel type.
+   *  Used by external cancel system to gate cancel timing.
+   */
+  static getCancelWindow(cancelType: 'normal' | 'rapid' | 'super' | 'free'): number {
+    switch (cancelType) {
+      case 'normal': return CANCEL_WINDOW_NORMAL;
+      case 'rapid': return CANCEL_WINDOW_RAPID;
+      case 'super': return CANCEL_WINDOW_SUPER;
+      case 'free': return CANCEL_WINDOW_FREE;
+    }
   }
 
   private resolveHit(attacker: Fighter, defender: Fighter, onHit?: HitCallback): void {

@@ -6,7 +6,17 @@ import type { Fighter } from '../entities/fighter.js';
 import type { VFXSystem, ScreenShake, ScreenFlash } from '../rendering/vfx.js';
 import type { PowerGauge } from '../core/types.js';
 import { AttackType, FighterState } from '../core/types.js';
-import { FRAME_DATA, STAGE_WIDTH, MAX_STOCKS, METER_PER_STOCK } from '../core/constants.js';
+import {
+  FRAME_DATA, STAGE_WIDTH, MAX_STOCKS, METER_PER_STOCK,
+  HITSTOP_LIGHT, HITSTOP_MEDIUM, HITSTOP_SPECIAL, HITSTOP_DM, HITSTOP_SDM, HITSTOP_COUNTER_BONUS,
+  BLOCKSTOP_LIGHT, BLOCKSTOP_HEAVY, BLOCKSTOP_SPECIAL, BLOCKSTOP_DM,
+  SHAKE_LIGHT, SHAKE_HEAVY, SHAKE_COUNTER, SHAKE_SPECIAL, SHAKE_THROW, SHAKE_DM, SHAKE_KO,
+  SHAKE_DURATION_LIGHT, SHAKE_DURATION_HEAVY, SHAKE_DURATION_SPECIAL, SHAKE_DURATION_DM, SHAKE_DURATION_KO,
+  SHAKE_BLOCK_LIGHT, SHAKE_BLOCK_HEAVY, SHAKE_BLOCK_SPECIAL, SHAKE_BLOCK_DM,
+  SHAKE_BLOCK_DURATION_LIGHT, SHAKE_BLOCK_DURATION_HEAVY, SHAKE_BLOCK_DURATION_SPECIAL, SHAKE_BLOCK_DURATION_DM,
+  SPARK_SIZE_LIGHT, SPARK_SIZE_HEAVY, SPARK_SIZE_SPECIAL, SPARK_SIZE_DM, SPARK_SIZE_SDM,
+  SPARK_COUNT_LIGHT, SPARK_COUNT_SPECIAL, SPARK_COUNT_DM, SPARK_COUNT_SDM, SPARK_COUNT_COUNTER,
+} from '../core/constants.js';
 import { ROSTER } from '../characters/index.js';
 import { isDM as isDMCheck } from '../core/attackClassifier.js';
 import { gainMeterOnHit, gainMeterOnBlock, gainMeterOnHitstun } from './meter.js';
@@ -40,21 +50,21 @@ function calcHitStop(at: AttackType, isDM: boolean, isSpecial: boolean, ch: bool
     || at === AttackType.JUMP_C || at === AttackType.JUMP_D;
   const s = at as string;
   const isSDM = s.startsWith('SDM_');
-  const r = isDM ? (isSDM ? 22 : 19) : isSpecial ? 13 : heavy ? 7 : 4;
-  return ch ? r + 3 : r;
+  const r = isDM ? (isSDM ? HITSTOP_SDM : HITSTOP_DM) : isSpecial ? HITSTOP_SPECIAL : heavy ? HITSTOP_MEDIUM : HITSTOP_LIGHT;
+  return ch ? r + HITSTOP_COUNTER_BONUS : r;
 }
 
 function calcShake(at: AttackType, isDM: boolean, isSpecial: boolean, ch: boolean, dmg: number): number {
   const s = at as string;
-  if (isDM) return 14;
-  if (isSpecial) return 8;
-  if (at === AttackType.THROW) return 8;
-  if (ch) return 6;
+  if (isDM) return SHAKE_DM;
+  if (isSpecial) return SHAKE_SPECIAL;
+  if (at === AttackType.THROW) return SHAKE_THROW;
+  if (ch) return SHAKE_COUNTER;
   if (at === AttackType.STAND_C || at === AttackType.STAND_D
     || at === AttackType.CLOSE_C || at === AttackType.CLOSE_D
-    || at === AttackType.CROUCH_C || at === AttackType.CROUCH_D) return 6;
+    || at === AttackType.CROUCH_C || at === AttackType.CROUCH_D) return SHAKE_HEAVY;
   if (dmg > 50) return 4;
-  return 3;
+  return SHAKE_LIGHT;
 }
 
 /** 判断是否为重攻击(需要斩击线特效) */
@@ -145,12 +155,16 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       if (blkHeavy || blkDM) {
         deps.vfx.spawnDust(defender.x, defender.y);
       }
-      // 防御顿帧 — KOF2002: DM防御8f, 必杀技防御5f, 重攻击防御4f, 轻攻击防御2f
-      const blkStop = blkDM ? 8 : blkSpecial ? 5 : blkHeavy ? 4 : 2;
+      // 防御顿帧 — 使用分层常量
+      const blkStop = blkDM ? BLOCKSTOP_DM : blkSpecial ? BLOCKSTOP_SPECIAL : blkHeavy ? BLOCKSTOP_HEAVY : BLOCKSTOP_LIGHT;
       deps.cinematic.triggerHitStop(blkStop, defIdx, attacker.facing);
       // 防御反馈更偏"硬切"而不是层层铺开
       const blkBias = (blkDM || blkSpecial || blkHeavy) ? attacker.facing * 3 : 0;
-      deps.screenShake.trigger(blkDM ? 8 : blkSpecial ? 5 : blkHeavy ? 4 : 3, blkDM ? 10 : blkSpecial ? 7 : blkHeavy ? 6 : 5, blkBias);
+      deps.screenShake.trigger(
+        blkDM ? SHAKE_BLOCK_DM : blkSpecial ? SHAKE_BLOCK_SPECIAL : blkHeavy ? SHAKE_BLOCK_HEAVY : SHAKE_BLOCK_LIGHT,
+        blkDM ? SHAKE_BLOCK_DURATION_DM : blkSpecial ? SHAKE_BLOCK_DURATION_SPECIAL : blkHeavy ? SHAKE_BLOCK_DURATION_HEAVY : SHAKE_BLOCK_DURATION_LIGHT,
+        blkBias,
+      );
       gainMeterOnBlock(deps.gauges[atkIdx], attackType);
       gainMeterOnHitstun(deps.gauges[defIdx], attackType, defender.health, defender.maxHealth);
       // Chip伤害数字: 必杀技/DM防御时显示灰色小数字
@@ -192,7 +206,7 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
 
     // === 基于伤害的火花尺寸分级 ===
     // 取攻击类型分类和伤害分级中的较大值，确保DM/必杀技有足够的辨识度
-    const typeSizeScale = isSDM ? 1.5 : isDM ? 1.3 : isSpecial ? 1.1 : isHeavyAttack(attackType) ? 0.85 : 0.55;
+    const typeSizeScale = isSDM ? SPARK_SIZE_SDM : isDM ? SPARK_SIZE_DM : isSpecial ? SPARK_SIZE_SPECIAL : isHeavyAttack(attackType) ? SPARK_SIZE_HEAVY : SPARK_SIZE_LIGHT;
     const dmgSizeScale = getDamageSizeScale(data.damage);
     const sparkSize = Math.max(typeSizeScale, dmgSizeScale);
     // Counter Hit: 火花尺寸翻倍
@@ -201,7 +215,7 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
     // 火花收口：保留主爆点，砍掉过多补层
     const comboSparkBonus = combo >= 10 ? 3 : combo >= 5 ? 1 : 0;
     const lowHpBonus = defender.health < defender.maxHealth * 0.25 ? 2 : 0;
-    const sparks = (isSDM ? 18 : isDM ? 14 : isSpecial ? 10 : counterHit ? 8 : 6) + comboSparkBonus + lowHpBonus;
+    const sparks = (isSDM ? SPARK_COUNT_SDM : isDM ? SPARK_COUNT_DM : isSpecial ? SPARK_COUNT_SPECIAL : counterHit ? SPARK_COUNT_COUNTER : SPARK_COUNT_LIGHT) + comboSparkBonus + lowHpBonus;
     // CH时用橙红色调
     const sparkColor = counterHit ? '#ff6600' : isSpecial ? atkChar.specialColor : isPunch ? '#ffdd44' : '#44ddff';
     // 连击中VFX递减: 高连击时火花逐步缩小，避免画面过于密集
@@ -409,8 +423,8 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       deps.screenFlash.trigger('#ffffff', 0.04, 2);
     }
 
-    // 震屏方向更明确，DM/KO层次拉开
-    const shakeDur = isDM ? 16 : isSpecial ? 10 : isHeavyAttack(attackType) ? 8 : 4;
+    // 震屏方向更明确，DM/KO层次拉开 — 使用分层常量
+    const shakeDur = isDM ? SHAKE_DURATION_DM : isSpecial ? SHAKE_DURATION_SPECIAL : isHeavyAttack(attackType) ? SHAKE_DURATION_HEAVY : SHAKE_DURATION_LIGHT;
     const comboShakeBonus = combo >= 10 ? 1 : 0;
     // 连击中震屏递减: 高连击时震屏强度逐步衰减，最低保留60%
     const comboShakeDecay = combo >= 3 ? Math.max(0.6, 1 - combo * 0.05) : 1;
@@ -445,6 +459,6 @@ export function triggerKOGroundEffect(deps: { vfx: VFXSystem; screenFlash: Scree
   deps.screenFlash.trigger('#ffffff', 0.25, 2);
   // 短暂延迟后叠加红色(通过延长闪光时间实现)
   deps.screenFlash.trigger('#ff2200', 0.35, 14);
-  // KOF2002: KO落地震屏55帧, 模拟地面冲击波持续感
-  deps.screenShake.trigger(22, 55);
+  // KOF2002: KO落地震屏55帧, 模拟地面冲击波持续感 — 使用KO分层常量
+  deps.screenShake.trigger(SHAKE_KO, SHAKE_DURATION_KO);
 }

@@ -34,6 +34,8 @@ import {
   JUGGLE_POINTS_MAX,
   JUGGLE_COST_LIGHT,
   JUGGLE_COST_HEAVY,
+  COMBO_MIN_SCALE,
+  DM_COMBO_PENALTY,
 } from '../src/core/constants.js';
 
 // ===== 最小化 IInputProvider mock =====
@@ -121,14 +123,14 @@ describe('完整连段流程', () => {
     expect(cs.getComboDamage(1)).toBeGreaterThan(0);
   });
 
-  it('连段缩放: 通常技每击递减5%', () => {
+  it('连段缩放: 分段缩放 (1-3=100%, 4-6=85%, 7-9=70%)', () => {
     const cs = new CombatSystem(createInputProvider());
     const { p1, p2 } = createStandardMatch();
 
     const hits: number[] = [];
 
-    // 连续 4 次 STAND_C (damage=100)
-    for (let i = 0; i < 4; i++) {
+    // 连续 7 次 STAND_C (damage=100) 覆盖三个缩放段
+    for (let i = 0; i < 7; i++) {
       const healthBefore = p2.health;
       resetAttacker(p1);
       if (i > 0) prepareDefenderForNextHit(p2);
@@ -139,17 +141,20 @@ describe('完整连段流程', () => {
       hits.push(damage);
     }
 
-    // 第1击: 100% (comboHits=0, scaledDamage 返回原值)
+    // comboHits at scaledDamage call: 0,1,2,3,4,5,6
+    // 第1击: comboHits=0 → 无缩放 → 100
     expect(hits[0]).toBe(100);
-    // 第2击: scale = max(0.30, 1 - 1*0.05) = 0.95 → 95
-    expect(hits[1]).toBe(95);
-    // 第3击: scale = max(0.30, 1 - 2*0.05) = 0.90 → 90
-    expect(hits[2]).toBe(90);
-    // 第4击: scale = max(0.30, 1 - 3*0.05) = 0.85 → 85
-    expect(hits[3]).toBe(85);
+    // 第2-4击: comboHits=1-3 → tier 1-3, scale=1.0 → 100
+    expect(hits[1]).toBe(100);
+    expect(hits[2]).toBe(100);
+    expect(hits[3]).toBe(100);
+    // 第5-7击: comboHits=4-6 → tier 4-6, scale=0.85 → 85
+    expect(hits[4]).toBe(85);
+    expect(hits[5]).toBe(85);
+    expect(hits[6]).toBe(85);
   });
 
-  it('连段缩放: 必杀技每击递减3%, 最低60%', () => {
+  it('连段缩放: 必杀技在连段中使用分段缩放', () => {
     const cs = new CombatSystem(createInputProvider());
     const { p1, p2 } = createStandardMatch();
 
@@ -158,7 +163,7 @@ describe('完整连段流程', () => {
     cs.resolveAttacks(p1, p2, []);
     expect(cs.getComboCount(1)).toBe(1);
 
-    // 第2击: 必杀技 SPECIAL_UPPER (damage=120, classified as special)
+    // 第2击: 必杀技 SPECIAL_UPPER (damage=120, comboHits=1 → tier 1-3, scale=1.0)
     resetAttacker(p1);
     prepareDefenderForNextHit(p2);
     const healthBefore = p2.health;
@@ -166,15 +171,15 @@ describe('完整连段流程', () => {
     cs.resolveAttacks(p1, p2, []);
 
     const specialDamage = healthBefore - p2.health;
-    // 必杀技: scale = max(0.60, 1 - 1*0.03) = 0.97 → 120 * 0.97 = 116.4 → 116
-    expect(specialDamage).toBe(116);
+    // comboHits=1 → 1 <= 3 → scale=1.0 → 120 * 1.0 = 120
+    expect(specialDamage).toBe(120);
   });
 
-  it('连段缩放: DM 总是造成完整伤害', () => {
+  it('连段缩放: DM在连段中受缩放+额外惩罚', () => {
     const cs = new CombatSystem(createInputProvider());
     const { p1, p2 } = createStandardMatch();
 
-    // 先建立长 combo
+    // 先建立长 combo (5 hits → comboHits=5 at DM)
     for (let i = 0; i < 5; i++) {
       resetAttacker(p1);
       if (i > 0) prepareDefenderForNextHit(p2);
@@ -183,7 +188,7 @@ describe('完整连段流程', () => {
     }
     expect(cs.getComboCount(1)).toBe(5);
 
-    // DM_OROCHINAGI 应该造成完整伤害
+    // DM_OROCHINAGI: comboHits=5 → tier 4-6, scale=0.85, DM额外-0.10 → 0.75
     resetAttacker(p1);
     prepareDefenderForNextHit(p2);
     const healthBefore = p2.health;
@@ -191,7 +196,9 @@ describe('完整连段流程', () => {
     cs.resolveAttacks(p1, p2, []);
 
     const dmDamage = healthBefore - p2.health;
-    expect(dmDamage).toBe(FRAME_DATA[AttackType.DM_OROCHINAGI].damage);
+    const baseDamage = FRAME_DATA[AttackType.DM_OROCHINAGI].damage;
+    const expected = Math.round(baseDamage * Math.max(COMBO_MIN_SCALE, 0.85 - DM_COMBO_PENALTY));
+    expect(dmDamage).toBe(expected);
   });
 
   it('必杀技命中后设置 superCancelReady', () => {

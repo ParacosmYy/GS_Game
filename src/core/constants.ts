@@ -108,6 +108,23 @@ export const DAMAGE_SCALE_MIN_SPECIAL = 0.20;  // 必杀技最低20%
 export const DAMAGE_SCALE_MIN_DM = 0.30;       // DM最低30%
 export const COMBO_TIMEOUT = 60;               // 60帧(1秒)无后续命中则重置连击计数
 
+// ===== Combo Tier Scaling (KOF2002风云再起分段缩放) =====
+// comboCount 1-3: 100%, 4-6: 85%, 7-9: 70%, 10+: 60% (下限)
+// 投技不参与缩放, DM在连段中缩放率额外-10%
+export const COMBO_DAMAGE_SCALE: Record<number, number> = {
+  3: 1.0,
+  6: 0.85,
+  9: 0.70,
+};
+export const COMBO_MIN_SCALE = 0.60;
+export const DM_COMBO_PENALTY = 0.10;
+
+// ===== Cancel Window Constants =====
+export const CANCEL_WINDOW_NORMAL = 3;   // 普通取消在命中后3帧内
+export const CANCEL_WINDOW_RAPID = 2;    // Rapid取消更紧
+export const CANCEL_WINDOW_SUPER = 5;    // 超必杀取消更宽
+export const CANCEL_WINDOW_FREE = 4;     // Free Cancel中等
+
 // ===== Power Gauge (能量槽) =====
 export const MAX_STOCKS = 5;
 export const METER_PER_STOCK = 100;
@@ -233,6 +250,163 @@ export const PUSHBLOCK_EXTRA_PUSHBACK = 1.5;         // Pushback multiplier when
 export const PUSHBLOCK_DECAY_FRAMES = 30;            // Frames without blocking before counter resets
 export const WRONG_BLOCK_PUSHBACK_MULT = 1.3;        // Extra pushback multiplier for wrong block type
 export const WRONG_BLOCK_STUN_MULT = 1.2;            // Extra blockstun multiplier for wrong block type
+
+// ===== Hitstop (命中暂停) — KOF2002 分层系统 =====
+export const HITSTOP_LIGHT = 4;      // 轻攻击 (A button normals)
+export const HITSTOP_MEDIUM = 7;     // 重攻击 (C/D button normals)
+export const HITSTOP_SPECIAL = 13;   // 必杀技
+export const HITSTOP_DM = 19;        // DM超必杀
+export const HITSTOP_SDM = 22;       // SDM超必杀
+export const HITSTOP_COUNTER_BONUS = 3;  // Counter Hit额外暂停帧数
+
+// ===== Blockstop (防御暂停) — KOF2002 分层系统 =====
+export const BLOCKSTOP_LIGHT = 2;    // 轻攻击防御
+export const BLOCKSTOP_HEAVY = 4;    // 重攻击防御
+export const BLOCKSTOP_SPECIAL = 5;  // 必杀技防御
+export const BLOCKSTOP_DM = 8;       // DM防御
+
+// ===== Screen Shake (画面震动) — KOF2002 分层系统 =====
+export const SHAKE_LIGHT = 3;               // 轻攻击
+export const SHAKE_HEAVY = 6;               // 重攻击
+export const SHAKE_COUNTER = 6;             // Counter Hit (非重攻击)
+export const SHAKE_SPECIAL = 8;             // 必杀技
+export const SHAKE_THROW = 8;               // 投技
+export const SHAKE_DM = 14;                 // DM超必杀
+export const SHAKE_KO = 22;                 // KO落地
+export const SHAKE_DMG_THRESHOLD = 50;      // 伤害>50时用中等震动
+
+export const SHAKE_DURATION_LIGHT = 4;      // 轻攻击震动持续
+export const SHAKE_DURATION_HEAVY = 8;      // 重攻击震动持续
+export const SHAKE_DURATION_SPECIAL = 10;   // 必杀技震动持续
+export const SHAKE_DURATION_DM = 16;        // DM震动持续
+export const SHAKE_DURATION_KO = 55;        // KO落地震动持续
+
+export const SHAKE_BLOCK_LIGHT = 3;         // 轻攻击防御震动
+export const SHAKE_BLOCK_HEAVY = 4;         // 重攻击防御震动
+export const SHAKE_BLOCK_SPECIAL = 5;       // 必杀技防御震动
+export const SHAKE_BLOCK_DM = 8;            // DM防御震动
+export const SHAKE_BLOCK_DURATION_LIGHT = 5;
+export const SHAKE_BLOCK_DURATION_HEAVY = 6;
+export const SHAKE_BLOCK_DURATION_SPECIAL = 7;
+export const SHAKE_BLOCK_DURATION_DM = 10;
+
+// ===== Spark/VFX Type 分级 =====
+export const SPARK_LIGHT = 'light';
+export const SPARK_HEAVY = 'heavy';
+export const SPARK_SPECIAL = 'special';
+export const SPARK_DM = 'dm';
+export const SPARK_SDM = 'sdm';
+export const SPARK_COUNTER = 'counter';
+export const SPARK_THROW = 'throw';
+
+// ===== Spark Size Scale 分级 =====
+export const SPARK_SIZE_LIGHT = 0.55;
+export const SPARK_SIZE_HEAVY = 0.85;
+export const SPARK_SIZE_SPECIAL = 1.1;
+export const SPARK_SIZE_DM = 1.3;
+export const SPARK_SIZE_SDM = 1.5;
+
+// ===== Spark Count 分级 =====
+export const SPARK_COUNT_LIGHT = 6;
+export const SPARK_COUNT_HEAVY = 6;
+export const SPARK_COUNT_SPECIAL = 10;
+export const SPARK_COUNT_DM = 14;
+export const SPARK_COUNT_SDM = 18;
+export const SPARK_COUNT_COUNTER = 8;
+
+/**
+ * 根据攻击类型返回对应的hitstop帧数。
+ * 使用分层常量而非硬编码值。
+ * Counter Hit额外加 HITSTOP_COUNTER_BONUS 帧。
+ */
+export function getHitstopFrames(attackType: string): number {
+  if (attackType.startsWith('SDM_') || attackType.startsWith('HSDM_')) return HITSTOP_SDM;
+  if (attackType.startsWith('DM_')) return HITSTOP_DM;
+  if (['STAND_C', 'CROUCH_C', 'JUMP_C',
+    'STAND_D', 'CROUCH_D', 'JUMP_D',
+    'CLOSE_C', 'CLOSE_D'].includes(attackType)) return HITSTOP_MEDIUM;
+  return HITSTOP_LIGHT;
+}
+
+/**
+ * 根据攻击类型返回对应的spark类型标签。
+ */
+export function getSparkType(attackType: string): string {
+  if (attackType.startsWith('SDM_') || attackType.startsWith('HSDM_')) return SPARK_SDM;
+  if (attackType.startsWith('DM_')) return SPARK_DM;
+  if (attackType === 'THROW' || attackType === 'THROW_FORWARD' || attackType === 'THROW_BACK') return SPARK_THROW;
+  if (isNonNormalAttack(attackType)) return SPARK_SPECIAL;
+  if (['STAND_C', 'CROUCH_C', 'JUMP_C',
+    'STAND_D', 'CROUCH_D', 'JUMP_D',
+    'CLOSE_C', 'CLOSE_D',
+    'STAND_CD', 'JUMP_CD'].includes(attackType)) return SPARK_HEAVY;
+  return SPARK_LIGHT;
+}
+
+/**
+ * 根据攻击类型返回对应的spark size scale。
+ */
+export function getSparkSizeScale(attackType: string): number {
+  if (attackType.startsWith('SDM_') || attackType.startsWith('HSDM_')) return SPARK_SIZE_SDM;
+  if (attackType.startsWith('DM_')) return SPARK_SIZE_DM;
+  if (isNonNormalAttack(attackType)) return SPARK_SIZE_SPECIAL;
+  if (['STAND_C', 'CROUCH_C', 'JUMP_C',
+    'STAND_D', 'CROUCH_D', 'JUMP_D',
+    'CLOSE_C', 'CLOSE_D',
+    'STAND_CD', 'JUMP_CD'].includes(attackType)) return SPARK_SIZE_HEAVY;
+  return SPARK_SIZE_LIGHT;
+}
+
+/**
+ * 根据攻击类型返回对应的spark粒子数量。
+ */
+export function getSparkCount(attackType: string): number {
+  if (attackType.startsWith('SDM_') || attackType.startsWith('HSDM_')) return SPARK_COUNT_SDM;
+  if (attackType.startsWith('DM_')) return SPARK_COUNT_DM;
+  if (isNonNormalAttack(attackType)) return SPARK_COUNT_SPECIAL;
+  if (['STAND_C', 'CROUCH_C', 'JUMP_C',
+    'STAND_D', 'CROUCH_D', 'JUMP_D',
+    'CLOSE_C', 'CLOSE_D',
+    'STAND_CD', 'JUMP_CD'].includes(attackType)) return SPARK_COUNT_HEAVY;
+  return SPARK_COUNT_LIGHT;
+}
+
+/**
+ * 根据攻击类型返回screen shake强度。
+ */
+export function getShakeIntensity(attackType: string, dmg: number, counterHit: boolean): number {
+  if (attackType.startsWith('DM_') || attackType.startsWith('SDM_') || attackType.startsWith('HSDM_')) return SHAKE_DM;
+  if (isNonNormalAttack(attackType)) return SHAKE_SPECIAL;
+  if (attackType === 'THROW' || attackType === 'THROW_FORWARD' || attackType === 'THROW_BACK') return SHAKE_THROW;
+  if (counterHit) return SHAKE_COUNTER;
+  if (['STAND_C', 'CROUCH_C', 'STAND_D', 'CROUCH_D', 'CLOSE_C', 'CLOSE_D'].includes(attackType)) return SHAKE_HEAVY;
+  if (dmg > SHAKE_DMG_THRESHOLD) return 4;
+  return SHAKE_LIGHT;
+}
+
+/**
+ * 根据攻击类型返回screen shake持续帧数。
+ */
+export function getShakeDuration(attackType: string): number {
+  if (attackType.startsWith('DM_') || attackType.startsWith('SDM_') || attackType.startsWith('HSDM_')) return SHAKE_DURATION_DM;
+  if (isNonNormalAttack(attackType)) return SHAKE_DURATION_SPECIAL;
+  if (['STAND_C', 'CROUCH_C', 'JUMP_C',
+    'STAND_D', 'CROUCH_D', 'JUMP_D',
+    'CLOSE_C', 'CLOSE_D',
+    'STAND_CD', 'JUMP_CD'].includes(attackType)) return SHAKE_DURATION_HEAVY;
+  return SHAKE_DURATION_LIGHT;
+}
+
+/** Internal helper: checks if attackType is a non-normal, non-throw, non-DM attack (i.e. a special) */
+function isNonNormalAttack(attackType: string): boolean {
+  if (attackType.startsWith('DM_') || attackType.startsWith('SDM_') || attackType.startsWith('HSDM_')) return false;
+  if (attackType === 'THROW' || attackType === 'THROW_FORWARD' || attackType === 'THROW_BACK') return false;
+  // Normal attacks
+  if (attackType.startsWith('CLOSE_') || attackType.startsWith('STAND_') || attackType.startsWith('CROUCH_') || attackType.startsWith('JUMP_')) return false;
+  if (attackType.startsWith('CMD_')) return false;
+  // Everything else is a special (character specials + SPECIAL_* generics)
+  return true;
+}
 
 // ===== HUD Layout =====
 export const HUD_BAR_WIDTH = 300;
