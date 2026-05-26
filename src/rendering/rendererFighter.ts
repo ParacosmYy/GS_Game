@@ -199,6 +199,14 @@ export function drawFighters(
       ctx.translate((Math.random() - 0.5) * shakeAmt, (Math.random() - 0.5) * shakeAmt * 0.5);
     }
 
+    // Getup Y offset — interpolate from lying (ground) to standing position
+    if (f.state === FighterState.GETUP && f.getupTimer > 0) {
+      const getupProgress = 1 - (f.getupTimer / (f.getupDuration || 15));
+      // Fighter rises from 20px below ground level to standing
+      const getYOffset = 20 * (1 - getupProgress);
+      ctx.translate(0, getYOffset);
+    }
+
     // Compute animation frame index: attacks use attackFrame, cyclic states use stateAge
     const isAttackState = f.state === FighterState.STAND_ATTACK
       || f.state === FighterState.CROUCH_ATTACK
@@ -501,7 +509,7 @@ function drawAfterimageTrail(
     ctx.globalAlpha = 0.32 / i;
     const trailX = sx - leanOffsetX * i * 1.5 - f.facing * 12 * i;
     // 用完整骨骼 pose 渲染残影，角色颜色略偏残影色调
-    drawSkeletalFighter(ctx, f, trailX, f.y, trailColor, trailOutline, globalTick, maxModeActive, playerIdx);
+    drawSkeletalFighter(ctx, f, trailX, f.y, trailColor, trailOutline, globalTick, maxModeActive);
     ctx.restore();
   }
 }

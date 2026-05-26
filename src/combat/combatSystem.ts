@@ -33,6 +33,7 @@ import {
   DESPERATION_HEALTH_THRESHOLD, DESPERATION_DM_DAMAGE_BONUS,
   OTG_DAMAGE_MULTIPLIER, OTG_MAX_HITS,
   SOFT_KNOCKDOWN_GROUND_TICKS, HARD_KNOCKDOWN_GROUND_TICKS,
+  CORNER_DAMAGE_BONUS, isInCorner, clampToStage,
 } from '../core/constants.js';
 import { CLOSE_RANGE } from '../core/types.js';
 import { FighterState, AttackType, JuggleState } from '../core/types.js';
@@ -565,6 +566,11 @@ export class CombatSystem {
       damage = Math.round(damage * DESPERATION_DM_DAMAGE_BONUS);
     }
 
+    // KOF2002: Corner damage bonus — attacks deal 5% more damage to cornered opponent
+    if (isInCorner(defender.x)) {
+      damage = Math.round(damage * CORNER_DAMAGE_BONUS);
+    }
+
     this.comboHits[defIdx]++;
     // 单层缩放已由 scaledDamage() 处理, 不再叠加第二层连击递减
     this.comboDamage[defIdx] += damage;
@@ -588,6 +594,24 @@ export class CombatSystem {
     if (counterHit && !defender.isGrounded()) {
       defender.juggleState = JuggleState.FULL;
       defender.jugglePoints = JUGGLE_POINTS_MAX;
+    }
+
+    // OTG hit: reset knockdown timer (prevents infinite OTG), apply short hitstun
+    if (isOTG) {
+      defender.knockdownTimer = SOFT_KNOCKDOWN_GROUND_TICKS;
+      // Skip normal knockdown/hitstun resolution below, jump to callbacks
+      // Still fire callbacks for VFX
+      onHit?.(attacker, defender, attackType, false, counterHit);
+
+      // Rapid Cancel: light normal on hit enables chaining
+      if (LIGHT_NORMALS.has(attackType as string)) {
+        attacker.rapidCancelReady = true;
+      }
+      if (NORMAL_ATTACKS.has(attackType as string)) {
+        attacker.normalCancelReady = true;
+      }
+      attacker.hitConfirmDelay = 1;
+      return;
     }
 
     // Counter Wire: counter hit + counterWire move → wall bounce instead of knockdown

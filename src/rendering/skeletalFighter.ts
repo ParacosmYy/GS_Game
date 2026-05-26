@@ -686,6 +686,20 @@ export function drawSkeletalFighter(
       p.body.oy += 0.6 * fall;
     }
   }
+  // KOF2002: Getup â fighter rises from lying to standing
+  if (f.state === FighterState.GETUP) {
+    const progress = 1 - ((f.getupTimer || 0) / (f.getupDuration || 15));
+    // Gradually reduce body rotation (from lying to upright)
+    p.body.rot *= (1 - progress);
+    p.head.rot *= (1 - progress);
+    // Arms come back to sides
+    p.armFront.rot *= (1 - progress);
+    p.armBack.rot *= (1 - progress);
+    p.legFront.rot *= (1 - progress);
+    p.legBack.rot *= (1 - progress);
+    // Y offset rises from ground level
+    p.body.oy -= progress * 15;
+  }
   // KOF2002: Block stance — arms raised in guard position, slight recoil from impact
   if (f.state === FighterState.BLOCK) {
     const impact = Math.min(1, (f.blockstunTimer || 0) / 10);

@@ -5,3 +5,9 @@
  * and completeness reports. Structure follows workspace-architecture-target.md.
  */
 export * from './characters/index.js';
+export {
+  loadCharacterContent,
+  hasCharacterContent,
+  getAvailableCharacterIds,
+  type CharacterContent,
+} from './contentLoader.js';

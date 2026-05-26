@@ -15,18 +15,18 @@ import { getAllStages, setStage, getStage } from '../src/rendering/stage.js';
 // ── 1. Camera ───────────────────────────────────────────────
 describe('Camera', () => {
   it('camera follows fighters', () => {
-    const camera = new Camera(STAGE_WIDTH);
+    const camera = new Camera();
     const f1 = new Fighter(300, '#ff0000', 1);
     const f2 = new Fighter(500, '#0000ff', -1);
-    camera.update(f1, f2);
+    camera.update(f1.x, f2.x);
     expect(camera.x).toBeGreaterThanOrEqual(0);
   });
 
   it('camera stays within stage bounds', () => {
-    const camera = new Camera(STAGE_WIDTH);
+    const camera = new Camera();
     const f1 = new Fighter(100, '#ff0000', 1);
     const f2 = new Fighter(200, '#0000ff', -1);
-    camera.update(f1, f2);
+    camera.update(f1.x, f2.x);
     expect(camera.x).toBeGreaterThanOrEqual(0);
   });
 });

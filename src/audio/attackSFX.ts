@@ -58,19 +58,19 @@ export const ATTACK_SFX_TABLE: AttackSFXEntry[] = [
   { attackType: 'RYO_ORISHI', phase: 'startup', frame: 0, sfx: 'playWhoosh', priority: 2 },
   { attackType: 'RYO_ORISHI', phase: 'active', frame: 0, sfx: 'playThudKick', priority: 2 },
 
-  // ── Ryo specials ──
-  { attackType: 'RYO_KOOU', phase: 'startup', frame: 0, sfx: 'playSpecialLight', priority: 2 },
-  { attackType: 'RYO_KOOU', phase: 'active', frame: 0, sfx: 'playSpecialHeavy', priority: 2 },
-  { attackType: 'RYO_KOOU_C', phase: 'startup', frame: 0, sfx: 'playSpecialLight', priority: 2 },
-  { attackType: 'RYO_KOOU_C', phase: 'active', frame: 0, sfx: 'playSpecialHeavy', priority: 2 },
-  { attackType: 'RYO_KO_HOU', phase: 'startup', frame: 0, sfx: 'playSpecialLight', priority: 2 },
-  { attackType: 'RYO_KO_HOU', phase: 'active', frame: 0, sfx: 'playSpecialHeavy', priority: 3 },
-  { attackType: 'RYO_KO_HOU_C', phase: 'startup', frame: 0, sfx: 'playSpecialLight', priority: 2 },
-  { attackType: 'RYO_KO_HOU_C', phase: 'active', frame: 0, sfx: 'playSpecialHeavy', priority: 3 },
-  { attackType: 'RYO_HIEN', phase: 'startup', frame: 0, sfx: 'playSpecialLight', priority: 2 },
-  { attackType: 'RYO_HIEN', phase: 'active', frame: 0, sfx: 'playSpecialHeavy', priority: 2 },
-  { attackType: 'RYO_HAOU', phase: 'startup', frame: 0, sfx: 'playSpecialLight', priority: 2 },
-  { attackType: 'RYO_HAOU', phase: 'active', frame: 0, sfx: 'playSpecialHeavy', priority: 2 },
+  // ── Ryo specials (differentiated SFX per move) ──
+  { attackType: 'RYO_KOOU', phase: 'startup', frame: 0, sfx: 'playKoouken', priority: 2 },
+  { attackType: 'RYO_KOOU', phase: 'active', frame: 0, sfx: 'playKoouken', priority: 2 },
+  { attackType: 'RYO_KOOU_C', phase: 'startup', frame: 0, sfx: 'playKoouken', priority: 2 },
+  { attackType: 'RYO_KOOU_C', phase: 'active', frame: 0, sfx: 'playKoouken', priority: 2 },
+  { attackType: 'RYO_KO_HOU', phase: 'startup', frame: 0, sfx: 'playKoHou', priority: 2 },
+  { attackType: 'RYO_KO_HOU', phase: 'active', frame: 0, sfx: 'playKoHou', priority: 3 },
+  { attackType: 'RYO_KO_HOU_C', phase: 'startup', frame: 0, sfx: 'playKoHou', priority: 2 },
+  { attackType: 'RYO_KO_HOU_C', phase: 'active', frame: 0, sfx: 'playKoHou', priority: 3 },
+  { attackType: 'RYO_HIEN', phase: 'startup', frame: 0, sfx: 'playHien', priority: 2 },
+  { attackType: 'RYO_HIEN', phase: 'active', frame: 0, sfx: 'playHien', priority: 2 },
+  { attackType: 'RYO_HAOU', phase: 'startup', frame: 0, sfx: 'playHaou', priority: 2 },
+  { attackType: 'RYO_HAOU', phase: 'active', frame: 0, sfx: 'playHaou', priority: 2 },
 
   // ── Ryo DM ──
   { attackType: 'DM_TEN_HA_OU', phase: 'startup', frame: 0, sfx: 'playSpecialLight', priority: 2 },

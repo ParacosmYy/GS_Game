@@ -26,8 +26,9 @@ import { SelectState } from './state/selectState.js';
 import { RoundState } from './state/roundState.js';
 import { DMManager } from './combat/dmManager.js';
 import { createHitCallback, triggerKOGroundEffect } from './combat/hitCallback.js';
-import { initAudio, initSampler, playKO, playVictoryFanfare, playMAXActivation, playPerfect, playThrowEscape, playFight, playRoll, playCancel, playQuickStand, playGuardCrush, playHit, playSpecialLight, playSpecialHeavy, playDM, playWhoosh, playHeavyWhoosh } from './audio/sampler.js';
-import { tickAttackSFX } from './audio/attackSFX.js';
+import { initAudio, initSampler, playKO, playVictoryFanfare, playMAXActivation, playPerfect, playThrowEscape, playFight, playRoll, playCancel, playQuickStand, playGuardCrush, playHit, playSpecialLight, playSpecialHeavy, playDM, playWhoosh, playHeavyWhoosh, playKoouken, playKoHou, playHien, playHaou } from './audio/sampler.js';
+import { tickAttackSFX, dispatchContractSFX } from './audio/attackSFX.js';
+import { getContractEventTags } from './entities/fighter.js';
 import { tickMotionSFX } from './audio/motionSFX.js';
 import { createTeam, defeatActive, switchToNext, activeChar, teamOrderString, type TeamState } from './state/teamState.js';
 import { resolveSimplified } from './input/simplifiedInput.js';
@@ -89,6 +90,9 @@ p1Ctrl.setGauge(gauges[0]);
 p2Ctrl.setGauge(gauges[1]);
 p1Ctrl.setMaxMode(maxModes[0]);
 p2Ctrl.setMaxMode(maxModes[1]);
+// Wall splat screen shake callback
+p1Ctrl.onScreenShake = (intensity, duration) => screenShake.trigger(intensity, duration);
+p2Ctrl.onScreenShake = (intensity, duration) => screenShake.trigger(intensity, duration);
 
 // ===== State modules =====
 const cinematic = new CinematicState();
@@ -383,6 +387,8 @@ function update(): void {
 
   if (gs.phase === GamePhase.KO) {
     gs.koTimer++;
+    // Phase 52: Tick KO state machine
+    cinematic.tickKOState();
     // Tick announce sequence for KO/TIME OVER text animation
     if (gs.announceSequence.isRunning()) {
       const sfxId = gs.announceSequence.tick();
@@ -393,6 +399,16 @@ function update(): void {
       } else if (sfxId === 'perfect') {
         playPerfect();
         announcer.perfect();
+        // Phase 52: PERFECT KO bonus meter award
+        if (!cinematic.perfectMeterAwarded && gs.winner !== null) {
+          cinematic.perfectMeterAwarded = true;
+          const perfectWinner = gs.winner;
+          // Award bonus meter: fill 1 full stock
+          if (gauges[perfectWinner].stocks < MAX_STOCKS) {
+            gauges[perfectWinner].meter = 0;
+            gauges[perfectWinner].stocks = Math.min(MAX_STOCKS, gauges[perfectWinner].stocks + 1);
+          }
+        }
       }
     }
     // Transition to WIN_QUOTE when announce sequence completes (or fallback timer)
@@ -628,9 +644,26 @@ function update(): void {
   combatSystem.tickThrowState(p1, p2, onHit);
 
   // Per-frame SFX dispatch: play whoosh/impact sounds at specific attack frames
-  const attackSampler = { playHit, playSpecialLight, playSpecialHeavy, playDM, playWhoosh, playHeavyWhoosh };
+  const attackSampler = { playHit, playSpecialLight, playSpecialHeavy, playDM, playWhoosh, playHeavyWhoosh,
+    playStep: playWhoosh, playLandingNormal: playWhoosh, playSuperFlash: playSpecialLight, playCancel,
+    playKoouken, playKoHou, playHien, playHaou };
   tickAttackSFX(p1, attackSampler, 0);
   tickAttackSFX(p2, attackSampler, 1);
+
+  // Frame Contract event tag → SFX dispatch (supplements phase-based SFX table)
+  for (let fi = 0; fi < 2; fi++) {
+    const f = fi === 0 ? p1 : p2;
+    if (f.currentAttack && f.attackPhase !== 'none') {
+      const tags = getContractEventTags(f.charId, f.currentAttack as string,
+        f.attackPhase as 'startup' | 'active' | 'recovery', f.attackFrame);
+      if (tags.length > 0) {
+        // Use phase + attackFrame as unique key for dedup
+        dispatchContractSFX(fi, f.currentAttack as string, tags,
+          (f.attackPhase === 'active' ? 100 : f.attackPhase === 'recovery' ? 200 : 0) + f.attackFrame,
+          attackSampler);
+      }
+    }
+  }
 
   if (!gs.firstHitTracked && (combatSystem.getComboCount(0) > 0 || combatSystem.getComboCount(1) > 0)) {
     gs.firstHitTracked = true;
@@ -668,9 +701,20 @@ function update(): void {
       combatSystem.resetCombo(i);
     }
     if (f.prevState === FighterState.BLOCK && f.state === FighterState.IDLE) vfx.spawnDust(f.x, STAGE_GROUND_Y);
-    if (f.prevState === FighterState.KNOCKDOWN && f.state === FighterState.IDLE && f.throwInvincibilityTimer === 0) {
+    // Wakeup detection: KNOCKDOWN->GETUP (start of getup) or GETUP->IDLE (getup complete)
+    if (f.prevState === FighterState.KNOCKDOWN && f.state === FighterState.GETUP) {
+      vfx.spawnDust(f.x, STAGE_GROUND_Y);
+    }
+    if (f.prevState === FighterState.GETUP && f.state === FighterState.IDLE) {
       vfx.spawnDust(f.x, STAGE_GROUND_Y);
       vfx.spawnQuickStandText(f.x, f.y - f.displayHeight - 40);
+      playQuickStand();
+      const oppIdx = 1 - i;
+      combatSystem.resetCombo(oppIdx);
+    }
+    // Legacy: direct KNOCKDOWN->IDLE (if getup was bypassed)
+    if (f.prevState === FighterState.KNOCKDOWN && f.state === FighterState.IDLE) {
+      vfx.spawnDust(f.x, STAGE_GROUND_Y);
       playQuickStand();
       const oppIdx = 1 - i;
       combatSystem.resetCombo(oppIdx);
@@ -782,6 +826,9 @@ function update(): void {
       bgm.stop();
       ambient.stop();
       announcer.knockOut();
+      // Phase 52: Initialize KO state machine
+      const koPlayerIdx = p1.health <= 0 ? 0 : (p2.health <= 0 ? 1 : -1);
+      cinematic.triggerKOSequence(koPlayerIdx, false);
     }
     if (!gs.koGroundSlamDone && cinematic.koSlowMoTriggered) {
       const bothKO = p1.health <= 0 && p2.health <= 0;
@@ -869,18 +916,35 @@ function render(): void {
     return;
   }
   rounds.tickFade();
-  camera.update(p1, p2);
+  camera.updateFromFighters(p1, p2);
   const perfectPlayer = (gs.phase === GamePhase.KO) ? cinematic.getPerfectPlayer(gs.winner) : null;
   const p1Char = ROSTER.find(c => c.id === p1.charId) || ROSTER[0];
   const p2Char = ROSTER.find(c => c.id === p2.charId) || ROSTER[1];
   renderer.render([p1, p2], camera.x, tickRef.value, gs.phase === GamePhase.KO, gs.winner, screenShake.offsetX, screenShake.offsetY,
     [p1DelayedHealth, p2DelayedHealth], maxModes, perfectPlayer, rounds.p1Wins, rounds.p2Wins, p1Char.nameCn, p2Char.nameCn, gs.isTimeOver, rounds.currentRound, gs.firstAttacker,
-    cinematic.hitStopDefender, cinematic.hitStopBias, [p1Char.specialColor, p2Char.specialColor], gs.koTimer, cinematic.koDustParticles, camera.zoom, p1Char.moveList, gs.simplifiedMode);
+    cinematic.hitStopDefender, cinematic.hitStopBias, [p1Char.specialColor, p2Char.specialColor], gs.koTimer, cinematic.koDustParticles, camera.zoom, p1Char.moveList, gs.simplifiedMode,
+    cinematic.getKOPhase(), cinematic.getKOTimer());
   renderer.drawProjectiles(projectiles, camera);
   vfx.render(ctx, camera.x);
 
-  if (cinematic.superFlashTimer > 0)
+  if (cinematic.superFlashTimer > 0) {
+    // Phase 51: camera zoom during super flash
+    renderer.updateSuperFlashZoom(cinematic.superFlashTimer, cinematic.superFlashType === 'HSDM' ? 32 : cinematic.superFlashType === 'SDM' ? 28 : 24);
+    const zoom = renderer.getSuperFlashZoom();
+    if (zoom > 1.001) {
+      ctx.save();
+      ctx.translate(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2);
+      ctx.scale(zoom, zoom);
+      ctx.translate(-CANVAS_WIDTH / 2, -CANVAS_HEIGHT / 2);
+    }
     renderer.drawSuperFlash(ctx, cinematic.superFlashTimer, cinematic.superFlashX - camera.x, cinematic.superFlashY, cinematic.superFlashType);
+    if (zoom > 1.001) {
+      ctx.restore();
+    }
+  } else {
+    // Decay zoom back to 1.0
+    renderer.updateSuperFlashZoom(0, 24);
+  }
   renderer.drawPowerGauges(gauges, maxModes);
   if (gs.phase === GamePhase.INTRO) {
     if (gs.announceSequence.isRunning()) {
@@ -984,6 +1048,69 @@ function render(): void {
   if (gs.isTrainingMode && (gs.phase === GamePhase.FIGHTING || gs.phase === GamePhase.KO)) {
     renderer.drawTrainingHUD(training, combatSystem.getComboCount(0), combatSystem.getComboDamage(0), tickRef.value, p1Char.moveList);
   }
+
+  // ===== HUD Info Display (Phase 69) =====
+  renderer.updateHUDFps();
+
+  // Match info panel — visible during FIGHTING and INTRO
+  if (gs.phase === GamePhase.FIGHTING || gs.phase === GamePhase.INTRO || gs.phase === GamePhase.KO) {
+    renderer.drawMatchInfoPanel({
+      gameMode: gs.isTrainingMode ? 'TRAINING' : 'ARCADE',
+      currentRound: rounds.currentRound,
+      totalRounds: 3,
+      stageName: gs.isTrainingMode ? 'TRAINING STAGE' : getStage().toUpperCase(),
+    }, tickRef.value);
+  }
+
+  // Character info — always visible during fights
+  if (gs.phase === GamePhase.FIGHTING || gs.phase === GamePhase.KO) {
+    renderer.drawCharacterInfo([p1, p2], gauges, p1Char.nameCn, p2Char.nameCn);
+  }
+
+  // HUD debug overlay (F12 toggle)
+  if (renderer.isDebugOverlayVisible() && (gs.phase === GamePhase.FIGHTING || gs.phase === GamePhase.KO)) {
+    renderer.drawHUDDebugOverlay(
+      [p1, p2], gauges, maxModes, camera, tickRef.value,
+      [combatSystem.getComboCount(0), combatSystem.getComboCount(1)],
+      [combatSystem.getComboDamage(0), combatSystem.getComboDamage(1)],
+    );
+  }
+
+  // Input display (F3 toggle)
+  if (renderer.isInputDisplayVisible() && (gs.phase === GamePhase.FIGHTING || gs.phase === GamePhase.KO)) {
+    renderer.drawHUDInputDisplay(
+      inputManager.getP1Input(), inputManager.getP2Input(),
+      p1.facing, p2.facing,
+    );
+  }
+
+  // Training mode frame advantage info
+  if (gs.isTrainingMode && (gs.phase === GamePhase.FIGHTING || gs.phase === GamePhase.KO) && renderer.isDebugOverlayVisible()) {
+    const p1Attack = p1.currentAttack;
+    let attackInfo: import('./rendering/hudInfo.js').TrainingAttackInfo = {
+      attackName: null, startup: 0, active: 0, recovery: 0,
+      advantageHit: 0, advantageBlock: 0, lastComboDamage: 0,
+      wasHit: false, wasBlocked: false,
+    };
+    if (p1Attack) {
+      const fd = FRAME_DATA[p1Attack as keyof typeof FRAME_DATA];
+      if (fd) {
+        const total = fd.startup + fd.active + fd.recovery;
+        attackInfo = {
+          attackName: p1Attack,
+          startup: fd.startup,
+          active: fd.active,
+          recovery: fd.recovery,
+          advantageHit: fd.hitstun - (total - 1),
+          advantageBlock: fd.blockstun - (total - 1),
+          lastComboDamage: combatSystem.getComboDamage(0),
+          wasHit: p2.hitstunTimer > 0,
+          wasBlocked: p2.blockstunTimer > 0,
+        };
+      }
+    }
+    renderer.drawHUDTrainingInfo(attackInfo);
+  }
 }
 
 function restartGame(): void {
@@ -1022,6 +1149,9 @@ window.addEventListener('keydown', e => {
   if (e.code === 'KeyB') bgm.toggle();
   if (e.code === 'Tab') { e.preventDefault(); gs.simplifiedMode = !gs.simplifiedMode; gs.modeIndicatorTimer = 120; }
   if (e.code === 'KeyN') { const s = cycleStage(); bgm.setStage(s); console.log('Stage:', s); gs.stageIndicatorTimer = 120; }
+  // HUD Info Display toggles
+  if (e.code === 'F12') { e.preventDefault(); renderer.toggleDebugOverlay(); }
+  if (!gs.isTrainingMode && e.code === 'F3') { e.preventDefault(); renderer.toggleInputDisplay(); }
 });
 window.addEventListener('keyup', e => {
   if (e.code === 'F1') f1Down = false;

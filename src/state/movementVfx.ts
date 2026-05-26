@@ -42,9 +42,12 @@ export function updateMovementVfx(fighters: Fighter[], vfx: VFXSystem, tick: num
         vfx.spawnCharacterHitSparks(wallX, f.y - f.displayHeight / 2, 6, '#ffaa44');
       }
     }
-    // KOF2002: 起身尘埃 — 从KNOCKDOWN恢复到IDLE时
-    if (f.prevState === FighterState.KNOCKDOWN && f.state === FighterState.IDLE) {
+    // KOF2002: 起身尘埃 — 从KNOCKDOWN恢复到GETUP或从GETUP恢复到IDLE时
+    if (f.prevState === FighterState.KNOCKDOWN && f.state === FighterState.GETUP) {
       vfx.spawnHeavyDust(f.x, STAGE_GROUND_Y, 6);
+    }
+    if (f.prevState === FighterState.GETUP && f.state === FighterState.IDLE) {
+      vfx.spawnHeavyDust(f.x, STAGE_GROUND_Y, 4);
     }
   }
 }

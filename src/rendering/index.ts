@@ -8,6 +8,7 @@ export { drawSkeletalFighter } from './skeletalFighter.js';
 export { drawAttackLimb } from './attackLimb.js';
 export { drawHUD, drawPowerGauges, drawComboCounters } from './hud.js';
 export { drawCharacterSelect, drawIntro, drawKO } from './screens.js';
-export { drawSuperFlash, drawMatchEnd, drawModeIndicator, drawStageIndicator, drawTitle, drawContinue } from './overlayScreens.js';
+export { drawSuperFlash, drawMatchEnd, drawModeIndicator, drawStageIndicator, drawTitle, drawContinue, getSuperFlashZoom, updateSuperFlashZoom } from './overlayScreens.js';
+export { drawMAXModeAura, drawMAXActivationFlash, resetMAXWisps } from './maxModeVfx.js';
 export { roundRect, shiftColor, parseColor } from './utils.js';
 export { getCharacterRenderData, getCharacterColors, getCharacterAnimFrameInfo, getOutfitColor, getHeadColor, getHairColor } from './manifestRenderData.js';

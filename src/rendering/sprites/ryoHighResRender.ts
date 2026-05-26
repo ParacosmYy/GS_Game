@@ -182,6 +182,10 @@ function resolveFrameKey(
     case FighterState.KNOCKDOWN:
       return 'KNOCKDOWN';
 
+    case FighterState.GETUP:
+      // Getup uses the last knockdown frames (lying → rising), same frame set
+      return 'KNOCKDOWN';
+
     case FighterState.JUMP:
     case FighterState.HOP:
     case FighterState.RUN_JUMP:

@@ -22,14 +22,23 @@ import type { Star } from './stage.js';
 import { drawFighters as drawFightersImpl } from './rendererFighter.js';
 import { drawHUD, drawPowerGauges, drawComboCounters, drawTeamOrder, type TeamDisplayInfo } from './hud.js';
 import { drawCharacterSelect, drawIntro, drawKO, drawWinQuote, drawVSSplash, drawStageSelect, drawTeamOrderSelect, drawTransition, WIN_QUOTE_DURATION } from './screens.js';
-import type { KODustParticle } from '../state/cinematicState.js';
-import { drawSuperFlash, drawMatchEnd, drawModeIndicator, drawStageIndicator, drawTitle, drawContinue, drawModeSelect, drawTrainingHUD, drawGameOver } from './overlayScreens.js';
+import type { KODustParticle, KOPhase } from '../state/cinematicState.js';
+import { drawSuperFlash, drawMatchEnd, drawModeIndicator, drawStageIndicator, drawTitle, drawContinue, drawModeSelect, drawTrainingHUD, drawGameOver, getSuperFlashZoom, updateSuperFlashZoom } from './overlayScreens.js';
 import { drawProjectiles as drawProjectilesImpl } from './projectileRenderer.js';
 import type { SpriteRenderer } from './spriteRenderer.js';
 import type { SelectState } from '../state/selectState.js';
 import type { CharacterDefinition } from '../characters/types.js';
 import type { StageId } from './stage.js';
 import type { TrainingModeState } from '../state/trainingMode.js';
+import type { PlayerInput } from '../core/types.js';
+import {
+  drawMatchInfoPanel, drawCharacterInfo, drawDebugOverlay,
+  drawInputDisplay, drawTrainingInfo,
+  updateFPSTracker, toggleDebugOverlay, toggleInputDisplay,
+  isDebugOverlayVisible as hudInfoDebugVisible, isInputDisplayVisible as hudInfoInputVisible,
+  collectDebugFighterInfo,
+  type MatchInfoConfig, type TrainingAttackInfo,
+} from './hudInfo.js';
 
 export class Renderer {
   private ctx: CanvasRenderingContext2D;
@@ -75,6 +84,8 @@ export class Renderer {
     cameraZoom: number = 1.0,
     p1MoveList: CharacterDefinition['moveList'] = [],
     simplifiedMode: boolean = false,
+    koPhase?: KOPhase,
+    koPhaseTimer: number = 0,
   ): void {
     this.frameCount++;
     this.globalTick = tick;
@@ -127,7 +138,7 @@ export class Renderer {
     drawHUD(ctx, fighters, tick, delayedHealth, p1Wins, p2Wins, p1Name, p2Name, currentRound, firstAttacker, p1MoveList ?? [], simplifiedMode);
 
     if (ko) {
-      drawKO(ctx, winner, perfectPlayer, isTimeOver, fighters[0].health, fighters[1].health, fighters[0].maxHealth, koTimer, koDustParticles, cameraX);
+      drawKO(ctx, winner, perfectPlayer, isTimeOver, fighters[0].health, fighters[1].health, fighters[0].maxHealth, koTimer, koDustParticles, cameraX, koPhase, koPhaseTimer);
     }
 
     // KOF2002: 暗角效果 — 聚焦中心, 边缘渐暗 (场景色温)
@@ -179,6 +190,14 @@ export class Renderer {
 
   drawSuperFlash(ctx: CanvasRenderingContext2D, timer: number, flashScreenX: number, flashScreenY: number, flashType: 'DM' | 'SDM' | 'HSDM' = 'DM'): void {
     drawSuperFlash(ctx, timer, flashScreenX, flashScreenY, flashType);
+  }
+
+  /** Get current super flash zoom factor (1.0 = no zoom, ~1.08 during flash) */
+  getSuperFlashZoom(): number { return getSuperFlashZoom(); }
+
+  /** Update super flash zoom state — call each tick */
+  updateSuperFlashZoom(timer: number, maxTimer: number): void {
+    updateSuperFlashZoom(timer, maxTimer);
   }
 
   drawPowerGauges(gauges: [PowerGauge, PowerGauge], maxModes: [MaxModeState, MaxModeState]): void {
@@ -438,5 +457,52 @@ export class Renderer {
 
   drawTrainingHUD(training: TrainingModeState, comboCount: number, comboDamage: number, tick: number, moveList: CharacterDefinition['moveList'] = []): void {
     drawTrainingHUD(this.ctx, training, comboCount, comboDamage, tick, moveList ?? []);
+  }
+
+  // ===== HUD Info Display (Phase 69) =====
+
+  drawMatchInfoPanel(config: MatchInfoConfig, tick: number): void {
+    drawMatchInfoPanel(this.ctx, config, tick);
+  }
+
+  drawCharacterInfo(fighters: Fighter[], gauges: [PowerGauge, PowerGauge], p1Name: string, p2Name: string): void {
+    drawCharacterInfo(this.ctx, fighters, gauges, p1Name, p2Name);
+  }
+
+  drawHUDDebugOverlay(
+    fighters: Fighter[],
+    gauges: [PowerGauge, PowerGauge],
+    maxModes: [MaxModeState, MaxModeState],
+    camera: Camera,
+    tick: number,
+    comboCounts: number[],
+    comboDamages: number[],
+  ): void {
+    const infos = collectDebugFighterInfo(fighters);
+    for (let i = 0; i < infos.length; i++) {
+      infos[i].comboCount = comboCounts[i] ?? 0;
+      infos[i].comboDamage = comboDamages[i] ?? 0;
+    }
+    drawDebugOverlay(this.ctx, infos, gauges, maxModes, camera, tick, this.currentFps);
+  }
+
+  drawHUDInputDisplay(
+    p1Input: PlayerInput, p2Input: PlayerInput,
+    p1Facing: number, p2Facing: number,
+  ): void {
+    drawInputDisplay(this.ctx, p1Input, p2Input, p1Facing, p2Facing);
+  }
+
+  drawHUDTrainingInfo(attackInfo: TrainingAttackInfo): void {
+    drawTrainingInfo(this.ctx, attackInfo);
+  }
+
+  toggleDebugOverlay(): boolean { return toggleDebugOverlay(); }
+  toggleInputDisplay(): boolean { return toggleInputDisplay(); }
+  isDebugOverlayVisible(): boolean { return hudInfoDebugVisible(); }
+  isInputDisplayVisible(): boolean { return hudInfoInputVisible(); }
+
+  updateHUDFps(): void {
+    updateFPSTracker();
   }
 }

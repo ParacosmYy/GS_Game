@@ -181,6 +181,9 @@ export class Fighter {
   isThrowing = false;
   throwVictim: Fighter | null = null;
 
+  // MAX mode flag — set externally by main loop, read by character onAttackActive
+  maxModeActive = false;
+
   // Super cancel tracking (P9-F)
   superCancelReady = false;
 

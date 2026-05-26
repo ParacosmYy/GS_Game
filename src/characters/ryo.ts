@@ -847,7 +847,7 @@ export const RyoDef: CharacterDefinition = {
     // EX (MAX mode): speed 10px/frame, 60x45 hitbox, 70 frames, level='strong'
     if ((attackType === AttackType.RYO_KOOU || attackType === AttackType.RYO_KOOU_C) && fighter.attackFrame === 0) {
       const isStrong = attackType === AttackType.RYO_KOOU_C;
-      const isEX = fighter.inMaxMode;
+      const isEX = fighter.maxModeActive;
       const hitW = isEX ? 30 : isStrong ? 25 : 20;
       const hitH = isEX ? 22.5 : isStrong ? 17.5 : 15;
       const speed = isEX ? 10 : isStrong ? 8 : 6;

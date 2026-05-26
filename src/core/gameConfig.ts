@@ -131,10 +131,161 @@ export const TRAINING_CONFIG_OVERRIDES: Partial<GameConfig> = {
   },
 };
 
+// ============================================================================
+// Runtime Config State
+// ============================================================================
+
+/** Current active config — mutable at runtime */
+let activeConfig: GameConfig = structuredClone(KOF2002_CONFIG);
+
+/** Get the current active config (fresh copy) */
+export function getActiveConfig(): GameConfig {
+  return activeConfig;
+}
+
 /** 获取配置值 */
 export function getGameConfig(training: boolean = false): GameConfig {
   if (training) {
-    return { ...KOF2002_CONFIG, ...TRAINING_CONFIG_OVERRIDES, round: { ...KOF2002_CONFIG.round, ...TRAINING_CONFIG_OVERRIDES.round } };
+    return deepMerge(structuredClone(KOF2002_CONFIG), TRAINING_CONFIG_OVERRIDES);
   }
-  return KOF2002_CONFIG;
+  return activeConfig;
+}
+
+// ============================================================================
+// Config Hot-Reload
+// ============================================================================
+
+/** Deep-merge a partial config into the active config.
+ *  Logs each changed key for traceability. */
+export function updateGameConfig(partial: Partial<GameConfig>): void {
+  const oldConfig = activeConfig;
+  activeConfig = deepMerge(structuredClone(activeConfig), partial);
+  logConfigChanges(oldConfig, activeConfig, partial);
+}
+
+/** Reset config back to KOF2002 defaults */
+export function resetGameConfig(): void {
+  activeConfig = structuredClone(KOF2002_CONFIG);
+}
+
+// ============================================================================
+// Config Validation
+// ============================================================================
+
+export interface ConfigValidationError {
+  path: string;
+  message: string;
+}
+
+/** Validate a GameConfig (full or partial). Returns errors array (empty = valid). */
+export function validateGameConfig(config: Partial<GameConfig>): ConfigValidationError[] {
+  const errors: ConfigValidationError[] = [];
+
+  if (config.round) {
+    validatePositive(config.round.roundTime, 'round.roundTime', errors, 'must be > 0 or Infinity');
+    if (config.round.roundTime !== Infinity && config.round.roundTime <= 0) {
+      errors.push({ path: 'round.roundTime', message: 'must be > 0 or Infinity' });
+    }
+    validatePositive(config.round.maxRounds, 'round.maxRounds', errors);
+    validatePositive(config.round.winsNeeded, 'round.winsNeeded', errors);
+  }
+
+  if (config.damage) {
+    validatePositive(config.damage.comboScaleStep, 'damage.comboScaleStep', errors);
+    validatePositive(config.damage.comboScaleMinNormal, 'damage.comboScaleMinNormal', errors);
+    validatePositive(config.damage.comboScaleMinSpecial, 'damage.comboScaleMinSpecial', errors);
+    validatePositive(config.damage.comboScaleMinDM, 'damage.comboScaleMinDM', errors);
+    validatePercentage(config.damage.chipDamageRatio, 'damage.chipDamageRatio', errors);
+    validatePositive(config.damage.chDamageBonus, 'damage.chDamageBonus', errors);
+    validatePositive(config.damage.chHitstunBonus, 'damage.chHitstunBonus', errors);
+  }
+
+  if (config.meter) {
+    validatePositive(config.meter.meterPerStock, 'meter.meterPerStock', errors);
+    if (config.meter.maxStocks !== undefined) {
+      if (!Number.isInteger(config.meter.maxStocks) || config.meter.maxStocks < 1 || config.meter.maxStocks > 5) {
+        errors.push({ path: 'meter.maxStocks', message: 'must be integer 1-5' });
+      }
+    }
+    validatePositive(config.meter.maxModeDuration, 'meter.maxModeDuration', errors);
+    validatePositive(config.meter.maxModeDamageBonus, 'meter.maxModeDamageBonus', errors);
+    validatePositive(config.meter.maxModeDefenseBonus, 'meter.maxModeDefenseBonus', errors);
+    validatePercentage(config.meter.desperationThreshold, 'meter.desperationThreshold', errors);
+    validatePositive(config.meter.desperationDmBonus, 'meter.desperationDmBonus', errors);
+  }
+
+  if (config.stun) {
+    validatePositive(config.stun.stunGaugeMax, 'stun.stunGaugeMax', errors);
+    validatePositive(config.stun.dizzyDurationMin, 'stun.dizzyDurationMin', errors);
+    validatePositive(config.stun.dizzyDurationMax, 'stun.dizzyDurationMax', errors);
+    validatePositive(config.stun.stunDecayRate, 'stun.stunDecayRate', errors);
+    if (config.stun.dizzyDurationMin !== undefined && config.stun.dizzyDurationMax !== undefined
+      && config.stun.dizzyDurationMin > config.stun.dizzyDurationMax) {
+      errors.push({ path: 'stun.dizzyDurationMin', message: 'must be <= dizzyDurationMax' });
+    }
+  }
+
+  if (config.guard) {
+    validatePositive(config.guard.guardGaugeMax, 'guard.guardGaugeMax', errors);
+    validatePositive(config.guard.guardCrushDuration, 'guard.guardCrushDuration', errors);
+    validatePositive(config.guard.guardGaugeRecoveryRate, 'guard.guardGaugeRecoveryRate', errors);
+  }
+
+  return errors;
+}
+
+/** Validate and apply — only applies if validation passes */
+export function safeUpdateGameConfig(partial: Partial<GameConfig>): ConfigValidationError[] {
+  const errors = validateGameConfig(partial);
+  if (errors.length === 0) {
+    updateGameConfig(partial);
+  }
+  return errors;
+}
+
+// ============================================================================
+// Internal helpers
+// ============================================================================
+
+function deepMerge<T extends Record<string, any>>(target: T, source: Partial<T>): T {
+  const result = { ...target };
+  for (const key of Object.keys(source) as (keyof T)[]) {
+    const sv = source[key];
+    const tv = target[key];
+    if (sv && typeof sv === 'object' && !Array.isArray(sv) && tv && typeof tv === 'object' && !Array.isArray(tv)) {
+      (result as any)[key] = deepMerge({ ...tv }, sv as any);
+    } else if (sv !== undefined) {
+      (result as any)[key] = sv;
+    }
+  }
+  return result;
+}
+
+function validatePositive(value: number | undefined, path: string, errors: ConfigValidationError[], extra?: string): void {
+  if (value === undefined) return;
+  if (typeof value !== 'number' || isNaN(value) || value <= 0) {
+    errors.push({ path, message: extra ?? 'must be a positive number' });
+  }
+}
+
+function validatePercentage(value: number | undefined, path: string, errors: ConfigValidationError[]): void {
+  if (value === undefined) return;
+  if (typeof value !== 'number' || isNaN(value) || value < 0 || value > 1) {
+    errors.push({ path, message: 'must be between 0 and 1' });
+  }
+}
+
+function logConfigChanges(old: GameConfig, _new: GameConfig, partial: Partial<GameConfig>): void {
+  const sections = Object.keys(partial) as (keyof GameConfig)[];
+  for (const section of sections) {
+    if (!partial[section]) continue;
+    const keys = Object.keys(partial[section]!) as string[];
+    for (const key of keys) {
+      const oldVal = (old[section] as any)?.[key];
+      const newVal = (_new[section] as any)?.[key];
+      if (oldVal !== newVal) {
+        console.log(`[Config] ${String(section)}.${key}: ${oldVal} -> ${newVal}`);
+      }
+    }
+  }
 }

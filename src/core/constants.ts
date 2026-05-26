@@ -16,6 +16,27 @@ export const FIGHTER_WIDTH = 80;
 export const FIGHTER_HEIGHT = 200;
 export const STAGE_LEFT = FIGHTER_WIDTH / 2;
 export const STAGE_RIGHT = STAGE_WIDTH - FIGHTER_WIDTH / 2;
+
+/** Check if a fighter at position x is within CORNER_RANGE of the left wall */
+export function isInLeftCorner(x: number): boolean {
+  return x - STAGE_LEFT <= CORNER_RANGE;
+}
+
+/** Check if a fighter at position x is within CORNER_RANGE of the right wall */
+export function isInRightCorner(x: number): boolean {
+  return STAGE_RIGHT - x <= CORNER_RANGE;
+}
+
+/** Check if a fighter at position x is in either corner */
+export function isInCorner(x: number): boolean {
+  return isInLeftCorner(x) || isInRightCorner(x);
+}
+
+/** Clamp x within stage boundaries [STAGE_LEFT, STAGE_RIGHT] */
+export function clampToStage(x: number): number {
+  return Math.max(STAGE_LEFT, Math.min(x, STAGE_RIGHT));
+}
+
 export const WALK_SPEED = 4;
 export const RUN_SPEED = 7;
 export const RUN_LATCH_FRAMES = 6;      // 双击后即使短暂松开，也保留短冲刺惯性
@@ -96,6 +117,11 @@ export const GROUND_BOUNCE_HITSTUN = 18;       // hitstun frames during ground b
 // ===== Wall Bounce =====
 export const WALL_BOUNCE_MAX_PER_COMBO = 1;    // only one wall bounce per combo
 export const WALL_BOUNCE_SLIDE_FRICTION = 0.85; // friction during post-bounce slide
+
+// ===== Corner Pressure (KOF2002 authentic) =====
+export const CORNER_RANGE = 30;                // fighter is "in corner" when within 30px of wall
+export const CORNER_DAMAGE_BONUS = 1.05;       // 5% extra damage to cornered opponent
+export const WALL_SPLAT_SHAKE_DURATION = 2;    // screen shake ticks when hitting wall
 
 // ===== Counter Wire (墙弹) =====
 export const COUNTER_WIRE_BOUNCE_VX = 8;   // Wall bounce horizontal speed

@@ -24,6 +24,7 @@ import {
   THROW_INVINCIBILITY_LANDING,
   FRAME_DATA,
   WAKEUP_BUFFER_WINDOW,
+  WALL_SPLAT_SHAKE_DURATION,
 } from '../core/constants.js';
 import { FighterState, AttackType, CLOSE_RANGE, JuggleState } from '../core/types.js';
 import type { PowerGauge, MaxModeState, CounterConfig } from '../core/types.js';
@@ -54,6 +55,8 @@ export class FighterController {
   private stats: CharacterStats;
   private gauge: PowerGauge | null = null;
   private maxMode: MaxModeState | null = null;
+  /** Optional screen shake callback — injected from main.ts for wall splat feedback */
+  onScreenShake: ((intensity: number, duration: number) => void) | null = null;
 
   private lastForwardTick = -999;
   private lastBackTick = -999;
@@ -239,7 +242,20 @@ export class FighterController {
         }
       } else if (f.vy > 0) { f.y = STAGE_GROUND_Y; f.vy = 0; }
     }
+    // Wall splat: detect wall clamp and spawn VFX
+    const prevX = f.x;
     f.x = Math.max(STAGE_LEFT, Math.min(f.x, STAGE_RIGHT));
+    const clamped = f.x !== prevX;
+    if (clamped && (f.state === FighterState.HITSTUN || f.state === FighterState.BLOCK
+        || f.state === FighterState.KNOCKDOWN || f.state === FighterState.GUARD_CRUSH)) {
+      const wallX = f.x <= STAGE_LEFT ? STAGE_LEFT : STAGE_RIGHT;
+      this.vfx.spawnHeavyDust(wallX, f.y - f.displayHeight / 2, 6);
+      this.vfx.spawnImpactRing(wallX, f.y - f.displayHeight / 2, 0.6);
+      // Screen shake for wall splat (2 ticks)
+      this.onScreenShake?.(4, WALL_SPLAT_SHAKE_DURATION);
+      // Reduce velocity on wall hit (wall pressure: opponent stays near wall)
+      f.vx *= 0.5;
+    }
   }
 
   private buildCtx(): FighterCtx {
