@@ -1019,3 +1019,9 @@
 ## H205: vfxPresets—8项验证getSparkSizeScaleFromDamage伤害阈值 — 177→178
 
 **commit:** <hash> | vfxPresets—8项验证getSparkSizeScaleFromDamage伤害阈值
+
+---
+
+## H206: coreConstants—7项验证画布/物理/气槽/打击反馈常量 — 178→179
+
+**commit:** <hash> | coreConstants—7项验证画布/物理/气槽/打击反馈常量
