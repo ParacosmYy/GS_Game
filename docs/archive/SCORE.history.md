@@ -673,3 +673,9 @@
 ## H153: inputRecorder测试—7项验证InputRecorder start/stop/active/frameCount — 125→126
 
 **commit:** <hash> | inputRecorder测试—7项验证InputRecorder start/stop/active/frameCount
+
+---
+
+## H154: inputPlayback—7项验证InputPlayback active/frameCount/isFinished/load/getInput — 126→127
+
+**commit:** <hash> | inputPlayback—7项验证InputPlayback active/frameCount/isFinished/load/getInput
