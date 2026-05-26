@@ -397,3 +397,9 @@
 ## H114: frameDataConstants测试—10项验证FRAME_DATA字段+startup+damage+拳速比较 — 86→87
 
 **commit:** <hash> | frameDataConstants测试—10项验证FRAME_DATA字段+startup+damage+拳速比较
+
+---
+
+## H115: meter测试—12项验证createPowerGauge+createMaxMode+gainMeter+spendStocks — 87→88
+
+**commit:** <hash> | meter测试—12项验证createPowerGauge+createMaxMode+gainMeter+spendStocks
