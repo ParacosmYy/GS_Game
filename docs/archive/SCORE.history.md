@@ -826,3 +826,9 @@
 ## H176: portraitBatch4—5项验证kula/leona/mai/mary/mature肖像 — 148→149
 
 **commit:** <hash> | portraitBatch4—5项验证kula/leona/mai/mary/mature肖像
+
+---
+
+## H177: portraitBatch5—8项验证剩余角色肖像+ryoPortraits多尺寸 — 149→150
+
+**commit:** <hash> | portraitBatch5—8项验证剩余角色肖像+ryoPortraits多尺寸
