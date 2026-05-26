@@ -743,6 +743,7 @@ export function printRyoReport(): void {
 /** Extended report that also checks animation manifest data */
 export function generateRyoExtendedReport(): RyoCompletenessReport & {
   specialMoves: { key: string; label: string; hasPose: boolean; hasFrameData: boolean }[];
+  normalMoves: { key: string; label: string; hasFrameData: boolean; hasAttackFrames: boolean }[];
   portraitSizes: { size: string; exists: boolean; width: number; height: number }[];
 } {
   const baseReport = generateRyoReport();
@@ -754,6 +755,13 @@ export function generateRyoExtendedReport(): RyoCompletenessReport & {
     label: spec.label,
     hasPose: spec.key in poses,
     hasFrameData: hasFrameDataEntry(spec.key),
+  }));
+
+  const normalMoves = NORMAL_MOVE_KEYS.map(norm => ({
+    key: norm.key,
+    label: norm.label,
+    hasFrameData: hasFrameDataEntry(norm.key),
+    hasAttackFrames: hasAttackFrameEntry(norm.key),
   }));
 
   const portraitEntries = PORTRAIT_MANIFEST.portraits['ryo'];
@@ -771,6 +779,7 @@ export function generateRyoExtendedReport(): RyoCompletenessReport & {
   return {
     ...baseReport,
     specialMoves,
+    normalMoves,
     portraitSizes,
   };
 }
