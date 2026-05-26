@@ -54,6 +54,26 @@ export class GameStateManager {
   // Input repeat throttle (for stage/team select cursor movement)
   inputRepeatCooldown = 0;
 
+  // Match stats for victory screen
+  matchStats = {
+    p1TotalDamage: 0,
+    p2TotalDamage: 0,
+    p1LongestCombo: 0,
+    p2LongestCombo: 0,
+  };
+
+  /** Record damage dealt by a player this match */
+  recordDamage(playerIndex: number, damage: number): void {
+    if (playerIndex === 0) this.matchStats.p1TotalDamage += damage;
+    else this.matchStats.p2TotalDamage += damage;
+  }
+
+  /** Record combo length for a player (keeps the longest) */
+  recordCombo(playerIndex: number, comboCount: number): void {
+    if (playerIndex === 0) this.matchStats.p1LongestCombo = Math.max(this.matchStats.p1LongestCombo, comboCount);
+    else this.matchStats.p2LongestCombo = Math.max(this.matchStats.p2LongestCombo, comboCount);
+  }
+
   setPhase(p: GamePhase): void {
     this.phase = p;
   }
@@ -99,6 +119,7 @@ export class GameStateManager {
     this.gameOverTimer = 0;
     this.transitionType = 'none';
     this.transitionTimer = 0;
+    this.matchStats = { p1TotalDamage: 0, p2TotalDamage: 0, p1LongestCombo: 0, p2LongestCombo: 0 };
     this.resetStageSelect();
     this.resetTeamOrder();
   }

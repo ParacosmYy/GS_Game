@@ -61,10 +61,10 @@ export function drawSuperFlash(
     }
   }
 
-  // Phase 2: DARKEN — 背景变暗 (帧18起, 持续)
+  // Phase 2: DARKEN — 背景变暗60% (帧18起, 持续) — Phase 51 enhancement
   if (isDarken) {
     const darkT = Math.min(1, (timer - 13) / 6);
-    const alpha = 0.7 * darkT;
+    const alpha = 0.6 * darkT;
     if (isHSDM) {
       ctx.fillStyle = `rgba(60, 0, 60, ${alpha})`;
     } else if (isSDM) {
@@ -73,6 +73,33 @@ export function drawSuperFlash(
       ctx.fillStyle = `rgba(0, 0, 80, ${alpha})`;
     }
     ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+  }
+
+  // Phase 51: Energy burst ring — expanding ring centered on attacker over 10 ticks then fades
+  if (timer <= 24 && timer > 14) {
+    const ringProgress = (24 - timer) / 10;
+    const ringRadius = 30 + ringProgress * (isHSDM ? 280 : 220);
+    const ringAlpha = (1 - ringProgress) * 0.65;
+    const ringWidth = (4 + ringProgress * 3) * (1 - ringProgress);
+    let ringColor: string;
+    if (isHSDM) {
+      ringColor = `rgba(255, 100, 255, ${ringAlpha})`;
+    } else if (isSDM) {
+      ringColor = `rgba(255, 180, 50, ${ringAlpha})`;
+    } else {
+      ringColor = `rgba(255, 255, 200, ${ringAlpha})`;
+    }
+    ctx.strokeStyle = ringColor;
+    ctx.lineWidth = ringWidth;
+    ctx.beginPath();
+    ctx.arc(flashScreenX, flashScreenY, ringRadius, 0, Math.PI * 2);
+    ctx.stroke();
+    // Inner bright ring
+    ctx.strokeStyle = `rgba(255, 255, 255, ${ringAlpha * 0.5})`;
+    ctx.lineWidth = ringWidth * 0.4;
+    ctx.beginPath();
+    ctx.arc(flashScreenX, flashScreenY, ringRadius * 0.85, 0, Math.PI * 2);
+    ctx.stroke();
   }
 
   // Phase 2-3: 角色周围爆发光晕
@@ -969,6 +996,64 @@ export function drawGameOver(ctx: CanvasRenderingContext2D, timer: number): void
 }
 
 export { GAME_OVER_DURATION };
+
+// ===== Screen Transition Helpers =====
+
+/**
+ * Draw a screen fade overlay with the given alpha.
+ * Alpha 0 = fully transparent (screen visible).
+ * Alpha 1 = fully opaque black (screen hidden).
+ */
+export function drawScreenFade(ctx: CanvasRenderingContext2D, alpha: number): void {
+  if (alpha <= 0) return;
+  ctx.save();
+  ctx.fillStyle = `rgba(0, 0, 0, ${Math.min(1, Math.max(0, alpha))})`;
+  ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+  ctx.restore();
+}
+
+/**
+ * Draw a screen wipe overlay with the given progress and direction.
+ * Progress 0 = no wipe (screen fully visible).
+ * Progress 1 = fully wiped (screen hidden).
+ * Direction 'left' wipes from right to left, 'right' from left to right.
+ */
+export function drawScreenWipe(
+  ctx: CanvasRenderingContext2D,
+  progress: number,
+  direction: 'left' | 'right',
+): void {
+  if (progress <= 0) return;
+  const p = Math.min(1, Math.max(0, progress));
+  ctx.save();
+  ctx.fillStyle = '#000000';
+
+  if (direction === 'left') {
+    const wipeX = CANVAS_WIDTH * (1 - p);
+    ctx.fillRect(wipeX, 0, CANVAS_WIDTH - wipeX, CANVAS_HEIGHT);
+    if (p < 1 && p > 0) {
+      const glowGrad = ctx.createLinearGradient(wipeX - 30, 0, wipeX + 10, 0);
+      glowGrad.addColorStop(0, 'rgba(255, 204, 0, 0)');
+      glowGrad.addColorStop(0.5, 'rgba(255, 204, 0, 0.4)');
+      glowGrad.addColorStop(1, 'rgba(255, 204, 0, 0)');
+      ctx.fillStyle = glowGrad;
+      ctx.fillRect(wipeX - 30, 0, 40, CANVAS_HEIGHT);
+    }
+  } else {
+    const wipeX = CANVAS_WIDTH * p;
+    ctx.fillRect(0, 0, wipeX, CANVAS_HEIGHT);
+    if (p < 1 && p > 0) {
+      const glowGrad = ctx.createLinearGradient(wipeX - 10, 0, wipeX + 30, 0);
+      glowGrad.addColorStop(0, 'rgba(255, 204, 0, 0)');
+      glowGrad.addColorStop(0.5, 'rgba(255, 204, 0, 0.4)');
+      glowGrad.addColorStop(1, 'rgba(255, 204, 0, 0)');
+      ctx.fillStyle = glowGrad;
+      ctx.fillRect(wipeX - 10, 0, 40, CANVAS_HEIGHT);
+    }
+  }
+
+  ctx.restore();
+}
 
 // ===== Training Mode HUD =====
 
