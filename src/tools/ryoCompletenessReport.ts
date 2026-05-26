@@ -8,16 +8,22 @@
  *   - Frame count thresholds per action
  *   - Portrait manifest data (select, vs, hud, win)
  *   - FRAME_DATA entries for attack actions
- *   - Special move pose data
+ *   - ATTACK_FRAMES entries for all Ryo attacks
+ *   - Feedback tier coverage for all Ryo attacks
+ *   - Hurtbox coverage for relevant states
+ *   - MoveList completeness
  *
- * Reads from ROSTER (src/characters/index.ts), FRAME_DATA
- * (src/core/constants.ts), and PORTRAIT_MANIFEST (src/core/portraitManifest.ts).
+ * Reads from ROSTER, FRAME_DATA, ATTACK_FRAMES, FEEDBACK_MANIFEST,
+ * HURTBOX_TABLE, PORTRAIT_MANIFEST.
  * Prints a formatted report to console and returns the structured report object.
  */
 
 import { ROSTER } from '../characters/index.js';
 import { FRAME_DATA } from '../core/constants.js';
-import { PORTRAIT_MANIFEST } from '../core/portraitManifest.js';
+import { PORTRAIT_MANIFEST, type PortraitSize } from '../core/portraitManifest.js';
+import { ATTACK_FRAMES } from '../core/attackFrames.js';
+import { getFeedback, inferTier, type FeedbackTier } from '../core/feedbackManifest.js';
+import { HURTBOX_TABLE } from '../core/hurtboxManifest.js';
 import type { Pose, PoseSet } from '../characters/types.js';
 import { FighterState, AttackType } from '../core/types.js';
 
@@ -55,6 +61,40 @@ export interface RyoCompletenessReport {
   overallProgress: number;
 }
 
+// ===== New dimension types =====
+
+export interface DimensionResult {
+  /** Dimension name */
+  dimension: string;
+  /** Total items checked */
+  total: number;
+  /** Items that passed */
+  passed: number;
+  /** Completion percentage (0-100) */
+  pct: number;
+  /** Items that are missing or incomplete */
+  missing: string[];
+  /** Items that are complete */
+  complete: string[];
+}
+
+export interface RyoDimensionReport {
+  /** Action frame completeness (8 minimum actions) */
+  actionFrames: DimensionResult;
+  /** Attack frame completeness (ATTACK_FRAMES for Ryo attacks) */
+  attackFrames: DimensionResult;
+  /** Feedback tier completeness (all Ryo attacks have feedback) */
+  feedback: DimensionResult;
+  /** Hurtbox completeness (states have HURTBOX_TABLE entries) */
+  hurtbox: DimensionResult;
+  /** Portrait completeness (4 size variants) */
+  portrait: DimensionResult;
+  /** MoveList completeness */
+  moveList: DimensionResult;
+  /** Weighted overall score across all dimensions (0-100) */
+  overallScore: number;
+}
+
 // ===== Minimum Action Definitions =====
 
 /** Maps action name to the pose key(s) in RyoDef.poses and minimum frame requirements */
@@ -69,6 +109,8 @@ interface ActionSpec {
   frameDataKeys: string[];
   /** Whether this action requires distinct startup/active/recovery phases */
   requiresPhaseAlignment: boolean;
+  /** FighterState(s) that need hurtbox entries */
+  hurtboxStates: string[];
 }
 
 const MINIMUM_ACTIONS: ActionSpec[] = [
@@ -78,6 +120,7 @@ const MINIMUM_ACTIONS: ActionSpec[] = [
     minFrames: 4,
     frameDataKeys: [],
     requiresPhaseAlignment: false,
+    hurtboxStates: [FighterState.IDLE],
   },
   {
     label: 'walk_forward',
@@ -85,6 +128,7 @@ const MINIMUM_ACTIONS: ActionSpec[] = [
     minFrames: 4,
     frameDataKeys: [],
     requiresPhaseAlignment: false,
+    hurtboxStates: [FighterState.WALK],
   },
   {
     label: 'walk_backward',
@@ -92,6 +136,7 @@ const MINIMUM_ACTIONS: ActionSpec[] = [
     minFrames: 4,
     frameDataKeys: [],
     requiresPhaseAlignment: false,
+    hurtboxStates: [FighterState.WALK],
   },
   {
     label: 'jump',
@@ -99,6 +144,7 @@ const MINIMUM_ACTIONS: ActionSpec[] = [
     minFrames: 2,
     frameDataKeys: [],
     requiresPhaseAlignment: false,
+    hurtboxStates: [FighterState.JUMP],
   },
   {
     label: 'stand_a',
@@ -106,6 +152,7 @@ const MINIMUM_ACTIONS: ActionSpec[] = [
     minFrames: 3, // at least startup + active + recovery frames
     frameDataKeys: [AttackType.STAND_A],
     requiresPhaseAlignment: true,
+    hurtboxStates: [FighterState.STAND_ATTACK],
   },
   {
     label: 'stand_c',
@@ -113,6 +160,7 @@ const MINIMUM_ACTIONS: ActionSpec[] = [
     minFrames: 3,
     frameDataKeys: [AttackType.STAND_C],
     requiresPhaseAlignment: true,
+    hurtboxStates: [FighterState.STAND_ATTACK],
   },
   {
     label: 'hurt',
@@ -120,6 +168,7 @@ const MINIMUM_ACTIONS: ActionSpec[] = [
     minFrames: 3,
     frameDataKeys: [],
     requiresPhaseAlignment: false,
+    hurtboxStates: [FighterState.HITSTUN],
   },
   {
     label: 'knockdown',
@@ -127,6 +176,7 @@ const MINIMUM_ACTIONS: ActionSpec[] = [
     minFrames: 3,
     frameDataKeys: [],
     requiresPhaseAlignment: false,
+    hurtboxStates: [FighterState.KNOCKDOWN],
   },
 ];
 
@@ -141,6 +191,78 @@ const SPECIAL_MOVE_KEYS: { key: string; label: string }[] = [
   { key: AttackType.RYO_TSURIZAO, label: 'RYO_TSURIZAO (->+A)' },
   { key: AttackType.RYO_ORISHI, label: 'RYO_ORISHI (v->+B)' },
   { key: 'DM_TEN_HA_OU', label: 'DM_TEN_HA_OU (DM)' },
+  { key: 'DM_RYUKO_RANBU', label: 'DM_RYUKO_RANBU (DM)' },
+  { key: 'SDM_RYUKO_RANBU', label: 'SDM_RYUKO_RANBU (SDM)' },
+  { key: 'HSDM_RYUKO_RANBU', label: 'HSDM_RYUKO_RANBU (HSDM)' },
+  { key: 'SDM_TEN_HA_OU', label: 'SDM_TEN_HA_OU (SDM)' },
+];
+
+/** All Ryo-relevant attack types (normals + specials + DMs) */
+const RYO_ALL_ATTACKS: { key: string; label: string }[] = [
+  // Normals (shared)
+  { key: AttackType.STAND_A, label: 'STAND_A' },
+  { key: AttackType.STAND_B, label: 'STAND_B' },
+  { key: AttackType.STAND_C, label: 'STAND_C' },
+  { key: AttackType.STAND_D, label: 'STAND_D' },
+  { key: AttackType.CLOSE_A, label: 'CLOSE_A' },
+  { key: AttackType.CLOSE_B, label: 'CLOSE_B' },
+  { key: AttackType.CLOSE_C, label: 'CLOSE_C' },
+  { key: AttackType.CLOSE_D, label: 'CLOSE_D' },
+  // Ryo command normals
+  { key: AttackType.RYO_TSURIZAO, label: 'RYO_TSURIZAO' },
+  { key: AttackType.RYO_ORISHI, label: 'RYO_ORISHI' },
+  // Crouching/air normals (shared)
+  { key: AttackType.CROUCH_A, label: 'CROUCH_A' },
+  { key: AttackType.CROUCH_B, label: 'CROUCH_B' },
+  { key: AttackType.CROUCH_C, label: 'CROUCH_C' },
+  { key: AttackType.CROUCH_D, label: 'CROUCH_D' },
+  { key: AttackType.JUMP_A, label: 'JUMP_A' },
+  { key: AttackType.JUMP_B, label: 'JUMP_B' },
+  { key: AttackType.JUMP_C, label: 'JUMP_C' },
+  { key: AttackType.JUMP_D, label: 'JUMP_D' },
+  // Throws and CD
+  { key: AttackType.THROW, label: 'THROW' },
+  { key: AttackType.THROW_FORWARD, label: 'THROW_FORWARD' },
+  { key: AttackType.THROW_BACK, label: 'THROW_BACK' },
+  { key: AttackType.STAND_CD, label: 'STAND_CD' },
+  { key: AttackType.JUMP_CD, label: 'JUMP_CD' },
+  // Ryo specials
+  { key: AttackType.RYO_KOOU, label: 'RYO_KOOU' },
+  { key: AttackType.RYO_KOOU_C, label: 'RYO_KOOU_C' },
+  { key: AttackType.RYO_KO_HOU, label: 'RYO_KO_HOU' },
+  { key: AttackType.RYO_KO_HOU_C, label: 'RYO_KO_HOU_C' },
+  { key: AttackType.RYO_HIEN, label: 'RYO_HIEN' },
+  { key: AttackType.RYO_HAOU, label: 'RYO_HAOU' },
+  // Ryo DMs/SDMs/HSDMs
+  { key: 'DM_TEN_HA_OU', label: 'DM_TEN_HA_OU' },
+  { key: 'DM_RYUKO_RANBU', label: 'DM_RYUKO_RANBU' },
+  { key: 'SDM_RYUKO_RANBU', label: 'SDM_RYUKO_RANBU' },
+  { key: 'HSDM_RYUKO_RANBU', label: 'HSDM_RYUKO_RANBU' },
+  { key: 'SDM_TEN_HA_OU', label: 'SDM_TEN_HA_OU' },
+];
+
+/** Ryo-specific moveList expected entries for completeness check */
+const EXPECTED_RYO_MOVES: { name: string; type: string }[] = [
+  { name: '冰柱割り', type: 'command' },
+  { name: '落蹴', type: 'command' },
+  { name: '虎煌拳', type: 'special' },
+  { name: '虎咆', type: 'special' },
+  { name: '飛燕疾風脚', type: 'special' },
+  { name: '霸王翔吼拳', type: 'special' },
+  { name: '天地霸煌拳', type: 'dm' },
+  { name: '龍虎乱舞', type: 'dm' },
+];
+
+/** States that should have hurtbox entries per the vertical slice plan */
+const RYO_HURTBOX_STATES: { state: string; label: string }[] = [
+  { state: FighterState.IDLE, label: 'IDLE' },
+  { state: FighterState.WALK, label: 'WALK' },
+  { state: FighterState.JUMP, label: 'JUMP' },
+  { state: FighterState.STAND_ATTACK, label: 'STAND_ATTACK' },
+  { state: FighterState.HITSTUN, label: 'HITSTUN' },
+  { state: FighterState.KNOCKDOWN, label: 'KNOCKDOWN' },
+  { state: FighterState.CROUCH, label: 'CROUCH' },
+  { state: FighterState.BLOCK, label: 'BLOCK' },
 ];
 
 // ===== Helper Functions =====
@@ -155,6 +277,36 @@ function countFrames(poseData: Pose | Pose[] | undefined): number {
 /** Check if a string key exists in FRAME_DATA */
 function hasFrameDataEntry(key: string): boolean {
   return key in FRAME_DATA;
+}
+
+/** Check if a string key exists in ATTACK_FRAMES */
+function hasAttackFrameEntry(key: string): boolean {
+  return key in ATTACK_FRAMES;
+}
+
+/** Build a DimensionResult from parallel checks */
+function buildDimension(
+  dimension: string,
+  items: { key: string; label: string }[],
+  checkFn: (key: string) => boolean,
+): DimensionResult {
+  const complete: string[] = [];
+  const missing: string[] = [];
+  let passed = 0;
+
+  for (const item of items) {
+    if (checkFn(item.key)) {
+      complete.push(item.label);
+      passed++;
+    } else {
+      missing.push(item.label);
+    }
+  }
+
+  const total = items.length;
+  const pct = total > 0 ? Math.round((passed / total) * 100) : 100;
+
+  return { dimension, total, passed, pct, missing, complete };
 }
 
 // ===== Main Report Generator =====
@@ -260,6 +412,117 @@ export function generateRyoReport(): RyoCompletenessReport {
   };
 }
 
+// ===== Dimension Report Generator =====
+
+export function generateRyoDimensionReport(): RyoDimensionReport {
+  const ryoDef = ROSTER.find(c => c.id === 'ryo');
+
+  // 1. Action Frames: 8 minimum actions with sufficient pose frames
+  const actionFrames = buildDimension(
+    'Action Frames',
+    MINIMUM_ACTIONS.map(spec => ({
+      key: spec.label,
+      label: spec.label,
+    })),
+    (key) => {
+      const spec = MINIMUM_ACTIONS.find(s => s.label === key);
+      if (!spec || !ryoDef) return false;
+      let bestCount = 0;
+      for (const pk of spec.poseKeys) {
+        const pd = ryoDef.poses[pk];
+        if (pd !== undefined) {
+          const c = countFrames(pd);
+          if (c > bestCount) bestCount = c;
+        }
+      }
+      return bestCount >= spec.minFrames;
+    },
+  );
+
+  // 2. Attack Frames: ATTACK_FRAMES entries for all Ryo attacks
+  const attackFrames = buildDimension(
+    'Attack Frames',
+    RYO_ALL_ATTACKS,
+    (key) => hasAttackFrameEntry(key),
+  );
+
+  // 3. Feedback: all Ryo attacks have feedback coverage
+  const feedback = buildDimension(
+    'Feedback',
+    RYO_ALL_ATTACKS,
+    (key) => {
+      try {
+        const params = getFeedback(key as AttackType);
+        return params !== undefined && params.hitstop > 0;
+      } catch {
+        return false;
+      }
+    },
+  );
+
+  // 4. Hurtbox: states have HURTBOX_TABLE entries
+  const hurtbox = buildDimension(
+    'Hurtbox',
+    RYO_HURTBOX_STATES.map(s => ({ key: s.state, label: s.label })),
+    (key) => key in HURTBOX_TABLE,
+  );
+
+  // 5. Portrait: 4 size variants exist in PORTRAIT_MANIFEST
+  const portraitSizes: PortraitSize[] = ['select', 'vs', 'hud', 'win'];
+  const portrait = buildDimension(
+    'Portrait',
+    portraitSizes.map(s => ({ key: s, label: s })),
+    (key) => {
+      const entry = PORTRAIT_MANIFEST.portraits['ryo']?.[key as PortraitSize];
+      return entry !== undefined && entry.width > 0;
+    },
+  );
+
+  // 6. MoveList: expected entries present
+  const moveListItems = EXPECTED_RYO_MOVES.map(m => ({
+    key: `${m.type}:${m.name}`,
+    label: `${m.type}/${m.name}`,
+  }));
+  const moveList = buildDimension(
+    'MoveList',
+    moveListItems,
+    (key) => {
+      if (!ryoDef?.moveList) return false;
+      const [type, name] = key.split(':');
+      // Check if moveList contains an entry matching the expected name
+      // Use partial match since moveList names may contain full Japanese text
+      return ryoDef.moveList.some(
+        entry => entry.type === type && entry.name.includes(name),
+      );
+    },
+  );
+
+  // Weighted overall score: action frames 30%, attack frames 20%, feedback 15%,
+  // hurtbox 10%, portrait 15%, moveList 10%
+  const weights = [
+    { result: actionFrames, weight: 0.30 },
+    { result: attackFrames, weight: 0.20 },
+    { result: feedback, weight: 0.15 },
+    { result: hurtbox, weight: 0.10 },
+    { result: portrait, weight: 0.15 },
+    { result: moveList, weight: 0.10 },
+  ];
+
+  const overallScore = Math.round(
+    weights.reduce((sum, w) => sum + w.result.pct * w.weight, 0),
+  );
+
+  return {
+    actionFrames,
+    attackFrames,
+    feedback,
+    hurtbox,
+    portrait,
+    moveList,
+    overallScore,
+  };
+}
+
 // ===== Console Report Printer =====
 
 /** Bar visualization for progress */
@@ -278,8 +541,16 @@ function statusIcon(status: 'complete' | 'partial' | 'missing'): string {
   }
 }
 
+/** Dimension status icon */
+function dimIcon(pct: number): string {
+  if (pct >= 100) return 'OK';
+  if (pct >= 50)  return '~~';
+  return '!!';
+}
+
 export function printRyoReport(): void {
   const report = generateRyoReport();
+  const dimReport = generateRyoDimensionReport();
 
   const line = '='.repeat(60);
   const dash = '-'.repeat(60);
@@ -310,6 +581,34 @@ export function printRyoReport(): void {
 
   console.log(dash);
 
+  // Dimension summary
+  console.log('  DIMENSION SUMMARY:');
+  console.log(`  Dimension          Status  Pct    Passed  Missing`);
+  console.log('  ' + '-'.repeat(53));
+
+  const dimensions: { dim: DimensionResult; label: string }[] = [
+    { dim: dimReport.actionFrames, label: 'Action Frames' },
+    { dim: dimReport.attackFrames, label: 'Attack Frames' },
+    { dim: dimReport.feedback, label: 'Feedback' },
+    { dim: dimReport.hurtbox, label: 'Hurtbox' },
+    { dim: dimReport.portrait, label: 'Portrait' },
+    { dim: dimReport.moveList, label: 'MoveList' },
+  ];
+
+  for (const { dim, label } of dimensions) {
+    const name = label.padEnd(18);
+    const icon = dimIcon(dim.pct);
+    const pctStr = `${dim.pct}%`.padStart(4);
+    const passedStr = `${dim.passed}/${dim.total}`.padStart(7);
+    const missingStr = dim.missing.length > 0 ? String(dim.missing.length) : '-';
+    console.log(`  ${name} [${icon}]  ${pctStr}  ${passedStr}  ${missingStr}`);
+  }
+
+  console.log(dash);
+  console.log(`  OVERALL SCORE:    ${progressBar(dimReport.overallScore)} ${dimReport.overallScore}%`);
+
+  console.log(dash);
+
   // Portrait section
   const portraitEntries = PORTRAIT_MANIFEST.portraits['ryo'];
   const sizes = ['select', 'vs', 'hud', 'win'] as const;
@@ -329,27 +628,83 @@ export function printRyoReport(): void {
   console.log('  SPECIAL MOVES:');
   for (const spec of SPECIAL_MOVE_KEYS) {
     const inFrameData = hasFrameDataEntry(spec.key);
+    const inAttackFrames = hasAttackFrameEntry(spec.key);
     const inPoses = spec.key in (ROSTER.find(c => c.id === 'ryo')?.poses ?? {});
     let status = '';
-    if (inFrameData && inPoses) {
-      status = '[OK] pose + frame data';
+    if (inFrameData && inAttackFrames && inPoses) {
+      status = '[OK] pose + frame data + attack frames';
+    } else if (inFrameData && inAttackFrames) {
+      status = '[~~] frame data + attack frames (no pose)';
+    } else if (inFrameData && inPoses) {
+      status = '[~~] pose + frame data (no attack frames)';
+    } else if (inAttackFrames && inPoses) {
+      status = '[~~] pose + attack frames (no frame data)';
     } else if (inFrameData) {
-      status = '[~~] frame data only (no pose)';
+      status = '[~~] frame data only';
+    } else if (inAttackFrames) {
+      status = '[~~] attack frames only';
     } else if (inPoses) {
-      status = '[~~] pose only (no frame data)';
+      status = '[~~] pose only';
     } else {
       status = '[!!] MISSING';
     }
     console.log(`    ${spec.label.padEnd(28)} ${status}`);
   }
 
-  // Missing actions summary
+  // Missing items detail
+  console.log(dash);
+  let hasMissing = false;
+
   if (report.missingActions.length > 0) {
-    console.log(dash);
+    hasMissing = true;
     console.log('  MISSING ACTIONS (no pose data at all):');
     for (const name of report.missingActions) {
       console.log(`    - ${name}`);
     }
+  }
+
+  if (dimReport.attackFrames.missing.length > 0) {
+    hasMissing = true;
+    console.log('  MISSING ATTACK FRAMES (no ATTACK_FRAMES entry):');
+    for (const name of dimReport.attackFrames.missing) {
+      console.log(`    - ${name}`);
+    }
+  }
+
+  if (dimReport.feedback.missing.length > 0) {
+    hasMissing = true;
+    console.log('  MISSING FEEDBACK (no feedback tier):');
+    for (const name of dimReport.feedback.missing) {
+      console.log(`    - ${name}`);
+    }
+  }
+
+  if (dimReport.hurtbox.missing.length > 0) {
+    hasMissing = true;
+    console.log('  MISSING HURTBOX (no HURTBOX_TABLE entry):');
+    for (const name of dimReport.hurtbox.missing) {
+      console.log(`    - ${name}`);
+    }
+  }
+
+  if (dimReport.portrait.missing.length > 0) {
+    hasMissing = true;
+    console.log('  MISSING PORTRAITS:');
+    for (const name of dimReport.portrait.missing) {
+      console.log(`    - ${name}`);
+    }
+  }
+
+  if (dimReport.moveList.missing.length > 0) {
+    hasMissing = true;
+    console.log('  MISSING MOVELIST ENTRIES:');
+    for (const name of dimReport.moveList.missing) {
+      console.log(`    - ${name}`);
+    }
+  }
+
+  if (!hasMissing) {
+    console.log('  ALL DIMENSIONS COMPLETE - no missing items.');
   }
 
   console.log(line);

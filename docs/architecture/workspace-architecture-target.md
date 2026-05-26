@@ -97,6 +97,34 @@ config/
 
 当前代码不需要一次性变成上面结构，但所有新目录和迁移都必须朝这个方向靠拢。
 
+### 1.0.1 单角色内容包优先策略
+
+当前阶段的第一收口对象不是“所有角色”，而是“Ryo 单角色内容包”。
+
+这意味着：
+
+- Ryo 的定义、stats、commands、frameData、animations、hitboxes、feedback、portraits、completeness 应逐步收拢为一个统一内容包。
+- 运行时只消费该内容包导出的统一数据，不允许同一份 Ryo 内容继续散落在多个互不相干的文件里。
+- 其他角色先保持只读参考或兼容校验，不作为目录扩张理由。
+
+Ryo 内容包的目标形态应尽量接近：
+
+```text
+src/content/characters/ryo/
+  index.ts
+  definition.ts
+  stats.ts
+  commands.ts
+  frameData.ts
+  animations.ts
+  hitboxes.ts
+  feedback.ts
+  portraits.ts
+  completeness.ts
+```
+
+如果暂时做不到完全迁移，也必须保持一个明确的“单一真源”方向，不能让 Ryo 内容继续横向生长成多个来源。
+
 运行时代码内部结构应接近：
 
 ```text
@@ -236,6 +264,7 @@ src/content/characters/ryo/
 - 写通用 combat 算法。
 - 直接调用 Canvas。
 - 直接播放音效。
+- 把 Ryo 专属数据继续拆散到多个顶层目录里。
 
 ### 3.5 `rendering/`
 

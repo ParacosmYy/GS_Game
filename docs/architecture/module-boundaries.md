@@ -37,6 +37,12 @@ tools -> assets/core schema
 | Ryo feedback | `core/` 数据，`combat` 发事件，`rendering/audio` 响应 |
 | 完整度报告 | `tools/` 或 `tests/` |
 
+补充约束：
+
+- Ryo 的单一真源应逐步向 `src/content/characters/ryo/` 收口。
+- 如果某个 Ryo 专属数据还留在旧目录，必须说明它是过渡层而不是新来源。
+- 通用模块只负责消费数据，不负责替 Ryo 生成新的数据来源。
+
 ## 3. Frame Contract 边界
 
 Frame Contract 是多个模块的共享协议：
