@@ -26,6 +26,7 @@ import { getFeedback, inferTier, type FeedbackTier } from '../core/feedbackManif
 import { HURTBOX_TABLE } from '../core/hurtboxManifest.js';
 import type { Pose, PoseSet } from '../characters/types.js';
 import { FighterState, AttackType } from '../core/types.js';
+import { getResolvedFrameKey, drawRyoWinPose } from '../rendering/sprites/ryoHighResRender.js';
 
 // ===== Type Definitions =====
 
@@ -91,6 +92,8 @@ export interface RyoDimensionReport {
   portrait: DimensionResult;
   /** MoveList completeness */
   moveList: DimensionResult;
+  /** Visual pixel frame completeness (dedicated frames, not IDLE fallback) */
+  visualFrames: DimensionResult;
   /** Weighted overall score across all dimensions (0-100) */
   overallScore: number;
 }
@@ -281,6 +284,50 @@ const RYO_HURTBOX_STATES: { state: string; label: string }[] = [
   { state: FighterState.KNOCKDOWN, label: 'KNOCKDOWN' },
   { state: FighterState.CROUCH, label: 'CROUCH' },
   { state: FighterState.BLOCK, label: 'BLOCK' },
+];
+
+/** States that should have dedicated visual pixel frames (not IDLE fallback) */
+const RYO_VISUAL_FRAME_STATES: { key: string; label: string }[] = [
+  { key: 'IDLE', label: 'IDLE' },
+  { key: 'WALK_FORWARD', label: 'WALK_FORWARD' },
+  { key: 'WALK_BACKWARD', label: 'WALK_BACKWARD' },
+  { key: 'JUMP', label: 'JUMP' },
+  { key: 'CROUCH', label: 'CROUCH' },
+  { key: 'RUN', label: 'RUN' },
+  { key: 'BACKDASH', label: 'BACKDASH' },
+  { key: 'ROLL', label: 'ROLL' },
+  { key: 'BACK_ROLL', label: 'BACK_ROLL' },
+  { key: 'STAND_A', label: 'STAND_A' },
+  { key: 'STAND_B', label: 'STAND_B' },
+  { key: 'STAND_C', label: 'STAND_C' },
+  { key: 'STAND_D', label: 'STAND_D' },
+  { key: 'CLOSE_B', label: 'CLOSE_B' },
+  { key: 'CLOSE_D', label: 'CLOSE_D' },
+  { key: 'CROUCH_A', label: 'CROUCH_A' },
+  { key: 'CROUCH_B', label: 'CROUCH_B' },
+  { key: 'CROUCH_C', label: 'CROUCH_C' },
+  { key: 'CROUCH_D', label: 'CROUCH_D' },
+  { key: 'AIR_A', label: 'AIR_A' },
+  { key: 'AIR_C', label: 'AIR_C' },
+  { key: 'AIR_D', label: 'AIR_D' },
+  { key: 'KO_HOU', label: 'KO_HOU (DP)' },
+  { key: 'KOOU', label: 'KOOU (QCF)' },
+  { key: 'HIEN', label: 'HIEN (QCB)' },
+  { key: 'HAOU', label: 'HAOU (counter)' },
+  { key: 'KOOU_C', label: 'KOOU_C (strong)' },
+  { key: 'KO_HOU_C', label: 'KO_HOU_C (strong)' },
+  { key: 'DM_TEN_HA_OU', label: 'DM_TEN_HA_OU' },
+  { key: 'RYUKO_RANBU', label: 'RYUKO_RANBU (DM/SDM shared)' },
+  { key: 'SDM_TEN_HA_OU', label: 'SDM_TEN_HA_OU' },
+  { key: 'HSDM_RYUKO_RANBU', label: 'HSDM_RYUKO_RANBU' },
+  { key: 'HURT', label: 'HURT' },
+  { key: 'KNOCKDOWN', label: 'KNOCKDOWN' },
+  { key: 'BLOCK', label: 'BLOCK' },
+  { key: 'GUARD_CRUSH', label: 'GUARD_CRUSH' },
+  { key: 'MAX_MODE', label: 'MAX_MODE' },
+  { key: 'TAUNT', label: 'TAUNT' },
+  { key: 'COUNTER_STANCE', label: 'COUNTER_STANCE' },
+  { key: 'WIN', label: 'WIN' },
 ];
 
 // ===== Helper Functions =====
@@ -515,15 +562,82 @@ export function generateRyoDimensionReport(): RyoDimensionReport {
     },
   );
 
-  // Weighted overall score: action frames 30%, attack frames 20%, feedback 15%,
-  // hurtbox 10%, portrait 15%, moveList 10%
+  // 7. Visual Frames: dedicated pixel frames for each registry key
+  //    Use a state-to-key mapping to call hasHighResFrame correctly
+  const STATE_MAP: Record<string, { state: FighterState; attack?: AttackType }> = {
+    IDLE: { state: FighterState.IDLE },
+    WALK_FORWARD: { state: FighterState.WALK, attack: undefined },
+    WALK_BACKWARD: { state: FighterState.WALK, attack: undefined },
+    JUMP: { state: FighterState.JUMP },
+    CROUCH: { state: FighterState.CROUCH },
+    RUN: { state: FighterState.RUN },
+    BACKDASH: { state: FighterState.BACKDASH },
+    ROLL: { state: FighterState.ROLL },
+    BACK_ROLL: { state: FighterState.BACK_ROLL },
+    STAND_A: { state: FighterState.STAND_ATTACK, attack: AttackType.STAND_A },
+    STAND_B: { state: FighterState.STAND_ATTACK, attack: AttackType.STAND_B },
+    STAND_C: { state: FighterState.STAND_ATTACK, attack: AttackType.STAND_C },
+    STAND_D: { state: FighterState.STAND_ATTACK, attack: AttackType.STAND_D },
+    CLOSE_B: { state: FighterState.STAND_ATTACK, attack: AttackType.CLOSE_B },
+    CLOSE_D: { state: FighterState.STAND_ATTACK, attack: AttackType.CLOSE_D },
+    CROUCH_A: { state: FighterState.CROUCH_ATTACK, attack: AttackType.CROUCH_A },
+    CROUCH_B: { state: FighterState.CROUCH_ATTACK, attack: AttackType.CROUCH_B },
+    CROUCH_C: { state: FighterState.CROUCH_ATTACK, attack: AttackType.CROUCH_C },
+    CROUCH_D: { state: FighterState.CROUCH_ATTACK, attack: AttackType.CROUCH_D },
+    AIR_A: { state: FighterState.AIR_ATTACK, attack: AttackType.JUMP_A },
+    AIR_C: { state: FighterState.AIR_ATTACK, attack: AttackType.JUMP_C },
+    AIR_D: { state: FighterState.AIR_ATTACK, attack: AttackType.JUMP_D },
+    KO_HOU: { state: FighterState.STAND_ATTACK, attack: AttackType.RYO_KO_HOU },
+    KOOU: { state: FighterState.STAND_ATTACK, attack: AttackType.RYO_KOOU },
+    HIEN: { state: FighterState.STAND_ATTACK, attack: AttackType.RYO_HIEN },
+    HAOU: { state: FighterState.STAND_ATTACK, attack: AttackType.RYO_HAOU },
+    KOOU_C: { state: FighterState.STAND_ATTACK, attack: AttackType.RYO_KOOU_C },
+    KO_HOU_C: { state: FighterState.STAND_ATTACK, attack: AttackType.RYO_KO_HOU_C },
+    DM_TEN_HA_OU: { state: FighterState.STAND_ATTACK, attack: AttackType.DM_TEN_HA_OU },
+    DM_RYUKO_RANBU: { state: FighterState.STAND_ATTACK, attack: AttackType.DM_RYUKO_RANBU },
+    // RYUKO_RANBU resolves to 'RYUKO_RANBU' for both DM and SDM
+    RYUKO_RANBU: { state: FighterState.STAND_ATTACK, attack: AttackType.DM_RYUKO_RANBU },
+    SDM_TEN_HA_OU: { state: FighterState.STAND_ATTACK, attack: AttackType.SDM_TEN_HA_OU },
+    HSDM_RYUKO_RANBU: { state: FighterState.STAND_ATTACK, attack: AttackType.HSDM_RYUKO_RANBU },
+    HURT: { state: FighterState.HITSTUN },
+    KNOCKDOWN: { state: FighterState.KNOCKDOWN },
+    BLOCK: { state: FighterState.BLOCK },
+    GUARD_CRUSH: { state: FighterState.GUARD_CRUSH },
+    MAX_MODE: { state: FighterState.MAX_MODE },
+    TAUNT: { state: FighterState.TAUNT },
+    COUNTER_STANCE: { state: FighterState.COUNTER_STANCE },
+    WIN: { state: FighterState.IDLE }, // WIN uses dedicated 'WIN' key, not a FighterState
+  };
+  const visualFrames = buildDimension(
+    'Visual Frames',
+    RYO_VISUAL_FRAME_STATES,
+    (key) => {
+      // WIN is a dedicated key not mapped through FighterState
+      if (key === 'WIN') {
+        return typeof drawRyoWinPose === 'function';
+      }
+      const mapping = STATE_MAP[key];
+      if (!mapping) return false;
+      // For walk, need to pass vx to distinguish forward/backward
+      let vx = 0;
+      if (key === 'WALK_FORWARD') vx = 1;
+      if (key === 'WALK_BACKWARD') vx = -1;
+      const resolvedKey = getResolvedFrameKey('ryo', mapping.state, mapping.attack, vx, 1);
+      // Must resolve to its own dedicated key, not fallback to IDLE/CROUCH
+      return resolvedKey === key;
+    },
+  );
+
+  // Weighted overall score: action frames 20%, attack frames 15%, feedback 10%,
+  // hurtbox 5%, portrait 10%, moveList 5%, visual frames 35%
   const weights = [
-    { result: actionFrames, weight: 0.30 },
-    { result: attackFrames, weight: 0.20 },
-    { result: feedback, weight: 0.15 },
-    { result: hurtbox, weight: 0.10 },
-    { result: portrait, weight: 0.15 },
-    { result: moveList, weight: 0.10 },
+    { result: actionFrames, weight: 0.20 },
+    { result: attackFrames, weight: 0.15 },
+    { result: feedback, weight: 0.10 },
+    { result: hurtbox, weight: 0.05 },
+    { result: portrait, weight: 0.10 },
+    { result: moveList, weight: 0.05 },
+    { result: visualFrames, weight: 0.35 },
   ];
 
   const overallScore = Math.round(
@@ -537,6 +651,7 @@ export function generateRyoDimensionReport(): RyoDimensionReport {
     hurtbox,
     portrait,
     moveList,
+    visualFrames,
     overallScore,
   };
 }
@@ -611,6 +726,7 @@ export function printRyoReport(): void {
     { dim: dimReport.hurtbox, label: 'Hurtbox' },
     { dim: dimReport.portrait, label: 'Portrait' },
     { dim: dimReport.moveList, label: 'MoveList' },
+    { dim: dimReport.visualFrames, label: 'Visual Frames' },
   ];
 
   for (const { dim, label } of dimensions) {
@@ -726,6 +842,14 @@ export function printRyoReport(): void {
     hasMissing = true;
     console.log('  MISSING MOVELIST ENTRIES:');
     for (const name of dimReport.moveList.missing) {
+      console.log(`    - ${name}`);
+    }
+  }
+
+  if (dimReport.visualFrames.missing.length > 0) {
+    hasMissing = true;
+    console.log('  MISSING VISUAL FRAMES (no dedicated pixel frame set):');
+    for (const name of dimReport.visualFrames.missing) {
       console.log(`    - ${name}`);
     }
   }

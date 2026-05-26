@@ -39,6 +39,8 @@ import {
   RYO_GUARD_CRUSH_FRAMES, RYO_MAX_MODE_FRAMES, RYO_TAUNT_FRAMES,
   RYO_COUNTER_STANCE_FRAMES, RYO_RYUKO_RANBU_FRAMES,
 } from './ryoMovementFrames.js';
+import { RYO_BLOCK_FRAMES } from './ryoBlockFrames.js';
+import { RYO_WIN_FRAMES } from './ryoWinFrames.js';
 
 // ===== Internal Frame Registry =====
 //
@@ -186,7 +188,8 @@ function initAllFrames(): void {
   registerFrames('ROLL', RYO_ROLL_FRAMES, 4);
   registerFrames('BACK_ROLL', RYO_BACK_ROLL_FRAMES, 4);
 
-  // SUB-STATES — guard crush, MAX mode, taunt, counter
+  // SUB-STATES — guard crush, MAX mode, taunt, counter, block
+  registerFrames('BLOCK', RYO_BLOCK_FRAMES, 8);
   registerFrames('GUARD_CRUSH', RYO_GUARD_CRUSH_FRAMES, 8);
   registerFrames('MAX_MODE', RYO_MAX_MODE_FRAMES, 6);
   registerFrames('TAUNT', RYO_TAUNT_FRAMES, 12);
@@ -194,6 +197,9 @@ function initAllFrames(): void {
 
   // SUPERS — Ryuko Ranbu (SDM/HSDM)
   registerFrames('RYUKO_RANBU', RYO_RYUKO_RANBU_FRAMES, 5);
+
+  // WIN POSE — arms crossed victory
+  registerFrames('WIN', RYO_WIN_FRAMES, 12);
 }
 
 // ===== State Resolution =====
@@ -328,7 +334,7 @@ function resolveFrameKey(
 
     case FighterState.BLOCK:
     case FighterState.AIR_BLOCK:
-      return 'IDLE';
+      return 'BLOCK';
 
     case FighterState.DIZZY:
       return 'IDLE';
@@ -435,6 +441,28 @@ export function drawHighResFrame(
 
   // Compute scale dynamically so all frame sizes display at the same target height.
   // 48x72 frames -> scale 2 (72*2=144), 96x144 frames -> scale 1 (144*1=144).
+  const scale = RYO_TARGET_DISPLAY_HEIGHT / frame.height;
+  drawPixelFrame(ctx, frame, x, y, scale, facing, palette);
+  return true;
+}
+
+/**
+ * Draw Ryo's win/victory pose. Called directly during WIN_QUOTE game phase.
+ */
+export function drawRyoWinPose(
+  ctx: CanvasRenderingContext2D,
+  stateAge: number,
+  x: number,
+  y: number,
+  facing: number,
+): boolean {
+  initAllFrames();
+  const entry = RYO_FRAMES.get('WIN');
+  if (!entry) return false;
+  const { frames, palette, ticksPerFrame } = entry;
+  if (frames.length === 0) return false;
+  const frameIdx = Math.floor(stateAge / ticksPerFrame) % frames.length;
+  const frame = frames[frameIdx];
   const scale = RYO_TARGET_DISPLAY_HEIGHT / frame.height;
   drawPixelFrame(ctx, frame, x, y, scale, facing, palette);
   return true;
