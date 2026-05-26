@@ -223,3 +223,9 @@
 ## H85: hit callback combat测试—37项验证 — 57→58
 
 **commit:** <hash> | classifyAttack+getDamageSizeScale+hitstop层级+Ryo VFX+combo scaling+KO ground effect
+
+---
+
+## H86: combat system类型和常量测试—73项验证 — 58→59
+
+**commit:** <hash> | cancelWindow+attackClassifier+combatConstants+stunDizzy+guardCrush+attackSets+Ryo validation+enum completeness
