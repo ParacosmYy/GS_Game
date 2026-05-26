@@ -751,3 +751,9 @@
 ## H166: overlayScreens—5项验证getSuperFlashZoom+updateSuperFlashZoom缩放逻辑 — 138→139
 
 **commit:** <hash> | overlayScreens—5项验证getSuperFlashZoom+updateSuperFlashZoom缩放逻辑
+
+---
+
+## H167: announcerOverlay—6项验证trigger/tick/isActive/getCurrentEventType/clear/queue — 139→140
+
+**commit:** <hash> | announcerOverlay—6项验证trigger/tick/isActive/getCurrentEventType/clear/queue
