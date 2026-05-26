@@ -257,15 +257,23 @@ function resolveFrameKey(
         return 'HSDM_RYUKO_RANBU';
       }
       // Default to STAND_A for STAND_A, CLOSE_A, and any other stand attack
+      // STAND_B/CLOSE_B use light punch sprite (no dedicated kick sprite yet)
+      // STAND_D/CLOSE_D use heavy punch sprite
+      if (currentAttack === AttackType.STAND_D || currentAttack === AttackType.CLOSE_D) {
+        return 'STAND_C';
+      }
       return 'STAND_A';
 
     case FighterState.CROUCH:
       return 'CROUCH';
 
     case FighterState.CROUCH_ATTACK:
-      // Resolve crouch attack type: CROUCH_C/CROUCH_D -> heavy, else light
+      // Resolve crouch attack: C/C/D -> heavy sprite, A/B -> light sprite
       if (currentAttack === AttackType.CROUCH_C || currentAttack === AttackType.CROUCH_D) {
         return 'CROUCH_C';
+      }
+      if (currentAttack === AttackType.CROUCH_B) {
+        return 'CROUCH_A'; // no dedicated crouch_b sprite, use crouch_a
       }
       return 'CROUCH_A';
 
