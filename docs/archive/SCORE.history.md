@@ -1001,3 +1001,9 @@
 ## H202: charDefBatch8—25项验证Leona/Mai/Mary/Mature/Robert角色定义 — 174→175
 
 **commit:** <hash> | charDefBatch8—25项验证Leona/Mai/Mary/Mature/Robert角色定义
+
+---
+
+## H203: charDefBatch9—30项验证Shermie/Terry/Vice/Xiangfei/Yamazaki/Yashiro角色定义 — 175→176
+
+**commit:** <hash> | charDefBatch9—30项验证Shermie/Terry/Vice/Xiangfei/Yamazaki/Yashiro角色定义
