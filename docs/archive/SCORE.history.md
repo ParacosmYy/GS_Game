@@ -5315,3 +5315,30 @@
 **下一轮方向：** 角色placeholder渲染优化+音频触发链细化+AI策略丰富度
 
 **commit: cd52ff0 | 下一目标: 568 (还需+5)**
+
+## Iter-H47 — AI策略+连击试炼+防御可视化+音频链+回放增强 (563→563)
+
+**日期:** 2026-05-26
+
+**本轮类型:** 系统广度迭代
+
+**实质性改变:**
+- AI策略丰富(22测试): shouldAntiAir/shouldPunish/shouldZone/shouldMeaty
+- 连击试炼系统(25测试): 类型+评估+Kyo/Iori/Ryo各5试炼
+- 防御槽视觉(18测试): guardGaugeMax/isGuardCrushed/getGuardGaugeVisualState
+- 音频触发链(24测试): SFX层级/时序/KO/角色特定/BGM duck
+- 回放增强(22测试): 确定性/输入记录/快进/快照/版本
+- 舞台摄像机(24测试): 跟踪/边界/震动/KO缩放
+- 眩晕系统(20测试): 积累/触发/恢复/视觉/连段
+- 角色漂浮修复: refY锚点从displayHeight改为hipY+legH/2
+- 测试总数: 5183→5338 (+155)
+
+**本轮不加分原因:** 新评分规则要求聚焦Ryo样板闭环;本轮是系统广度扩展,不直接服务Ryo
+
+**更像KOF在哪里:** AI行为更智能;连击试炼框架可服务Ryo练习
+
+**仍不像KOF在哪里:** 角色仍是骨骼棍人,没有sprite;Ryo没有样板闭环
+
+**下一轮最小任务:** Ryo样板闭环 — 参考MUGEN .air帧数据,改进Ryo骨骼渲染+动作帧
+
+**commit: 9452dd1 | 下一目标: 568 (聚焦Ryo样板)**
