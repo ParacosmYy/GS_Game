@@ -319,3 +319,9 @@
 ## H101: input log测试—16项验证record+dump/load+meta+clear — 73→74
 
 **commit:** <hash> | input log测试—16项验证record+dump/load+meta+clear
+
+---
+
+## H102: replay snapshot测试—16项验证FNV1a+checksum+recorder+verifier — 74→75
+
+**commit:** <hash> | replay snapshot测试—16项验证FNV1a+checksum+recorder+verifier
