@@ -14,6 +14,7 @@ import {
   HUD_GAUGE_SEGMENT_GAP, HUD_WIN_MARKER_SIZE,
 } from '../core/constants.js';
 import { shiftColor, roundRect, drawSNKText } from './utils.js';
+import { drawRyoPortrait } from './skeletalParts.js';
 
 // ===== SNK pixel font rendering =====
 const PIXEL_FONT_SCALE = 2;
@@ -173,6 +174,54 @@ const comboAnim: [ComboAnimState, ComboAnimState] = [
   { displayed: 0, scale: 1, prevCount: 0 },
 ];
 
+/** HUD portrait size constants */
+const HUD_PORTRAIT_SIZE = 30;
+
+/**
+ * Draw character portrait in HUD area.
+ * Uses drawRyoPortrait for Ryo, falls back to simple colored square for others.
+ */
+function drawHUDPortrait(
+  ctx: CanvasRenderingContext2D,
+  charId: string,
+  x: number, y: number,
+  healthPercent: number,
+): void {
+  if (charId === 'ryo') {
+    drawRyoPortrait(ctx, x, y, HUD_PORTRAIT_SIZE, HUD_PORTRAIT_SIZE, healthPercent, 0);
+  } else {
+    // Fallback: simple colored square with first letter
+    const colors: Record<string, string> = {
+      kyo: '#FF6600', iori: '#AA1133', terry: '#CC8800', andy: '#FFAA22',
+      joe: '#FF8800', kim: '#2288CC', chang: '#885522', choi: '#66CC66',
+      robert: '#22AA44', leona: '#2266BB', ralf: '#CC6633', clark: '#556B2F',
+      athena: '#FF66AA', mai: '#FF4488', kdash: '#444466', kula: '#4488CC',
+      yashiro: '#664488', shermie: '#CC44AA', chris: '#FF8844',
+      mature: '#882255', vice: '#3366AA', billy: '#4488CC', yamazaki: '#556622',
+      mary: '#5588CC', xiangfei: '#EE6688', kasumi: '#DD4466',
+    };
+    const col = colors[charId] ?? '#888';
+    ctx.fillStyle = '#0a0a18';
+    roundRect(ctx, x, y, HUD_PORTRAIT_SIZE, HUD_PORTRAIT_SIZE, 3);
+    ctx.fill();
+    const grad = ctx.createLinearGradient(x, y, x + HUD_PORTRAIT_SIZE, y + HUD_PORTRAIT_SIZE);
+    grad.addColorStop(0, col);
+    grad.addColorStop(1, shiftColor(col, -40));
+    ctx.fillStyle = grad;
+    roundRect(ctx, x + 2, y + 2, HUD_PORTRAIT_SIZE - 4, HUD_PORTRAIT_SIZE - 4, 2);
+    ctx.fill();
+    ctx.font = 'bold 14px "Courier New", monospace';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = '#fff';
+    ctx.fillText(charId[0].toUpperCase(), x + HUD_PORTRAIT_SIZE / 2, y + HUD_PORTRAIT_SIZE / 2);
+    ctx.strokeStyle = 'rgba(200, 168, 50, 0.4)';
+    ctx.lineWidth = 1;
+    roundRect(ctx, x, y, HUD_PORTRAIT_SIZE, HUD_PORTRAIT_SIZE, 3);
+    ctx.stroke();
+  }
+}
+
 export function drawHUD(ctx: CanvasRenderingContext2D, fighters: Fighter[], tick: number, delayedHealth: [number, number], p1Wins: number = 0, p2Wins: number = 0, p1Name: string = '', p2Name: string = '', currentRound: number = 1, firstAttacker: number | null = null): void {
   if (fighters.length < 2) return;
 
@@ -198,6 +247,15 @@ export function drawHUD(ctx: CanvasRenderingContext2D, fighters: Fighter[], tick
   ctx.strokeStyle = borderGrad;
   ctx.lineWidth = 2;
   ctx.beginPath(); ctx.moveTo(0, 62); ctx.lineTo(CANVAS_WIDTH, 62); ctx.stroke();
+
+  // ===== Character portraits in HUD =====
+  const p1PortraitX = HUD_MARGIN - HUD_PORTRAIT_SIZE - 6;
+  const p1PortraitY = HUD_BAR_Y - 2;
+  drawHUDPortrait(ctx, fighters[0].charId, p1PortraitX, p1PortraitY, Math.max(0, fighters[0].health / MAX_HEALTH));
+
+  const p2PortraitX = CANVAS_WIDTH - HUD_MARGIN + 6;
+  const p2PortraitY = HUD_BAR_Y - 2;
+  drawHUDPortrait(ctx, fighters[1].charId, p2PortraitX, p2PortraitY, Math.max(0, fighters[1].health / MAX_HEALTH));
 
   // ===== P1 side =====
   drawSNKText(ctx, '1P', HUD_MARGIN + 8, HUD_BAR_Y - 3, 12, '#ff4444', '#000000', 'center');

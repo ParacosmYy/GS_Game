@@ -61,6 +61,23 @@
 5. 输出本轮 PM/玩家/研发/测试/架构结论。
 6. 写方案后再实施。
 
+## 4.0 并行子 agent 编队
+
+每轮默认调用 8 个并行子 agent：
+
+- 架构师 A：总架构与边界。
+- 架构师 B：Frame Contract 与资产管线。
+- 研发 A：simulation / combat。
+- 研发 B：content / character。
+- 研发 C：rendering / animation。
+- 研发 D：tools / asset pipeline。
+- 产品经理：玩家价值、范围、验收。
+- 测试负责人：自动测试、手测、回归风险。
+
+允许范围是 6-9 个子 agent。低于 6 个视为流程不完整。涉及换栈、大迁移、资产管线时建议增加第 9 个“参考研究员”或“发布集成负责人”。
+
+如果当前工具环境无法创建子 agent，必须写明原因，并在主线程按同样角色逐项输出结论。不能假装已经并行调用。
+
 ## 4.1 大型项目化方向
 
 所有后续迁移都必须朝 [工作区目标架构](docs/architecture/workspace-architecture-target.md) 收敛：

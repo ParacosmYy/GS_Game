@@ -1,6 +1,96 @@
 # 角色协同模板
 
-每轮迭代必须进行多角色评审。可以调用子 agent，也可以由主 agent 模拟，但输出必须完整。
+每轮迭代必须进行多角色评审。默认必须并行调用 8 个子 agent；允许范围为 6-9 个。
+
+默认角色配比：
+
+- 2 个架构师。
+- 4 个研发工程师。
+- 1 个产品经理。
+- 1 个测试负责人。
+
+如果任务特别小，最低也必须 6 个角色；如果任务涉及换栈、资产管线或大迁移，建议 9 个角色。
+
+如果工具环境无法创建子 agent，主 agent 必须明确说明原因，并在同一轮中按本文模板逐项模拟这些角色的结论。不得写成“已调用子 agent”。
+
+## 0. 默认 8 角色并行编队
+
+### 0.1 架构师 A：总架构与边界
+
+关注：
+
+- 是否符合 [工作区目标架构](../architecture/workspace-architecture-target.md)。
+- 是否保持 `app / engine / simulation / content / rendering / audio / tools` 分层。
+- 是否需要新增目录、迁移目录或保留兼容层。
+- 是否违反模块依赖方向。
+
+### 0.2 架构师 B：Frame Contract 与资产管线
+
+关注：
+
+- 视觉帧、判定帧、反馈事件是否同源。
+- manifest 是否可验证。
+- 运行时是否只消费 manifest。
+- 工具层是否和运行时分离。
+
+### 0.3 研发 A：simulation / combat
+
+关注：
+
+- Fighter 状态、物理、hit resolution。
+- hitstop / hitstun / pushback / cancel。
+- replay determinism。
+
+### 0.4 研发 B：content / character
+
+关注：
+
+- Ryo content package。
+- stats、commands、frameData、animations、hitboxes、feedback。
+- 角色数据是否泄露到通用系统。
+
+### 0.5 研发 C：rendering / animation
+
+关注：
+
+- Canvas2D 渲染。
+- sprite / skeletal fallback。
+- debug overlay。
+- 视觉帧是否来自 manifest。
+
+### 0.6 研发 D：tools / asset pipeline
+
+关注：
+
+- atlas 生成。
+- manifest validator。
+- completeness report。
+- 资产授权与来源记录。
+
+### 0.7 产品经理
+
+关注：
+
+- 玩家价值。
+- 本轮是否让 Ryo 更像 KOF。
+- 验收标准。
+- 非目标和 scope 控制。
+
+### 0.8 测试负责人
+
+关注：
+
+- 自动测试。
+- 手测路径。
+- 回归风险。
+- 质量门禁。
+
+## 0.9 可选第 9 角色
+
+当任务涉及参考资料、SNK/MUGEN/IKEMEN 对标或大型迁移时，可增加：
+
+- 参考研究员：只研究公开资料和本地 `references/`，不得复制商业素材。
+- 发布/集成负责人：关注构建、chunk、CI、分支、提交边界。
 
 ## 1. PM 模板
 

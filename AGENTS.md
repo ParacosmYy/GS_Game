@@ -67,7 +67,7 @@
 2. `读取约束`：读 `AGENTS.md`、`CLAUDE.md`、[Ryo 样板线](docs/product/ryo-vertical-slice-plan.md)、[迭代流程](docs/process/iteration-workflow.md)。
 3. `决策门`：按 [决策门](docs/process/decision-gates.md) 判断本轮是否允许实施。
 4. `研究参考`：查 `references/mugen/` 或公开资料，只学习数据组织和工具链，不复制受保护素材。
-5. `角色评审`：按 [角色协同模板](docs/process/role-prompts.md) 输出 PM、玩家、研发、测试、架构结论。
+5. `并行协作`：按 [角色协同模板](docs/process/role-prompts.md) 默认调用 8 个子 agent，允许 6-9 个；最少覆盖 2 架构、4 研发、1 产品、1 测试。
 6. `方案`：写清本轮目标、范围、非目标、文件归属、验收、回退。
 7. `实施`：只做本轮闭环，不扩张。
 8. `验证`：按 [质量门禁](docs/process/quality-gates.md) 执行。
@@ -75,6 +75,8 @@
 10. `提交`：按 [Git 规则](docs/process/git-rules.md) 中文 Conventional Commit。
 
 没有验收标准的改动不得实施。不能说明“更接近 KOF 在哪里”的改动不得加分。
+
+如果工具环境无法创建子 agent，必须显式记录失败原因，并由主 agent 按同样角色清单补齐结论。不得伪造“已调用”。
 
 ## 5. 架构铁律
 
@@ -131,3 +133,4 @@ npx vite build
 - [质量门禁](docs/process/quality-gates.md)：验证规则。
 - [评分规则](docs/process/scoring.md)：千分制和 +5 规则。
 - [Git 规则](docs/process/git-rules.md)：提交规则。
+- [格斗游戏工程架构参考](docs/reference/fighting-game-architecture-reference.md)：公开可参考的成熟格斗工程分层。

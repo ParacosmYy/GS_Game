@@ -47,6 +47,8 @@ npx vitest run
 5. [角色协同模板](docs/process/role-prompts.md)：PM、玩家、研发、测试、架构评审。
 6. [决策门](docs/process/decision-gates.md)：每类重大决策的允许条件。
 
+每轮默认需要 8 个并行角色协同：2 架构、4 研发、1 产品、1 测试；允许范围 6-9 个。
+
 架构相关：
 
 - [当前架构](docs/architecture/current-architecture.md)
@@ -70,6 +72,7 @@ npx vitest run
 参考：
 
 - [公开参考源](docs/reference/public-research-sources.md)
+- [格斗游戏工程架构参考](docs/reference/fighting-game-architecture-reference.md)
 - [操作说明](docs/reference/controls.md)
 
 ## 当前禁止方向

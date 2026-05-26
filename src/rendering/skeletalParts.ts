@@ -1091,6 +1091,458 @@ function drawHair(ctx: CanvasRenderingContext2D, charId: string, facing: number,
   }
 }
 
+// ===== Ryo portrait rendering — HUD & select screen =====
+
+/** Ryo color palette variants for A/B/C/D color indices */
+const RYO_COLOR_PALETTES: Array<{ hair: string; headband: string; skin: string; gi: string; giShadow: string }> = [
+  // A: classic orange gi, gold-brown hair
+  { hair: '#8B6914', headband: '#cc2222', skin: '#e8b07d', gi: '#f7f4ee', giShadow: '#d5cec2' },
+  // B: dark gi, lighter hair
+  { hair: '#a07828', headband: '#2255cc', skin: '#e8b07d', gi: '#2a2a3a', giShadow: '#1a1a2a' },
+  // C: red gi, dark hair
+  { hair: '#5a4020', headband: '#cc2222', skin: '#e8b07d', gi: '#cc3333', giShadow: '#992222' },
+  // D: green gi, gold hair
+  { hair: '#b8901a', headband: '#225522', skin: '#e8b07d', gi: '#338844', giShadow: '#226633' },
+];
+
+function getRyoPalette(colorIndex: number) {
+  return RYO_COLOR_PALETTES[Math.max(0, Math.min(3, colorIndex))] ?? RYO_COLOR_PALETTES[0];
+}
+
+/**
+ * Draw Ryo's HUD portrait — small face closeup for health bar area.
+ *
+ * Health-dependent effects:
+ *   > 50%: normal expression
+ *   25-50%: slightly bruised (darker shadows)
+ *   < 25%: desperation (red tint, sweat drops)
+ */
+export function drawRyoPortrait(
+  ctx: CanvasRenderingContext2D,
+  x: number, y: number,
+  width: number, height: number,
+  healthPercent: number,
+  colorIndex: number,
+): void {
+  ctx.save();
+  ctx.translate(x, y);
+
+  const pal = getRyoPalette(colorIndex);
+  const isLow = healthPercent < 0.5;
+  const isDesperate = healthPercent < 0.25;
+
+  // Clip to portrait bounds
+  ctx.beginPath();
+  roundRect(ctx, 0, 0, width, height, 3);
+  ctx.clip();
+
+  // Background
+  const bgGrad = ctx.createLinearGradient(0, 0, 0, height);
+  bgGrad.addColorStop(0, '#0a0a18');
+  bgGrad.addColorStop(1, '#151520');
+  ctx.fillStyle = bgGrad;
+  ctx.fillRect(0, 0, width, height);
+
+  // Center the head within the portrait box
+  const cx = width / 2;
+  const cy = height * 0.45;
+  const headR = Math.min(width, height) * 0.36;
+
+  // Head shape — skin with gradient
+  const skinGrad = ctx.createRadialGradient(cx - 1, cy - 1, 0, cx, cy, headR);
+  skinGrad.addColorStop(0, shiftColor(pal.skin, 20));
+  skinGrad.addColorStop(0.7, pal.skin);
+  skinGrad.addColorStop(1, shiftColor(pal.skin, -20));
+  ctx.fillStyle = skinGrad;
+  ctx.beginPath();
+  ctx.ellipse(cx, cy, headR * 0.92, headR, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Desperation red tint overlay
+  if (isDesperate) {
+    ctx.fillStyle = 'rgba(200, 30, 10, 0.15)';
+    ctx.beginPath();
+    ctx.ellipse(cx, cy, headR * 0.92, headR, 0, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // Low health darker shadows
+  if (isLow) {
+    ctx.fillStyle = 'rgba(60, 20, 10, 0.18)';
+    ctx.beginPath();
+    ctx.ellipse(cx + headR * 0.3, cy + headR * 0.3, headR * 0.5, headR * 0.6, 0.3, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // Hair — short spiky swept-back style
+  ctx.fillStyle = pal.hair;
+  const hairSpikes = [[-0.5, -1.1], [-0.15, -1.4], [0.15, -1.3], [0.45, -1.0]];
+  for (const [sx, sy] of hairSpikes) {
+    const spikeX = cx + sx * headR;
+    const spikeY = cy + sy * headR;
+    ctx.beginPath();
+    ctx.moveTo(spikeX - headR * 0.15, cy - headR + headR * 0.08);
+    ctx.lineTo(spikeX, spikeY);
+    ctx.lineTo(spikeX + headR * 0.15, cy - headR + headR * 0.08);
+    ctx.closePath();
+    ctx.fill();
+  }
+  // Hair base
+  ctx.beginPath();
+  ctx.moveTo(cx - headR * 0.88, cy - headR + headR * 0.12);
+  ctx.quadraticCurveTo(cx, cy - headR - headR * 0.15, cx + headR * 0.88, cy - headR + headR * 0.12);
+  ctx.lineTo(cx + headR * 0.85, cy - headR + headR * 0.22);
+  ctx.lineTo(cx - headR * 0.85, cy - headR + headR * 0.22);
+  ctx.closePath();
+  ctx.fill();
+
+  // Red headband — Ryo's signature
+  ctx.fillStyle = pal.headband;
+  ctx.fillRect(cx - headR * 0.9, cy - headR + headR * 0.08, headR * 1.8, headR * 0.18);
+  // Headband tails
+  ctx.strokeStyle = shiftColor(pal.headband, -30);
+  ctx.lineWidth = Math.max(1, headR * 0.06);
+  ctx.beginPath();
+  ctx.moveTo(cx - headR * 0.6, cy - headR + headR * 0.15);
+  ctx.lineTo(cx - headR * 0.85, cy - headR + headR * 0.4);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(cx - headR * 0.55, cy - headR + headR * 0.2);
+  ctx.lineTo(cx - headR * 0.75, cy - headR + headR * 0.5);
+  ctx.stroke();
+
+  // Eyes — determined stare
+  const eyeSpacing = headR * 0.3;
+  const eyeY = cy - headR * 0.05;
+  const eyeR = headR * 0.12;
+  for (const side of [-1, 1]) {
+    const ex = cx + side * eyeSpacing;
+    // Sclera
+    ctx.fillStyle = '#fff';
+    ctx.beginPath();
+    ctx.ellipse(ex, eyeY, eyeR, eyeR + 0.5, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#333';
+    ctx.lineWidth = 0.5;
+    ctx.stroke();
+    // Iris
+    ctx.fillStyle = '#4169E1';
+    ctx.beginPath();
+    ctx.arc(ex + 1, eyeY, eyeR * 0.55, 0, Math.PI * 2);
+    ctx.fill();
+    // Pupil
+    ctx.fillStyle = '#111';
+    ctx.beginPath();
+    ctx.arc(ex + 1.2, eyeY, eyeR * 0.28, 0, Math.PI * 2);
+    ctx.fill();
+    // Eye shine
+    ctx.fillStyle = 'rgba(255,255,255,0.6)';
+    ctx.beginPath();
+    ctx.arc(ex + 0.5, eyeY - eyeR * 0.2, eyeR * 0.2, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // Strong brow ridge — Ryo's determined glare
+  ctx.strokeStyle = shiftColor(pal.hair, -30);
+  ctx.lineWidth = Math.max(1.5, headR * 0.07);
+  for (const side of [-1, 1]) {
+    const browX = cx + side * eyeSpacing;
+    ctx.beginPath();
+    ctx.moveTo(browX - headR * 0.15, eyeY - headR * 0.2 - side * headR * 0.04);
+    ctx.lineTo(browX + headR * 0.15, eyeY - headR * 0.22 + side * headR * 0.04);
+    ctx.stroke();
+  }
+
+  // Nose
+  ctx.fillStyle = shiftColor(pal.skin, -12);
+  ctx.beginPath();
+  ctx.arc(cx + 1, cy + headR * 0.15, headR * 0.04, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Mouth — determined line, slight grimace when low health
+  const mouthY = cy + headR * 0.4;
+  ctx.strokeStyle = shiftColor(pal.skin, -40);
+  ctx.lineWidth = Math.max(1, headR * 0.04);
+  ctx.beginPath();
+  if (isDesperate) {
+    // Grimace — downturned
+    ctx.moveTo(cx - headR * 0.15, mouthY - headR * 0.02);
+    ctx.quadraticCurveTo(cx, mouthY + headR * 0.05, cx + headR * 0.15, mouthY - headR * 0.02);
+  } else {
+    // Determined line
+    ctx.moveTo(cx - headR * 0.12, mouthY);
+    ctx.lineTo(cx + headR * 0.12, mouthY);
+  }
+  ctx.stroke();
+
+  // Jaw line — strong defined jaw
+  ctx.strokeStyle = shiftColor(pal.skin, -25);
+  ctx.lineWidth = Math.max(0.8, headR * 0.03);
+  ctx.beginPath();
+  ctx.moveTo(cx - headR * 0.55, cy + headR * 0.55);
+  ctx.quadraticCurveTo(cx - headR * 0.35, cy + headR * 0.85, cx, cy + headR * 0.9);
+  ctx.quadraticCurveTo(cx + headR * 0.35, cy + headR * 0.85, cx + headR * 0.55, cy + headR * 0.55);
+  ctx.stroke();
+
+  // Sweat drops when desperate
+  if (isDesperate) {
+    ctx.fillStyle = 'rgba(120, 200, 255, 0.7)';
+    const sweatX = cx + headR * 0.7;
+    const sweatY = cy - headR * 0.3;
+    ctx.beginPath();
+    ctx.moveTo(sweatX, sweatY - headR * 0.06);
+    ctx.quadraticCurveTo(sweatX + headR * 0.04, sweatY, sweatX, sweatY + headR * 0.04);
+    ctx.quadraticCurveTo(sweatX - headR * 0.04, sweatY, sweatX, sweatY - headR * 0.06);
+    ctx.fill();
+    // Second smaller drop
+    ctx.fillStyle = 'rgba(120, 200, 255, 0.5)';
+    ctx.beginPath();
+    ctx.moveTo(sweatX - headR * 0.1, sweatY + headR * 0.12);
+    ctx.quadraticCurveTo(sweatX - headR * 0.06, sweatY + headR * 0.16, sweatX - headR * 0.1, sweatY + headR * 0.19);
+    ctx.quadraticCurveTo(sweatX - headR * 0.14, sweatY + headR * 0.16, sweatX - headR * 0.1, sweatY + headR * 0.12);
+    ctx.fill();
+  }
+
+  // Portrait border
+  ctx.strokeStyle = 'rgba(200, 168, 50, 0.6)';
+  ctx.lineWidth = 1;
+  roundRect(ctx, 0, 0, width, height, 3);
+  ctx.stroke();
+
+  ctx.restore();
+}
+
+/**
+ * Draw Ryo's select screen portrait — larger upper body bust.
+ *
+ * Shows: head + shoulders + gi V-neck + red headband.
+ * Slight 3/4 view angle simulated with offset features.
+ */
+export function drawRyoSelectPortrait(
+  ctx: CanvasRenderingContext2D,
+  x: number, y: number,
+  size: number,
+  colorIndex: number,
+): void {
+  ctx.save();
+  ctx.translate(x, y);
+
+  const pal = getRyoPalette(colorIndex);
+
+  // Clip to portrait bounds
+  ctx.beginPath();
+  roundRect(ctx, 0, 0, size, size, 6);
+  ctx.clip();
+
+  // Background gradient
+  const bgGrad = ctx.createRadialGradient(size * 0.5, size * 0.4, 0, size * 0.5, size * 0.5, size * 0.7);
+  bgGrad.addColorStop(0, '#1a1520');
+  bgGrad.addColorStop(1, '#080810');
+  ctx.fillStyle = bgGrad;
+  ctx.fillRect(0, 0, size, size);
+
+  // Center of portrait — slightly off-center for 3/4 view feel
+  const cx = size * 0.48;
+  const headCy = size * 0.35;
+  const headR = size * 0.22;
+
+  // === Shoulders / Gi top ===
+  const shoulderY = size * 0.62;
+  const shoulderW = size * 0.7;
+
+  // Gi body
+  const giGrad = ctx.createLinearGradient(cx - shoulderW / 2, shoulderY, cx + shoulderW / 2, shoulderY + size * 0.4);
+  giGrad.addColorStop(0, pal.gi);
+  giGrad.addColorStop(0.5, shiftColor(pal.gi, -10));
+  giGrad.addColorStop(1, pal.giShadow);
+  ctx.fillStyle = giGrad;
+  ctx.beginPath();
+  ctx.moveTo(cx - shoulderW / 2, shoulderY);
+  ctx.quadraticCurveTo(cx - shoulderW / 2 - size * 0.05, shoulderY + size * 0.15, cx - shoulderW / 2 + size * 0.05, size);
+  ctx.lineTo(cx + shoulderW / 2 - size * 0.05, size);
+  ctx.quadraticCurveTo(cx + shoulderW / 2 + size * 0.05, shoulderY + size * 0.15, cx + shoulderW / 2, shoulderY);
+  ctx.closePath();
+  ctx.fill();
+
+  // Gi V-neck opening — skin visible
+  const neckTopY = headCy + headR * 0.9;
+  ctx.fillStyle = pal.skin;
+  ctx.beginPath();
+  ctx.moveTo(cx - size * 0.06, neckTopY);
+  ctx.lineTo(cx, shoulderY + size * 0.18);
+  ctx.lineTo(cx + size * 0.06, neckTopY);
+  ctx.closePath();
+  ctx.fill();
+
+  // Gi V-neck lines
+  ctx.strokeStyle = pal.giShadow;
+  ctx.lineWidth = Math.max(1, size * 0.012);
+  ctx.beginPath();
+  ctx.moveTo(cx - size * 0.06, neckTopY);
+  ctx.lineTo(cx, shoulderY + size * 0.18);
+  ctx.lineTo(cx + size * 0.06, neckTopY);
+  ctx.stroke();
+
+  // Gi collar fold highlights
+  ctx.strokeStyle = shiftColor(pal.gi, 30);
+  ctx.lineWidth = Math.max(1, size * 0.008);
+  ctx.beginPath();
+  ctx.moveTo(cx - size * 0.065, neckTopY - size * 0.01);
+  ctx.lineTo(cx - size * 0.08, shoulderY + size * 0.05);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(cx + size * 0.065, neckTopY - size * 0.01);
+  ctx.lineTo(cx + size * 0.08, shoulderY + size * 0.05);
+  ctx.stroke();
+
+  // === Neck ===
+  ctx.fillStyle = shiftColor(pal.skin, -10);
+  ctx.beginPath();
+  ctx.moveTo(cx - headR * 0.3, headCy + headR * 0.7);
+  ctx.lineTo(cx - headR * 0.25, shoulderY + size * 0.02);
+  ctx.lineTo(cx + headR * 0.25, shoulderY + size * 0.02);
+  ctx.lineTo(cx + headR * 0.3, headCy + headR * 0.7);
+  ctx.closePath();
+  ctx.fill();
+
+  // === Head ===
+  const skinGrad = ctx.createRadialGradient(cx - headR * 0.1, headCy - headR * 0.1, 0, cx, headCy, headR);
+  skinGrad.addColorStop(0, shiftColor(pal.skin, 20));
+  skinGrad.addColorStop(0.7, pal.skin);
+  skinGrad.addColorStop(1, shiftColor(pal.skin, -15));
+  ctx.fillStyle = skinGrad;
+  ctx.beginPath();
+  ctx.ellipse(cx, headCy, headR * 0.92, headR, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Head outline
+  ctx.strokeStyle = shiftColor(pal.skin, -35);
+  ctx.lineWidth = Math.max(1, size * 0.006);
+  ctx.beginPath();
+  ctx.ellipse(cx, headCy, headR * 0.92, headR, 0, 0, Math.PI * 2);
+  ctx.stroke();
+
+  // === Hair — swept back spiky ===
+  ctx.fillStyle = pal.hair;
+  const spikes = [[-0.6, -1.15], [-0.2, -1.45], [0.15, -1.35], [0.5, -1.05]];
+  for (const [sx, sy] of spikes) {
+    const spikeX = cx + sx * headR;
+    const spikeY = headCy + sy * headR;
+    ctx.beginPath();
+    ctx.moveTo(spikeX - headR * 0.16, headCy - headR + headR * 0.06);
+    ctx.lineTo(spikeX, spikeY);
+    ctx.lineTo(spikeX + headR * 0.16, headCy - headR + headR * 0.06);
+    ctx.closePath();
+    ctx.fill();
+  }
+  // Hair base
+  ctx.beginPath();
+  ctx.moveTo(cx - headR * 0.88, headCy - headR + headR * 0.08);
+  ctx.quadraticCurveTo(cx, headCy - headR - headR * 0.2, cx + headR * 0.88, headCy - headR + headR * 0.08);
+  ctx.lineTo(cx + headR * 0.85, headCy - headR + headR * 0.22);
+  ctx.lineTo(cx - headR * 0.85, headCy - headR + headR * 0.22);
+  ctx.closePath();
+  ctx.fill();
+  // Darker hair band
+  ctx.fillStyle = shiftColor(pal.hair, -25);
+  ctx.fillRect(cx - headR * 0.85, headCy - headR + headR * 0.16, headR * 1.7, headR * 0.06);
+
+  // === Red headband ===
+  ctx.fillStyle = pal.headband;
+  ctx.fillRect(cx - headR * 0.92, headCy - headR + headR * 0.06, headR * 1.84, headR * 0.18);
+  // Headband tails
+  ctx.strokeStyle = shiftColor(pal.headband, -25);
+  ctx.lineWidth = Math.max(1.5, size * 0.012);
+  ctx.beginPath();
+  ctx.moveTo(cx - headR * 0.65, headCy - headR + headR * 0.12);
+  ctx.lineTo(cx - headR * 0.9, headCy - headR + headR * 0.4);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(cx - headR * 0.6, headCy - headR + headR * 0.18);
+  ctx.lineTo(cx - headR * 0.8, headCy - headR + headR * 0.5);
+  ctx.stroke();
+
+  // === Eyes — 3/4 view, slightly toward viewer ===
+  const eyeSpacing = headR * 0.28;
+  const eyeY = headCy - headR * 0.02;
+  const eyeR = headR * 0.12;
+  for (const side of [-1, 1]) {
+    // Closer eye slightly larger for 3/4 perspective
+    const adjustedR = side === 1 ? eyeR * 1.05 : eyeR * 0.95;
+    const ex = cx + side * eyeSpacing;
+    ctx.fillStyle = '#fff';
+    ctx.beginPath();
+    ctx.ellipse(ex, eyeY, adjustedR, adjustedR + 0.5, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#333';
+    ctx.lineWidth = 0.5;
+    ctx.stroke();
+    // Iris
+    ctx.fillStyle = '#4169E1';
+    ctx.beginPath();
+    ctx.arc(ex + 1, eyeY, adjustedR * 0.55, 0, Math.PI * 2);
+    ctx.fill();
+    // Pupil
+    ctx.fillStyle = '#111';
+    ctx.beginPath();
+    ctx.arc(ex + 1.2, eyeY, adjustedR * 0.28, 0, Math.PI * 2);
+    ctx.fill();
+    // Eye shine
+    ctx.fillStyle = 'rgba(255,255,255,0.6)';
+    ctx.beginPath();
+    ctx.arc(ex + 0.5, eyeY - adjustedR * 0.2, adjustedR * 0.2, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // === Brows — determined glare ===
+  ctx.strokeStyle = shiftColor(pal.hair, -30);
+  ctx.lineWidth = Math.max(2, size * 0.015);
+  for (const side of [-1, 1]) {
+    const browX = cx + side * eyeSpacing;
+    ctx.beginPath();
+    ctx.moveTo(browX - headR * 0.16, eyeY - headR * 0.2 - side * headR * 0.04);
+    ctx.lineTo(browX + headR * 0.16, eyeY - headR * 0.22 + side * headR * 0.04);
+    ctx.stroke();
+  }
+
+  // === Nose ===
+  ctx.fillStyle = shiftColor(pal.skin, -12);
+  ctx.beginPath();
+  ctx.arc(cx + 1, headCy + headR * 0.18, headR * 0.05, 0, Math.PI * 2);
+  ctx.fill();
+
+  // === Mouth — confident smirk ===
+  const mouthY = headCy + headR * 0.42;
+  ctx.strokeStyle = shiftColor(pal.skin, -40);
+  ctx.lineWidth = Math.max(1, size * 0.008);
+  ctx.beginPath();
+  ctx.moveTo(cx - headR * 0.14, mouthY);
+  ctx.quadraticCurveTo(cx, mouthY + headR * 0.04, cx + headR * 0.14, mouthY - headR * 0.02);
+  ctx.stroke();
+
+  // === Jaw line ===
+  ctx.strokeStyle = shiftColor(pal.skin, -25);
+  ctx.lineWidth = Math.max(1, size * 0.006);
+  ctx.beginPath();
+  ctx.moveTo(cx - headR * 0.5, headCy + headR * 0.55);
+  ctx.quadraticCurveTo(cx - headR * 0.3, headCy + headR * 0.85, cx, headCy + headR * 0.9);
+  ctx.quadraticCurveTo(cx + headR * 0.3, headCy + headR * 0.85, cx + headR * 0.5, headCy + headR * 0.55);
+  ctx.stroke();
+
+  // Portrait frame
+  ctx.strokeStyle = 'rgba(200, 168, 50, 0.6)';
+  ctx.lineWidth = 2;
+  roundRect(ctx, 0, 0, size, size, 6);
+  ctx.stroke();
+  // Inner gold border
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+  ctx.lineWidth = 1;
+  roundRect(ctx, 1, 1, size - 2, size - 2, 5);
+  ctx.stroke();
+
+  ctx.restore();
+}
+
 /** Draw a small shoe/boot shape at the bottom of a leg */
 export function drawShoe(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, rot: number, color: string, facing: number): void {
   ctx.save();
@@ -1107,4 +1559,78 @@ export function drawShoe(ctx: CanvasRenderingContext2D, x: number, y: number, w:
   roundRect(ctx, -w / 2 + facing * 2, -h / 2, w, h, 3);
   ctx.stroke();
   ctx.restore();
+}
+
+/**
+ * Draw attack trail behind a striking limb during the active phase.
+ * Draws 2-3 fading lines in the direction opposite to the attack motion.
+ * @param ctx - Canvas 2D context (already translated/rotated to limb position)
+ * @param attackPhase - Current attack phase ('startup' | 'active' | 'recovery' | 'none')
+ * @param isKick - true for kick (vertical trail), false for punch (horizontal trail)
+ * @param color - Trail color (typically character's special color)
+ * @param limbLength - Length of the striking limb for trail sizing
+ * @param facing - Direction character faces (1 or -1)
+ */
+export function drawAttackTrail(
+  ctx: CanvasRenderingContext2D,
+  attackPhase: string,
+  isKick: boolean,
+  color: string,
+  limbLength: number,
+  facing: number,
+): void {
+  if (attackPhase !== 'active') return;
+
+  const { r, g, b } = parseColorRGB(color);
+  const trailCount = 3;
+  const trailSpacing = limbLength * 0.12;
+  const baseTrailLen = limbLength * 0.35;
+
+  ctx.save();
+  ctx.lineCap = 'round';
+
+  for (let i = 1; i <= trailCount; i++) {
+    const alpha = 0.35 - (i - 1) * 0.1;
+    const lineWidth = 3 - (i - 1) * 0.7;
+    const offset = i * trailSpacing;
+
+    ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    ctx.lineWidth = lineWidth;
+
+    ctx.beginPath();
+    if (isKick) {
+      // Vertical trail for kicks — trails upward behind the extending leg
+      const trailX = -facing * offset * 0.3;
+      const startY = -limbLength * 0.3;
+      const endY = startY - baseTrailLen * (1 + i * 0.2);
+      ctx.moveTo(trailX, startY);
+      ctx.lineTo(trailX + facing * offset * 0.5, endY);
+    } else {
+      // Horizontal trail for punches — trails backward behind the extending arm
+      const trailY = -offset * 0.3;
+      const startX = -limbLength * 0.3;
+      const endX = startX - facing * baseTrailLen * (1 + i * 0.2);
+      ctx.moveTo(startX, trailY);
+      ctx.lineTo(endX, trailY + offset * 0.5);
+    }
+    ctx.stroke();
+  }
+
+  ctx.restore();
+}
+
+/** Parse a color string to RGB components (utility for drawAttackTrail) */
+function parseColorRGB(color: string): { r: number; g: number; b: number } {
+  if (color.startsWith('#')) {
+    return {
+      r: parseInt(color.slice(1, 3), 16),
+      g: parseInt(color.slice(3, 5), 16),
+      b: parseInt(color.slice(5, 7), 16),
+    };
+  }
+  if (color.startsWith('rgba(') || color.startsWith('rgb(')) {
+    const m = color.match(/(\d+)/g);
+    return m ? { r: +m[0], g: +m[1], b: +m[2] } : { r: 255, g: 160, b: 0 };
+  }
+  return { r: 255, g: 160, b: 0 };
 }

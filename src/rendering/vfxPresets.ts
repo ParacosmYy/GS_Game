@@ -682,6 +682,198 @@ export function spawnDizzyStars(particles: Particle[], worldX: number, worldY: n
   }
 }
 
+// ═══════════════════════════════════════════════════════════════
+// Ryo-specific Special Move VFX
+// ═══════════════════════════════════════════════════════════════
+
+/**
+ * Ko'ou Ken (虎煌拳) projectile VFX — bright orange/yellow ki blast orb with trailing particles.
+ * Orb is 30x30 effective size, 8 trailing particles fading from orange to transparent.
+ * Trailing particles move forward at 8px/frame equivalent, duration 40 frames.
+ */
+export function spawnKooukenVFX(particles: Particle[], x: number, y: number, facing: number, _charId: string): void {
+  // Core ki blast orb — orange/yellow flash
+  particles.push({
+    x, y: y - 10, vx: facing * 8, vy: 0,
+    life: 40, maxLife: 40, size: 30,
+    color: '#ffaa22', type: 'flash',
+  });
+  // White-hot center
+  particles.push({
+    x, y: y - 10, vx: facing * 8, vy: 0,
+    life: 35, maxLife: 35, size: 15,
+    color: '#ffffff', type: 'flash',
+  });
+  // 8 trailing particles — fading orange to transparent
+  for (let i = 0; i < 8; i++) {
+    const delay = i * 3;
+    particles.push({
+      x: x - facing * (8 + i * 6),
+      y: y - 10 + (Math.random() - 0.5) * 10,
+      vx: facing * (8 - i * 0.6),
+      vy: (Math.random() - 0.5) * 1.2,
+      life: 20 - i * 2 + delay,
+      maxLife: 20 + delay,
+      size: 8 + Math.random() * 4 - i * 0.5,
+      color: i % 2 === 0 ? '#ff8800' : '#ffcc44',
+      type: 'spark',
+      gravity: 0,
+      friction: 0.96,
+    });
+  }
+}
+
+/**
+ * Ko Hou (虎咲) uppercut flame column — rising flame from ground to peak.
+ * Orange-red with white core, 12 particles in a column pattern, rising and fading.
+ * Duration: 20 frames.
+ */
+export function spawnKoHouVFX(particles: Particle[], x: number, y: number, _charId: string): void {
+  // White-hot core flash at ground level
+  particles.push({
+    x, y: y - 20, vx: 0, vy: -6,
+    life: 12, maxLife: 12, size: 35,
+    color: '#ffffff', type: 'flash',
+  });
+  // Orange-red flame column — 12 particles rising upward
+  for (let i = 0; i < 12; i++) {
+    const heightOffset = i * 8;
+    const spread = (Math.random() - 0.5) * 10;
+    particles.push({
+      x: x + spread,
+      y: y - heightOffset,
+      vx: (Math.random() - 0.5) * 1.5,
+      vy: -4 - Math.random() * 3,
+      life: 18 - Math.floor(i * 0.8),
+      maxLife: 20,
+      size: 6 + Math.random() * 4,
+      color: i < 3 ? '#ffffff' : i < 6 ? '#ffaa33' : '#ff4400',
+      type: 'spark',
+      gravity: -0.15,
+      friction: 0.94,
+    });
+  }
+  // Base impact ring
+  particles.push({
+    x, y: y, vx: 0, vy: 0,
+    life: 12, maxLife: 12, size: 8,
+    color: '#ff6600', type: 'ring',
+  });
+}
+
+/**
+ * Hien (飛燕) flying kick trail — speed lines behind the character during flight.
+ * 6 horizontal lines with alpha fade. Color based on character accent color.
+ */
+export function spawnHienTrail(particles: Particle[], x: number, y: number, facing: number, _charId: string): void {
+  for (let i = 0; i < 6; i++) {
+    const yOffset = (i - 2.5) * 8;
+    particles.push({
+      x: x - facing * (10 + i * 4),
+      y: y - 15 + yOffset,
+      vx: -facing * (3 + Math.random() * 2),
+      vy: (Math.random() - 0.5) * 0.8,
+      life: 12 - i,
+      maxLife: 12,
+      size: 20 + Math.random() * 15,
+      color: i % 2 === 0 ? '#ffcc44' : '#ff8833',
+      type: 'slash',
+      rotation: facing > 0 ? 0 : Math.PI,
+    });
+  }
+}
+
+/**
+ * DM Ten Ha Ou (天地霸煌拳) energy burst — massive energy explosion.
+ * Expanding ring + flash + screen shake trigger. Golden yellow with white core.
+ * 30+ particles in expanding circle pattern. Screen flash for 10 frames.
+ * Duration: 40 frames.
+ */
+export function spawnDMTenHaOuVFX(particles: Particle[], x: number, y: number, _charId: string): void {
+  // Massive white core explosion
+  particles.push({
+    x, y: y - 20, vx: 0, vy: 0,
+    life: 20, maxLife: 20, size: 90,
+    color: '#ffffff', type: 'superburst',
+  });
+  // Golden yellow main burst
+  particles.push({
+    x, y: y - 20, vx: 0, vy: 0,
+    life: 30, maxLife: 30, size: 110,
+    color: '#ffcc00', type: 'superburst',
+  });
+  // 30+ particles in expanding circle pattern
+  for (let i = 0; i < 32; i++) {
+    const angle = (i / 32) * Math.PI * 2 + Math.random() * 0.15;
+    const speed = 3.5 + Math.random() * 7;
+    particles.push({
+      x, y: y - 20,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed - 2.5,
+      life: 18 + Math.floor(Math.random() * 14),
+      maxLife: 35,
+      size: 3 + Math.random() * 5,
+      color: i % 4 === 0 ? '#ffffff' : i % 3 === 0 ? '#ffee66' : '#ffaa00',
+      type: 'star',
+      gravity: 0.1,
+      friction: 0.94,
+      rotation: angle,
+      rotSpeed: (Math.random() - 0.5) * 0.5,
+    });
+  }
+  // Multiple expanding rings for shockwave feel
+  for (let r = 0; r < 3; r++) {
+    particles.push({
+      x, y: y - 20, vx: 0, vy: 0,
+      life: 15 + r * 5, maxLife: 15 + r * 5, size: 6 + r * 3,
+      color: r === 0 ? '#ffffff' : r === 1 ? '#ffee66' : '#ffaa00',
+      type: 'ring',
+    });
+  }
+}
+
+/**
+ * Haou Shou Kou Ken (霸王翔吼拳) counter flash — bright shield-like burst on counter activation.
+ * Duration: 15 frames.
+ */
+export function spawnHaouFlash(particles: Particle[], x: number, y: number, _charId: string): void {
+  // Bright shield-shaped flash
+  particles.push({
+    x, y: y - 20, vx: 0, vy: 0,
+    life: 10, maxLife: 10, size: 50,
+    color: '#ffffff', type: 'flash',
+  });
+  // Golden outer burst
+  particles.push({
+    x, y: y - 20, vx: 0, vy: 0,
+    life: 12, maxLife: 12, size: 65,
+    color: '#ffcc44', type: 'flash',
+  });
+  // Scattered golden sparks for shield effect
+  for (let i = 0; i < 10; i++) {
+    const angle = (i / 10) * Math.PI * 2;
+    const speed = 2 + Math.random() * 3;
+    particles.push({
+      x, y: y - 20,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed,
+      life: 10 + Math.floor(Math.random() * 5),
+      maxLife: 15,
+      size: 3 + Math.random() * 3,
+      color: i % 3 === 0 ? '#ffffff' : '#ffcc44',
+      type: 'spark',
+      gravity: 0,
+      friction: 0.92,
+    });
+  }
+  // Counter activation ring
+  particles.push({
+    x, y: y - 20, vx: 0, vy: 0,
+    life: 12, maxLife: 12, size: 10,
+    color: '#ffcc44', type: 'ring',
+  });
+}
+
 /**
  * 浮动连击文本 — 在被击方头顶显示当前连击数和累计伤害
  * - 2-4 hits: 白色

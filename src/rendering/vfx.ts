@@ -37,6 +37,11 @@ import {
   spawnCancelFlash,
   spawnDizzyStars,
   spawnFloatingComboText,
+  spawnKooukenVFX,
+  spawnKoHouVFX,
+  spawnHienTrail,
+  spawnDMTenHaOuVFX,
+  spawnHaouFlash,
 } from './vfxPresets.js';
 import type { Particle } from './vfxPresets.js';
 
@@ -234,6 +239,31 @@ export class VFXSystem {
   /** 浮动连击文本 — "N HIT (totalDmg)" 格式, 2-4白色/5-9黄色/10+红色 */
   spawnFloatingComboText(worldX: number, worldY: number, combo: number, totalDamage: number): void {
     spawnFloatingComboText(this.particles, worldX, worldY, combo, totalDamage);
+  }
+
+  /** Ryo: Ko'ou Ken (虎煌拳) projectile ki blast VFX */
+  spawnKooukenVFX(worldX: number, worldY: number, facing: number, charId: string): void {
+    spawnKooukenVFX(this.particles, worldX, worldY, facing, charId);
+  }
+
+  /** Ryo: Ko Hou (虎咲) uppercut flame column VFX */
+  spawnKoHouVFX(worldX: number, worldY: number, charId: string): void {
+    spawnKoHouVFX(this.particles, worldX, worldY, charId);
+  }
+
+  /** Ryo: Hien (飛燕) flying kick speed line trail */
+  spawnHienTrail(worldX: number, worldY: number, facing: number, charId: string): void {
+    spawnHienTrail(this.particles, worldX, worldY, facing, charId);
+  }
+
+  /** Ryo: DM Ten Ha Ou (天地霸煌拳) massive energy burst */
+  spawnDMTenHaOuVFX(worldX: number, worldY: number, charId: string): void {
+    spawnDMTenHaOuVFX(this.particles, worldX, worldY, charId);
+  }
+
+  /** Ryo: Haou Shou Kou Ken (霸王翔吼拳) counter activation flash */
+  spawnHaouFlash(worldX: number, worldY: number, charId: string): void {
+    spawnHaouFlash(this.particles, worldX, worldY, charId);
   }
 
   update(): void {

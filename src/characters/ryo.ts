@@ -94,8 +94,25 @@ export const RyoDef: CharacterDefinition = {
       legBack: bone(-8, 0, -0.38),
     }),
     [FighterState.BLOCK]: [
-      pose({ armFront: bone(3, 10, -0.4), armBack: bone(0, 8, -0.6), legFront: bone(3, 0, 0.05) }),
-      pose({ armFront: bone(2, 12, -0.45), armBack: bone(-1, 10, -0.65), body: bone(-2, 0, -0.05) }),
+      // Frame 0: Guard up — arms crossed in front, body braced for impact
+      pose({ head: bone(-1, 1, -0.04), body: bone(-1, 1, 0.05), armFront: bone(-2, 4, 0.8), armBack: bone(-8, 6, -0.6), legFront: bone(6, 0, 0.05), legBack: bone(-5, 0, -0.08) }),
+      // Frame 1: Impact absorption — slight pushback, arms tighten against body
+      pose({ head: bone(-2, 2, -0.06), body: bone(-3, 2, 0.08), armFront: bone(-4, 3, 0.85), armBack: bone(-10, 5, -0.65), legFront: bone(5, 1, 0.08), legBack: bone(-6, 1, -0.1) }),
+      // Frame 2: Holding guard — stable defensive position, arms locked
+      pose({ head: bone(-1, 1, -0.03), body: bone(-2, 1, 0.06), armFront: bone(-3, 4, 0.82), armBack: bone(-9, 5, -0.62), legFront: bone(6, 0, 0.06), legBack: bone(-5, 0, -0.08) }),
+      // Frame 3: Guard recovery — preparing to counter, arms start opening
+      pose({ head: bone(0, 0, -0.02), body: bone(-1, 0, 0.03), armFront: bone(0, 6, 0.5), armBack: bone(-6, 7, -0.45), legFront: bone(5, 0, 0.04), legBack: bone(-5, 0, -0.06) }),
+    ],
+    // COUNTER_STANCE: 4 frames — enter stance → ready → still ready → counter activation
+    [FighterState.COUNTER_STANCE]: [
+      // Frame 0: Enter stance — arms go to defensive position, body lowers
+      pose({ head: bone(0, 2, -0.05), body: bone(0, 4, 0.08), armFront: bone(-2, 8, 0.3), armBack: bone(-6, 10, -0.5), legFront: bone(8, 2, 0.15), legBack: bone(-6, 2, -0.2) }),
+      // Frame 1: Ready — hands in defensive catch position, waiting for opponent attack
+      pose({ head: bone(0, 2, -0.04), body: bone(0, 5, 0.1), armFront: bone(0, 6, 0.2), armBack: bone(-5, 8, -0.45), legFront: bone(8, 3, 0.18), legBack: bone(-7, 3, -0.22) }),
+      // Frame 2: Still ready — subtle tension, body braced for impact
+      pose({ head: bone(0, 3, -0.05), body: bone(-1, 5, 0.1), armFront: bone(-1, 7, 0.25), armBack: bone(-5, 9, -0.48), legFront: bone(7, 3, 0.16), legBack: bone(-7, 3, -0.21) }),
+      // Frame 3: Counter activation — explosive response pose, arms thrust forward
+      pose({ head: bone(2, 0, -0.06), body: bone(3, 2, 0.12), armFront: bone(18, 4, 0.15, 1.2), armBack: bone(-4, 8, -0.35, 1.1), legFront: bone(6, 1, 0.1), legBack: bone(-6, 1, -0.15) }),
     ],
     // HITSTUN: 5 frames — impact → recoil → peak stagger → recovery start → guard reforming
     [FighterState.HITSTUN]: [
@@ -286,8 +303,18 @@ export const RyoDef: CharacterDefinition = {
       pose({ head: bone(2, -2, -0.08), body: bone(5, 0, 0.16), armFront: bone(28, -4, 0.28, 1.3), armBack: bone(-10, 2, -0.5, 0.88), legFront: bone(15, 4, 0.38, 1.12), legBack: bone(-8, -1, -0.25) }),
     ],
     [FighterState.THROW]: [
-      pose({ head: bone(2, 0, 0.03), body: bone(4, 0, 0.12), armFront: bone(20, 3, 0.0, 1.15), armBack: bone(14, 5, -0.1, 1.0), legFront: bone(5, 0, 0.08), legBack: bone(-5, 0, -0.08) }),
-      pose({ head: bone(3, 1, 0.05), body: bone(6, 0, 0.18), armFront: bone(26, 4, -0.08, 1.3), armBack: bone(18, 6, -0.15, 1.1), legFront: bone(6, 0, 0.1), legBack: bone(-6, 0, -0.1) }),
+      // Frame 0: Grab — arms extend forward to grab opponent
+      pose({ head: bone(2, 0, 0.02), body: bone(4, 0, 0.08), armFront: bone(20, 3, 0.0, 1.15), armBack: bone(14, 5, -0.1, 1.0), legFront: bone(5, 0, 0.08), legBack: bone(-5, 0, -0.08) }),
+      // Frame 1: Grip secured — arms pull back, grip locked on opponent
+      pose({ head: bone(1, 1, 0.04), body: bone(2, 0, 0.12), armFront: bone(14, 4, 0.1, 1.1), armBack: bone(8, 5, -0.15, 1.05), legFront: bone(6, 0, 0.1), legBack: bone(-5, 0, -0.1) }),
+      // Frame 2: Turn — body rotates, pulling opponent off balance
+      pose({ head: bone(0, 2, 0.08), body: bone(0, 2, 0.2), armFront: bone(6, 6, 0.2, 1.0), armBack: bone(-2, 8, -0.25, 0.95), legFront: bone(4, 1, 0.15), legBack: bone(-6, 1, -0.15) }),
+      // Frame 3: Throw execution — full rotation, opponent goes flying
+      pose({ head: bone(-2, 3, 0.12), body: bone(-4, 3, 0.35), armFront: bone(-4, 10, 0.4, 0.9), armBack: bone(-10, 8, -0.4, 0.85), legFront: bone(2, 2, 0.2), legBack: bone(-8, 2, -0.25) }),
+      // Frame 4: Follow-through — body completing rotation, momentum carrying
+      pose({ head: bone(-1, 2, 0.06), body: bone(-2, 2, 0.2), armFront: bone(0, 8, 0.3, 0.95), armBack: bone(-6, 7, -0.3, 0.9), legFront: bone(3, 1, 0.12), legBack: bone(-6, 1, -0.18) }),
+      // Frame 5: Recovery — return to fighting stance, throw complete
+      pose({ head: bone(1, 0, 0.02), body: bone(2, 0, 0.08), armFront: bone(8, 6, 0.15, 1.0), armBack: bone(-4, 8, -0.2, 0.95), legFront: bone(4, 0, 0.06), legBack: bone(-5, 0, -0.08) }),
     ],
     // GUARD_CRUSH: 4 frames — guard broken → stagger → vulnerable → slight recovery
     [FighterState.GUARD_CRUSH]: [
@@ -356,12 +383,66 @@ export const RyoDef: CharacterDefinition = {
       legFront: bone(5, 18, -0.2),
       legBack: bone(-5, 21, 0.3),
     }),
-    [FighterState.AIR_BLOCK]: pose({
-      armFront: bone(2, 8, -0.5),
-      armBack: bone(-2, 6, -0.65),
-      legFront: bone(3, -2, 0.1),
-      legBack: bone(-4, 0, -0.15),
-    }),
+    [FighterState.AIR_BLOCK]: [
+      // Frame 0: Air guard up — arms raised to block overhead attack
+      pose({ head: bone(0, -1, -0.03), body: bone(-1, -2, 0.02), armFront: bone(2, 2, -0.7), armBack: bone(-2, 0, -0.85), legFront: bone(3, -2, 0.1), legBack: bone(-4, 0, -0.15) }),
+      // Frame 1: Impact absorption in air — body pushed back from block, arms absorb force
+      pose({ head: bone(-2, 0, -0.05), body: bone(-3, 0, 0.06), armFront: bone(0, 4, -0.6), armBack: bone(-4, 2, -0.75), legFront: bone(2, -1, 0.08), legBack: bone(-5, 1, -0.12) }),
+      // Frame 2: Recovery — preparing to land, arms lowering back
+      pose({ head: bone(0, 0, -0.02), body: bone(-1, 1, 0.03), armFront: bone(4, 6, -0.45), armBack: bone(-1, 5, -0.6), legFront: bone(4, 0, 0.06), legBack: bone(-4, 1, -0.1) }),
+    ],
+
+    // ── Ryo 胜利姿势 (WIN_POSE) ──
+    // 8帧动画: 从倒地恢复 → 站立 → 整理道服 → 自信格斗架势 → 呼吸循环
+    // 最后两帧(loop point)适合循环播放
+    WIN_POSE: [
+      // Frame 0: 从恢复姿态开始 — 身体微倾，头低下，手臂放松
+      pose({ head: bone(2, 6, 0.2), body: bone(4, 8, 0.12), armFront: bone(4, 20, 0.4), armBack: bone(-8, 18, 0.2), legFront: bone(8, 4, 0.12), legBack: bone(-6, 4, -0.08) }),
+      // Frame 1: 站直 — 身体上升，头抬起，手臂开始回收
+      pose({ head: bone(1, 3, 0.1), body: bone(2, 4, 0.06), armFront: bone(8, 16, 0.3), armBack: bone(-6, 14, 0.05), legFront: bone(7, 2, 0.08), legBack: bone(-5, 2, -0.04) }),
+      // Frame 2: 完全站直 — 身体归位，准备整理道服
+      pose({ head: bone(0, 1, 0.05), body: bone(1, 1, 0.02), armFront: bone(10, 14, 0.25), armBack: bone(-6, 12, -0.1), legFront: bone(6, 0, 0.06), legBack: bone(-5, 0, -0.03) }),
+      // Frame 3: 整理道服 — 前手下拉整理道服下摆，后手辅助，头微低
+      pose({ head: bone(2, 3, 0.15), body: bone(2, 2, 0.04), armFront: bone(14, 20, 0.45), armBack: bone(-4, 16, 0.2), legFront: bone(7, 0, 0.06), legBack: bone(-5, 0, -0.03) }),
+      // Frame 4: 整理道服完成 — 双手收回，身体挺拔
+      pose({ head: bone(1, 1, 0.08), body: bone(1, 0, -0.02), armFront: bone(10, 12, 0.2), armBack: bone(-6, 10, -0.2), legFront: bone(6, 0, 0.05), legBack: bone(-5, 0, -0.04) }),
+      // Frame 5: 转入格斗架势 — 前手护胸，后手收腰，头正前方
+      pose({ head: bone(0, 0, -0.02), body: bone(0, 0, -0.04), armFront: bone(12, 10, 0.3), armBack: bone(-6, 16, -0.4), legFront: bone(8, 0, 0.06), legBack: bone(-6, 0, -0.05) }),
+      // Frame 6: 格斗架势确立 — 呼吸开始(微上升)，自信姿态 (loop point A)
+      pose({ head: bone(0, -1, -0.03), body: bone(0, -1, -0.05), armFront: bone(12, 9, 0.28), armBack: bone(-6, 15, -0.38), legFront: bone(8, -1, 0.05), legBack: bone(-6, -1, -0.05) }),
+      // Frame 7: 呼吸回落 — 重心微沉，架势稳定 (loop point B)
+      pose({ head: bone(0, 0, -0.02), body: bone(0, 0, -0.04), armFront: bone(12, 10, 0.3), armBack: bone(-6, 16, -0.4), legFront: bone(8, 0, 0.06), legBack: bone(-6, 0, -0.05) }),
+    ],
+
+    // ── Ryo 嘲讽动画 (TAUNT) ──
+    // 6帧动画: 前手招引 → 触碰头带 → 自信微笑回到架势
+    [FighterState.TAUNT]: [
+      // Frame 0: 开始招手 — 前手抬起，掌心向外，招引对手
+      pose({ head: bone(0, 0, -0.02), body: bone(0, 0, -0.04), armFront: bone(15, 8, 0.5), armBack: bone(-6, 16, -0.4), legFront: bone(8, 0, 0.06), legBack: bone(-6, 0, -0.05) }),
+      // Frame 1: 招手动作完成 — 前手完全伸出，手指弯曲勾引
+      pose({ head: bone(1, -1, 0.0), body: bone(1, 0, -0.02), armFront: bone(18, 4, 0.6), armBack: bone(-6, 14, -0.35), legFront: bone(8, 0, 0.06), legBack: bone(-6, 0, -0.04) }),
+      // Frame 2: 收回前手，后手触碰头带 — 身体微转
+      pose({ head: bone(-1, -1, 0.1), body: bone(-1, 0, 0.02), armFront: bone(8, 10, 0.2), armBack: bone(-10, 4, -0.6), legFront: bone(7, 0, 0.04), legBack: bone(-5, 0, -0.04) }),
+      // Frame 3: 后手整理头带 — 手指触及额头，头微低
+      pose({ head: bone(-2, -2, 0.12), body: bone(-1, -1, 0.0), armFront: bone(6, 12, 0.15), armBack: bone(-12, -2, -0.8), legFront: bone(7, -1, 0.04), legBack: bone(-5, -1, -0.04) }),
+      // Frame 4: 收回后手，自信微笑 — 身体回正
+      pose({ head: bone(0, -1, -0.02), body: bone(0, 0, -0.03), armFront: bone(10, 12, 0.25), armBack: bone(-6, 10, -0.3), legFront: bone(7, 0, 0.05), legBack: bone(-5, 0, -0.04) }),
+      // Frame 5: 完全回到架势 — 自信表情，准备继续战斗
+      pose({ head: bone(0, 0, -0.02), body: bone(0, 0, -0.04), armFront: bone(12, 10, 0.3), armBack: bone(-6, 16, -0.4), legFront: bone(8, 0, 0.06), legBack: bone(-6, 0, -0.05) }),
+    ],
+
+    // ── Ryo MAX模式激活动画 (MAX_MODE) ──
+    // 4帧动画: 蹲身蓄力 → 爆发上升 → 蓄力架势 → MAX格斗架势
+    [FighterState.MAX_MODE]: [
+      // Frame 0: 蹲身蓄力 — 身体下蹲，双手收紧，气力集中
+      pose({ head: bone(0, 8, 0.1), body: bone(0, 12, 0.12), armFront: bone(4, 20, -0.3), armBack: bone(-4, 18, -0.5), legFront: bone(10, 6, 0.35), legBack: bone(-8, 6, -0.3) }),
+      // Frame 1: 爆发上升 — 身体急剧上升，双臂张开释放能量
+      pose({ head: bone(0, -5, -0.08), body: bone(0, -5, -0.1), armFront: bone(16, 4, 0.6, 1.15), armBack: bone(-14, 2, -0.7, 1.15), legFront: bone(8, -2, 0.1), legBack: bone(-6, -2, -0.08) }),
+      // Frame 2: 蓄力架势 — 能量环绕，双脚扎根，双臂收于身前
+      pose({ head: bone(0, -2, -0.04), body: bone(0, -2, -0.06), armFront: bone(12, 8, 0.4, 1.1), armBack: bone(-10, 6, -0.5, 1.1), legFront: bone(8, 0, 0.08), legBack: bone(-6, 0, -0.06) }),
+      // Frame 3: MAX格斗架势 — 安定架势，能量内敛，呼吸稳健
+      pose({ head: bone(0, -1, -0.03), body: bone(0, -1, -0.05), armFront: bone(12, 10, 0.35, 1.05), armBack: bone(-6, 14, -0.45, 1.05), legFront: bone(8, 0, 0.06), legBack: bone(-6, 0, -0.05) }),
+    ],
 
     // ── Ryo 必杀技动画 (attack-specific poses) ──
     // 虎煌拳 QCF+A (Ko'ou Ken — fireball): startup=12, active=18, recovery=34

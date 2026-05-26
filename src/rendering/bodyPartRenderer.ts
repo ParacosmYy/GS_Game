@@ -1055,23 +1055,66 @@ function drawArmDetail(
     ctx.beginPath(); ctx.moveTo(-hw + 1, -hh + sleeveH + 1); ctx.lineTo(hw - 1, -hh + sleeveH + 1); ctx.stroke();
   } else if (charId === 'ryo') {
     // 亮: 黑色空手道护手 + 正宗空手道拳 (knuckles forward, closed fist)
-    ctx.fillStyle = '#222';
-    ctx.fillRect(-hw * 0.85, fistY - 2, w * 0.85, 4);
-    // 手背绑带 — 多层缠绕
+    // ── Karate fist shape: wider at knuckles, narrower at wrist ──
+    const fistTop = fistY - 3;
+    const fistBottom = fistY + h * 0.12;
+    const fistKnuckleW = hw * 0.92; // wider at top (knuckles)
+    const fistWristW = hw * 0.72;   // narrower at bottom (wrist)
+    // Main fist shape — trapezoid for proper karate fist silhouette
+    ctx.fillStyle = shiftColor(skinColor, 5);
+    ctx.beginPath();
+    ctx.moveTo(-fistKnuckleW, fistTop);
+    ctx.lineTo(fistKnuckleW, fistTop);
+    ctx.lineTo(fistWristW, fistBottom);
+    ctx.lineTo(-fistWristW, fistBottom);
+    ctx.closePath();
+    ctx.fill();
+    // Knuckle ridge — 2-3 horizontal lines across the top of the fist
+    ctx.strokeStyle = shiftColor(skinColor, -15);
+    ctx.lineWidth = 0.7;
+    const knuckleLineY1 = fistTop + (fistBottom - fistTop) * 0.15;
+    const knuckleLineY2 = fistTop + (fistBottom - fistTop) * 0.35;
+    const knuckleLineY3 = fistTop + (fistBottom - fistTop) * 0.55;
+    ctx.beginPath(); ctx.moveTo(-fistKnuckleW * 0.8, knuckleLineY1); ctx.lineTo(fistKnuckleW * 0.8, knuckleLineY1); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(-fistWristW * 0.75, knuckleLineY2); ctx.lineTo(fistWristW * 0.75, knuckleLineY2); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(-fistWristW * 0.65, knuckleLineY3); ctx.lineTo(fistWristW * 0.65, knuckleLineY3); ctx.stroke();
+    // Knuckle bumps — small raised areas at the top
+    ctx.fillStyle = shiftColor(skinColor, 10);
+    for (let i = 0; i < 4; i++) {
+      const bumpX = -fistKnuckleW * 0.6 + i * fistKnuckleW * 0.4;
+      ctx.beginPath();
+      ctx.arc(bumpX, fistTop + 1, fistKnuckleW * 0.15, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    // Thumb outline — small bump on side of fist
+    const thumbSide = isBack ? 1 : -1;
+    ctx.fillStyle = shiftColor(skinColor, -5);
+    ctx.beginPath();
+    ctx.ellipse(thumbSide * fistKnuckleW * 0.85, fistTop + (fistBottom - fistTop) * 0.35,
+      fistKnuckleW * 0.2, fistKnuckleW * 0.3, thumbSide * 0.3, 0, Math.PI * 2);
+    ctx.fill();
+    // Hand wraps (bandage) — multiple layers
     ctx.strokeStyle = '#fff';
     ctx.lineWidth = 0.8;
     ctx.beginPath(); ctx.moveTo(-hw * 0.5, fistY - 4); ctx.lineTo(hw * 0.3, fistY - 1); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(-hw * 0.3, fistY); ctx.lineTo(hw * 0.5, fistY + 3); ctx.stroke();
-    // 空手道拳 — 指关节隆起
-    ctx.fillStyle = shiftColor(skinColor, 8);
-    ctx.beginPath();
-    ctx.arc(0, fistY + h * 0.04, hw * 0.55, 0, Math.PI * 2);
-    ctx.fill();
-    // 指关节线 — 空手道握拳特征
-    ctx.strokeStyle = shiftColor(skinColor, -10);
-    ctx.lineWidth = 0.6;
-    ctx.beginPath(); ctx.moveTo(-hw * 0.35, fistY + 1); ctx.lineTo(hw * 0.25, fistY + 1); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(-hw * 0.3, fistY + h * 0.07); ctx.lineTo(hw * 0.2, fistY + h * 0.07); ctx.stroke();
+    // Wrist guard — black karate guard below the fist
+    ctx.fillStyle = '#222';
+    ctx.fillRect(-hw * 0.85, fistY - 2, w * 0.85, 4);
+    // Motion blur during attack active phase (scale > 1.0)
+    const scale = w / (hw * 2 || 1); // detect if limb is enlarged (attack)
+    if (scale > 1.0) {
+      ctx.strokeStyle = `rgba(255, 160, 0, 0.3)`;
+      ctx.lineWidth = 1.5;
+      for (let i = 1; i <= 3; i++) {
+        const trailAlpha = 0.3 - i * 0.08;
+        ctx.strokeStyle = `rgba(255, 160, 0, ${trailAlpha})`;
+        ctx.beginPath();
+        ctx.moveTo(-hw - i * 3, fistTop + i * 2);
+        ctx.lineTo(-hw - i * 3, fistBottom - i * 2);
+        ctx.stroke();
+      }
+    }
   } else if (charId === 'leona') {
     // 莉安娜: 军用护腕+深蓝
     ctx.fillStyle = '#224466';
@@ -1479,19 +1522,49 @@ function drawShoeDetail(
     ctx.fillStyle = '#6699cc';
     ctx.fillRect(-hw, hh - 2, w, 2);
   } else if (charId === 'ryo') {
-    // 亮: 棕色空手道训练鞋+鞋带+脚趾可见
+    // 亮: 棕色空手道训练鞋 with detailed structure
+    // Shoe shape — slightly wider at sole than ankle
+    const soleW = hw * 1.12;
+    const ankleW = hw * 0.85;
     ctx.fillStyle = shiftColor(outfit.shoes, 5);
-    ctx.fillRect(-hw, hh - shoeH, w, shoeH);
-    // 鞋面高光
+    ctx.beginPath();
+    ctx.moveTo(-ankleW, hh - shoeH);
+    ctx.lineTo(ankleW, hh - shoeH);
+    ctx.lineTo(soleW, hh);
+    ctx.lineTo(-soleW, hh);
+    ctx.closePath();
+    ctx.fill();
+    // Shoe upper highlight
     ctx.fillStyle = shiftColor(outfit.shoes, 18);
-    ctx.fillRect(-hw + 1, hh - shoeH, w * 0.4, shoeH * 0.5);
-    // 鞋带
-    ctx.strokeStyle = shiftColor(outfit.shoes, 25);
+    ctx.beginPath();
+    ctx.moveTo(-ankleW + 1, hh - shoeH + 1);
+    ctx.lineTo(ankleW * 0.2, hh - shoeH + 1);
+    ctx.lineTo(ankleW * 0.4, hh - shoeH * 0.4);
+    ctx.lineTo(-ankleW * 0.3, hh - shoeH * 0.4);
+    ctx.closePath();
+    ctx.fill();
+    // Ankle wrapping — band at top of shoe (karate training style)
+    ctx.fillStyle = shiftColor(outfit.shoes, 25);
+    ctx.fillRect(-ankleW, hh - shoeH, ankleW * 2, Math.max(2, shoeH * 0.25));
+    // Ankle wrap detail — cross pattern
+    ctx.strokeStyle = shiftColor(outfit.shoes, 15);
     ctx.lineWidth = 0.5;
-    ctx.beginPath(); ctx.moveTo(-hw * 0.2, hh - shoeH + 1); ctx.lineTo(hw * 0.1, hh - 3); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(-hw * 0.1, hh - shoeH + 2); ctx.lineTo(hw * 0.15, hh - 4); ctx.stroke();
-    // 鞋底厚底
-    ctx.fillStyle = shiftColor(outfit.shoes, -25);
-    ctx.fillRect(-hw, hh - 2, w, 2);
+    ctx.beginPath(); ctx.moveTo(-ankleW * 0.5, hh - shoeH + 1); ctx.lineTo(ankleW * 0.3, hh - shoeH + shoeH * 0.2); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(ankleW * 0.5, hh - shoeH + 1); ctx.lineTo(-ankleW * 0.3, hh - shoeH + shoeH * 0.2); ctx.stroke();
+    // Shoe laces — multiple crossing laces
+    ctx.strokeStyle = shiftColor(outfit.shoes, 30);
+    ctx.lineWidth = 0.6;
+    ctx.beginPath(); ctx.moveTo(-hw * 0.2, hh - shoeH + 2); ctx.lineTo(hw * 0.1, hh - shoeH * 0.5); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(-hw * 0.1, hh - shoeH + 3); ctx.lineTo(hw * 0.15, hh - shoeH * 0.6); ctx.stroke();
+    // Sole line — darker, thicker line at bottom of shoe
+    ctx.fillStyle = shiftColor(outfit.shoes, -30);
+    ctx.fillRect(-soleW, hh - Math.max(2, shoeH * 0.2), soleW * 2, Math.max(2, shoeH * 0.2));
+    // Tread pattern on sole
+    ctx.strokeStyle = shiftColor(outfit.shoes, -40);
+    ctx.lineWidth = 0.5;
+    for (let i = 0; i < 4; i++) {
+      const tx = -soleW * 0.7 + i * soleW * 0.47;
+      ctx.beginPath(); ctx.moveTo(tx, hh - 1); ctx.lineTo(tx + soleW * 0.2, hh); ctx.stroke();
+    }
   }
 }

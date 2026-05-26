@@ -291,6 +291,30 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       deps.screenShake.trigger(6, 8, getAttackDirectionBias(attacker, defender, attackType, counterHit));
     }
 
+    // === Ryo 角色专属必杀技VFX ===
+    // Ko'ou Ken (虎煌拳) projectile — ki blast effect
+    if (atkName.startsWith('RYO_KOOU')) {
+      deps.vfx.spawnKooukenVFX(attacker.x, attacker.y, attacker.facing, attacker.charId);
+    }
+    // Ko Hou (虎咲) uppercut — flame column
+    if (atkName.startsWith('RYO_KO_HOU')) {
+      deps.vfx.spawnKoHouVFX(attacker.x, attacker.y, attacker.charId);
+    }
+    // Hien (飛燕) flying kick — speed line trail
+    if (atkName === 'RYO_HIEN') {
+      deps.vfx.spawnHienTrail(attacker.x, attacker.y, attacker.facing, attacker.charId);
+    }
+    // DM Ten Ha Ou (天地霸煌拳) — massive energy burst + screen flash
+    if (atkName === 'DM_TEN_HA_OU') {
+      deps.vfx.spawnDMTenHaOuVFX(hitX, hitY, attacker.charId);
+      deps.screenFlash.trigger('#ffcc00', 0.35, 10);
+      deps.screenShake.trigger(14, 14, getAttackDirectionBias(attacker, defender, attackType, counterHit));
+    }
+    // Haou Shou Kou Ken (霸王翔吼拳) counter flash
+    if (atkName === 'RYO_HAOU') {
+      deps.vfx.spawnHaouFlash(attacker.x, attacker.y, attacker.charId);
+    }
+
     // SFX
     if (isDM) { playSuperFlash(isSDM); playDM(); }
     else if (isThrowAttack(attackType)) {
