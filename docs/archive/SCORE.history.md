@@ -1055,3 +1055,9 @@
 ## H211: comboTrialData—6项验证连招试炼数据 — 183→184
 
 **commit:** <hash> | comboTrialData—6项验证连招试炼数据
+
+---
+
+## H212: teamState—5项验证队伍创建/切换/淘汰逻辑 — 184→185
+
+**commit:** <hash> | teamState—5项验证队伍创建/切换/淘汰逻辑
