@@ -21,10 +21,10 @@ export interface PixelFrame {
 const PALETTE: Record<number, string> = {
   0: 'transparent',
   1: '#080604', 2: '#1a1208', 3: '#2a1c10', 4: '#3a2818',
-  5: '#5a3a22', 6: '#7a5030', 7: '#9a6840', 8: '#f8d4a8', 9: '#d8a878',
-  10: '#c09060', 11: '#a07840', 12: '#886030', 13: '#704820',
-  14: '#faf8f4', 15: '#f0ece4', 16: '#b8a488', 17: '#d0c4b0',
-  18: '#806850', 19: '#a09484', 20: '#181410', 21: '#ffffff',
+  5: '#5a3a22', 6: '#7a5030', 7: '#9a6840', 8: '#f8cc98', 9: '#d89858',
+  10: '#b88840', 11: '#987030', 12: '#805820', 13: '#684818',
+  14: '#faf8f4', 15: '#e4d8c4', 16: '#806838', 17: '#a89070',
+  18: '#382010', 19: '#685830', 20: '#181410', 21: '#ffffff',
   22: '#d83030', 23: '#a02020',
 };
 
@@ -83,27 +83,27 @@ const CB_F1 = clone(BASE);
 
 // Remove right portion of gi pants (the right leg half) from y=64-84
 // In idle, right pants occupy x~12-45 area. We keep left pants, remove right.
-CB_F1[64] = r('...........................k1eeeeeeggigeeeegg1k1k');
-CB_F1[65] = r('..........................k1eeeeeeeggigeeeeegg1k1k');
-CB_F1[66] = r('.........................k1eeeeeeeggigeeeeegg1k1k');
-CB_F1[67] = r('........................k1eeeeeeeggigeeeeegg1k1k');
-CB_F1[68] = r('.......................k1eeeeeeggigeeeeegg1k1k2');
-CB_F1[69] = r('......................k1eeeeeggigeeeegg1k1k.22');
-CB_F1[70] = r('.....................k1eeeeeeggigeeeeegg1k1k2');
-CB_F1[71] = r('....................k1eeeeeeggigeeeeegg1k1k');
-CB_F1[72] = r('...................k1eeeeeeggigeeeeegg1k1k');
-CB_F1[73] = r('..................k1eeeeeeggigeeeegg1k1k2');
-CB_F1[74] = r('.................k1eeeeeegigeeegg1k1k.22');
-CB_F1[75] = r('................k1eeeeeggigeeeegg1k1k.2');
-CB_F1[76] = r('...............k1eeeeeeggigeeeegg1k1k');
-CB_F1[77] = r('..............k1eeeeeegigeeegg1k1k.22');
-CB_F1[78] = r('.............k1eeeeegigeeegg1k1k2..2');
-CB_F1[79] = r('............k1eeeeegigeegg1k1k2');
-CB_F1[80] = r('...........k1eeeeegigeegg1k1k');
-CB_F1[81] = r('..........k1eeeegigeegg1k1k2');
-CB_F1[82] = r('.........k1eeeegigeegg1k1k');
-CB_F1[83] = r('........k1eeeegigegg1k1k2');
-CB_F1[84] = r('.......k1eeeegigegg1k1k');
+CB_F1[64] = r('...........................k1eeeeeeggieeeegg1k1k');
+CB_F1[65] = r('..........................k1eeeeeeeggieeeeegg1k1k');
+CB_F1[66] = r('.........................k1eeeeeeeggieeeeegg1k1k');
+CB_F1[67] = r('........................k1eeeeeeeggieeeeegg1k1k');
+CB_F1[68] = r('.......................k1eeeeeeggieeeeegg1k1k2');
+CB_F1[69] = r('......................k1eeeeeggieeeegg1k1k.22');
+CB_F1[70] = r('.....................k1eeeeeeggieeeeegg1k1k2');
+CB_F1[71] = r('....................k1eeeeeeggieeeeegg1k1k');
+CB_F1[72] = r('...................k1eeeeeeggieeeeegg1k1k');
+CB_F1[73] = r('..................k1eeeeeeggieeeegg1k1k2');
+CB_F1[74] = r('.................k1eeeeeegieeegg1k1k.22');
+CB_F1[75] = r('................k1eeeeeggieeeegg1k1k.2');
+CB_F1[76] = r('...............k1eeeeeeggieeeegg1k1k');
+CB_F1[77] = r('..............k1eeeeeegieeegg1k1k.22');
+CB_F1[78] = r('.............k1eeeeegieeegg1k1k2..2');
+CB_F1[79] = r('............k1eeeeegieegg1k1k2');
+CB_F1[80] = r('...........k1eeeeegieegg1k1k');
+CB_F1[81] = r('..........k1eeeegieegg1k1k2');
+CB_F1[82] = r('.........k1eeeegieegg1k1k');
+CB_F1[83] = r('........k1eeeegiegg1k1k2');
+CB_F1[84] = r('.......k1eeeegiegg1k1k');
 
 // Belt area — keep left side, remove right leg opening
 CB_F1[85] = r('......kkkkkkkkkkkkkkkk');
@@ -111,25 +111,25 @@ CB_F1[86] = r('.....k11111114111111k.22');
 CB_F1[87] = r('....k111111114111111111k');
 
 // Left leg stays (right side of stance) — remove right leg below belt
-CB_F1[88] = r('...k1eeeeeeggigeeeegg1k');
-CB_F1[89] = r('..k1eeeeeeeggigeeeeegg1k');
-CB_F1[90] = r('..k1eeeeeeeggigeeeeegg1k');
-CB_F1[91] = r('..k1eeeeeeeggigeeeeegg1k');
-CB_F1[92] = r('..k1eeeeeeeggigeeeeegg1k');
-CB_F1[93] = r('..k1eeeeeeeggigeeeeegg1k');
-CB_F1[94] = r('...k1eeeeeeggigeeeegg1k');
-CB_F1[95] = r('...k1eeeeeeggigeeeegg1k');
-CB_F1[96] = r('...k1eeeeeeggigeeeegg1k');
-CB_F1[97] = r('...k1eeeeeeggigeeeegg1k');
-CB_F1[98] = r('....k1eeeeegigeeegg1k2');
-CB_F1[99] = r('....k1eeeeegigeeegg1k');
-CB_F1[100]= r('....k1eeeeegigeeegg1k');
-CB_F1[101]= r('.....k1eeeegigeegg1k');
-CB_F1[102]= r('.....k1eeeegigeegg1k');
-CB_F1[103]= r('.....k1eeeegigeegg1k2');
-CB_F1[104]= r('......k1eeeeegigeegg1k');
-CB_F1[105]= r('......k1eeeeegigeegg1k');
-CB_F1[106]= r('......k1eeeeegigeegg1k');
+CB_F1[88] = r('...k1eeeeeeggieeeegg1k');
+CB_F1[89] = r('..k1eeeeeeeggieeeeegg1k');
+CB_F1[90] = r('..k1eeeeeeeggieeeeegg1k');
+CB_F1[91] = r('..k1eeeeeeeggieeeeegg1k');
+CB_F1[92] = r('..k1eeeeeeeggieeeeegg1k');
+CB_F1[93] = r('..k1eeeeeeeggieeeeegg1k');
+CB_F1[94] = r('...k1eeeeeeggieeeegg1k');
+CB_F1[95] = r('...k1eeeeeeggieeeegg1k');
+CB_F1[96] = r('...k1eeeeeeggieeeegg1k');
+CB_F1[97] = r('...k1eeeeeeggieeeegg1k');
+CB_F1[98] = r('....k1eeeeegieeegg1k2');
+CB_F1[99] = r('....k1eeeeegieeegg1k');
+CB_F1[100]= r('....k1eeeeegieeegg1k');
+CB_F1[101]= r('.....k1eeeegieegg1k');
+CB_F1[102]= r('.....k1eeeegieegg1k');
+CB_F1[103]= r('.....k1eeeegieegg1k2');
+CB_F1[104]= r('......k1eeeeegieegg1k');
+CB_F1[105]= r('......k1eeeeegieegg1k');
+CB_F1[106]= r('......k1eeeeegieegg1k');
 CB_F1[107]= r('.......k1eeeegegg1k.22');
 CB_F1[108]= r('.......k1eeeegegg1k.2');
 CB_F1[109]= r('.......k1eeeegegg1k');
@@ -172,29 +172,29 @@ CB_F1[143]= r('.......k1k1k1k1k1k........222....................222');
 // Knee at x~42-55, y~50-68. Gi pants material wraps the knee, skin at kneecap.
 // The knee shape is compact — a small round bump with skin-colored front.
 // y=50-51: top of thigh rising from gi pants below
-CB_F1[50] = r('.......22.2.2.2.22........k1eeeeeeeeeggigeeeeeeegg1k.........2.2');
-CB_F1[51] = r('........2.2.2.2.2.........k1eeeeeeeeeggigeeeeeeegg1k.......222.22');
+CB_F1[50] = r('.......22.2.2.2.22........k1eeeeeeeeeggieeeeeeegg1k.........2.2');
+CB_F1[51] = r('........2.2.2.2.2.........k1eeeeeeeeeggieeeeeeegg1k.......222.22');
 // y=52-55: thigh rising into knee position
-CB_F1[52] = r('..........................k1eeeeeeeeeggigeeeeeeegg1k......22.1k12');
-CB_F1[53] = r('..........................k1eeeeeeeeeggigeeeeeeegg1k...2..21keek122');
-CB_F1[54] = r('..........................k1eeeeeeeeeggigeeeeeeegg1k..22221keegek122');
-CB_F1[55] = r('...........................k1eeeeeeeggigeeeeeegg1k2...21keegegk1.2');
+CB_F1[52] = r('..........................k1eeeeeeeeeggieeeeeeegg1k......22.1k12');
+CB_F1[53] = r('..........................k1eeeeeeeeeggieeeeeeegg1k...2..21keek122');
+CB_F1[54] = r('..........................k1eeeeeeeeeggieeeeeeegg1k..22221keegek122');
+CB_F1[55] = r('...........................k1eeeeeeeggieeeeeegg1k2...21keegegk1.2');
 // y=56-60: knee peak — skin kneecap visible
-CB_F1[56] = r('...........................k1eeeeeeeggigeeeeeegg1k...21keege89ek1.22');
-CB_F1[57] = r('............................k1eeeeeeggigeeeeegg1k...21keegeg889gek122');
-CB_F1[58] = r('.............................k1eeeeeeggigeeeegg1k.221keeegeg889gek122');
-CB_F1[59] = r('..............................k1eeeeeggigeeeegg1k221keeegeeg89gek1.2');
+CB_F1[56] = r('...........................k1eeeeeeeggieeeeeegg1k...21keege89ek1.22');
+CB_F1[57] = r('............................k1eeeeeeggieeeeegg1k...21keegeg889gek122');
+CB_F1[58] = r('.............................k1eeeeeeggieeeegg1k.221keeegeg889gek122');
+CB_F1[59] = r('..............................k1eeeeeggieeeegg1k221keeegeeg89gek1.2');
 CB_F1[60] = r('...............................k1111111141111111k.21keeegeeg89gek122');
 // y=61-65: shin folds back behind knee (tapers down to the right, behind body)
 CB_F1[61] = r('..............................kk1111111141111111kk.1keeegeg89gek122');
 CB_F1[62] = r('.............................kk11111111411111111kk.2keeegeg89ek12');
 CB_F1[63] = r('............................k1111111114111111111k...keege89e1k12');
-CB_F1[64] = r('...........................k1eeeeeeggigeeeegg1k1k..kge89g1k.2.22');
-CB_F1[65] = r('..........................k1eeeeeeggigeeeeegg1k1k..k89ek1...2.2');
+CB_F1[64] = r('...........................k1eeeeeeggieeeegg1k1k..kge89g1k.2.22');
+CB_F1[65] = r('..........................k1eeeeeeggieeeeegg1k1k..k89ek1...2.2');
 // y=66-68: shin/foot tucked behind, fading
-CB_F1[66] = r('.........................k1eeeeeeggigeeeeegg1k1k...ke89k122');
-CB_F1[67] = r('........................k1eeeeeeggigeeeegg1k1k2...k891k.22');
-CB_F1[68] = r('.......................k1eeeeeeggigeeeegg1k1k....21d912.2');
+CB_F1[66] = r('.........................k1eeeeeeggieeeeegg1k1k...ke89k122');
+CB_F1[67] = r('........................k1eeeeeeggieeeegg1k1k2...k891k.22');
+CB_F1[68] = r('.......................k1eeeeeeggieeeegg1k1k....21d912.2');
 
 // CB_F2: recovery — back to guard
 const CB_F2 = clone(BASE);
@@ -222,60 +222,60 @@ const CD_F0 = clone(BASE);
 // Crouch wind-up: shift lower body down 1-2px, widen stance slightly
 // Torso stays mostly same but belt dips 1px. Legs compress.
 // Modify the belt/torso junction area to show slight compression
-CD_F0[59] = r('.......................222...k1eeeeeeeggigeeeeegg1k.222');
-CD_F0[60] = r('........................2.....k1eeeeeeggigeeeeegg1k..2');
+CD_F0[59] = r('.......................222...k1eeeeeeeggieeeeegg1k.222');
+CD_F0[60] = r('........................2.....k1eeeeeeggieeeeegg1k..2');
 CD_F0[61] = r('...............................k111111114111111111k');
 CD_F0[62] = r('...........................2..kk1111111114111111111kk');
 CD_F0[63] = r('..........................22.kk11111111114111111111kk');
 // Wider stance at pants top
-CD_F0[64] = r('..........................k1eeeeeeggigeeeegg1k1k.222');
-CD_F0[65] = r('.........................k1eeeeeeggigeeeeegg1k1k.22');
-CD_F0[66] = r('........................k1eeeeeeggigeeeeegg1k1k');
-CD_F0[67] = r('.......................k1eeeeeeggigeeeegg1k1k2');
-CD_F0[68] = r('......................k1eeeeeegigeeegg1k1k.22');
-CD_F0[69] = r('.....................k1eeeeeegigeeegg1k1k..2');
-CD_F0[70] = r('....................k1eeeeeggigeeeegg1k1k');
-CD_F0[71] = r('...................k1eeeeeggigeeeegg1k1k');
-CD_F0[72] = r('..................k1eeeeeggigeeeegg1k1k');
-CD_F0[73] = r('.................k1eeeeeggigeeeegg1k1k');
-CD_F0[74] = r('................k1eeeeeegigeeegg1k1k2');
-CD_F0[75] = r('...............k1eeeeeegigeeegg1k1k');
-CD_F0[76] = r('..............k1eeeeegigeeegg1k1k2');
-CD_F0[77] = r('.............k1eeeeegigeeegg1k1k');
-CD_F0[78] = r('............k1eeeeegigeegg1k1k2');
-CD_F0[79] = r('...........k1eeeeegigeegg1k1k');
-CD_F0[80] = r('..........k1eeeegigeegg1k1k2');
-CD_F0[81] = r('.........k1eeeegigeegg1k1k');
-CD_F0[82] = r('........k1eeeegigegg1k1k2');
-CD_F0[83] = r('.......k1eeeegigegg1k1k.....2................2.2');
-CD_F0[84] = r('......k1eeeegigegg1k1k.....222..............22.22');
+CD_F0[64] = r('..........................k1eeeeeeggieeeegg1k1k.222');
+CD_F0[65] = r('.........................k1eeeeeeggieeeeegg1k1k.22');
+CD_F0[66] = r('........................k1eeeeeeggieeeeegg1k1k');
+CD_F0[67] = r('.......................k1eeeeeeggieeeegg1k1k2');
+CD_F0[68] = r('......................k1eeeeeegieeegg1k1k.22');
+CD_F0[69] = r('.....................k1eeeeeegieeegg1k1k..2');
+CD_F0[70] = r('....................k1eeeeeggieeeegg1k1k');
+CD_F0[71] = r('...................k1eeeeeggieeeegg1k1k');
+CD_F0[72] = r('..................k1eeeeeggieeeegg1k1k');
+CD_F0[73] = r('.................k1eeeeeggieeeegg1k1k');
+CD_F0[74] = r('................k1eeeeeegieeegg1k1k2');
+CD_F0[75] = r('...............k1eeeeeegieeegg1k1k');
+CD_F0[76] = r('..............k1eeeeegieeegg1k1k2');
+CD_F0[77] = r('.............k1eeeeegieeegg1k1k');
+CD_F0[78] = r('............k1eeeeegieegg1k1k2');
+CD_F0[79] = r('...........k1eeeeegieegg1k1k');
+CD_F0[80] = r('..........k1eeeegieegg1k1k2');
+CD_F0[81] = r('.........k1eeeegieegg1k1k');
+CD_F0[82] = r('........k1eeeegiegg1k1k2');
+CD_F0[83] = r('.......k1eeeegiegg1k1k.....2................2.2');
+CD_F0[84] = r('......k1eeeegiegg1k1k.....222..............22.22');
 
 // CD_F1: knee drives forward — body leans into it
 // Right knee comes up to belt level, body leans forward slightly
 const CD_F1 = clone(BASE);
 
 // Remove right portion of gi pants and right leg
-CD_F1[64] = r('......222........22.22.....k1eeeeeeggigeeeegg1k1k');
-CD_F1[65] = r('.......2..........2.2.....k1eeeeeeggigeeeeegg1k1k');
-CD_F1[66] = r('.........................k1eeeeeeggigeeeeegg1k1k');
-CD_F1[67] = r('........................k1eeeeeeggigeeeegg1k1k2');
-CD_F1[68] = r('.......................k1eeeeeeggigeeeegg1k1k');
-CD_F1[69] = r('......................k1eeeeeggigeeeegg1k1k2');
-CD_F1[70] = r('.....................k1eeeeeeggigeeeegg1k1k');
-CD_F1[71] = r('....................k1eeeeeeggigeeeegg1k1k');
-CD_F1[72] = r('...................k1eeeeeggigeeeegg1k1k');
-CD_F1[73] = r('..................k1eeeeeeggigeeeeegg1k1k');
-CD_F1[74] = r('.................k1eeeeeegigeeegg1k1k2222');
-CD_F1[75] = r('................k1eeeeeggigeeeegg1k1k..2');
-CD_F1[76] = r('...............k1eeeeeeggigeeeegg1k1k');
-CD_F1[77] = r('..............k1eeeeeegigeeegg1k1k.22');
-CD_F1[78] = r('.............k1eeeeegigeeegg1k1k2..2');
-CD_F1[79] = r('............k1eeeeegigeegg1k1k');
-CD_F1[80] = r('...........k1eeeeegigeegg1k1k................................................');
-CD_F1[81] = r('..........k1eeeegigeegg1k1k..................................................');
-CD_F1[82] = r('.........k1eeeegigeegg1k1k...................................................');
-CD_F1[83] = r('........k1eeeegigegg1k1k.....................................................');
-CD_F1[84] = r('.......k1eeeegigegg1k1k......................................................');
+CD_F1[64] = r('......222........22.22.....k1eeeeeeggieeeegg1k1k');
+CD_F1[65] = r('.......2..........2.2.....k1eeeeeeggieeeeegg1k1k');
+CD_F1[66] = r('.........................k1eeeeeeggieeeeegg1k1k');
+CD_F1[67] = r('........................k1eeeeeeggieeeegg1k1k2');
+CD_F1[68] = r('.......................k1eeeeeeggieeeegg1k1k');
+CD_F1[69] = r('......................k1eeeeeggieeeegg1k1k2');
+CD_F1[70] = r('.....................k1eeeeeeggieeeegg1k1k');
+CD_F1[71] = r('....................k1eeeeeeggieeeegg1k1k');
+CD_F1[72] = r('...................k1eeeeeggieeeegg1k1k');
+CD_F1[73] = r('..................k1eeeeeeggieeeeegg1k1k');
+CD_F1[74] = r('.................k1eeeeeegieeegg1k1k2222');
+CD_F1[75] = r('................k1eeeeeggieeeegg1k1k..2');
+CD_F1[76] = r('...............k1eeeeeeggieeeegg1k1k');
+CD_F1[77] = r('..............k1eeeeeegieeegg1k1k.22');
+CD_F1[78] = r('.............k1eeeeegieeegg1k1k2..2');
+CD_F1[79] = r('............k1eeeeegieegg1k1k');
+CD_F1[80] = r('...........k1eeeeegieegg1k1k................................................');
+CD_F1[81] = r('..........k1eeeegieegg1k1k..................................................');
+CD_F1[82] = r('.........k1eeeegieegg1k1k...................................................');
+CD_F1[83] = r('........k1eeeegiegg1k1k.....................................................');
+CD_F1[84] = r('.......k1eeeegiegg1k1k......................................................');
 
 // Belt area
 CD_F1[85] = r('......kkkkkkkkkkkkkkkk...........................................');
@@ -283,25 +283,25 @@ CD_F1[86] = r('.....k11111114111111k............................................
 CD_F1[87] = r('....k111111114111111111k.........................................');
 
 // Left leg stays — right leg removed below belt
-CD_F1[88] = r('...k1eeeeeeggigeeeegg1k........................................');
-CD_F1[89] = r('..k1eeeeeeeggigeeeeegg1k.......................................');
-CD_F1[90] = r('..k1eeeeeeeggigeeeeegg1k.......................................');
-CD_F1[91] = r('..k1eeeeeeeggigeeeeegg1k.......................................');
-CD_F1[92] = r('..k1eeeeeeeggigeeeeegg1k.......................................');
-CD_F1[93] = r('..k1eeeeeeeggigeeeeegg1k.......................................');
-CD_F1[94] = r('...k1eeeeeeggigeeeegg1k........................................');
-CD_F1[95] = r('...k1eeeeeeggigeeeegg1k........................................');
-CD_F1[96] = r('...k1eeeeeeggigeeeegg1k........................................');
-CD_F1[97] = r('...k1eeeeeeggigeeeegg1k........................................');
-CD_F1[98] = r('....k1eeeeegigeeegg1k.........................................');
-CD_F1[99] = r('....k1eeeeegigeeegg1k.........................................');
-CD_F1[100]= r('....k1eeeeegigeeegg1k.........................................');
-CD_F1[101]= r('.....k1eeeegigeegg1k..........................................');
-CD_F1[102]= r('.....k1eeeegigeegg1k..........................................');
-CD_F1[103]= r('.....k1eeeegigeegg1k..........................................');
-CD_F1[104]= r('......k1eeeeegigeegg1k...........................................');
-CD_F1[105]= r('......k1eeeeegigeegg1k...........................................');
-CD_F1[106]= r('......k1eeeeegigeegg1k...........................................');
+CD_F1[88] = r('...k1eeeeeeggieeeegg1k........................................');
+CD_F1[89] = r('..k1eeeeeeeggieeeeegg1k.......................................');
+CD_F1[90] = r('..k1eeeeeeeggieeeeegg1k.......................................');
+CD_F1[91] = r('..k1eeeeeeeggieeeeegg1k.......................................');
+CD_F1[92] = r('..k1eeeeeeeggieeeeegg1k.......................................');
+CD_F1[93] = r('..k1eeeeeeeggieeeeegg1k.......................................');
+CD_F1[94] = r('...k1eeeeeeggieeeegg1k........................................');
+CD_F1[95] = r('...k1eeeeeeggieeeegg1k........................................');
+CD_F1[96] = r('...k1eeeeeeggieeeegg1k........................................');
+CD_F1[97] = r('...k1eeeeeeggieeeegg1k........................................');
+CD_F1[98] = r('....k1eeeeegieeegg1k.........................................');
+CD_F1[99] = r('....k1eeeeegieeegg1k.........................................');
+CD_F1[100]= r('....k1eeeeegieeegg1k.........................................');
+CD_F1[101]= r('.....k1eeeegieegg1k..........................................');
+CD_F1[102]= r('.....k1eeeegieegg1k..........................................');
+CD_F1[103]= r('.....k1eeeegieegg1k..........................................');
+CD_F1[104]= r('......k1eeeeegieegg1k...........................................');
+CD_F1[105]= r('......k1eeeeegieegg1k...........................................');
+CD_F1[106]= r('......k1eeeeegieegg1k...........................................');
 CD_F1[107]= r('.......k1eeeegegg1k............................................');
 CD_F1[108]= r('.......k1eeeegegg1k............................................');
 CD_F1[109]= r('.......k1eeeegegg1k............................................');
@@ -342,53 +342,53 @@ CD_F1[143]= r('.......k1k1k1k1k1k...............................................
 
 // Overlay the driving knee — bigger than close_B, more forceful
 // Knee at x~40-58, y~48-68. Body lean shows in gi top shift.
-CD_F1[48] = r('..........................k1eeeeeeeeeggigeeeeeeeegg1k.....................................');
-CD_F1[49] = r('..........................k1eeeeeeeeeggigeeeeeeeegg1k.....................................');
-CD_F1[50] = r('..........................k1eeeeeeeeeggigeeeeeeegg1k..........1k1..........................');
-CD_F1[51] = r('..........................k1eeeeeeeeeggigeeeeeeegg1k........1keek1.........................');
-CD_F1[52] = r('..........................k1eeeeeeeeeggigeeeeeeegg1k.......1keegek1........................');
-CD_F1[53] = r('..........................k1eeeeeeeeeggigeeeeeeegg1k......1keegegk1.......................');
-CD_F1[54] = r('..........................k1eeeeeeeeeggigeeeeeeegg1k.....1keeegegk1......................');
-CD_F1[55] = r('...........................k1eeeeeeeggigeeeeeegg1k....1keege89e1k1.....................');
-CD_F1[56] = r('...........................k1eeeeeeeggigeeeeeegg1k...1keegeg889gek1....................');
-CD_F1[57] = r('............................k1eeeeeeggigeeeeegg1k...1keeegeg889gek1...................');
-CD_F1[58] = r('.............................k1eeeeeeggigeeeegg1k..1keeegeeg889gek1..................');
-CD_F1[59] = r('..............................k1eeeeeggigeeeegg1k.1keeegeeg889gek1.................');
+CD_F1[48] = r('..........................k1eeeeeeeeeggieeeeeeeegg1k.....................................');
+CD_F1[49] = r('..........................k1eeeeeeeeeggieeeeeeeegg1k.....................................');
+CD_F1[50] = r('..........................k1eeeeeeeeeggieeeeeeegg1k..........1k1..........................');
+CD_F1[51] = r('..........................k1eeeeeeeeeggieeeeeeegg1k........1keek1.........................');
+CD_F1[52] = r('..........................k1eeeeeeeeeggieeeeeeegg1k.......1keegek1........................');
+CD_F1[53] = r('..........................k1eeeeeeeeeggieeeeeeegg1k......1keegegk1.......................');
+CD_F1[54] = r('..........................k1eeeeeeeeeggieeeeeeegg1k.....1keeegegk1......................');
+CD_F1[55] = r('...........................k1eeeeeeeggieeeeeegg1k....1keege89e1k1.....................');
+CD_F1[56] = r('...........................k1eeeeeeeggieeeeeegg1k...1keegeg889gek1....................');
+CD_F1[57] = r('............................k1eeeeeeggieeeeegg1k...1keeegeg889gek1...................');
+CD_F1[58] = r('.............................k1eeeeeeggieeeegg1k..1keeegeeg889gek1..................');
+CD_F1[59] = r('..............................k1eeeeeggieeeegg1k.1keeegeeg889gek1.................');
 CD_F1[60] = r('...............................k1111111141111111k.1keeegeeg89gek1..................');
 CD_F1[61] = r('..............................kk1111111141111111kkkeeegeeg89gek1..................');
 CD_F1[62] = r('.............................kk11111111411111111kkeeegeeg89ek1...................');
 CD_F1[63] = r('............................k1111111114111111111kkeege89gek1k1..................');
-CD_F1[64] = r('...........................k1eeeeeeggigeeeegg1k1kge89ek1k........................');
-CD_F1[65] = r('..........................k1eeeeeeggigeeeeegg1k1k89ek1.........................');
-CD_F1[66] = r('.........................k1eeeeeeggigeeeeegg1k1ke891k..........................');
-CD_F1[67] = r('........................k1eeeeeeggigeeeegg1k1k.1d1............................');
+CD_F1[64] = r('...........................k1eeeeeeggieeeegg1k1kge89ek1k........................');
+CD_F1[65] = r('..........................k1eeeeeeggieeeeegg1k1k89ek1.........................');
+CD_F1[66] = r('.........................k1eeeeeeggieeeeegg1k1ke891k..........................');
+CD_F1[67] = r('........................k1eeeeeeggieeeegg1k1k.1d1............................');
 
 // CD_F2: full knee thrust / close front kick — foot at ~x=55
 // Maximum extension. Body leans forward. Foot extends from knee.
 const CD_F2 = clone(BASE);
 
 // Remove right portion of gi pants and right leg
-CD_F2[64] = r('...........................k1eeeeeeggigeeeeegg1k1k..........................');
-CD_F2[65] = r('..........................k1eeeeeeeggigeeeeeegg1k1k..........................');
-CD_F2[66] = r('.........................k1eeeeeeggigeeeeegg1k1k...........................');
-CD_F2[67] = r('........................k1eeeeeeggigeeeeegg1k1k............................');
-CD_F2[68] = r('.......................k1eeeeeeggigeeeeegg1k1k.............................');
-CD_F2[69] = r('......................k1eeeeeeggigeeeegg1k1k...............................');
-CD_F2[70] = r('.....................k1eeeeeeggigeeeeegg1k1k..................................');
-CD_F2[71] = r('....................k1eeeeeeggigeeeegg1k1k...................................');
-CD_F2[72] = r('...................k1eeeeeggigeeeegg1k1k....................................');
-CD_F2[73] = r('..................k1eeeeeeggigeeeeegg1k1k......................................');
-CD_F2[74] = r('.................k1eeeeeegigeeegg1k1k.......................................');
-CD_F2[75] = r('................k1eeeeeggigeeeegg1k1k.........................................');
-CD_F2[76] = r('...............k1eeeeeeggigeeeegg1k1k..........................................');
-CD_F2[77] = r('..............k1eeeeeegigeeegg1k1k............................................');
-CD_F2[78] = r('.............k1eeeeegigeeegg1k1k.............................................');
-CD_F2[79] = r('............k1eeeeegigeegg1k1k...............................................');
-CD_F2[80] = r('...........k1eeeeegigeegg1k1k................................................');
-CD_F2[81] = r('..........k1eeeegigeegg1k1k..................................................');
-CD_F2[82] = r('.........k1eeeegigeegg1k1k...................................................');
-CD_F2[83] = r('........k1eeeegigegg1k1k.....................................................');
-CD_F2[84] = r('.......k1eeeegigegg1k1k......................................................');
+CD_F2[64] = r('...........................k1eeeeeeggieeeeegg1k1k..........................');
+CD_F2[65] = r('..........................k1eeeeeeeggieeeeeegg1k1k..........................');
+CD_F2[66] = r('.........................k1eeeeeeggieeeeegg1k1k...........................');
+CD_F2[67] = r('........................k1eeeeeeggieeeeegg1k1k............................');
+CD_F2[68] = r('.......................k1eeeeeeggieeeeegg1k1k.............................');
+CD_F2[69] = r('......................k1eeeeeeggieeeegg1k1k...............................');
+CD_F2[70] = r('.....................k1eeeeeeggieeeeegg1k1k..................................');
+CD_F2[71] = r('....................k1eeeeeeggieeeegg1k1k...................................');
+CD_F2[72] = r('...................k1eeeeeggieeeegg1k1k....................................');
+CD_F2[73] = r('..................k1eeeeeeggieeeeegg1k1k......................................');
+CD_F2[74] = r('.................k1eeeeeegieeegg1k1k.......................................');
+CD_F2[75] = r('................k1eeeeeggieeeegg1k1k.........................................');
+CD_F2[76] = r('...............k1eeeeeeggieeeegg1k1k..........................................');
+CD_F2[77] = r('..............k1eeeeeegieeegg1k1k............................................');
+CD_F2[78] = r('.............k1eeeeegieeegg1k1k.............................................');
+CD_F2[79] = r('............k1eeeeegieegg1k1k...............................................');
+CD_F2[80] = r('...........k1eeeeegieegg1k1k................................................');
+CD_F2[81] = r('..........k1eeeegieegg1k1k..................................................');
+CD_F2[82] = r('.........k1eeeegieegg1k1k...................................................');
+CD_F2[83] = r('........k1eeeegiegg1k1k.....................................................');
+CD_F2[84] = r('.......k1eeeegiegg1k1k......................................................');
 
 // Belt area
 CD_F2[85] = r('......kkkkkkkkkkkkkkkk...........................................');
@@ -396,25 +396,25 @@ CD_F2[86] = r('.....k11111114111111k............................................
 CD_F2[87] = r('....k111111114111111111k.........................................');
 
 // Left leg stays — right leg removed below belt
-CD_F2[88] = r('...k1eeeeeeggigeeeegg1k........................................');
-CD_F2[89] = r('..k1eeeeeeeggigeeeeegg1k.......................................');
-CD_F2[90] = r('..k1eeeeeeeggigeeeeegg1k.......................................');
-CD_F2[91] = r('..k1eeeeeeeggigeeeeegg1k.......................................');
-CD_F2[92] = r('..k1eeeeeeeggigeeeeegg1k.......................................');
-CD_F2[93] = r('..k1eeeeeeeggigeeeeegg1k.......................................');
-CD_F2[94] = r('...k1eeeeeeggigeeeegg1k........................................');
-CD_F2[95] = r('...k1eeeeeeggigeeeegg1k........................................');
-CD_F2[96] = r('...k1eeeeeeggigeeeegg1k........................................');
-CD_F2[97] = r('...k1eeeeeeggigeeeegg1k........................................');
-CD_F2[98] = r('....k1eeeeegigeeegg1k.........................................');
-CD_F2[99] = r('....k1eeeeegigeeegg1k.........................................');
-CD_F2[100]= r('....k1eeeeegigeeegg1k.........................................');
-CD_F2[101]= r('.....k1eeeegigeegg1k..........................................');
-CD_F2[102]= r('.....k1eeeegigeegg1k..........................................');
-CD_F2[103]= r('.....k1eeeegigeegg1k..........................................');
-CD_F2[104]= r('......k1eeeeegigeegg1k...........................................');
-CD_F2[105]= r('......k1eeeeegigeegg1k...........................................');
-CD_F2[106]= r('......k1eeeeegigeegg1k...........................................');
+CD_F2[88] = r('...k1eeeeeeggieeeegg1k........................................');
+CD_F2[89] = r('..k1eeeeeeeggieeeeegg1k.......................................');
+CD_F2[90] = r('..k1eeeeeeeggieeeeegg1k.......................................');
+CD_F2[91] = r('..k1eeeeeeeggieeeeegg1k.......................................');
+CD_F2[92] = r('..k1eeeeeeeggieeeeegg1k.......................................');
+CD_F2[93] = r('..k1eeeeeeeggieeeeegg1k.......................................');
+CD_F2[94] = r('...k1eeeeeeggieeeegg1k........................................');
+CD_F2[95] = r('...k1eeeeeeggieeeegg1k........................................');
+CD_F2[96] = r('...k1eeeeeeggieeeegg1k........................................');
+CD_F2[97] = r('...k1eeeeeeggieeeegg1k........................................');
+CD_F2[98] = r('....k1eeeeegieeegg1k.........................................');
+CD_F2[99] = r('....k1eeeeegieeegg1k.........................................');
+CD_F2[100]= r('....k1eeeeegieeegg1k.........................................');
+CD_F2[101]= r('.....k1eeeegieegg1k..........................................');
+CD_F2[102]= r('.....k1eeeegieegg1k..........................................');
+CD_F2[103]= r('.....k1eeeegieegg1k..........................................');
+CD_F2[104]= r('......k1eeeeegieegg1k...........................................');
+CD_F2[105]= r('......k1eeeeegieegg1k...........................................');
+CD_F2[106]= r('......k1eeeeegieegg1k...........................................');
 CD_F2[107]= r('.......k1eeeegegg1k............................................');
 CD_F2[108]= r('.......k1eeeegegg1k............................................');
 CD_F2[109]= r('.......k1eeeegegg1k............................................');
@@ -455,35 +455,35 @@ CD_F2[143]= r('.......k1k1k1k1k1k...............................................
 
 // Overlay the full knee thrust + foot extension — foot reaches ~x=55
 // The kick extends from the hip: thigh rises, knee drives forward, foot extends
-CD_F2[46] = r('............................k1eeeeeeeeeggigeeeeeeeegg1k...............................................');
-CD_F2[47] = r('............................k1eeeeeeeeeggigeeeeeeeegg1k...............................................');
-CD_F2[48] = r('............................k1eeeeeeeeeggigeeeeeeegg1k..........1k1...................................');
-CD_F2[49] = r('............................k1eeeeeeeeeggigeeeeeeegg1k........1keek1..................................');
-CD_F2[50] = r('............................k1eeeeeeeeeggigeeeeeeegg1k.......1keegek1.................................');
-CD_F2[51] = r('............................k1eeeeeeeeeggigeeeeeeegg1k......1keegegk1................................');
-CD_F2[52] = r('............................k1eeeeeeeeeggigeeeeeeegg1k.....1keeegegk1...............................');
-CD_F2[53] = r('............................k1eeeeeeeeeggigeeeeeeegg1k....1keeegeegk1..............................');
+CD_F2[46] = r('............................k1eeeeeeeeeggieeeeeeeegg1k...............................................');
+CD_F2[47] = r('............................k1eeeeeeeeeggieeeeeeeegg1k...............................................');
+CD_F2[48] = r('............................k1eeeeeeeeeggieeeeeeegg1k..........1k1...................................');
+CD_F2[49] = r('............................k1eeeeeeeeeggieeeeeeegg1k........1keek1..................................');
+CD_F2[50] = r('............................k1eeeeeeeeeggieeeeeeegg1k.......1keegek1.................................');
+CD_F2[51] = r('............................k1eeeeeeeeeggieeeeeeegg1k......1keegegk1................................');
+CD_F2[52] = r('............................k1eeeeeeeeeggieeeeeeegg1k.....1keeegegk1...............................');
+CD_F2[53] = r('............................k1eeeeeeeeeggieeeeeeegg1k....1keeegeegk1..............................');
 // y=54-58: knee peak, then shin extends forward to foot at x~55
-CD_F2[54] = r('.............................k1eeeeeeeggigeeeeeegg1k...1keege89e1k1.............................');
-CD_F2[55] = r('.............................k1eeeeeeeggigeeeeeegg1k..1keegeg889gek1............................');
-CD_F2[56] = r('..............................k1eeeeeeggigeeeeegg1k..1keeegeg889gek1...........................');
-CD_F2[57] = r('...............................k1eeeeeeggigeeeegg1k.1keeegeeg889gek1..........................');
-CD_F2[58] = r('................................k1eeeeeggigeeeegg1k1keeeegegg889gek1.........................');
+CD_F2[54] = r('.............................k1eeeeeeeggieeeeeegg1k...1keege89e1k1.............................');
+CD_F2[55] = r('.............................k1eeeeeeeggieeeeeegg1k..1keegeg889gek1............................');
+CD_F2[56] = r('..............................k1eeeeeeggieeeeegg1k..1keeegeg889gek1...........................');
+CD_F2[57] = r('...............................k1eeeeeeggieeeegg1k.1keeegeeg889gek1..........................');
+CD_F2[58] = r('................................k1eeeeeggieeeegg1k1keeeegegg889gek1.........................');
 CD_F2[59] = r('.................................k111111114111111111keeeegegg89gek1........................');
 CD_F2[60] = r('................................kk111111114111111111keeeegegg89gek1.......................');
 CD_F2[61] = r('...............................kk111111114111111111keeegeeg89ek1k1.......................');
 CD_F2[62] = r('..............................kk11111111411111111kkeege89gek1k1........................');
 CD_F2[63] = r('.............................k111111114111111111kke89ge1k1k...........................');
 // y=64-68: foot extends further forward (x~55-60 area)
-CD_F2[64] = r('............................k1eeeeeeggigeeeegg1k189ek1k..............................');
-CD_F2[65] = r('...........................k1eeeeeeggigeeeeegg1k891k................................');
-CD_F2[66] = r('..........................k1eeeeeeggigeeeeegg1ke91k.................................');
-CD_F2[67] = r('.........................k1eeeeeeggigeeeegg1k1k1k..................................');
+CD_F2[64] = r('............................k1eeeeeeggieeeegg1k189ek1k..............................');
+CD_F2[65] = r('...........................k1eeeeeeggieeeeegg1k891k................................');
+CD_F2[66] = r('..........................k1eeeeeeggieeeeegg1ke91k.................................');
+CD_F2[67] = r('.........................k1eeeeeeggieeeegg1k1k1k..................................');
 // Foot reaches x~55-62 with skin/shoe colors
-CD_F2[55] = r('.............................k1eeeeeeeggigeeeeeegg1k..1keegeg889gek1....1kk1..............');
-CD_F2[56] = r('..............................k1eeeeeeggigeeeeegg1k..1keeegeg889gek1...1k9k1.............');
-CD_F2[57] = r('...............................k1eeeeeeggigeeeegg1k.1keeegeeg889gek1..1k891k.............');
-CD_F2[58] = r('................................k1eeeeeggigeeeegg1k1keeeegegg889gek1.1k8d1k.............');
+CD_F2[55] = r('.............................k1eeeeeeeggieeeeeegg1k..1keegeg889gek1....1kk1..............');
+CD_F2[56] = r('..............................k1eeeeeeggieeeeegg1k..1keeegeg889gek1...1k9k1.............');
+CD_F2[57] = r('...............................k1eeeeeeggieeeegg1k.1keeegeeg889gek1..1k891k.............');
+CD_F2[58] = r('................................k1eeeeeggieeeegg1k1keeeegegg889gek1.1k8d1k.............');
 CD_F2[59] = r('.................................k111111114111111111keeeegegg89gek11k8d81k............');
 CD_F2[60] = r('................................kk111111114111111111keeeegegg89gek1k8d81.............');
 CD_F2[61] = r('...............................kk111111114111111111keeegeeg89ek1k189d1..............');

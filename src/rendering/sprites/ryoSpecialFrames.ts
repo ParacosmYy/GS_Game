@@ -23,10 +23,10 @@ export interface PixelFrame {
 const PALETTE: Record<number, string> = {
   0: 'transparent',
   1: '#080604', 2: '#1a1208', 3: '#2a1c10', 4: '#3a2818',
-  5: '#5a3a22', 6: '#7a5030', 7: '#9a6840', 8: '#f8d4a8', 9: '#d8a878',
-  10: '#c09060', 11: '#a07840', 12: '#886030', 13: '#704820',
-  14: '#faf8f4', 15: '#f0ece4', 16: '#b8a488', 17: '#d0c4b0',
-  18: '#806850', 19: '#a09484', 20: '#181410', 21: '#ffffff',
+  5: '#5a3a22', 6: '#7a5030', 7: '#9a6840', 8: '#f8cc98', 9: '#d89858',
+  10: '#b88840', 11: '#987030', 12: '#805820', 13: '#684818',
+  14: '#faf8f4', 15: '#e4d8c4', 16: '#806838', 17: '#a89070',
+  18: '#382010', 19: '#685830', 20: '#181410', 21: '#ffffff',
   22: '#d83030', 23: '#a02020',
 };
 
@@ -71,14 +71,14 @@ KH_F0[65] = r('........................................kkkkkkkkk');
 KH_F0[66] = r('.......................................k111111111k');
 KH_F0[67] = r('......................................k11111111111k');
 KH_F0[68] = r('.....................................k111111111111k');
-KH_F0[69] = r('....................................k1eeeegigegg1k...2');
-KH_F0[70] = r('...................................k1eeeegigegg1k.22222');
+KH_F0[69] = r('....................................k1eeeegiegg1k...2');
+KH_F0[70] = r('...................................k1eeeegiegg1k.22222');
 // Right fist at hip (y=70-78 area, skin colored at right side)
-KH_F0[71] = r('..................................k1eeeegigegg1k.21d9122');
-KH_F0[72] = r('.................................k1eeeegigegg1k.21dbd122');
-KH_F0[73] = r('................................k1eeeegigegg1k.21d8d122');
-KH_F0[74] = r('...............................k1eeeegigegg1k.21d91.222');
-KH_F0[75] = r('..............................k1eeeegigegg1k.21d1.2.2222');
+KH_F0[71] = r('..................................k1eeeegiegg1k.21d9122');
+KH_F0[72] = r('.................................k1eeeegiegg1k.21dbd122');
+KH_F0[73] = r('................................k1eeeegiegg1k.21d8d122');
+KH_F0[74] = r('...............................k1eeeegiegg1k.21d91.222');
+KH_F0[75] = r('..............................k1eeeegiegg1k.21d1.2.2222');
 
 // F1: rising — use idle base, arm going up alongside head
 const KH_F1 = clone(IDLE_BASE);
@@ -203,17 +203,17 @@ KF_F1[17] = r('..................mn1mmn2.1mn..221.2nm21.111.222.................
 // y=18-28: both arms thrust forward with palms out
 // Upper arm: gi sleeve + skin palm at x~80-88
 // Lower arm: gi sleeve + skin palm at x~75-83
-KF_F1[18] = r('...................12mn21222....22212mn221112.1eeeeeeeeeeggigeeeeeeeegg18bd8122');
-KF_F1[19] = r('.................2128921.22......22128b12111.1eeeeeeeeeeggigeeeeeeeeegg18bd8122');
-KF_F1[20] = r('................21289la122.......22189a1.111eeeeeeeeeeggigeeeeeeeeegg188bd8122');
-KF_F1[21] = r('...............21289ka122........2218ka111eeeeeeeeeeeggigeeeeeeeeegg188bd81.2');
-KF_F1[22] = r('..............212899a12..........221891.1eeeeeeeeeeeeggigeeeeeeeeeegg188bd8122');
-KF_F1[23] = r('.............212899a1............2218d1eeeeeeeeeeeeggigeeeeeeeeeeegg188bd8122');
-KF_F1[24] = r('............212899b2122..........2.1d8eeeeeeeeeeeeggigeeeeeeeeeeegg1d912.222');
-KF_F1[25] = r('...........21289b1.222..........221d8eeeeeeeeeeeeggigeeeeeeeeeegg1d91.22..2');
-KF_F1[26] = r('..........21289b12.22...........221d8eeeeeeeeeeggigeeeeeeeeegg1d9122222');
-KF_F1[27] = r('........22128b1.22..............221deeeeeeeeeeggigeeeeeeeeegg1d912..2');
-KF_F1[28] = r('.......22128b12.2...............2211eeeeeeeeeggigeeeeeeegg1d912222');
+KF_F1[18] = r('...................12mn21222....22212mn221112.1eeeeeeeeeeggieeeeeeeegg18bd8122');
+KF_F1[19] = r('.................2128921.22......22128b12111.1eeeeeeeeeeggieeeeeeeeegg18bd8122');
+KF_F1[20] = r('................21289la122.......22189a1.111eeeeeeeeeeggieeeeeeeeegg188bd8122');
+KF_F1[21] = r('...............21289ka122........2218ka111eeeeeeeeeeeggieeeeeeeeegg188bd81.2');
+KF_F1[22] = r('..............212899a12..........221891.1eeeeeeeeeeeeggieeeeeeeeeegg188bd8122');
+KF_F1[23] = r('.............212899a1............2218d1eeeeeeeeeeeeggieeeeeeeeeeegg188bd8122');
+KF_F1[24] = r('............212899b2122..........2.1d8eeeeeeeeeeeeggieeeeeeeeeeegg1d912.222');
+KF_F1[25] = r('...........21289b1.222..........221d8eeeeeeeeeeeeggieeeeeeeeeegg1d91.22..2');
+KF_F1[26] = r('..........21289b12.22...........221d8eeeeeeeeeeggieeeeeeeeegg1d9122222');
+KF_F1[27] = r('........22128b1.22..............221deeeeeeeeeeggieeeeeeeeegg1d912..2');
+KF_F1[28] = r('.......22128b12.2...............2211eeeeeeeeeggieeeeeeegg1d912222');
 
 // F2: follow-through — arms still extended but relaxing
 const KF_F2 = clone(KF_F1);
@@ -241,36 +241,36 @@ const HI_F1 = clone(JUMP_BASE);
 // The kick leg extends to x~80-88 at about y=50-65 (waist height)
 HI_F1[50] = r('........2222222..............2...2222....2..2............222222.2');
 HI_F1[51] = r('.........22..2..............222...22....222222............2..2');
-HI_F1[52] = r('............................21eeeegigeegg1d91222');
-HI_F1[53] = r('...........................21eeeegigeegg1dbd1.222');
-HI_F1[54] = r('..........................21eeeeeeggigeeeegg1d9122');
-HI_F1[55] = r('.........................21eeeeeeggigeeeegg1d9122');
-HI_F1[56] = r('........................21eeeeegigeeegg1d1.22222');
-HI_F1[57] = r('.......................21eeeeegigeeegg1d1..2..2');
-HI_F1[58] = r('......................21eeeeeggigeeeegg1122');
-HI_F1[59] = r('.....................21eeeeegigeeegg1k1.22');
-HI_F1[60] = r('....................21eeeeegigeegg1k1.222');
-HI_F1[61] = r('..................221eeeegigeegg1k1.222');
-HI_F1[62] = r('.................221eeeegigegg1k1.222');
+HI_F1[52] = r('............................21eeeegieegg1d91222');
+HI_F1[53] = r('...........................21eeeegieegg1dbd1.222');
+HI_F1[54] = r('..........................21eeeeeeggieeeegg1d9122');
+HI_F1[55] = r('.........................21eeeeeeggieeeegg1d9122');
+HI_F1[56] = r('........................21eeeeegieeegg1d1.22222');
+HI_F1[57] = r('.......................21eeeeegieeegg1d1..2..2');
+HI_F1[58] = r('......................21eeeeeggieeeegg1122');
+HI_F1[59] = r('.....................21eeeeegieeegg1k1.22');
+HI_F1[60] = r('....................21eeeeegieegg1k1.222');
+HI_F1[61] = r('..................221eeeegieegg1k1.222');
+HI_F1[62] = r('.................221eeeegiegg1k1.222');
 
 // F2: full flying kick — maximum extension (impact frame)
 const HI_F2 = clone(JUMP_BASE);
 // Body more horizontal, leg fully extended to x~85-92
 HI_F2[48] = r('..................222.....2..22.222..............2..2');
 HI_F2[49] = r('...................2.....222..2.2...............222222');
-HI_F2[50] = r('.........................21eeeeeeeeeggigeeeeeeegg1d9122');
-HI_F2[51] = r('........................21eeeeeeeggigeeeeeegg1d8d1...22');
-HI_F2[52] = r('.......................21eeeeeeeeeggigeeeeeeeegg18bd8122');
-HI_F2[53] = r('......................21eeeeeeeeeggigeeeeeeeegg188bd8122');
-HI_F2[54] = r('.....................21eeeeeeeeeeggigeeeeeeeegg18bd8122');
-HI_F2[55] = r('....................21eeeeeeeeeggigeeeeeeeegg1d912.222');
-HI_F2[56] = r('...................21eeeeeeeggigeeeeeegg1d12222222..2');
-HI_F2[57] = r('..................21eeeeeeeggigeeeeeegg11.22.2..2');
-HI_F2[58] = r('.................21eeeeeeggigeeeegg1k1.2222');
-HI_F2[59] = r('................21eeeeeggigeeeegg1k1.2222');
-HI_F2[60] = r('...............21eeeeegigeegg1k1.2.222');
-HI_F2[61] = r('.............221eeeegigeegg1k1.222.22..2.222');
-HI_F2[62] = r('............221eeeegigegg1k1.2.2...2222222222');
+HI_F2[50] = r('.........................21eeeeeeeeeggieeeeeeegg1d9122');
+HI_F2[51] = r('........................21eeeeeeeggieeeeeegg1d8d1...22');
+HI_F2[52] = r('.......................21eeeeeeeeeggieeeeeeeegg18bd8122');
+HI_F2[53] = r('......................21eeeeeeeeeggieeeeeeeegg188bd8122');
+HI_F2[54] = r('.....................21eeeeeeeeeeggieeeeeeeegg18bd8122');
+HI_F2[55] = r('....................21eeeeeeeeeggieeeeeeeegg1d912.222');
+HI_F2[56] = r('...................21eeeeeeeggieeeeeegg1d12222222..2');
+HI_F2[57] = r('..................21eeeeeeeggieeeeeegg11.22.2..2');
+HI_F2[58] = r('.................21eeeeeeggieeeegg1k1.2222');
+HI_F2[59] = r('................21eeeeeggieeeegg1k1.2222');
+HI_F2[60] = r('...............21eeeeegieegg1k1.2.222');
+HI_F2[61] = r('.............221eeeegieegg1k1.222.22..2.222');
+HI_F2[62] = r('............221eeeegiegg1k1.2.2...2222222222');
 
 // F3: descending — kick retracting
 const HI_F3 = clone(HI_F1);
@@ -291,17 +291,17 @@ const HI_F4 = clone(IDLE_BASE);
 // F0: windup — arms crossed in front of chest, defensive stance
 const HA_F0 = clone(IDLE_BASE);
 // Head and hair stay the same. Modify arm area to show crossed arms.
-HA_F0[18] = r('.............222...12mn2eeeeegigeegg2nm2.1112.2');
-HA_F0[19] = r('..............2..2128921eeeeegigeegg19281.111.22');
-HA_F0[20] = r('................212899a1eeeeegigeegg1a99821.11122');
-HA_F0[21] = r('...............212899a12.1eeeegigegg1a99821.111.2');
-HA_F0[22] = r('..............212899a1.21eeeegigegg1..a9982111d122');
-HA_F0[23] = r('.............212899a1.21eeeegigegg1.21a99821d1.22');
-HA_F0[24] = r('............212899b212.1eeeegigegg12212b9981d122');
-HA_F0[25] = r('...........21289b1.2221eeeegigegg1.2221b98d1.22');
-HA_F0[26] = r('..........21289b12.2221eeeegigegg122..21b9d122');
-HA_F0[27] = r('........22128b1.22..221eeeegigegg1222222.1d122');
-HA_F0[28] = r('.......22128b12.2.....1eeeegigegg122222.2.11.22');
+HA_F0[18] = r('.............222...12mn2eeeeegieegg2nm2.1112.2');
+HA_F0[19] = r('..............2..2128921eeeeegieegg19281.111.22');
+HA_F0[20] = r('................212899a1eeeeegieegg1a99821.11122');
+HA_F0[21] = r('...............212899a12.1eeeegiegg1a99821.111.2');
+HA_F0[22] = r('..............212899a1.21eeeegiegg1..a9982111d122');
+HA_F0[23] = r('.............212899a1.21eeeegiegg1.21a99821d1.22');
+HA_F0[24] = r('............212899b212.1eeeegiegg12212b9981d122');
+HA_F0[25] = r('...........21289b1.2221eeeegiegg1.2221b98d1.22');
+HA_F0[26] = r('..........21289b12.2221eeeegiegg122..21b9d122');
+HA_F0[27] = r('........22128b1.22..221eeeegiegg1222222.1d122');
+HA_F0[28] = r('.......22128b12.2.....1eeeegiegg122222.2.11.22');
 
 // F1: counter-pose — one arm extended forward, energy gathering
 const HA_F1 = clone(IDLE_BASE);
@@ -369,14 +369,14 @@ KFC_F0[28] = r('.........128b1....................11..mn.mm22mm.................
 const KFC_F1 = clone(KF_F1); // Start from KOOU thrust frame
 // Replace the thrust arm area with wider orange-glowing energy ball
 // The existing arms extend to x~90 area; we add a larger energy ball
-KFC_F1[18] = r('...................12mn21..........12mn2.111..1eeeeeeeggigeeeeeegg18bd81.');
-KFC_F1[19] = r('..................128921...........128b1.111.1eeeeeeeeggigeeeeeegg188bd81.');
-KFC_F1[20] = r('.................1289la1...........189a1.111eeeeeeeeggigeeeeeeegg188bd81.');
-KFC_F1[21] = r('................1289ka1............18ka111eeeeeeeeeggigeeeeeeeegg18d81..');
-KFC_F1[22] = r('...............12899a1.............1891.1eeeeegigeeeggmn22meeee1d91....');
-KFC_F1[23] = r('..............12899a1..............18d1eeeegigeeggm2222222nei1d91.....');
-KFC_F1[24] = r('.............12899b21..............1d8eeeegigeggm222222222221d91.......');
-KFC_F1[25] = r('............1289b1................1d8eeeegigeggm2222222222n1d91.........');
+KFC_F1[18] = r('...................12mn21..........12mn2.111..1eeeeeeeggieeeeeegg18bd81.');
+KFC_F1[19] = r('..................128921...........128b1.111.1eeeeeeeeggieeeeeegg188bd81.');
+KFC_F1[20] = r('.................1289la1...........189a1.111eeeeeeeeggieeeeeeegg188bd81.');
+KFC_F1[21] = r('................1289ka1............18ka111eeeeeeeeeggieeeeeeeegg18d81..');
+KFC_F1[22] = r('...............12899a1.............1891.1eeeeegieeeggmn22meeee1d91....');
+KFC_F1[23] = r('..............12899a1..............18d1eeeegieeggm2222222nei1d91.....');
+KFC_F1[24] = r('.............12899b21..............1d8eeeegieggm222222222221d91.......');
+KFC_F1[25] = r('............1289b1................1d8eeeegieggm2222222222n1d91.........');
 KFC_F1[26] = r('...........1289b1.................1d8eeegeegm2222222222n1d91...........');
 KFC_F1[27] = r('..........128b1...................1deeegegm222222222n1d91..............');
 KFC_F1[28] = r('.........128b1....................11eeegegm2222222n1d91................');
@@ -393,12 +393,12 @@ KFC_F1[28] = r('.........128b1....................11eeegegm2222222n1d91.........
 // F0: deeper crouch — use crouch base, body even lower, fist at waist
 const KHC_F0 = clone(CROUCH_BASE);
 // Right fist pulled way back at waist level, ready to launch
-KHC_F0[60] = r('..................................k1eeeegigegg1k...........................');
-KHC_F0[61] = r('.................................k1eeeegigegg1k............................');
-KHC_F0[62] = r('................................k1eeeegigegg1k..1d91......................');
-KHC_F0[63] = r('...............................k1eeeegigegg1k..1dbd1.....................');
-KHC_F0[64] = r('..............................k1eeeegigegg1k..1d8d1......................');
-KHC_F0[65] = r('.............................k1eeeegigegg1k..1dbd1.......................');
+KHC_F0[60] = r('..................................k1eeeegiegg1k...........................');
+KHC_F0[61] = r('.................................k1eeeegiegg1k............................');
+KHC_F0[62] = r('................................k1eeeegiegg1k..1d91......................');
+KHC_F0[63] = r('...............................k1eeeegiegg1k..1dbd1.....................');
+KHC_F0[64] = r('..............................k1eeeegiegg1k..1d8d1......................');
+KHC_F0[65] = r('.............................k1eeeegiegg1k..1dbd1.......................');
 KHC_F0[66] = r('............................k11111114111111k..1d8d1........................');
 KHC_F0[67] = r('...........................k1111111141111111k..1d91.........................');
 KHC_F0[68] = r('..........................kkkkkkkkkkkkkkkkkk..1d1..........................');
