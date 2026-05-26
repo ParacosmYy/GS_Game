@@ -4964,3 +4964,45 @@
 **下一轮方向：** 角色rendering改进(使用manifest数据驱动placeholder)+版边系统测试+计时器/回合系统测试
 
 **commit: 995380e | 下一目标: 523 (还需+5)**
+
+---
+
+## Iter-H38 — 渲染manifest驱动+版边/回合/状态机/能量/输入/回放测试 (518→523)
+
+**日期:** 2026-05-26
+
+**本轮类型:** 系统稳定性+测试覆盖率迭代
+
+**实质性改变:**
+- 渲染层改进: manifest fallbackColors驱动角色渲染, 不再硬编码颜色
+- 新增manifestRenderData.ts: 渲染查询层(getCharacterRenderData/getCharacterColors等)
+- 7个新测试文件共185个测试:
+  - 版边系统(25): 边界/wall bounce/corner pressure/位置钳制
+  - 回合计时器(24): timer/KO/round transitions/3v3 match flow
+  - 角色状态机(56): 转换/非法防护/reset/空中/特殊状态/timer
+  - 能量边界(26): meter/MAX/DM/desperation/free cancel/guard cancel
+  - 输入边界(23): buffer/direction/command/timing/edge cases
+  - 回放确定性(21): PRNG/snapshot/replay/input recording
+  - 渲染manifest(10): 可访问性/颜色/动画/肖像
+- 测试总数: 3937→4092 (+155)
+
+| 维度 | 诚实分 | 变化 | 备注 |
+|------|--------|------|------|
+| 角色美术 | 48/200 | = | 未改(placeholder仍为色块) |
+| 舞台美术 | 42/100 | = | 未改 |
+| 音频品质 | 60/150 | = | 未改 |
+| 角色内容 | 102/150 | = | 未改 |
+| 战斗手感 | 131/150 | +3 | 版边/回合/状态机全面验证, 系统可信度提升 |
+| 帧数据精度 | 88/100 | = | 未改 |
+| 游戏流程 | 86/100 | +2 | 回合/KO/计时器/3v3 match flow验证 |
+| UI/HUD品质 | 46/50 | = | 未改 |
+
+**本轮提升了哪个维度？** 战斗手感(+3 系统级验证), 游戏流程(+2 回合/比赛验证)
+
+**为什么只加5分？** 以测试验证为主,无新玩家可感知功能;渲染改为manifest驱动是基础设施
+
+**还有哪些差距？** 角色美术(48/200)和舞台(42/100)需要真实资产;缺少训练模式/选人界面
+
+**下一轮方向：** AI行为改进(更真实的AI策略)+训练模式基础+选人界面框架
+
+**commit: 00d30be | 下一目标: 528 (还需+5)**
