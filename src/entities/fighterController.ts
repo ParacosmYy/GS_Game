@@ -203,13 +203,20 @@ export class FighterController {
           else f.landingRecovery = JUMP_LANDING_RECOVERY;
         }
         f.throwInvincibilityTimer = THROW_INVINCIBILITY_LANDING;
-        f.juggleState = JuggleState.NONE;
-        f.airHitCount = 0;
+        f.resetComboJuggleState();
         f.hasAttackedInAir = false;
         this.vfx.spawnDust(f.x, STAGE_GROUND_Y);
       } else if (wasAirHitstun) {
         f.y = STAGE_GROUND_Y; f.vy = 0; f.vx = 0;
-        if (this.recoveryRollRequested) {
+        // Ground bounce: if fighter has ground bounce state, launch back up
+        if (f.isGroundBounce && f.groundBounceTimer > 0) {
+          // Ground bounce preserves combo state (juggle points, wall bounce count)
+          // The timer was already set by combatSystem on the initial impact
+          // Just keep the fighter in hitstun while bouncing
+          f.state = FighterState.HITSTUN;
+          f.hitstunTimer = f.groundBounceTimer;
+          this.vfx.spawnDust(f.x, STAGE_GROUND_Y);
+        } else if (this.recoveryRollRequested) {
           f.state = FighterState.IDLE;
           f.isKnockedDown = false;
           f.landingRecovery = LANDING_RECOVERY;
@@ -220,8 +227,7 @@ export class FighterController {
           f.knockdownTimer = 25;
           f.isKnockedDown = true;
           f.isHardKnockdown = false;
-          f.juggleState = JuggleState.NONE;
-          f.airHitCount = 0;
+          f.resetComboJuggleState();
           this.recoveryRollRequested = false;
           this.vfx.spawnDust(f.x, STAGE_GROUND_Y);
         }

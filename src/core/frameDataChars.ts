@@ -250,6 +250,31 @@ export const FRAME_DATA_CHARS = {
     hitLevel: "MID" as const,
     knockdown: false,
   },
+  // 大蛇薙古式→火 qcf+K (大蛇薙近距离火柱, KD) — KOF2002UM 校准数据
+  KYO_OBINIGURUMA: {
+    startup: 8,
+    active: 8,
+    recovery: 26,
+    damage: 90,
+    hitstun: 22,
+    blockstun: 18,
+    pushback: 6,
+    hitLevel: "MID" as const,
+    knockdown: true,
+    chipDamage: 12,
+  },
+  // 百八十二式 qcf+K→P (短距连打突进, KD) — KOF2002UM 校准数据
+  KYO_GEODOU: {
+    startup: 10,
+    active: 10,
+    recovery: 28,
+    damage: 85,
+    hitstun: 22,
+    blockstun: 18,
+    pushback: 5,
+    hitLevel: "MID" as const,
+    knockdown: true,
+  },
   // ── 京DM/SDM ── Dream Cancel Wiki KOF2002UM
   DM_OROCHINAGI_A: {
     startup: 21,
@@ -561,6 +586,19 @@ export const FRAME_DATA_CHARS = {
     hitLevel: "MID" as const,
     knockdown: true,
     chipDamage: 8,
+  },
+  // Burn Knuckle qcb+D (重版, 远距离高伤害) — KOF2002UM 校准数据
+  TERRY_BURN_KNUCKLE_D: {
+    startup: 18,
+    active: 14,
+    recovery: 22,
+    damage: 95,
+    hitstun: 19,
+    blockstun: 17,
+    pushback: 7,
+    hitLevel: "MID" as const,
+    knockdown: true,
+    chipDamage: 10,
   },
   // Crack Shoot qcb+B (中段)
   TERRY_CRACK_SHOT: {
@@ -888,6 +926,19 @@ export const FRAME_DATA_CHARS = {
     hitLevel: "MID" as const,
     knockdown: false,
     chipDamage: 10,
+  },
+  // 虎煌拳 重版 qcf+D (Ko'ou Ken D, heavy projectile) — KOF2002UM 校准数据
+  RYO_KOOUKEN_D: {
+    startup: 15,
+    active: 22,
+    recovery: 30,
+    damage: 120,
+    hitstun: 32,
+    blockstun: 30,
+    pushback: 6,
+    hitLevel: "MID" as const,
+    knockdown: true,
+    chipDamage: 12,
   },
   // 虎煌 dp+A (Kohou, weak DP, KD)
   RYO_KO_HOU: {
@@ -1228,6 +1279,18 @@ export const FRAME_DATA_CHARS = {
     hitLevel: "HIGH" as const,
     knockdown: true,
   },
+  // ムササビの舞 重版 空中 qcb+K (空中俯冲扇 重版, 高伤害) — KOF2002UM 校准数据
+  MAI_MUSASABI_D: {
+    startup: 14,
+    active: 12,
+    recovery: 22,
+    damage: 95,
+    hitstun: 24,
+    blockstun: 20,
+    pushback: 6,
+    hitLevel: "HIGH" as const,
+    knockdown: true,
+  },
   // 必殺忍蜂 ←↙↓↘→+K (冲刺攻击)
   MAI_HISSATSU_SHINOBI: {
     startup: 8,
@@ -1342,6 +1405,31 @@ export const FRAME_DATA_CHARS = {
     hitLevel: "MID" as const,
     knockdown: true,
     chipDamage: 14,
+  },
+  // Crow Bites dp+D (重版 DP, 多段上升, KD) — KOF2002UM 校准数据
+  KDASH_CROW_BITE_D: {
+    startup: 7,
+    active: 10,
+    recovery: 30,
+    damage: 110,
+    hitstun: 22,
+    blockstun: 18,
+    pushback: 8,
+    hitLevel: "MID" as const,
+    knockdown: true,
+    chipDamage: 16,
+  },
+  // One Inch f+A (近距离特殊技, 快速短距打击) — KOF2002UM 校准数据
+  KDASH_ONE_INCH: {
+    startup: 8,
+    active: 5,
+    recovery: 18,
+    damage: 65,
+    hitstun: 18,
+    blockstun: 14,
+    pushback: 4,
+    hitLevel: "MID" as const,
+    knockdown: false,
   },
   // Minute Spike qcb+K (jumping knee)
   KDASH_MINUTE: {

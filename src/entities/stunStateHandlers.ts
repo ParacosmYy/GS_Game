@@ -7,7 +7,7 @@ import type { ResolvedInput } from '../input/inputResolver.js';
 import {
   STAGE_GROUND_Y,
   ROLL_SPEED, ROLL_DURATION,
-  DM_STOCK_COST,
+  GC_ROLL_STOCK_COST, GC_CD_STOCK_COST,
   THROW_INVINCIBILITY_POST_STUN,
   THROW_INVINCIBILITY_WAKEUP,
   WAKEUP_BUFFER_WINDOW,
@@ -25,8 +25,8 @@ export function handleBlock(ctx: FighterCtx, input: ResolvedInput): void {
     f.throwBufferTimer = 3;
     f.throwBufferDirection = input.forward ? 'forward' : input.back ? 'back' : 'neutral';
   }
-  // Guard Cancel Roll (A+B during early blockstun, costs 1 stock)
-  if (f.blockstunTimer > 0 && input.rollPressed && ctx.gauge && spendStocks(ctx.gauge, DM_STOCK_COST)) {
+  // Guard Cancel Roll (A+B during early blockstun, costs GC_ROLL_STOCK_COST stocks)
+  if (f.blockstunTimer > 0 && input.rollPressed && ctx.gauge && spendStocks(ctx.gauge, GC_ROLL_STOCK_COST)) {
     f.state = input.back ? FighterState.BACK_ROLL : FighterState.ROLL;
     f.rollTimer = ROLL_DURATION;
     f.isGCRoll = true;
@@ -36,8 +36,8 @@ export function handleBlock(ctx: FighterCtx, input: ResolvedInput): void {
     ctx.vfx.spawnDust(f.x, STAGE_GROUND_Y);
     return;
   }
-  // Guard Cancel CD
-  if (f.blockstunTimer > 0 && input.blowbackPressed && ctx.gauge && spendStocks(ctx.gauge, DM_STOCK_COST)) {
+  // Guard Cancel CD (costs GC_CD_STOCK_COST stocks)
+  if (f.blockstunTimer > 0 && input.blowbackPressed && ctx.gauge && spendStocks(ctx.gauge, GC_CD_STOCK_COST)) {
     f.blockstunTimer = 0;
     f.startAttack(AttackType.STAND_CD);
     return;

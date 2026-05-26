@@ -379,8 +379,8 @@ export class CombatSystem {
       const pushblockMult = defender.consecutiveBlockCount >= PUSHBLOCK_THRESHOLD ? PUSHBLOCK_EXTRA_PUSHBACK : 1.0;
 
       // KOF2002: 防御时防御槽减少(被攻击消耗)但成功防御获得少量气槽恢复奖励
-      defender.guardGauge = Math.max(0, defender.guardGauge - guardGaugeDamage(attackType));
-      defender.guardGauge = Math.min(100, defender.guardGauge + GUARD_GAUGE_METER_BONUS_ON_BLOCK);
+      const drain = guardGaugeDamage(attackType);
+      defender.guardGauge = Math.max(0, defender.guardGauge - drain);
 
       if (defender.guardGauge <= 0) {
         // Guard Crush — stunned instead of normal blockstun
@@ -393,6 +393,7 @@ export class CombatSystem {
         const hitY = defender.y - defender.displayHeight / 2;
         this.onGuardCrush?.(defender, hitX, hitY);
       } else {
+        defender.guardGauge = Math.min(100, defender.guardGauge + GUARD_GAUGE_METER_BONUS_ON_BLOCK);
         defender.applyBlockstun(data.blockstun, data.pushback * pushblockMult);
       }
       const chipData = data as { chipDamage?: number };
@@ -536,11 +537,14 @@ export class CombatSystem {
 
     // Counter Wire: counter hit + counterWire move → wall bounce instead of knockdown
     // CD attacks always cause wall bounce on hit (not just counter)
-    const frameData = data as { counterWire?: boolean };
+    // Wall bounce is limited to WALL_BOUNCE_MAX_PER_COMBO per combo
+    const frameData = data as { counterWire?: boolean; groundBounce?: boolean };
     const isCDAttack = attackType === AttackType.STAND_CD || attackType === AttackType.JUMP_CD;
-    const shouldWallBounce = (counterHit && frameData.counterWire) || isCDAttack;
+    const shouldWallBounce = ((counterHit && frameData.counterWire) || isCDAttack)
+      && defender.wallBounceCount < WALL_BOUNCE_MAX_PER_COMBO;
     if (shouldWallBounce) {
       defender.isCounterWire = true;
+      defender.wallBounceCount++;
       const flyDir = defender.x < attacker.x ? -1 : 1;
       defender.vx = COUNTER_WIRE_BOUNCE_VX * flyDir * -1;
       defender.vy = COUNTER_WIRE_BOUNCE_VY;
@@ -551,11 +555,25 @@ export class CombatSystem {
       defender.hitstunTimer = 30;
       defender.isKnockedDown = false;
     } else if (data.knockdown && !isCancelledCmdNormal) {
-      defender.applyKnockdown(25);
-      // 浮空追打: 击飞时给予完整的juggle预算和FULL状态
-      if (!defender.isGrounded()) {
-        defender.jugglePoints = JUGGLE_POINTS_MAX;
+      // Ground bounce: certain knockdown moves cause a small bounce on first ground impact
+      if (frameData.groundBounce && defender.isGrounded()) {
+        defender.isGroundBounce = true;
+        defender.groundBounceTimer = GROUND_BOUNCE_HITSTUN;
+        defender.vy = GROUND_BOUNCE_VY;
+        defender.vx = 0;
         defender.juggleState = JuggleState.FULL;
+        // Ground bounce follow-up costs extra juggle points
+        defender.jugglePoints = Math.max(0, JUGGLE_POINTS_MAX - GROUND_BOUNCE_COST);
+        defender.state = FighterState.HITSTUN;
+        defender.hitstunTimer = GROUND_BOUNCE_HITSTUN;
+        defender.isKnockedDown = false;
+      } else {
+        defender.applyKnockdown(25);
+        // 浮空追打: 击飞时给予完整的juggle预算和FULL状态
+        if (!defender.isGrounded()) {
+          defender.jugglePoints = JUGGLE_POINTS_MAX;
+          defender.juggleState = JuggleState.FULL;
+        }
       }
     } else {
       // KOF2002: pushback递减 — 连段越长推力越小(第2击85%, 第3击70%, 第4+击55%)
@@ -623,7 +641,7 @@ function isSpecialMoveCheck(at: AttackType): boolean {
 /** Guard gauge depletion based on attack type */
 function guardGaugeDamage(attackType: AttackType): number {
   const name = attackType as string;
-  if (isDM(name)) return name.startsWith('SDM_') ? GUARD_GAUGE_DRAIN_SDM : GUARD_GAUGE_DRAIN_DM;
+  if (isDM(name)) return (name.startsWith('SDM_') || name.startsWith('HSDM_')) ? GUARD_GAUGE_DRAIN_SDM : GUARD_GAUGE_DRAIN_DM;
   if (isSpecialMoveCheck(attackType)) return GUARD_GAUGE_DRAIN_SPECIAL;
   if (COMMAND_NORMALS.has(name)) return GUARD_GAUGE_DRAIN_COMMAND_NORMAL;
   if (attackType === AttackType.STAND_CD || attackType === AttackType.JUMP_CD) return GUARD_GAUGE_DRAIN_CD;
@@ -655,6 +673,8 @@ function stunFill(attackType: AttackType): number {
 function getJuggleCost(attackType: AttackType): number {
   const name = attackType as string;
   if (isDM(name)) return JUGGLE_COST_DM;
+  // CD blowback attacks
+  if (attackType === AttackType.STAND_CD || attackType === AttackType.JUMP_CD) return JUGGLE_COST_CD;
   if (isSpecialMoveCheck(attackType)) return JUGGLE_COST_SPECIAL;
   if (name.endsWith('_C') || name.endsWith('_D')
     || COMMAND_NORMALS.has(name)

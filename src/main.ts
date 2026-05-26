@@ -543,6 +543,12 @@ function update(): void {
     if (p1Input.buttonCPressed) btns.push('C');
     if (p1Input.buttonDPressed) btns.push('D');
     if (p1Input.throwAttackPressed) btns.push('CD');
+    // Negative Edge display: show button releases with ~ prefix
+    if (p1Input.punchJustReleased && !p1Input.punchPressed) btns.push('~P');
+    if (p1Input.kickJustReleased && !p1Input.kickPressed) btns.push('~K');
+    // Charge ready indicator
+    const chargeReady = p1Cmd.getChargeState('down').ready || p1Cmd.getChargeState('back').ready;
+    if (chargeReady) btns.push('CHG');
     training.recordInput(dir, btns, tickRef.value);
     training.updateFrameData(p1, tickRef.value);
   }
@@ -595,7 +601,7 @@ function update(): void {
     vfx.spawnFirstAttackText(hitter.x, hitter.y - hitter.displayHeight - 40);
     announcer.firstAttack();
     if (gauges[hitterIdx]) {
-      gainMeterOnHit(gauges[hitterIdx]);
+      gainMeterOnHit(gauges[hitterIdx], undefined, hitter.health, hitter.maxHealth);
     }
   }
 

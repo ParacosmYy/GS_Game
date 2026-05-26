@@ -5,13 +5,13 @@
 import type { Fighter } from '../entities/fighter.js';
 import type { PowerGauge, MaxModeState } from '../core/types.js';
 import { AttackType } from '../core/types.js';
-import { DM_STOCK_COST } from '../core/constants.js';
-import { spendStocks, activateMaxMode } from './meter.js';
+import { DM_STOCK_COST, DESPERATION_HEALTH_THRESHOLD } from '../core/constants.js';
+import { spendStocks, activateMaxMode, isDesperation } from './meter.js';
 import type { CinematicState } from '../state/cinematicState.js';
 import type { VFXSystem, ScreenShake } from '../rendering/vfx.js';
 import type { ResolvedInput } from '../input/inputResolver.js';
 
-// DM → SDM upgrade mapping
+// DM -> SDM upgrade mapping
 const DM_TO_SDM: Partial<Record<AttackType, AttackType>> = {
   [AttackType.DM_OROCHINAGI]: AttackType.SDM_OROCHINAGI,
   [AttackType.DM_YATAGARASU]: AttackType.SDM_YATAGARASU,
@@ -57,17 +57,21 @@ export class DMManager {
       if (!this.isDMAttack(atk) && !this.isSDMAttack(atk)) continue;
 
       if (this.isSDMAttack(atk)) {
-        // SDM: MAX mode required + extra stock (2 total), ends MAX mode
-        if (!maxModes[i].active || gauges[i].stocks < 2) {
-          f.endAttack(); // Not in MAX or not enough stocks → cancel
+        // SDM: MAX mode or desperation mode required + extra stock (2 total)
+        const inDesperation = isDesperation(f.health, f.maxHealth);
+        if ((!maxModes[i].active && !inDesperation) || gauges[i].stocks < 2) {
+          f.endAttack(); // Not in MAX/desperation or not enough stocks -> cancel
           continue;
         }
         spendStocks(gauges[i], 2);
-        maxModes[i].active = false;
-        maxModes[i].timer = 0;
+        // Desperation SDM does NOT end MAX mode (only MAX SDM does)
+        if (maxModes[i].active) {
+          maxModes[i].active = false;
+          maxModes[i].timer = 0;
+        }
         cinematic.triggerSuperFlash(f.x, f.y - f.displayHeight / 2, i);
       } else if (maxModes[i].active) {
-        // MAX mode: upgrade DM to SDM if ≥2 stocks, otherwise free DM
+        // MAX mode: upgrade DM to SDM if >=2 stocks, otherwise free DM
         if (gauges[i].stocks >= 2 && DM_TO_SDM[atk]) {
           f.currentAttack = DM_TO_SDM[atk]!;
           spendStocks(gauges[i], 2);
@@ -75,12 +79,20 @@ export class DMManager {
         maxModes[i].active = false;
         maxModes[i].timer = 0;
         cinematic.triggerSuperFlash(f.x, f.y - f.displayHeight / 2, i);
-      } else if (gauges[i].stocks >= DM_STOCK_COST) {
-        // Non-MAX: consume 1 stock
-        this.useDM(i);
-        cinematic.triggerSuperFlash(f.x, f.y - f.displayHeight / 2, i);
       } else {
-        f.endAttack(); // Not enough meter → cancel
+        // Desperation mode: upgrade DM to SDM (costs 2 stocks instead of 1)
+        const inDesperation = isDesperation(f.health, f.maxHealth);
+        if (inDesperation && gauges[i].stocks >= 2 && DM_TO_SDM[atk]) {
+          f.currentAttack = DM_TO_SDM[atk]!;
+          spendStocks(gauges[i], 2);
+          cinematic.triggerSuperFlash(f.x, f.y - f.displayHeight / 2, i);
+        } else if (gauges[i].stocks >= DM_STOCK_COST) {
+          // Non-MAX, non-desperation: consume 1 stock for DM
+          this.useDM(i);
+          cinematic.triggerSuperFlash(f.x, f.y - f.displayHeight / 2, i);
+        } else {
+          f.endAttack(); // Not enough meter -> cancel
+        }
       }
     }
   }

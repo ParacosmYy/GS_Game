@@ -152,7 +152,7 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       const blkBias = (blkDM || blkSpecial || blkHeavy) ? attacker.facing * 3 : 0;
       deps.screenShake.trigger(blkDM ? 8 : blkSpecial ? 5 : blkHeavy ? 4 : 3, blkDM ? 10 : blkSpecial ? 7 : blkHeavy ? 6 : 5, blkBias);
       gainMeterOnBlock(deps.gauges[atkIdx], attackType);
-      gainMeterOnHitstun(deps.gauges[defIdx], attackType);
+      gainMeterOnHitstun(deps.gauges[defIdx], attackType, defender.health, defender.maxHealth);
       // Chip伤害数字: 必杀技/DM防御时显示灰色小数字
       if (blkSpecial || blkDM) {
         const chip = Math.round(data.damage * 0.07);
@@ -174,7 +174,7 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
     const comboStop = combo >= 10 ? 1 : 0;
     const criticalStop = defender.health < defender.maxHealth * 0.15 ? 1 : 0;
     deps.cinematic.triggerHitStop(baseStop + comboStop + criticalStop, defIdx, attacker.facing);
-    gainMeterOnHitstun(deps.gauges[defIdx], attackType);
+    gainMeterOnHitstun(deps.gauges[defIdx], attackType, defender.health, defender.maxHealth);
     // 风云再起特色: 第一次命中奖励 — 每回合首次命中额外+30气槽
     if (!deps.combatSystem.wasFirstHitAwarded(defIdx)) {
       deps.gauges[atkIdx].meter = Math.min(deps.gauges[atkIdx].meter + 30, MAX_STOCKS * METER_PER_STOCK);
