@@ -899,3 +899,9 @@
 ## H185: ryoSpriteBatch3—11项验证crouch/block/damage/special/super/throw/win/dizzy帧 — 157→158
 
 **commit:** <hash> | ryoSpriteBatch3—11项验证crouch/block/damage/special/super/throw/win/dizzy帧
+
+---
+
+## H186: victoryPose—5项验证getVictoryPose+角色区分+tick动画 — 158→159
+
+**commit:** <hash> | victoryPose—5项验证getVictoryPose+角色区分+tick动画
