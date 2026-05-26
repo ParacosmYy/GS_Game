@@ -330,6 +330,8 @@ describe('2. 硬直平衡性', () => {
       if (isAirAttack(key)) continue; // 空中攻击跳过
       // 跳过空中命令通常技 (recovery极低, blockstun高)
       if (/YUKIWARUI|AIR_B/.test(key) && fd.recovery <= 5) continue;
+      // 跳过投技(blockstun=0, pushback=0的不防技)
+      if (fd.blockstun === 0 && fd.pushback === 0) continue;
       const blockAdv = fd.blockstun - fd.recovery;
       if (blockAdv < -20 || blockAdv > 5) {
         violations.push(`${key}: blockAdvantage=${blockAdv}`);
