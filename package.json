@@ -8,6 +8,11 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "test": "vitest run",
+    "test:smoke": "vitest run tests/constantsConsistency.test.ts tests/commandBuffer.test.ts tests/airborneActionRouting.test.ts tests/fighterStateIntegrity.test.ts",
+    "test:ryo": "vitest run tests/ryo*.test.ts",
+    "test:combat": "vitest run tests/combat*.test.ts tests/cancel*.test.ts tests/hit*.test.ts tests/guard*.test.ts tests/juggle*.test.ts",
+    "test:content": "vitest run tests/*Manifest*.test.ts tests/*FrameData*.test.ts tests/ryoFrameContract.test.ts",
+    "test:full": "vitest run",
     "test:watch": "vitest"
   },
   "devDependencies": {

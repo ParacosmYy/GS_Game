@@ -44,6 +44,7 @@
 - [模块边界](../architecture/module-boundaries.md)
 - [真实性标准](../product/authenticity-standard.md)
 - [质量门禁](quality-gates.md)
+- [测试治理](test-governance.md)
 
 ### 2.3 研究
 
@@ -108,6 +109,8 @@ npx vite build
 ```
 
 涉及核心逻辑时运行相关 `vitest`。
+
+测试选择必须遵守 [测试治理](test-governance.md)：默认先跑 `npm run test:smoke`，再按本轮改动追加 `test:ryo`、`test:combat` 或 `test:content`。不得因为测试文件多而直接删除回归测试。
 
 ### 2.8 复盘
 

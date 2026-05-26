@@ -9,9 +9,12 @@
 ```bash
 npx tsc --noEmit
 npx vite build
+npm run test:smoke
 ```
 
 如果这两项失败，不得声称完成。
+
+测试分层按 [测试治理](test-governance.md) 执行。默认不盲跑全量测试，除非本轮是阶段验收、发布前、大规模重构，或用户明确要求。
 
 ## 2. 按改动类型增加验证
 
@@ -24,6 +27,8 @@ npx vite build
 | portrait/sprite manifest | 资源引用、尺寸、anchor、fallback 校验 |
 | rendering | 本地手测路径，确认 fallback 可用 |
 | 文档 | 链接一致性、优先级一致性、无冲突规则 |
+
+如果本轮只改文档，可用 `npx tsc --noEmit`、`npx vite build` 和链接/规则一致性检查替代领域测试；但涉及测试策略或脚本时必须至少运行 `npm run test:smoke`。
 
 ## 3. Ryo 样板专属门禁
 
