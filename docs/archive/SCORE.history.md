@@ -163,3 +163,9 @@
 ## H75: frame data Ryo完整性测试—37项验证帧数据30个攻击 — 47→48
 
 **commit:** <hash> | 21普攻+6必杀+3DM存在性+结构体+逻辑验证
+
+---
+
+## H76: attack frames Ryo完整性测试—45项验证31个攻击 — 48→49
+
+**commit:** <hash> | 31存在性+4结构体+5帧数逻辑+2命令通常技+HSDM_RYUKO_RANBU
