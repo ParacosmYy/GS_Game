@@ -571,3 +571,9 @@
 ## H138: commandBuffer测试—8项验证record+reset+checkSpecial+getChargeState+hasQCF — 110→111
 
 **commit:** <hash> | commandBuffer测试—8项验证record+reset+checkSpecial+getChargeState+hasQCF
+
+---
+
+## H139: vfx测试—4项验证ScreenFlash构造+trigger+update衰减 — 111→112
+
+**commit:** <hash> | vfx测试—4项验证ScreenFlash构造+trigger+update衰减
