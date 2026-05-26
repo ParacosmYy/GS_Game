@@ -802,3 +802,9 @@
 ## H172: skeletalParts—5项验证CHAR_OUTFIT+RYO_PALETTES+getOutfit — 144→145
 
 **commit:** <hash> | skeletalParts—5项验证CHAR_OUTFIT+RYO_PALETTES+getOutfit
+
+---
+
+## H173: portraitBatch1—5项验证kyo/iori/terry/ralf/clark肖像数据 — 145→146
+
+**commit:** <hash> | portraitBatch1—5项验证kyo/iori/terry/ralf/clark肖像数据
