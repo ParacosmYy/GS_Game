@@ -4,6 +4,8 @@ import {
   MAX_STOCKS, METER_PER_STOCK,
   METER_GAIN_HIT, METER_GAIN_BLOCK, METER_GAIN_WHIFF, METER_GAIN_HITSTUN,
   MAX_MODE_DURATION, MAX_MODE_STOCK_COST,
+  DESPERATION_HEALTH_THRESHOLD, DESPERATION_METER_GAIN_BONUS,
+  GC_ROLL_STOCK_COST, GC_CD_STOCK_COST,
 } from '../core/constants.js';
 import { isDM, isCharacterSpecial } from '../core/attackClassifier.js';
 
@@ -30,9 +32,18 @@ export function createMaxMode(): MaxModeState {
   return { active: false, timer: 0, maxDuration: MAX_MODE_DURATION };
 }
 
-/** Add meter gain from hitting opponent */
-export function gainMeterOnHit(gauge: PowerGauge, attackType: AttackType = AttackType.STAND_C): void {
-  addMeter(gauge, meterGainForAttack(METER_GAIN_HIT, attackType));
+/** Check if a fighter is in desperation mode (health < 25% maxHealth) */
+export function isDesperation(health: number, maxHealth: number): boolean {
+  return maxHealth > 0 && health > 0 && health / maxHealth < DESPERATION_HEALTH_THRESHOLD;
+}
+
+/** Add meter gain from hitting opponent. Optionally apply desperation bonus. */
+export function gainMeterOnHit(gauge: PowerGauge, attackType: AttackType = AttackType.STAND_C, health?: number, maxHealth?: number): void {
+  let gain = meterGainForAttack(METER_GAIN_HIT, attackType);
+  if (health !== undefined && maxHealth !== undefined && isDesperation(health, maxHealth)) {
+    gain = Math.round(gain * DESPERATION_METER_GAIN_BONUS);
+  }
+  addMeter(gauge, gain);
 }
 
 /** Add meter gain from having attack blocked */
@@ -40,14 +51,24 @@ export function gainMeterOnBlock(gauge: PowerGauge, attackType: AttackType = Att
   addMeter(gauge, meterGainForAttack(METER_GAIN_BLOCK, attackType));
 }
 
-/** Add meter gain from whiffing an attack */
+/** Add meter gain from whiffing a special move (small gain) */
 export function gainMeterOnWhiff(gauge: PowerGauge, attackType: AttackType = AttackType.STAND_C): void {
+  // KOF2002: whiff meter gain only for specials/DMs, not normals
+  const name = attackType as string;
+  if (!isCharacterSpecial(name) && name !== 'SPECIAL_UPPER' && name !== 'SPECIAL_PROJECTILE' && !isDM(name)) {
+    return; // normals give zero meter on whiff
+  }
   addMeter(gauge, meterGainForAttack(METER_GAIN_WHIFF, attackType));
 }
 
-/** Add meter gain from getting hit (defender side) */
-export function gainMeterOnHitstun(gauge: PowerGauge, attackType: AttackType = AttackType.STAND_C): void {
-  addMeter(gauge, meterGainForAttack(METER_GAIN_HITSTUN, attackType));
+/** Add meter gain from getting hit (defender side). Optionally apply desperation bonus. */
+export function gainMeterOnHitstun(gauge: PowerGauge, attackType: AttackType = AttackType.STAND_C, health?: number, maxHealth?: number): void {
+  let gain = meterGainForAttack(METER_GAIN_HITSTUN, attackType);
+  // Desperation bonus: defender gains meter faster when low health
+  if (health !== undefined && maxHealth !== undefined && isDesperation(health, maxHealth)) {
+    gain = Math.round(gain * DESPERATION_METER_GAIN_BONUS);
+  }
+  addMeter(gauge, gain);
 }
 
 /** Spend stocks for a move. Returns true if enough stocks */
@@ -59,7 +80,18 @@ export function spendStocks(gauge: PowerGauge, cost: number): boolean {
   return false;
 }
 
-/** Activate MAX mode. Returns true if activation succeeded */
+/** Spend stocks for Guard Cancel Roll. Returns true if enough stocks. */
+export function spendGCRoll(gauge: PowerGauge): boolean {
+  return spendStocks(gauge, GC_ROLL_STOCK_COST);
+}
+
+/** Spend stocks for Guard Cancel CD. Returns true if enough stocks. */
+export function spendGCCD(gauge: PowerGauge): boolean {
+  return spendStocks(gauge, GC_CD_STOCK_COST);
+}
+
+/** Activate MAX mode. Returns true if activation succeeded.
+ *  KOF2002正版: costs 3 stocks in Advanced mode. */
 export function activateMaxMode(gauge: PowerGauge, maxMode: MaxModeState): boolean {
   if (maxMode.active) return false;
   if (!spendStocks(gauge, MAX_MODE_STOCK_COST)) return false;

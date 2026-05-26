@@ -436,6 +436,14 @@ export interface MaxModeState {
   maxDuration: number;
 }
 
+// ===== Desperation Mode (health < 25%) =====
+export interface DesperationState {
+  /** Whether the fighter is in desperation range (health < 25%) */
+  active: boolean;
+  /** Health threshold ratio for desperation mode (0.25 = 25%) */
+  threshold: number;
+}
+
 // ===== Rekka Chain State (荒咬み/毒咬み连段) =====
 export type RekkaChain = 'aragami' | 'dokugami' | 'aoihana' | null;
 
@@ -444,6 +452,12 @@ export enum JuggleState {
   NONE = 'NONE',       // 不可追打 (普通通常技命中后)
   HALF = 'HALF',       // 半追打 (落下前期可打)
   FULL = 'FULL',       // 全追打 (落地前都可打 — 大多数必杀技/升龙)
+}
+
+// ===== Throw Target Type =====
+export enum ThrowTarget {
+  GROUND = 'GROUND',   // Normal/command throws — only grab grounded opponents
+  AIR = 'AIR',          // Air throws — only grab airborne opponents
 }
 
 // ===== 碰撞矩形 (世界空间) =====

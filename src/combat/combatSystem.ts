@@ -13,11 +13,22 @@ import {
   COUNTER_WIRE_BOUNCE_VX, COUNTER_WIRE_BOUNCE_VY,
   LIGHT_NORMALS, NORMAL_ATTACKS, COMMAND_NORMALS,
   STAGE_LEFT, STAGE_RIGHT,
-  JUGGLE_POINTS_MAX, JUGGLE_COST_LIGHT, JUGGLE_COST_HEAVY, JUGGLE_COST_SPECIAL, JUGGLE_COST_DM,
+  JUGGLE_POINTS_MAX, JUGGLE_COST_LIGHT, JUGGLE_COST_HEAVY, JUGGLE_COST_SPECIAL, JUGGLE_COST_DM, JUGGLE_COST_CD,
+  JUGGLE_GRAVITY_BASE, JUGGLE_GRAVITY_SCALE_PER_HIT,
+  GROUND_BOUNCE_VY, GROUND_BOUNCE_COST, GROUND_BOUNCE_HITSTUN,
+  WALL_BOUNCE_MAX_PER_COMBO,
   THROW_INVINCIBILITY_POST_ESCAPE,
   PROXIMITY_GUARD_RANGE,
   STUN_FILL_LIGHT, STUN_FILL_HEAVY, STUN_FILL_COMMAND_NORMAL,
   STUN_FILL_SPECIAL, STUN_FILL_DM, STUN_FILL_CD, STUN_FILL_THROW,
+  GUARD_CRUSH_DURATION,
+  GUARD_GAUGE_DRAIN_LIGHT, GUARD_GAUGE_DRAIN_HEAVY, GUARD_GAUGE_DRAIN_COMMAND_NORMAL,
+  GUARD_GAUGE_DRAIN_SPECIAL, GUARD_GAUGE_DRAIN_DM, GUARD_GAUGE_DRAIN_SDM, GUARD_GAUGE_DRAIN_CD,
+  GUARD_GAUGE_METER_BONUS_ON_BLOCK,
+  PUSHBLOCK_THRESHOLD, PUSHBLOCK_EXTRA_PUSHBACK, PUSHBLOCK_DECAY_FRAMES,
+  WRONG_BLOCK_PUSHBACK_MULT, WRONG_BLOCK_STUN_MULT,
+  MAX_MODE_DAMAGE_BONUS, MAX_MODE_DEFENSE_BONUS,
+  DESPERATION_HEALTH_THRESHOLD, DESPERATION_DM_DAMAGE_BONUS,
 } from '../core/constants.js';
 import { CLOSE_RANGE } from '../core/types.js';
 import { FighterState, AttackType, JuggleState } from '../core/types.js';
@@ -52,7 +63,7 @@ export class CombatSystem {
   private currentFrame = 0;
   // 风云再起特色: 第一次命中奖励 (每回合每个对手一次)
   private firstHitAwarded = [false, false];
-  // MAX mode state per player (true = active, -33% damage penalty)
+  // MAX mode state per player (true = active, +20% damage bonus)
   private maxModes: [boolean, boolean] = [false, false];
 
   constructor(inputProvider: IInputProvider) {
@@ -190,10 +201,10 @@ export class CombatSystem {
           : FRAME_DATA[AttackType.THROW];
         const defIdx = i;
         let damage = this.scaledDamage(data.damage, defIdx, throwType ?? undefined);
-        // MAX mode damage penalty on throws
+        // MAX mode damage bonus on throws (+20%)
         const atkIdxForThrow = 1 - i;
         if (this.maxModes[atkIdxForThrow]) {
-          damage = Math.round(damage * 0.67);
+          damage = Math.round(damage * MAX_MODE_DAMAGE_BONUS);
         }
 
         defender.health = Math.max(0, defender.health - damage);
@@ -322,10 +333,12 @@ export class CombatSystem {
       if (defender.jugglePoints < juggleCost) return; // not enough juggle budget
       defender.jugglePoints -= juggleCost;
       defender.airHitCount++;
-      // KOF2002 juggle gravity: each successive air hit increases gravity (opponent falls faster)
+      // KOF2002 juggle gravity decay: each successive air hit increases gravity (opponent falls faster)
       // Makes long juggle combos progressively harder
-      const gravityScale = 1 + defender.airHitCount * 0.15;
-      defender.vy += 0.3 * gravityScale;
+      const gravityScale = 1 + defender.airHitCount * JUGGLE_GRAVITY_SCALE_PER_HIT;
+      defender.vy += JUGGLE_GRAVITY_BASE * gravityScale;
+      // Mark airborne fighter as vulnerable to air throws
+      defender.airThrowVulnerable = true;
     }
 
     const defIdx = this.fighters ? (this.fighters[0] === defender ? 0 : 1) : 0;
@@ -340,7 +353,11 @@ export class CombatSystem {
 
     // 空中防御：空中按后可防 HIGH/MID 攻击，不能防 LOW
     if (isAirborne && defender.canAirBlock() && defInput.back && hitLevel !== 'LOW') {
-      defender.applyAirBlockstun(data.blockstun, data.pushback);
+      // Track consecutive blocks for pushblock
+      defender.consecutiveBlockCount++;
+      defender.consecutiveBlockDecayTimer = PUSHBLOCK_DECAY_FRAMES;
+      const pushblockMult = defender.consecutiveBlockCount >= PUSHBLOCK_THRESHOLD ? PUSHBLOCK_EXTRA_PUSHBACK : 1.0;
+      defender.applyAirBlockstun(data.blockstun, data.pushback * pushblockMult);
       // KOF2002: 空中防御chip damage比地面少30%
       const chipData = data as { chipDamage?: number };
       const chip = chipData.chipDamage ?? Math.round(data.damage * CHIP_DAMAGE_RATIO * 0.7);
@@ -354,22 +371,29 @@ export class CombatSystem {
 
     // 地面防御
     const dist = Math.abs(attacker.x - defender.x);
-    if (defender.canBlock() && !isAirborne && defInput.back && this.canBlock(hitLevel, crouching, dist)) {
+    const correctBlock = this.canBlock(hitLevel, crouching, dist);
+    if (defender.canBlock() && !isAirborne && defInput.back && correctBlock) {
+      // Track consecutive blocks for pushblock mechanic
+      defender.consecutiveBlockCount++;
+      defender.consecutiveBlockDecayTimer = PUSHBLOCK_DECAY_FRAMES;
+      const pushblockMult = defender.consecutiveBlockCount >= PUSHBLOCK_THRESHOLD ? PUSHBLOCK_EXTRA_PUSHBACK : 1.0;
+
       // KOF2002: 防御时防御槽减少(被攻击消耗)但成功防御获得少量气槽恢复奖励
       defender.guardGauge = Math.max(0, defender.guardGauge - guardGaugeDamage(attackType));
-      defender.guardGauge = Math.min(100, defender.guardGauge + 2);
+      defender.guardGauge = Math.min(100, defender.guardGauge + GUARD_GAUGE_METER_BONUS_ON_BLOCK);
 
       if (defender.guardGauge <= 0) {
         // Guard Crush — stunned instead of normal blockstun
         defender.state = FighterState.GUARD_CRUSH;
         defender.guardCrushTimer = GUARD_CRUSH_DURATION;
+        defender.consecutiveBlockCount = 0;
         defender.vx = data.pushback * (defender.facing === 1 ? -1 : 1) * 1.5;
         defender.resetAttackState();
         const hitX = (attacker.x + defender.x) / 2;
         const hitY = defender.y - defender.displayHeight / 2;
         this.onGuardCrush?.(defender, hitX, hitY);
       } else {
-        defender.applyBlockstun(data.blockstun, data.pushback);
+        defender.applyBlockstun(data.blockstun, data.pushback * pushblockMult);
       }
       const chipData = data as { chipDamage?: number };
       const chip = chipData.chipDamage ?? Math.round(data.damage * CHIP_DAMAGE_RATIO);
@@ -382,6 +406,31 @@ export class CombatSystem {
         attacker.vx = -data.pushback * 0.5 * attacker.facing;
       }
       // KOF2002: 通常技被防也允许取消到必杀技
+      if (NORMAL_ATTACKS.has(attackType as string)) attacker.normalCancelReady = true;
+      onHit?.(attacker, defender, attackType, true, false);
+      return;
+    }
+
+    // Wrong block penalty: defender is pressing back but has the wrong block type
+    // KOF2002: wrong block (stand vs low, crouch vs overhead) — takes chip damage and extra pushback/stun
+    if (defender.canBlock() && !isAirborne && defInput.back && !correctBlock && hitLevel !== 'MID') {
+      // Wrong block: still takes blockstun-like state but with penalty
+      const wrongBlockStun = Math.round(data.blockstun * WRONG_BLOCK_STUN_MULT);
+      const wrongBlockPushback = data.pushback * WRONG_BLOCK_PUSHBACK_MULT;
+      defender.consecutiveBlockCount++;
+      defender.consecutiveBlockDecayTimer = PUSHBLOCK_DECAY_FRAMES;
+      defender.applyBlockstun(wrongBlockStun, wrongBlockPushback);
+      // Wrong block drains extra guard gauge
+      defender.guardGauge = Math.max(0, defender.guardGauge - guardGaugeDamage(attackType) * 1.3);
+      // Chip damage on wrong block is the same as normal block (cannot kill)
+      const chipData = data as { chipDamage?: number };
+      const chip = chipData.chipDamage ?? Math.round(data.damage * CHIP_DAMAGE_RATIO);
+      defender.health = Math.max(1, defender.health - chip);
+      this.comboHits[defIdx] = 0;
+      const defNearCorner = defender.x < STAGE_LEFT + 60 || defender.x > STAGE_RIGHT - 60;
+      if (defNearCorner) {
+        attacker.vx = -data.pushback * 0.5 * attacker.facing;
+      }
       if (NORMAL_ATTACKS.has(attackType as string)) attacker.normalCancelReady = true;
       onHit?.(attacker, defender, attackType, true, false);
       return;
@@ -445,14 +494,19 @@ export class CombatSystem {
       }
     }
 
-    // MAX mode damage penalty: attacker in MAX mode deals -33% damage (KOF2002)
+    // MAX mode damage bonus: attacker in MAX mode deals +20% damage (KOF2002正版)
     const atkIdx = this.fighters![0] === attacker ? 0 : 1;
     if (this.maxModes[atkIdx]) {
-      damage = Math.round(damage * 0.67);
+      damage = Math.round(damage * MAX_MODE_DAMAGE_BONUS);
     }
     // MAX mode defense bonus: defender in MAX mode takes -25% damage (KOF2002)
     if (this.maxModes[defIdx]) {
-      damage = Math.round(damage * 0.75);
+      damage = Math.round(damage * MAX_MODE_DEFENSE_BONUS);
+    }
+
+    // Desperation mode: defender at low health (<25%), DM damage +30% for attacker
+    if (isDM(attackName) && defender.health > 0 && defender.health / defender.maxHealth < DESPERATION_HEALTH_THRESHOLD) {
+      damage = Math.round(damage * DESPERATION_DM_DAMAGE_BONUS);
     }
 
     this.comboHits[defIdx]++;
@@ -569,12 +623,12 @@ function isSpecialMoveCheck(at: AttackType): boolean {
 /** Guard gauge depletion based on attack type */
 function guardGaugeDamage(attackType: AttackType): number {
   const name = attackType as string;
-  if (isDM(name)) return name.startsWith('SDM_') ? 35 : 25;
-  if (isSpecialMoveCheck(attackType)) return 15;
-  if (COMMAND_NORMALS.has(name)) return 12;
-  if (attackType === AttackType.STAND_CD || attackType === AttackType.JUMP_CD) return 12;
-  if (name.endsWith('_C') || name.endsWith('_D')) return 10;
-  return 5;
+  if (isDM(name)) return name.startsWith('SDM_') ? GUARD_GAUGE_DRAIN_SDM : GUARD_GAUGE_DRAIN_DM;
+  if (isSpecialMoveCheck(attackType)) return GUARD_GAUGE_DRAIN_SPECIAL;
+  if (COMMAND_NORMALS.has(name)) return GUARD_GAUGE_DRAIN_COMMAND_NORMAL;
+  if (attackType === AttackType.STAND_CD || attackType === AttackType.JUMP_CD) return GUARD_GAUGE_DRAIN_CD;
+  if (name.endsWith('_C') || name.endsWith('_D')) return GUARD_GAUGE_DRAIN_HEAVY;
+  return GUARD_GAUGE_DRAIN_LIGHT;
 }
 
 /** Stun gauge fill based on attack type (KOF2002: heavy > light, specials much more) */
@@ -596,9 +650,6 @@ function stunFill(attackType: AttackType): number {
   // Light normals (A/B)
   return STUN_FILL_LIGHT;
 }
-
-/** Guard Crush constant — stun duration in frames (KOF2002: 90 frames / 1.5 seconds) */
-const GUARD_CRUSH_DURATION = 90;
 
 /** Get juggle point cost for an attack type */
 function getJuggleCost(attackType: AttackType): number {

@@ -38,9 +38,10 @@ export const PUSH_BOX_WIDTH = 60;
 export const MAX_HEALTH = 1000;
 
 // ===== Input Constants =====
-export const COMMAND_WINDOW = 18;          // 单个搓招窗口（正版KOF ≈ 16-20帧）
-export const HCF_WINDOW = 28;              // 半圆指令窗口（↓↙←↙↓↘→）
-export const DOUBLE_QCF_WINDOW = 30;       // 双QCF指令窗口（正版KOF UM DM窗口 ≈ 28-32帧）
+export const COMMAND_WINDOW = 12;          // 单个搓招窗口（正版KOF标准 ≈ 10-14帧, 12为经典值）
+export const HCF_WINDOW = 24;              // 半圆指令窗口（↓↙←↙↓↘→）
+export const DOUBLE_QCF_WINDOW = 28;       // 双QCF指令窗口（正版KOF UM DM窗口 ≈ 28-32帧）
+export const CHARGE_FRAMES_REQUIRED = 40;  // 蓄力帧数要求（正版KOF ≈ 40-55帧, 40为最低值）
 
 // ===== Game Loop Constants =====
 export const TICK_RATE = 1000 / 60;
@@ -79,6 +80,20 @@ export const JUGGLE_COST_LIGHT = 1;           // A/B normals cost 1
 export const JUGGLE_COST_HEAVY = 2;           // C/D normals cost 2
 export const JUGGLE_COST_SPECIAL = 2;         // specials cost 2
 export const JUGGLE_COST_DM = 3;              // DMs cost 3
+export const JUGGLE_COST_CD = 2;              // CD blowback cost 2
+
+// ===== Juggle Gravity Decay (progressive juggle difficulty) =====
+export const JUGGLE_GRAVITY_BASE = 0.3;       // base gravity addition per juggle hit
+export const JUGGLE_GRAVITY_SCALE_PER_HIT = 0.15; // +15% gravity per successive air hit
+
+// ===== Ground Bounce =====
+export const GROUND_BOUNCE_VY = -5;            // upward velocity on ground bounce
+export const GROUND_BOUNCE_COST = 2;           // extra juggle points consumed by ground bounce follow-up
+export const GROUND_BOUNCE_HITSTUN = 18;       // hitstun frames during ground bounce state
+
+// ===== Wall Bounce =====
+export const WALL_BOUNCE_MAX_PER_COMBO = 1;    // only one wall bounce per combo
+export const WALL_BOUNCE_SLIDE_FRICTION = 0.85; // friction during post-bounce slide
 
 // ===== Counter Wire (墙弹) =====
 export const COUNTER_WIRE_BOUNCE_VX = 8;   // Wall bounce horizontal speed
@@ -102,10 +117,20 @@ export const METER_GAIN_WHIFF = 10;
 export const METER_GAIN_HITSTUN = 50;
 export const DM_STOCK_COST = 1;
 
-// ===== MAX Mode =====
-export const MAX_MODE_DURATION = 720;     // 12秒 @60fps
-export const MAX_MODE_STOCK_COST = 1;
-export const MAX_MODE_DMG_REDUCTION = 0.75;
+// ===== MAX Mode (KOF2002 Advanced Mode) =====
+export const MAX_MODE_DURATION = 720;          // 12秒 @60fps (风云再起: 基于消耗的stock数)
+export const MAX_MODE_STOCK_COST = 3;          // KOF2002正版: MAX激活需要3个stock
+export const MAX_MODE_DAMAGE_BONUS = 1.20;     // MAX mode: 伤害 +20% (KOF2002正版)
+export const MAX_MODE_DEFENSE_BONUS = 0.75;    // MAX mode: 受伤 -25% (防御加成)
+
+// ===== Desperation Mode (health < 25%) =====
+export const DESPERATION_HEALTH_THRESHOLD = 0.25;  // 血量 < 25% 触发绝体绝命
+export const DESPERATION_DM_DAMAGE_BONUS = 1.30;    // 绝体绝命: DM伤害 +30%
+export const DESPERATION_METER_GAIN_BONUS = 1.50;   // 绝体绝命: 气槽获取 +50%
+
+// ===== Guard Cancel Costs =====
+export const GC_ROLL_STOCK_COST = 1;       // Guard Cancel Roll 消耗1个stock
+export const GC_CD_STOCK_COST = 1;         // Guard Cancel CD 消耗1个stock
 
 // ===== Advanced Cancel Mechanics =====
 export const PROXIMITY_GUARD_RANGE = 120;        // 仅近距离触发proximity guard (正版KOF ≈ close range)
@@ -189,6 +214,25 @@ export const STUN_FILL_THROW = 15;                 // Throw stun fill
 export const DIZZY_BASE_DURATION_MIN = 60;         // Minimum dizzy frames (~1 sec)
 export const DIZZY_BASE_DURATION_MAX = 180;        // Maximum dizzy frames (~3 sec)
 export const DIZZY_MASH_RECOVERY = 3;              // Frames recovered per button press (mashing)
+
+// ===== Defense System (KOF2002 authentic) =====
+export const GUARD_CRUSH_DURATION = 90;              // Guard Crush stun frames (KOF2002: ~1.5 sec)
+export const GUARD_GAUGE_MAX = 100;                  // Guard gauge maximum value
+export const GUARD_GAUGE_RECOVERY_IDLE = 0.25;       // Guard gauge recovery per frame (idle/walk)
+export const GUARD_GAUGE_RECOVERY_RUN = 0.15;        // Guard gauge recovery per frame (running)
+export const GUARD_GAUGE_DRAIN_LIGHT = 5;            // Light normal guard gauge drain
+export const GUARD_GAUGE_DRAIN_HEAVY = 10;           // Heavy normal guard gauge drain
+export const GUARD_GAUGE_DRAIN_COMMAND_NORMAL = 12;  // Command normal guard gauge drain
+export const GUARD_GAUGE_DRAIN_SPECIAL = 15;         // Special move guard gauge drain
+export const GUARD_GAUGE_DRAIN_DM = 25;              // DM guard gauge drain
+export const GUARD_GAUGE_DRAIN_SDM = 35;             // SDM guard gauge drain
+export const GUARD_GAUGE_DRAIN_CD = 12;              // CD blowback guard gauge drain
+export const GUARD_GAUGE_METER_BONUS_ON_BLOCK = 2;   // Guard gauge meter bonus per block
+export const PUSHBLOCK_THRESHOLD = 3;                // Consecutive blocks before pushback increases
+export const PUSHBLOCK_EXTRA_PUSHBACK = 1.5;         // Pushback multiplier when pushblock triggers
+export const PUSHBLOCK_DECAY_FRAMES = 30;            // Frames without blocking before counter resets
+export const WRONG_BLOCK_PUSHBACK_MULT = 1.3;        // Extra pushback multiplier for wrong block type
+export const WRONG_BLOCK_STUN_MULT = 1.2;            // Extra blockstun multiplier for wrong block type
 
 // ===== HUD Layout =====
 export const HUD_BAR_WIDTH = 300;

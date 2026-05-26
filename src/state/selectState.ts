@@ -5,7 +5,7 @@
 import type { PlayerInput } from '../core/types.js';
 import { ROSTER } from '../characters/index.js';
 import type { CharacterDefinition } from '../characters/types.js';
-import { SimpleAI } from '../ai/simpleAI.js';
+import { AdvancedAI } from '../ai/advancedAI.js';
 import { FighterController } from '../entities/fighterController.js';
 import { Fighter } from '../entities/fighter.js';
 import { gameRandomInt } from '../core/prng.js';
@@ -35,7 +35,7 @@ export interface SelectResult {
   p1Team: CharacterDefinition[];
   p2Team: CharacterDefinition[];
   p2IsAI: boolean;
-  p2AI: SimpleAI | null;
+  p2AI: AdvancedAI | null;
   p1ColorIndex: number;
   p2ColorIndex: number;
 }
@@ -206,7 +206,7 @@ export class SelectState {
     this.p2Ctrl.setCharacter(p2Char);
     this.p1.setStats(p1Char.stats);
     this.p2.setStats(p2Char.stats);
-    const p2AI = this.p2IsAI ? new SimpleAI(this.p2, this.p1, p2Char, 0.6) : null;
+    const p2AI = this.p2IsAI ? new AdvancedAI(this.p2, this.p1, p2Char, 'medium') : null;
 
     // Build 3-member teams: selected char + next 2 in roster (wrapping)
     const p1Idx = ROSTER.indexOf(p1Char);

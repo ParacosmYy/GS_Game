@@ -111,3 +111,100 @@ export function getDirectionInput(input: ResolvedInput): DirectionInput {
   if (input.back) return 'back';
   return 'neutral';
 }
+
+// ===== Training Mode Display Helpers =====
+
+/** Direction input symbol mapping for training mode input display */
+const DIRECTION_SYMBOLS: Record<DirectionInput, string> = {
+  neutral: '·',       // ·
+  up: '↑',            // ↑
+  down: '↓',          // ↓
+  forward: '→',       // →
+  back: '←',          // ←
+  upforward: '↗',     // ↗
+  upback: '↖',        // ↖
+  downforward: '↘',   // ↘
+  downback: '↙',      // ↙
+};
+
+/** Convert a DirectionInput to its display symbol */
+export function getDirectionSymbol(dir: DirectionInput): string {
+  return DIRECTION_SYMBOLS[dir] || '?';
+}
+
+/** Get active button display string for training mode (e.g., "A C") */
+export function getButtonDisplayString(input: ResolvedInput): string {
+  const buttons: string[] = [];
+  if (input.buttonA) buttons.push('A');
+  if (input.buttonB) buttons.push('B');
+  if (input.buttonC) buttons.push('C');
+  if (input.buttonD) buttons.push('D');
+  return buttons.join(' ');
+}
+
+/** Get just-pressed button display string (for input history) */
+export function getPressedButtonString(input: ResolvedInput): string[] {
+  const buttons: string[] = [];
+  if (input.buttonAPressed) buttons.push('A');
+  if (input.buttonBPressed) buttons.push('B');
+  if (input.buttonCPressed) buttons.push('C');
+  if (input.buttonDPressed) buttons.push('D');
+  if (input.rollPressed) buttons.push('A+B');
+  if (input.blowbackPressed) buttons.push('C+D');
+  return buttons;
+}
+
+/**
+ * Recognize what command the current input history matches.
+ * Returns a human-readable command name for training mode display.
+ */
+export function getCommandName(
+  direction: DirectionInput,
+  input: ResolvedInput,
+  hasQCF: boolean,
+  hasQCB: boolean,
+  hasHCB: boolean,
+  hasDP: boolean,
+  chargeReady: boolean,
+): string | null {
+  // Check DM-level inputs first (highest priority display)
+  // These would need to be checked at a higher level; here we just report
+  // what motion is detected.
+
+  // Dragon Punch
+  if (hasDP && (input.punchPressed || input.punchJustReleased)) {
+    return 'DP+P';
+  }
+
+  // QCF
+  if (hasQCF && (input.punchPressed || input.punchJustReleased)) {
+    return 'QCF+P';
+  }
+  if (hasQCF && (input.kickPressed || input.kickJustReleased)) {
+    return 'QCF+K';
+  }
+
+  // QCB
+  if (hasQCB && (input.punchPressed || input.punchJustReleased)) {
+    return 'QCB+P';
+  }
+  if (hasQCB && (input.kickPressed || input.kickJustReleased)) {
+    return 'QCB+K';
+  }
+
+  // HCB
+  if (hasHCB && (input.punchPressed || input.punchJustReleased)) {
+    return 'HCB+P';
+  }
+
+  // Charge ready indicator
+  if (chargeReady) {
+    return 'CHARGE READY';
+  }
+
+  // Negative Edge display
+  if (input.punchJustReleased) return '~P';
+  if (input.kickJustReleased) return '~K';
+
+  return null;
+}

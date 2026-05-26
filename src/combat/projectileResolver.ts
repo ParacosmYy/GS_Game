@@ -6,6 +6,7 @@ import type { PrevAttack } from '../input/inputResolver.js';
 import {
   FRAME_DATA,
   CHIP_DAMAGE_RATIO,
+  MAX_MODE_DAMAGE_BONUS,
 } from '../core/constants.js';
 import { AttackType, FighterState } from '../core/types.js';
 import type { HitLevel } from '../core/types.js';
@@ -108,7 +109,7 @@ export function resolveProjectileHits(
       } else {
         const damage = ctx.scaledDamage(data.damage, i, AttackType.SPECIAL_PROJECTILE);
         const projAtkIdx = 1 - i;
-        const projDamage = ctx.maxModes[projAtkIdx] ? Math.round(damage * 0.67) : damage;
+        const projDamage = ctx.maxModes[projAtkIdx] ? Math.round(damage * MAX_MODE_DAMAGE_BONUS) : damage;
         ctx.comboHits[i]++;
         ctx.lastHitFrame[i] = ctx.currentFrame;
         defender.health = Math.max(0, defender.health - projDamage);

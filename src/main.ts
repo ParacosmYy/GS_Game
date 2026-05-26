@@ -32,7 +32,7 @@ import { resolveSimplified } from './input/simplifiedInput.js';
 import { bgm } from './audio/bgm.js';
 import { AmbientSoundPlayer } from './audio/ambient.js';
 import { announcer } from './audio/announcer.js';
-import { SimpleAI } from './ai/simpleAI.js';
+import { AdvancedAI } from './ai/advancedAI.js';
 import { updateMovementVfx } from './state/movementVfx.js';
 import { WIN_QUOTE_DURATION, drawAnnounceSequence } from './rendering/screens.js';
 import { GameStateManager } from './state/gameStateManager.js';
@@ -113,7 +113,7 @@ combatSystem.onGuardCrush = (fighter, hitX, hitY) => {
 // ===== Derived state =====
 const CONTINUE_DURATION = 600;
 const INTRO_DURATION = 150;
-let p2AI: InstanceType<typeof import('./ai/simpleAI.js').SimpleAI> | null = null;
+let p2AI: InstanceType<typeof import('./ai/advancedAI.js').AdvancedAI> | null = null;
 let p1Team: TeamState | null = null;
 let p2Team: TeamState | null = null;
 let p1DelayedHealth = p1.maxHealth;
@@ -419,7 +419,7 @@ function update(): void {
           loser.setStats(newChar.stats);
           loserCtrl.setCharacter(newChar);
           if (p2AI && losingIdx === 1) {
-            p2AI = new SimpleAI(p2, p1, newChar, 0.6);
+            p2AI = new AdvancedAI(p2, p1, newChar, 'medium');
           }
           rounds.currentRound++;
           rounds.resetForNextRound();

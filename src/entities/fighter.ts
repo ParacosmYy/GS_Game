@@ -57,6 +57,10 @@ export class Fighter {
   guardGauge = 100;
   guardCrushTimer = 0;
 
+  // Consecutive block counter (for pushblock mechanic)
+  consecutiveBlockCount = 0;
+  consecutiveBlockDecayTimer = 0;
+
   // Stun / Dizzy gauge (0–STUN_GAUGE_MAX, fills on hit, decays when not hit)
   stunGauge = 0;
   stunDecayTimer = 0;        // frames since last hit; starts decaying after STUN_DECAY_DELAY
@@ -141,6 +145,17 @@ export class Fighter {
 
   // Counter Wire: currently bouncing off wall from counter wire
   isCounterWire = false;
+
+  // Ground Bounce: fighter bounced off ground, briefly launchable again
+  isGroundBounce = false;
+  groundBounceTimer = 0;
+
+  // Wall Bounce tracking: limits wall bounces to 1 per combo
+  wallBounceCount = 0;
+
+  // Air throw vulnerability: allows air-specific throws to connect
+  // (ground throws still require isThrowVulnerable + grounded check)
+  airThrowVulnerable = false;
 
   // Hit confirm delay: 1-frame gate to prevent zero-frame cancel (resolveHit sets, tickTimers decrements)
   hitConfirmDelay: number = 0;
@@ -238,7 +253,7 @@ export class Fighter {
     return null;
   }
 
-  /** 是否可被投(防御中/被击中/倒地时/空中不可被投) */
+  /** 是否可被地面投技 (防御中/被击中/倒地时/空中不可被地面投) */
   isThrowVulnerable(): boolean {
     if (this.throwInvulnFrames > 0) return false;
     if (!this.isGrounded()) return false; // KOF2002: 空中不可被地面投技
@@ -253,6 +268,15 @@ export class Fighter {
     if (this.isRolling() && this.isGCRoll) return false;
     // Normal roll: throwable at any point (KOF2002)
     return true;
+  }
+
+  /** Whether this fighter can be grabbed by an air throw (airborne + air-throw-vulnerable) */
+  isAirThrowVulnerable(): boolean {
+    if (this.throwInvulnFrames > 0) return false;
+    if (this.isGrounded()) return false; // Air throws only work on airborne opponents
+    if (this.state === FighterState.AIR_BLOCK) return false;
+    if (this.state === FighterState.THROW) return false;
+    return this.airThrowVulnerable;
   }
 
   /** Get the active hitbox in world coordinates, or null if not attacking */
@@ -340,6 +364,17 @@ export class Fighter {
     this.normalCancelReady = false;
     this.cancelledIntoNormal = false;
     this.cancelEvent = null;
+  }
+
+  /** Reset combo-related juggle state — called when fighter lands or combo ends */
+  resetComboJuggleState(): void {
+    this.juggleState = JuggleState.NONE;
+    this.jugglePoints = 0;
+    this.airHitCount = 0;
+    this.wallBounceCount = 0;
+    this.isGroundBounce = false;
+    this.groundBounceTimer = 0;
+    this.airThrowVulnerable = false;
   }
 
   /** Reset attack state — called from endAttack, applyHitstun, applyBlockstun, applyKnockdown */
@@ -487,6 +522,13 @@ export class Fighter {
     if (this.hitConfirmDelay > 0) this.hitConfirmDelay--;
     if (this.hitFlashFrames > 0) this.hitFlashFrames--;
     if (this.throwBufferTimer > 0) this.throwBufferTimer--;
+    // Ground bounce timer: when expired, fighter lands normally
+    if (this.groundBounceTimer > 0) {
+      this.groundBounceTimer--;
+      if (this.groundBounceTimer <= 0) {
+        this.isGroundBounce = false;
+      }
+    }
     // MAX activation invincibility countdown
     if (this.throwInvulnFrames > 0) {
       this.throwInvulnFrames--;
@@ -509,6 +551,12 @@ export class Fighter {
       } else {
         this.guardGauge = Math.min(100, this.guardGauge + 0.25);
       }
+    }
+    // Consecutive block count decay: reset if no block for 30 frames
+    if (this.consecutiveBlockDecayTimer > 0) {
+      this.consecutiveBlockDecayTimer--;
+    } else if (this.consecutiveBlockCount > 0) {
+      this.consecutiveBlockCount = 0;
     }
     // Stun gauge decay: after STUN_DECAY_DELAY frames without being hit, gauge decays
     if (this.stunGauge > 0 && this.state !== FighterState.DIZZY) {
@@ -611,11 +659,17 @@ export class Fighter {
     this.runStopTimer = 0;
     this.guardGauge = 100;
     this.guardCrushTimer = 0;
+    this.consecutiveBlockCount = 0;
+    this.consecutiveBlockDecayTimer = 0;
     this.juggleState = JuggleState.NONE;
     this.jugglePoints = 0;
     this.airHitCount = 0;
     this.resetCancelFlags();
     this.isCounterWire = false;
+    this.isGroundBounce = false;
+    this.groundBounceTimer = 0;
+    this.wallBounceCount = 0;
+    this.airThrowVulnerable = false;
     this.hasAttackedInAir = false;
     this.hitConfirmDelay = 0;
     this.throwInvulnFrames = 0;

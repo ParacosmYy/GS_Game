@@ -11,6 +11,7 @@ import {
   ROLL_SPEED, ROLL_DURATION, ROLL_RECOVERY,
   LANDING_RECOVERY,
   DM_STOCK_COST,
+  MAX_MODE_STOCK_COST,
   SUPER_CANCEL_STOCK_COST,
   FREE_CANCEL_TIMER_COST,
   LIGHT_NORMALS, NORMAL_ATTACKS, COMMAND_NORMALS,
@@ -332,15 +333,15 @@ export function handleAttack(ctx: FighterCtx, input: ResolvedInput): void {
     }
   }
 
-  // Normal/Command Normal >> MAX activation (BC during attack on hit/block, costs 2 stocks)
+  // Normal/Command Normal >> MAX activation (BC during attack on hit/block, costs MAX_MODE_STOCK_COST stocks)
   if (input.buttonB && input.buttonC && (input.buttonBPressed || input.buttonCPressed)
       && f.currentAttack && f.hasHit && ctx.gauge && ctx.maxMode
       && !ctx.maxMode.active && isNormal(f.currentAttack as string)
-      && ctx.gauge.stocks >= 2) {
+      && ctx.gauge.stocks >= MAX_MODE_STOCK_COST) {
     f.resetAttackState();
     f.resetCancelFlags();
     f.state = FighterState.IDLE;
-    spendStocks(ctx.gauge, 1);
+    spendStocks(ctx.gauge, MAX_MODE_STOCK_COST);
     ctx.maxMode.active = true;
     ctx.maxMode.timer = ctx.maxMode.maxDuration;
     ctx.vfx.spawnMAXAura(f.x, f.y);

@@ -9,6 +9,7 @@ import {
   GRAVITY,
   BACKDASH_VX, BACKDASH_VY, BACKDASH_DURATION, BACKDASH_INVINCIBLE_FRAMES,
   DOUBLE_TAP_WINDOW, HYPER_CHARGE_WINDOW,
+  CHARGE_FRAMES_REQUIRED,
   HOP_THRESHOLD,
   ROLL_SPEED, ROLL_DURATION, ROLL_RECOVERY,
   LANDING_RECOVERY, HOP_LANDING_RECOVERY, JUMP_LANDING_RECOVERY, AIR_ATTACK_LANDING_RECOVERY,
@@ -130,7 +131,13 @@ export class FighterController {
 
   /** Check if a charge release (↓蓄↑) is available and consume it */
   consumeChargeRelease(): boolean {
-    if (this.chargeDownFrames >= 20) {
+    const chargeState = this.cmdBuf.getChargeState('down');
+    if (chargeState.ready) {
+      // Use the buffer's charge release detection
+      return true;
+    }
+    // Fallback: old local counter for backward compatibility
+    if (this.chargeDownFrames >= CHARGE_FRAMES_REQUIRED) {
       this.chargeDownFrames = 0;
       this.wasChargingDown = false;
       return true;
