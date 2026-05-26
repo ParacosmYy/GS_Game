@@ -784,3 +784,9 @@
 ## H169: spritePoseData—8项验证PW/PH/PIXEL+CHAR_VISUALS+darken/lighten+pose数组 — 141→142
 
 **commit:** <hash> | spritePoseData—8项验证PW/PH/PIXEL+CHAR_VISUALS+darken/lighten+pose数组
+
+---
+
+## H170: renderUtils—6项验证parseColor+shiftColor+clamp — 142→143
+
+**commit:** <hash> | renderUtils—6项验证parseColor+shiftColor+clamp
