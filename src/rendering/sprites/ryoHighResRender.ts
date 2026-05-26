@@ -281,6 +281,8 @@ function resolveFrameKey(
       if (currentAttack === AttackType.STAND_D) return 'STAND_D';
       if (currentAttack === AttackType.CLOSE_B) return 'CLOSE_B';
       if (currentAttack === AttackType.CLOSE_D) return 'CLOSE_D';
+      // Command normals: tsurizao is an overhead punch (use STAND_C), orishi is low kick
+      if (currentAttack === AttackType.RYO_TSURIZAO) return 'STAND_C';
       return 'STAND_A';
 
     case FighterState.CROUCH:
@@ -291,6 +293,8 @@ function resolveFrameKey(
       if (currentAttack === AttackType.CROUCH_B) return 'CROUCH_B';
       if (currentAttack === AttackType.CROUCH_C) return 'CROUCH_C';
       if (currentAttack === AttackType.CROUCH_D) return 'CROUCH_D';
+      // Command normal: orishi (↘+B) is a low kick, use CROUCH_B sprite
+      if (currentAttack === AttackType.RYO_ORISHI) return 'CROUCH_B';
       return 'CROUCH_A';
 
     case FighterState.AIR_ATTACK:
