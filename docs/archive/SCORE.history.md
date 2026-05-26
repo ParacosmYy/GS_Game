@@ -808,3 +808,9 @@
 ## H173: portraitBatch1—5项验证kyo/iori/terry/ralf/clark肖像数据 — 145→146
 
 **commit:** <hash> | portraitBatch1—5项验证kyo/iori/terry/ralf/clark肖像数据
+
+---
+
+## H174: portraitBatch2—5项验证andy/athena/billy/chang/choi肖像 — 146→147
+
+**commit:** <hash> | portraitBatch2—5项验证andy/athena/billy/chang/choi肖像
