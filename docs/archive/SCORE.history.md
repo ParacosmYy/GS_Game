@@ -679,3 +679,9 @@
 ## H154: inputPlayback—7项验证InputPlayback active/frameCount/isFinished/load/getInput — 126→127
 
 **commit:** <hash> | inputPlayback—7项验证InputPlayback active/frameCount/isFinished/load/getInput
+
+---
+
+## H155: comboTrialData—6项验证COMBO_TRIALS+getTrialsForCharacter+getTrialById — 127→128
+
+**commit:** <hash> | comboTrialData—6项验证COMBO_TRIALS+getTrialsForCharacter+getTrialById
