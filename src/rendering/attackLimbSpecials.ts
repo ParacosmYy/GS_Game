@@ -103,6 +103,14 @@ export function drawSpecialAttackLimb(
     drawRyoHaou(ctx, f, sx, sy, limbLen);
     return true;
   }
+  if (f.currentAttack === AttackType.RYO_TSURIZAO) {
+    drawRyoTsurizao(ctx, f, sx, sy, limbLen);
+    return true;
+  }
+  if (f.currentAttack === AttackType.RYO_ORISHI) {
+    drawRyoOrishi(ctx, f, sx, sy, limbLen);
+    return true;
+  }
 
   // ── 莉安娜 (Leona) ──
   if (f.currentAttack === AttackType.LEONA_EAR_RING || f.currentAttack === AttackType.LEONA_EAR_RING_C) {
@@ -472,6 +480,55 @@ function drawRyoHaou(
   ctx.beginPath();
   ctx.moveTo(sx + 10 * f.facing, sy - f.displayHeight * 0.55);
   ctx.lineTo(sx + (FIGHTER_WIDTH / 2 + reach) * f.facing, sy - f.displayHeight * 0.5);
+  ctx.stroke();
+}
+
+// ── Ryo 命令通常技 ──────────────────────────────────────
+
+/** RYO_TSURIZAO (→+A): 冰柱割り — diagonal downward knife-hand strike */
+function drawRyoTsurizao(
+  ctx: CanvasRenderingContext2D, f: Fighter, sx: number, sy: number,
+  limbLen: number,
+): void {
+  const reach = limbLen * 1.1;
+  ctx.strokeStyle = '#ffdd44';
+  ctx.shadowColor = '#ffaa00';
+  ctx.shadowBlur = 12;
+  ctx.lineWidth = 10;
+  // Diagonal slash from upper-right to lower-left (overhead arc)
+  ctx.beginPath();
+  ctx.moveTo(sx + 10 * f.facing, sy - f.displayHeight * 0.7);
+  ctx.lineTo(sx + (FIGHTER_WIDTH / 2 + reach) * f.facing, sy - f.displayHeight * 0.35);
+  ctx.stroke();
+  // Small arc hint for the overhead swing
+  ctx.save();
+  ctx.globalAlpha = 0.2;
+  ctx.strokeStyle = '#ffee88';
+  ctx.lineWidth = 6;
+  const arcCx = sx + 12 * f.facing;
+  const arcCy = sy - f.displayHeight * 0.6;
+  ctx.beginPath();
+  ctx.arc(arcCx, arcCy, reach * 0.5,
+    f.facing > 0 ? -Math.PI * 0.7 : Math.PI - 0.3,
+    f.facing > 0 ? -Math.PI * 0.1 : Math.PI + 0.3);
+  ctx.stroke();
+  ctx.restore();
+}
+
+/** RYO_ORISHI (↘+B): 落蹴 — low sweeping kick near ground level */
+function drawRyoOrishi(
+  ctx: CanvasRenderingContext2D, f: Fighter, sx: number, sy: number,
+  limbLen: number,
+): void {
+  const reach = limbLen * 1.1;
+  ctx.strokeStyle = '#44ddff';
+  ctx.shadowColor = '#00aaff';
+  ctx.shadowBlur = 10;
+  ctx.lineWidth = 10;
+  // Horizontal line near ground level (low sweep)
+  ctx.beginPath();
+  ctx.moveTo(sx + 5 * f.facing, sy - 8);
+  ctx.lineTo(sx + (FIGHTER_WIDTH / 2 + reach) * f.facing, sy - 3);
   ctx.stroke();
 }
 

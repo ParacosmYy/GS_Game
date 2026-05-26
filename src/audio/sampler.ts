@@ -23,7 +23,8 @@ type SampleId =
   | 'perfect_ko' | 'round_start' | 'time_up'
   | 'battle_bgm'
   | 'whoosh' | 'whoosh_heavy' | 'footstep' | 'jump' | 'landing_normal'
-  | 'ryo_koouken' | 'ryo_ko_hou' | 'ryo_hien' | 'ryo_haou';
+  | 'ryo_koouken' | 'ryo_ko_hou' | 'ryo_hien' | 'ryo_haou'
+  | 'ryo_tsurizao' | 'ryo_orishi';
 
 const samples = new Map<SampleId, AudioBuffer>();
 let initialized = false;

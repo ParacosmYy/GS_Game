@@ -52,6 +52,12 @@ export const ATTACK_SFX_TABLE: AttackSFXEntry[] = [
   { attackType: 'STAND_CD', phase: 'startup', frame: 0, sfx: 'playHeavyWhoosh', priority: 2 },
   { attackType: 'JUMP_CD', phase: 'startup', frame: 0, sfx: 'playHeavyWhoosh', priority: 2 },
 
+  // ── Ryo 命令通常技 (command normals) ──
+  { attackType: 'RYO_TSURIZAO', phase: 'startup', frame: 0, sfx: 'playWhoosh', priority: 2 },
+  { attackType: 'RYO_TSURIZAO', phase: 'active', frame: 0, sfx: 'playSlice', priority: 2 },
+  { attackType: 'RYO_ORISHI', phase: 'startup', frame: 0, sfx: 'playWhoosh', priority: 2 },
+  { attackType: 'RYO_ORISHI', phase: 'active', frame: 0, sfx: 'playThudKick', priority: 2 },
+
   // ── Ryo specials ──
   { attackType: 'RYO_KOOU', phase: 'startup', frame: 0, sfx: 'playSpecialLight', priority: 2 },
   { attackType: 'RYO_KOOU', phase: 'active', frame: 0, sfx: 'playSpecialHeavy', priority: 2 },

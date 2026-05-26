@@ -16,16 +16,20 @@ export class Projectile {
   /** Hitbox half-height (total height = hitboxH * 2) */
   hitboxH: number;
 
-  constructor(x: number, y: number, facing: Direction, activeFrames: number, ownerId: number, charId: string = 'kyo', hitboxW: number = 15, hitboxH: number = 15) {
+  /** Version tag for rendering differentiation (e.g., 'A' vs 'C' version) */
+  version: string;
+
+  constructor(x: number, y: number, facing: Direction, activeFrames: number, ownerId: number, charId: string = 'kyo', hitboxW: number = 15, hitboxH: number = 15, speed: number = PROJECTILE_SPEED, version: string = 'A') {
     this.x = x;
     this.y = y;
     this.facing = facing;
-    this.vx = PROJECTILE_SPEED * facing;
+    this.vx = speed * facing;
     this.activeFrames = activeFrames;
     this.ownerId = ownerId;
     this.charId = charId;
     this.hitboxW = hitboxW;
     this.hitboxH = hitboxH;
+    this.version = version;
   }
 
   update(): void {

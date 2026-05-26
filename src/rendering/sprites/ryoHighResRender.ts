@@ -195,8 +195,12 @@ function resolveFrameKey(
 
 // ===== Public API =====
 
-/** Scale factor for high-res pixel frames. 2x so each source pixel becomes a 2x2 block. */
-export const RYO_HIGHRES_SCALE = 2;
+/**
+ * Target display height in screen pixels for all Ryo high-res frames.
+ * Historically 48x72 frames rendered at 2x scale = 144px display height.
+ * Newer 96x144 frames render at 1x scale to hit the same 144px target.
+ */
+const RYO_TARGET_DISPLAY_HEIGHT = 144;
 
 /**
  * Check whether a high-resolution frame is available for the given character and state.
@@ -256,6 +260,9 @@ export function drawHighResFrame(
   const frameIdx = Math.floor(stateAge / ticksPerFrame) % frames.length;
   const frame = frames[frameIdx];
 
-  drawPixelFrame(ctx, frame, x, y, RYO_HIGHRES_SCALE, facing, palette);
+  // Compute scale dynamically so all frame sizes display at the same target height.
+  // 48x72 frames -> scale 2 (72*2=144), 96x144 frames -> scale 1 (144*1=144).
+  const scale = RYO_TARGET_DISPLAY_HEIGHT / frame.height;
+  drawPixelFrame(ctx, frame, x, y, scale, facing, palette);
   return true;
 }
