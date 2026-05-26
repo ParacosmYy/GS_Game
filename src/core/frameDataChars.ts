@@ -900,6 +900,19 @@ export const FRAME_DATA_CHARS = {
     knockdown: true,
     chipDamage: 14,
   },
+  // SDM 凤凰飞天 (Phoenix Hiten SDM)
+  SDM_PHOENIX_HITEN: {
+    startup: 6,
+    active: 8,
+    recovery: 28,
+    damage: 260,
+    hitstun: 0,
+    blockstun: 21,
+    pushback: 10,
+    hitLevel: "MID" as const,
+    knockdown: true,
+    chipDamage: 22,
+  },
   // ── 坂崎亮必杀技 (Ryo Sakazaki) ── KOF2002UM calibrated
   // 虎煌拳 qcf+A (Ko'ou Ken, projectile)
   RYO_KOOU: {
@@ -1015,6 +1028,19 @@ export const FRAME_DATA_CHARS = {
     hitLevel: "MID" as const,
     knockdown: true,
     chipDamage: 20,
+  },
+  // SDM 龍虎乱舞 (Ryuko Ranbu SDM)
+  SDM_RYUKO_RANBU: {
+    startup: 6,
+    active: 13,
+    recovery: 36,
+    damage: 310,
+    hitstun: 0,
+    blockstun: 21,
+    pushback: 12,
+    hitLevel: "MID" as const,
+    knockdown: true,
+    chipDamage: 30,
   },
   // ── 莉安娜必杀技 (Leona Heidern) ── KOF2002UM 校准数据
   LEONA_MOON_SLASH: {
@@ -1368,6 +1394,19 @@ export const FRAME_DATA_CHARS = {
     knockdown: true,
     chipDamage: 18,
   },
+  // SDM 必殺忍蜂 (Hissatsu Shinobi SDM)
+  SDM_CHOU_HISSATSU: {
+    startup: 6,
+    active: 17,
+    recovery: 36,
+    damage: 290,
+    hitstun: 0,
+    blockstun: 21,
+    pushback: 12,
+    hitLevel: "MID" as const,
+    knockdown: true,
+    chipDamage: 26,
+  },
   // ── K' 必杀技 (K Dash) ── KOF2002UM calibrated
   // Ein Trigger qcf+A (standalone punch)
   KDASH_EINS: {
@@ -1519,6 +1558,32 @@ export const FRAME_DATA_CHARS = {
     hitLevel: "MID" as const,
     knockdown: true,
     chipDamage: 20,
+  },
+  // SDM Chain Drive (K' Chain Drive SDM)
+  SDM_CHAIN_DRIVE: {
+    startup: 8,
+    active: 14,
+    recovery: 36,
+    damage: 300,
+    hitstun: 0,
+    blockstun: 21,
+    pushback: 12,
+    hitLevel: "MID" as const,
+    knockdown: true,
+    chipDamage: 28,
+  },
+  // SDM Heat Drive (K' Heat Drive SDM)
+  SDM_HEAT_DRIVE: {
+    startup: 20,
+    active: 18,
+    recovery: 38,
+    damage: 310,
+    hitstun: 0,
+    blockstun: 22,
+    pushback: 12,
+    hitLevel: "MID" as const,
+    knockdown: true,
+    chipDamage: 30,
   },
   // ── 库拉必杀技 (Kula Diamond) ── KOF2002UM 校准数据
   // Diamond Breath qcf+A (冰飞行道具)
@@ -1832,6 +1897,30 @@ export const FRAME_DATA_CHARS = {
     hitLevel: "MID" as const,
     knockdown: true,
   },
+  // 精神传送 qcb+A (瞬移技)
+  ATHENA_PSYCHO_TELEPORT: {
+    startup: 5,
+    active: 1,
+    recovery: 15,
+    damage: 1,
+    hitstun: 0,
+    blockstun: 0,
+    pushback: 0,
+    hitLevel: "MID" as const,
+    knockdown: false,
+  },
+  // 精神传送·强 qcb+C (瞬移技, 长距离)
+  ATHENA_PSYCHO_TELEPORT_C: {
+    startup: 8,
+    active: 1,
+    recovery: 15,
+    damage: 1,
+    hitstun: 0,
+    blockstun: 0,
+    pushback: 0,
+    hitLevel: "MID" as const,
+    knockdown: false,
+  },
   // ── 雅典娜DM (Athena) ──
   DM_SHINING_CRYSTAL_BIT: {
     startup: 8,
@@ -1857,6 +1946,32 @@ export const FRAME_DATA_CHARS = {
     hitLevel: "MID" as const,
     knockdown: true,
     chipDamage: 30,
+  },
+  // 凤凰箭DM (空中DM) qcf,qcf+P in air
+  DM_PHOENIX_FANG_ARROW: {
+    startup: 7,
+    active: 12,
+    recovery: 38,
+    damage: 180,
+    hitstun: 0,
+    blockstun: 21,
+    pushback: 8,
+    hitLevel: "MID" as const,
+    knockdown: true,
+    chipDamage: 18,
+  },
+  // 凤凰箭SDM (空中SDM)
+  SDM_PHOENIX_FANG_ARROW: {
+    startup: 6,
+    active: 15,
+    recovery: 36,
+    damage: 240,
+    hitstun: 0,
+    blockstun: 21,
+    pushback: 10,
+    hitLevel: "MID" as const,
+    knockdown: true,
+    chipDamage: 28,
   },
   // ── 克拉克必杀技 (Clark Still) ── KOF2002UM 校准数据
   // Super Argentine Backbreaker hcf+A (指令投)
@@ -2406,6 +2521,31 @@ export const FRAME_DATA_CHARS = {
     hitLevel: "MID" as const,
     knockdown: true,
   },
+  // 超火炎旋风拳 qcb,f+P
+  BILLY_CHOU_KAEN_SENPU_JIN: {
+    startup: 10,
+    active: 8,
+    recovery: 28,
+    damage: 85,
+    hitstun: 20,
+    blockstun: 18,
+    pushback: 6,
+    hitLevel: "MID" as const,
+    knockdown: true,
+    chipDamage: 12,
+  },
+  // 流星踢 qcf+K
+  BILLY_RYUSEI_KYAKU: {
+    startup: 8,
+    active: 6,
+    recovery: 22,
+    damage: 75,
+    hitstun: 16,
+    blockstun: 16,
+    pushback: 5,
+    hitLevel: "MID" as const,
+    knockdown: true,
+  },
   DM_KAEN_SENPU_JIN: {
     startup: 10,
     active: 12,
@@ -2478,6 +2618,30 @@ export const FRAME_DATA_CHARS = {
     hitLevel: "MID" as const,
     knockdown: true,
     chipDamage: 10,
+  },
+  // 铁球大回转 hcf+P (连打属性)
+  CHANG_TEKKYUU_TAIGYOKU: {
+    startup: 6,
+    active: 20,
+    recovery: 24,
+    damage: 70,
+    hitstun: 18,
+    blockstun: 16,
+    pushback: 5,
+    hitLevel: "MID" as const,
+    knockdown: false,
+  },
+  // 大破坏 qcb,f+P
+  CHANG_DAI_HAKKI: {
+    startup: 10,
+    active: 8,
+    recovery: 30,
+    damage: 90,
+    hitstun: 22,
+    blockstun: 20,
+    pushback: 7,
+    hitLevel: "MID" as const,
+    knockdown: true,
   },
   DM_TEKKYUU_DAI_BOUSOU: {
     startup: 10,
@@ -2585,6 +2749,30 @@ export const FRAME_DATA_CHARS = {
     knockdown: true,
     chipDamage: 10,
   },
+  // 突刺 qcf+P
+  CHOI_TATAKI_KOMYAKU: {
+    startup: 4,
+    active: 4,
+    recovery: 16,
+    damage: 55,
+    hitstun: 16,
+    blockstun: 14,
+    pushback: 3,
+    hitLevel: "MID" as const,
+    knockdown: false,
+  },
+  // 龙卷突 qcb+K
+  CHOI_TATSUMAKI_SHITOTSU: {
+    startup: 6,
+    active: 8,
+    recovery: 22,
+    damage: 70,
+    hitstun: 16,
+    blockstun: 16,
+    pushback: 5,
+    hitLevel: "MID" as const,
+    knockdown: true,
+  },
   // ── 蔡宝奇DM/SDM (Choi) ──
   DM_SHIN_CHOU_HOUYOKU: {
     startup: 8,
@@ -2681,6 +2869,31 @@ export const FRAME_DATA_CHARS = {
     hitLevel: "MID" as const,
     knockdown: true,
     chipDamage: 10,
+  },
+  // Metal Massacre·EX qcb,f+K
+  MATURE_METAL_MASSACRE_EX: {
+    startup: 8,
+    active: 10,
+    recovery: 30,
+    damage: 95,
+    hitstun: 20,
+    blockstun: 18,
+    pushback: 7,
+    hitLevel: "MID" as const,
+    knockdown: true,
+  },
+  // 夜之气息 qcf+P (飞行道具)
+  MATURE_NOCTURNAL_BREATH: {
+    startup: 14,
+    active: 20,
+    recovery: 32,
+    damage: 55,
+    hitstun: 14,
+    blockstun: 14,
+    pushback: 3,
+    hitLevel: "MID" as const,
+    knockdown: false,
+    chipDamage: 6,
   },
   // ── 玛卓DM (Mature) ── KOF2002UM 校准数据
   DM_NOCTURNAL_LIGHT: {
@@ -2803,6 +3016,19 @@ export const FRAME_DATA_CHARS = {
     hitLevel: "MID" as const,
     knockdown: true,
     chipDamage: 32,
+  },
+  // DM 大地爆裂 (Territory Bust DM)
+  DM_TERRITORY_BUST: {
+    startup: 12,
+    active: 8,
+    recovery: 42,
+    damage: 210,
+    hitstun: 0,
+    blockstun: 21,
+    pushback: 12,
+    hitLevel: "MID" as const,
+    knockdown: true,
+    chipDamage: 22,
   },
   // ── 克里斯命令通常技 (Chris) ── KOF2002UM 校准数据
   CHRIS_MAKASHIPPO: {
@@ -2995,6 +3221,30 @@ export const FRAME_DATA_CHARS = {
     knockdown: true,
     chipDamage: 30,
   },
+  // DM Shermie Flash (投技DM)
+  DM_SHERMIE_FLASH: {
+    startup: 5,
+    active: 4,
+    recovery: 40,
+    damage: 190,
+    hitstun: 0,
+    blockstun: 0,
+    pushback: 0,
+    hitLevel: "MID" as const,
+    knockdown: true,
+  },
+  // SDM Shermie Flash (投技SDM)
+  SDM_SHERMIE_FLASH: {
+    startup: 4,
+    active: 6,
+    recovery: 38,
+    damage: 260,
+    hitstun: 0,
+    blockstun: 0,
+    pushback: 0,
+    hitLevel: "MID" as const,
+    knockdown: true,
+  },
   // ── 薇丝命令通常技 (Vice) ── KOF2002UM 校准数据
   VICE_MONSTROSITY: {
     startup: 10,
@@ -3067,6 +3317,42 @@ export const FRAME_DATA_CHARS = {
     knockdown: true,
     chipDamage: 8,
   },
+  // Decide hcf+A (投技)
+  VICE_DECIDE: {
+    startup: 5,
+    active: 3,
+    recovery: 28,
+    damage: 80,
+    hitstun: 0,
+    blockstun: 0,
+    pushback: 0,
+    hitLevel: "MID" as const,
+    knockdown: true,
+  },
+  // Decide·强 hcf+C (投技)
+  VICE_DECIDE_C: {
+    startup: 6,
+    active: 3,
+    recovery: 30,
+    damage: 95,
+    hitstun: 0,
+    blockstun: 0,
+    pushback: 0,
+    hitLevel: "MID" as const,
+    knockdown: true,
+  },
+  // Gore Fest·特殊 hcb,f+P (投技)
+  VICE_GORE_FEST_SPECIAL: {
+    startup: 4,
+    active: 4,
+    recovery: 32,
+    damage: 90,
+    hitstun: 0,
+    blockstun: 0,
+    pushback: 0,
+    hitLevel: "MID" as const,
+    knockdown: true,
+  },
   // ── 薇丝DM/SDM (Vice) ── KOF2002UM 校准数据
   // Negative Gain hcf,hcf+K (指令投 DM)
   DM_NEGATIVE_GAIN: {
@@ -3092,6 +3378,42 @@ export const FRAME_DATA_CHARS = {
     hitLevel: "MID" as const,
     knockdown: true,
     chipDamage: 30,
+  },
+  // DM Gore Fest (投技DM)
+  DM_GORE_FEST: {
+    startup: 5,
+    active: 4,
+    recovery: 42,
+    damage: 195,
+    hitstun: 0,
+    blockstun: 0,
+    pushback: 0,
+    hitLevel: "MID" as const,
+    knockdown: true,
+  },
+  // SDM Gore Fest (投技SDM)
+  SDM_GORE_FEST: {
+    startup: 4,
+    active: 6,
+    recovery: 40,
+    damage: 270,
+    hitstun: 0,
+    blockstun: 0,
+    pushback: 0,
+    hitLevel: "MID" as const,
+    knockdown: true,
+  },
+  // DM Overkill (投技DM)
+  DM_OVERKILL_DM: {
+    startup: 4,
+    active: 4,
+    recovery: 40,
+    damage: 200,
+    hitstun: 0,
+    blockstun: 0,
+    pushback: 0,
+    hitLevel: "MID" as const,
+    knockdown: true,
   }, // ── 布鲁·玛丽命令通常技 (Blue Mary) ── KOF2002UM 校准数据
   MARY_HAMMER_PUNCH: {
     startup: 10,
