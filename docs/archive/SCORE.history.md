@@ -703,3 +703,9 @@
 ## H158: ryoAttacks—5项验证RYO_ATTACK_KEYS+getRyoFrameData+getRyoAttackFrameData — 130→131
 
 **commit:** <hash> | ryoAttacks—5项验证RYO_ATTACK_KEYS+getRyoFrameData+getRyoAttackFrameData
+
+---
+
+## H159: ryoCommands—5项验证RYO_MOVE_LIST+RYO_WIN_QUOTES — 131→132
+
+**commit:** <hash> | ryoCommands—5项验证RYO_MOVE_LIST+RYO_WIN_QUOTES
