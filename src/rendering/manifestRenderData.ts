@@ -23,9 +23,12 @@ import {
   hasPixelPortraitData,
   getPortraitFallbackColor,
   getPortraitFallbackAccent,
+  getSizedPortrait,
+  hasSizedPortrait,
   type PortraitEntry,
   type PortraitSize,
 } from '../core/portraitManifest.js';
+import type { PixelPortraitData } from './pixelPortraits.js';
 
 /** 角色渲染用的完整数据包 */
 export interface CharacterRenderData {
@@ -86,6 +89,30 @@ export function getCharacterRenderData(charId: string): CharacterRenderData {
     winPortrait,
     hasPixelPortrait: pixelAvailable,
   };
+}
+
+/**
+ * 获取角色的尺寸专用像素肖像
+ *
+ * 先查 sizedPortraits 注册表，有则返回尺寸专用数据；
+ * 否则返回 undefined，调用方应 fallback 到 CharacterDefinition.pixelPortrait。
+ *
+ * @param charId 角色 ID
+ * @param size 肖像尺寸变体
+ * @returns PixelPortraitData 或 undefined
+ */
+export function getPortraitForSize(
+  charId: string,
+  size: PortraitSize,
+): PixelPortraitData | undefined {
+  return getSizedPortrait(charId, size);
+}
+
+/**
+ * 判断角色是否有指定尺寸的专用像素肖像
+ */
+export function hasPortraitForSize(charId: string, size: PortraitSize): boolean {
+  return hasSizedPortrait(charId, size);
 }
 
 /**

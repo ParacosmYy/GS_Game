@@ -2,9 +2,11 @@
  * Portrait Manifest — 肖像 manifest 类型定义、查询接口与数据
  *
  * 角色肖像用于选人界面、VS 画面、HUD 和胜利画面。
- * 当前阶段：所有角色已有 PixelPortraitData 像素肖像（32×40），通过
+ * 当前阶段：所有角色已有 PixelPortraitData 像素肖像（64×80），通过
  * CharacterDefinition.pixelPortrait 提供给渲染管线。
  * hasPixelPortrait=true 标记表示该角色有真实像素数据可用。
+ * Ryo 已升级为多尺寸肖像（48×48 HUD, 120×120 select, 160×160 VS），
+ * 通过 sizedPortraits 注册表提供尺寸专用像素数据。
  * 未来资产管线就绪后，通过工具层离线生成完整 atlas manifest 注入此处。
  *
  * fallbackColor 取自各角色 spriteManifestData 中的 outfit（服装主色），
@@ -244,4 +246,51 @@ for (const [charId, colors] of Object.entries(CHARACTER_PORTRAIT_COLORS)) {
 
   PORTRAIT_MANIFEST.portraits[charId] = charPortraits;
   rowIndex++;
+}
+
+// ===== 尺寸专用像素肖像注册表 =====
+
+/**
+ * 尺寸专用像素肖像注册表
+ *
+ * key: `${charId}:${size}` → PixelPortraitData
+ * 只有具有独立尺寸肖像的角色才会出现在这里。
+ * 渲染代码应先查此表，查不到再用 CharacterDefinition.pixelPortrait。
+ */
+export const sizedPortraits: Map<string, import('../rendering/pixelPortraits.js').PixelPortraitData> = new Map();
+
+/**
+ * 注册角色的尺寸专用肖像
+ */
+export function registerSizedPortrait(
+  charId: string,
+  size: PortraitSize,
+  data: import('../rendering/pixelPortraits.js').PixelPortraitData,
+): void {
+  sizedPortraits.set(`${charId}:${size}`, data);
+}
+
+/**
+ * 查询角色的尺寸专用像素肖像
+ * @returns PixelPortraitData 或 undefined
+ */
+export function getSizedPortrait(
+  charId: string,
+  size: PortraitSize,
+): import('../rendering/pixelPortraits.js').PixelPortraitData | undefined {
+  return sizedPortraits.get(`${charId}:${size}`);
+}
+
+/**
+ * 判断角色是否有指定尺寸的专用像素肖像
+ */
+export function hasSizedPortrait(charId: string, size: PortraitSize): boolean {
+  return sizedPortraits.has(`${charId}:${size}`);
+}
+
+// ===== 注册 Ryo 的多尺寸肖像 =====
+import { RYO_SIZED_PORTRAITS } from '../rendering/portraits/ryoPortraits.js';
+
+for (const [size, data] of Object.entries(RYO_SIZED_PORTRAITS)) {
+  registerSizedPortrait('ryo', size as PortraitSize, data);
 }

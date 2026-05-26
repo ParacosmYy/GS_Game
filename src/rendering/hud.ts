@@ -16,6 +16,7 @@ import {
 import { shiftColor, roundRect, drawSNKText } from './utils.js';
 import { ROSTER } from '../characters/index.js';
 import { drawPixelPortrait } from './pixelPortraits.js';
+import { getPortraitForSize } from './manifestRenderData.js';
 
 const charById = new Map(ROSTER.map(c => [c.id, c]));
 
@@ -177,20 +178,26 @@ function drawHUDPortrait(
   x: number, y: number,
   healthPercent: number,
 ): void {
+  // Try size-specific portrait first, then fallback to CharacterDefinition.pixelPortrait
+  const sizedPortrait = getPortraitForSize(charId, 'hud');
   const charDef = charById.get(charId);
-  if (charDef?.pixelPortrait) {
-    const portrait = charDef.pixelPortrait;
+  const portrait = sizedPortrait ?? charDef?.pixelPortrait;
+
+  if (portrait) {
     ctx.save();
     ctx.beginPath();
     roundRect(ctx, x, y, HUD_PORTRAIT_SIZE, HUD_PORTRAIT_SIZE, 3);
     ctx.clip();
-    const scale = 1;
+    // For HUD-sized portraits, use scale=1; for base portraits, fit into HUD area
+    const isNativeSize = portrait.width === HUD_PORTRAIT_SIZE;
+    const scale = isNativeSize ? 1 : Math.min(HUD_PORTRAIT_SIZE / portrait.width, HUD_PORTRAIT_SIZE / portrait.height);
     const pw = portrait.width * scale;
     const ph = portrait.height * scale;
     const ox = Math.floor((HUD_PORTRAIT_SIZE - pw) / 2);
-    drawPixelPortrait(ctx, portrait, x + ox, y, scale, {
+    const oy = Math.floor((HUD_PORTRAIT_SIZE - ph) / 2);
+    drawPixelPortrait(ctx, portrait, x + ox, y + oy, scale, {
       backdropColor: 'rgba(8, 8, 18, 0.9)',
-      frameColor: charDef.color,
+      frameColor: charDef?.color ?? '#888',
     });
     // Low-health danger tint
     if (healthPercent < 0.25) {

@@ -40,6 +40,7 @@ import { announcerOverlay } from './rendering/announcerOverlay.js';
 import { AdvancedAI } from './ai/advancedAI.js';
 import { updateMovementVfx } from './state/movementVfx.js';
 import { WIN_QUOTE_DURATION, drawAnnounceSequence } from './rendering/screens.js';
+import { getPortraitForSize } from './rendering/manifestRenderData.js';
 import { GameStateManager } from './state/gameStateManager.js';
 import { gameRandom, gameRandomInt } from './core/prng.js';
 import { InputLogger } from './core/inputLog.js';
@@ -997,7 +998,7 @@ function render(): void {
       gs.winQuoteCharName,
       gs.currentWinQuote,
       gs.winQuoteCharColor,
-      charDef?.pixelPortrait,
+      charDef ? getPortraitForSize(charDef.id, 'win') ?? charDef.pixelPortrait : undefined,
     );
   }
 

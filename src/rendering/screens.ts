@@ -6,6 +6,7 @@ import { ROSTER } from '../characters/index.js';
 import { roundRect, drawSNKText } from './utils.js';
 import { drawPixelPortrait } from './pixelPortraits.js';
 import type { PixelPortraitData } from './pixelPortraits.js';
+import { getPortraitForSize } from './manifestRenderData.js';
 import {
   RANDOM_SLOT_INDEX, TOTAL_SELECT_SLOTS, COLOR_PALETTES,
   VS_SPLASH_DURATION,
@@ -27,6 +28,19 @@ const STAGE_NAMES: Record<StageId, string> = {
 };
 
 // ===== Character Select =====
+
+/**
+ * Helper: get the best portrait for a given size context.
+ * Returns size-specific portrait if available, else CharacterDefinition.pixelPortrait.
+ */
+function getBestPortrait(
+  char: CharacterDefinition | null,
+  size: 'select' | 'vs' | 'hud' | 'win',
+): PixelPortraitData | undefined {
+  if (!char) return undefined;
+  const sized = getPortraitForSize(char.id, size);
+  return sized ?? char.pixelPortrait;
+}
 
 // 格子布局参数
 const CARD_W = 68;
@@ -156,13 +170,14 @@ export function drawCharacterSelect(
       roundRect(ctx, cx + 8, portraitY, CARD_W - 16, 48, 4);
       ctx.fill();
 
-      if (char.pixelPortrait) {
+      const selectPortrait = getBestPortrait(char, 'select');
+      if (selectPortrait) {
         const portraitScale = 1.2;
-        const pw = char.pixelPortrait.width * portraitScale;
-        const ph = char.pixelPortrait.height * portraitScale;
+        const pw = selectPortrait.width * portraitScale;
+        const ph = selectPortrait.height * portraitScale;
         const px = cx + 8 + ((CARD_W - 16) - pw) / 2;
         const py = portraitY + (48 - ph) / 2;
-        drawPixelPortrait(ctx, char.pixelPortrait, px, py, portraitScale, {
+        drawPixelPortrait(ctx, selectPortrait, px, py, portraitScale, {
           frameColor: char.color,
           backdropColor: 'rgba(8, 8, 18, 0.85)',
           scanlines: true,
@@ -224,10 +239,11 @@ export function drawCharacterSelect(
   const hoverY = startY + gridH + 8;
   if (hoveredChar) {
     // 放大肖像预览 — 网格左侧
-    if (hoveredChar.pixelPortrait) {
-      const previewScale = 4;
-      const pw = hoveredChar.pixelPortrait.width * previewScale;
-      const ph = hoveredChar.pixelPortrait.height * previewScale;
+    const hoverPortrait = getBestPortrait(hoveredChar, 'select');
+    if (hoverPortrait) {
+      const previewScale = hoverPortrait.width > 100 ? 1.5 : 4;
+      const pw = hoverPortrait.width * previewScale;
+      const ph = hoverPortrait.height * previewScale;
       const ppx = CANVAS_WIDTH / 2 - pw / 2 - 100;
       const ppy = hoverY - ph / 2 - 5;
       // 肖像背景
@@ -238,7 +254,7 @@ export function drawCharacterSelect(
       ctx.lineWidth = 1;
       roundRect(ctx, ppx - 4, ppy - 4, pw + 8, ph + 8, 4);
       ctx.stroke();
-      drawPixelPortrait(ctx, hoveredChar.pixelPortrait, ppx, ppy, previewScale, {
+      drawPixelPortrait(ctx, hoverPortrait, ppx, ppy, previewScale, {
         frameColor: hoveredChar.color,
         backdropColor: 'rgba(8, 8, 18, 0.9)',
         scanlines: true,
@@ -346,16 +362,17 @@ function drawPlayerInfo(
   const baseX = isLeft ? 90 : CANVAS_WIDTH - 90;
 
   // 头像预览
-  if (char?.pixelPortrait) {
-    const pScale = 2;
-    const pw = char.pixelPortrait.width * pScale;
-    const ph = char.pixelPortrait.height * pScale;
+  const infoPortrait = char ? getBestPortrait(char, 'select') : undefined;
+  if (infoPortrait) {
+    const pScale = infoPortrait.width > 80 ? 0.8 : 2;
+    const pw = infoPortrait.width * pScale;
+    const ph = infoPortrait.height * pScale;
     const ppx = isLeft ? 10 : CANVAS_WIDTH - pw - 18;
     const ppy = panelY + 2;
     ctx.fillStyle = 'rgba(10, 10, 20, 0.7)';
     roundRect(ctx, ppx, ppy, pw + 8, ph + 8, 4); ctx.fill();
-    drawPixelPortrait(ctx, char.pixelPortrait, ppx + 4, ppy + 4, pScale, {
-      frameColor: char.color,
+    drawPixelPortrait(ctx, infoPortrait, ppx + 4, ppy + 4, pScale, {
+      frameColor: char?.color ?? '#888',
       backdropColor: 'rgba(8, 8, 18, 0.85)',
       scanlines: true,
     });
@@ -491,23 +508,25 @@ export function drawVSSplash(
   const p2Char = selectState.p2ConfirmedChar;
 
   // P1头像 (左侧)
-  if (p1Char?.pixelPortrait) {
-    const scale = 3;
-    const pw = p1Char.pixelPortrait.width * scale;
-    const ph = p1Char.pixelPortrait.height * scale;
+  const p1VSPortrait = p1Char ? getBestPortrait(p1Char, 'vs') : undefined;
+  if (p1VSPortrait) {
+    const scale = p1VSPortrait.width > 100 ? 1.5 : 3;
+    const pw = p1VSPortrait.width * scale;
+    const ph = p1VSPortrait.height * scale;
     const px = CANVAS_WIDTH * 0.25 - pw / 2;
     const py = 100;
-    drawVSPortrait(ctx, px, py, pw, ph, p1Char.pixelPortrait, scale, p1Char.color, tick, 0);
+    drawVSPortrait(ctx, px, py, pw, ph, p1VSPortrait, scale, (p1Char?.color ?? '#888'), tick, 0);
   }
 
   // P2头像 (右侧)
-  if (p2Char?.pixelPortrait) {
-    const scale = 3;
-    const pw = p2Char.pixelPortrait.width * scale;
-    const ph = p2Char.pixelPortrait.height * scale;
+  const p2VSPortrait = p2Char ? getBestPortrait(p2Char, 'vs') : undefined;
+  if (p2VSPortrait) {
+    const scale = p2VSPortrait.width > 100 ? 1.5 : 3;
+    const pw = p2VSPortrait.width * scale;
+    const ph = p2VSPortrait.height * scale;
     const px = CANVAS_WIDTH * 0.75 - pw / 2;
     const py = 100;
-    drawVSPortrait(ctx, px, py, pw, ph, p2Char.pixelPortrait, scale, p2Char.color, tick, 1);
+    drawVSPortrait(ctx, px, py, pw, ph, p2VSPortrait, scale, (p2Char?.color ?? '#888'), tick, 1);
   }
 
   // P1角色名 (左侧)
@@ -1458,13 +1477,14 @@ export function drawTeamOrderSelect(
       }
 
       if (char) {
-        if (char.pixelPortrait) {
-          const pScale = 2.5;
-          const pw = char.pixelPortrait.width * pScale;
-          const ph = char.pixelPortrait.height * pScale;
+        const orderPortrait = getBestPortrait(char, 'select');
+        if (orderPortrait) {
+          const pScale = orderPortrait.width > 80 ? 0.8 : 2.5;
+          const pw = orderPortrait.width * pScale;
+          const ph = orderPortrait.height * pScale;
           const ppx = sx + (slotW - pw) / 2;
           const ppy = sy + 10;
-          drawPixelPortrait(ctx, char.pixelPortrait, ppx, ppy, pScale, {
+          drawPixelPortrait(ctx, orderPortrait, ppx, ppy, pScale, {
             frameColor: char.color,
             backdropColor: 'rgba(8, 8, 18, 0.85)',
             scanlines: true,

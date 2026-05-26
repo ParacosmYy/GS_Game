@@ -284,8 +284,16 @@ const RYO_SEQUENCES: Record<string, AnimSequence> = {
   ryo_tsurizao:  attackSequence('ryo_tsurizao', 'RYO_TSURIZAO', 18),  // 釣瓶打
   ryo_orishi:    attackSequence('ryo_orishi', 'RYO_ORISHI', 17),      // 卸し
 
+  // ── 必杀技 C版 (强版) ──
+  ryo_koou_c:   attackSequence('ryo_koou_c', 'RYO_KOOU_C', 17),         // 虎煌拳 C版 ↓↘→+C
+  ryo_ko_hou_c: attackSequence('ryo_ko_hou_c', 'RYO_KO_HOU_C', 15, 3),  // 虎咆 C版 →↓↘+C, startup前3帧无敌
+
   // ── DM (AttackType 映射名) ──
-  dm_ten_ha_ou: attackSequence('dm_ten_ha_ou', 'DM_TEN_HA_OU', 35),   // 天地霸煌拳
+  dm_ten_ha_ou:       attackSequence('dm_ten_ha_ou', 'DM_TEN_HA_OU', 35),         // 天地霸煌拳 DM
+  sdm_ten_ha_ou:      attackSequence('sdm_ten_ha_ou', 'SDM_TEN_HA_OU', 35),       // 天地霸煌拳 SDM
+  dm_ryuko_ranbu:     attackSequence('dm_ryuko_ranbu', 'DM_RYUKO_RANBU', 30),     // 龍虎乱舞 DM
+  sdm_ryuko_ranbu:    attackSequence('sdm_ryuko_ranbu', 'SDM_RYUKO_RANBU', 30),   // 龍虎乱舞 SDM
+  hsdm_ryuko_ranbu:   attackSequence('hsdm_ryuko_ranbu', 'HSDM_RYUKO_RANBU', 30), // 龍虎乱舞 HSDM
 
   // ── 必杀技 (旧名，向后兼容) ──
   koouken:  attackSequence('koouken', 'RYO_KOOU', 17),

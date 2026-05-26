@@ -23,7 +23,14 @@ import { RYO_JUMP_FRAMES } from './ryoJumpFrames.js';
 import { RYO_HURT_FRAMES, RYO_KNOCKDOWN_FRAMES } from './ryoDamageFrames.js';
 import { RYO_CROUCH_FRAMES, RYO_CROUCH_A_FRAMES, RYO_CROUCH_C_FRAMES } from './ryoCrouchFrames.js';
 import { RYO_AIR_A_FRAMES, RYO_AIR_C_FRAMES, RYO_AIR_D_FRAMES } from './ryoAirAttackFrames.js';
-import { RYO_KO_HOU_FRAMES, RYO_KOOU_FRAMES, RYO_HIEN_FRAMES } from './ryoSpecialFrames.js';
+import {
+  RYO_KO_HOU_FRAMES, RYO_KOOU_FRAMES, RYO_HIEN_FRAMES,
+  RYO_HAOU_FRAMES, RYO_KOOU_C_FRAMES, RYO_KO_HOU_C_FRAMES,
+} from './ryoSpecialFrames.js';
+import {
+  RYO_DM_TEN_HA_OU_FRAMES, RYO_DM_RYUKO_RANBU_FRAMES,
+  RYO_SDM_TEN_HA_OU_FRAMES, RYO_HSDM_RYUKO_RANBU_FRAMES,
+} from './ryoSuperFrames.js';
 import {
   RYO_RUN_FRAMES, RYO_BACKDASH_FRAMES, RYO_ROLL_FRAMES, RYO_BACK_ROLL_FRAMES,
   RYO_GUARD_CRUSH_FRAMES, RYO_MAX_MODE_FRAMES, RYO_TAUNT_FRAMES,
@@ -136,6 +143,22 @@ function initAllFrames(): void {
   registerFrames('KOOU', RYO_KOOU_FRAMES, 16);
   // HIEN: startup=10, active=8, recovery=22 = 40; 5 frames × 8 = 40
   registerFrames('HIEN', RYO_HIEN_FRAMES, 8);
+  // HAOU: counter stance, 3 frames × 12 = 36
+  registerFrames('HAOU', RYO_HAOU_FRAMES, 12);
+  // KOOU_C: strong projectile, 2 frames × 20 = 40
+  registerFrames('KOOU_C', RYO_KOOU_C_FRAMES, 20);
+  // KO_HOU_C: strong uppercut, 2 frames × 18 = 36
+  registerFrames('KO_HOU_C', RYO_KO_HOU_C_FRAMES, 18);
+
+  // SUPERS — DM/SDM/HSDM
+  // DM_TEN_HA_OU: 4 frames × 12 = 48
+  registerFrames('DM_TEN_HA_OU', RYO_DM_TEN_HA_OU_FRAMES, 12);
+  // DM_RYUKO_RANBU: 5 frames × 8 = 40
+  registerFrames('DM_RYUKO_RANBU', RYO_DM_RYUKO_RANBU_FRAMES, 8);
+  // SDM_TEN_HA_OU: 3 frames × 16 = 48
+  registerFrames('SDM_TEN_HA_OU', RYO_SDM_TEN_HA_OU_FRAMES, 16);
+  // HSDM_RYUKO_RANBU: 4 frames × 10 = 40
+  registerFrames('HSDM_RYUKO_RANBU', RYO_HSDM_RYUKO_RANBU_FRAMES, 10);
 
   // MOVEMENT — run, backdash, rolls
   registerFrames('RUN', RYO_RUN_FRAMES, 3);
@@ -196,21 +219,42 @@ function resolveFrameKey(
       if (currentAttack === AttackType.STAND_C || currentAttack === AttackType.CLOSE_C) {
         return 'STAND_C';
       }
-      // Special moves: uppercut and projectile
-      if (currentAttack === AttackType.RYO_KO_HOU || currentAttack === AttackType.RYO_KO_HOU_C) {
+      // Special moves: uppercut variants
+      if (currentAttack === AttackType.RYO_KO_HOU) {
         return 'KO_HOU';
       }
-      if (currentAttack === AttackType.RYO_KOOU || currentAttack === AttackType.RYO_KOOU_C) {
+      if (currentAttack === AttackType.RYO_KO_HOU_C) {
+        return 'KO_HOU_C';
+      }
+      // Special moves: projectile variants
+      if (currentAttack === AttackType.RYO_KOOU) {
         return 'KOOU';
       }
+      if (currentAttack === AttackType.RYO_KOOU_C) {
+        return 'KOOU_C';
+      }
+      // Special moves: flying kick
       if (currentAttack === AttackType.RYO_HIEN) {
         return 'HIEN';
       }
+      // Special moves: counter
+      if (currentAttack === AttackType.RYO_HAOU) {
+        return 'HAOU';
+      }
+      // Super moves: Ten Ha Ou variants
+      if (currentAttack === AttackType.DM_TEN_HA_OU) {
+        return 'DM_TEN_HA_OU';
+      }
+      if (currentAttack === AttackType.SDM_TEN_HA_OU) {
+        return 'SDM_TEN_HA_OU';
+      }
       // Super moves: Ryuko Ranbu variants
       if (currentAttack === AttackType.DM_RYUKO_RANBU
-        || currentAttack === AttackType.SDM_RYUKO_RANBU
-        || currentAttack === AttackType.HSDM_RYUKO_RANBU) {
+        || currentAttack === AttackType.SDM_RYUKO_RANBU) {
         return 'RYUKO_RANBU';
+      }
+      if (currentAttack === AttackType.HSDM_RYUKO_RANBU) {
+        return 'HSDM_RYUKO_RANBU';
       }
       // Default to STAND_A for STAND_A, CLOSE_A, and any other stand attack
       return 'STAND_A';
