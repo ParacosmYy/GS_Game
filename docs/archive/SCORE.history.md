@@ -739,3 +739,9 @@
 ## H164: aiRoutes—5项验证COMBO_ROUTES+JUMP_IN_ROUTE+attack/delay字段 — 136→137
 
 **commit:** <hash> | aiRoutes—5项验证COMBO_ROUTES+JUMP_IN_ROUTE+attack/delay字段
+
+---
+
+## H165: charStrategies—5项验证getCharacterStrategy+ryo/kyo/iori策略 — 137→138
+
+**commit:** <hash> | charStrategies—5项验证getCharacterStrategy+ryo/kyo/iori策略
