@@ -359,19 +359,63 @@ function drawHair(ctx: CanvasRenderingContext2D, charId: string, facing: number,
     ctx.beginPath(); ctx.moveTo(-r, -r + 1); ctx.lineTo(-r - 6, -r + 5); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(r, -r + 1); ctx.lineTo(r + 6, -r + 5); ctx.stroke();
   } else if (charId === 'ryo') {
-    // Ryo: short spiky brown hair
+    // Ryo: short spiky brown hair swept back + stronger brow + red headband
+    // Hair — swept back spiky style with more volume
     ctx.fillStyle = '#8B6914';
-    for (let i = -1; i <= 1; i++) {
-      const sx = i * 5;
+    const spikes = [[-8, -12], [-3, -16], [2, -14], [7, -10]];
+    for (const [sx, sy] of spikes) {
       ctx.beginPath();
-      ctx.moveTo(sx - 3, -r + 2);
-      ctx.lineTo(sx, -r - 8);
-      ctx.lineTo(sx + 3, -r + 2);
+      ctx.moveTo(sx - 4, -r + 2);
+      ctx.lineTo(sx, -r + sy);
+      ctx.lineTo(sx + 4, -r + 2);
       ctx.closePath();
       ctx.fill();
     }
+    // Hair base — fuller coverage
+    ctx.fillStyle = '#8B6914';
+    ctx.beginPath();
+    ctx.moveTo(-r + 2, -r + 3);
+    ctx.quadraticCurveTo(-r + 4, -r - 6, 0, -r - 4);
+    ctx.quadraticCurveTo(r - 4, -r - 6, r - 2, -r + 3);
+    ctx.lineTo(r - 3, -r + 7);
+    ctx.lineTo(-r + 3, -r + 7);
+    ctx.closePath();
+    ctx.fill();
+    // Darker hair base band
     ctx.fillStyle = '#6B4B14';
     ctx.fillRect(-r + 1, -r + 5, headW - 2, 2);
+    // Red headband — Ryo's signature
+    ctx.fillStyle = '#cc2222';
+    ctx.fillRect(-r, -r + 2, headW, 4);
+    // Headband trailing tails
+    ctx.strokeStyle = '#aa1111';
+    ctx.lineWidth = 2;
+    const hbX = -r * facing * 0.6;
+    ctx.beginPath();
+    ctx.moveTo(hbX, -r + 3);
+    ctx.lineTo(hbX - 5 * facing, -r + 8);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(hbX, -r + 4);
+    ctx.lineTo(hbX - 3 * facing, -r + 11);
+    ctx.stroke();
+    // Stronger jaw line — Ryo's trademark determined face
+    ctx.strokeStyle = shiftColor('#e8b88a', -30);
+    ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    ctx.moveTo(-r * 0.6, r * 0.5);
+    ctx.quadraticCurveTo(-r * 0.4, r * 0.85, 0, r * 0.9);
+    ctx.quadraticCurveTo(r * 0.4, r * 0.85, r * 0.6, r * 0.5);
+    ctx.stroke();
+    // Stronger brow ridge — Ryo's trademark glare (override default brows for more intensity)
+    ctx.strokeStyle = '#5a3a0a';
+    ctx.lineWidth = 3;
+    for (const side of [-1, 1]) {
+      ctx.beginPath();
+      ctx.moveTo(side * (8 - 5), -4 - 2 * side);
+      ctx.lineTo(side * (8 + 5), -4.5 + 2 * side);
+      ctx.stroke();
+    }
   } else if (charId === 'leona') {
     // Leona: short blonde hair
     ctx.fillStyle = '#DAA520';

@@ -47,8 +47,8 @@ export interface Pose {
 /** 骨骼部位名称 */
 export type BoneName = keyof Pose;
 
-/** 完整的角色姿态库 — 每个 FighterState 对应一个 Pose 或 Pose[] 动画序列 */
-export type PoseSet = Partial<Record<FighterState, Pose | Pose[]>>;
+/** 完整的角色姿态库 — FighterState 或 AttackType 字符串对应一个 Pose 或 Pose[] 动画序列 */
+export type PoseSet = Partial<Record<string, Pose | Pose[]>>;
 
 /** 创建 BonePose 的辅助函数 */
 export function bone(ox: number, oy: number, rot: number = 0, scale: number = 1): BonePose {

@@ -253,14 +253,22 @@ function drawTorsoDetail(
 
   } else if (charId === 'ryo') {
     // 亮: 橙色空手道道服+黑色腰带+道服V领+破烂袖口暗示
-    // 道服V领 — 粗线条
-    ctx.strokeStyle = shiftColor(outfit.shirt, -25);
-    ctx.lineWidth = 2;
+    // 道服V领 — 粗线条清晰可见的空手道V领
+    ctx.strokeStyle = shiftColor(outfit.shirt, -30);
+    ctx.lineWidth = 2.5;
     ctx.beginPath();
     ctx.moveTo(-PX * 2.5, -hh + PX);
     ctx.lineTo(0, -hh + PX * 6);
     ctx.lineTo(PX * 2.5, -hh + PX);
     ctx.stroke();
+    // V领内衬 — 深色内衬可见
+    ctx.fillStyle = shiftColor(outfit.shirt, -35);
+    ctx.beginPath();
+    ctx.moveTo(-PX * 1.5, -hh + PX * 1.5);
+    ctx.lineTo(0, -hh + PX * 5.5);
+    ctx.lineTo(PX * 1.5, -hh + PX * 1.5);
+    ctx.closePath();
+    ctx.fill();
     // 道服左片
     ctx.fillStyle = shiftColor(outfit.shirt, -8);
     ctx.beginPath();
@@ -279,14 +287,26 @@ function drawTorsoDetail(
     ctx.lineTo(PX * 2.5, hh * 0.3);
     ctx.closePath();
     ctx.fill();
-    // 十字交叉线
+    // 十字交叉线 — 前襟交叉绑带
     ctx.strokeStyle = shiftColor(outfit.shirt, -15);
-    ctx.lineWidth = 1;
+    ctx.lineWidth = 1.2;
     ctx.beginPath(); ctx.moveTo(-PX * 1.5, -hh + PX * 2); ctx.lineTo(PX * 1.5, hh * 0.2); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(PX * 1.5, -hh + PX * 2); ctx.lineTo(-PX * 1.5, hh * 0.2); ctx.stroke();
-    // 黑带
+    // 黑带(obi) — 更宽更清晰的腰带
     ctx.fillStyle = '#222';
-    ctx.fillRect(-ww + 1, hh * 0.5, (ww - 1) * 2, PX * 1.2);
+    ctx.fillRect(-ww + 1, hh * 0.48, (ww - 1) * 2, PX * 1.5);
+    // 腰带高光
+    ctx.fillStyle = '#333';
+    ctx.fillRect(-ww + 2, hh * 0.48, (ww - 2) * 2, PX * 0.4);
+    // 腰带结
+    ctx.fillStyle = '#1a1a1a';
+    ctx.beginPath();
+    ctx.moveTo(0, hh * 0.48 + PX * 0.2);
+    ctx.lineTo(-PX * 0.8, hh * 0.48 + PX);
+    ctx.lineTo(0, hh * 0.48 + PX * 1.8);
+    ctx.lineTo(PX * 0.8, hh * 0.48 + PX);
+    ctx.closePath();
+    ctx.fill();
     // 道服破损边缘暗示 — 锯齿线
     ctx.strokeStyle = shiftColor(outfit.shirt, -20);
     ctx.lineWidth = 0.6;
@@ -1034,14 +1054,24 @@ function drawArmDetail(
     ctx.beginPath(); ctx.moveTo(-hw + 1, -hh + sleeveH - 1); ctx.lineTo(hw - 1, -hh + sleeveH - 1); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(-hw + 1, -hh + sleeveH + 1); ctx.lineTo(hw - 1, -hh + sleeveH + 1); ctx.stroke();
   } else if (charId === 'ryo') {
-    // 亮: 黑色空手道护手
+    // 亮: 黑色空手道护手 + 正宗空手道拳 (knuckles forward, closed fist)
     ctx.fillStyle = '#222';
     ctx.fillRect(-hw * 0.85, fistY - 2, w * 0.85, 4);
-    // 手背绑带
+    // 手背绑带 — 多层缠绕
     ctx.strokeStyle = '#fff';
     ctx.lineWidth = 0.8;
     ctx.beginPath(); ctx.moveTo(-hw * 0.5, fistY - 4); ctx.lineTo(hw * 0.3, fistY - 1); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(-hw * 0.3, fistY); ctx.lineTo(hw * 0.5, fistY + 3); ctx.stroke();
+    // 空手道拳 — 指关节隆起
+    ctx.fillStyle = shiftColor(skinColor, 8);
+    ctx.beginPath();
+    ctx.arc(0, fistY + h * 0.04, hw * 0.55, 0, Math.PI * 2);
+    ctx.fill();
+    // 指关节线 — 空手道握拳特征
+    ctx.strokeStyle = shiftColor(skinColor, -10);
+    ctx.lineWidth = 0.6;
+    ctx.beginPath(); ctx.moveTo(-hw * 0.35, fistY + 1); ctx.lineTo(hw * 0.25, fistY + 1); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(-hw * 0.3, fistY + h * 0.07); ctx.lineTo(hw * 0.2, fistY + h * 0.07); ctx.stroke();
   } else if (charId === 'leona') {
     // 莉安娜: 军用护腕+深蓝
     ctx.fillStyle = '#224466';
@@ -1249,14 +1279,22 @@ function drawLegDetail(
     ctx.fillStyle = shiftColor(outfit.pants, -15);
     ctx.fillRect(-hw + 1, hh - shoeH - 4, w - 2, 3);
   } else if (charId === 'ryo') {
-    // 亮: 橙色空手道道裤+中线
+    // 亮: 橙色空手道道裤+中线+折痕+裤脚收口
     ctx.strokeStyle = shiftColor(outfit.pants, 20);
     ctx.lineWidth = 0.8;
     ctx.beginPath(); ctx.moveTo(0, -hh + 4); ctx.lineTo(0, hh - shoeH - 2); ctx.stroke();
+    // 道裤折痕 — 空手道裤特征性褶皱
+    ctx.strokeStyle = shiftColor(outfit.pants, 15);
+    ctx.lineWidth = 0.5;
+    ctx.beginPath(); ctx.moveTo(-hw * 0.2, -hh + h * 0.2); ctx.lineTo(-hw * 0.15, hh - shoeH - 4); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(hw * 0.2, -hh + h * 0.2); ctx.lineTo(hw * 0.15, hh - shoeH - 4); ctx.stroke();
     // 破损暗示
     ctx.strokeStyle = shiftColor(outfit.pants, -15);
     ctx.lineWidth = 0.5;
     ctx.beginPath(); ctx.moveTo(-hw * 0.4, -hh + h * 0.35); ctx.lineTo(-hw * 0.3, -hh + h * 0.4); ctx.stroke();
+    // 裤脚收口 — 道裤底部绑带
+    ctx.fillStyle = shiftColor(outfit.pants, -12);
+    ctx.fillRect(-hw + 2, hh - shoeH - 3, w - 4, 2);
   } else if (charId === 'leona') {
     // 莉安娜: 军裤+侧口袋+绑带
     ctx.strokeStyle = shiftColor(outfit.pants, -12);
@@ -1439,6 +1477,21 @@ function drawShoeDetail(
     ctx.fillStyle = '#88bbee';
     ctx.fillRect(-hw, hh - shoeH, w, 2);
     ctx.fillStyle = '#6699cc';
+    ctx.fillRect(-hw, hh - 2, w, 2);
+  } else if (charId === 'ryo') {
+    // 亮: 棕色空手道训练鞋+鞋带+脚趾可见
+    ctx.fillStyle = shiftColor(outfit.shoes, 5);
+    ctx.fillRect(-hw, hh - shoeH, w, shoeH);
+    // 鞋面高光
+    ctx.fillStyle = shiftColor(outfit.shoes, 18);
+    ctx.fillRect(-hw + 1, hh - shoeH, w * 0.4, shoeH * 0.5);
+    // 鞋带
+    ctx.strokeStyle = shiftColor(outfit.shoes, 25);
+    ctx.lineWidth = 0.5;
+    ctx.beginPath(); ctx.moveTo(-hw * 0.2, hh - shoeH + 1); ctx.lineTo(hw * 0.1, hh - 3); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(-hw * 0.1, hh - shoeH + 2); ctx.lineTo(hw * 0.15, hh - 4); ctx.stroke();
+    // 鞋底厚底
+    ctx.fillStyle = shiftColor(outfit.shoes, -25);
     ctx.fillRect(-hw, hh - 2, w, 2);
   }
 }

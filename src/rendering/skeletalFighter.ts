@@ -32,8 +32,12 @@ export function drawSkeletalFighter(
   // 将动画帧传递给身体部位渲染器（用于呼吸偏移、闪烁等动态效果）
   setBodyPartTick(globalTick);
 
-  // Resolve pose
-  const rawPose = poseSet?.[f.state] ?? poseSet?.[FighterState.IDLE] ?? pose({
+  // Resolve pose — attack-specific poses take priority over state-based poses
+  const attackKey = f.currentAttack as string;
+  const attackPose = attackKey && poseSet?.[attackKey];
+  // If the attack pose is a string reference (alias), follow it
+  const resolvedAttackPose = typeof attackPose === 'string' ? poseSet?.[attackPose] : attackPose;
+  const rawPose = resolvedAttackPose ?? poseSet?.[f.state] ?? poseSet?.[FighterState.IDLE] ?? pose({
     armFront: bone(10, 20, 0.3),
     armBack: bone(-8, 15, -0.5),
   });
