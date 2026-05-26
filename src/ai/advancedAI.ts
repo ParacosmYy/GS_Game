@@ -878,10 +878,11 @@ export class AdvancedAI {
     return {
       up: false, down: false, forward: false, back: false,
       buttonA: false, buttonB: false, buttonC: false, buttonD: false,
-      throwAttack: false,
+      throwAttack: false, burst: false,
       buttonAPressed: false, buttonBPressed: false,
       buttonCPressed: false, buttonDPressed: false,
       throwAttackPressed: false,
+      burstPressed: false,
       punchPressed: false, kickPressed: false,
       rollPressed: false, blowbackPressed: false,
       punchJustReleased: false, kickJustReleased: false,
@@ -994,18 +995,36 @@ export class AdvancedAI {
         break;
       }
 
-      case 'poke':
-        // Mid-range poke: use quick, safe normals
-        if (dist < 120) {
-          if (this.chance(rng, 0.5)) {
+      case 'poke': {
+        // Use character strategy preferred poke when available
+        const prefPoke = this.strategy.preferredPoke;
+        if (prefPoke === AttackType.RYO_KOOU) {
+          // Ryo KOOU (虎煌拳): ↓↘→ + P — preferred poke at mid-range
+          base.down = true;
+          if (dist > 150 || this.chance(rng, 0.5)) {
+            base.buttonC = true; base.buttonCPressed = true; base.punchPressed = true;
+          } else {
             base.buttonA = true; base.buttonAPressed = true; base.punchPressed = true;
+          }
+        } else if (prefPoke === AttackType.STAND_B) {
+          // Default safe poke
+          base.buttonB = true; base.buttonBPressed = true; base.kickPressed = true;
+        } else if (prefPoke === AttackType.STAND_A) {
+          base.buttonA = true; base.buttonAPressed = true; base.punchPressed = true;
+        } else {
+          // Generic: use quick, safe normals based on distance
+          if (dist < 120) {
+            if (this.chance(rng, 0.5)) {
+              base.buttonA = true; base.buttonAPressed = true; base.punchPressed = true;
+            } else {
+              base.buttonB = true; base.buttonBPressed = true; base.kickPressed = true;
+            }
           } else {
             base.buttonB = true; base.buttonBPressed = true; base.kickPressed = true;
           }
-        } else {
-          base.buttonB = true; base.buttonBPressed = true; base.kickPressed = true;
         }
         break;
+      }
 
       case 'projectile':
         if (canAct && this.spacingProfile.hasProjectile) {
@@ -1078,25 +1097,67 @@ export class AdvancedAI {
       }
 
       case 'antiair': {
-        const antiAirType = this.spacingProfile.antiAirType;
         if (canAct) {
-          if (antiAirType === 'dp') {
-            // DP motion: forward + button for uppercut-type move
+          // Use character strategy preferred anti-air when available
+          const aaCharId = this.fighter.charId;
+          const preferredAA = this.strategy.preferredAntiAir;
+
+          // Route specific anti-air moves based on character strategy
+          if (preferredAA === AttackType.RYO_KO_HOU_C) {
+            // Ryo KO_HOU: →↓↘ + C (虎咆 strong upper)
+            base.forward = true;
+            base.down = true;
             base.buttonC = true;
             base.buttonCPressed = true;
             base.punchPressed = true;
-            if (this.chance(rng, 0.5)) base.forward = true;
-          } else if (antiAirType === 'crouchC') {
-            // Crouch C anti-air
+          } else if (preferredAA === AttackType.KYO_ONIYAKI_C) {
+            base.forward = true;
+            base.down = true;
+            base.buttonC = true;
+            base.buttonCPressed = true;
+            base.punchPressed = true;
+          } else if (preferredAA === AttackType.IORI_ONIYAKI_C) {
+            base.forward = true;
+            base.down = true;
+            base.buttonC = true;
+            base.buttonCPressed = true;
+            base.punchPressed = true;
+          } else if (preferredAA === AttackType.TERRY_POWER_DUNK) {
+            base.forward = true;
+            base.down = true;
+            base.buttonD = true;
+            base.buttonDPressed = true;
+            base.kickPressed = true;
+          } else if (preferredAA === AttackType.KIM_HIENZAN) {
+            base.forward = true;
+            base.down = true;
+            base.buttonD = true;
+            base.buttonDPressed = true;
+            base.kickPressed = true;
+          } else if (preferredAA === AttackType.KDASH_CROW_C) {
+            base.forward = true;
             base.down = true;
             base.buttonC = true;
             base.buttonCPressed = true;
             base.punchPressed = true;
           } else {
-            // Stand D anti-air
-            base.buttonD = true;
-            base.buttonDPressed = true;
-            base.kickPressed = true;
+            // Fallback to spacing profile
+            const antiAirType = this.spacingProfile.antiAirType;
+            if (antiAirType === 'dp') {
+              base.buttonC = true;
+              base.buttonCPressed = true;
+              base.punchPressed = true;
+              if (this.chance(rng, 0.5)) base.forward = true;
+            } else if (antiAirType === 'crouchC') {
+              base.down = true;
+              base.buttonC = true;
+              base.buttonCPressed = true;
+              base.punchPressed = true;
+            } else {
+              base.buttonD = true;
+              base.buttonDPressed = true;
+              base.kickPressed = true;
+            }
           }
         } else if (f.state === FighterState.BLOCK || f.state === FighterState.HITSTUN || f.state === FighterState.DIZZY) {
           base.back = true;
@@ -1127,20 +1188,101 @@ export class AdvancedAI {
               break;
             }
           }
-          // Projectile-based special with proper motion
-          if (this.spacingProfile.hasProjectile && this.chance(rng, 0.6)) {
-            // QCF motion for projectile specials: ↓↘→ + P
-            base.down = true;
-            base.buttonC = true;
-            base.buttonCPressed = true;
-            base.punchPressed = true;
+
+          // Character-specific special routing
+          const charId = this.fighter.charId;
+          const oppAirborne = this.opponent.state === FighterState.JUMP
+            || this.opponent.state === FighterState.RUN_JUMP
+            || this.opponent.state === FighterState.HOP
+            || this.opponent.state === FighterState.HYPER_JUMP
+            || this.opponent.state === FighterState.AIR_ATTACK;
+
+          if (charId === 'ryo') {
+            // Ryo-specific special move selection based on distance and context
+            // DM when opponent is low HP or in MAX mode
+            if (this.gauge && this.gauge.stocks >= 1) {
+              const oppLowHp = this.opponent.health < this.opponent.maxHealth * 0.3;
+              const inMax = this.maxMode?.active ?? false;
+              if ((oppLowHp || inMax || this.inCombo) && this.chance(rng, 0.4)) {
+                // DM_TEN_HA_OU: ↓↘→↓↘→ + P (routed through character routeSpecial)
+                base.down = true;
+                base.buttonC = true;
+                base.buttonCPressed = true;
+                base.punchPressed = true;
+                break;
+              }
+            }
+
+            if (dist > RANGE_FAR) {
+              // Far range: KOOU (虎煌拳 projectile) ↓↘→ + P
+              base.down = true;
+              if (this.chance(rng, 0.5)) {
+                base.buttonC = true; base.buttonCPressed = true; base.punchPressed = true;
+              } else {
+                base.buttonA = true; base.buttonAPressed = true; base.punchPressed = true;
+              }
+            } else if (oppAirborne && dist < 160) {
+              // Opponent airborne: KO_HOU (虎咆 anti-air DP) →↓↘ + P
+              base.forward = true;
+              base.down = true;
+              base.buttonC = true;
+              base.buttonCPressed = true;
+              base.punchPressed = true;
+            } else if (dist > RANGE_CLOSE && dist <= RANGE_MID) {
+              // Mid range: mix between HIEN (飛燕疾風脚) and KOOU
+              if (this.chance(rng, 0.45)) {
+                // HIEN: ←↙↓ + K (overhead kick approach)
+                base.back = true;
+                base.down = true;
+                base.buttonD = true;
+                base.buttonDPressed = true;
+                base.kickPressed = true;
+              } else {
+                // KOOU: ↓↘→ + P (projectile)
+                base.down = true;
+                base.buttonC = true;
+                base.buttonCPressed = true;
+                base.punchPressed = true;
+              }
+            } else if (dist <= RANGE_CLOSE) {
+              // Close range: mix between ORISHI (low) and TSURIZAO (overhead)
+              if (this.chance(rng, 0.5)) {
+                // ORISHI: ↘+B (low sweep, command normal)
+                base.down = true;
+                base.forward = true;
+                base.buttonB = true;
+                base.buttonBPressed = true;
+                base.kickPressed = true;
+              } else {
+                // TSURIZAO: →+A (overhead, command normal)
+                base.forward = true;
+                base.buttonA = true;
+                base.buttonAPressed = true;
+                base.punchPressed = true;
+              }
+            } else {
+              // Default: KOOU projectile
+              base.down = true;
+              base.buttonC = true;
+              base.buttonCPressed = true;
+              base.punchPressed = true;
+            }
           } else {
-            // DP motion for anti-air specials: →↓↘ + P
-            base.forward = true;
-            base.down = true;
-            base.buttonC = true;
-            base.buttonCPressed = true;
-            base.punchPressed = true;
+            // Generic special routing for non-Ryo characters
+            if (this.spacingProfile.hasProjectile && this.chance(rng, 0.6)) {
+              // QCF motion for projectile specials: ↓↘→ + P
+              base.down = true;
+              base.buttonC = true;
+              base.buttonCPressed = true;
+              base.punchPressed = true;
+            } else {
+              // DP motion for anti-air specials: →↓↘ + P
+              base.forward = true;
+              base.down = true;
+              base.buttonC = true;
+              base.buttonCPressed = true;
+              base.punchPressed = true;
+            }
           }
         }
         break;
