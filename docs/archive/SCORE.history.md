@@ -721,3 +721,9 @@
 ## H161: ryoHitboxes—5项验证RYO_HITBOX_KEYS+getRyoHitboxOffsets+RYO_ATTACK_FRAME_KEYS — 133→134
 
 **commit:** <hash> | ryoHitboxes—5项验证RYO_HITBOX_KEYS+getRyoHitboxOffsets+RYO_ATTACK_FRAME_KEYS
+
+---
+
+## H162: ryoAnimations—5项验证getRyoAnimations+getRyoAnimSequence+getRyoAnimSequenceNames — 134→135
+
+**commit:** <hash> | ryoAnimations—5项验证getRyoAnimations+getRyoAnimSequence+getRyoAnimSequenceNames
