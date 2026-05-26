@@ -194,6 +194,14 @@ export function handleIdleWalk(ctx: FighterCtx, input: ResolvedInput): void {
     f.vx = ctx.stats.runSpeed * f.facing;
     return;
   }
+  if (input.up && f.isGrounded() && (input.forward || input.back || f.runLatchTimer > 0)) {
+    f.throwInvincibilityTimer = THROW_INVINCIBILITY_JUMP_STARTUP;
+    f.y = STAGE_GROUND_Y - 1;
+    f.vy = ctx.stats.jumpVelocity;
+    f.vx = ctx.stats.jumpForwardSpeed * (input.forward ? 1 : input.back ? -1 : 0) * f.facing;
+    f.state = FighterState.JUMP;
+    return;
+  }
   if (upReleased(ctx, input) && f.isGrounded() && ctx.upHoldFrames > 0) {
     f.throwInvincibilityTimer = THROW_INVINCIBILITY_JUMP_STARTUP;
     // KOF2002: 跳跃第1帧即脱离地面(isGrounded=false), 可避开地面投技

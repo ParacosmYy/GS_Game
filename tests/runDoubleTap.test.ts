@@ -69,4 +69,15 @@ describe('run double tap movement', () => {
     step(fighter, ctrl, tickRef, prev, makeRawInput());
     expect(fighter.state).toBe(FighterState.RUN);
   });
+
+  it('starts a jump immediately when pressing up while still moving forward in WALK', () => {
+    const { fighter, ctrl, tickRef } = makeController();
+    const prev = createPrevAttack();
+
+    step(fighter, ctrl, tickRef, prev, makeRawInput({ right: true }));
+    expect(fighter.state).toBe(FighterState.WALK);
+
+    step(fighter, ctrl, tickRef, prev, makeRawInput({ right: true, up: true }));
+    expect(fighter.state).toBe(FighterState.JUMP);
+  });
 });
