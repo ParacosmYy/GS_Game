@@ -1100,6 +1100,19 @@ export const FRAME_DATA_CHARS = {
     knockdown: true,
     chipDamage: 20,
   },
+  // Moon Slasher hcb,f+P (DP-type special, stronger version)
+  LEONA_MOON_SLASHER: {
+    startup: 5,
+    active: 10,
+    recovery: 30,
+    damage: 95,
+    hitstun: 24,
+    blockstun: 20,
+    pushback: 8,
+    hitLevel: "MID" as const,
+    knockdown: true,
+    chipDamage: 14,
+  },
   // ── 罗伯特必杀技 (Robert Garcia) ── KOF2002UM 校准数据
   // 龙撃拳 qcf+A (飞行道具)
   ROBERT_RYU_GEKI: {
@@ -1944,6 +1957,18 @@ export const FRAME_DATA_CHARS = {
     knockdown: true,
     chipDamage: 30,
   },
+  // DM Super Argentine Backbreaker hcb,hcb+P (command grab DM)
+  DM_SUPER_ARGENTINE_BACKBREAKER: {
+    startup: 4,
+    active: 3,
+    recovery: 42,
+    damage: 200,
+    hitstun: 0,
+    blockstun: 0,
+    pushback: 0,
+    hitLevel: "MID" as const,
+    knockdown: true,
+  },
   // ── 拉尔夫必杀技 (Ralf Jones) ── KOF2002UM 校准数据
   // Vulcan Punch qcf+A (机枪拳 多段)
   RALF_VULCAN: {
@@ -2032,6 +2057,19 @@ export const FRAME_DATA_CHARS = {
     knockdown: true,
     chipDamage: 32,
   },
+  // DM Galactic Phantom charge b,f+P (alternate name variant)
+  DM_GALACTIC_PHANTOM: {
+    startup: 18,
+    active: 8,
+    recovery: 44,
+    damage: 280,
+    hitstun: 0,
+    blockstun: 21,
+    pushback: 14,
+    hitLevel: "MID" as const,
+    knockdown: true,
+    chipDamage: 30,
+  },
   // ── 乔·东必杀技 (Joe Higashi) ── KOF2002UM 校准数据
   // Hurricane Upper qcf+A (龙卷风飞行道具)
   JOE_HURRICANE: {
@@ -2108,6 +2146,19 @@ export const FRAME_DATA_CHARS = {
     pushback: 5,
     hitLevel: "MID" as const,
     knockdown: true,
+  },
+  // 黄金之踵 dp+K (DP-type golden heel kick)
+  JOE_OUGON_NO_KAKATO: {
+    startup: 7,
+    active: 8,
+    recovery: 26,
+    damage: 90,
+    hitstun: 24,
+    blockstun: 20,
+    pushback: 7,
+    hitLevel: "MID" as const,
+    knockdown: true,
+    chipDamage: 12,
   },
   // 黄金之踵 ←↙↓↘→+K (黄金脚跟落地)
   JOE_SLASH_KICK: {
@@ -2232,6 +2283,18 @@ export const FRAME_DATA_CHARS = {
     hitstun: 22,
     blockstun: 18,
     pushback: 5,
+    hitLevel: "MID" as const,
+    knockdown: true,
+  },
+  // 斩影拳 qcb+P (shadow elbow rush, alternate variant)
+  ANDY_ZANEIKEN: {
+    startup: 8,
+    active: 8,
+    recovery: 24,
+    damage: 80,
+    hitstun: 22,
+    blockstun: 18,
+    pushback: 6,
     hitLevel: "MID" as const,
     knockdown: true,
   },
