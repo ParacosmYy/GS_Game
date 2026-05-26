@@ -13,7 +13,7 @@ import { FighterState, AttackType } from '../core/types.js';
 import type { PowerGauge, MaxModeState } from '../core/types.js';
 import { FRAME_DATA } from '../core/constants.js';
 import { SeededRNG } from '../core/prng.js';
-import { COMBO_ROUTES, applyComboStep, routeComboSpecial } from './aiRoutes.js';
+import { COMBO_ROUTES, AIR_COMBO_ROUTES, applyComboStep, routeComboSpecial } from './aiRoutes.js';
 import type { ComboStep } from './aiRoutes.js';
 import { getCharacterStrategy } from './characterStrategies.js';
 import type { CharacterStrategy } from './characterStrategies.js';
@@ -935,7 +935,7 @@ export class AdvancedAI {
           this.action = 'attack';
           this.comboStep = 0;
           this.inCombo = true;
-          const route = this.getCurrentRoute();
+          const route = AIR_COMBO_ROUTES[this.fighter.charId] ?? this.getCurrentRoute();
           if (route.length > 0) {
             this.doApplyComboStep(route[0], base);
             this.comboStep = 1;

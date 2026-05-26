@@ -6,7 +6,7 @@ import { createPrevAttack } from '../input/inputResolver.js';
 import { FighterState, AttackType } from '../core/types.js';
 import { SeededRNG } from '../core/prng.js';
 import type { PowerGauge, MaxModeState } from '../core/types.js';
-import { COMBO_ROUTES, JUMP_IN_ROUTE, applyComboStep, routeComboSpecial } from './aiRoutes.js';
+import { COMBO_ROUTES, JUMP_IN_ROUTE, AIR_COMBO_ROUTES, applyComboStep, routeComboSpecial } from './aiRoutes.js';
 import type { ComboStep } from './aiRoutes.js';
 
 const AI_RNG_OFFSET = 0x811C9DC5;
@@ -351,8 +351,8 @@ export class SimpleAI {
           this.action = 'attack';
           this.comboStep = 0;
           this.inCombo = true;
-          // Apply first combo step (closeC)
-          const route = this.getCurrentRoute();
+          // Prefer character-specific air combo route
+          const route = AIR_COMBO_ROUTES[this.fighter.charId] ?? this.getCurrentRoute();
           if (route.length > 0) {
             this.doApplyComboStep(route[0], base);
             this.comboStep = 1;
