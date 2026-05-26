@@ -565,3 +565,9 @@
 ## H137: types测试—19项验证FighterState+AttackType+HitLevel+HitHeight+GamePhase枚举 — 109→110
 
 **commit:** <hash> | types测试—19项验证FighterState+AttackType+HitLevel+HitHeight+GamePhase枚举
+
+---
+
+## H138: commandBuffer测试—8项验证record+reset+checkSpecial+getChargeState+hasQCF — 110→111
+
+**commit:** <hash> | commandBuffer测试—8项验证record+reset+checkSpecial+getChargeState+hasQCF
