@@ -410,6 +410,11 @@ function update(): void {
 
   if (gs.phase === GamePhase.WIN_QUOTE) {
     gs.winQuoteTimer++;
+    // During cinematic round transition, keep ticking fade but skip re-entry logic
+    if (rounds.isTransitioning()) {
+      if (inputManager.isKeyDown('KeyR')) restartGame();
+      return;
+    }
     if (gs.winQuoteTimer >= WIN_QUOTE_DURATION) {
       if (gs.teamMode && p1Team && p2Team && gs.winner !== null) {
         const loserTeam = gs.winner === 0 ? p2Team : p1Team;
@@ -426,16 +431,22 @@ function update(): void {
           if (p2AI && losingIdx === 1) {
             p2AI = new AdvancedAI(p2, p1, newChar, 'medium');
           }
-          rounds.currentRound++;
-          rounds.resetForNextRound();
-          gs.setPhase(GamePhase.INTRO);
-          gs.phaseTimer = 0;
-          p1DelayedHealth = p1.maxHealth;
-          p2DelayedHealth = p2.maxHealth;
-          cinematic.reset();
-          gs.announceSequence.setSteps(createRoundStartSequence(rounds.currentRound));
-          announcer.roundStart(rounds.currentRound);
-          announcer.fight();
+          // Cinematic transition for team mode round change
+          rounds.startCinematicTransition(
+            () => {
+              p1DelayedHealth = p1.maxHealth;
+              p2DelayedHealth = p2.maxHealth;
+              cinematic.reset();
+            },
+            () => {
+              gs.setPhase(GamePhase.INTRO);
+              gs.phaseTimer = 0;
+              gs.resetForNextRound();
+              gs.announceSequence.setSteps(createRoundStartSequence(rounds.currentRound));
+              announcer.roundStart(rounds.currentRound);
+              announcer.fight();
+            },
+          );
           return;
         }
         if (!p1Team.alive || !p2Team.alive) {
@@ -462,17 +473,25 @@ function update(): void {
           gs.announceSequence.setSteps(createWinnerSequence(wc?.nameCn ?? ''));
         }
       } else {
-        rounds.currentRound++;
-        rounds.resetForNextRound();
-        gs.setPhase(GamePhase.INTRO);
-        gs.phaseTimer = 0;
-        gs.isTimeOver = false;
-        gs.koGroundSlamDone = false;
-        p1DelayedHealth = p1.maxHealth;
-        p2DelayedHealth = p2.maxHealth;
-        gs.announceSequence.setSteps(createRoundStartSequence(rounds.currentRound));
-        announcer.roundStart(rounds.currentRound);
-        announcer.fight();
+        // Start cinematic round transition: fade out → hold black → fade in
+        rounds.startCinematicTransition(
+          // onPeak: fires at full black — delayed health reset
+          () => {
+            gs.isTimeOver = false;
+            gs.koGroundSlamDone = false;
+            p1DelayedHealth = p1.maxHealth;
+            p2DelayedHealth = p2.maxHealth;
+          },
+          // onComplete: fires when fade-in finishes — start next round
+          () => {
+            gs.setPhase(GamePhase.INTRO);
+            gs.phaseTimer = 0;
+            gs.resetForNextRound();
+            gs.announceSequence.setSteps(createRoundStartSequence(rounds.currentRound));
+            announcer.roundStart(rounds.currentRound);
+            announcer.fight();
+          },
+        );
       }
     }
     if (inputManager.isKeyDown('KeyR')) restartGame();
@@ -894,7 +913,25 @@ function render(): void {
       drawAnnounceSequence(ctx, gs.announceSequence, canvas.width, canvas.height);
     }
   }
-  if (rounds.fadeAlpha > 0) { ctx.fillStyle = `rgba(0,0,0,${rounds.fadeAlpha})`; ctx.fillRect(0, 0, canvas.width, canvas.height); }
+  if (rounds.fadeAlpha > 0) {
+    ctx.save();
+    // Main fade overlay
+    ctx.fillStyle = `rgba(0,0,0,${rounds.fadeAlpha})`;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    // Subtle warm edge glow during fade — gives cinematic round transition feel
+    if (rounds.isTransitioning() && rounds.fadeAlpha >= 0.9) {
+      const glowGrad = ctx.createRadialGradient(
+        canvas.width / 2, canvas.height / 2, 40,
+        canvas.width / 2, canvas.height / 2, canvas.width * 0.5,
+      );
+      glowGrad.addColorStop(0, `rgba(255, 180, 60, ${0.08 * rounds.fadeAlpha})`);
+      glowGrad.addColorStop(0.5, `rgba(255, 120, 30, ${0.04 * rounds.fadeAlpha})`);
+      glowGrad.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = glowGrad;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+    ctx.restore();
+  }
   screenFlash.render(ctx, canvas.width, canvas.height);
   // KO去饱和闪光 + 红色暗角 — 由CinematicState控制
   if (cinematic.koDesaturateTimer > 0) {

@@ -258,56 +258,66 @@ export const RyoDef: CharacterDefinition = {
     //
     [FighterState.CROUCH_ATTACK]: [
       // ── Startup (frames 0-6): crouch attack wind-up ──
-      // F0: crouch base, slight tension in arms
-      pose({ head: bone(2, 12, 0.04), body: bone(2, 16, 0.06), armFront: bone(10, 18, 0.05, 1.0), armBack: bone(-6, 18, -0.3, 0.9), legFront: bone(12, 2, 0.35, 1.0), legBack: bone(-8, 8, -0.25) }),
-      // F1: weight shifts to back leg, arm starts to pull back
-      pose({ head: bone(2, 12, 0.04), body: bone(1, 17, 0.06), armFront: bone(8, 18, 0.0, 1.0), armBack: bone(-6, 18, -0.35, 0.9), legFront: bone(11, 3, 0.32, 1.0), legBack: bone(-9, 8, -0.28) }),
-      // F2: deeper crouch, arm pulling further back
-      pose({ head: bone(1, 13, 0.05), body: bone(0, 18, 0.08), armFront: bone(5, 18, -0.08, 1.0), armBack: bone(-7, 19, -0.4, 0.9), legFront: bone(10, 4, 0.3, 1.0), legBack: bone(-10, 9, -0.32) }),
-      // F3: fully wound up, coiled for strike
-      pose({ head: bone(1, 14, 0.05), body: bone(-1, 19, 0.1), armFront: bone(3, 18, -0.12, 1.0), armBack: bone(-7, 20, -0.45, 0.9), legFront: bone(10, 5, 0.28, 1.0), legBack: bone(-10, 10, -0.35) }),
-      // F4: beginning to uncoil, weight transferring forward
-      pose({ head: bone(2, 13, 0.05), body: bone(1, 18, 0.08), armFront: bone(8, 16, 0.02, 1.05), armBack: bone(-7, 19, -0.4, 0.9), legFront: bone(11, 4, 0.32, 1.02), legBack: bone(-9, 9, -0.3) }),
-      // F5: accelerating, arm extending forward
-      pose({ head: bone(3, 12, 0.06), body: bone(3, 17, 0.1), armFront: bone(14, 12, 0.1, 1.1), armBack: bone(-7, 18, -0.38, 0.88), legFront: bone(14, 3, 0.38, 1.05), legBack: bone(-10, 9, -0.32) }),
-      // F6: near peak, arm almost fully extended
-      pose({ head: bone(3, 12, 0.06), body: bone(4, 16, 0.12), armFront: bone(18, 10, 0.14, 1.15), armBack: bone(-8, 17, -0.4, 0.88), legFront: bone(16, 3, 0.42, 1.08), legBack: bone(-11, 10, -0.34) }),
+      // F0: crouch base, weight settling, slight arm tension
+      pose({ head: bone(2, 13, 0.04), body: bone(2, 17, 0.06), armFront: bone(10, 19, 0.05, 1.0), armBack: bone(-6, 18, -0.25, 0.92), legFront: bone(12, 2, 0.36, 1.0), legBack: bone(-8, 8, -0.28) }),
+      // F1: weight shifts to back leg, arm pulls back slightly
+      pose({ head: bone(2, 13, 0.04), body: bone(1, 18, 0.07), armFront: bone(8, 19, 0.0, 1.0), armBack: bone(-7, 19, -0.32, 0.92), legFront: bone(11, 3, 0.34, 1.0), legBack: bone(-9, 9, -0.3) }),
+      // F2: deeper crouch, arm pulling further back (body drops for power)
+      pose({ head: bone(1, 14, 0.05), body: bone(0, 19, 0.09), armFront: bone(5, 19, -0.06, 1.0), armBack: bone(-7, 20, -0.38, 0.9), legFront: bone(10, 4, 0.32, 1.0), legBack: bone(-10, 10, -0.34) }),
+      // F3: fully coiled — maximum wind-up, body compacted low
+      pose({ head: bone(1, 15, 0.05), body: bone(-1, 20, 0.12), armFront: bone(3, 19, -0.1, 1.0), armBack: bone(-7, 21, -0.42, 0.88), legFront: bone(10, 5, 0.3, 1.0), legBack: bone(-10, 10, -0.36) }),
+      // F4: beginning to uncoil, hips driving forward
+      pose({ head: bone(2, 14, 0.05), body: bone(1, 19, 0.1), armFront: bone(8, 17, 0.02, 1.04), armBack: bone(-7, 20, -0.38, 0.9), legFront: bone(11, 4, 0.34, 1.02), legBack: bone(-9, 9, -0.32) }),
+      // F5: accelerating hard, arm extending rapidly forward
+      pose({ head: bone(3, 13, 0.06), body: bone(3, 18, 0.12), armFront: bone(14, 14, 0.12, 1.1), armBack: bone(-7, 19, -0.36, 0.88), legFront: bone(14, 3, 0.4, 1.06), legBack: bone(-10, 10, -0.34) }),
+      // F6: near peak, arm/leg almost fully extended — last startup frame
+      pose({ head: bone(3, 13, 0.06), body: bone(4, 17, 0.14), armFront: bone(20, 11, 0.18, 1.18), armBack: bone(-8, 18, -0.4, 0.86), legFront: bone(18, 2, 0.48, 1.1), legBack: bone(-11, 10, -0.36) }),
       // ── Active (frames 7-12): crouch strike contact ──
-      // F7: full extension — crouch punch/kick/sweep contact
-      pose({ head: bone(4, 12, 0.07), body: bone(5, 16, 0.14), armFront: bone(22, 8, 0.18, 1.2), armBack: bone(-8, 16, -0.5, 0.85), legFront: bone(18, 3, 0.45, 1.12), legBack: bone(-12, 10, -0.35) }),
-      // F8: peak impact — deepest crouch strike
-      pose({ head: bone(4, 11, 0.08), body: bone(5, 15, 0.16), armFront: bone(24, 8, 0.2, 1.25), armBack: bone(-8, 16, -0.55, 0.85), legFront: bone(20, 3, 0.48, 1.15), legBack: bone(-12, 10, -0.36) }),
-      // F9: follow-through, power dissipating
-      pose({ head: bone(4, 12, 0.07), body: bone(4, 16, 0.14), armFront: bone(22, 9, 0.18, 1.2), armBack: bone(-8, 16, -0.5, 0.87), legFront: bone(18, 4, 0.44, 1.1), legBack: bone(-12, 10, -0.35) }),
-      // F10: early retraction
-      pose({ head: bone(3, 12, 0.06), body: bone(3, 17, 0.12), armFront: bone(18, 11, 0.14, 1.12), armBack: bone(-7, 17, -0.45, 0.9), legFront: bone(15, 4, 0.38, 1.05), legBack: bone(-10, 9, -0.32) }),
-      // F11: mid-retraction, settling back to crouch
-      pose({ head: bone(3, 13, 0.05), body: bone(3, 17, 0.1), armFront: bone(14, 14, 0.1, 1.05), armBack: bone(-7, 18, -0.4, 0.92), legFront: bone(13, 4, 0.34, 1.02), legBack: bone(-9, 9, -0.28) }),
-      // F12: late active, near crouch neutral
-      pose({ head: bone(2, 13, 0.04), body: bone(2, 17, 0.08), armFront: bone(11, 16, 0.08, 1.02), armBack: bone(-6, 18, -0.35, 0.94), legFront: bone(12, 3, 0.32, 1.0), legBack: bone(-8, 9, -0.26) }),
-      // ── Recovery (frames 13-30): return to crouch neutral (CROUCH_D has 31 recovery frames) ──
-      // F13-F16: early recovery
-      pose({ head: bone(2, 13, 0.04), body: bone(2, 17, 0.07), armFront: bone(10, 17, 0.06, 1.0), armBack: bone(-6, 18, -0.32, 0.95), legFront: bone(12, 3, 0.35, 1.0), legBack: bone(-8, 9, -0.25) }),
-      pose({ head: bone(2, 14, 0.03), body: bone(2, 18, 0.06), armFront: bone(10, 18, 0.06, 1.0), armBack: bone(-6, 18, -0.3, 0.95), legFront: bone(12, 3, 0.36, 1.0), legBack: bone(-8, 9, -0.25) }),
-      pose({ head: bone(2, 14, 0.03), body: bone(2, 18, 0.06), armFront: bone(10, 18, 0.06, 1.0), armBack: bone(-6, 18, -0.3, 0.95), legFront: bone(12, 3, 0.36, 1.0), legBack: bone(-8, 9, -0.25) }),
-      pose({ head: bone(2, 14, 0.03), body: bone(2, 18, 0.06), armFront: bone(10, 18, 0.06, 1.0), armBack: bone(-6, 18, -0.3, 0.95), legFront: bone(12, 3, 0.36, 1.0), legBack: bone(-8, 9, -0.25) }),
-      // F17-F20: mid recovery
-      pose({ head: bone(2, 14, 0.03), body: bone(2, 18, 0.06), armFront: bone(10, 18, 0.06, 1.0), armBack: bone(-6, 18, -0.3, 0.95), legFront: bone(12, 3, 0.36, 1.0), legBack: bone(-8, 9, -0.25) }),
-      pose({ head: bone(2, 14, 0.03), body: bone(2, 18, 0.06), armFront: bone(10, 18, 0.06, 1.0), armBack: bone(-6, 18, -0.3, 0.95), legFront: bone(12, 3, 0.36, 1.0), legBack: bone(-8, 9, -0.25) }),
-      pose({ head: bone(2, 14, 0.03), body: bone(2, 18, 0.06), armFront: bone(10, 18, 0.06, 1.0), armBack: bone(-6, 18, -0.3, 0.95), legFront: bone(12, 3, 0.36, 1.0), legBack: bone(-8, 9, -0.25) }),
-      pose({ head: bone(2, 14, 0.03), body: bone(2, 18, 0.06), armFront: bone(10, 18, 0.06, 1.0), armBack: bone(-6, 18, -0.3, 0.95), legFront: bone(12, 3, 0.36, 1.0), legBack: bone(-8, 9, -0.25) }),
-      // F21-F25: late recovery
-      pose({ head: bone(2, 14, 0.03), body: bone(2, 18, 0.06), armFront: bone(10, 18, 0.06, 1.0), armBack: bone(-6, 18, -0.3, 0.95), legFront: bone(12, 3, 0.36, 1.0), legBack: bone(-8, 9, -0.25) }),
-      pose({ head: bone(2, 14, 0.03), body: bone(2, 18, 0.06), armFront: bone(10, 18, 0.06, 1.0), armBack: bone(-6, 18, -0.3, 0.95), legFront: bone(12, 3, 0.36, 1.0), legBack: bone(-8, 9, -0.25) }),
-      pose({ head: bone(2, 14, 0.03), body: bone(2, 18, 0.06), armFront: bone(10, 18, 0.06, 1.0), armBack: bone(-6, 18, -0.3, 0.95), legFront: bone(12, 3, 0.36, 1.0), legBack: bone(-8, 9, -0.25) }),
-      pose({ head: bone(2, 14, 0.03), body: bone(2, 18, 0.06), armFront: bone(10, 18, 0.06, 1.0), armBack: bone(-6, 18, -0.3, 0.95), legFront: bone(12, 3, 0.36, 1.0), legBack: bone(-8, 9, -0.25) }),
-      pose({ head: bone(2, 14, 0.03), body: bone(2, 18, 0.06), armFront: bone(10, 18, 0.06, 1.0), armBack: bone(-6, 18, -0.3, 0.95), legFront: bone(12, 3, 0.36, 1.0), legBack: bone(-8, 9, -0.25) }),
-      // F26-F30: final recovery (CROUCH_D sweep has 31 recovery frames)
-      pose({ head: bone(2, 14, 0.03), body: bone(2, 18, 0.06), armFront: bone(10, 18, 0.06, 1.0), armBack: bone(-6, 18, -0.3, 0.95), legFront: bone(12, 3, 0.36, 1.0), legBack: bone(-8, 9, -0.25) }),
-      pose({ head: bone(2, 14, 0.03), body: bone(2, 18, 0.06), armFront: bone(10, 18, 0.06, 1.0), armBack: bone(-6, 18, -0.3, 0.95), legFront: bone(12, 3, 0.36, 1.0), legBack: bone(-8, 9, -0.25) }),
-      pose({ head: bone(2, 14, 0.03), body: bone(2, 18, 0.06), armFront: bone(10, 18, 0.06, 1.0), armBack: bone(-6, 18, -0.3, 0.95), legFront: bone(12, 3, 0.36, 1.0), legBack: bone(-8, 9, -0.25) }),
-      pose({ head: bone(2, 14, 0.03), body: bone(2, 18, 0.06), armFront: bone(10, 18, 0.06, 1.0), armBack: bone(-6, 18, -0.3, 0.95), legFront: bone(12, 3, 0.36, 1.0), legBack: bone(-8, 9, -0.25) }),
-      pose({ head: bone(2, 14, 0.03), body: bone(2, 18, 0.06), armFront: bone(10, 18, 0.06, 1.0), armBack: bone(-6, 18, -0.3, 0.95), legFront: bone(12, 3, 0.36, 1.0), legBack: bone(-8, 9, -0.25) }),
+      // F7: full extension — CROUCH_A/B punch/kick reach, arm+leg stretched
+      //   armFront ox=28: far forward for jab reach
+      //   legFront ox=22, rot=0.55: sweeping leg extension for CROUCH_B/D
+      pose({ head: bone(4, 12, 0.07), body: bone(5, 17, 0.16), armFront: bone(28, 8, 0.25, 1.25), armBack: bone(-9, 17, -0.5, 0.82), legFront: bone(22, 2, 0.55, 1.18), legBack: bone(-12, 10, -0.38) }),
+      // F8: peak impact — maximum extension, body committed forward
+      //   armFront ox=32, oy=4, rot=0.28: uppercut angle for CROUCH_C (negative rot = upward arc)
+      //   legFront ox=26, rot=0.7: full sweep for CROUCH_D
+      //   Both arm and leg reach maximum stretch — the visual system picks
+      //   the active limb based on attack type in rendering
+      pose({ head: bone(5, 11, 0.08), body: bone(6, 16, 0.18), armFront: bone(32, 4, 0.28, 1.32), armBack: bone(-9, 17, -0.55, 0.8), legFront: bone(26, 1, 0.7, 1.22), legBack: bone(-13, 11, -0.4) }),
+      // F9: follow-through — power dissipating, slight overshoot
+      pose({ head: bone(4, 12, 0.07), body: bone(5, 17, 0.16), armFront: bone(28, 7, 0.24, 1.22), armBack: bone(-8, 17, -0.48, 0.85), legFront: bone(22, 2, 0.52, 1.14), legBack: bone(-12, 10, -0.36) }),
+      // F10: early retraction — pulling back from extended strike
+      pose({ head: bone(3, 13, 0.06), body: bone(4, 18, 0.13), armFront: bone(20, 12, 0.16, 1.12), armBack: bone(-7, 18, -0.42, 0.9), legFront: bone(17, 3, 0.42, 1.06), legBack: bone(-10, 9, -0.32) }),
+      // F11: mid-retraction, arms and legs returning to crouch guard
+      pose({ head: bone(3, 13, 0.05), body: bone(3, 18, 0.1), armFront: bone(14, 16, 0.1, 1.04), armBack: bone(-7, 19, -0.36, 0.92), legFront: bone(14, 4, 0.38, 1.02), legBack: bone(-9, 9, -0.3) }),
+      // F12: late active, settling toward crouch neutral
+      pose({ head: bone(2, 14, 0.04), body: bone(2, 18, 0.09), armFront: bone(12, 18, 0.08, 1.01), armBack: bone(-6, 19, -0.3, 0.94), legFront: bone(12, 4, 0.35, 1.0), legBack: bone(-8, 9, -0.28) }),
+      // ── Recovery (frames 13-30): progressive return to crouch neutral ──
+      // Crouch neutral target: head(0,14) body(0,18,0.08) armFront(10,22,0.05) armBack(-6,20,-0.2) legFront(10,0,0.48) legBack(-8,0,-0.38)
+      // F13: recovery start — body still slightly forward from attack
+      pose({ head: bone(2, 14, 0.04), body: bone(2, 18, 0.08), armFront: bone(11, 19, 0.06, 1.0), armBack: bone(-6, 19, -0.28, 0.95), legFront: bone(11, 3, 0.38, 1.0), legBack: bone(-8, 8, -0.28) }),
+      // F14: arms lowering to guard position
+      pose({ head: bone(1, 14, 0.04), body: bone(1, 18, 0.08), armFront: bone(10, 20, 0.06, 1.0), armBack: bone(-6, 20, -0.25, 0.96), legFront: bone(10, 2, 0.4, 1.0), legBack: bone(-8, 6, -0.3) }),
+      // F15: body centering, weight rebalancing
+      pose({ head: bone(1, 14, 0.03), body: bone(1, 18, 0.08), armFront: bone(10, 21, 0.05, 1.0), armBack: bone(-6, 20, -0.22, 0.97), legFront: bone(10, 1, 0.42, 1.0), legBack: bone(-8, 4, -0.32) }),
+      // F16: near crouch neutral, minor wobble
+      pose({ head: bone(1, 14, 0.03), body: bone(0, 18, 0.08), armFront: bone(10, 21, 0.05, 1.0), armBack: bone(-6, 20, -0.21, 0.98), legFront: bone(10, 1, 0.44, 1.0), legBack: bone(-8, 2, -0.34) }),
+      // F17-F20: settled into crouch neutral, holding guard
+      pose({ head: bone(0, 14, 0.03), body: bone(0, 18, 0.08), armFront: bone(10, 22, 0.05, 1.0), armBack: bone(-6, 20, -0.2, 0.98), legFront: bone(10, 0, 0.46, 1.0), legBack: bone(-8, 0, -0.36) }),
+      pose({ head: bone(0, 14, 0.03), body: bone(0, 18, 0.08), armFront: bone(10, 22, 0.05, 1.0), armBack: bone(-6, 20, -0.2, 0.99), legFront: bone(10, 0, 0.47, 1.0), legBack: bone(-8, 0, -0.37) }),
+      pose({ head: bone(0, 14, 0.03), body: bone(0, 18, 0.08), armFront: bone(10, 22, 0.05, 1.0), armBack: bone(-6, 20, -0.2, 0.99), legFront: bone(10, 0, 0.48, 1.0), legBack: bone(-8, 0, -0.38) }),
+      pose({ head: bone(0, 14, 0.03), body: bone(0, 18, 0.08), armFront: bone(10, 22, 0.05, 1.0), armBack: bone(-6, 20, -0.2, 1.0), legFront: bone(10, 0, 0.48, 1.0), legBack: bone(-8, 0, -0.38) }),
+      // F21-F25: stable crouch idle with subtle breathing
+      pose({ head: bone(0, 14, 0.03), body: bone(0, 18, 0.08), armFront: bone(10, 22, 0.05, 1.0), armBack: bone(-6, 20, -0.2, 1.0), legFront: bone(10, 0, 0.48, 1.0), legBack: bone(-8, 0, -0.38) }),
+      pose({ head: bone(0, 14, 0.03), body: bone(0, 18, 0.08), armFront: bone(10, 22, 0.05, 1.0), armBack: bone(-6, 20, -0.2, 1.0), legFront: bone(10, 0, 0.48, 1.0), legBack: bone(-8, 0, -0.38) }),
+      pose({ head: bone(0, 14, 0.03), body: bone(0, 18, 0.08), armFront: bone(10, 22, 0.05, 1.0), armBack: bone(-6, 20, -0.2, 1.0), legFront: bone(10, 0, 0.48, 1.0), legBack: bone(-8, 0, -0.38) }),
+      pose({ head: bone(0, 14, 0.03), body: bone(0, 18, 0.08), armFront: bone(10, 22, 0.05, 1.0), armBack: bone(-6, 20, -0.2, 1.0), legFront: bone(10, 0, 0.48, 1.0), legBack: bone(-8, 0, -0.38) }),
+      pose({ head: bone(0, 14, 0.03), body: bone(0, 18, 0.08), armFront: bone(10, 22, 0.05, 1.0), armBack: bone(-6, 20, -0.2, 1.0), legFront: bone(10, 0, 0.48, 1.0), legBack: bone(-8, 0, -0.38) }),
+      // F26-F30: final recovery — crouch idle stable
+      pose({ head: bone(0, 14, 0.03), body: bone(0, 18, 0.08), armFront: bone(10, 22, 0.05, 1.0), armBack: bone(-6, 20, -0.2, 1.0), legFront: bone(10, 0, 0.48, 1.0), legBack: bone(-8, 0, -0.38) }),
+      pose({ head: bone(0, 14, 0.03), body: bone(0, 18, 0.08), armFront: bone(10, 22, 0.05, 1.0), armBack: bone(-6, 20, -0.2, 1.0), legFront: bone(10, 0, 0.48, 1.0), legBack: bone(-8, 0, -0.38) }),
+      pose({ head: bone(0, 14, 0.03), body: bone(0, 18, 0.08), armFront: bone(10, 22, 0.05, 1.0), armBack: bone(-6, 20, -0.2, 1.0), legFront: bone(10, 0, 0.48, 1.0), legBack: bone(-8, 0, -0.38) }),
+      pose({ head: bone(0, 14, 0.03), body: bone(0, 18, 0.08), armFront: bone(10, 22, 0.05, 1.0), armBack: bone(-6, 20, -0.2, 1.0), legFront: bone(10, 0, 0.48, 1.0), legBack: bone(-8, 0, -0.38) }),
+      pose({ head: bone(0, 14, 0.03), body: bone(0, 18, 0.08), armFront: bone(10, 22, 0.05, 1.0), armBack: bone(-6, 20, -0.2, 1.0), legFront: bone(10, 0, 0.48, 1.0), legBack: bone(-8, 0, -0.38) }),
     ],
 
     // AIR_ATTACK covers: JUMP_A/B/C/D, JUMP_CD

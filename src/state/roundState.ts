@@ -23,6 +23,16 @@ interface RoundDeps {
   tickRef: { value: number };
 }
 
+/** Round transition phase — controls visual fade between rounds */
+export enum RoundTransitionPhase {
+  /** No transition active */
+  NONE = 'none',
+  /** Waiting in black before revealing next round */
+  HOLD_BLACK = 'hold_black',
+  /** Fading back in from black to reveal the new round */
+  FADE_IN = 'fade_in',
+}
+
 export class RoundState {
   p1Wins = 0;
   p2Wins = 0;
@@ -33,6 +43,14 @@ export class RoundState {
   fadeAlpha = 0;
   fadeDirection = 0;  // 0=idle, 1=out(to black), -1=in(from black)
   fadeCallback: (() => void) | null = null;
+
+  // Round transition state machine
+  transitionPhase: RoundTransitionPhase = RoundTransitionPhase.NONE;
+  /** Frames to hold black screen between fade-out and fade-in */
+  private holdBlackFrames = 0;
+  private readonly HOLD_BLACK_DURATION = 30;
+  /** Callback to invoke once the transition fully completes (fade-in done) */
+  private transitionCompleteCallback: (() => void) | null = null;
 
   // Injected system refs
   private p1: Fighter;
@@ -57,6 +75,11 @@ export class RoundState {
     this.gauges = d.gauges;
     this.maxModes = d.maxModes;
     this.tickRef = d.tickRef;
+  }
+
+  /** Whether a round transition animation is currently active */
+  isTransitioning(): boolean {
+    return this.transitionPhase !== RoundTransitionPhase.NONE;
   }
 
   /** Add a win. Returns match winner (0 or 1), or null if match continues. */
@@ -87,8 +110,62 @@ export class RoundState {
     };
   }
 
-  /** Tick fade alpha. Returns true while fade is active. */
+  /**
+   * Start a cinematic round transition with three phases:
+   *  1. Fade to black (fadeDirection=1)
+   *  2. Hold black for HOLD_BLACK_DURATION frames
+   *  3. Fade in from black (fadeDirection=-1)
+   * On fade-out peak: round increments, fighters reset, onPeakCallback fires.
+   * On transition complete: onCompleteCallback fires.
+   */
+  startCinematicTransition(
+    onPeakCallback: (() => void) | null = null,
+    onCompleteCallback: (() => void) | null = null,
+  ): void {
+    this.transitionPhase = RoundTransitionPhase.NONE; // will enter hold after fade-out
+    this.fadeDirection = 1;
+    this.fadeAlpha = 0;
+    this.holdBlackFrames = 0;
+    // Store the peak callback — fires when fade reaches full black
+    this.fadeCallback = () => {
+      // Reset round state at peak of fade-out
+      this.currentRound++;
+      this.resetForNewRound();
+      onPeakCallback?.();
+      // Transition to hold-black phase
+      this.transitionPhase = RoundTransitionPhase.HOLD_BLACK;
+      this.holdBlackFrames = 0;
+      this.fadeDirection = 0; // pause fade during hold
+    };
+    this.transitionCompleteCallback = onCompleteCallback;
+  }
+
+  /** Tick fade alpha and transition state machine. Returns true while fade/transition is active. */
   tickFade(): boolean {
+    // Phase: hold black — count frames, then start fade-in
+    if (this.transitionPhase === RoundTransitionPhase.HOLD_BLACK) {
+      this.holdBlackFrames++;
+      if (this.holdBlackFrames >= this.HOLD_BLACK_DURATION) {
+        this.transitionPhase = RoundTransitionPhase.FADE_IN;
+        this.fadeDirection = -1; // start fading back in
+      }
+      return true;
+    }
+
+    // Phase: fade-in from black
+    if (this.transitionPhase === RoundTransitionPhase.FADE_IN) {
+      this.fadeAlpha -= 0.05; // slightly faster fade-in for snappy feel
+      if (this.fadeAlpha <= 0) {
+        this.fadeAlpha = 0;
+        this.fadeDirection = 0;
+        this.transitionPhase = RoundTransitionPhase.NONE;
+        this.transitionCompleteCallback?.();
+        this.transitionCompleteCallback = null;
+      }
+      return true;
+    }
+
+    // Normal fade (legacy path)
     if (this.fadeDirection === 0) return false;
     this.fadeAlpha += this.fadeDirection * 0.04;
     if (this.fadeAlpha >= 1 && this.fadeDirection === 1) {
@@ -133,6 +210,9 @@ export class RoundState {
     this.fadeAlpha = 0;
     this.fadeDirection = 0;
     this.fadeCallback = null;
+    this.transitionPhase = RoundTransitionPhase.NONE;
+    this.holdBlackFrames = 0;
+    this.transitionCompleteCallback = null;
     resetMeterSystem(this.gauges[0], this.maxModes[0]);
     resetMeterSystem(this.gauges[1], this.maxModes[1]);
   }
@@ -151,5 +231,8 @@ export class RoundState {
     this.fadeAlpha = 0;
     this.fadeDirection = 0;
     this.fadeCallback = null;
+    this.transitionPhase = RoundTransitionPhase.NONE;
+    this.holdBlackFrames = 0;
+    this.transitionCompleteCallback = null;
   }
 }
