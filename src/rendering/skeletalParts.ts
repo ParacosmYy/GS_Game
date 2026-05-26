@@ -4,6 +4,10 @@
  */
 import { shiftColor, roundRect } from './utils.js';
 
+// Animation tick — injected externally via setSkeletalPartsTick
+let _headTick = 0;
+export function setSkeletalPartsTick(t: number): void { _headTick = t; }
+
 // Character-specific outfit color overrides (secondary colors)
 export const CHAR_OUTFIT: Record<string, { shirt: string; pants: string; belt: string; shoes: string }> = {
   kyo: { shirt: '#cc4400', pants: '#2a2a55', belt: '#884422', shoes: '#442211' },
@@ -116,8 +120,9 @@ export function getEyeColor(charId: string): string {
 /** Draw character-specific head with detailed features */
 export function drawCharacterHead(
   ctx: CanvasRenderingContext2D, charId: string, facing: number, skinColor: string, headW: number,
-  colorIndex?: number,
+  colorIndex?: number, tick?: number,
 ): void {
+  const animTick = tick ?? _headTick;
   const r = headW / 2;
 
   // 角色面部特征差异化参数
@@ -193,7 +198,7 @@ export function drawCharacterHead(
   }
 
   // === Character-specific hair/accessories ===
-  drawHair(ctx, charId, facing, r, headW, colorIndex);
+  drawHair(ctx, charId, facing, r, headW, colorIndex, animTick);
 }
 
 // 眉毛角度 — 正值=内侧低(怒), 负值=内侧高(温和)
@@ -296,7 +301,7 @@ function drawMouth(ctx: CanvasRenderingContext2D, charId: string, r: number, ski
   }
 }
 
-function drawHair(ctx: CanvasRenderingContext2D, charId: string, facing: number, r: number, headW: number, colorIndex?: number): void {
+function drawHair(ctx: CanvasRenderingContext2D, charId: string, facing: number, r: number, headW: number, colorIndex?: number, tick?: number): void {
   if (charId === 'kyo') {
     // Kyo: brown spiky hair sticking up
     ctx.fillStyle = '#8B4513';
@@ -420,18 +425,58 @@ function drawHair(ctx: CanvasRenderingContext2D, charId: string, facing: number,
     // Red headband — Ryo's signature (palette-aware)
     ctx.fillStyle = ryoHeadbandColor;
     ctx.fillRect(-r, -r + 2, headW, 4);
-    // Headband trailing tails
-    ctx.strokeStyle = shiftColor(ryoHeadbandColor, -30);
-    ctx.lineWidth = 2;
+
+    // Headband trailing tails — animated with sin wave flutter
+    // Flutter amplitude: small in idle (1-2px), larger in motion
     const hbX = -r * facing * 0.6;
+    const animTick = tick ?? _headTick;
+    const flutterBase = 1.5;
+    const flutterWave = Math.sin(animTick * 0.12) * flutterBase;
+    const flutterWave2 = Math.sin(animTick * 0.18 + 1.2) * (flutterBase * 0.7);
+    const flutterWave3 = Math.sin(animTick * 0.15 + 2.5) * (flutterBase * 0.5);
+
+    // Tail 1 — longer ribbon, sin wave along its length
+    ctx.strokeStyle = shiftColor(ryoHeadbandColor, -15);
+    ctx.lineWidth = 2;
     ctx.beginPath();
     ctx.moveTo(hbX, -r + 3);
-    ctx.lineTo(hbX - 5 * facing, -r + 8);
+    ctx.quadraticCurveTo(
+      hbX - 3 * facing + flutterWave * facing,
+      -r + 6,
+      hbX - 7 * facing + flutterWave2 * facing * 1.5,
+      -r + 10,
+    );
     ctx.stroke();
+
+    // Tail 2 — shorter ribbon, offset phase
+    ctx.strokeStyle = shiftColor(ryoHeadbandColor, -30);
+    ctx.lineWidth = 1.5;
     ctx.beginPath();
     ctx.moveTo(hbX, -r + 4);
-    ctx.lineTo(hbX - 3 * facing, -r + 11);
+    ctx.quadraticCurveTo(
+      hbX - 2 * facing + flutterWave3 * facing,
+      -r + 8,
+      hbX - 5 * facing + flutterWave2 * facing,
+      -r + 13,
+    );
     ctx.stroke();
+
+    // Tail 3 — thin wispy strand, most responsive to flutter
+    ctx.strokeStyle = shiftColor(ryoHeadbandColor, -10);
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(hbX + facing, -r + 3.5);
+    ctx.quadraticCurveTo(
+      hbX - 4 * facing + flutterWave * facing * 1.8,
+      -r + 7,
+      hbX - 9 * facing + flutterWave3 * facing * 2,
+      -r + 12,
+    );
+    ctx.stroke();
+
+    // Headband knot — small rectangle where tails emerge
+    ctx.fillStyle = shiftColor(ryoHeadbandColor, -20);
+    ctx.fillRect(hbX - 2, -r + 2, 4, 3);
     // Stronger jaw line — Ryo's trademark determined face
     ctx.strokeStyle = shiftColor('#e8b88a', -30);
     ctx.lineWidth = 1.2;

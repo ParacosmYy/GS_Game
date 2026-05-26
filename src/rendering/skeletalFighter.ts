@@ -9,7 +9,7 @@ import { bone, pose } from '../characters/types.js';
 import type { Pose, BonePose, BodyProportions } from '../characters/types.js';
 import { DEFAULT_PROPORTIONS } from '../characters/types.js';
 import { shiftColor, roundRect } from './utils.js';
-import { getOutfit, drawCharacterHead } from './skeletalParts.js';
+import { getOutfit, drawCharacterHead, setSkeletalPartsTick } from './skeletalParts.js';
 import { drawPixelTorso, drawPixelArm, drawPixelLeg, setBodyPartTick } from './bodyPartRenderer.js';
 import { getVictoryPose, drawVictoryVFX } from './victoryPose.js';
 
@@ -69,6 +69,7 @@ export function drawSkeletalFighter(
 
   // 将动画帧传递给身体部位渲染器（用于呼吸偏移、闪烁等动态效果）
   setBodyPartTick(globalTick);
+  setSkeletalPartsTick(globalTick);
 
   // Resolve pose — attack-specific poses take priority over state-based poses
   const attackKey = f.currentAttack as string;
@@ -790,7 +791,7 @@ export function drawSkeletalFighter(
     ctx.fillStyle = '#fff';
     ctx.beginPath(); ctx.arc(0, 0, headW / 2, 0, Math.PI * 2); ctx.fill();
   } else {
-    drawCharacterHead(ctx, f.charId, f.facing, skinColor, headW, colorIdx);
+    drawCharacterHead(ctx, f.charId, f.facing, skinColor, headW, colorIdx, globalTick);
   }
   ctx.restore();
 
@@ -1056,7 +1057,7 @@ export function drawVictoryPose(
   ctx.save();
   ctx.translate(headPos.x, refY + 5 + p.head.oy);
   ctx.rotate(p.head.rot * facing);
-  drawCharacterHead(ctx, charId, facing, skinColor, headW, colorIndex);
+  drawCharacterHead(ctx, charId, facing, skinColor, headW, colorIndex, tick);
   ctx.restore();
 
   // Front leg — pixel art

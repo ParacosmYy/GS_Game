@@ -1303,9 +1303,77 @@ function drawArmDetail(
       fistKnuckleW * 0.08, fistKnuckleW * 0.1, thumbSide * 0.5, 0, Math.PI * 2);
     ctx.fill();
 
-    // === Attack motion trail ===
+    // === Hand wrap texture — leather/strap cross-binding pattern ===
+    // Wrap texture lines across the fist surface (karate hand wraps under gloves)
+    ctx.strokeStyle = shiftColor('#e8e4dc', -8);
+    ctx.lineWidth = 0.5;
+    // Horizontal wrap bands
+    for (let i = 0; i < 3; i++) {
+      const wrapY = fistTop + (fistBottom - fistTop) * (0.2 + i * 0.25);
+      const wrapWidthL = fistKnuckleW * (0.7 - i * 0.08);
+      ctx.beginPath();
+      ctx.moveTo(-wrapWidthL, wrapY);
+      ctx.lineTo(wrapWidthL, wrapY);
+      ctx.stroke();
+    }
+    // Diagonal wrap texture — X-pattern across back of hand
+    ctx.strokeStyle = shiftColor('#e8e4dc', -4);
+    ctx.lineWidth = 0.4;
+    ctx.beginPath();
+    ctx.moveTo(-fistKnuckleW * 0.5, fistTop + (fistBottom - fistTop) * 0.15);
+    ctx.lineTo(fistKnuckleW * 0.3, fistTop + (fistBottom - fistTop) * 0.65);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(fistKnuckleW * 0.5, fistTop + (fistBottom - fistTop) * 0.15);
+    ctx.lineTo(-fistKnuckleW * 0.3, fistTop + (fistBottom - fistTop) * 0.65);
+    ctx.stroke();
+
+    // === Glove leather texture — subtle grain lines matching gi color ===
+    // Gi-colored leather patches on knuckles (karate sparring glove style)
+    const glovePatchColor = shiftColor(shirtColor, -20);
+    ctx.fillStyle = glovePatchColor;
+    for (let i = 0; i < 4; i++) {
+      const patchX = -fistKnuckleW * 0.55 + i * fistKnuckleW * 0.37;
+      ctx.fillRect(patchX, fistTop - 1, fistKnuckleW * 0.25, (fistBottom - fistTop) * 0.2);
+    }
+    // Leather stitching lines on patches
+    ctx.strokeStyle = shiftColor(glovePatchColor, 12);
+    ctx.lineWidth = 0.3;
+    for (let i = 0; i < 4; i++) {
+      const patchX = -fistKnuckleW * 0.55 + i * fistKnuckleW * 0.37;
+      const patchMidX = patchX + fistKnuckleW * 0.125;
+      ctx.beginPath();
+      ctx.moveTo(patchMidX, fistTop);
+      ctx.lineTo(patchMidX, fistTop + (fistBottom - fistTop) * 0.18);
+      ctx.stroke();
+    }
+
+    // === Impact glow on active attack frames ===
+    // Triggered when the arm is scaled up (attack pose) — matches existing motion trail pattern
     const scale = w / (hw * 2 || 1);
     if (scale > 1.0) {
+      const impactPulse = 0.4 + Math.sin(_tick * 0.5) * 0.2;
+      // Radial glow around fist — warm orange/white burst
+      const glowGrad = ctx.createRadialGradient(0, fistTop + (fistBottom - fistTop) * 0.3, 0,
+        0, fistTop + (fistBottom - fistTop) * 0.3, fistKnuckleW * 1.5);
+      glowGrad.addColorStop(0, `rgba(255, 240, 200, ${impactPulse})`);
+      glowGrad.addColorStop(0.3, `rgba(255, 180, 60, ${impactPulse * 0.6})`);
+      glowGrad.addColorStop(0.6, `rgba(255, 120, 20, ${impactPulse * 0.3})`);
+      glowGrad.addColorStop(1, 'rgba(255, 100, 0, 0)');
+      ctx.fillStyle = glowGrad;
+      ctx.beginPath();
+      ctx.arc(0, fistTop + (fistBottom - fistTop) * 0.3, fistKnuckleW * 1.5, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Bright impact line across knuckles
+      ctx.strokeStyle = `rgba(255, 255, 220, ${impactPulse * 0.8})`;
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(-fistKnuckleW * 0.8, fistTop + 2);
+      ctx.lineTo(fistKnuckleW * 0.8, fistTop + 2);
+      ctx.stroke();
+
+      // Attack motion trail — extending backward
       ctx.strokeStyle = `rgba(255, 160, 0, 0.3)`;
       ctx.lineWidth = 1.5;
       for (let i = 1; i <= 3; i++) {
@@ -1806,49 +1874,119 @@ function drawShoeDetail(
     ctx.fillStyle = '#6699cc';
     ctx.fillRect(-hw, hh - 2, w, 2);
   } else if (charId === 'ryo') {
-    // 亮: 棕色空手道训练鞋 with detailed structure
-    // Shoe shape — slightly wider at sole than ankle
+    // Ryo: Brown karate training shoes — flat lightweight martial arts shoes
+    // Shoe shape — slightly wider at sole than ankle (karate flat sole)
     const soleW = hw * 1.12;
     const ankleW = hw * 0.85;
+    const soleThickness = Math.max(3, shoeH * 0.28);
+
+    // === Shoe upper body — tapered from ankle to sole ===
     ctx.fillStyle = shiftColor(outfit.shoes, 5);
     ctx.beginPath();
     ctx.moveTo(-ankleW, hh - shoeH);
     ctx.lineTo(ankleW, hh - shoeH);
-    ctx.lineTo(soleW, hh);
-    ctx.lineTo(-soleW, hh);
+    ctx.lineTo(soleW, hh - soleThickness);
+    ctx.lineTo(-soleW, hh - soleThickness);
     ctx.closePath();
     ctx.fill();
-    // Shoe upper highlight
-    ctx.fillStyle = shiftColor(outfit.shoes, 18);
-    ctx.beginPath();
-    ctx.moveTo(-ankleW + 1, hh - shoeH + 1);
-    ctx.lineTo(ankleW * 0.2, hh - shoeH + 1);
-    ctx.lineTo(ankleW * 0.4, hh - shoeH * 0.4);
-    ctx.lineTo(-ankleW * 0.3, hh - shoeH * 0.4);
-    ctx.closePath();
-    ctx.fill();
-    // Ankle wrapping — band at top of shoe (karate training style)
-    ctx.fillStyle = shiftColor(outfit.shoes, 25);
-    ctx.fillRect(-ankleW, hh - shoeH, ankleW * 2, Math.max(2, shoeH * 0.25));
-    // Ankle wrap detail — cross pattern
-    ctx.strokeStyle = shiftColor(outfit.shoes, 15);
-    ctx.lineWidth = 0.5;
-    ctx.beginPath(); ctx.moveTo(-ankleW * 0.5, hh - shoeH + 1); ctx.lineTo(ankleW * 0.3, hh - shoeH + shoeH * 0.2); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(ankleW * 0.5, hh - shoeH + 1); ctx.lineTo(-ankleW * 0.3, hh - shoeH + shoeH * 0.2); ctx.stroke();
-    // Shoe laces — multiple crossing laces
-    ctx.strokeStyle = shiftColor(outfit.shoes, 30);
-    ctx.lineWidth = 0.6;
-    ctx.beginPath(); ctx.moveTo(-hw * 0.2, hh - shoeH + 2); ctx.lineTo(hw * 0.1, hh - shoeH * 0.5); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(-hw * 0.1, hh - shoeH + 3); ctx.lineTo(hw * 0.15, hh - shoeH * 0.6); ctx.stroke();
-    // Sole line — darker, thicker line at bottom of shoe
-    ctx.fillStyle = shiftColor(outfit.shoes, -30);
-    ctx.fillRect(-soleW, hh - Math.max(2, shoeH * 0.2), soleW * 2, Math.max(2, shoeH * 0.2));
-    // Tread pattern on sole
+
+    // === Thick flat sole — karate shoes have distinct thick soles ===
+    // Main sole body — dark rubber
+    ctx.fillStyle = shiftColor(outfit.shoes, -25);
+    ctx.fillRect(-soleW, hh - soleThickness, soleW * 2, soleThickness);
+    // Sole top edge — lighter rim separating upper from sole
+    ctx.fillStyle = shiftColor(outfit.shoes, -15);
+    ctx.fillRect(-soleW, hh - soleThickness, soleW * 2, Math.max(1, soleThickness * 0.2));
+    // Sole highlight — top of sole rim
+    ctx.fillStyle = shiftColor(outfit.shoes, -5);
+    ctx.fillRect(-soleW + 1, hh - soleThickness, soleW * 2 - 2, 1);
+    // Tread pattern — horizontal grip lines
     ctx.strokeStyle = shiftColor(outfit.shoes, -40);
     ctx.lineWidth = 0.5;
     for (let i = 0; i < 4; i++) {
       const tx = -soleW * 0.7 + i * soleW * 0.47;
       ctx.beginPath(); ctx.moveTo(tx, hh - 1); ctx.lineTo(tx + soleW * 0.2, hh); ctx.stroke();
+    }
+    // Toe cap — slightly curved front
+    ctx.fillStyle = shiftColor(outfit.shoes, -10);
+    ctx.beginPath();
+    ctx.ellipse(soleW * 0.3, hh - soleThickness * 0.5, soleW * 0.25, soleThickness * 0.4, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // === Shoe upper highlight — leather shine ===
+    ctx.fillStyle = shiftColor(outfit.shoes, 18);
+    ctx.beginPath();
+    ctx.moveTo(-ankleW + 1, hh - shoeH + 1);
+    ctx.lineTo(ankleW * 0.2, hh - shoeH + 1);
+    ctx.lineTo(ankleW * 0.4, hh - shoeH * 0.5);
+    ctx.lineTo(-ankleW * 0.3, hh - shoeH * 0.5);
+    ctx.closePath();
+    ctx.fill();
+    // Leather grain — subtle vertical lines on shoe upper
+    ctx.strokeStyle = shiftColor(outfit.shoes, 10);
+    ctx.lineWidth = 0.3;
+    for (let i = 0; i < 3; i++) {
+      const gx = -ankleW * 0.4 + i * ankleW * 0.35;
+      ctx.beginPath();
+      ctx.moveTo(gx, hh - shoeH + 2);
+      ctx.lineTo(gx + ankleW * 0.05, hh - soleThickness - 1);
+      ctx.stroke();
+    }
+
+    // === Ankle collar — padded opening at top of shoe ===
+    ctx.fillStyle = shiftColor(outfit.shoes, 25);
+    ctx.fillRect(-ankleW, hh - shoeH, ankleW * 2, Math.max(2, shoeH * 0.2));
+    // Collar stitching line
+    ctx.strokeStyle = shiftColor(outfit.shoes, 15);
+    ctx.lineWidth = 0.4;
+    ctx.beginPath(); ctx.moveTo(-ankleW + 1, hh - shoeH + 1); ctx.lineTo(ankleW - 1, hh - shoeH + 1); ctx.stroke();
+
+    // === Shoe laces / strap bindings — karate shoe style ===
+    // Lace eyelets — small dots where laces thread through
+    ctx.fillStyle = shiftColor(outfit.shoes, 30);
+    for (let i = 0; i < 3; i++) {
+      const eyeletY = hh - shoeH + shoeH * 0.25 + i * shoeH * 0.18;
+      ctx.beginPath(); ctx.arc(-hw * 0.25, eyeletY, 0.8, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(hw * 0.25, eyeletY, 0.8, 0, Math.PI * 2); ctx.fill();
+    }
+    // Crossing lace lines — V-pattern lacing
+    ctx.strokeStyle = shiftColor(outfit.shoes, 35);
+    ctx.lineWidth = 0.6;
+    ctx.beginPath(); ctx.moveTo(-hw * 0.25, hh - shoeH + shoeH * 0.25); ctx.lineTo(hw * 0.25, hh - shoeH + shoeH * 0.43); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(hw * 0.25, hh - shoeH + shoeH * 0.25); ctx.lineTo(-hw * 0.25, hh - shoeH + shoeH * 0.43); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(-hw * 0.25, hh - shoeH + shoeH * 0.43); ctx.lineTo(hw * 0.25, hh - shoeH + shoeH * 0.61); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(hw * 0.25, hh - shoeH + shoeH * 0.43); ctx.lineTo(-hw * 0.25, hh - shoeH + shoeH * 0.61); ctx.stroke();
+
+    // === Ankle strap — karate shoe has a strap across the instep ===
+    ctx.fillStyle = shiftColor(outfit.shoes, 12);
+    ctx.fillRect(-ankleW + 2, hh - shoeH + shoeH * 0.55, ankleW * 2 - 4, Math.max(2, shoeH * 0.12));
+    // Strap buckle — small metal detail
+    ctx.fillStyle = '#aaa';
+    ctx.fillRect(-1, hh - shoeH + shoeH * 0.55, 2, Math.max(2, shoeH * 0.12));
+
+    // === Kick/running motion trail — trailing afterimage behind shoe ===
+    const legScale = w / (hw * 2 || 1);
+    if (legScale > 1.0) {
+      // Shoe is in a kicking/moving pose — draw speed lines behind it
+      const trailAlpha = 0.25 + Math.sin(_tick * 0.3) * 0.08;
+      ctx.strokeStyle = `rgba(180, 140, 80, ${trailAlpha})`;
+      ctx.lineWidth = 1.5;
+      ctx.lineCap = 'round';
+      for (let i = 1; i <= 3; i++) {
+        const fade = trailAlpha - i * 0.06;
+        ctx.strokeStyle = `rgba(180, 140, 80, ${Math.max(0.05, fade)})`;
+        ctx.beginPath();
+        ctx.moveTo(-soleW - i * 2.5, hh - shoeH * 0.5 + i);
+        ctx.lineTo(-soleW - i * 2.5, hh - 1);
+        ctx.stroke();
+      }
+      // Subtle wind streak behind sole
+      ctx.strokeStyle = `rgba(220, 200, 160, ${trailAlpha * 0.4})`;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(-soleW - 1, hh - soleThickness * 0.5);
+      ctx.quadraticCurveTo(-soleW - 6, hh - soleThickness, -soleW - 8, hh - soleThickness * 0.3);
+      ctx.stroke();
     }
   }
 }

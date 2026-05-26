@@ -441,12 +441,27 @@ function drawConfirmedLabel(
   colorIndex: number,
   tick: number,
 ): void {
+  const isP1 = playerLabel === 'P1';
+  const labelY = isP1 ? cy - 2 : cy + CARD_H + 10;
   // 小标签
   ctx.save();
   ctx.font = 'bold 9px "Courier New", monospace';
   ctx.textAlign = 'center';
   ctx.fillStyle = labelColor;
-  ctx.fillText(playerLabel + ' OK!', cx + CARD_W / 2, cy + (playerLabel === 'P1' ? - 2 : CARD_H + 10));
+  ctx.fillText(playerLabel + ' OK!', cx + CARD_W / 2, labelY);
+  // Palette color indicator dot next to label
+  const palette = COLOR_PALETTES[colorIndex];
+  const dotX = cx + CARD_W / 2 + 28;
+  const dotY = labelY - 3;
+  ctx.fillStyle = palette.color;
+  ctx.beginPath();
+  ctx.arc(dotX, dotY, 4, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = '#fff';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.arc(dotX, dotY, 4, 0, Math.PI * 2);
+  ctx.stroke();
   ctx.restore();
 }
 

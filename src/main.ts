@@ -210,6 +210,9 @@ function update(): void {
     const result = select.update(inputManager.getP1Input(), inputManager.getP2Input(), inputManager.isKeyDown('KeyT'));
     if (result) {
       p2AI = gs.isTrainingMode ? null : result.p2AI;
+      // Apply palette selection to fighters so rendering uses the correct color variant
+      p1.colorIndex = result.p1ColorIndex;
+      p2.colorIndex = result.p2ColorIndex;
       if (gs.teamMode) {
         p1Team = createTeam(result.p1Team);
         p2Team = createTeam(result.p2Team);
