@@ -175,3 +175,9 @@
 ## H77: hurtbox manifest Ryo测试—13项验证8个状态 — 49→50
 
 **commit:** <hash> | 8状态存在性+结构体(width/height正数)+crouch<idle+jump/hitstun存在
+
+---
+
+## H78: Ryo stats定义测试—11项验证角色数值 — 50→51
+
+**commit:** <hash> | walkSpeed/runSpeed/jumpVelocity/maxHealth/pushWidth+合理性范围
