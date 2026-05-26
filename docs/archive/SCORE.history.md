@@ -1037,3 +1037,9 @@
 ## H208: coreConstants3—7项验证移动/输入/起身/OTG常量 — 180→181
 
 **commit:** <hash> | coreConstants3—7项验证移动/输入/起身/OTG常量
+
+---
+
+## H209: frameData—6项验证FRAME_DATA帧数据(startup/damage/条目数) — 181→182
+
+**commit:** <hash> | frameData—6项验证FRAME_DATA帧数据(startup/damage/条目数)
