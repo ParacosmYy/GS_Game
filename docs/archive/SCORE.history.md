@@ -559,3 +559,9 @@
 ## H136: announceSequence测试—8项验证setSteps+tick+reset+getPhase+isComplete+isRunning — 108→109
 
 **commit:** <hash> | announceSequence测试—8项验证setSteps+tick+reset+getPhase+isComplete+isRunning
+
+---
+
+## H137: types测试—19项验证FighterState+AttackType+HitLevel+HitHeight+GamePhase枚举 — 109→110
+
+**commit:** <hash> | types测试—19项验证FighterState+AttackType+HitLevel+HitHeight+GamePhase枚举
