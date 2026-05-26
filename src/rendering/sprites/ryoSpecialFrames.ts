@@ -291,7 +291,7 @@ const HI_F4 = clone(IDLE_BASE);
 // F0: windup — arms crossed in front of chest, defensive stance
 const HA_F0 = clone(IDLE_BASE);
 // Head and hair stay the same. Modify arm area to show crossed arms.
-HA_F0[18] = r('...................12mn2eeeeefefgjee2nm2.111..............................');
+HA_F0[18] = r('...................12mn2efgeefefgjee2nm2.111..............................');
 HA_F0[19] = r('..................128921eefeeefefefe19281.111.............................');
 HA_F0[20] = r('.................12899a1eefeeefefefe1a99821.111............................');
 HA_F0[21] = r('................12899a1..1efeefefgee1a99821.111...........................');

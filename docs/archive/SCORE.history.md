@@ -1031,3 +1031,9 @@
 ## H207: coreConstants2—7项验证juggle/damageScale/guard/stun/MAX模式常量 — 179→180
 
 **commit:** <hash> | coreConstants2—7项验证juggle/damageScale/guard/stun/MAX模式常量
+
+---
+
+## H208: coreConstants3—7项验证移动/输入/起身/OTG常量 — 180→181
+
+**commit:** <hash> | coreConstants3—7项验证移动/输入/起身/OTG常量
