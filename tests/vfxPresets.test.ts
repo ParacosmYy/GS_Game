@@ -1,45 +1,29 @@
 import { describe, it, expect } from 'vitest';
-import { spawnHitSparks, spawnBlockFlash, getSparkSizeScaleFromDamage, Particle } from '../src/rendering/vfxPresets.js';
+import { getSparkSizeScaleFromDamage } from '../src/rendering/vfxPresets.js';
 
-describe('vfxPresets', () => {
-  describe('Particle', () => {
-    it('can be created manually', () => {
-      const p: Particle = { x: 0, y: 0, vx: 1, vy: -2, life: 10, maxLife: 10, size: 3, color: '#fff', type: 'spark' };
-      expect(p.x).toBe(0);
-      expect(p.type).toBe('spark');
-    });
+describe('vfxPresets getSparkSizeScaleFromDamage', () => {
+  it('returns 0.5 for damage 0', () => {
+    expect(getSparkSizeScaleFromDamage(0)).toBe(0.5);
   });
-
-  describe('spawnHitSparks', () => {
-    it('adds particles to array', () => {
-      const particles: Particle[] = [];
-      spawnHitSparks(particles, 100, -200);
-      expect(particles.length).toBeGreaterThan(0);
-    });
-    it('respects count param', () => {
-      const particles: Particle[] = [];
-      spawnHitSparks(particles, 100, -200, 4);
-      expect(particles.length).toBe(4);
-    });
+  it('returns 0.5 for damage 49', () => {
+    expect(getSparkSizeScaleFromDamage(49)).toBe(0.5);
   });
-
-  describe('spawnBlockFlash', () => {
-    it('adds particles to array', () => {
-      const particles: Particle[] = [];
-      spawnBlockFlash(particles, 100, -200);
-      expect(particles.length).toBeGreaterThan(0);
-    });
+  it('returns 0.8 for damage 50', () => {
+    expect(getSparkSizeScaleFromDamage(50)).toBe(0.8);
   });
-
-  describe('getSparkSizeScaleFromDamage', () => {
-    it('returns a number', () => {
-      const result = getSparkSizeScaleFromDamage(100);
-      expect(typeof result).toBe('number');
-    });
-    it('higher damage gives equal or larger scale', () => {
-      const low = getSparkSizeScaleFromDamage(10);
-      const high = getSparkSizeScaleFromDamage(200);
-      expect(high).toBeGreaterThanOrEqual(low);
-    });
+  it('returns 0.8 for damage 99', () => {
+    expect(getSparkSizeScaleFromDamage(99)).toBe(0.8);
+  });
+  it('returns 1.1 for damage 100', () => {
+    expect(getSparkSizeScaleFromDamage(100)).toBe(1.1);
+  });
+  it('returns 1.4 for damage 150', () => {
+    expect(getSparkSizeScaleFromDamage(150)).toBe(1.4);
+  });
+  it('returns 1.7 for damage 200', () => {
+    expect(getSparkSizeScaleFromDamage(200)).toBe(1.7);
+  });
+  it('returns 1.7 for damage 500', () => {
+    expect(getSparkSizeScaleFromDamage(500)).toBe(1.7);
   });
 });

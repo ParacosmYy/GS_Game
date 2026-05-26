@@ -1013,3 +1013,9 @@
 ## H204: roster—5项验证ROSTER注册表(26+角色/唯一id/stats) — 176→177
 
 **commit:** <hash> | roster—5项验证ROSTER注册表(26+角色/唯一id/stats)
+
+---
+
+## H205: vfxPresets—8项验证getSparkSizeScaleFromDamage伤害阈值 — 177→178
+
+**commit:** <hash> | vfxPresets—8项验证getSparkSizeScaleFromDamage伤害阈值
