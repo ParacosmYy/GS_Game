@@ -151,3 +151,9 @@
 ## H73: Ryo completeness report测试—18项验证覆盖3种报告 — 45→46
 
 **commit:** <hash> | generateRyoReport(8)+generateRyoDimensionReport(7)+generateRyoExtendedReport(4)
+
+---
+
+## H74: sprite manifest查询函数测试—26项验证Ryo数据完整性 — 46→47
+
+**commit:** <hash> | 结构验证+查询函数+fallback色+攻击映射+关键动画存在性
