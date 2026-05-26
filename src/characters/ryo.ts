@@ -158,14 +158,21 @@ export const RyoDef: CharacterDefinition = {
     // (startup / active / recovery), so the array must be long enough for the longest phase
     // across all attacks that share this state.
     //
-    // STAND_ATTACK covers: STAND_A/B/C/D, CLOSE_A/B/C/D
-    //   Max startup=10 (STAND_D), max active=8 (STAND_D), max recovery=20 (STAND_C/D)
-    //   → 20 frames total
+    // STAND_ATTACK covers: STAND_A/B/C/D, CLOSE_A/B/C/D, RYO specials, DM_TEN_HA_OU, SDM_TEN_HA_OU
     //
-    // Frame layout:
-    //   0-9:   startup (wind-up, pull-back, weight shift)
-    //   10-17: active  (full extension, strike contact)
-    //   18-19: recovery (return to idle, long recovery clamps to last frame)
+    // The renderer indexes by attackFrame within each phase (startup/active/recovery),
+    // resetting attackFrame to 0 at each phase transition. The pose array must be long
+    // enough to cover the max single-phase frame count across ALL attacks sharing this state.
+    //
+    //   Max startup = 18 (DM_TEN_HA_OU)
+    //   Max active  = 22 (SDM_TEN_HA_OU)
+    //   Max recovery = 35 (DM_TEN_HA_OU, SDM_TEN_HA_OU)
+    //   → 35 frames total
+    //
+    // Frame layout (per-phase indexing, NOT cumulative):
+    //   Index 0-17:  used during startup phases (up to 18 frames)
+    //   Index 0-21:  used during active phases (up to 22 frames)
+    //   Index 0-34:  used during recovery phases (up to 35 frames)
     //
     [FighterState.STAND_ATTACK]: [
       // ── Startup (frames 0-9): wind-up progression ──
@@ -206,11 +213,30 @@ export const RyoDef: CharacterDefinition = {
       pose({ head: bone(2, 0, 0.03), body: bone(3, 0, 0.08), armFront: bone(16, 4, 0.44, 1.04), armBack: bone(-5, 3, -0.58, 0.94), legFront: bone(9, 0, 0.09), legBack: bone(-8, 0, -0.08) }),
       // F17: end active — back to neutral-ready kyokugen stance
       pose({ head: bone(1, 0, 0.02), body: bone(2, 0, 0.06), armFront: bone(14, 4, 0.45, 1.02), armBack: bone(-4, 3, -0.58, 0.95), legFront: bone(10, 0, 0.08), legBack: bone(-8, 0, -0.06) }),
-      // ── Recovery (frames 18-19): return to idle (long recovery clamps to F19) ──
+      // ── Recovery (frames 18-34): return to idle ──
       // F18: settling, weight redistributing back to stance
       pose({ head: bone(1, 0, 0.02), body: bone(1, 1, 0.04), armFront: bone(14, 4, 0.45, 1.0), armBack: bone(-4, 2, -0.58, 0.96), legFront: bone(10, 0, 0.08), legBack: bone(-8, 1, -0.06) }),
-      // F19: back to idle-like neutral (long recovery attacks clamp here)
+      // F19: back to idle-like neutral
       pose({ head: bone(1, 0, 0.01), body: bone(0, 1, 0.02), armFront: bone(14, 4, 0.45, 1.0), armBack: bone(-4, 2, -0.6, 0.97), legFront: bone(10, 0, 0.08), legBack: bone(-8, 1, -0.06) }),
+      // F20-F22: extended recovery for specials (KOOU recovery=34, DM recovery=35)
+      pose({ head: bone(1, 0, 0.01), body: bone(0, 0, 0.02), armFront: bone(14, 4, 0.45, 1.0), armBack: bone(-4, 2, -0.6, 0.97), legFront: bone(10, 0, 0.08), legBack: bone(-8, 1, -0.06) }),
+      pose({ head: bone(1, 0, 0.01), body: bone(0, 0, 0.02), armFront: bone(14, 4, 0.45, 1.0), armBack: bone(-4, 2, -0.6, 0.97), legFront: bone(10, 0, 0.08), legBack: bone(-8, 1, -0.06) }),
+      pose({ head: bone(1, 0, 0.01), body: bone(0, 0, 0.02), armFront: bone(14, 4, 0.45, 1.0), armBack: bone(-4, 2, -0.6, 0.97), legFront: bone(10, 0, 0.08), legBack: bone(-8, 1, -0.06) }),
+      // F23-F26: mid recovery
+      pose({ head: bone(1, 0, 0.01), body: bone(0, 0, 0.02), armFront: bone(14, 4, 0.45, 1.0), armBack: bone(-4, 2, -0.6, 0.97), legFront: bone(10, 0, 0.08), legBack: bone(-8, 1, -0.06) }),
+      pose({ head: bone(1, 0, 0.01), body: bone(0, 0, 0.02), armFront: bone(14, 4, 0.45, 1.0), armBack: bone(-4, 2, -0.6, 0.97), legFront: bone(10, 0, 0.08), legBack: bone(-8, 1, -0.06) }),
+      pose({ head: bone(1, 0, 0.01), body: bone(0, 0, 0.02), armFront: bone(14, 4, 0.45, 1.0), armBack: bone(-4, 2, -0.6, 0.97), legFront: bone(10, 0, 0.08), legBack: bone(-8, 1, -0.06) }),
+      pose({ head: bone(1, 0, 0.01), body: bone(0, 0, 0.02), armFront: bone(14, 4, 0.45, 1.0), armBack: bone(-4, 2, -0.6, 0.97), legFront: bone(10, 0, 0.08), legBack: bone(-8, 1, -0.06) }),
+      // F27-F30: late recovery
+      pose({ head: bone(1, 0, 0.01), body: bone(0, 0, 0.02), armFront: bone(14, 4, 0.45, 1.0), armBack: bone(-4, 2, -0.6, 0.97), legFront: bone(10, 0, 0.08), legBack: bone(-8, 1, -0.06) }),
+      pose({ head: bone(1, 0, 0.01), body: bone(0, 0, 0.02), armFront: bone(14, 4, 0.45, 1.0), armBack: bone(-4, 2, -0.6, 0.97), legFront: bone(10, 0, 0.08), legBack: bone(-8, 1, -0.06) }),
+      pose({ head: bone(1, 0, 0.01), body: bone(0, 0, 0.02), armFront: bone(14, 4, 0.45, 1.0), armBack: bone(-4, 2, -0.6, 0.97), legFront: bone(10, 0, 0.08), legBack: bone(-8, 1, -0.06) }),
+      pose({ head: bone(1, 0, 0.01), body: bone(0, 0, 0.02), armFront: bone(14, 4, 0.45, 1.0), armBack: bone(-4, 2, -0.6, 0.97), legFront: bone(10, 0, 0.08), legBack: bone(-8, 1, -0.06) }),
+      // F31-F34: final recovery (DM_TEN_HA_OU recovery=35, SDM_TEN_HA_OU recovery=35)
+      pose({ head: bone(1, 0, 0.01), body: bone(0, 0, 0.02), armFront: bone(14, 4, 0.45, 1.0), armBack: bone(-4, 2, -0.6, 0.97), legFront: bone(10, 0, 0.08), legBack: bone(-8, 1, -0.06) }),
+      pose({ head: bone(1, 0, 0.01), body: bone(0, 0, 0.02), armFront: bone(14, 4, 0.45, 1.0), armBack: bone(-4, 2, -0.6, 0.97), legFront: bone(10, 0, 0.08), legBack: bone(-8, 1, -0.06) }),
+      pose({ head: bone(1, 0, 0.01), body: bone(0, 0, 0.02), armFront: bone(14, 4, 0.45, 1.0), armBack: bone(-4, 2, -0.6, 0.97), legFront: bone(10, 0, 0.08), legBack: bone(-8, 1, -0.06) }),
+      pose({ head: bone(1, 0, 0.01), body: bone(0, 0, 0.02), armFront: bone(14, 4, 0.45, 1.0), armBack: bone(-4, 2, -0.6, 0.97), legFront: bone(10, 0, 0.08), legBack: bone(-8, 1, -0.06) }),
     ],
 
     // CROUCH_ATTACK covers: CROUCH_A/B/C/D
@@ -276,13 +302,13 @@ export const RyoDef: CharacterDefinition = {
       pose({ head: bone(2, 14, 0.03), body: bone(2, 18, 0.06), armFront: bone(10, 18, 0.06, 1.0), armBack: bone(-6, 18, -0.3, 0.95), legFront: bone(12, 3, 0.36, 1.0), legBack: bone(-8, 9, -0.25) }),
     ],
 
-    // AIR_ATTACK covers: JUMP_A/B/C/D
-    //   Max startup=8 (JUMP_C), max active=9 (JUMP_A), recovery=0
-    //   → 9 frames total
+    // AIR_ATTACK covers: JUMP_A/B/C/D, JUMP_CD
+    //   Max startup=12 (JUMP_CD), max active=9 (JUMP_A), recovery=0
+    //   → 12 frames total
     //
-    // Frame layout:
-    //   0-7: startup (airborne wind-up)
-    //   8:   active  (air strike contact — long active phases clamp to last frame)
+    // Frame layout (per-phase indexing, NOT cumulative):
+    //   Index 0-11: used during startup phases (up to 12 frames)
+    //   Index 0-8:  used during active phases (up to 9 frames)
     //
     [FighterState.AIR_ATTACK]: [
       // ── Startup (frames 0-7): airborne wind-up ──
@@ -304,6 +330,10 @@ export const RyoDef: CharacterDefinition = {
       pose({ head: bone(2, -2, -0.07), body: bone(5, 0, 0.15), armFront: bone(26, -4, 0.26, 1.25), armBack: bone(-10, 2, -0.5, 0.88), legFront: bone(14, 4, 0.35, 1.1), legBack: bone(-8, -1, -0.25) }),
       // ── Active (frame 8): air strike contact (long active phases clamp here) ──
       // F8: full extension — air strike contact
+      pose({ head: bone(2, -2, -0.08), body: bone(5, 0, 0.16), armFront: bone(28, -4, 0.28, 1.3), armBack: bone(-10, 2, -0.5, 0.88), legFront: bone(15, 4, 0.38, 1.12), legBack: bone(-8, -1, -0.25) }),
+      // F9-F11: extended startup for JUMP_CD (startup=12)
+      pose({ head: bone(2, -2, -0.08), body: bone(5, 0, 0.15), armFront: bone(26, -4, 0.26, 1.28), armBack: bone(-10, 2, -0.5, 0.88), legFront: bone(14, 4, 0.36, 1.1), legBack: bone(-8, -1, -0.25) }),
+      pose({ head: bone(2, -2, -0.08), body: bone(5, 0, 0.15), armFront: bone(27, -4, 0.27, 1.29), armBack: bone(-10, 2, -0.5, 0.88), legFront: bone(14, 4, 0.37, 1.11), legBack: bone(-8, -1, -0.25) }),
       pose({ head: bone(2, -2, -0.08), body: bone(5, 0, 0.16), armFront: bone(28, -4, 0.28, 1.3), armBack: bone(-10, 2, -0.5, 0.88), legFront: bone(15, 4, 0.38, 1.12), legBack: bone(-8, -1, -0.25) }),
     ],
     [FighterState.THROW]: [

@@ -253,8 +253,8 @@ function drawTorsoDetail(
     ctx.beginPath(); ctx.moveTo(PX * 1.5, -hh + PX * 3); ctx.lineTo(PX * 2.2, hh * 0.35); ctx.stroke();
 
   } else if (charId === 'ryo') {
-    // 亮: 橙色空手道道服+黑色腰带+道服V领+强肩线+粗壮躯干感
-    // 肩线强调 — Ryo的宽肩是极限流空手道家的标志
+    // Ryo: Orange karate gi + black obi + deep V-neck + wide shoulders + training wear
+    // === Shoulder line emphasis — Kyokugen karateka's broad shoulders ===
     ctx.strokeStyle = shiftColor(outfit.shirt, -25);
     ctx.lineWidth = 2;
     ctx.beginPath();
@@ -267,7 +267,7 @@ function drawTorsoDetail(
     ctx.lineTo(sw * 0.5, -hh + PX * 0.5);
     ctx.lineTo(0, -hh + PX);
     ctx.stroke();
-    // 肩部肌肉暗示 — 三角肌线条
+    // Deltoid muscle lines — shoulder bulk
     ctx.strokeStyle = shiftColor(outfit.shirt, -12);
     ctx.lineWidth = 1;
     ctx.beginPath();
@@ -278,7 +278,9 @@ function drawTorsoDetail(
     ctx.moveTo(sw * 0.9, -hh + PX * 0.8);
     ctx.quadraticCurveTo(sw * 0.6, -hh + PX * 1.5, sw * 0.3, -hh + PX * 2);
     ctx.stroke();
-    // 道服V领 — 粗线条清晰可见的空手道V领
+
+    // === Gi V-neck — deep opening showing chest ===
+    // V-neck outline — thick clear karate collar
     ctx.strokeStyle = shiftColor(outfit.shirt, -30);
     ctx.lineWidth = 2.5;
     ctx.beginPath();
@@ -286,15 +288,44 @@ function drawTorsoDetail(
     ctx.lineTo(0, -hh + PX * 6);
     ctx.lineTo(PX * 2.5, -hh + PX);
     ctx.stroke();
-    // V领内衬 — 深色内衬可见
-    ctx.fillStyle = shiftColor(outfit.shirt, -35);
+    // V-neck inner shadow — depth behind the collar
+    ctx.fillStyle = shiftColor(outfit.shirt, -38);
     ctx.beginPath();
-    ctx.moveTo(-PX * 1.5, -hh + PX * 1.5);
-    ctx.lineTo(0, -hh + PX * 5.5);
-    ctx.lineTo(PX * 1.5, -hh + PX * 1.5);
+    ctx.moveTo(-PX * 1.8, -hh + PX * 1.2);
+    ctx.lineTo(0, -hh + PX * 5.8);
+    ctx.lineTo(PX * 1.8, -hh + PX * 1.2);
     ctx.closePath();
     ctx.fill();
-    // 道服左片
+    // Chest skin visible in V-neck
+    const chestSkin = '#d4a07a';
+    ctx.fillStyle = chestSkin;
+    ctx.beginPath();
+    ctx.moveTo(-PX * 1.2, -hh + PX * 1.8);
+    ctx.lineTo(0, -hh + PX * 5.2);
+    ctx.lineTo(PX * 1.2, -hh + PX * 1.8);
+    ctx.closePath();
+    ctx.fill();
+    // Chest muscle line — pectoral division hint
+    ctx.strokeStyle = shiftColor(chestSkin, -15);
+    ctx.lineWidth = 0.6;
+    ctx.beginPath();
+    ctx.moveTo(0, -hh + PX * 3);
+    ctx.lineTo(0, -hh + PX * 5);
+    ctx.stroke();
+    // Collarbone hints
+    ctx.strokeStyle = shiftColor(chestSkin, -10);
+    ctx.lineWidth = 0.5;
+    ctx.beginPath();
+    ctx.moveTo(-PX * 1.0, -hh + PX * 2);
+    ctx.quadraticCurveTo(-PX * 0.3, -hh + PX * 1.6, 0, -hh + PX * 2.2);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(PX * 1.0, -hh + PX * 2);
+    ctx.quadraticCurveTo(PX * 0.3, -hh + PX * 1.6, 0, -hh + PX * 2.2);
+    ctx.stroke();
+
+    // === Gi lapels — overlapping left and right panels ===
+    // Left panel (underneath, slightly darker)
     ctx.fillStyle = shiftColor(outfit.shirt, -8);
     ctx.beginPath();
     ctx.moveTo(-PX * 2.5, -hh + PX);
@@ -303,7 +334,14 @@ function drawTorsoDetail(
     ctx.lineTo(-PX * 2.5, hh * 0.3);
     ctx.closePath();
     ctx.fill();
-    // 道服右片
+    // Left panel edge highlight — fold line
+    ctx.strokeStyle = shiftColor(outfit.shirt, 15);
+    ctx.lineWidth = 0.8;
+    ctx.beginPath();
+    ctx.moveTo(-PX * 2.3, -hh + PX * 1.2);
+    ctx.lineTo(-PX * 0.4, -hh + PX * 5.8);
+    ctx.stroke();
+    // Right panel (on top, slightly lighter)
     ctx.fillStyle = shiftColor(outfit.shirt, 5);
     ctx.beginPath();
     ctx.moveTo(PX * 2.5, -hh + PX);
@@ -312,27 +350,85 @@ function drawTorsoDetail(
     ctx.lineTo(PX * 2.5, hh * 0.3);
     ctx.closePath();
     ctx.fill();
-    // 十字交叉线 — 前襟交叉绑带
+    // Right panel edge highlight — fold line
+    ctx.strokeStyle = shiftColor(outfit.shirt, 18);
+    ctx.lineWidth = 0.8;
+    ctx.beginPath();
+    ctx.moveTo(PX * 2.3, -hh + PX * 1.2);
+    ctx.lineTo(PX * 0.4, -hh + PX * 5.8);
+    ctx.stroke();
+
+    // === Gi fabric folds — diagonal draping lines ===
+    ctx.strokeStyle = shiftColor(outfit.shirt, -10);
+    ctx.lineWidth = 0.6;
+    // Left side folds
+    ctx.beginPath();
+    ctx.moveTo(-PX * 2.0, -hh + PX * 2.5);
+    ctx.quadraticCurveTo(-PX * 1.2, hh * 0.1, -PX * 1.5, hh * 0.35);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(-sw * 0.5, -hh + PX * 2);
+    ctx.quadraticCurveTo(-PX * 2.0, hh * 0.0, -PX * 2.2, hh * 0.3);
+    ctx.stroke();
+    // Right side folds
+    ctx.beginPath();
+    ctx.moveTo(PX * 2.0, -hh + PX * 2.5);
+    ctx.quadraticCurveTo(PX * 1.2, hh * 0.1, PX * 1.5, hh * 0.35);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(sw * 0.5, -hh + PX * 2);
+    ctx.quadraticCurveTo(PX * 2.0, hh * 0.0, PX * 2.2, hh * 0.3);
+    ctx.stroke();
+
+    // === Cross-tie lines — front panel binding ===
     ctx.strokeStyle = shiftColor(outfit.shirt, -15);
     ctx.lineWidth = 1.2;
     ctx.beginPath(); ctx.moveTo(-PX * 1.5, -hh + PX * 2); ctx.lineTo(PX * 1.5, hh * 0.2); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(PX * 1.5, -hh + PX * 2); ctx.lineTo(-PX * 1.5, hh * 0.2); ctx.stroke();
-    // 黑带(obi) — 更宽更清晰的腰带
-    ctx.fillStyle = '#222';
-    ctx.fillRect(-ww + 1, hh * 0.48, (ww - 1) * 2, PX * 1.5);
-    // 腰带高光
+
+    // === Black obi (belt) — wider, clearer ===
+    const beltY = hh * 0.48;
+    // Belt body
+    ctx.fillStyle = '#1a1a1a';
+    ctx.fillRect(-ww + 1, beltY, (ww - 1) * 2, PX * 1.5);
+    // Belt highlight — subtle sheen on top edge
     ctx.fillStyle = '#333';
-    ctx.fillRect(-ww + 2, hh * 0.48, (ww - 2) * 2, PX * 0.4);
-    // 腰带结
+    ctx.fillRect(-ww + 2, beltY, (ww - 2) * 2, PX * 0.4);
+    // Belt bottom shadow
+    ctx.fillStyle = '#111';
+    ctx.fillRect(-ww + 1, beltY + PX * 1.1, (ww - 1) * 2, PX * 0.4);
+    // Belt knot — diamond shape with tails
     ctx.fillStyle = '#1a1a1a';
     ctx.beginPath();
-    ctx.moveTo(0, hh * 0.48 + PX * 0.2);
-    ctx.lineTo(-PX * 0.8, hh * 0.48 + PX);
-    ctx.lineTo(0, hh * 0.48 + PX * 1.8);
-    ctx.lineTo(PX * 0.8, hh * 0.48 + PX);
+    ctx.moveTo(0, beltY + PX * 0.2);
+    ctx.lineTo(-PX * 0.9, beltY + PX);
+    ctx.lineTo(0, beltY + PX * 1.8);
+    ctx.lineTo(PX * 0.9, beltY + PX);
     ctx.closePath();
     ctx.fill();
-    // 道服破损边缘暗示 — 锯齿线
+    // Knot center highlight
+    ctx.fillStyle = '#2a2a2a';
+    ctx.beginPath();
+    ctx.arc(0, beltY + PX, PX * 0.25, 0, Math.PI * 2);
+    ctx.fill();
+    // Belt tails — hanging strips below knot
+    ctx.fillStyle = '#181818';
+    ctx.beginPath();
+    ctx.moveTo(-PX * 0.15, beltY + PX * 1.7);
+    ctx.quadraticCurveTo(-PX * 0.3, beltY + PX * 2.8, -PX * 0.2, beltY + PX * 3.5);
+    ctx.lineTo(-PX * 0.05, beltY + PX * 3.5);
+    ctx.quadraticCurveTo(-PX * 0.15, beltY + PX * 2.6, PX * 0.05, beltY + PX * 1.7);
+    ctx.closePath();
+    ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(PX * 0.15, beltY + PX * 1.7);
+    ctx.quadraticCurveTo(PX * 0.25, beltY + PX * 2.6, PX * 0.15, beltY + PX * 3.2);
+    ctx.lineTo(PX * 0.03, beltY + PX * 3.2);
+    ctx.quadraticCurveTo(PX * 0.1, beltY + PX * 2.4, -PX * 0.05, beltY + PX * 1.7);
+    ctx.closePath();
+    ctx.fill();
+
+    // === Gi edge wear — battle-damaged hint ===
     ctx.strokeStyle = shiftColor(outfit.shirt, -20);
     ctx.lineWidth = 0.6;
     ctx.beginPath();
@@ -340,6 +436,11 @@ function drawTorsoDetail(
     ctx.lineTo(-sw * 0.75, -hh + PX);
     ctx.lineTo(-sw * 0.7, -hh + 1);
     ctx.stroke();
+    // Sweat/stain spots on gi — subtle worn look
+    ctx.fillStyle = shiftColor(outfit.shirt, -5);
+    ctx.beginPath();
+    ctx.ellipse(-PX * 1.0, hh * 0.15, PX * 0.6, PX * 0.3, 0.2, 0, Math.PI * 2);
+    ctx.fill();
 
   } else if (charId === 'leona') {
     // 莉安娜: 绿色军装夹克+高翻领+胸前口袋+军章+拉链
@@ -1008,7 +1109,7 @@ export function drawPixelArm(
   ctx.beginPath(); ctx.moveTo(hw * 0.1, fistY + 1); ctx.lineTo(hw * 0.1, fistY + h * 0.1); ctx.stroke();
 
   // 角色专属手套/护腕/手部细节
-  drawArmDetail(ctx, charId, w, h, hw, hh, sleeveH, fistY, skinColor, isBack);
+  drawArmDetail(ctx, charId, w, h, hw, hh, sleeveH, fistY, skinColor, shirtColor, isBack);
 
   // SNK风格轮廓线
   ctx.strokeStyle = OUTLINE_COLOR;
@@ -1036,7 +1137,7 @@ export function drawPixelArm(
 function drawArmDetail(
   ctx: CanvasRenderingContext2D, charId: string, w: number, h: number,
   hw: number, hh: number, sleeveH: number, fistY: number,
-  skinColor: string, isBack: boolean,
+  skinColor: string, shirtColor: string, isBack: boolean,
 ): void {
   if (charId === 'kyo') {
     // 京: 黑色半指手套+袖口红色护腕带
@@ -1080,13 +1181,72 @@ function drawArmDetail(
     ctx.beginPath(); ctx.moveTo(-hw + 1, -hh + sleeveH - 1); ctx.lineTo(hw - 1, -hh + sleeveH - 1); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(-hw + 1, -hh + sleeveH + 1); ctx.lineTo(hw - 1, -hh + sleeveH + 1); ctx.stroke();
   } else if (charId === 'ryo') {
-    // 亮: 黑色空手道护手 + 正宗空手道拳 (knuckles forward, closed fist)
-    // ── Karate fist shape: wider at knuckles, narrower at wrist ──
-    const fistTop = fistY - 4;
+    // Ryo: Karate gi sleeve with cuff + hand wraps + proper karate fist
+    // === Sleeve cuff detail — gi sleeve opening with fold ===
+    // Sleeve cuff fold — fabric rolls at the edge
+    ctx.fillStyle = shiftColor(shirtColor, -15);
+    ctx.fillRect(-hw, -hh + sleeveH - 3, w, 3);
+    // Cuff highlight — lighter inner edge of fold
+    ctx.fillStyle = shiftColor(shirtColor, 20);
+    ctx.fillRect(-hw + 1, -hh + sleeveH - 1, w - 2, 1.5);
+    // Cuff shadow — depth under the fold
+    ctx.fillStyle = shiftColor(shirtColor, -25);
+    ctx.fillRect(-hw + 1, -hh + sleeveH, w - 2, 1.5);
+    // Sleeve fabric fold lines — gi wrinkles
+    ctx.strokeStyle = shiftColor(shirtColor, -10);
+    ctx.lineWidth = 0.5;
+    ctx.beginPath();
+    ctx.moveTo(-hw * 0.3, -hh + sleeveH * 0.3);
+    ctx.lineTo(-hw * 0.5, -hh + sleeveH * 0.7);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(hw * 0.2, -hh + sleeveH * 0.2);
+    ctx.lineTo(hw * 0.1, -hh + sleeveH * 0.65);
+    ctx.stroke();
+
+    // === Forearm — muscular kyokugen karateka forearm ===
+    // Forearm muscle bulk
+    ctx.fillStyle = shiftColor(skinColor, -6);
+    ctx.fillRect(-hw * 0.85, -hh + sleeveH + h * 0.12, w * 0.3, h * 0.32);
+    // Forearm tendon lines
+    ctx.strokeStyle = shiftColor(skinColor, -12);
+    ctx.lineWidth = 0.4;
+    ctx.beginPath();
+    ctx.moveTo(-hw * 0.15, -hh + sleeveH + h * 0.1);
+    ctx.lineTo(-hw * 0.2, -hh + sleeveH + h * 0.4);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(hw * 0.1, -hh + sleeveH + h * 0.08);
+    ctx.lineTo(hw * 0.05, -hh + sleeveH + h * 0.38);
+    ctx.stroke();
+    // Forearm vein hint — subtle
+    ctx.strokeStyle = shiftColor(skinColor, -5);
+    ctx.lineWidth = 0.3;
+    ctx.beginPath();
+    ctx.moveTo(-hw * 0.5, -hh + sleeveH + h * 0.15);
+    ctx.quadraticCurveTo(-hw * 0.35, -hh + sleeveH + h * 0.25, -hw * 0.4, -hh + sleeveH + h * 0.4);
+    ctx.stroke();
+
+    // === Wrist wraps — hand bandaging ===
+    ctx.strokeStyle = '#e8e4dc';
+    ctx.lineWidth = 0.8;
+    ctx.beginPath(); ctx.moveTo(-hw * 0.6, fistY - 5); ctx.lineTo(hw * 0.4, fistY - 2); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(-hw * 0.4, fistY - 2); ctx.lineTo(hw * 0.5, fistY + 2); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(-hw * 0.3, fistY + 1); ctx.lineTo(hw * 0.2, fistY + 4); ctx.stroke();
+
+    // === Wrist guard — black karate guard ===
+    ctx.fillStyle = '#222';
+    ctx.fillRect(-hw * 0.85, fistY - 3, w * 0.85, 4);
+    // Guard highlight
+    ctx.fillStyle = '#333';
+    ctx.fillRect(-hw * 0.8, fistY - 3, w * 0.8, 1.5);
+
+    // === Karate fist — wider at knuckles, narrower at wrist ===
+    const fistTop = fistY - 5;
     const fistBottom = fistY + h * 0.14;
-    const fistKnuckleW = hw * 1.0;   // wider knuckles — heavier fist for kyokugen power
-    const fistWristW = hw * 0.75;    // narrower at wrist
-    // Main fist shape — trapezoid for proper karate fist silhouette
+    const fistKnuckleW = hw * 1.05;
+    const fistWristW = hw * 0.75;
+    // Fist base shape — trapezoid
     ctx.fillStyle = shiftColor(skinColor, 5);
     ctx.beginPath();
     ctx.moveTo(-fistKnuckleW, fistTop);
@@ -1095,10 +1255,16 @@ function drawArmDetail(
     ctx.lineTo(-fistWristW, fistBottom);
     ctx.closePath();
     ctx.fill();
-    // Forearm muscle definition — thicker forearm for kyokugen karateka
-    ctx.fillStyle = shiftColor(skinColor, -6);
-    ctx.fillRect(-hw * 0.9, -hh + sleeveH + h * 0.15, w * 0.25, h * 0.3);
-    // Knuckle ridge — 2-3 horizontal lines across the top of the fist
+    // Fist shadow side — 3D depth
+    ctx.fillStyle = shiftColor(skinColor, -8);
+    ctx.beginPath();
+    ctx.moveTo(fistWristW * 0.3, fistTop + 1);
+    ctx.lineTo(fistKnuckleW, fistTop);
+    ctx.lineTo(fistWristW, fistBottom);
+    ctx.lineTo(fistWristW * 0.3, fistBottom - 1);
+    ctx.closePath();
+    ctx.fill();
+    // Knuckle ridge lines
     ctx.strokeStyle = shiftColor(skinColor, -15);
     ctx.lineWidth = 0.7;
     const knuckleLineY1 = fistTop + (fistBottom - fistTop) * 0.15;
@@ -1107,7 +1273,7 @@ function drawArmDetail(
     ctx.beginPath(); ctx.moveTo(-fistKnuckleW * 0.8, knuckleLineY1); ctx.lineTo(fistKnuckleW * 0.8, knuckleLineY1); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(-fistWristW * 0.75, knuckleLineY2); ctx.lineTo(fistWristW * 0.75, knuckleLineY2); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(-fistWristW * 0.65, knuckleLineY3); ctx.lineTo(fistWristW * 0.65, knuckleLineY3); ctx.stroke();
-    // Knuckle bumps — 4 prominent knuckles for a powerful karate fist
+    // Knuckle bumps — 4 prominent
     ctx.fillStyle = shiftColor(skinColor, 10);
     for (let i = 0; i < 4; i++) {
       const bumpX = -fistKnuckleW * 0.6 + i * fistKnuckleW * 0.4;
@@ -1115,23 +1281,30 @@ function drawArmDetail(
       ctx.arc(bumpX, fistTop + 1, fistKnuckleW * 0.16, 0, Math.PI * 2);
       ctx.fill();
     }
-    // Thumb outline — small bump on side of fist
+    // Knuckle highlight dots
+    ctx.fillStyle = shiftColor(skinColor, 18);
+    for (let i = 0; i < 4; i++) {
+      const bumpX = -fistKnuckleW * 0.6 + i * fistKnuckleW * 0.4;
+      ctx.beginPath();
+      ctx.arc(bumpX - 0.5, fistTop + 0.5, fistKnuckleW * 0.06, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    // Thumb — side bump
     const thumbSide = isBack ? 1 : -1;
-    ctx.fillStyle = shiftColor(skinColor, -5);
+    ctx.fillStyle = shiftColor(skinColor, -3);
     ctx.beginPath();
     ctx.ellipse(thumbSide * fistKnuckleW * 0.88, fistTop + (fistBottom - fistTop) * 0.35,
       fistKnuckleW * 0.22, fistKnuckleW * 0.32, thumbSide * 0.3, 0, Math.PI * 2);
     ctx.fill();
-    // Hand wraps (bandage) — multiple layers crossing
-    ctx.strokeStyle = '#fff';
-    ctx.lineWidth = 0.8;
-    ctx.beginPath(); ctx.moveTo(-hw * 0.5, fistY - 4); ctx.lineTo(hw * 0.3, fistY - 1); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(-hw * 0.3, fistY); ctx.lineTo(hw * 0.5, fistY + 3); ctx.stroke();
-    // Wrist guard — black karate guard below the fist
-    ctx.fillStyle = '#222';
-    ctx.fillRect(-hw * 0.85, fistY - 2, w * 0.85, 4);
-    // Motion blur during attack active phase (scale > 1.0)
-    const scale = w / (hw * 2 || 1); // detect if limb is enlarged (attack)
+    // Thumb nail hint
+    ctx.fillStyle = shiftColor(skinColor, 15);
+    ctx.beginPath();
+    ctx.ellipse(thumbSide * fistKnuckleW * 0.92, fistTop + (fistBottom - fistTop) * 0.25,
+      fistKnuckleW * 0.08, fistKnuckleW * 0.1, thumbSide * 0.5, 0, Math.PI * 2);
+    ctx.fill();
+
+    // === Attack motion trail ===
+    const scale = w / (hw * 2 || 1);
     if (scale > 1.0) {
       ctx.strokeStyle = `rgba(255, 160, 0, 0.3)`;
       ctx.lineWidth = 1.5;
@@ -1352,44 +1525,103 @@ function drawLegDetail(
     ctx.fillStyle = shiftColor(outfit.pants, -15);
     ctx.fillRect(-hw + 1, hh - shoeH - 4, w - 2, 3);
   } else if (charId === 'ryo') {
-    // 亮: 橙色空手道道裤+中线+折痕+粗腿肌肉暗示+裤脚收口
-    // 大腿肌肉暗示 — 粗壮的空手道家腿部
+    // Ryo: Orange karate gi pants with loose drape + muscle hints + cuff
+    // === Thigh muscle bulk — thick kyokugen legs ===
     ctx.fillStyle = shiftColor(pantsColor, 10);
-    ctx.fillRect(-hw * 0.3, -hh + h * 0.1, w * 0.2, h * 0.25);
-    // 内侧肌肉线条
+    ctx.fillRect(-hw * 0.3, -hh + h * 0.1, w * 0.22, h * 0.25);
+    // Inner thigh muscle line
     ctx.strokeStyle = shiftColor(pantsColor, 8);
     ctx.lineWidth = 0.6;
     ctx.beginPath(); ctx.moveTo(-hw * 0.1, -hh + h * 0.15); ctx.lineTo(-hw * 0.05, -hh + h * 0.45); ctx.stroke();
-    // 膝盖线 — 空手道家粗壮膝盖暗示
+
+    // === Gi pants fabric drape — loose karate pants ===
+    // Loose fabric fold — outer leg drape (karate pants billow outward)
+    ctx.fillStyle = shiftColor(pantsColor, 6);
+    ctx.beginPath();
+    ctx.moveTo(-hw, -hh + h * 0.2);
+    ctx.quadraticCurveTo(-hw - w * 0.05, -hh + h * 0.35, -hw * 0.95, -hh + h * 0.5);
+    ctx.lineTo(-hw + 1, -hh + h * 0.5);
+    ctx.closePath();
+    ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(hw, -hh + h * 0.2);
+    ctx.quadraticCurveTo(hw + w * 0.05, -hh + h * 0.35, hw * 0.95, -hh + h * 0.5);
+    ctx.lineTo(hw - 1, -hh + h * 0.5);
+    ctx.closePath();
+    ctx.fill();
+
+    // === Knee area — defined crease ===
+    // Knee crease line
     ctx.strokeStyle = shiftColor(outfit.pants, -8);
     ctx.lineWidth = 0.8;
     ctx.beginPath();
     ctx.moveTo(-hw * 0.35, -hh + h * 0.48);
     ctx.lineTo(hw * 0.35, -hh + h * 0.48);
     ctx.stroke();
-    // 膝盖下方肌肉收缩线
+    // Below-knee tension line
     ctx.strokeStyle = shiftColor(outfit.pants, 12);
     ctx.lineWidth = 0.5;
     ctx.beginPath();
     ctx.moveTo(-hw * 0.25, -hh + h * 0.52);
     ctx.lineTo(hw * 0.25, -hh + h * 0.52);
     ctx.stroke();
-    // 中线熨烫线
+    // Knee fabric drape — diagonal fold
+    ctx.strokeStyle = shiftColor(pantsColor, -5);
+    ctx.lineWidth = 0.4;
+    ctx.beginPath();
+    ctx.moveTo(-hw * 0.4, -hh + h * 0.42);
+    ctx.quadraticCurveTo(-hw * 0.1, -hh + h * 0.5, hw * 0.1, -hh + h * 0.44);
+    ctx.stroke();
+
+    // === Center crease line — pressed pants look ===
     ctx.strokeStyle = shiftColor(outfit.pants, 20);
     ctx.lineWidth = 0.8;
     ctx.beginPath(); ctx.moveTo(0, -hh + h * 0.15); ctx.lineTo(0, hh - shoeH - 2); ctx.stroke();
-    // 道裤折痕 — 空手道裤特征性褶皱
+
+    // === Diagonal fabric fold lines — karate gi pants characteristic wrinkles ===
     ctx.strokeStyle = shiftColor(outfit.pants, 15);
     ctx.lineWidth = 0.5;
     ctx.beginPath(); ctx.moveTo(-hw * 0.2, -hh + h * 0.2); ctx.lineTo(-hw * 0.15, hh - shoeH - 4); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(hw * 0.2, -hh + h * 0.2); ctx.lineTo(hw * 0.15, hh - shoeH - 4); ctx.stroke();
-    // 破损暗示
+    // Cross-thigh diagonal folds
+    ctx.strokeStyle = shiftColor(pantsColor, 8);
+    ctx.lineWidth = 0.4;
+    ctx.beginPath();
+    ctx.moveTo(-hw * 0.35, -hh + h * 0.25);
+    ctx.lineTo(hw * 0.1, -hh + h * 0.4);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(hw * 0.35, -hh + h * 0.25);
+    ctx.lineTo(-hw * 0.1, -hh + h * 0.4);
+    ctx.stroke();
+
+    // === Shin area — tapered tightness below knee ===
+    ctx.fillStyle = shiftColor(pantsColor, -6);
+    ctx.fillRect(-hw * 0.3, -hh + h * 0.55, w * 0.15, h * 0.25);
+    ctx.fillRect(hw * 0.15, -hh + h * 0.55, w * 0.15, h * 0.25);
+
+    // === Calf muscle hints ===
+    ctx.fillStyle = shiftColor(pantsColor, 8);
+    ctx.fillRect(-hw * 0.15, -hh + h * 0.6, w * 0.15, h * 0.12);
+
+    // === Battle damage hint ===
     ctx.strokeStyle = shiftColor(outfit.pants, -15);
     ctx.lineWidth = 0.5;
     ctx.beginPath(); ctx.moveTo(-hw * 0.4, -hh + h * 0.35); ctx.lineTo(-hw * 0.3, -hh + h * 0.4); ctx.stroke();
-    // 裤脚收口 — 道裤底部绑带
-    ctx.fillStyle = shiftColor(outfit.pants, -12);
-    ctx.fillRect(-hw + 2, hh - shoeH - 4, w - 4, 3);
+
+    // === Pants cuff — gi pants tied at ankle ===
+    // Cuff band — darker binding at bottom
+    ctx.fillStyle = shiftColor(outfit.pants, -15);
+    ctx.fillRect(-hw + 1, hh - shoeH - 5, w - 2, 4);
+    // Cuff highlight — top edge of binding
+    ctx.fillStyle = shiftColor(outfit.pants, 5);
+    ctx.fillRect(-hw + 2, hh - shoeH - 5, w - 4, 1);
+    // Cuff gather lines — fabric bunching at ankle
+    ctx.strokeStyle = shiftColor(outfit.pants, -8);
+    ctx.lineWidth = 0.4;
+    ctx.beginPath(); ctx.moveTo(-hw * 0.3, hh - shoeH - 4); ctx.lineTo(-hw * 0.35, hh - shoeH - 1); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(hw * 0.2, hh - shoeH - 4); ctx.lineTo(hw * 0.15, hh - shoeH - 1); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(-hw * 0.05, hh - shoeH - 4); ctx.lineTo(0, hh - shoeH - 1); ctx.stroke();
   } else if (charId === 'leona') {
     // 莉安娜: 军裤+侧口袋+绑带
     ctx.strokeStyle = shiftColor(outfit.pants, -12);

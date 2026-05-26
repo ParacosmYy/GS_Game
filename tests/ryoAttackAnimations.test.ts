@@ -50,6 +50,7 @@ const CROUCH_ATTACKS = [
 /** Frame data for attacks using AIR_ATTACK state */
 const AIR_ATTACKS = [
   'JUMP_A', 'JUMP_B', 'JUMP_C', 'JUMP_D',
+  'JUMP_CD',
 ] as const;
 
 // ── Tests ──
@@ -57,8 +58,12 @@ const AIR_ATTACKS = [
 describe('Ryo STAND_ATTACK animation', () => {
   const frames = getPoseArray(RyoDef.poses, FighterState.STAND_ATTACK);
 
-  it('should have 20 frames to cover all stand attack phases', () => {
-    expect(frames.length).toBe(20);
+  it('should have 35 frames to cover all stand attack phases (including Ryo specials and DM)', () => {
+    // Max single-phase frame count across all attacks sharing STAND_ATTACK:
+    //   Max startup = 18 (DM_TEN_HA_OU)
+    //   Max active  = 22 (SDM_TEN_HA_OU)
+    //   Max recovery = 35 (DM_TEN_HA_OU, SDM_TEN_HA_OU)
+    expect(frames.length).toBeGreaterThanOrEqual(35);
   });
 
   it('should cover the longest startup phase (STAND_D startup=10)', () => {
@@ -202,13 +207,17 @@ describe('Ryo CROUCH_ATTACK animation', () => {
 describe('Ryo AIR_ATTACK animation', () => {
   const frames = getPoseArray(RyoDef.poses, FighterState.AIR_ATTACK);
 
-  it('should have 9 frames to cover all air attack phases', () => {
-    expect(frames.length).toBe(9);
+  it('should have at least 12 frames to cover all air attack phases (JUMP_CD startup=12)', () => {
+    // Max single-phase frame count across all attacks sharing AIR_ATTACK:
+    //   Max startup = 12 (JUMP_CD)
+    //   Max active  = 9  (JUMP_A)
+    //   Max recovery = 0  (all air attacks)
+    expect(frames.length).toBeGreaterThanOrEqual(12);
   });
 
-  it('should cover the longest startup phase (JUMP_C startup=8)', () => {
+  it('should cover the longest startup phase (JUMP_CD startup=12)', () => {
     const maxStartup = Math.max(...AIR_ATTACKS.map(a => FRAME_DATA[a].startup));
-    expect(maxStartup).toBe(8);
+    expect(maxStartup).toBe(12);
     expect(frames.length).toBeGreaterThanOrEqual(maxStartup);
   });
 
