@@ -2,8 +2,10 @@
  * Portrait Manifest — 肖像 manifest 类型定义、查询接口与数据
  *
  * 角色肖像用于选人界面、VS 画面、HUD 和胜利画面。
- * 当前阶段：只有 fallback 颜色和 atlas 占位坐标，无实际 atlas 图像。
- * 未来资产管线就绪后，通过工具层离线生成完整 manifest 注入此处。
+ * 当前阶段：所有角色已有 PixelPortraitData 像素肖像（32×40），通过
+ * CharacterDefinition.pixelPortrait 提供给渲染管线。
+ * hasPixelPortrait=true 标记表示该角色有真实像素数据可用。
+ * 未来资产管线就绪后，通过工具层离线生成完整 atlas manifest 注入此处。
  *
  * fallbackColor 取自各角色 spriteManifestData 中的 outfit（服装主色），
  * fallbackAccent 取自 hair（特征发色），与 sprite manifest 保持一致。
@@ -34,6 +36,8 @@ export interface PortraitEntry {
   fallbackColor: string;
   /** 占位渲染的强调色（来自角色发色） */
   fallbackAccent: string;
+  /** 是否有真实像素肖像数据（CharacterDefinition.pixelPortrait） */
+  hasPixelPortrait?: boolean;
 }
 
 /** 全角色肖像 manifest */
@@ -94,45 +98,45 @@ export function getHUDPortrait(
  * 27 个角色按 ROSTER 注册顺序排列。
  * 颜色来源与 spriteManifestData.ts 中的 CHARACTER_COLORS 保持一致。
  */
-const CHARACTER_PORTRAIT_COLORS: Record<string, { fallbackColor: string; fallbackAccent: string }> = {
+const CHARACTER_PORTRAIT_COLORS: Record<string, { fallbackColor: string; fallbackAccent: string; hasPixelPortrait?: boolean }> = {
   // ── 日本队 ──
-  kyo:      { fallbackColor: '#FF6600', fallbackAccent: '#1A1A2E' },
-  iori:     { fallbackColor: '#AA1133', fallbackAccent: '#C41E3A' },
+  kyo:      { fallbackColor: '#FF6600', fallbackAccent: '#1A1A2E', hasPixelPortrait: true },
+  iori:     { fallbackColor: '#AA1133', fallbackAccent: '#C41E3A', hasPixelPortrait: true },
   // ── 饿狼队 ──
-  terry:    { fallbackColor: '#CC8800', fallbackAccent: '#FFD700' },
-  andy:     { fallbackColor: '#FFAA22', fallbackAccent: '#DAA520' },
-  joe:      { fallbackColor: '#FF8800', fallbackAccent: '#2F2F2F' },
+  terry:    { fallbackColor: '#CC8800', fallbackAccent: '#FFD700', hasPixelPortrait: true },
+  andy:     { fallbackColor: '#FFAA22', fallbackAccent: '#DAA520', hasPixelPortrait: true },
+  joe:      { fallbackColor: '#FF8800', fallbackAccent: '#2F2F2F', hasPixelPortrait: true },
   // ── 韩国队 ──
-  kim:      { fallbackColor: '#2288CC', fallbackAccent: '#1A1A2E' },
-  chang:    { fallbackColor: '#885522', fallbackAccent: '#2F2F2F' },
-  choi:     { fallbackColor: '#66CC66', fallbackAccent: '#4A4A4A' },
+  kim:      { fallbackColor: '#2288CC', fallbackAccent: '#1A1A2E', hasPixelPortrait: true },
+  chang:    { fallbackColor: '#885522', fallbackAccent: '#2F2F2F', hasPixelPortrait: true },
+  choi:     { fallbackColor: '#66CC66', fallbackAccent: '#4A4A4A', hasPixelPortrait: true },
   // ── 极限流队 ──
-  ryo:      { fallbackColor: '#DD6600', fallbackAccent: '#8B4513' },
-  robert:   { fallbackColor: '#22AA44', fallbackAccent: '#DAA520' },
+  ryo:      { fallbackColor: '#DD6600', fallbackAccent: '#8B4513', hasPixelPortrait: true },
+  robert:   { fallbackColor: '#22AA44', fallbackAccent: '#DAA520', hasPixelPortrait: true },
   // ── 怒队 ──
-  leona:    { fallbackColor: '#2266BB', fallbackAccent: '#C0C0C0' },
-  ralf:     { fallbackColor: '#CC6633', fallbackAccent: '#8B4513' },
-  clark:    { fallbackColor: '#556B2F', fallbackAccent: '#DAA520' },
+  leona:    { fallbackColor: '#2266BB', fallbackAccent: '#C0C0C0', hasPixelPortrait: true },
+  ralf:     { fallbackColor: '#CC6633', fallbackAccent: '#8B4513', hasPixelPortrait: true },
+  clark:    { fallbackColor: '#556B2F', fallbackAccent: '#DAA520', hasPixelPortrait: true },
   // ── 超能力队 ──
-  athena:   { fallbackColor: '#FF66AA', fallbackAccent: '#8B008B' },
+  athena:   { fallbackColor: '#FF66AA', fallbackAccent: '#8B008B', hasPixelPortrait: true },
   // ── 女性格斗家队 ──
-  mai:      { fallbackColor: '#FF4488', fallbackAccent: '#1A1A2E' },
+  mai:      { fallbackColor: '#FF4488', fallbackAccent: '#1A1A2E', hasPixelPortrait: true },
   // ── K'队 ──
-  kdash:    { fallbackColor: '#444466', fallbackAccent: '#C0C0C0' },
-  kula:     { fallbackColor: '#4488CC', fallbackAccent: '#B0C4DE' },
+  kdash:    { fallbackColor: '#444466', fallbackAccent: '#C0C0C0', hasPixelPortrait: true },
+  kula:     { fallbackColor: '#4488CC', fallbackAccent: '#B0C4DE', hasPixelPortrait: true },
   // ── 大蛇队 ──
-  yashiro:  { fallbackColor: '#664488', fallbackAccent: '#E8E8E8' },
-  shermie:  { fallbackColor: '#CC44AA', fallbackAccent: '#8B4513' },
-  chris:    { fallbackColor: '#FF8844', fallbackAccent: '#DAA520' },
+  yashiro:  { fallbackColor: '#664488', fallbackAccent: '#E8E8E8', hasPixelPortrait: true },
+  shermie:  { fallbackColor: '#CC44AA', fallbackAccent: '#8B4513', hasPixelPortrait: true },
+  chris:    { fallbackColor: '#FF8844', fallbackAccent: '#DAA520', hasPixelPortrait: true },
   // ── 大蛇四天王 ──
-  mature:   { fallbackColor: '#882255', fallbackAccent: '#DAA520' },
-  vice:     { fallbackColor: '#3366AA', fallbackAccent: '#C0C0C0' },
+  mature:   { fallbackColor: '#882255', fallbackAccent: '#DAA520', hasPixelPortrait: true },
+  vice:     { fallbackColor: '#3366AA', fallbackAccent: '#C0C0C0', hasPixelPortrait: true },
   // ── 其他 ──
-  billy:    { fallbackColor: '#4488CC', fallbackAccent: '#FFD700' },
-  yamazaki: { fallbackColor: '#556622', fallbackAccent: '#1A1A2E' },
-  mary:     { fallbackColor: '#5588CC', fallbackAccent: '#DAA520' },
-  xiangfei: { fallbackColor: '#EE6688', fallbackAccent: '#1A1A2E' },
-  kasumi:   { fallbackColor: '#DD4466', fallbackAccent: '#1A1A2E' },
+  billy:    { fallbackColor: '#4488CC', fallbackAccent: '#FFD700', hasPixelPortrait: true },
+  yamazaki: { fallbackColor: '#556622', fallbackAccent: '#1A1A2E', hasPixelPortrait: true },
+  mary:     { fallbackColor: '#5588CC', fallbackAccent: '#DAA520', hasPixelPortrait: true },
+  xiangfei: { fallbackColor: '#EE6688', fallbackAccent: '#1A1A2E', hasPixelPortrait: true },
+  kasumi:   { fallbackColor: '#DD4466', fallbackAccent: '#1A1A2E', hasPixelPortrait: true },
 };
 
 /** 尺寸变体列表 */
@@ -172,6 +176,7 @@ for (const [charId, colors] of Object.entries(CHARACTER_PORTRAIT_COLORS)) {
       height: dims.height,
       fallbackColor: colors.fallbackColor,
       fallbackAccent: colors.fallbackAccent,
+      hasPixelPortrait: colors.hasPixelPortrait,
     };
   }
 
