@@ -511,3 +511,9 @@
 ## H130: frameContractBuilder测试—8项验证resolveFrameIndex(startup/active/recovery/clamp) — 102→103
 
 **commit:** <hash> | frameContractBuilder测试—8项验证resolveFrameIndex(startup/active/recovery/clamp)
+
+---
+
+## H131: inputResolver测试—9项验证resolveInput+createPrevAttack+facing方向 — 103→104
+
+**commit:** <hash> | inputResolver测试—9项验证resolveInput+createPrevAttack+facing方向
