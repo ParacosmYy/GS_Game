@@ -10,3 +10,4 @@ export { drawHUD, drawPowerGauges, drawComboCounters } from './hud.js';
 export { drawCharacterSelect, drawIntro, drawKO } from './screens.js';
 export { drawSuperFlash, drawMatchEnd, drawModeIndicator, drawStageIndicator, drawTitle, drawContinue } from './overlayScreens.js';
 export { roundRect, shiftColor, parseColor } from './utils.js';
+export { getCharacterRenderData, getCharacterColors, getCharacterAnimFrameInfo, getOutfitColor, getHeadColor, getHairColor } from './manifestRenderData.js';

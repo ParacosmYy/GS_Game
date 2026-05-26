@@ -10,6 +10,7 @@ import { shiftColor } from './utils.js';
 import { drawSkeletalFighter } from './skeletalFighter.js';
 import { drawAttackLimb } from './attackLimb.js';
 import type { SpriteRenderer } from './spriteRenderer.js';
+import { getCharacterColors } from './manifestRenderData.js';
 
 const fighterDebugOverlayEnabled = isFighterDebugOverlayEnabled();
 
@@ -82,7 +83,7 @@ export function drawFighters(
       ctx.translate(sx, STAGE_GROUND_Y);
       ctx.scale(1, -0.15);
       ctx.translate(-sx, -STAGE_GROUND_Y);
-      drawSkeletalFighter(ctx, f, sx, f.y, f.color, '#000000', globalTick, maxModeActive);
+      drawSkeletalFighter(ctx, f, sx, f.y, getCharacterColors(f.charId ?? '').outfit, '#000000', globalTick, maxModeActive);
       ctx.restore();
     }
 
@@ -165,7 +166,7 @@ export function drawFighters(
     }
 
     const spriteRendered = spriteRenderer?.canRender(f.charId)
-      ? spriteRenderer.render(ctx, f.charId, f.state, Math.max(0, f.attackFrame), sx + leanOffsetX, sy, f.facing, f.color)
+      ? spriteRenderer.render(ctx, f.charId, f.state, Math.max(0, f.attackFrame), sx + leanOffsetX, sy, f.facing, getCharacterColors(f.charId ?? '').outfit)
       : false;
     if (!spriteRendered) {
       drawSkeletalFighter(ctx, f, sx + leanOffsetX, sy, bodyColor, outlineColor, globalTick, maxModeActive);
@@ -269,43 +270,45 @@ export function drawFighters(
   }
 }
 
-/** Resolve body/outline/glow colors from fighter state */
+/** Resolve body/outline/glow colors from fighter state — queries manifest fallbackColors */
 export function resolveFighterColors(f: Fighter, globalTick: number): { bodyColor: string; outlineColor: string; glowColor: string | null } {
-  let bodyColor = f.color;
+  // Use manifest outfit color as the base body color, falling back to f.color
+  const manifestColors = getCharacterColors(f.charId ?? '');
+  let bodyColor = manifestColors.outfit;
   let outlineColor = '#ffffff30';
   let glowColor: string | null = null;
 
   switch (f.state) {
     case FighterState.WALK:
-      bodyColor = shiftColor(f.color, 12);
+      bodyColor = shiftColor(manifestColors.outfit, 12);
       break;
     case FighterState.RUN:
-      bodyColor = shiftColor(f.color, 20);
+      bodyColor = shiftColor(manifestColors.outfit, 20);
       outlineColor = '#ff880050';
       glowColor = '#ff660025';
       break;
     case FighterState.BACKDASH:
-      bodyColor = shiftColor(f.color, 35);
+      bodyColor = shiftColor(manifestColors.outfit, 35);
       outlineColor = '#88ccff60';
       glowColor = '#4488ff20';
       break;
     case FighterState.ROLL:
     case FighterState.BACK_ROLL:
-      bodyColor = shiftColor(f.color, 40);
+      bodyColor = shiftColor(manifestColors.outfit, 40);
       outlineColor = '#44ff8860';
       glowColor = '#22ff4420';
       break;
     case FighterState.HOP:
-      bodyColor = shiftColor(f.color, 15);
+      bodyColor = shiftColor(manifestColors.outfit, 15);
       break;
     case FighterState.HYPER_JUMP:
-      bodyColor = shiftColor(f.color, 30);
+      bodyColor = shiftColor(manifestColors.outfit, 30);
       outlineColor = '#ff44ff50';
       glowColor = '#ff22ff25';
       break;
     case FighterState.JUMP:
     case FighterState.RUN_JUMP:
-      bodyColor = shiftColor(f.color, 25);
+      bodyColor = shiftColor(manifestColors.outfit, 25);
       break;
     case FighterState.STAND_ATTACK:
     case FighterState.CROUCH_ATTACK:
@@ -334,18 +337,18 @@ export function resolveFighterColors(f: Fighter, globalTick: number): { bodyColo
         bodyColor = f.hitFlashColor || '#ffffff';
         outlineColor = '#ffffffcc';
       } else {
-        bodyColor = globalTick % 8 < 2 ? '#ffffff' : f.color;
+        bodyColor = globalTick % 8 < 2 ? '#ffffff' : manifestColors.outfit;
         outlineColor = '#ff505070';
       }
       break;
     case FighterState.DIZZY:
       // KOF2002: dizzy characters flash yellow/white with a dazed look
-      bodyColor = globalTick % 10 < 3 ? '#ffffaa' : globalTick % 10 < 5 ? '#ffffff' : f.color;
+      bodyColor = globalTick % 10 < 3 ? '#ffffaa' : globalTick % 10 < 5 ? '#ffffff' : manifestColors.outfit;
       outlineColor = '#ffcc0060';
       glowColor = '#ffcc0020';
       break;
     case FighterState.KNOCKDOWN:
-      bodyColor = shiftColor(f.color, -50);
+      bodyColor = shiftColor(manifestColors.outfit, -50);
       outlineColor = '#88000040';
       break;
   }
@@ -393,11 +396,12 @@ function drawAfterimageTrail(
   globalTick: number, maxModeActive: boolean,
 ): void {
   // KOF2002: 残影色调 — RUN=橙, BACKDASH=蓝, ROLL=绿
+  const trailManifestColors = getCharacterColors(f.charId ?? '');
   const trailColor = f.state === FighterState.RUN
-    ? shiftColor(f.color, 40)
+    ? shiftColor(trailManifestColors.outfit, 40)
     : f.state === FighterState.BACKDASH
-    ? shiftColor(f.color, 60)
-    : shiftColor(f.color, 50);
+    ? shiftColor(trailManifestColors.outfit, 60)
+    : shiftColor(trailManifestColors.outfit, 50);
   const trailOutline = f.state === FighterState.RUN
     ? '#ff880050'
     : f.state === FighterState.BACKDASH

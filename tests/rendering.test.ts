@@ -217,9 +217,10 @@ describe('Fighter Rendering', () => {
     const colors1 = resolveFighterColors(f, 0);  // tick=0 -> 0%10=0 < 3 -> yellow
     expect(['#ffffaa', '#ffffff']).toContain(colors1.bodyColor);
 
-    // At tick where flash is NOT active (tick % 10 = 5), body should be original color
+    // At tick where flash is NOT active (tick % 10 = 5), body should be manifest outfit color
     const colors2 = resolveFighterColors(f, 5);
-    expect(colors2.bodyColor).toBe(f.color);
+    // kyo manifest outfit color is #FF6600
+    expect(colors2.bodyColor).toBe('#FF6600');
   });
 });
 
