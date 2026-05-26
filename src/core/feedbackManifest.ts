@@ -151,7 +151,8 @@ function isSpecial(at: string): boolean {
 }
 function isHeavy(at: string): boolean {
   return at.endsWith('_C') || at.endsWith('_D') || at === 'STAND_CD'
-    || at === 'CROUCH_C' || at === 'CROUCH_D' || at === 'JUMP_C' || at === 'JUMP_D';
+    || at === 'JUMP_CD' || at === 'CROUCH_C' || at === 'CROUCH_D'
+    || at === 'JUMP_C' || at === 'JUMP_D';
 }
 
 /**
