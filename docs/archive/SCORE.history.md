@@ -947,3 +947,9 @@
 ## H193: ryoSpriteBatch5—5项验证backdash/crouchD/standD/airC/walkBack帧 — 165→166
 
 **commit:** <hash> | ryoSpriteBatch5—5项验证backdash/crouchD/standD/airC/walkBack帧
+
+---
+
+## H194: replayInputSource—5项验证createReplayInputSource+readFrame+isFinished — 166→167
+
+**commit:** <hash> | replayInputSource—5项验证createReplayInputSource+readFrame+isFinished
