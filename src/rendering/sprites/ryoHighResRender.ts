@@ -377,6 +377,22 @@ export function hasHighResFrame(
 }
 
 /**
+ * Resolve the frame registry key for a given character state.
+ * Returns null if the character is not 'ryo' or the state has no mapping.
+ */
+export function getResolvedFrameKey(
+  charId: string,
+  state: FighterState,
+  currentAttack: AttackType | null = null,
+  vx: number = 0,
+  facing: number = 1,
+): string | null {
+  if (charId !== 'ryo') return null;
+  initAllFrames();
+  return resolveFrameKey(state, currentAttack, vx, facing);
+}
+
+/**
  * Draw a high-resolution pixel frame for the given character.
  *
  * @param ctx            - Canvas 2D context

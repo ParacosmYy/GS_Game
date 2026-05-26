@@ -206,14 +206,14 @@ KF_F1[17] = r('..................mn1mmn2.1mn....1.2nm21.111.....................
 KF_F1[18] = r('...................12mn21..........12mn2.111..1eefeefeeeegeeefeeeeeefee18bd81.');
 KF_F1[19] = r('..................128921...........12891.111.1eefeefeeeeegeeefeeeeeefee18bd81.');
 KF_F1[20] = r('.................1289la1...........189a1.111eefeefeeeeegeeefefeeeefee1888d81.');
-KF_F1[21] = r('................1289ka1............18ka111eefeeefeeeeegeeefefeeeefee1888d81.');
-KF_F1[22] = r('...............12899a1.............1891.1eefeeefeeeeegeeeeefeeeeeefee1888d81.');
-KF_F1[23] = r('..............12899a1..............18d1eefeeefeeeeeegeeeeefeeeeeefee1888d81.');
-KF_F1[24] = r('.............12899b21..............1d8eefeeefeeeeeegeeeeefeeeeeefee1d91.....');
-KF_F1[25] = r('............1289b1................1d8eefeeefeeeeegeeeeefeeeeeefee1d91.........');
+KF_F1[21] = r('................1289ka1............18ka111eeieeefeeeeegeeefefeeeefee1888d81.');
+KF_F1[22] = r('...............12899a1.............1891.1eeieeefeeeeegeeeeefeeeeeefee1888d81.');
+KF_F1[23] = r('..............12899a1..............18d1eeieeefeeeeeegeeeeefeeeeeefee1888d81.');
+KF_F1[24] = r('.............12899b21..............1d8eeieeefeeeeeegeeeeefeeeeeefee1d91.....');
+KF_F1[25] = r('............1289b1................1d8eeieeefeeeeegeeeeefeeeeeefee1d91.........');
 KF_F1[26] = r('...........1289b1.................1d8eefeefeeeeegeeefefeeeefee1d91...........');
 KF_F1[27] = r('..........128b1...................1deefeefeeeeegeeefeeeeeefee1d91.............');
-KF_F1[28] = r('.........128b1....................11eefefeeeegeeefeeeeefee1d91................');
+KF_F1[28] = r('.........128b1....................11eefefeeeegeeefeegeefee1d91................');
 
 // F2: follow-through — arms still extended but relaxing
 const KF_F2 = clone(KF_F1);
@@ -258,15 +258,15 @@ const HI_F2 = clone(JUMP_BASE);
 // Body more horizontal, leg fully extended to x~85-92
 HI_F2[48] = r('................................................................................');
 HI_F2[49] = r('................................................................................');
-HI_F2[50] = r('..........................1eefefeeeegeeefeeeeefee1d91........................');
+HI_F2[50] = r('..........................1eefefeeeegeeefeegeefee1d91........................');
 HI_F2[51] = r('.........................1efeeeefeeeeeefefeeee1d8d1.......................');
-HI_F2[52] = r('........................1eefeefeeeegeeefeeeeefee18bd81......................');
-HI_F2[53] = r('.......................1eefeefeeeegeeefeeeeefee1888d81.....................');
+HI_F2[52] = r('........................1eefeefeeeegeeefeegeefee18bd81......................');
+HI_F2[53] = r('.......................1eefeefeeeegeeefeegeefee1888d81.....................');
 HI_F2[54] = r('......................1eefeefeeeegeeefeeeeeefee18bd81......................');
-HI_F2[55] = r('.....................1eefeefeeeegeeefeeeeefee1d91........................');
+HI_F2[55] = r('.....................1eefeefeeeegeeefeegeefee1d91........................');
 HI_F2[56] = r('....................1efeeeefeeeeeefefeeee1d1.........................');
-HI_F2[57] = r('...................1efeeeefeeeeefeeeeee11...........................');
-HI_F2[58] = r('..................1efeeeefeeefefeeee1k1............................');
+HI_F2[57] = r('...................1efeeeefeegeefeeeeee11...........................');
+HI_F2[58] = r('..................1efeeeeieeefefeeee1k1............................');
 HI_F2[59] = r('.................1efeeeefeefeeeee1k1...................................');
 HI_F2[60] = r('................1efeeeefefeeee1k1......................................');
 HI_F2[61] = r('...............1eeeeefeeeeee1k1.........................................');
@@ -370,9 +370,9 @@ const KFC_F1 = clone(KF_F1); // Start from KOOU thrust frame
 // Replace the thrust arm area with wider orange-glowing energy ball
 // The existing arms extend to x~90 area; we add a larger energy ball
 KFC_F1[18] = r('...................12mn21..........12mn2.111..1eefeeeeeegefeeeefee18bd81.');
-KFC_F1[19] = r('..................128921...........12891.111.1eefeeeeeegeefeeeefee1888d81.');
-KFC_F1[20] = r('.................1289la1...........189a1.111eefeeeeeegeefeeeeefee1888d81.');
-KFC_F1[21] = r('................1289ka1............18ka111eefeefeeeegeeefeeeeefee18d81..');
+KFC_F1[19] = r('..................128921...........12891.111.1eefeeeeeegeeeefeefee1888d81.');
+KFC_F1[20] = r('.................1289la1...........189a1.111eefeeeeeegeeeeieeefee1888d81.');
+KFC_F1[21] = r('................1289ka1............18ka111eefeefeeeegeeefeegeefee18d81..');
 KFC_F1[22] = r('...............12899a1.............1891.1eeeeeefefeeeemm22meeee1d91....');
 KFC_F1[23] = r('..............12899a1..............18d1eeeeefeeeeeem2222222mee1d91.....');
 KFC_F1[24] = r('.............12899b21..............1d8eeefefeeeem222222222221d91.......');
