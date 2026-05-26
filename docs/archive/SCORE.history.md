@@ -4733,3 +4733,44 @@
 **下一轮方向：** 角色招式继续扩展+帧数据精度提升+战斗手感打磨
 
 **tag: 待定 | commit: df7d948 | 下一目标: 诚实分565 (还需+5)**
+
+---
+
+### Iter-H32 — 2026-05-26（AI全角色策略+帧数据扩展+连段缩放+打击反馈分层+帧数据校验）
+
+**实质性改变:**
+- AI策略覆盖全部27角色(+17: Kula/Leona/Athena/Billy/Chang/Choi/Joe/Andy/Mature/Yashiro/Chris/Vice/Shermie/Yamazaki/Mary/Xiangfei/Kasumi)
+- 39个新招式帧数据: Yamazaki(12含蛇使三段/砂/逆方向/爆弹拳/斩铁虫DM/SDM), Mary(9含M-type/Crab Clutch/追击/Dynamite Swing DM/SDM), Xiangfei(9含超球弾/龙连打/天舞乱舞/DM/SDM), Kasumi(7含无二返/殺陣陽旋/波及乱舞/DM/SDM)
+- 连段缩放改为分段系统: comboCount 1-3=100%/4-6=85%/7-9=70%/10+=60%，DM额外-10%
+- Hitstop分层: Light4/Medium7/Special13/DM19/SDM22 + Counter Bonus +3
+- Screen Shake分层: Light3~KO22, 持续时间4~55帧
+- Spark/VFX分层: 7级(Light/Heavy/Special/DM/SDM/Counter/Throw)
+- 取消窗口常量: Normal3/Rapid2/Super5/Free4
+- hitCallback重构: 硬编码→分层常量
+- 新增comboScaling.test.ts(76个测试): 缩放分段/投技豁免/DM惩罚/取消窗口/meter缩放
+- 新增hitFeedback.test.ts(114个测试): hitstop/shake/spark分层+KO特殊处理+跨层一致性
+- 新增frameDataValidation.test.ts(84个测试): 完整性/合理性/取消合法性/角色覆盖度
+- 新增frameDataPrecision.test.ts(50个测试): 物理合理性/硬直平衡/伤害层级/防御槽消耗/取消链
+- combatDeepIntegration.test: 3个旧缩放测试更新为新分段系统
+
+| 维度 | 诚实分 | 变化 | 备注 |
+|------|--------|------|------|
+| 角色美术 | 48/200 | = | 未改 |
+| 舞台美术 | 42/100 | = | 未改 |
+| 音频品质 | 57/150 | = | 未改 |
+| 角色内容 | 90/150 | +2 | 39个新招式+17角色AI策略(27角色全覆盖) |
+| 战斗手感 | 119/150 | +2 | 连段缩放分层+hitstop/shake/spark分层+取消窗口常量化 |
+| 帧数据精度 | 79/100 | +2 | 134个帧数据校验测试(完整性/精度/合理性/取消合法性) |
+| 游戏流程 | 84/100 | = | 未改 |
+| UI/HUD品质 | 46/50 | = | 未改 |
+| **总分** | **565/1000** | | 按约束本轮+5 |
+
+**本轮提升了哪个维度？** 角色内容(+2 全角色AI+39招式)、战斗手感(+2 分层反馈系统)、帧数据精度(+2 134个校验测试)
+
+**为什么只加5分？** 数据量和测试量大幅增长但缺乏玩家可感知的视觉/听觉品质提升
+
+**还有哪些差距？** 角色美术(48/200)和音频(57/150)仍是最大短板；连段缩放和打击反馈需要实战调校
+
+**下一轮方向：** 继续角色招式深度+实战连段测试+更多DM/SDM补全
+
+**tag: 待定 | commit: b79a43f | 下一目标: 诚实分570 (还需+5)**
