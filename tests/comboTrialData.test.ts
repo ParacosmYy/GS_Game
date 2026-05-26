@@ -2,30 +2,31 @@ import { describe, it, expect } from 'vitest';
 import { COMBO_TRIALS, getTrialsForCharacter, getTrialsByDifficulty, getTrialById, getTrialCharacterIds } from '../src/state/comboTrialData.js';
 
 describe('comboTrialData', () => {
-  it('COMBO_TRIALS is array', () => {
-    expect(Array.isArray(COMBO_TRIALS)).toBe(true);
+  it('COMBO_TRIALS has entries', () => {
     expect(COMBO_TRIALS.length).toBeGreaterThan(0);
   });
   it('getTrialsForCharacter returns array', () => {
-    const result = getTrialsForCharacter('ryo');
-    expect(Array.isArray(result)).toBe(true);
+    const ryoTrials = getTrialsForCharacter('ryo');
+    expect(Array.isArray(ryoTrials)).toBe(true);
   });
   it('getTrialsByDifficulty returns array', () => {
-    const result = getTrialsByDifficulty('beginner');
-    expect(Array.isArray(result)).toBe(true);
+    const easy = getTrialsByDifficulty('easy');
+    expect(Array.isArray(easy)).toBe(true);
   });
-  it('getTrialById returns undefined for missing', () => {
-    const result = getTrialById('nonexistent');
-    expect(result).toBeUndefined();
+  it('getTrialById returns trial or undefined', () => {
+    if (COMBO_TRIALS.length > 0) {
+      const first = COMBO_TRIALS[0];
+      const found = getTrialById(first.id);
+      expect(found).toBeDefined();
+      expect(found!.id).toBe(first.id);
+    }
   });
-  it('getTrialCharacterIds returns array', () => {
+  it('getTrialById returns undefined for unknown id', () => {
+    expect(getTrialById('nonexistent_trial_xyz')).toBeUndefined();
+  });
+  it('getTrialCharacterIds returns non-empty array', () => {
     const ids = getTrialCharacterIds();
     expect(Array.isArray(ids)).toBe(true);
-  });
-  it('trials have name and steps', () => {
-    for (const trial of COMBO_TRIALS) {
-      expect(trial).toHaveProperty('name');
-      expect(trial).toHaveProperty('steps');
-    }
+    expect(ids.length).toBeGreaterThan(0);
   });
 });

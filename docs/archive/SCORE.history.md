@@ -1049,3 +1049,9 @@
 ## H210: announcePresets—8项验证popIn/fadeInHoldOut/burstIn/KO序列 — 182→183
 
 **commit:** <hash> | announcePresets—8项验证popIn/fadeInHoldOut/burstIn/KO序列
+
+---
+
+## H211: comboTrialData—6项验证连招试炼数据 — 183→184
+
+**commit:** <hash> | comboTrialData—6项验证连招试炼数据
