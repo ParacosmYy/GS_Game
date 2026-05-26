@@ -7,6 +7,8 @@
  * 归属: core/ — 纯类型、纯函数，不持有运行时状态
  */
 
+import { AttackType } from './types.js';
+
 // ===== 类型定义 =====
 
 /** 单个精灵图的锚点偏移 */
@@ -102,4 +104,67 @@ export function getFallbackColors(
     outfit: '#FF6600',
     hair: '#333333',
   };
+}
+
+/**
+ * 获取角色的所有动画名称列表
+ */
+export function getAnimationNames(manifest: SpriteManifest, charId: string): string[] {
+  const charManifest = manifest.characters[charId];
+  if (!charManifest) return [];
+  return Object.keys(charManifest.animations);
+}
+
+/**
+ * 获取动画总时长（毫秒）
+ * 将每帧 duration 累加，未定义 duration 的帧不计入
+ */
+export function getAnimationDuration(manifest: SpriteManifest, charId: string, animName: string): number {
+  const anim = getAnimation(manifest, charId, animName);
+  if (!anim) return 0;
+  return anim.frames.reduce((sum, frame) => sum + (frame.duration ?? 0), 0);
+}
+
+/**
+ * 获取动画帧数
+ */
+export function getAnimationFrameCount(manifest: SpriteManifest, charId: string, animName: string): number {
+  const anim = getAnimation(manifest, charId, animName);
+  if (!anim) return 0;
+  return anim.frames.length;
+}
+
+/**
+ * 检查角色是否拥有指定动画
+ */
+export function hasAnimation(manifest: SpriteManifest, charId: string, animName: string): boolean {
+  return getAnimation(manifest, charId, animName) !== undefined;
+}
+
+/**
+ * 获取 manifest 中所有角色 ID
+ */
+export function getCharacterIds(manifest: SpriteManifest): string[] {
+  return Object.keys(manifest.characters);
+}
+
+/**
+ * 将 AttackType 枚举值映射为动画名称
+ * 规则：大写枚举值转小写，如 STAND_A -> 'stand_a'
+ */
+export function attackTypeToAnimName(attackType: AttackType): string {
+  return attackType.toLowerCase();
+}
+
+/**
+ * 根据攻击类型获取对应的动画
+ * 先将 AttackType 映射为动画名称，再查询 manifest
+ */
+export function getAttackAnimation(
+  manifest: SpriteManifest,
+  charId: string,
+  attackType: AttackType,
+): SpriteAnimation | undefined {
+  const animName = attackTypeToAnimName(attackType);
+  return getAnimation(manifest, charId, animName);
 }

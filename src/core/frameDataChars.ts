@@ -4270,6 +4270,45 @@ export const FRAME_DATA_CHARS = {
     pushback: 0,
     hitLevel: "MID" as const,
     knockdown: true,
+  },
+  // Outrage qcb+P (近距离爪击) — KOF2002UM 校准数据
+  VICE_OUTRAGE_QCB: {
+    startup: 6,
+    active: 5,
+    recovery: 20,
+    damage: 75,
+    hitstun: 15,
+    blockstun: 15,
+    pushback: 4,
+    hitLevel: "MID" as const,
+    knockdown: false,
+    chipDamage: 8,
+  },
+  // Mayhem qcf+P (突进打) — KOF2002UM 校准数据
+  VICE_MAYHEM_QCF: {
+    startup: 7,
+    active: 6,
+    recovery: 24,
+    damage: 82,
+    hitstun: 16,
+    blockstun: 16,
+    pushback: 5,
+    hitLevel: "MID" as const,
+    knockdown: false,
+    chipDamage: 10,
+  },
+  // DM Negative Flog qcf,qcf+K (突进投 DM) — KOF2002UM 校准数据
+  DM_NEGATIVE_FLOG: {
+    startup: 8,
+    active: 10,
+    recovery: 40,
+    damage: 210,
+    hitstun: 0,
+    blockstun: 22,
+    pushback: 10,
+    hitLevel: "MID" as const,
+    knockdown: true,
+    chipDamage: 22,
   }, // ── 布鲁·玛丽命令通常技 (Blue Mary) ── KOF2002UM 校准数据
   MARY_HAMMER_PUNCH: {
     startup: 10,
@@ -4477,6 +4516,45 @@ export const FRAME_DATA_CHARS = {
     pushback: 0,
     hitLevel: "MID" as const,
     knockdown: true,
+  },
+  // Straight Slider qcb+K (低姿态滑踢) — KOF2002UM 校准数据
+  MARY_STRAIGHT_SLIDER: {
+    startup: 8,
+    active: 6,
+    recovery: 24,
+    damage: 78,
+    hitstun: 16,
+    blockstun: 16,
+    pushback: 5,
+    hitLevel: "MID" as const,
+    knockdown: false,
+    chipDamage: 8,
+  },
+  // Mary Spin Fall qcb,qcb+K (旋转突进, KD) — KOF2002UM 校准数据
+  MARY_SPIN_FALL: {
+    startup: 7,
+    active: 8,
+    recovery: 30,
+    damage: 90,
+    hitstun: 18,
+    blockstun: 18,
+    pushback: 6,
+    hitLevel: "MID" as const,
+    knockdown: true,
+    chipDamage: 10,
+  },
+  // DM Mary Dynamic qcf,qcf+K (突进连打 DM) — KOF2002UM 校准数据
+  DM_MARY_DYNAMIC: {
+    startup: 8,
+    active: 10,
+    recovery: 42,
+    damage: 210,
+    hitstun: 0,
+    blockstun: 22,
+    pushback: 12,
+    hitLevel: "MID" as const,
+    knockdown: true,
+    chipDamage: 22,
   }, // ── 李香绯命令通常技 (Li Xiangfei) ── KOF2002UM 校准数据
   XIANGFEI_KYU_HO: {
     startup: 7,
@@ -4677,6 +4755,45 @@ export const FRAME_DATA_CHARS = {
     knockdown: true,
     chipDamage: 18,
   },
+  // 飞脚 dp+K (上升踢技, KD) — KOF2002UM 校准数据
+  XIANGFEI_NIKYAKU: {
+    startup: 7,
+    active: 6,
+    recovery: 22,
+    damage: 75,
+    hitstun: 16,
+    blockstun: 16,
+    pushback: 5,
+    hitLevel: "MID" as const,
+    knockdown: false,
+    chipDamage: 8,
+  },
+  // 栄扇楼 qcb+P (突进肘打) — KOF2002UM 校准数据
+  XIANGFEI_EISANROU: {
+    startup: 10,
+    active: 8,
+    recovery: 26,
+    damage: 80,
+    hitstun: 18,
+    blockstun: 18,
+    pushback: 6,
+    hitLevel: "MID" as const,
+    knockdown: false,
+    chipDamage: 10,
+  },
+  // DM 鉄山靠 qcf,qcf+P (突进正拳 DM) — KOF2002UM 校准数据
+  DM_TETSUZAN_KOU: {
+    startup: 8,
+    active: 10,
+    recovery: 40,
+    damage: 200,
+    hitstun: 0,
+    blockstun: 22,
+    pushback: 10,
+    hitLevel: "MID" as const,
+    knockdown: true,
+    chipDamage: 20,
+  },
   // ── 李香绯追加SDM (Li Xiangfei) ── KOF2002UM 校准数据
   // 超球弾·SDM qcf×2+AC (飞行道具SDM)
   SDM_CHOU_KYOKU_DAN: {
@@ -4690,6 +4807,32 @@ export const FRAME_DATA_CHARS = {
     hitLevel: "MID" as const,
     knockdown: true,
     chipDamage: 28,
+  },
+  // 蛇使 qcf+P (蛇臂攻击, 突进打击) — KOF2002UM 校准数据
+  YAMAZAKI_SNAKE_ARM_QCF: {
+    startup: 6,
+    active: 5,
+    recovery: 18,
+    damage: 72,
+    hitstun: 14,
+    blockstun: 14,
+    pushback: 4,
+    hitLevel: "MID" as const,
+    knockdown: false,
+    chipDamage: 8,
+  },
+  // ドリル hcf+P hold (多段连打, 投技属性) — KOF2002UM 校准数据
+  YAMAZAKI_DRILL: {
+    startup: 5,
+    active: 3,
+    recovery: 20,
+    damage: 10,
+    hits: 8,
+    hitstun: 14,
+    blockstun: 12,
+    pushback: 2,
+    hitLevel: "MID" as const,
+    knockdown: false,
   },
   // ── 山崎龙二命令通常技 (Yamazaki) ── KOF2002UM 校准数据
   YAMAZAKI_SASHI: {
@@ -5172,5 +5315,110 @@ export const FRAME_DATA_CHARS = {
     hitLevel: "MID" as const,
     knockdown: true,
     counterOnly: true,
+  },
+  // 三連撃水 qcb+P (三连突进打击) — KOF2002UM 校准数据
+  KASUMI_SANREN_GEKISUI: {
+    startup: 6,
+    active: 5,
+    recovery: 20,
+    damage: 70,
+    hitstun: 14,
+    blockstun: 14,
+    pushback: 4,
+    hitLevel: "MID" as const,
+    knockdown: false,
+    chipDamage: 8,
+  },
+  // 白投 hcf+K (指令投, KD) — KOF2002UM 校准数据
+  KASUMI_HAKUBI_NAGE: {
+    startup: 5,
+    active: 4,
+    recovery: 28,
+    damage: 100,
+    hitstun: 25,
+    blockstun: 0,
+    pushback: 8,
+    hitLevel: "MID" as const,
+    knockdown: true,
+  },
+  // DM 三神雷 qcf,qcf+K (突进打击 DM) — KOF2002UM 校准数据
+  DM_SAN_SHIN_RAI: {
+    startup: 8,
+    active: 8,
+    recovery: 38,
+    damage: 200,
+    hitstun: 0,
+    blockstun: 22,
+    pushback: 10,
+    hitLevel: "MID" as const,
+    knockdown: true,
+    chipDamage: 20,
+  },
+  // ── SDM 补全: 缺少SDM的DM角色的超必杀技强化版 ── KOF2002UM 校准
+  // Kyo
+  SDM_HIGH_ANGLE_GEYSER: {
+    startup: 7, active: 12, recovery: 38,
+    damage: 280, hitstun: 0, blockstun: 24, pushback: 12,
+    hitLevel: "MID" as const, knockdown: true, chipDamage: 24,
+  },
+  // Athena
+  SDM_GALACTIC_PHANTOM: {
+    startup: 9, active: 14, recovery: 42,
+    damage: 300, hitstun: 0, blockstun: 24, pushback: 12,
+    hitLevel: "MID" as const, knockdown: true, chipDamage: 32,
+  },
+  // Joe
+  SDM_BOMBER_TIGER: {
+    startup: 7, active: 12, recovery: 38,
+    damage: 280, hitstun: 0, blockstun: 24, pushback: 12,
+    hitLevel: "MID" as const, knockdown: true, chipDamage: 24,
+  },
+  // Kim
+  SDM_HI_EN_KYAKU: {
+    startup: 7, active: 10, recovery: 36,
+    damage: 270, hitstun: 0, blockstun: 23, pushback: 11,
+    hitLevel: "MID" as const, knockdown: true, chipDamage: 23,
+  },
+  // Chang
+  SDM_DAISAN_NO_KON: {
+    startup: 8, active: 12, recovery: 40,
+    damage: 280, hitstun: 0, blockstun: 24, pushback: 12,
+    hitLevel: "MID" as const, knockdown: true, chipDamage: 24,
+  },
+  // Choi
+  SDM_TEKKYUU_DAI_SESSA: {
+    startup: 7, active: 10, recovery: 38,
+    damage: 270, hitstun: 0, blockstun: 23, pushback: 11,
+    hitLevel: "MID" as const, knockdown: true, chipDamage: 23,
+  },
+  // Yashiro
+  SDM_TERRITORY_BUST: {
+    startup: 8, active: 12, recovery: 40,
+    damage: 280, hitstun: 0, blockstun: 24, pushback: 12,
+    hitLevel: "MID" as const, knockdown: true, chipDamage: 24,
+  },
+  // Vice
+  SDM_NEGATIVE_FLOG: {
+    startup: 7, active: 12, recovery: 38,
+    damage: 280, hitstun: 0, blockstun: 24, pushback: 12,
+    hitLevel: "MID" as const, knockdown: true, chipDamage: 24,
+  },
+  // Mary
+  SDM_MARY_DYNAMIC: {
+    startup: 7, active: 12, recovery: 40,
+    damage: 280, hitstun: 0, blockstun: 24, pushback: 12,
+    hitLevel: "MID" as const, knockdown: true, chipDamage: 24,
+  },
+  // Xiangfei
+  SDM_TETSUZAN_KOU: {
+    startup: 7, active: 12, recovery: 38,
+    damage: 270, hitstun: 0, blockstun: 24, pushback: 12,
+    hitLevel: "MID" as const, knockdown: true, chipDamage: 24,
+  },
+  // Kasumi
+  SDM_SAN_SHIN_RAI: {
+    startup: 7, active: 10, recovery: 36,
+    damage: 270, hitstun: 0, blockstun: 23, pushback: 11,
+    hitLevel: "MID" as const, knockdown: true, chipDamage: 23,
   },
 } as const;

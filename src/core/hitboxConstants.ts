@@ -350,4 +350,23 @@ export const HITBOX_OFFSETS = {
   // 藤堂香澄DM/SDM (Kasumi Todoh)
   DM_CHO_MUKIGENZAN: { offsetX: 42, offsetY: -115, width: 95, height: 70 },
   SDM_CHO_MUKIGENZAN: { offsetX: 42, offsetY: -125, width: 105, height: 80 },
+  // 李香绯追加必杀技 (Xiangfei Additional Specials)
+  XIANGFEI_NIKYAKU: { offsetX: 45, offsetY: -140, width: 60, height: 60 },
+  XIANGFEI_EISANROU: { offsetX: 55, offsetY: -105, width: 70, height: 45 },
+  DM_TETSUZAN_KOU: { offsetX: 45, offsetY: -110, width: 90, height: 65 },
+  // 藤堂香澄追加必杀技 (Kasumi Additional Specials)
+  KASUMI_SANREN_GEKISUI: { offsetX: 55, offsetY: -100, width: 65, height: 42 },
+  KASUMI_HAKUBI_NAGE: { offsetX: 15, offsetY: -110, width: 90, height: 70 },
+  DM_SAN_SHIN_RAI: { offsetX: 45, offsetY: -120, width: 90, height: 68 },
+  // 布鲁·玛丽追加必杀技 (Mary Additional Specials)
+  MARY_STRAIGHT_SLIDER: { offsetX: 58, offsetY: -30, width: 80, height: 28 },
+  MARY_SPIN_FALL: { offsetX: 50, offsetY: -80, width: 75, height: 55 },
+  DM_MARY_DYNAMIC: { offsetX: 42, offsetY: -110, width: 95, height: 70 },
+  // 山崎龙二追加必杀技 (Yamazaki Additional Specials)
+  YAMAZAKI_SNAKE_ARM_QCF: { offsetX: 62, offsetY: -95, width: 78, height: 40 },
+  YAMAZAKI_DRILL: { offsetX: 50, offsetY: -105, width: 60, height: 50 },
+  // 薇丝追加必杀技 (Vice Additional Specials)
+  VICE_OUTRAGE_QCB: { offsetX: 58, offsetY: -100, width: 72, height: 42 },
+  VICE_MAYHEM_QCF: { offsetX: 55, offsetY: -95, width: 75, height: 45 },
+  DM_NEGATIVE_FLOG: { offsetX: 42, offsetY: -115, width: 92, height: 68 },
 } as const;

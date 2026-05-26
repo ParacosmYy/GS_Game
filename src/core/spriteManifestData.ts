@@ -2,6 +2,7 @@
  * Sprite Manifest Data — 全角色最小 manifest 数据
  *
  * 当前阶段：每个角色只有 fallbackColors，无实际 atlas 或动画帧数据。
+ * Ryo 作为样板角色，已填充完整动画 manifest，用于验证资产管线接口。
  * 未来资产管线就绪后，通过工具层离线生成完整 manifest 注入此处。
  *
  * 颜色来源：各角色 CharacterDefinition 中的 color / accentColor / specialColor
@@ -14,11 +15,632 @@
  * 归属: core/ — 只依赖 spriteManifest 类型，不持有运行时逻辑
  */
 
-import type { SpriteManifest } from './spriteManifest.js';
+import type { SpriteManifest, SpriteAnimation } from './spriteManifest.js';
 
 export const SPRITE_MANIFEST: SpriteManifest = {
   version: 1,
   characters: {},
+};
+
+// ===== 帧时长换算 =====
+// 1 frame @60fps ≈ 16.67ms，取整到 17ms
+const F = 17; // ms per game frame @60fps
+
+// ===== 通用精灵帧参数 =====
+// placeholder atlasX/atlasY = 0,0; 未来资产管线替换为真实 atlas 坐标
+const STD_W = 80;
+const STD_H = 160;
+const STD_ANCHOR_X = 40;  // 脚底中心 X
+const STD_ANCHOR_Y = 160; // 脚底中心 Y
+
+/**
+ * 快速生成 N 个相同尺寸的 placeholder 帧
+ * @param count 帧数
+ * @param durationMs 每帧持续毫秒
+ * @param w 宽度
+ * @param h 高度
+ */
+function placeholderFrames(
+  count: number,
+  durationMs: number,
+  w = STD_W,
+  h = STD_H,
+): SpriteAnimation['frames'] {
+  return Array.from({ length: count }, (_, i) => ({
+    atlasX: 0,
+    atlasY: 0,
+    width: w,
+    height: h,
+    anchor: { x: STD_ANCHOR_X, y: STD_ANCHOR_Y },
+    duration: durationMs,
+  }));
+}
+
+/**
+ * 生成攻击动画帧序列：startup + active + recovery
+ * 每段帧数来自 FRAME_DATA，active 段可用不同尺寸(攻击延伸)
+ * @param startup 攻击前摇帧数
+ * @param active 攻击判定帧数
+ * @param recovery 攻击后摇帧数
+ * @param activeW active 阶段宽度(攻击范围延伸)
+ * @param activeH active 阶段高度
+ */
+function attackFrames(
+  startup: number,
+  active: number,
+  recovery: number,
+  activeW = STD_W + 40,
+  activeH = STD_H,
+): SpriteAnimation['frames'] {
+  const frames: SpriteAnimation['frames'] = [];
+  // startup: 蓄力/准备动作
+  for (let i = 0; i < startup; i++) {
+    frames.push({
+      atlasX: 0, atlasY: 0,
+      width: STD_W, height: STD_H,
+      anchor: { x: STD_ANCHOR_X, y: STD_ANCHOR_Y },
+      duration: F,
+    });
+  }
+  // active: 攻击判定帧，宽度延伸表示攻击范围
+  for (let i = 0; i < active; i++) {
+    frames.push({
+      atlasX: 0, atlasY: 0,
+      width: activeW, height: activeH,
+      anchor: { x: STD_ANCHOR_X, y: STD_ANCHOR_Y },
+      duration: F,
+    });
+  }
+  // recovery: 收招动作
+  for (let i = 0; i < recovery; i++) {
+    frames.push({
+      atlasX: 0, atlasY: 0,
+      width: STD_W, height: STD_H,
+      anchor: { x: STD_ANCHOR_X, y: STD_ANCHOR_Y },
+      duration: F,
+    });
+  }
+  return frames;
+}
+
+// ============================================================================
+// Ryo 动画 Manifest — 样板角色完整动画数据
+// ============================================================================
+// 帧数据来源: frameDataConstants.ts (通常技) + frameDataChars.ts (必杀技/DM)
+// 站姿/移动/跳跃等基础动画帧数为 placeholder，未来由 atlas 工具生成
+// 攻击动画帧数严格对齐 FRAME_DATA 的 startup/active/recovery
+// ============================================================================
+
+export const RYO_ANIMATIONS: Record<string, SpriteAnimation> = {
+  // ── 基础动作 ──────────────────────────────────────────────────────
+
+  /** 站立待机 — 4帧循环, 150ms/帧, 呼吸摇摆 */
+  idle: {
+    name: 'idle',
+    loop: true,
+    frames: placeholderFrames(4, 150),
+  },
+
+  /** 前走 — 6帧循环, 100ms/帧 */
+  walk_forward: {
+    name: 'walk_forward',
+    loop: true,
+    frames: placeholderFrames(6, 100),
+  },
+
+  /** 后走 — 6帧循环, 120ms/帧 */
+  walk_backward: {
+    name: 'walk_backward',
+    loop: true,
+    frames: placeholderFrames(6, 120),
+  },
+
+  /** 垂直跳 — 8帧非循环 (启动2 + 上升3 + 下降3) */
+  jump_up: {
+    name: 'jump_up',
+    loop: false,
+    frames: placeholderFrames(8, F),
+  },
+
+  /** 前跳 — 8帧非循环 */
+  jump_forward: {
+    name: 'jump_forward',
+    loop: false,
+    frames: placeholderFrames(8, F),
+  },
+
+  // ── 通常技 ──────────────────────────────────────────────────────
+  // 帧数对齐 FRAME_DATA: startup + active + recovery
+
+  /** 远A (远距离轻拳) — startup=6 + active=3 + recovery=5 = 14帧 */
+  stand_a: {
+    name: 'stand_a',
+    loop: false,
+    cancelStartFrame: 9, // startup(6) + active(3) 之后可取消
+    frames: attackFrames(6, 3, 5),
+  },
+
+  /** 远C (远距离重拳) — startup=7 + active=3 + recovery=20 = 30帧 */
+  stand_c: {
+    name: 'stand_c',
+    loop: false,
+    cancelStartFrame: 10, // startup(7) + active(3) 之后可取消
+    frames: attackFrames(7, 3, 20, STD_W + 50),
+  },
+
+  /** 蹲A (蹲轻拳) — startup=5 + active=4 + recovery=7 = 16帧 */
+  crouch_a: {
+    name: 'crouch_a',
+    loop: false,
+    cancelStartFrame: 9, // startup(5) + active(4) 之后可取消
+    frames: attackFrames(5, 4, 7),
+  },
+
+  /** 蹲B (蹲轻踢) — startup=5 + active=5 + recovery=5 = 15帧 */
+  crouch_b: {
+    name: 'crouch_b',
+    loop: false,
+    cancelStartFrame: 10, // startup(5) + active(5) 之后可取消
+    frames: attackFrames(5, 5, 5),
+  },
+
+  // ── 受击/倒地 ──────────────────────────────────────────────────
+
+  /** 站立受击 — 3帧非循环, 受击反应 */
+  hurt_standing: {
+    name: 'hurt_standing',
+    loop: false,
+    frames: placeholderFrames(3, F * 5), // 每帧约5游戏帧时长
+  },
+
+  /** 蹲受击 — 3帧非循环 */
+  hurt_crouching: {
+    name: 'hurt_crouching',
+    loop: false,
+    frames: placeholderFrames(3, F * 5),
+  },
+
+  /** 倒地 — 5帧非循环 (倒下2 + 躺地3) */
+  knockdown: {
+    name: 'knockdown',
+    loop: false,
+    frames: [
+      ...placeholderFrames(2, F * 3), // 倒下过程, 每帧3游戏帧
+      ...placeholderFrames(3, F * 8), // 躺地, 每帧较长
+    ],
+  },
+
+  // ── 胜利 ────────────────────────────────────────────────────────
+
+  /** 胜利 — 4帧非循环, 200ms/帧 */
+  win: {
+    name: 'win',
+    loop: false,
+    frames: placeholderFrames(4, 200),
+  },
+
+  // ── 必杀技 ──────────────────────────────────────────────────────
+  // 帧数对齐 FRAME_DATA (frameDataChars.ts RYO_* 系列)
+
+  /** 虎煌拳 (Ko'ou Ken) 波动拳 — startup=12 + active=18 + recovery=34 = 64帧 */
+  koouken: {
+    name: 'koouken',
+    loop: false,
+    cancelStartFrame: 30, // startup(12) + active(18) 后进入可取消
+    frames: attackFrames(12, 18, 34, STD_W + 60, STD_H + 20),
+  },
+
+  /** 虎咆 (Ko Hou) 升龙拳 — startup=5 + active=5 + recovery=25 = 35帧 */
+  ko_hou: {
+    name: 'ko_hou',
+    loop: false,
+    cancelStartFrame: 10, // startup(5) + active(5) 后可取消
+    frames: attackFrames(5, 5, 25, STD_W + 30, STD_H + 30),
+  },
+
+  // ── 超必杀技 (DM) ───────────────────────────────────────────────
+
+  /** 霸王翔吼拳 (Haou Shoukou Ken) DM — startup=10 + active=12 + recovery=22 = 44帧 */
+  dm_haou: {
+    name: 'dm_haou',
+    loop: false,
+    cancelStartFrame: 22, // startup(10) + active(12) 后可取消
+    frames: attackFrames(10, 12, 22, STD_W + 80, STD_H + 40),
+  },
+};
+
+// ============================================================================
+// 全角色最小动画 Manifest — 27 个非 Ryo 角色
+// ============================================================================
+// 每个角色获得 9 个基础动画 + 角色专属必杀技动画（占位帧）
+// 基础动画帧数/时长对齐任务规范
+// 必杀技名称来自 frameDataChars.ts 中各角色的关键招式
+// ============================================================================
+
+/** 创建占位动画条目 */
+function makeAnim(name: string, frameCount: number, loop: boolean, durationMs: number): SpriteAnimation {
+  return { name, frames: placeholderFrames(frameCount, durationMs), loop };
+}
+
+/**
+ * 创建最小通用动画集 — 9 个基础动画
+ * idle / walk_forward / crouch / jump / stand_a / stand_c / hurt / knockdown / win
+ */
+function createMinimalAnimations(): Record<string, SpriteAnimation> {
+  return {
+    idle:         makeAnim('idle',         4, true,  150),
+    walk_forward: makeAnim('walk_forward', 6, true,  100),
+    crouch:       makeAnim('crouch',       1, false, 200),
+    jump:         makeAnim('jump',         6, false,  80),
+    stand_a:      makeAnim('stand_a',      3, false, 100),
+    stand_c:      makeAnim('stand_c',      4, false, 120),
+    hurt:         makeAnim('hurt',         3, false, 100),
+    knockdown:    makeAnim('knockdown',    4, false, 150),
+    win:          makeAnim('win',          3, false, 200),
+  };
+}
+
+/** 创建必杀技占位动画 — 4 帧, 不循环, 100ms */
+function specialAnim(name: string): SpriteAnimation {
+  return makeAnim(name, 4, false, 100);
+}
+
+/** 创建超必杀技 (DM) 占位动画 — 6 帧, 不循环, 120ms */
+function dmAnim(name: string): SpriteAnimation {
+  return makeAnim(name, 6, false, 120);
+}
+
+// ── 角色专属动画生成函数 ──────────────────────────────────────────────
+
+/** Kyo — 鬼焼き/暗払い/荒咬み/RED Kicks + DM 大蛇薙 */
+function kyoAnimations(): Record<string, SpriteAnimation> {
+  return {
+    ...createMinimalAnimations(),
+    oniyaki:        specialAnim('oniyaki'),
+    yamibarai:      specialAnim('yamibarai'),
+    aragami:        specialAnim('aragami'),
+    red_kick:       specialAnim('red_kick'),
+    dokugami:       specialAnim('dokugami'),
+    dm_orochinagi:  dmAnim('dm_orochinagi'),
+  };
+}
+
+/** Iori — 葵花/鬼焼き/屑風/琴月 + DM 八稚女 */
+function ioriAnimations(): Record<string, SpriteAnimation> {
+  return {
+    ...createMinimalAnimations(),
+    aoihana:     specialAnim('aoihana'),
+    yamibarai:   specialAnim('yamibarai'),
+    oniyaki:     specialAnim('oniyaki'),
+    kototsuki:   specialAnim('kototsuki'),
+    kuzukaze:    specialAnim('kuzukaze'),
+    dm_yaotome:  dmAnim('dm_yaotome'),
+  };
+}
+
+/** Terry — Power Wave / Burn Knuckle / Crack Shot / Rising Tackle + DM Power Geyser */
+function terryAnimations(): Record<string, SpriteAnimation> {
+  return {
+    ...createMinimalAnimations(),
+    power_wave:      specialAnim('power_wave'),
+    burn_knuckle:    specialAnim('burn_knuckle'),
+    crack_shot:      specialAnim('crack_shot'),
+    power_dunk:      specialAnim('power_dunk'),
+    rising_tackle:   specialAnim('rising_tackle'),
+    dm_power_geyser: dmAnim('dm_power_geyser'),
+  };
+}
+
+/** Andy — 飞翔拳 / 昇龍弾 / 斬影流星拳 / 空破弾 + DM 超裂破弾 */
+function andyAnimations(): Record<string, SpriteAnimation> {
+  return {
+    ...createMinimalAnimations(),
+    hishou_ken:           specialAnim('hishou_ken'),
+    shouryuu_dan:         specialAnim('shouryuu_dan'),
+    zanei_ryusei_ken:     specialAnim('zanei_ryusei_ken'),
+    kuhadan:              specialAnim('kuhadan'),
+    dm_cho_reppa_dan:     dmAnim('dm_cho_reppa_dan'),
+  };
+}
+
+/** Joe — Hurricane Upper / Tiger Kick / 爆裂拳 / 黄金のカカト + DM Screw Upper */
+function joeAnimations(): Record<string, SpriteAnimation> {
+  return {
+    ...createMinimalAnimations(),
+    hurricane:       specialAnim('hurricane'),
+    tiger_kick:      specialAnim('tiger_kick'),
+    bakuretsuken:    specialAnim('bakuretsuken'),
+    slash_kick:      specialAnim('slash_kick'),
+    ougon_kakato:    specialAnim('ougon_kakato'),
+    dm_screw_upper:  dmAnim('dm_screw_upper'),
+  };
+}
+
+/** Kim — 飛燕斬 / 半月斬 / 飛翔脚 / 三連脚 + DM 鳳凰脚 */
+function kimAnimations(): Record<string, SpriteAnimation> {
+  return {
+    ...createMinimalAnimations(),
+    hienzan:        specialAnim('hienzan'),
+    hangetsu:       specialAnim('hangetsu'),
+    hishou:         specialAnim('hishou'),
+    sanren:         specialAnim('sanren'),
+    dm_yatagarasu:  dmAnim('dm_yatagarasu'),
+  };
+}
+
+/** Chang — 鉄球大回転 / 鉄球粉砕 / 鉄球飛燕斬 + DM 鉄球大破壊 */
+function changAnimations(): Record<string, SpriteAnimation> {
+  return {
+    ...createMinimalAnimations(),
+    tekyuu_kaiten:       specialAnim('tekyuu_kaiten'),
+    tekyuu_fasshu:       specialAnim('tekyuu_fasshu'),
+    tekyuu_hien_zan:     specialAnim('tekyuu_hien_zan'),
+    dai_hakki:           specialAnim('dai_hakki'),
+    dm_tekyuu_dai_sessa: dmAnim('dm_tekyuu_dai_sessa'),
+  };
+}
+
+/** Choi — 飛翔口脚 / 回転飛燕斬 / 鳳翼天心 + DM 真超鳳翼 */
+function choiAnimations(): Record<string, SpriteAnimation> {
+  return {
+    ...createMinimalAnimations(),
+    hishou_kyaku:         specialAnim('hishou_kyaku'),
+    kaiten_hien_zan:      specialAnim('kaiten_hien_zan'),
+    houyoku_tenshin:      specialAnim('houyoku_tenshin'),
+    tataki_komyaku:       specialAnim('tataki_komyaku'),
+    dm_shin_chou_houyoku: dmAnim('dm_shin_chou_houyoku'),
+  };
+}
+
+/** Robert — 龍撃拳 / 龍斬 / 飛燕龍脚 / 幻影脚 + DM 龍虎乱舞 */
+function robertAnimations(): Record<string, SpriteAnimation> {
+  return {
+    ...createMinimalAnimations(),
+    ryu_geki:        specialAnim('ryu_geki'),
+    ryu_zan:         specialAnim('ryu_zan'),
+    hien_ryu_jin:    specialAnim('hien_ryu_jin'),
+    genei_kyaku:     specialAnim('genei_kyaku'),
+    dm_ryuko_ranbu:  dmAnim('dm_ryuko_ranbu'),
+  };
+}
+
+/** Leona — Moon Slasher / Ear Ring / Grand Saber / Baltic Launcher + DM V Slasher */
+function leonaAnimations(): Record<string, SpriteAnimation> {
+  return {
+    ...createMinimalAnimations(),
+    moon_slash:       specialAnim('moon_slash'),
+    ear_ring:         specialAnim('ear_ring'),
+    grand_saber:     specialAnim('grand_saber'),
+    baltic_launcher: specialAnim('baltic_launcher'),
+    dm_v_slasher:    dmAnim('dm_v_slasher'),
+  };
+}
+
+/** Ralf — Vulcan Punch / Backbreaker / Gatling Attack + DM Galactica Phantom */
+function ralfAnimations(): Record<string, SpriteAnimation> {
+  return {
+    ...createMinimalAnimations(),
+    vulcan_punch:          specialAnim('vulcan_punch'),
+    backbreaker:           specialAnim('backbreaker'),
+    gatling_attack:        specialAnim('gatling_attack'),
+    ralf_kick:             specialAnim('ralf_kick'),
+    dm_galactica_phantom:  dmAnim('dm_galactica_phantom'),
+  };
+}
+
+/** Clark — Argentine Backbreaker / Napalm Stretch / Flash Elbow + DM Super Argentine */
+function clarkAnimations(): Record<string, SpriteAnimation> {
+  return {
+    ...createMinimalAnimations(),
+    argentine:          specialAnim('argentine'),
+    flash_elbow:        specialAnim('flash_elbow'),
+    napalm_stretch:     specialAnim('napalm_stretch'),
+    mount_tackle:       specialAnim('mount_tackle'),
+    dm_super_argentine: dmAnim('dm_super_argentine'),
+  };
+}
+
+/** Athena — Psycho Ball / Psycho Sword / Phoenix Arrow / Teleport + DM Shining Crystal Bit */
+function athenaAnimations(): Record<string, SpriteAnimation> {
+  return {
+    ...createMinimalAnimations(),
+    psycho_ball:        specialAnim('psycho_ball'),
+    psycho_sword:       specialAnim('psycho_sword'),
+    phoenix_arrow:      specialAnim('phoenix_arrow'),
+    psycho_teleport:    specialAnim('psycho_teleport'),
+    dm_shining_crystal: dmAnim('dm_shining_crystal'),
+  };
+}
+
+/** Mai — 花蝶扇 / 飛翔龍炎陣 / ムササビ / 必殺忍蜂 + DM 超必殺忍蜂 */
+function maiAnimations(): Record<string, SpriteAnimation> {
+  return {
+    ...createMinimalAnimations(),
+    ka_cho_sen:        specialAnim('ka_cho_sen'),
+    hisho_ryu_en_jin:  specialAnim('hisho_ryu_en_jin'),
+    musasabi:          specialAnim('musasabi'),
+    hissatsu_shinobi:  specialAnim('hissatsu_shinobi'),
+    dm_chou_hissatsu:  dmAnim('dm_chou_hissatsu'),
+  };
+}
+
+/** K' — Eins Trigger / Second Shell / Crow Bite / Minute Spike + DM Chain Drive */
+function kdashAnimations(): Record<string, SpriteAnimation> {
+  return {
+    ...createMinimalAnimations(),
+    eins:            specialAnim('eins'),
+    second_shell:    specialAnim('second_shell'),
+    crow_bite:       specialAnim('crow_bite'),
+    one_inch:        specialAnim('one_inch'),
+    minute_spike:    specialAnim('minute_spike'),
+    dm_chain_drive:  dmAnim('dm_chain_drive'),
+  };
+}
+
+/** Kula — Diamond Breath / Counter Shell / Diamond Edge / Rei Spin + DM Freeze */
+function kulaAnimations(): Record<string, SpriteAnimation> {
+  return {
+    ...createMinimalAnimations(),
+    breath:       specialAnim('breath'),
+    shell:        specialAnim('shell'),
+    lay:          specialAnim('lay'),
+    edge:         specialAnim('edge'),
+    rei_spin:     specialAnim('rei_spin'),
+    dm_freeze:    dmAnim('dm_freeze'),
+  };
+}
+
+/** Yashiro — 虎舞/斧旋/upper/無殺 + DM Armageddon Busters */
+function yashiroAnimations(): Record<string, SpriteAnimation> {
+  return {
+    ...createMinimalAnimations(),
+    shuu_wani:              specialAnim('shuu_wani'),
+    juu_zutsu:              specialAnim('juu_zutsu'),
+    upper_du:               specialAnim('upper_du'),
+    musatsu:                specialAnim('musatsu'),
+    dm_armageddon_busters:  dmAnim('dm_armageddon_busters'),
+  };
+}
+
+/** Shermie — Shermie Shoot / Carnival / Spiral / Axle Spin + DM Shermie Flash */
+function shermieAnimations(): Record<string, SpriteAnimation> {
+  return {
+    ...createMinimalAnimations(),
+    shermie_shoot:     specialAnim('shermie_shoot'),
+    shermie_carnival:  specialAnim('shermie_carnival'),
+    shermie_spiral:    specialAnim('shermie_spiral'),
+    shermie_axle_spin: specialAnim('shermie_axle_spin'),
+    dm_shermie_flash:  dmAnim('dm_shermie_flash'),
+  };
+}
+
+/** Chris — Shot Weaver / Twister Drive / Scramble Dash + DM Chain Slide Touch */
+function chrisAnimations(): Record<string, SpriteAnimation> {
+  return {
+    ...createMinimalAnimations(),
+    shot_weave:      specialAnim('shot_weave'),
+    twister_drive:   specialAnim('twister_drive'),
+    scramble_dash:   specialAnim('scramble_dash'),
+    tsuki_tsuka:     specialAnim('tsuki_tsuka'),
+    dm_chain_slide:  dmAnim('dm_chain_slide'),
+  };
+}
+
+/** Mature — Metal Massacre / Heaven's Gate / Ecstasy / Vanilla Rush + DM Nocturnal Light */
+function matureAnimations(): Record<string, SpriteAnimation> {
+  return {
+    ...createMinimalAnimations(),
+    massacre:      specialAnim('massacre'),
+    heavens_gate:  specialAnim('heavens_gate'),
+    ecstasy:       specialAnim('ecstasy'),
+    vanilla_rush:  specialAnim('vanilla_rush'),
+    dm_nocturnal:  dmAnim('dm_nocturnal'),
+  };
+}
+
+/** Vice — Outrage / Black End / Mayhem / Decide + DM Negative Gain */
+function viceAnimations(): Record<string, SpriteAnimation> {
+  return {
+    ...createMinimalAnimations(),
+    outrage:          specialAnim('outrage'),
+    black_end:        specialAnim('black_end'),
+    mayhem:           specialAnim('mayhem'),
+    decide:           specialAnim('decide'),
+    dm_negative_gain: dmAnim('dm_negative_gain'),
+  };
+}
+
+/** Billy — 三節棍 / 旋風棍 / 飛燕斬 / 流星脚 + DM 火炎旋風陣 */
+function billyAnimations(): Record<string, SpriteAnimation> {
+  return {
+    ...createMinimalAnimations(),
+    sansetsu_kon:   specialAnim('sansetsu_kon'),
+    senpu_kon:      specialAnim('senpu_kon'),
+    hien_zan:       specialAnim('hien_zan'),
+    ryusei_kyaku:   specialAnim('ryusei_kyaku'),
+    dm_kaen_senpu:  dmAnim('dm_kaen_senpu'),
+  };
+}
+
+/** Yamazaki — Snake Arm / Sandstorm / 蛇使い / 爆弾拳 + DM Guillotine */
+function yamazakiAnimations(): Record<string, SpriteAnimation> {
+  return {
+    ...createMinimalAnimations(),
+    snake_arm:      specialAnim('snake_arm'),
+    sandstorm:      specialAnim('sandstorm'),
+    hebi_tsukai:    specialAnim('hebi_tsukai'),
+    bakudan_ken:    specialAnim('bakudan_ken'),
+    dm_guillotine:  dmAnim('dm_guillotine'),
+  };
+}
+
+/** Mary — Straight Slicer / Spider / Vertical Arrow / Backdrop Real + DM Typhoon */
+function maryAnimations(): Record<string, SpriteAnimation> {
+  return {
+    ...createMinimalAnimations(),
+    straight_slicer:  specialAnim('straight_slicer'),
+    spider:           specialAnim('spider'),
+    vertical_arrow:   specialAnim('vertical_arrow'),
+    backdrop_real:    specialAnim('backdrop_real'),
+    dm_typhoon:       dmAnim('dm_typhoon'),
+  };
+}
+
+/** Xiangfei — 万泊/天弾/麻保飛車/猿臂/円閉 + DM 超カリンガ */
+function xiangfeiAnimations(): Record<string, SpriteAnimation> {
+  return {
+    ...createMinimalAnimations(),
+    nanpa:           specialAnim('nanpa'),
+    tenpatsu:        specialAnim('tenpatsu'),
+    maho_hisha:      specialAnim('maho_hisha'),
+    manpi:           specialAnim('manpi'),
+    enzan:           specialAnim('enzan'),
+    dm_cho_ka_ringa: dmAnim('dm_cho_ka_ringa'),
+  };
+}
+
+/** Kasumi — 皇拳/重ね当て/無劫斬/崩山天 + DM 超無劫斬 */
+function kasumiAnimations(): Record<string, SpriteAnimation> {
+  return {
+    ...createMinimalAnimations(),
+    koou_ken:          specialAnim('koou_ken'),
+    kasane_ate:        specialAnim('kasane_ate'),
+    mukigenzan:        specialAnim('mukigenzan'),
+    hakusanten:        specialAnim('hakusanten'),
+    dm_cho_mukigenzan: dmAnim('dm_cho_mukigenzan'),
+  };
+}
+
+// ── 角色动画映射表 ────────────────────────────────────────────────────
+// ryo 由 RYO_ANIMATIONS 处理，不在此表中
+
+const CHARACTER_ANIMATION_BUILDERS: Record<string, () => Record<string, SpriteAnimation>> = {
+  kyo:      kyoAnimations,
+  iori:     ioriAnimations,
+  terry:    terryAnimations,
+  andy:     andyAnimations,
+  joe:      joeAnimations,
+  kim:      kimAnimations,
+  chang:    changAnimations,
+  choi:     choiAnimations,
+  robert:   robertAnimations,
+  leona:    leonaAnimations,
+  ralf:     ralfAnimations,
+  clark:    clarkAnimations,
+  athena:   athenaAnimations,
+  mai:      maiAnimations,
+  kdash:    kdashAnimations,
+  kula:     kulaAnimations,
+  yashiro:  yashiroAnimations,
+  shermie:  shermieAnimations,
+  chris:    chrisAnimations,
+  mature:   matureAnimations,
+  vice:     viceAnimations,
+  billy:    billyAnimations,
+  yamazaki: yamazakiAnimations,
+  mary:     maryAnimations,
+  xiangfei: xiangfeiAnimations,
+  kasumi:   kasumiAnimations,
 };
 
 /**
@@ -68,12 +690,17 @@ const CHARACTER_COLORS: Record<string, { body: string; head: string; outfit: str
   kasumi: { body: '#FFD699', head: '#FFD699', outfit: '#DD4466', hair: '#1A1A2E' },
 };
 
-// 填充 manifest — 每个角色创建最小条目
+// 填充 manifest — 每个角色创建最小条目 + 角色专属动画
+// Ryo 使用 RYO_ANIMATIONS（样板角色完整数据），其他角色使用专属动画生成函数
 for (const [charId, colors] of Object.entries(CHARACTER_COLORS)) {
+  const animations = charId === 'ryo'
+    ? RYO_ANIMATIONS
+    : (CHARACTER_ANIMATION_BUILDERS[charId]?.() ?? createMinimalAnimations());
+
   SPRITE_MANIFEST.characters[charId] = {
     charId,
     atlasPath: `assets/sprites/${charId}.png`,
-    animations: {},
+    animations,
     fallbackColors: colors,
   };
 }
