@@ -929,3 +929,9 @@
 ## H190: ryoSpriteBatch4—6项验证SDM/HSDM/heavyAttack像素帧 — 162→163
 
 **commit:** <hash> | ryoSpriteBatch4—6项验证SDM/HSDM/heavyAttack像素帧
+
+---
+
+## H191: stageTempleLayers—6项验证shiftHex+hexToRgb颜色工具 — 163→164
+
+**commit:** <hash> | stageTempleLayers—6项验证shiftHex+hexToRgb颜色工具
