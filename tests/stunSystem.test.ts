@@ -410,10 +410,10 @@ describe('DIZZY state properties', () => {
     expect(f.facing).toBe(1);
   });
 
-  it('fighter is NOT throw vulnerable during DIZZY', () => {
+  it('fighter IS throw vulnerable during DIZZY (风云再起特色)', () => {
     const f = createFighter();
     f.applyDizzy();
-    expect(f.isThrowVulnerable()).toBe(false);
+    expect(f.isThrowVulnerable()).toBe(true);
   });
 
   it('fighter is grounded during DIZZY', () => {

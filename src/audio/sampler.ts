@@ -18,7 +18,8 @@ type SampleId =
   | 'guard_break' | 'charge_up'
   | 'block_special' | 'block_dm' | 'special_light' | 'special_heavy'
   | 'ko_hit' | 'landing_heavy'
-  | 'accent_fire' | 'accent_purple' | 'accent_ice' | 'accent_generic';
+  | 'accent_fire' | 'accent_purple' | 'accent_ice' | 'accent_generic'
+  | 'dizzy_hit' | 'ground_bounce';
 
 const samples = new Map<SampleId, AudioBuffer>();
 let initialized = false;
@@ -140,8 +141,9 @@ function padTo(src: Float32Array, totalLen: number, offset: number = 0): Float32
 // === 各音效预渲染函数 ===
 
 // 轻击：短促清脆，快速衰减 — A/B按钮打击感
+// v2: 增加短促高频成分，更像拳击手套击打的"啪"声
 function renderHitLight(sr: number): Float32Array {
-  const dur = 0.065;
+  const dur = 0.075;
   // 中频噪声 — 紧凑肉体冲击
   const noiseMid = bandPass(renderNoise(sr, dur, t => expDecay(t, 0.45, 35)), sr, 900, 3500);
   // 高频噪声 — 快速衰减的空气噼啪感
@@ -152,14 +154,31 @@ function renderHitLight(sr: number): Float32Array {
   const snap = renderOsc(sr, dur * 0.45, 'triangle', t => 1400 - 22000 * t, t => expDecay(t, 0.2, 65));
   // 中频共鸣 — 更快衰减
   const mid = renderOsc(sr, dur * 0.5, 'sine', t => 450 - 5500 * t, t => expDecay(t, 0.12, 38));
-  const snapP = padTo(snap, Math.ceil(sr * dur));
-  const midP = padTo(mid, Math.ceil(sr * dur));
-  return normalize(mixLayers([noiseMid, noiseHi, body, snapP, midP], [1, 0.55, 0.7, 0.55, 0.3]));
+  // === v2新增 ===
+  // 超高频手套击打瞬态 — 7000-12000Hz的极短"啪"声，模拟拳击手套皮革击打
+  const gloveSlap = bandPass(renderNoise(sr, 0.02, t => expDecay(t, 0.3, 60)), sr, 7000, 12000);
+  // 高频脆响三角波 — 拳击手套特有的清脆回弹
+  const clickOsc = renderOsc(sr, 0.015, 'triangle', t => 6000 - 80000 * t, t => expDecay(t, 0.18, 80));
+  // 中高频"呼吸"层 — 手套击打的空气挤出感
+  const airPop = highPass(renderNoise(sr, 0.025, t => expDecay(t, 0.15, 55)), sr, 5000);
+
+  const total = Math.ceil(sr * dur);
+  const snapP = padTo(snap, total);
+  const midP = padTo(mid, total);
+  const gloveSlapP = padTo(gloveSlap, total);
+  const clickP = padTo(clickOsc, total);
+  const airPopP = padTo(airPop, total);
+
+  return normalize(mixLayers(
+    [noiseMid, noiseHi, body, snapP, midP, gloveSlapP, clickP, airPopP],
+    [1, 0.55, 0.7, 0.55, 0.3, 0.7, 0.5, 0.35]
+  ));
 }
 
 // 重击：更深更重，更多低频，更长衰减 — C/D按钮打击感
+// v2: 增加低频body impact感，更深的拳头穿透质感
 function renderHitHeavy(sr: number): Float32Array {
-  const dur = 0.22;
+  const dur = 0.25;
   // 低频噪声带 — 深沉肉体冲击
   const noiseMid = bandPass(renderNoise(sr, dur, t => expDecay(t, 0.5, 8)), sr, 250, 1800);
   // 高频噪声 — 空气爆裂
@@ -178,14 +197,27 @@ function renderHitHeavy(sr: number): Float32Array {
   const hi = renderOsc(sr, 0.025, 'square', t => 2200 - 55000 * t, t => expDecay(t, 0.09, 65));
   // 50-120Hz权重层 — 可感知的打击深度
   const weight = renderOsc(sr, dur * 0.8, 'sine', t => 90 - 100 * t, t => expDecay(t, 0.5, 5));
-  const crackP = padTo(crack, Math.ceil(sr * dur));
-  const metalP = padTo(metal, Math.ceil(sr * dur));
-  const harmP = padTo(harm, Math.ceil(sr * dur));
-  const hiP = padTo(hi, Math.ceil(sr * dur));
-  const weightP = padTo(weight, Math.ceil(sr * dur));
+  // === v2新增：低频body impact层 ===
+  // 深层body冲击 — 60-90Hz的"穿透"感，模拟拳头深入躯体的低频反馈
+  const bodyImpact = renderOsc(sr, 0.18, 'sine', t => 70 - 80 * t, t => expDecay(t, 0.55, 5));
+  // 中低频冲击共鸣 — 躯体共振的"闷响"
+  const chestThud = bandPass(renderNoise(sr, 0.12, t => expDecay(t, 0.4, 10)), sr, 120, 500);
+  // 低频二次脉冲 — 击打后的"余震"
+  const aftershock = renderOsc(sr, 0.2, 'sine', t => 55 - 45 * t, t => t < 0.02 ? 0 : expDecay(t - 0.02, 0.35, 4));
+
+  const total = Math.ceil(sr * dur);
+  const crackP = padTo(crack, total);
+  const metalP = padTo(metal, total);
+  const harmP = padTo(harm, total);
+  const hiP = padTo(hi, total);
+  const weightP = padTo(weight, total);
+  const bodyImpactP = padTo(bodyImpact, total);
+  const chestThudP = padTo(chestThud, total);
+  const aftershockP = padTo(aftershock, total, Math.floor(sr * 0.04));
+
   return normalize(mixLayers(
-    [noiseMid, noiseHi, body, sub, crackP, metalP, harmP, hiP, weightP],
-    [1, 0.35, 1.3, 1.0, 0.65, 0.3, 0.35, 0.22, 0.9]
+    [noiseMid, noiseHi, body, sub, crackP, metalP, harmP, hiP, weightP, bodyImpactP, chestThudP, aftershockP],
+    [1, 0.35, 1.3, 1.0, 0.65, 0.3, 0.35, 0.22, 0.9, 1.1, 0.8, 0.7]
   ));
 }
 
@@ -244,8 +276,9 @@ function renderSpecial(sr: number): Float32Array {
 }
 
 // DM：爆炸分层 — 噪声爆发 + 低音爆炸 + 高频噼啪声
+// v2: 增加持续时间，更戏剧化的能量爆发
 function renderDM(sr: number): Float32Array {
-  const dur = 0.7;
+  const dur = 0.85;
   // 低频扫频 — 能量蓄积
   const bass = renderOsc(sr, dur, 'sawtooth', t => 80 - 150 * t, t => expDecay(t, 0.35, 3.5));
   // 中频方波 — 攻击性质感
@@ -320,7 +353,8 @@ function renderKO(sr: number): Float32Array {
   ));
 }
 
-// Counter：明亮金属质感 + 额外延音
+// Counter：明亮金属质感 + 额外延音 + 高频裂纹声
+// v2: 增加额外的高频裂纹声，让Counter Hit更有"打破"感
 function renderCounter(sr: number): Float32Array {
   const dur = 0.3;
   // 尖锐方波瞬态 — 更高频率
@@ -349,6 +383,13 @@ function renderCounter(sr: number): Float32Array {
   const metalOvertone = renderOsc(sr, 0.08, 'triangle',
     t => 3600 - 20000 * t,
     t => expDecay(t, 0.06, 22));
+  // === v2新增：高频裂纹声 ===
+  // 极高频裂纹瞬态 — 模拟玻璃碎裂的尖锐"crack"
+  const hiCrack = renderOsc(sr, 0.025, 'square', t => 6000 - 100000 * t, t => expDecay(t, 0.22, 55));
+  // 高频噪声裂纹 — 空气撕裂的质感
+  const airCrack = highPass(renderNoise(sr, 0.04, t => expDecay(t, 0.2, 35)), sr, 8000);
+  // 尖锐泛音碎片 — 延迟0.02s
+  const shard = renderOsc(sr, 0.03, 'sawtooth', t => 4500 - 50000 * t, t => expDecay(t, 0.12, 50));
 
   const total = Math.ceil(sr * dur);
   const osc1P = padTo(osc1, total);
@@ -358,10 +399,13 @@ function renderCounter(sr: number): Float32Array {
   const sparkleP = padTo(sparkle, total, Math.floor(sr * 0.03));
   const noiseP = padTo(noiseHit, total);
   const metalP = padTo(metalOvertone, total, Math.floor(sr * 0.04));
+  const hiCrackP = padTo(hiCrack, total);
+  const airCrackP = padTo(airCrack, total);
+  const shardP = padTo(shard, total, Math.floor(sr * 0.02));
 
   return normalize(mixLayers(
-    [osc1P, osc2P, sustainP, echoP, sparkleP, noiseP, metalP],
-    [1, 0.7, 0.5, 0.4, 0.4, 0.5, 0.35]
+    [osc1P, osc2P, sustainP, echoP, sparkleP, noiseP, metalP, hiCrackP, airCrackP, shardP],
+    [1, 0.7, 0.5, 0.4, 0.4, 0.5, 0.35, 0.6, 0.45, 0.4]
   ));
 }
 
@@ -873,26 +917,44 @@ function renderKOHit(sr: number): Float32Array {
   ));
 }
 
-// 重落地：从高空落地的重击声
+// 重落地：从高空落地的重击声，带低频震动
+// v2: 增强低频震动层，让落地更有"重量"感
 function renderLandingHeavy(sr: number): Float32Array {
-  const dur = 0.14;
+  const dur = 0.2;
   // 深沉低频着地冲击
-  const thud = renderOsc(sr, dur, 'sine', t => 70 - 700 * t, t => expDecay(t, 0.15, 16));
+  const thud = renderOsc(sr, dur, 'sine', t => 70 - 700 * t, t => expDecay(t, 0.15, 14));
   // 低频体感层
-  const sub = renderOsc(sr, dur * 0.8, 'sine', t => 45 - 300 * t, t => expDecay(t, 0.2, 12));
+  const sub = renderOsc(sr, dur * 0.9, 'sine', t => 40 - 250 * t, t => expDecay(t, 0.25, 10));
   // 地面尘土噪声 — 更强
-  const dust = bandPass(renderNoise(sr, 0.08, t => expDecay(t, 0.1, 20)), sr, 500, 3000);
+  const dust = bandPass(renderNoise(sr, 0.1, t => expDecay(t, 0.1, 18)), sr, 500, 3000);
   // 中频冲击层
-  const impact = renderOsc(sr, dur * 0.5, 'triangle', t => 200 - 2500 * t, t => expDecay(t, 0.12, 25));
+  const impact = renderOsc(sr, dur * 0.5, 'triangle', t => 200 - 2500 * t, t => expDecay(t, 0.12, 22));
   // 高频碎片 — 地面碎片飞溅感
   const debris = highPass(renderNoise(sr, 0.04, t => expDecay(t, 0.06, 35)), sr, 4000);
+  // === v2新增：低频震动层 ===
+  // 超低频地面震动 — 30-50Hz，模拟地面传导的震动感
+  const groundRumble = renderOsc(sr, dur * 1.2, 'sine', t => 35 - 25 * t, t => expDecay(t, 0.3, 3));
+  // 低频冲击余震 — 延迟0.04s
+  const rumblePulse = renderOsc(sr, 0.15, 'sine', t => 50 - 40 * t, t => t < 0.01 ? 0 : expDecay(t - 0.01, 0.25, 5));
 
   const total = Math.ceil(sr * dur);
   const dustP = padTo(dust, total);
   const impactP = padTo(impact, total);
   const debrisP = padTo(debris, total);
+  const groundRumbleP = padTo(groundRumble, Math.ceil(sr * dur * 1.2));
+  const rumblePulseP = padTo(rumblePulse, total, Math.floor(sr * 0.04));
 
-  return normalize(mixLayers([thud, sub, dustP, impactP, debrisP], [1, 0.8, 0.6, 0.5, 0.3]));
+  // 混合时groundRumble可能比total长，取max
+  const maxLen = Math.max(total, groundRumbleP.length);
+  const allLayers = [thud, sub, dustP, impactP, debrisP, groundRumbleP, rumblePulseP];
+  const padded = allLayers.map(l => {
+    if (l.length >= maxLen) return l;
+    const p = new Float32Array(maxLen);
+    p.set(l);
+    return p;
+  });
+
+  return normalize(mixLayers(padded, [1, 0.9, 0.7, 0.55, 0.35, 1.0, 0.7]));
 }
 
 // === 角色特有音效点缀 ===
@@ -979,6 +1041,64 @@ function renderAccentGeneric(sr: number): Float32Array {
   return normalize(mixLayers([pulse, sparkleP, snapP], [1, 0.4, 0.5]));
 }
 
+// === 新增：Dizzy Hit / Ground Bounce SFX ===
+
+// Dizzy Hit：带回声的打击声 — DIZZY状态被命中时叠加
+// 特征：延迟回声 + 空洞共鸣 + 眩晕感
+function renderDizzyHit(sr: number): Float32Array {
+  const dur = 0.35;
+  // 主冲击 — 中频噪声
+  const impact = bandPass(renderNoise(sr, 0.08, t => expDecay(t, 0.35, 20)), sr, 800, 3000);
+  // 低频体感
+  const body = renderOsc(sr, 0.1, 'sine', t => 120 - 1500 * t, t => expDecay(t, 0.3, 15));
+  // 第一次回声 — 延迟0.06s，音量衰减30%
+  const echo1 = bandPass(renderNoise(sr, 0.06, t => expDecay(t, 0.2, 25)), sr, 1000, 3500);
+  // 第二次回声 — 延迟0.14s，音量衰减55%
+  const echo2 = bandPass(renderNoise(sr, 0.05, t => expDecay(t, 0.12, 30)), sr, 1200, 4000);
+  // 空洞共鸣 — 模拟头部被击中的"嗡嗡"感
+  const hollow = renderOsc(sr, 0.2, 'sine', t => 300 - 800 * t, t => expDecay(t, 0.1, 8));
+  // 高频闪烁 — 眩晕"星星"感
+  const stars = renderOsc(sr, 0.08, 'sine',
+    t => 2000 + 3000 * Math.sin(t * 80),
+    t => expDecay(t, 0.06, 20));
+
+  const total = Math.ceil(sr * dur);
+  const echo1P = padTo(echo1, total, Math.floor(sr * 0.06));
+  const echo2P = padTo(echo2, total, Math.floor(sr * 0.14));
+  const hollowP = padTo(hollow, total, Math.floor(sr * 0.03));
+  const starsP = padTo(stars, total, Math.floor(sr * 0.02));
+
+  return normalize(mixLayers(
+    [impact, body, echo1P, echo2P, hollowP, starsP],
+    [0.8, 0.7, 0.5, 0.3, 0.45, 0.35]
+  ));
+}
+
+// Ground Bounce：地面弹跳声 — 角色从地面弹起时播放
+// 特征：低频冲击 + 弹性反馈 + 地面摩擦
+function renderGroundBounce(sr: number): Float32Array {
+  const dur = 0.18;
+  // 低频着地冲击 — "砰"
+  const thud = renderOsc(sr, dur, 'sine', t => 80 - 600 * t, t => expDecay(t, 0.2, 15));
+  // 弹性反馈 — 上升的频率曲线模拟弹性
+  const bounce = renderOsc(sr, dur * 0.6, 'triangle',
+    t => 150 + 800 * t - 2000 * t * t,
+    t => expDecay(t, 0.15, 18));
+  // 地面摩擦噪声 — 中低频
+  const friction = bandPass(renderNoise(sr, 0.08, t => expDecay(t, 0.12, 22)), sr, 400, 2000);
+  // 子低音弹跳脉冲
+  const subBounce = renderOsc(sr, 0.12, 'sine', t => 50 - 30 * t, t => expDecay(t, 0.3, 8));
+  // 碎片飞溅 — 高频短暂
+  const debris = highPass(renderNoise(sr, 0.03, t => expDecay(t, 0.1, 40)), sr, 5000);
+
+  const total = Math.ceil(sr * dur);
+  const bounceP = padTo(bounce, total);
+  const frictionP = padTo(friction, total);
+  const debrisP = padTo(debris, total);
+
+  return normalize(mixLayers([thud, bounceP, frictionP, subBounce, debrisP], [1, 0.7, 0.6, 0.8, 0.3]));
+}
+
 // === 初始化：预渲染所有采样 ===
 
 export function initSampler(): void {
@@ -1037,6 +1157,9 @@ export function initSampler(): void {
     ['accent_purple', renderAccentPurple],
     ['accent_ice', renderAccentIce],
     ['accent_generic', renderAccentGeneric],
+    // 新增：Dizzy Hit + Ground Bounce
+    ['dizzy_hit', renderDizzyHit],
+    ['ground_bounce', renderGroundBounce],
   ];
 
   for (const [id, renderer] of renderers) {
@@ -1066,7 +1189,8 @@ function addSubBassPulse(ctx: AudioContext, sampleId: string, now: number): void
   if (sampleId === 'dm' || sampleId === 'ko' || sampleId === 'guard_break'
     || sampleId === 'wall_bounce_heavy' || sampleId === 'super_flash'
     || sampleId === 'super_flash_sdm' || sampleId === 'max_activation'
-    || sampleId === 'ko_hit' || sampleId === 'landing_heavy') {
+    || sampleId === 'ko_hit' || sampleId === 'landing_heavy'
+    || sampleId === 'ground_bounce') {
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
     osc.type = 'sine';
@@ -1202,3 +1326,9 @@ export function playHitAccent(charId: string, isDM: boolean = false): void {
 
 /** 播放重落地音效 — KO落地或从高处落下时使用 */
 export function playHeavyLanding(): void { initSampler(); play('landing_heavy'); }
+
+/** 播放Dizzy Hit音效 — DIZZY状态被命中时叠加 */
+export function playDizzyHit(): void { initSampler(); play('dizzy_hit', 0.8); }
+
+/** 播放Ground Bounce音效 — 角色从地面弹起时 */
+export function playGroundBounce(): void { initSampler(); play('ground_bounce'); }

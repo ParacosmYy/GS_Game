@@ -1189,6 +1189,32 @@ export const FRAME_DATA_CHARS = {
     hitLevel: "MID" as const,
     knockdown: false,
   },
+  // 飞燕疾风脚 dp+B (DP 对空踢)
+  ROBERT_HIEN_SHIPPU_KYAKU: {
+    startup: 5,
+    active: 8,
+    recovery: 28,
+    damage: 85,
+    hitstun: 22,
+    blockstun: 18,
+    pushback: 6,
+    hitLevel: "MID" as const,
+    knockdown: true,
+    chipDamage: 13,
+  },
+  // 飞燕疾风脚 dp+D (DP 对空踢 强版)
+  ROBERT_HIEN_SHIPPU_KYAKU_D: {
+    startup: 7,
+    active: 12,
+    recovery: 32,
+    damage: 130,
+    hitstun: 28,
+    blockstun: 22,
+    pushback: 10,
+    hitLevel: "MID" as const,
+    knockdown: true,
+    chipDamage: 20,
+  },
   // 龙虎乱舞 DM qcf,qcf+P
   DM_RYU_KO_RYU: {
     startup: 8,

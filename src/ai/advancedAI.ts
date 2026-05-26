@@ -14,6 +14,8 @@ import type { PowerGauge, MaxModeState } from '../core/types.js';
 import { SeededRNG } from '../core/prng.js';
 import { COMBO_ROUTES, applyComboStep, routeComboSpecial } from './aiRoutes.js';
 import type { ComboStep } from './aiRoutes.js';
+import { getCharacterStrategy } from './characterStrategies.js';
+import type { CharacterStrategy } from './characterStrategies.js';
 
 // ─── Difficulty levels ───
 
@@ -197,6 +199,9 @@ export class AdvancedAI {
   private jumpInPhase = 0;
   private okiTimer = 0;
 
+  // Character strategy (character-specific AI personality)
+  private strategy: CharacterStrategy;
+
   // Spacing state
   private spacingProfile: CharacterSpacingProfile;
   private spacingAction = 'idle' as 'idle' | 'approach' | 'retreat' | 'hold';
@@ -236,6 +241,7 @@ export class AdvancedAI {
     }
 
     this.spacingProfile = SPACING_PROFILES[fighter.charId] ?? DEFAULT_SPACING;
+    this.strategy = getCharacterStrategy(fighter.charId);
   }
 
   /** Generate ResolvedInput for this frame */
@@ -505,13 +511,18 @@ export class AdvancedAI {
     rng: SeededRNG,
   ): AIAction {
     const r = rng.next();
+    const aggro = this.strategy.aggressiveLevel;
 
-    // Low HP: cautious mix
+    // Low HP: cautious mix -- aggression reduces retreat chance
     if (lowHp) {
-      if (r < 0.20) return 'retreat';
-      if (r < 0.40) return 'block';
-      if (r < 0.60) return 'attack';
-      if (r < 0.75) return 'throw';
+      const retreatP = Math.max(0.05, 0.35 - aggro * 0.25);
+      const blockP = retreatP + 0.20;
+      const attackP = blockP + 0.25 + aggro * 0.1;
+      const throwP = attackP + 0.15;
+      if (r < retreatP) return 'retreat';
+      if (r < blockP) return 'block';
+      if (r < attackP) return 'attack';
+      if (r < throwP) return 'throw';
       return 'retreat';
     }
 
@@ -526,17 +537,24 @@ export class AdvancedAI {
     // Corner pressure
     const oppInCorner = this.opponent.x < 80 || this.opponent.x > 720;
     if (oppInCorner) {
-      if (r < 0.45) return 'attack';
-      if (r < 0.60) return 'throw';
-      if (r < 0.80) return 'attack';
+      const attackP = 0.35 + aggro * 0.15;
+      const throwP = attackP + 0.20;
+      const specialP = throwP + 0.15 + aggro * 0.1;
+      if (r < attackP) return 'attack';
+      if (r < throwP) return 'throw';
+      if (r < specialP) return 'attack';
       return 'special';
     }
 
-    // Standard close mix
-    if (r < 0.40) return 'attack';
-    if (r < 0.55) return 'throw';
-    if (r < 0.70) return 'retreat';
-    if (r < 0.80) return 'poke';
+    // Standard close mix -- aggression shifts toward attack/throw
+    const attackP = 0.25 + aggro * 0.2;
+    const throwP = attackP + 0.15 + aggro * 0.05;
+    const retreatP = throwP + Math.max(0.05, 0.25 - aggro * 0.2);
+    const pokeP = retreatP + 0.10;
+    if (r < attackP) return 'attack';
+    if (r < throwP) return 'throw';
+    if (r < retreatP) return 'retreat';
+    if (r < pokeP) return 'poke';
     return 'attack';
   }
 
@@ -897,25 +915,16 @@ export class AdvancedAI {
           this.action = 'idle';
           break;
         }
-        // Wake-up pressure: mix between high/low/throw
+        // Wake-up pressure: mix from character strategy wakeUpOptions
         if (this.okiTimer > 18 && this.okiTimer < 45 && canAct) {
           const oppStillDown = this.opponent.state === FighterState.KNOCKDOWN;
           if (oppStillDown) {
             // Wait longer for opponent to stand
             break;
           }
-          const r = rng.next();
-          if (r < 0.35) {
-            // High (stand C)
-            base.buttonC = true; base.buttonCPressed = true; base.punchPressed = true;
-          } else if (r < 0.65) {
-            // Low (crouch D)
-            base.down = true; base.buttonD = true; base.buttonDPressed = true; base.kickPressed = true;
-          } else {
-            // Throw (mix)
-            base.forward = true;
-            base.throwAttack = true; base.throwAttackPressed = true;
-          }
+          const options = this.strategy.wakeUpOptions;
+          const pick = options[Math.floor(rng.next() * options.length)];
+          this.applyWakeUpOption(pick, base);
           this.okiTimer = 99;
           this.action = 'idle';
         }
@@ -957,6 +966,142 @@ export class AdvancedAI {
     }
 
     return base;
+  }
+
+  // ═══════════════════════════════════════════
+  // Wake-up option helper
+  // ═══════════════════════════════════════════
+
+  /** Translate a CharacterStrategy wakeUpOption AttackType into button input */
+  private applyWakeUpOption(pick: AttackType, base: ResolvedInput): void {
+    switch (pick) {
+      // Throws
+      case AttackType.THROW_FORWARD:
+        base.forward = true;
+        base.throwAttack = true;
+        base.throwAttackPressed = true;
+        break;
+      case AttackType.THROW_BACK:
+        base.back = true;
+        base.throwAttack = true;
+        base.throwAttackPressed = true;
+        break;
+      // Close normals
+      case AttackType.CLOSE_C:
+        base.buttonC = true;
+        base.buttonCPressed = true;
+        base.punchPressed = true;
+        break;
+      case AttackType.CLOSE_D:
+        base.buttonD = true;
+        base.buttonDPressed = true;
+        base.kickPressed = true;
+        break;
+      case AttackType.STAND_A:
+        base.buttonA = true;
+        base.buttonAPressed = true;
+        base.punchPressed = true;
+        break;
+      case AttackType.STAND_B:
+        base.buttonB = true;
+        base.buttonBPressed = true;
+        base.kickPressed = true;
+        break;
+      case AttackType.STAND_D:
+        base.buttonD = true;
+        base.buttonDPressed = true;
+        base.kickPressed = true;
+        break;
+      case AttackType.CROUCH_C:
+        base.down = true;
+        base.buttonC = true;
+        base.buttonCPressed = true;
+        base.punchPressed = true;
+        break;
+      case AttackType.CROUCH_D:
+        base.down = true;
+        base.buttonD = true;
+        base.buttonDPressed = true;
+        base.kickPressed = true;
+        break;
+      case AttackType.JUMP_C:
+        base.buttonC = true;
+        base.buttonCPressed = true;
+        base.punchPressed = true;
+        break;
+      // Command normals
+      case AttackType.CMD_GOFU_YOU:
+        base.forward = true;
+        base.buttonB = true;
+        base.buttonBPressed = true;
+        base.kickPressed = true;
+        break;
+      case AttackType.IORI_YUMEYUMI:
+        base.forward = true;
+        base.buttonA = true;
+        base.buttonAPressed = true;
+        base.punchPressed = true;
+        break;
+      case AttackType.KIM_HAKI:
+        base.down = true;
+        base.buttonB = true;
+        base.buttonBPressed = true;
+        base.kickPressed = true;
+        break;
+      case AttackType.RYO_HIEN:
+        base.buttonD = true;
+        base.buttonDPressed = true;
+        base.kickPressed = true;
+        break;
+      case AttackType.KDASH_MINUTE:
+        base.buttonD = true;
+        base.buttonDPressed = true;
+        base.kickPressed = true;
+        break;
+      case AttackType.MAI_RYU_EN_BU:
+        base.buttonD = true;
+        base.buttonDPressed = true;
+        base.kickPressed = true;
+        break;
+      case AttackType.ROBERT_GENEI_KYAKU:
+        base.forward = true;
+        base.buttonA = true;
+        base.buttonAPressed = true;
+        base.punchPressed = true;
+        break;
+      // Command grabs / specials used on wake-up
+      case AttackType.CLARK_ARGENTINE:
+      case AttackType.IORI_KUZUKAZE:
+        base.throwAttack = true;
+        base.throwAttackPressed = true;
+        break;
+      case AttackType.RALF_VULCAN:
+        base.buttonA = true;
+        base.buttonAPressed = true;
+        base.punchPressed = true;
+        break;
+      case AttackType.RALF_BACKBREAKER:
+        base.buttonC = true;
+        base.buttonCPressed = true;
+        base.punchPressed = true;
+        break;
+      case AttackType.CLARK_VULCAN:
+        base.buttonA = true;
+        base.buttonAPressed = true;
+        base.punchPressed = true;
+        break;
+      case AttackType.TERRY_CRACK_SHOT:
+        base.buttonB = true;
+        base.buttonBPressed = true;
+        base.kickPressed = true;
+        break;
+      default:
+        // Fallback: stand C
+        base.buttonC = true;
+        base.buttonCPressed = true;
+        base.punchPressed = true;
+        break;
+    }
   }
 
   // ═══════════════════════════════════════════

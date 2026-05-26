@@ -263,7 +263,7 @@ export class Fighter {
     if (this.state === FighterState.AIR_BLOCK) return false;
     if (this.state === FighterState.THROW) return false;
     if (this.state === FighterState.GUARD_CRUSH) return false;
-    if (this.state === FighterState.DIZZY) return false;
+    // DIZZY: 风云再起 — 晕眩状态可被投技 (不同于正版KOF2002)
     // Guard Cancel Roll is unthrowable (KOF2002)
     if (this.isRolling() && this.isGCRoll) return false;
     // Normal roll: throwable at any point (KOF2002)
