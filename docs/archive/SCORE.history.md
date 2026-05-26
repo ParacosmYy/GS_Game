@@ -469,3 +469,9 @@
 ## H126: spriteManifestData测试—10项验证SPRITE_MANIFEST+RYO_ANIMATIONS — 98→99
 
 **commit:** <hash> | spriteManifestData测试—10项验证SPRITE_MANIFEST+RYO_ANIMATIONS
+
+---
+
+## H127: animationBlender测试—8项验证AnimationBlender+getFighterBlender — 99→100
+
+**commit:** <hash> | animationBlender测试—8项验证AnimationBlender+getFighterBlender
