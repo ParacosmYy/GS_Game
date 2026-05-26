@@ -365,6 +365,22 @@ export const RYO_ANIMATIONS: Record<string, SpriteAnimation> = {
     frames: attackFrames(5, 5, 25, STD_W + 30, STD_H + 30),
   },
 
+  /** 虎煌拳C (Ko'ou Ken C) — ryo_koou_c: startup=13 + active=20 + recovery=32 = 65帧 */
+  ryo_koou_c: {
+    name: 'ryo_koou_c',
+    loop: false,
+    cancelStartFrame: 33,
+    frames: attackFrames(13, 20, 32, STD_W + 70, STD_H + 25),
+  },
+
+  /** 虎咲C (Ko Hou C) — ryo_ko_hou_c: startup=7 + active=10 + recovery=30 = 47帧 */
+  ryo_ko_hou_c: {
+    name: 'ryo_ko_hou_c',
+    loop: false,
+    cancelStartFrame: 17,
+    frames: attackFrames(7, 10, 30, STD_W + 35, STD_H + 35),
+  },
+
   /** 飛燕疾風脚 (Hien) — ryo_hien: startup=10 + active=8 + recovery=22 = 40帧 */
   ryo_hien: {
     name: 'ryo_hien',
@@ -396,6 +412,182 @@ export const RYO_ANIMATIONS: Record<string, SpriteAnimation> = {
     loop: false,
     cancelStartFrame: 22,
     frames: attackFrames(10, 12, 22, STD_W + 80, STD_H + 40),
+  },
+
+  // ── 龍虎乱舞 DM/SDM/HSDM ────────────────────────────────────────
+
+  /** 龍虎乱舞 DM — dm_ryuko_ranbu: startup=8 + active=10 + recovery=38 = 56帧 */
+  dm_ryuko_ranbu: {
+    name: 'dm_ryuko_ranbu',
+    loop: false,
+    cancelStartFrame: 18,
+    frames: attackFrames(8, 10, 38, STD_W + 50, STD_H + 20),
+  },
+
+  /** 龍虎乱舞 SDM — sdm_ryuko_ranbu: startup=6 + active=13 + recovery=36 = 55帧 */
+  sdm_ryuko_ranbu: {
+    name: 'sdm_ryuko_ranbu',
+    loop: false,
+    cancelStartFrame: 19,
+    frames: attackFrames(6, 13, 36, STD_W + 55, STD_H + 25),
+  },
+
+  // ── 移动 & 闪避 ──────────────────────────────────────────────
+
+  /** 跑步 — 8帧循环 */
+  run: {
+    name: 'run',
+    loop: true,
+    frames: placeholderFrames(8, 83),
+  },
+
+  /** 蹲姿 idle — 4帧循环 */
+  crouch_idle: {
+    name: 'crouch_idle',
+    loop: true,
+    frames: placeholderFrames(4, 150),
+  },
+
+  /** 小跳 — 4帧非循环 */
+  hop: {
+    name: 'hop',
+    loop: false,
+    frames: placeholderFrames(4, 100),
+  },
+
+  /** 后闪 — 6帧非循环 */
+  backdash: {
+    name: 'backdash',
+    loop: false,
+    frames: placeholderFrames(6, 67),
+  },
+
+  /** 前滚 — 6帧非循环 */
+  roll: {
+    name: 'roll',
+    loop: false,
+    frames: placeholderFrames(6, 67),
+  },
+
+  /** 后滚 — 6帧非循环 */
+  back_roll: {
+    name: 'back_roll',
+    loop: false,
+    frames: placeholderFrames(6, 67),
+  },
+
+  // ── 近距离攻击 ──────────────────────────────────────────────
+
+  /** 近A — startup=4 + active=5 + recovery=5 = 14帧 */
+  close_a: {
+    name: 'close_a',
+    loop: false,
+    cancelStartFrame: 9,
+    frames: attackFrames(4, 5, 5),
+  },
+
+  /** 近B — startup=5 + active=3 + recovery=8 = 16帧 */
+  close_b: {
+    name: 'close_b',
+    loop: false,
+    cancelStartFrame: 8,
+    frames: attackFrames(5, 3, 8),
+  },
+
+  /** 近C — startup=4 + active=5 + recovery=16 = 25帧 */
+  close_c: {
+    name: 'close_c',
+    loop: false,
+    cancelStartFrame: 9,
+    frames: attackFrames(4, 5, 16, STD_W + 20),
+  },
+
+  /** 近D — startup=5 + active=6 + recovery=18 = 29帧 */
+  close_d: {
+    name: 'close_d',
+    loop: false,
+    cancelStartFrame: 11,
+    frames: attackFrames(5, 6, 18, STD_W + 20),
+  },
+
+  // ── 空中攻击 ──────────────────────────────────────────────
+
+  /** 跳A — active=9 frames */
+  jump_a: {
+    name: 'jump_a',
+    loop: false,
+    frames: placeholderFrames(9, F),
+  },
+
+  /** 跳B — active=7 frames */
+  jump_b: {
+    name: 'jump_b',
+    loop: false,
+    frames: placeholderFrames(7, F),
+  },
+
+  /** 跳C — active=3 frames */
+  jump_c: {
+    name: 'jump_c',
+    loop: false,
+    frames: attackFrames(2, 3, 5, STD_W + 15),
+  },
+
+  /** 跳D — active=5 frames */
+  jump_d: {
+    name: 'jump_d',
+    loop: false,
+    frames: attackFrames(2, 5, 5, STD_W + 20),
+  },
+
+  // ── 投技 ──────────────────────────────────────────────
+
+  /** 投技 — startup=5 + active=2 + recovery=20 = 27帧 */
+  throw_anim: {
+    name: 'throw_anim',
+    loop: false,
+    frames: attackFrames(5, 2, 20),
+  },
+
+  // ── 防御 ──────────────────────────────────────────────
+
+  /** 站防 — 1帧 */
+  block_stand: {
+    name: 'block_stand',
+    loop: false,
+    frames: placeholderFrames(1, 200),
+  },
+
+  /** 蹲防 — 1帧 */
+  block_crouch: {
+    name: 'block_crouch',
+    loop: false,
+    frames: placeholderFrames(1, 200),
+  },
+
+  /** 空防 — 1帧 */
+  block_air: {
+    name: 'block_air',
+    loop: false,
+    frames: placeholderFrames(1, 200),
+  },
+
+  // ── Ryo 命令通常技 ──────────────────────────────────────
+
+  /** 冰柱割り →+A (overhead) — startup=8 + active=4 + recovery=12 = 24帧 */
+  ryo_tsurizao: {
+    name: 'ryo_tsurizao',
+    loop: false,
+    cancelStartFrame: 12,
+    frames: attackFrames(8, 4, 12, STD_W + 15),
+  },
+
+  /** 落蹴 ↘+B (low) — startup=7 + active=4 + recovery=14 = 25帧 */
+  ryo_orishi: {
+    name: 'ryo_orishi',
+    loop: false,
+    cancelStartFrame: 11,
+    frames: attackFrames(7, 4, 14),
   },
 };
 
