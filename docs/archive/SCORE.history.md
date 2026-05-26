@@ -643,3 +643,15 @@
 ## H150: charBatch3—25项验证kim/kula/leona/mai/mary — 122→123
 
 **commit:** <hash> | charBatch3—25项验证kim/kula/leona/mai/mary
+
+---
+
+## H151: 倒地像素帧修复—6帧全透明→可见击倒动画 — 123→124
+
+**commit:** 93617f8 | KD_F0-F5每帧有实际像素数据,击飞/翻滚/下落/着地/躺地
+
+---
+
+## H152: 翻滚像素帧+命令技路由—roll/back_roll手绘8帧+tsurizao/orishi映射 — 124→125
+
+**commit:** b0335fa | 8个翻滚帧手绘+tsurizao→STAND_C+orishi→CROUCH_B
