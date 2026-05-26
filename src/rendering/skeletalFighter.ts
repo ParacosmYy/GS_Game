@@ -875,31 +875,173 @@ export function drawSkeletalFighter(
     ctx.restore();
   }
 
-  // === MAX mode glow aura ===
+  // === MAX mode glow aura — KOF2002 style ===
   if (maxModeActive) {
-    const glowPulse = 0.2 + Math.sin(globalTick / 4) * 0.1;
+    const glowPulse = 0.3 + Math.sin(globalTick / 4) * 0.12;
+
+    // ── 1. Outer pulse ring: expands every 60 frames ──
+    const ringPhase = (globalTick % 60) / 60;
+    const ringR = 20 + ringPhase * f.displayHeight * 0.9;
+    const ringAlpha = (1 - ringPhase) * 0.35;
+    ctx.save();
+    ctx.strokeStyle = `rgba(255, 210, 60, ${ringAlpha})`;
+    ctx.lineWidth = 2.5 * (1 - ringPhase) + 0.5;
+    ctx.beginPath();
+    ctx.arc(sx, sy - f.displayHeight / 2, ringR, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.restore();
+
+    // ── 2. Main radial aura glow (radius increased to displayHeight * 1.0) ──
     const glowGrad = ctx.createRadialGradient(
       sx, sy - f.displayHeight / 2, 10,
-      sx, sy - f.displayHeight / 2, f.displayHeight * 0.8,
+      sx, sy - f.displayHeight / 2, f.displayHeight * 1.0,
     );
     glowGrad.addColorStop(0, `rgba(255, 255, 100, ${glowPulse})`);
-    glowGrad.addColorStop(0.4, `rgba(255, 220, 50, ${glowPulse * 0.5})`);
-    glowGrad.addColorStop(0.7, `rgba(255, 150, 0, ${glowPulse * 0.2})`);
+    glowGrad.addColorStop(0.3, `rgba(255, 220, 50, ${glowPulse * 0.6})`);
+    glowGrad.addColorStop(0.6, `rgba(255, 150, 0, ${glowPulse * 0.25})`);
+    glowGrad.addColorStop(0.85, `rgba(255, 120, 0, ${glowPulse * 0.08})`);
     glowGrad.addColorStop(1, 'rgba(255, 200, 50, 0)');
     ctx.fillStyle = glowGrad;
-    ctx.fillRect(Math.round(sx - 60), Math.round(sy - f.displayHeight - 30), 120, f.displayHeight + 50);
+    ctx.fillRect(Math.round(sx - f.displayHeight), Math.round(sy - f.displayHeight * 1.6), f.displayHeight * 2, f.displayHeight * 2);
 
-    // MAX mode particle sparkles
-    if (globalTick % 6 === 0) {
-      const sparkleX = sx + (Math.random() - 0.5) * 50;
-      const sparkleY = sy - Math.random() * f.displayHeight;
+    // ── 3. Enhanced energy particles (every 3 frames, larger, float upward) ──
+    if (globalTick % 3 === 0) {
+      const sparkleX = sx + (Math.random() - 0.5) * 60;
+      // Particles spawn across body height, then drift upward
+      const sparkleBaseY = sy - Math.random() * f.displayHeight;
+      const sparkleDrift = -1.5 - Math.random() * 2; // upward drift
       ctx.save();
-      ctx.fillStyle = `rgba(255, 255, 150, ${0.5 + Math.random() * 0.3})`;
+      // Inner bright core
+      ctx.fillStyle = `rgba(255, 255, 180, ${0.6 + Math.random() * 0.3})`;
       ctx.beginPath();
-      ctx.arc(sparkleX, sparkleY, 1.5, 0, Math.PI * 2);
+      ctx.arc(sparkleX, sparkleBaseY + sparkleDrift * ((globalTick % 12) / 12), 2.5, 0, Math.PI * 2);
+      ctx.fill();
+      // Outer soft glow around particle
+      ctx.fillStyle = `rgba(255, 210, 80, ${0.25 + Math.random() * 0.15})`;
+      ctx.beginPath();
+      ctx.arc(sparkleX, sparkleBaseY + sparkleDrift * ((globalTick % 12) / 12), 5, 0, Math.PI * 2);
       ctx.fill();
       ctx.restore();
     }
+
+    // ── 4. Afterimage / ghost trail (every 4 frames) ──
+    if (globalTick % 4 === 0) {
+      const afterimageOffset = -3 * f.facing; // trails behind movement direction
+      ctx.save();
+      ctx.globalAlpha = 0.15;
+      // Draw a simplified silhouette behind the character
+      const ghostX = sx + afterimageOffset;
+      const ghostCenterY = sy - f.displayHeight / 2;
+      const ghostH = f.displayHeight * 0.8;
+      const ghostGrad = ctx.createRadialGradient(
+        ghostX, ghostCenterY, 5,
+        ghostX, ghostCenterY, ghostH * 0.5,
+      );
+      ghostGrad.addColorStop(0, 'rgba(255, 180, 50, 0.3)');
+      ghostGrad.addColorStop(0.5, 'rgba(255, 140, 20, 0.12)');
+      ghostGrad.addColorStop(1, 'rgba(255, 120, 0, 0)');
+      ctx.fillStyle = ghostGrad;
+      ctx.beginPath();
+      ctx.ellipse(ghostX, ghostCenterY, 22, ghostH * 0.45, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    // ── 5. Outline glow on all body parts ──
+    // Applied by re-drawing stroke outlines with golden shadow
+    ctx.save();
+    ctx.shadowColor = '#ffcc00';
+    ctx.shadowBlur = 6;
+    ctx.strokeStyle = 'rgba(255, 200, 60, 0.4)';
+    ctx.lineWidth = 1.5;
+    ctx.lineJoin = 'round';
+    // Back arm outline glow
+    ctx.translate(backArm.x, shoulderY + p.armBack.oy * heightFactor);
+    ctx.rotate(backArm.rot);
+    if (!isFlashing) {
+      roundRect(ctx, -armW * p.armBack.scale / 2, -armH * p.armBack.scale / 2,
+        armW * p.armBack.scale, armH * p.armBack.scale, 3);
+      ctx.stroke();
+    }
+    ctx.restore();
+
+    ctx.save();
+    ctx.shadowColor = '#ffcc00';
+    ctx.shadowBlur = 6;
+    ctx.strokeStyle = 'rgba(255, 200, 60, 0.4)';
+    ctx.lineWidth = 1.5;
+    ctx.lineJoin = 'round';
+    // Back leg outline glow
+    ctx.translate(backLeg.x, hipY + p.legBack.oy * heightFactor);
+    ctx.rotate(backLeg.rot);
+    if (!isFlashing) {
+      roundRect(ctx, -legW * p.legBack.scale / 2, -legH * p.legBack.scale / 2,
+        legW * p.legBack.scale, legH * p.legBack.scale, 3);
+      ctx.stroke();
+    }
+    ctx.restore();
+
+    ctx.save();
+    ctx.shadowColor = '#ffcc00';
+    ctx.shadowBlur = 6;
+    ctx.strokeStyle = 'rgba(255, 200, 60, 0.4)';
+    ctx.lineWidth = 1.5;
+    ctx.lineJoin = 'round';
+    // Torso outline glow
+    ctx.translate(torsoX, torsoCenterY);
+    ctx.rotate(p.body.rot * f.facing);
+    if (!isFlashing) {
+      roundRect(ctx, -torsoW / 2, -torsoH * heightFactor / 2, torsoW, torsoH * heightFactor, 5);
+      ctx.stroke();
+    }
+    ctx.restore();
+
+    ctx.save();
+    ctx.shadowColor = '#ffcc00';
+    ctx.shadowBlur = 6;
+    ctx.strokeStyle = 'rgba(255, 200, 60, 0.4)';
+    ctx.lineWidth = 1.5;
+    // Head outline glow
+    ctx.translate(headPos.x, headCenterY);
+    ctx.rotate(p.head.rot * f.facing);
+    if (!isFlashing) {
+      ctx.beginPath();
+      ctx.arc(0, 0, headW / 2 + 1, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+    ctx.restore();
+
+    ctx.save();
+    ctx.shadowColor = '#ffcc00';
+    ctx.shadowBlur = 6;
+    ctx.strokeStyle = 'rgba(255, 200, 60, 0.4)';
+    ctx.lineWidth = 1.5;
+    ctx.lineJoin = 'round';
+    // Front leg outline glow
+    ctx.translate(frontLeg.x, hipY + p.legFront.oy * heightFactor);
+    ctx.rotate(frontLeg.rot);
+    if (!isFlashing) {
+      roundRect(ctx, -legW * p.legFront.scale / 2, -legH * p.legFront.scale / 2,
+        legW * p.legFront.scale, legH * p.legFront.scale, 3);
+      ctx.stroke();
+    }
+    ctx.restore();
+
+    ctx.save();
+    ctx.shadowColor = '#ffcc00';
+    ctx.shadowBlur = 6;
+    ctx.strokeStyle = 'rgba(255, 200, 60, 0.4)';
+    ctx.lineWidth = 1.5;
+    ctx.lineJoin = 'round';
+    // Front arm outline glow
+    ctx.translate(frontArm.x, shoulderY + p.armFront.oy * heightFactor);
+    ctx.rotate(frontArm.rot);
+    if (!isFlashing) {
+      roundRect(ctx, -armW * p.armFront.scale / 2, -armH * p.armFront.scale / 2,
+        armW * p.armFront.scale, armH * p.armFront.scale, 3);
+      ctx.stroke();
+    }
+    ctx.restore();
   }
 
   // KOF2002: 低血量红色脉冲光环 — 血量<25%时可见的警告效果

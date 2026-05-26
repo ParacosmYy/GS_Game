@@ -14,7 +14,10 @@ import {
   HUD_GAUGE_SEGMENT_GAP, HUD_WIN_MARKER_SIZE,
 } from '../core/constants.js';
 import { shiftColor, roundRect, drawSNKText } from './utils.js';
-import { drawRyoPortrait } from './skeletalParts.js';
+import { ROSTER } from '../characters/index.js';
+import { drawPixelPortrait } from './pixelPortraits.js';
+
+const charById = new Map(ROSTER.map(c => [c.id, c]));
 
 // ===== SNK pixel font rendering =====
 const PIXEL_FONT_SCALE = 2;
@@ -159,27 +162,14 @@ export function resetHUDFlash(): void {
   }
 }
 
-// ===== Combo counter animation state =====
-interface ComboAnimState {
-  /** Displayed count (animates toward actual) */
-  displayed: number;
-  /** Scale multiplier (1.0 = normal, pops to 1.3 on increment) */
-  scale: number;
-  /** Previous combo count for detecting increments */
-  prevCount: number;
-}
-
-const comboAnim: [ComboAnimState, ComboAnimState] = [
-  { displayed: 0, scale: 1, prevCount: 0 },
-  { displayed: 0, scale: 1, prevCount: 0 },
-];
+// ===== Combo counter fade state (see ComboFadeState below) =====
 
 /** HUD portrait size constants */
 const HUD_PORTRAIT_SIZE = 30;
 
 /**
  * Draw character portrait in HUD area.
- * Uses drawRyoPortrait for Ryo, falls back to simple colored square for others.
+ * Uses PixelPortraitData for characters that have one, falls back to colored square.
  */
 function drawHUDPortrait(
   ctx: CanvasRenderingContext2D,
@@ -187,10 +177,33 @@ function drawHUDPortrait(
   x: number, y: number,
   healthPercent: number,
 ): void {
-  if (charId === 'ryo') {
-    drawRyoPortrait(ctx, x, y, HUD_PORTRAIT_SIZE, HUD_PORTRAIT_SIZE, healthPercent, 0);
+  const charDef = charById.get(charId);
+  if (charDef?.pixelPortrait) {
+    const portrait = charDef.pixelPortrait;
+    ctx.save();
+    ctx.beginPath();
+    roundRect(ctx, x, y, HUD_PORTRAIT_SIZE, HUD_PORTRAIT_SIZE, 3);
+    ctx.clip();
+    const scale = 1;
+    const pw = portrait.width * scale;
+    const ph = portrait.height * scale;
+    const ox = Math.floor((HUD_PORTRAIT_SIZE - pw) / 2);
+    drawPixelPortrait(ctx, portrait, x + ox, y, scale, {
+      backdropColor: 'rgba(8, 8, 18, 0.9)',
+      frameColor: charDef.color,
+    });
+    // Low-health danger tint
+    if (healthPercent < 0.25) {
+      ctx.fillStyle = `rgba(180, 30, 10, ${0.15 + 0.1 * Math.sin(Date.now() * 0.008)})`;
+      ctx.fillRect(x, y, HUD_PORTRAIT_SIZE, HUD_PORTRAIT_SIZE);
+    }
+    ctx.restore();
+    ctx.strokeStyle = 'rgba(200, 168, 50, 0.4)';
+    ctx.lineWidth = 1;
+    roundRect(ctx, x, y, HUD_PORTRAIT_SIZE, HUD_PORTRAIT_SIZE, 3);
+    ctx.stroke();
   } else {
-    // Fallback: simple colored square with first letter
+    // Fallback: colored square with initial letter
     const colors: Record<string, string> = {
       kyo: '#FF6600', iori: '#AA1133', terry: '#CC8800', andy: '#FFAA22',
       joe: '#FF8800', kim: '#2288CC', chang: '#885522', choi: '#66CC66',
@@ -1090,113 +1103,237 @@ function drawNamePlate(ctx: CanvasRenderingContext2D, x: number, y: number, name
   drawSNKText(ctx, text, align === 'left' ? plateX + 5 : plateX + plateW - 5, y + 5, 9, 'rgba(220, 220, 220, 0.9)', '#000000', align);
 }
 
-// ===== Combo counter with color tiers and scale animation =====
+// ===== Combo counter — KOF2002 arcade-authentic =====
+
+/** Fade-out duration in frames after combo resets */
+const COMBO_FADE_FRAMES = 60;
 
 /**
- * Combo counter — KOF2002 style
- * Color tiers: white (2-4) -> yellow (5-9) -> orange (10-19) -> red (20+)
- * Scale pop on increment
+ * Per-player combo display state.
+ * Tracks the fading animation that plays after a combo ends.
+ * When comboCount drops to 0, `fadeTimer` counts from COMBO_FADE_FRAMES down to 0,
+ * during which the last combo count is still displayed at decreasing alpha.
+ */
+interface ComboFadeState {
+  /** Last combo count before it reset (displayed during fade) */
+  lastCombo: number;
+  /** Remaining frames of fade-out animation; 0 = not fading */
+  fadeTimer: number;
+  /** Cumulative damage at the time the combo ended */
+  lastDamage: number;
+  /** Scale multiplier (1.0 = normal, pops to 1.4 on increment) */
+  scale: number;
+  /** Previous combo count for detecting increments */
+  prevCount: number;
+}
+
+const comboFade: [ComboFadeState, ComboFadeState] = [
+  { lastCombo: 0, fadeTimer: 0, lastDamage: 0, scale: 1, prevCount: 0 },
+  { lastCombo: 0, fadeTimer: 0, lastDamage: 0, scale: 1, prevCount: 0 },
+];
+
+/**
+ * Get KOF2002 combo color tier.
+ *  1-4 hits: white
+ *  5-9 hits: yellow
+ * 10+ hits:  red
+ */
+function getComboColor(combo: number): { fill: string; glow: string; shadow: string } {
+  if (combo >= 10) {
+    return { fill: '#ff2222', glow: '#ff0000', shadow: '#ff4444' };
+  } else if (combo >= 5) {
+    return { fill: '#ffdd00', glow: '#ffaa00', shadow: '#ffcc44' };
+  }
+  return { fill: '#ffffff', glow: '#ffffff', shadow: '#ffcc44' };
+}
+
+/**
+ * Draw a large combo number with thick white outline (KOF2002 arcade style).
+ * The outline is drawn as two layers: a wide white stroke underneath, then a
+ * thinner black stroke to give the classic SNK "double border" look.
+ */
+function drawComboDigit(
+  ctx: CanvasRenderingContext2D,
+  text: string,
+  x: number, y: number,
+  fontSize: number,
+  fillColor: string,
+  alpha: number,
+): void {
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  ctx.font = `bold ${fontSize}px "Courier New", monospace`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+
+  // Layer 1: wide white outline (2px, the signature KOF look)
+  ctx.strokeStyle = '#ffffff';
+  ctx.lineWidth = Math.max(3, Math.round(fontSize / 6));
+  ctx.lineJoin = 'round';
+  ctx.strokeText(text, x, y);
+
+  // Layer 2: thinner black outer border for contrast against light backgrounds
+  ctx.strokeStyle = '#000000';
+  ctx.lineWidth = Math.max(2, Math.round(fontSize / 10));
+  ctx.lineJoin = 'round';
+  ctx.strokeText(text, x, y);
+
+  // Layer 3: fill with vertical gradient (bright top, darker bottom)
+  const grad = ctx.createLinearGradient(x, y - fontSize * 0.5, x, y + fontSize * 0.5);
+  grad.addColorStop(0, shiftColor(fillColor, 50));
+  grad.addColorStop(0.35, fillColor);
+  grad.addColorStop(1, shiftColor(fillColor, -40));
+  ctx.fillStyle = grad;
+  ctx.fillText(text, x, y);
+
+  ctx.restore();
+}
+
+/**
+ * Combo counter rendering -- KOF2002 arcade-authentic.
+ *
+ * Features:
+ *  - Large numbers above the hit character with 2px white outline
+ *  - Color tiers: white (1-4), yellow (5-9), red (10+)
+ *  - Scale pop animation on each new hit
+ *  - Smooth 60-frame fade-out after combo ends
+ *  - Total damage display below combo count
+ *  - "HIT" label in KOF2002 position
+ *
+ * comboTimer is unused (kept for API compatibility); fade-out is handled
+ * internally via comboFade state to avoid requiring the caller to track it.
  */
 export function drawComboCounters(
   ctx: CanvasRenderingContext2D,
   fighters: Fighter[],
   comboCount: number[],
-  comboTimer: number[],
+  _comboTimer: number[],
   camera: Camera,
   comboDamage?: number[],
 ): void {
   ctx.save();
+
   for (let i = 0; i < 2; i++) {
-    if (comboCount[i] < 2) {
-      comboAnim[i].prevCount = 0;
-      comboAnim[i].scale = 1;
-      continue;
+    const currentCombo = comboCount[i];
+    const currentDamage = comboDamage?.[i] ?? 0;
+    const fade = comboFade[i];
+
+    // --- Detect combo state transitions ---
+    if (currentCombo >= 2) {
+      // Active combo: update last-known values
+      fade.lastCombo = currentCombo;
+      fade.lastDamage = currentDamage;
+      fade.fadeTimer = COMBO_FADE_FRAMES; // keep topped up while combo is live
+
+      // Scale pop on increment
+      if (currentCombo > fade.prevCount) {
+        fade.scale = 1.4;
+      }
+    } else if (fade.fadeTimer > 0) {
+      // Combo just ended: tick the fade timer down
+      fade.fadeTimer--;
     }
 
-    // Detect combo increment for scale animation
-    if (comboCount[i] > comboAnim[i].prevCount) {
-      comboAnim[i].scale = 1.35; // Pop up on increment
-    }
-    comboAnim[i].prevCount = comboCount[i];
+    fade.prevCount = currentCombo;
 
-    // Smoothly decay scale back to 1.0
-    comboAnim[i].scale += (1.0 - comboAnim[i].scale) * 0.15;
+    // --- Skip if nothing to display ---
+    if (currentCombo < 2 && fade.fadeTimer <= 0) continue;
 
-    const f = fighters[i];
-    const sx = camera.worldToScreen(f.x);
-    const sy = f.y - f.displayHeight - 30;
-    const alpha = Math.min(1, comboTimer[i] < 30 ? 1 : 1 - (comboTimer[i] - 30) / 30);
+    // --- Determine display values ---
+    const isActive = currentCombo >= 2;
+    const displayCombo = isActive ? currentCombo : fade.lastCombo;
+    const displayDamage = isActive ? currentDamage : fade.lastDamage;
+    const alpha = isActive ? 1.0 : fade.fadeTimer / COMBO_FADE_FRAMES;
+
     if (alpha <= 0) continue;
 
+    // Smoothly decay scale back to 1.0
+    fade.scale += (1.0 - fade.scale) * 0.12;
+
+    // --- Position: above the hit character's head ---
+    const f = fighters[i];
+    const sx = camera.worldToScreen(f.x);
+    const sy = f.y - f.displayHeight - 40;
+
+    // --- Color tier ---
+    const colors = getComboColor(displayCombo);
+
+    // --- Font size: large, scales up with combo count ---
+    const baseFontSize = 28 + Math.min(displayCombo, 20) * 0.8;
+    const fontSize = baseFontSize * fade.scale;
+
+    // --- Main combo digit ---
+    ctx.save();
+    // Glow behind digit (stronger for higher combos)
+    const glowIntensity = Math.min(1, 0.3 + displayCombo * 0.04);
+    ctx.shadowColor = colors.glow;
+    ctx.shadowBlur = 8 + Math.min(displayCombo, 20);
+    drawComboDigit(ctx, `${displayCombo}`, sx, sy, fontSize, colors.fill, alpha);
+    ctx.restore();
+
+    // --- "HIT" label at lower-right (KOF2002 layout) ---
+    const hitFontSize = 10;
+    const hitOffsetX = fontSize * 0.4 + 4;
+    const hitOffsetY = fontSize * 0.35;
+    const hitColor = displayCombo >= 10 ? '#ff4444' : displayCombo >= 5 ? '#ffdd00' : '#cccccc';
+
+    ctx.save();
     ctx.globalAlpha = alpha;
+    ctx.font = `bold ${hitFontSize}px "Courier New", monospace`;
     ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    // White outline on HIT label
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 2;
+    ctx.lineJoin = 'round';
+    ctx.strokeText('HIT', sx + hitOffsetX, sy + hitOffsetY);
+    ctx.strokeStyle = '#000000';
+    ctx.lineWidth = 1;
+    ctx.strokeText('HIT', sx + hitOffsetX, sy + hitOffsetY);
+    ctx.fillStyle = hitColor;
+    ctx.fillText('HIT', sx + hitOffsetX, sy + hitOffsetY);
+    ctx.restore();
 
-    const combo = comboCount[i];
-    let comboColor: string;
-    let glowColor: string;
+    // --- Total damage display ---
+    if (displayDamage > 0) {
+      const dmgFontSize = displayDamage >= 200 ? 18 : displayDamage >= 100 ? 16 : 14;
+      const dmgY = sy + fontSize * 0.55 + 8;
+      const dmgColor = displayDamage >= 200 ? '#ff2222'
+        : displayDamage >= 100 ? '#ff6644'
+          : '#ffcc44';
 
-    // Color tier system: white -> yellow -> orange -> red
-    if (combo >= 20) { comboColor = '#ff2222'; glowColor = '#ff0000'; }
-    else if (combo >= 10) { comboColor = '#ff8800'; glowColor = '#ff6600'; }
-    else if (combo >= 5) { comboColor = '#ffcc00'; glowColor = '#ffaa00'; }
-    else { comboColor = '#ffffff'; glowColor = '#ffcc44'; }
-
-    // Font size with scale animation
-    const baseFontSize = 20 + Math.min(combo, 15);
-    const pulseScale = comboTimer[i] > 50 ? 1.15 : 1.0;
-    const fontSize = baseFontSize * pulseScale * comboAnim[i].scale;
-
-    // Fade-out blink
-    const isFading = comboTimer[i] < 12;
-    const flashCol = isFading && comboTimer[i] % 3 < 2 ? '#ffffff' : comboColor;
-    const flashGlow = isFading ? '#ffffff' : glowColor;
-
-    // 7+ combo: gold outline effect
-    if (combo >= 7) {
-      const goldGlow = Math.sin(Date.now() / 80) * 0.3 + 0.7;
       ctx.save();
-      ctx.shadowColor = `rgba(255, 200, 0, ${goldGlow})`;
-      ctx.shadowBlur = 16 + Math.min(combo, 15);
-      ctx.font = `bold ${fontSize}px "Courier New", monospace`;
+      ctx.globalAlpha = alpha;
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.6)';
+      ctx.shadowBlur = 4;
+      // White outline on damage number
+      ctx.font = `bold ${dmgFontSize}px "Courier New", monospace`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.strokeStyle = `rgba(255, 200, 0, ${goldGlow * 0.8})`;
-      ctx.lineWidth = Math.max(3, Math.round(fontSize / 5));
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 2;
       ctx.lineJoin = 'round';
-      ctx.strokeText(`${combo}`, sx, sy);
+      ctx.strokeText(`${displayDamage}`, sx, dmgY);
+      ctx.strokeStyle = '#000000';
+      ctx.lineWidth = 1;
+      ctx.strokeText(`${displayDamage}`, sx, dmgY);
+      const dmgGrad = ctx.createLinearGradient(sx, dmgY - dmgFontSize * 0.5, sx, dmgY + dmgFontSize * 0.5);
+      dmgGrad.addColorStop(0, shiftColor(dmgColor, 40));
+      dmgGrad.addColorStop(0.4, dmgColor);
+      dmgGrad.addColorStop(1, shiftColor(dmgColor, -30));
+      ctx.fillStyle = dmgGrad;
+      ctx.fillText(`${displayDamage}`, sx, dmgY);
       ctx.restore();
     }
 
-    // Combo number main text
-    ctx.save();
-    ctx.shadowColor = flashGlow;
-    ctx.shadowBlur = 12 + Math.min(combo, 10);
-    drawSNKText(ctx, `${combo}`, sx, sy, fontSize, flashCol);
-    ctx.restore();
-
-    // "HIT" label — small text at lower-right of number (KOF2002 layout)
-    const hitOffsetX = 12 + Math.min(combo, 10) * 0.5;
-    const hitOffsetY = 6;
-    const hitColor = combo >= 7 ? '#ffcc00' : comboColor;
-    drawSNKText(ctx, 'HIT', sx + hitOffsetX, sy + hitOffsetY, 9, hitColor);
-
-    // Combo total damage
-    if (comboDamage && comboDamage[i] > 0) {
-      const totalDmg = comboDamage[i];
-      const dmgCol = totalDmg >= 200 ? '#ff2222' : totalDmg >= 100 ? '#ff6644' : '#ffcc44';
-      drawSNKText(ctx, `${totalDmg}`, sx, sy + 30, totalDmg >= 200 ? 15 : 13, dmgCol);
-    }
-
-    // Combo timer bar
-    const ctRatio = Math.max(0, comboTimer[i] / 60);
-    if (ctRatio > 0) {
-      const barW = 30, barH = 2;
-      ctx.fillStyle = 'rgba(0,0,0,0.4)';
-      ctx.fillRect(sx - barW / 2, sy + 38, barW, barH);
-      const ctCol = ctRatio > 0.5 ? '#22cc55' : ctRatio > 0.25 ? '#ffcc00' : '#ff4444';
-      ctx.fillStyle = ctCol;
-      ctx.fillRect(sx - barW / 2, sy + 38, barW * ctRatio, barH);
+    // --- Reset fade state when animation completes ---
+    if (fade.fadeTimer <= 0 && !isActive) {
+      fade.lastCombo = 0;
+      fade.lastDamage = 0;
+      fade.scale = 1;
+      fade.prevCount = 0;
     }
   }
+
   ctx.restore();
 }
