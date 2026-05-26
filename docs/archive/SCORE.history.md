@@ -625,3 +625,9 @@
 ## H147: iori测试—9项验证IoriDef id/name/nameCn/color/winQuotes/stats/poses/moveList/proportions — 119→120
 
 **commit:** <hash> | iori测试—9项验证IoriDef id/name/nameCn/color/winQuotes/stats/poses/moveList/proportions
+
+---
+
+## H148: charBatch1测试—25项验证andy/athena/billy/chang/choi角色定义 — 120→121
+
+**commit:** <hash> | charBatch1测试—25项验证andy/athena/billy/chang/choi角色定义
