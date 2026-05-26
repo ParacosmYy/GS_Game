@@ -655,3 +655,9 @@
 ## H152: 翻滚像素帧+命令技路由—roll/back_roll手绘8帧+tsurizao/orishi映射 — 124→125
 
 **commit:** b0335fa | 8个翻滚帧手绘+tsurizao→STAND_C+orishi→CROUCH_B
+
+---
+
+## H151: charBatch4—25项验证mature/ralf/robert/shermie/terry — 123→124
+
+**commit:** <hash> | charBatch4—25项验证mature/ralf/robert/shermie/terry
