@@ -29,17 +29,17 @@ const PALETTE: Record<number, string> = {
    5: '#5a3a22',   // hair mid
    6: '#7a5030',   // hair light
    7: '#9a6840',   // hair highlight
-   8: '#f5d0a0',   // skin light
-   9: '#e0b888',   // skin mid-light
-  10: '#c89868',   // skin mid
-  11: '#a88048',   // skin dark
-  12: '#906838',   // skin darker
-  13: '#785028',   // skin darkest
+   8: '#f8d4a8',   // skin light
+   9: '#d8a878',   // skin mid-light
+  10: '#c09060',   // skin mid
+  11: '#a07840',   // skin dark
+  12: '#886030',   // skin darker
+  13: '#704820',   // skin darkest
   14: '#faf8f4',   // gi lightest
   15: '#f0ece4',   // gi light
-  16: '#c8b498',   // gi mid-light
+  16: '#b8a488',   // gi mid-light
   17: '#d0c4b0',   // gi mid
-  18: '#987860',   // gi dark
+  18: '#806850',   // gi dark
   19: '#a09484',   // gi darkest
   20: '#181410',   // belt / eyes black
   21: '#ffffff',   // eye white / highlight
