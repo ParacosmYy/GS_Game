@@ -235,3 +235,9 @@
 ## H87: input buffer指令系统测试—84项验证 — 59→60
 
 **commit:** <hash> | commandBuffer全函数+motion检测(QCF/DP/QCB/HCB/charge/DM)+inputResolver+display helpers
+
+---
+
+## H88: audio manifest Ryo测试—17项验证 — 60→61
+
+**commit:** <hash> | manifest结构+synth参数+Ryo攻击音效映射(10)+系统音+环境音+播报+tier覆盖
