@@ -16,6 +16,8 @@ import {
   JUGGLE_POINTS_MAX, JUGGLE_COST_LIGHT, JUGGLE_COST_HEAVY, JUGGLE_COST_SPECIAL, JUGGLE_COST_DM,
   THROW_INVINCIBILITY_POST_ESCAPE,
   PROXIMITY_GUARD_RANGE,
+  STUN_FILL_LIGHT, STUN_FILL_HEAVY, STUN_FILL_COMMAND_NORMAL,
+  STUN_FILL_SPECIAL, STUN_FILL_DM, STUN_FILL_CD, STUN_FILL_THROW,
 } from '../core/constants.js';
 import { CLOSE_RANGE } from '../core/types.js';
 import { FighterState, AttackType, JuggleState } from '../core/types.js';
@@ -462,6 +464,16 @@ export class CombatSystem {
     // KOF2002: 被命中时防御槽也减少(比防御时少30%), 连段越久防御崩坏风险越高
     defender.guardGauge = Math.max(0, defender.guardGauge - guardGaugeDamage(attackType) * 0.3);
 
+    // Stun gauge accumulation — each hit fills the gauge based on attack type
+    // When gauge is full and defender is grounded, enter dizzy state (overrides hitstun/knockdown)
+    const stunned = defender.addStunFill(stunFill(attackType));
+    if (stunned && defender.isGrounded() && defender.state !== FighterState.DIZZY) {
+      defender.applyDizzy();
+      // Still fire onHit callback but skip normal hitstun/knockdown resolution below
+      onHit?.(attacker, defender, attackType, false, counterHit);
+      return;
+    }
+
     // KOF2002: air counter hit → jugglable state (full juggle budget)
     if (counterHit && !defender.isGrounded()) {
       defender.juggleState = JuggleState.FULL;
@@ -563,6 +575,26 @@ function guardGaugeDamage(attackType: AttackType): number {
   if (attackType === AttackType.STAND_CD || attackType === AttackType.JUMP_CD) return 12;
   if (name.endsWith('_C') || name.endsWith('_D')) return 10;
   return 5;
+}
+
+/** Stun gauge fill based on attack type (KOF2002: heavy > light, specials much more) */
+function stunFill(attackType: AttackType): number {
+  const name = attackType as string;
+  // Throws
+  if (attackType === AttackType.THROW || attackType === AttackType.THROW_FORWARD
+    || attackType === AttackType.THROW_BACK) return STUN_FILL_THROW;
+  // DM/SDM
+  if (isDM(name)) return STUN_FILL_DM;
+  // Specials (character specials + generic specials)
+  if (isSpecialMoveCheck(attackType)) return STUN_FILL_SPECIAL;
+  // CD blowback
+  if (attackType === AttackType.STAND_CD || attackType === AttackType.JUMP_CD) return STUN_FILL_CD;
+  // Command normals
+  if (COMMAND_NORMALS.has(name)) return STUN_FILL_COMMAND_NORMAL;
+  // Heavy normals (C/D)
+  if (name.endsWith('_C') || name.endsWith('_D')) return STUN_FILL_HEAVY;
+  // Light normals (A/B)
+  return STUN_FILL_LIGHT;
 }
 
 /** Guard Crush constant — stun duration in frames (KOF2002: 90 frames / 1.5 seconds) */

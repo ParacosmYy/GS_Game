@@ -1,6 +1,6 @@
 /**
  * Stun/defensive state handlers — extracted from stateHandlers.ts.
- * BLOCK, AIR_BLOCK, GUARD_CRUSH, COUNTER_STANCE, HITSTUN, KNOCKDOWN.
+ * BLOCK, AIR_BLOCK, GUARD_CRUSH, COUNTER_STANCE, HITSTUN, KNOCKDOWN, DIZZY.
  */
 import type { FighterCtx } from './stateContext.js';
 import type { ResolvedInput } from '../input/inputResolver.js';
@@ -138,5 +138,31 @@ export function handleKnockdown(ctx: FighterCtx, input: ResolvedInput): void {
         ctx.vfx.spawnReversalText(f.x, f.y - f.displayHeight - 30);
       }
     }
+  }
+}
+
+/** DIZZY state handler — stun gauge full, character dazed (stars/birds visual)
+ *  KOF2002: mashing buttons reduces dizzy duration; when timer hits 0, recover to IDLE.
+ */
+export function handleDizzy(ctx: FighterCtx, input: ResolvedInput): void {
+  const f = ctx.fighter;
+  f.vx = 0;
+
+  // Mash detection: any button press reduces dizzy timer
+  if (input.punchPressed || input.kickPressed || input.buttonAPressed
+    || input.buttonBPressed || input.buttonCPressed || input.buttonDPressed
+    || input.blowbackPressed) {
+    f.mashDizzy();
+  }
+
+  f.dizzyTimer--;
+  if (f.dizzyTimer <= 0) {
+    f.state = FighterState.IDLE;
+    f.vx = 0;
+    f.stunGauge = 0;
+    f.stunDecayTimer = 0;
+    f.dizzyTimer = 0;
+    f.dizzyMashCount = 0;
+    f.throwInvincibilityTimer = THROW_INVINCIBILITY_POST_STUN;
   }
 }

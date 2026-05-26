@@ -174,6 +174,22 @@ export const WAKEUP_REVERSAL_WINDOW = 5;  // KOF2002: ~5帧起身反转窗口
 export const WAKEUP_BUFFER_WINDOW = 5;    // 起身前5帧可缓冲输入
 export const WAKEUP_FULL_INVINCIBILITY = 5; // KOF2002: 正常起身(非Quick Stand)前5帧完全无敌
 
+// ===== Stun / Dizzy System (KOF2002 authentic) =====
+// Stun gauge fills when hit; when full the character enters dizzy state.
+export const STUN_GAUGE_MAX = 100;                // Stun gauge max value
+export const STUN_DECAY_DELAY = 60;               // Frames without being hit before gauge starts decaying
+export const STUN_DECAY_RATE = 0.5;               // Gauge decay per frame during delay window
+export const STUN_FILL_LIGHT = 6;                 // Light normal (A/B) stun fill
+export const STUN_FILL_HEAVY = 12;                // Heavy normal (C/D) stun fill
+export const STUN_FILL_COMMAND_NORMAL = 10;        // Command normal stun fill
+export const STUN_FILL_SPECIAL = 18;               // Special move stun fill
+export const STUN_FILL_DM = 25;                    // DM/SDM stun fill
+export const STUN_FILL_CD = 14;                    // CD blowback stun fill
+export const STUN_FILL_THROW = 15;                 // Throw stun fill
+export const DIZZY_BASE_DURATION_MIN = 60;         // Minimum dizzy frames (~1 sec)
+export const DIZZY_BASE_DURATION_MAX = 180;        // Maximum dizzy frames (~3 sec)
+export const DIZZY_MASH_RECOVERY = 3;              // Frames recovered per button press (mashing)
+
 // ===== HUD Layout =====
 export const HUD_BAR_WIDTH = 300;
 export const HUD_BAR_HEIGHT = 20;

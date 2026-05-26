@@ -29,7 +29,7 @@ function stateToPoseSet(state: FighterState): PoseSet {
     case FighterState.CROUCH: case FighterState.ROLL: case FighterState.BACK_ROLL: return 'crouch';
     case FighterState.JUMP: case FighterState.HOP: case FighterState.RUN_JUMP:
     case FighterState.HYPER_JUMP: case FighterState.BACKDASH: return 'jump';
-    case FighterState.HITSTUN: case FighterState.GUARD_CRUSH: return 'hit';
+    case FighterState.HITSTUN: case FighterState.GUARD_CRUSH: case FighterState.DIZZY: return 'hit';
     case FighterState.BLOCK: case FighterState.AIR_BLOCK: return 'block';
     case FighterState.KNOCKDOWN: return 'hit';
     default: return 'idle';
@@ -117,7 +117,7 @@ export function generatePlaceholderSpritesheet(color: string, charId: string): {
     FighterState.STAND_ATTACK, FighterState.CROUCH_ATTACK, FighterState.AIR_ATTACK,
     FighterState.COUNTER_STANCE, FighterState.THROW, FighterState.MAX_MODE,
     FighterState.BLOCK, FighterState.AIR_BLOCK, FighterState.GUARD_CRUSH,
-    FighterState.HITSTUN, FighterState.BACKDASH,
+    FighterState.HITSTUN, FighterState.BACKDASH, FighterState.DIZZY,
   ];
 
   const animations: SpriteAnimationMap = {};

@@ -548,6 +548,13 @@ function update(): void {
 
   updateMovementVfx([p1, p2], vfx, tickRef.value);
 
+  // Dizzy stars: spawn periodically for fighters in DIZZY state
+  for (const f of [p1, p2]) {
+    if (f.state === FighterState.DIZZY && tickRef.value % 20 === 0) {
+      vfx.spawnDizzyStars(f.x, f.y - f.displayHeight - 10);
+    }
+  }
+
   for (let i = projectiles.length - 1; i >= 0; i--) { if (!projectiles[i].active) projectiles.splice(i, 1); }
 
   for (let i = 0; i < projectiles.length; i++) {

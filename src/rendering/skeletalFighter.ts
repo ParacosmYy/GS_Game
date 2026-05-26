@@ -61,15 +61,23 @@ export function drawSkeletalFighter(
     legBack: { ...currentPose.legBack },
   };
 
-  // Idle breathing — character-specific
+  // Idle breathing — character-specific breathing + body language profiles
+  // Each character gets unique breathSpeed (cycle period), breathAmp (vertical range),
+  // headBob, chestLift, shoulderTilt, plus optional body sway and arm offsets.
   if (f.state === FighterState.IDLE) {
     const charId = f.charId ?? '';
-    // Breathing speed/amplitude varies by character
     let breathSpeed = 30;
     let breathAmp = 2;
     let headBob = 0;
     let chestLift = 0;
     let shoulderTilt = 0;
+    // Body sway: lateral oscillation for characters that shift weight side-to-side
+    let bodySway = 0;
+    // Arm position offsets: characters with distinct default arm angles
+    let armFrontRotOffset = 0;
+    let armBackRotOffset = 0;
+
+    // ── Original 8 characters ──
     if (charId === 'kyo') { breathSpeed = 23; breathAmp = 2.9; headBob = 1.1; chestLift = -0.6; shoulderTilt = 0.05; }
     else if (charId === 'iori') { breathSpeed = 38; breathAmp = 1.2; headBob = -0.6; chestLift = 0.9; shoulderTilt = -0.08; }
     else if (charId === 'terry') { breathSpeed = 27; breathAmp = 2.8; headBob = 1.1; chestLift = -0.2; }
@@ -78,9 +86,27 @@ export function drawSkeletalFighter(
     else if (charId === 'leona') { breathSpeed = 32; breathAmp = 1.5; headBob = 0; }
     else if (charId === 'kdash') { breathSpeed = 24; breathAmp = 1.9; headBob = 0.4; }
     else if (charId === 'kula') { breathSpeed = 28; breathAmp = 1.8; headBob = 0.8; }
-    else if (charId === 'robert') { breathSpeed = 26; breathAmp = 2.1; headBob = 0.9; }
+    // ── New characters: breathing profiles ──
+    // Mai: graceful, slow breathing with gentle sway, fan-dancer posture
+    else if (charId === 'mai') { breathSpeed = 32; breathAmp = 1.6; headBob = 0.7; chestLift = -0.3; bodySway = 1.2; armFrontRotOffset = 0.06; armBackRotOffset = -0.1; }
+    // Robert: confident karateka, moderate breathing, slight head tilt
+    else if (charId === 'robert') { breathSpeed = 26; breathAmp = 2.1; headBob = 0.9; chestLift = -0.2; shoulderTilt = 0.04; }
+    // Clark: heavy grappler, slow deep breaths, very stable base
+    else if (charId === 'clark') { breathSpeed = 20; breathAmp = 3.2; headBob = 0.5; chestLift = 0.4; shoulderTilt = 0.02; armFrontRotOffset = -0.04; }
+    // Ralf: military brawler, powerful breaths, shoulders tense
+    else if (charId === 'ralf') { breathSpeed = 21; breathAmp = 3.0; headBob = 0.6; chestLift = 0.3; shoulderTilt = 0.06; armFrontRotOffset = -0.06; }
+    // Joe: Muay Thai stance, high guard, rhythmic bounce
+    else if (charId === 'joe') { breathSpeed = 20; breathAmp = 2.6; headBob = 1.0; chestLift = -0.1; bodySway = 0.8; armFrontRotOffset = 0.08; }
+    // Andy: disciplined Shiranui style, compact breathing
+    else if (charId === 'andy') { breathSpeed = 25; breathAmp = 1.9; headBob = 0.5; chestLift = -0.2; shoulderTilt = 0.03; armFrontRotOffset = 0.04; }
+    // Billy: tall staff user, upright posture, minimal movement
+    else if (charId === 'billy') { breathSpeed = 34; breathAmp = 1.4; headBob = 0.3; chestLift = 0.1; armFrontRotOffset = -0.12; armBackRotOffset = 0.15; }
+    // Chang: enormous, slow labored breathing, heavy sway
+    else if (charId === 'chang') { breathSpeed = 18; breathAmp = 3.8; headBob = 1.4; chestLift = 0.6; bodySway = 1.8; armFrontRotOffset = -0.08; }
+    // Yashiro: power fighter, broad shoulders, heavy breathing
+    else if (charId === 'yashiro') { breathSpeed = 22; breathAmp = 2.5; headBob = 1.1; chestLift = 0.3; shoulderTilt = 0.05; armFrontRotOffset = -0.04; }
+    // ── Existing extended roster ──
     else if (charId === 'mature') { breathSpeed = 30; breathAmp = 1.7; headBob = 0.4; }
-    else if (charId === 'yashiro') { breathSpeed = 22; breathAmp = 2.5; headBob = 1.1; }
     else if (charId === 'chris') { breathSpeed = 24; breathAmp = 2.2; headBob = 0.8; }
     else if (charId === 'shermie') { breathSpeed = 30; breathAmp = 1.6; headBob = 0.4; }
     else if (charId === 'vice') { breathSpeed = 26; breathAmp = 2.0; headBob = 0.6; }
@@ -88,10 +114,18 @@ export function drawSkeletalFighter(
     else if (charId === 'yamazaki') { breathSpeed = 28; breathAmp = 1.8; headBob = 0.2; }
     else if (charId === 'mary') { breathSpeed = 26; breathAmp = 1.8; headBob = 0.5; }
     else if (charId === 'kasumi') { breathSpeed = 28; breathAmp = 1.6; headBob = 0.4; }
+
     const breathe = Math.sin(globalTick / breathSpeed) * breathAmp;
     p.body.oy += breathe + chestLift;
     p.body.rot += shoulderTilt * Math.sin(globalTick / (breathSpeed * 2));
     p.head.oy += breathe + headBob * Math.sin(globalTick / breathSpeed * 0.5);
+    // Body sway: lateral shift for characters with weight-shifting idle
+    p.body.ox += bodySway * Math.sin(globalTick / (breathSpeed * 1.5)) * 0.5;
+    // Arm offsets: character-specific default arm angle adjustments
+    p.armFront.rot += armFrontRotOffset * Math.sin(globalTick / (breathSpeed * 1.2));
+    p.armBack.rot += armBackRotOffset * Math.sin(globalTick / (breathSpeed * 1.2));
+
+    // ── Character-specific idle silhouette adjustments ──
     if (charId === 'iori') {
       // Iori reads better when the silhouette feels coiled instead of upright.
       p.head.rot -= 0.05;
@@ -108,6 +142,59 @@ export function drawSkeletalFighter(
       p.head.rot += 0.02;
       p.armFront.rot -= 0.03;
       p.armBack.rot += 0.03;
+    } else if (charId === 'mai') {
+      // Mai: one hand slightly raised (fan position), graceful head tilt
+      p.armFront.oy -= 2;
+      p.armFront.rot += 0.12;
+      p.head.rot -= 0.03;
+      p.body.rot += 0.02;
+    } else if (charId === 'clark') {
+      // Clark: wide grappler stance, fists ready at chest level
+      p.armFront.oy -= 3;
+      p.armFront.rot -= 0.06;
+      p.armBack.rot += 0.04;
+      p.legFront.ox += 2;
+      p.legBack.ox -= 2;
+    } else if (charId === 'ralf') {
+      // Ralf: aggressive military stance, fists clenched tight
+      p.armFront.rot -= 0.08;
+      p.armBack.rot += 0.06;
+      p.head.rot -= 0.02;
+      p.body.oy += 1;
+    } else if (charId === 'chang') {
+      // Chang: heavy labored stance, iron ball weight shows in posture
+      p.body.oy += 2;
+      p.head.oy += 1;
+      p.armFront.rot += 0.15;
+      p.armBack.rot -= 0.1;
+      p.legFront.ox += 3;
+      p.legBack.ox -= 3;
+    } else if (charId === 'joe') {
+      // Joe: Muay Thai high guard, bouncing rhythm
+      p.armFront.oy -= 4;
+      p.armFront.rot += 0.1;
+      p.armBack.oy -= 3;
+      p.armBack.rot -= 0.1;
+      p.head.rot += 0.02;
+    } else if (charId === 'billy') {
+      // Billy: tall upright staff stance, one arm reaching up (holding staff)
+      p.armFront.oy -= 6;
+      p.armFront.rot -= 0.2;
+      p.armBack.oy -= 2;
+      p.armBack.rot += 0.08;
+      p.head.oy -= 1;
+    } else if (charId === 'yashiro') {
+      // Yashiro: broad-shouldered power stance, fists loose at sides
+      p.armFront.rot += 0.04;
+      p.armBack.rot -= 0.06;
+      p.body.oy += 1;
+      p.legFront.ox += 2;
+      p.legBack.ox -= 2;
+    } else if (charId === 'andy') {
+      // Andy: compact Shiranui stance, one hand forward
+      p.armFront.oy -= 2;
+      p.armFront.rot += 0.08;
+      p.head.rot -= 0.02;
     }
   }
 
@@ -246,6 +333,109 @@ export function drawSkeletalFighter(
     }
   }
 
+  // ── Attack pose differentiation — character-specific attack stance modifiers ──
+  // Applied on top of the base attack poses to make each character's strikes feel distinct
+  if (f.state === FighterState.STAND_ATTACK || f.state === FighterState.CROUCH_ATTACK || f.state === FighterState.AIR_ATTACK) {
+    const charId = f.charId ?? '';
+    const isKicking = p.legFront.scale > 1.05; // detect kick attacks by leg scale
+    if (charId === 'kyo') {
+      // Kyo: wide karate stances, powerful punches with full body rotation
+      p.body.rot += 0.06;
+      p.armFront.oy -= 2;
+      p.armFront.rot -= 0.08;
+      p.legFront.ox += 2;
+    } else if (charId === 'iori') {
+      // Iori: claw-like hand positions, hunched forward, slashing motions
+      p.head.rot += 0.06;
+      p.body.rot += 0.04;
+      p.body.oy += 2;
+      p.armFront.rot += 0.12;
+      p.armFront.scale *= 1.08;
+    } else if (charId === 'terry') {
+      // Terry: boxing-style punches, cap-like head forward, solid base
+      p.head.oy += 1;
+      p.head.rot -= 0.04;
+      p.body.rot += 0.03;
+      p.legFront.ox += 1;
+    } else if (charId === 'kim') {
+      // Kim: taekwondo high kicks, wide stance, upright posture on punches
+      if (isKicking) {
+        p.legFront.rot += 0.15;
+        p.legFront.scale *= 1.1;
+        p.body.oy -= 2;
+      } else {
+        p.armFront.rot -= 0.06;
+        p.body.rot += 0.04;
+      }
+    } else if (charId === 'ryo') {
+      // Ryo: kyokushin low stance, tight punches, rooted to the ground
+      p.body.oy += 2;
+      p.body.rot += 0.02;
+      p.armFront.rot -= 0.1;
+      p.head.rot -= 0.02;
+      p.legFront.oy += 1;
+    } else if (charId === 'mai') {
+      // Mai: fan-like hand positions, graceful kicks with extended reach
+      if (isKicking) {
+        p.legFront.rot += 0.1;
+        p.legFront.scale *= 1.06;
+        p.body.rot -= 0.03;
+      } else {
+        p.armFront.rot += 0.08;
+        p.armFront.scale *= 1.04;
+      }
+      p.head.rot -= 0.03;
+      p.body.oy -= 1;
+    } else if (charId === 'clark' || charId === 'ralf') {
+      // Grapplers: wider body, heavier movements, more torso commitment
+      p.body.rot += 0.08;
+      p.armFront.scale *= 1.12;
+      p.armFront.oy -= 2;
+      p.legFront.ox += 2;
+      p.legBack.ox -= 2;
+      p.body.oy += 1;
+      if (charId === 'ralf') {
+        // Ralf: even more aggressive, lunging forward
+        p.body.ox += 2;
+        p.armFront.scale *= 1.06;
+      }
+    } else if (charId === 'chang') {
+      // Chang: enormous swings, whole body behind the attack
+      p.body.rot += 0.1;
+      p.armFront.scale *= 1.2;
+      p.armFront.oy -= 3;
+      p.legFront.ox += 3;
+      p.legBack.ox -= 3;
+      p.body.oy += 2;
+    } else if (charId === 'joe') {
+      // Joe: Muay Thai elbows and knees, high guard maintained
+      p.armBack.rot -= 0.08;
+      p.armBack.oy -= 2;
+      if (isKicking) {
+        p.legFront.rot += 0.12;
+        p.legFront.scale *= 1.08;
+      }
+      p.body.rot += 0.04;
+    } else if (charId === 'billy') {
+      // Billy: long-reaching staff strikes, one arm extended far
+      p.armFront.oy -= 4;
+      p.armFront.rot -= 0.15;
+      p.armFront.scale *= 1.15;
+      p.body.rot += 0.02;
+    } else if (charId === 'yashiro') {
+      // Yashiro: brutal power punches, broad shoulders commit fully
+      p.body.rot += 0.08;
+      p.armFront.scale *= 1.14;
+      p.armFront.oy -= 2;
+      p.legFront.ox += 2;
+    } else if (charId === 'andy') {
+      // Andy: fast, precise strikes from Shiranui style
+      p.armFront.rot -= 0.04;
+      p.body.rot += 0.03;
+      p.head.rot -= 0.02;
+    }
+  }
+
   // Height factor for crouch/roll — KOF2002: 蹲下时宽度略增, 压缩感更自然
   const isCrouching = f.state === FighterState.CROUCH;
   const isRolling = f.state === FighterState.ROLL || f.state === FighterState.BACK_ROLL;
@@ -294,6 +484,23 @@ export function drawSkeletalFighter(
       p.armBack.rot -= 0.45 * stunProgress;
       p.body.oy += 0.6 * recoil;
     }
+  }
+  // KOF2002: Dizzy wobble — character sways back and forth with drooping arms
+  if (f.state === FighterState.DIZZY) {
+    const wobble = Math.sin(globalTick * 0.15) * 0.15;
+    const headWobble = Math.sin(globalTick * 0.2) * 0.2;
+    p.body.rot += wobble;
+    p.body.oy += Math.abs(Math.sin(globalTick * 0.12)) * 2;
+    p.head.rot += headWobble;
+    p.head.oy -= 3;
+    // Arms droop lifelessly
+    p.armFront.rot += 0.4 + Math.sin(globalTick * 0.1) * 0.1;
+    p.armBack.rot += 0.35 + Math.sin(globalTick * 0.1 + 1) * 0.1;
+    p.armFront.oy += 4;
+    p.armBack.oy += 4;
+    // Legs slightly buckled
+    p.legFront.oy += 2;
+    p.legBack.oy += 2;
   }
   // KOF2002: Knockdown tumble — character tumbles with rotation
   if (f.state === FighterState.KNOCKDOWN) {
@@ -611,81 +818,49 @@ function drawFistGlow(
   ctx.arc(0, fistY, fistR, 0, Math.PI * 2);
   ctx.fill();
   ctx.stroke();
-  // 角色专属光效
+  // 角色专属光效 — each character has a unique attack accent color
   const flicker = 0.3 + Math.sin(tick * 0.2) * 0.15;
+  const glow = getAttackAccentGlow(charId);
+  if (glow) {
+    ctx.shadowColor = glow.shadow;
+    ctx.shadowBlur = glow.blur;
+    ctx.fillStyle = `rgba(${glow.r}, ${glow.g}, ${glow.b}, ${flicker * glow.intensity})`;
+    ctx.beginPath(); ctx.arc(0, fistY, fistR + glow.radius, 0, Math.PI * 2); ctx.fill();
+    ctx.shadowBlur = 0;
+  }
+}
+
+/** Per-character attack accent color configuration */
+function getAttackAccentGlow(charId: string): { shadow: string; blur: number; r: number; g: number; b: number; intensity: number; radius: number } | null {
   switch (charId) {
-    case 'kyo': {
-      ctx.shadowColor = '#ff4400';
-      ctx.shadowBlur = 12;
-      ctx.fillStyle = `rgba(255, 120, 0, ${flicker})`;
-      ctx.beginPath(); ctx.arc(0, fistY, fistR + 3, 0, Math.PI * 2); ctx.fill();
-      ctx.shadowBlur = 0;
-      break;
-    }
-    case 'iori': {
-      ctx.shadowColor = '#8800cc';
-      ctx.shadowBlur = 10;
-      ctx.fillStyle = `rgba(136, 0, 204, ${flicker})`;
-      ctx.beginPath(); ctx.arc(0, fistY, fistR + 2, 0, Math.PI * 2); ctx.fill();
-      ctx.shadowBlur = 0;
-      break;
-    }
-    case 'terry': {
-      ctx.shadowColor = '#ffcc00';
-      ctx.shadowBlur = 8;
-      ctx.fillStyle = `rgba(255, 200, 0, ${flicker * 0.7})`;
-      ctx.beginPath(); ctx.arc(0, fistY, fistR + 2, 0, Math.PI * 2); ctx.fill();
-      ctx.shadowBlur = 0;
-      break;
-    }
-    case 'kim': {
-      ctx.shadowColor = '#4488ff';
-      ctx.shadowBlur = 8;
-      ctx.fillStyle = `rgba(100, 150, 255, ${flicker * 0.6})`;
-      ctx.beginPath(); ctx.arc(0, fistY, fistR + 2, 0, Math.PI * 2); ctx.fill();
-      ctx.shadowBlur = 0;
-      break;
-    }
-    case 'ryo': {
-      ctx.shadowColor = '#ff8800';
-      ctx.shadowBlur = 10;
-      ctx.fillStyle = `rgba(255, 160, 0, ${flicker})`;
-      ctx.beginPath(); ctx.arc(0, fistY, fistR + 3, 0, Math.PI * 2); ctx.fill();
-      ctx.shadowBlur = 0;
-      break;
-    }
-    case 'leona': {
-      ctx.shadowColor = '#44ff88';
-      ctx.shadowBlur = 6;
-      ctx.fillStyle = `rgba(80, 255, 120, ${flicker * 0.5})`;
-      ctx.beginPath(); ctx.arc(0, fistY, fistR + 1, 0, Math.PI * 2); ctx.fill();
-      ctx.shadowBlur = 0;
-      break;
-    }
-    case 'kdash': {
-      ctx.shadowColor = '#ff4400';
-      ctx.shadowBlur = 8;
-      ctx.fillStyle = `rgba(255, 80, 0, ${flicker * 0.8})`;
-      ctx.beginPath(); ctx.arc(0, fistY, fistR + 2, 0, Math.PI * 2); ctx.fill();
-      ctx.shadowBlur = 0;
-      break;
-    }
-    case 'kula': {
-      ctx.shadowColor = '#44ccff';
-      ctx.shadowBlur = 8;
-      ctx.fillStyle = `rgba(100, 200, 255, ${flicker * 0.6})`;
-      ctx.beginPath(); ctx.arc(0, fistY, fistR + 2, 0, Math.PI * 2); ctx.fill();
-      ctx.shadowBlur = 0;
-      break;
-    }
-    case 'robert': {
-      ctx.shadowColor = '#22dd66';
-      ctx.shadowBlur = 8;
-      ctx.fillStyle = `rgba(68, 255, 136, ${flicker * 0.7})`;
-      ctx.beginPath(); ctx.arc(0, fistY, fistR + 2, 0, Math.PI * 2); ctx.fill();
-      ctx.shadowBlur = 0;
-      break;
-    }
+    case 'kyo':      return { shadow: '#ff4400', blur: 12, r: 255, g: 120, b: 0,   intensity: 1.0, radius: 3 };   // orange fire
+    case 'iori':     return { shadow: '#8800cc', blur: 10, r: 136, g: 0,   b: 204, intensity: 1.0, radius: 2 };   // purple claw
+    case 'terry':    return { shadow: '#ffcc00', blur: 8,  r: 255, g: 200, b: 0,   intensity: 0.7, radius: 2 };   // blue-gold (yellow glow)
+    case 'kim':      return { shadow: '#4488ff', blur: 8,  r: 100, g: 150, b: 255, intensity: 0.6, radius: 2 };   // white-blue TKD
+    case 'ryo':      return { shadow: '#ff8800', blur: 10, r: 255, g: 160, b: 0,   intensity: 1.0, radius: 3 };   // orange karate power
+    case 'leona':    return { shadow: '#44ff88', blur: 6,  r: 80,  g: 255, b: 120, intensity: 0.5, radius: 1 };   // green military
+    case 'kdash':    return { shadow: '#ff4400', blur: 8,  r: 255, g: 80,  b: 0,   intensity: 0.8, radius: 2 };   // red fire
+    case 'kula':     return { shadow: '#44ccff', blur: 8,  r: 100, g: 200, b: 255, intensity: 0.6, radius: 2 };   // ice blue
+    case 'robert':   return { shadow: '#22dd66', blur: 8,  r: 68,  g: 255, b: 136, intensity: 0.7, radius: 2 };   // green dragon
+    case 'mai':      return { shadow: '#ff4488', blur: 9,  r: 255, g: 100, b: 136, intensity: 0.8, radius: 2 };   // pink flame (fan fire)
+    case 'clark':    return { shadow: '#88aa44', blur: 10, r: 136, g: 170, b: 68,  intensity: 0.8, radius: 3 };   // olive-green military
+    case 'ralf':     return { shadow: '#ff8844', blur: 12, r: 255, g: 136, b: 68,  intensity: 0.9, radius: 3 };   // orange-red explosion
+    case 'joe':      return { shadow: '#ff8800', blur: 10, r: 255, g: 170, b: 0,   intensity: 0.85, radius: 3 };  // golden Muay Thai
+    case 'andy':     return { shadow: '#ffaa22', blur: 8,  r: 255, g: 180, b: 50,  intensity: 0.7, radius: 2 };   // amber Shiranui
+    case 'billy':    return { shadow: '#4488cc', blur: 8,  r: 80,  g: 150, b: 220, intensity: 0.7, radius: 2 };   // steel blue staff
+    case 'chang':    return { shadow: '#cc8833', blur: 12, r: 200, g: 140, b: 50,  intensity: 0.9, radius: 4 };   // heavy iron brown
+    case 'yashiro':  return { shadow: '#9966cc', blur: 10, r: 150, g: 100, b: 200, intensity: 0.8, radius: 3 };   // dark purple power
+    case 'athena':   return { shadow: '#ff66aa', blur: 8,  r: 255, g: 100, b: 170, intensity: 0.7, radius: 2 };   // psychic pink
+    case 'mature':   return { shadow: '#cc0044', blur: 8,  r: 200, g: 0,   b: 68,  intensity: 0.7, radius: 2 };   // blood red claw
+    case 'chris':    return { shadow: '#ff8844', blur: 8,  r: 255, g: 140, b: 68,  intensity: 0.7, radius: 2 };   // warm orange flame
+    case 'shermie':  return { shadow: '#cc44aa', blur: 8,  r: 200, g: 68,  b: 170, intensity: 0.7, radius: 2 };   // magenta lightning
+    case 'vice':     return { shadow: '#6644cc', blur: 8,  r: 100, g: 68,  b: 200, intensity: 0.8, radius: 2 };   // dark violet
+    case 'yamazaki': return { shadow: '#44aa00', blur: 9,  r: 68,  g: 170, b: 0,   intensity: 0.8, radius: 2 };   // sickly green snake
+    case 'mary':     return { shadow: '#4488ff', blur: 8,  r: 80,  g: 140, b: 255, intensity: 0.7, radius: 2 };   // blue wolf
+    case 'kasumi':   return { shadow: '#ff6688', blur: 7,  r: 255, g: 100, b: 136, intensity: 0.6, radius: 2 };   // soft pink judo
+    case 'xiangfei': return { shadow: '#ff8866', blur: 8,  r: 255, g: 140, b: 100, intensity: 0.7, radius: 2 };   // warm coral
+    case 'choi':     return { shadow: '#aacc00', blur: 7,  r: 170, g: 200, b: 0,   intensity: 0.6, radius: 1 };   // acidic yellow-green
+    default:         return null;
   }
 }
 

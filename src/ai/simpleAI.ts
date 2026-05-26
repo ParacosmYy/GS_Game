@@ -34,7 +34,7 @@ function mixFloat(hash: number, value: number, scale: number = 1000): number {
 
 // ─── AI action types (expanded) ───
 type AIAction = 'idle' | 'approach' | 'retreat' | 'attack' | 'block'
-  | 'antiair' | 'throw' | 'special' | 'jumpIn' | 'okizeme' | 'guardCancel' | 'counterStance';
+  | 'antiair' | 'throw' | 'special' | 'jumpIn' | 'okizeme' | 'guardCancel' | 'counterStance' | 'combo';
 
 // COMBO_ROUTES and JUMP_IN_ROUTE are imported from aiRoutes.ts
 
@@ -154,6 +154,13 @@ export class SimpleAI {
       this.action = 'okizeme';
       this.actionFrames = 30;
       this.okiTimer = 0;
+    }
+
+    // ── Dizzy punish: opponent is dizzy — free combo opportunity ──
+    if (canAct && opp.state === FighterState.DIZZY && dist < 150
+      && this.action !== 'combo' && this.chance(rng, 0.85)) {
+      this.action = 'combo';
+      this.actionFrames = 40;
     }
 
     // ── Decide (every 6-12 frames depending on difficulty) ──
@@ -474,7 +481,7 @@ export class SimpleAI {
           base.punchPressed = true;
           // Also hold forward for DP motion sometimes
           if (this.chance(rng, 0.5)) base.forward = true;
-        } else if (f.state === FighterState.BLOCK || f.state === FighterState.HITSTUN) {
+        } else if (f.state === FighterState.BLOCK || f.state === FighterState.HITSTUN || f.state === FighterState.DIZZY) {
           // Can't anti-air → block
           base.back = true;
           base.down = true;

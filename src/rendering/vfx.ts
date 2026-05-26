@@ -35,6 +35,7 @@ import {
   spawnProjectileExplosion,
   spawnTauntSparks,
   spawnCancelFlash,
+  spawnDizzyStars,
 } from './vfxPresets.js';
 import type { Particle } from './vfxPresets.js';
 
@@ -221,6 +222,11 @@ export class VFXSystem {
   /** 取消点闪光 — 命中可取消时在攻击者身上显示短暂蓝白光环 */
   spawnCancelFlash(x: number, y: number, height: number): void {
     spawnCancelFlash(this.particles, x, y, height);
+  }
+
+  /** Dizzy stars — orbiting stars above character's head during stun */
+  spawnDizzyStars(worldX: number, worldY: number): void {
+    spawnDizzyStars(this.particles, worldX, worldY);
   }
 
   update(): void {

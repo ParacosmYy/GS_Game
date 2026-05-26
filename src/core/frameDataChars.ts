@@ -248,180 +248,219 @@ export const FRAME_DATA_CHARS = {
     damage: 350, hitstun: 0, blockstun: 0, pushback: 0,
     hitLevel: 'MID' as const, knockdown: true, chipDamage: 30,
   },
-  // ── 特瑞必杀技 (Terry Bogard) ── APPROX (OG): SuperCombo Wiki KOF2002原版
+  // ── 特瑞必杀技 (Terry Bogard) ── Dream Cancel Wiki KOF2002UM 校准数据
   // Power Wave qcf+A (地面波)
   TERRY_POWER_WAVE: {
-    startup: 14, active: 20, recovery: 32,
-    damage: 85, hitstun: 31, blockstun: 29, pushback: 5,
+    startup: 12, active: 20, recovery: 32,
+    damage: 70, hitstun: 27, blockstun: 25, pushback: 5,
     hitLevel: 'MID' as const, knockdown: false, chipDamage: 8,
   },
-  // Round Wave qcf+C (原地波, 可取消) APPROX (OG)
+  // Round Wave qcf+C (原地波, 可取消)
   TERRY_ROUND_WAVE: {
-    startup: 19, active: 10, recovery: 18,
-    damage: 95, hitstun: 19, blockstun: 17, pushback: 5,
+    startup: 17, active: 10, recovery: 18,
+    damage: 90, hitstun: 19, blockstun: 17, pushback: 5,
     hitLevel: 'MID' as const, knockdown: true, chipDamage: 10,
   },
-  // Burn Knuckle qcb+A APPROX (OG)
+  // Burn Knuckle qcb+A
   TERRY_BURN_KNUCKLE: {
-    startup: 13, active: 10, recovery: 18,
-    damage: 60, hitstun: 19, blockstun: 17, pushback: 4,
-    hitLevel: 'MID' as const, knockdown: true,
-  },
-  // Burn Knuckle qcb+C (全屏) APPROX (OG)
-  TERRY_BURN_KNUCKLE_C: {
-    startup: 20, active: 19, recovery: 20,
-    damage: 85, hitstun: 19, blockstun: 17, pushback: 6,
-    hitLevel: 'MID' as const, knockdown: true,
-  },
-  // Crack Shoot qcb+B APPROX (OG)
-  TERRY_CRACK_SHOT: {
-    startup: 10, active: 6, recovery: 21,
+    startup: 11, active: 10, recovery: 18,
     damage: 55, hitstun: 19, blockstun: 17, pushback: 4,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 6,
+  },
+  // Burn Knuckle qcb+C (远距离)
+  TERRY_BURN_KNUCKLE_C: {
+    startup: 16, active: 14, recovery: 20,
+    damage: 80, hitstun: 19, blockstun: 17, pushback: 6,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 8,
+  },
+  // Crack Shoot qcb+B (中段)
+  TERRY_CRACK_SHOT: {
+    startup: 11, active: 6, recovery: 21,
+    damage: 50, hitstun: 19, blockstun: 17, pushback: 4,
     hitLevel: 'HIGH' as const, knockdown: false,
   },
-  // Crack Shoot qcb+D APPROX (OG)
+  // Crack Shoot qcb+D (中段)
   TERRY_CRACK_SHOT_D: {
     startup: 9, active: 8, recovery: 23,
-    damage: 65, hitstun: 19, blockstun: 17, pushback: 5,
+    damage: 60, hitstun: 19, blockstun: 17, pushback: 5,
     hitLevel: 'HIGH' as const, knockdown: false,
   },
-  // Power Dunk dp+B (2段KD) APPROX (OG)
+  // Power Dunk dp+B (2段KD)
   TERRY_POWER_DUNK: {
-    startup: 6, active: 8, recovery: 40,
-    damage: 100, hitstun: 25, blockstun: 20, pushback: 8,
+    startup: 8, active: 8, recovery: 40,
+    damage: 90, hitstun: 25, blockstun: 20, pushback: 8,
     hitLevel: 'MID' as const, knockdown: true, chipDamage: 12,
   },
-  // Power Dunk dp+D APPROX (OG)
+  // Power Dunk dp+D (2段KD)
   TERRY_POWER_DUNK_D: {
-    startup: 7, active: 8, recovery: 44,
-    damage: 115, hitstun: 25, blockstun: 20, pushback: 10,
+    startup: 10, active: 8, recovery: 44,
+    damage: 110, hitstun: 25, blockstun: 20, pushback: 10,
     hitLevel: 'MID' as const, knockdown: true, chipDamage: 14,
   },
-  // Rising Tackle d,u+A (多段上升) APPROX (OG)
+  // Rising Tackle d,u+A (多段上升)
   TERRY_RISING_TACKLE: {
-    startup: 5, active: 12, recovery: 35,
-    damage: 105, hitstun: 25, blockstun: 20, pushback: 8,
+    startup: 6, active: 12, recovery: 35,
+    damage: 90, hitstun: 25, blockstun: 20, pushback: 8,
     hitLevel: 'MID' as const, knockdown: true, chipDamage: 12,
   },
-  // Rising Tackle d,u+C (多段, 更多hits) APPROX (OG)
+  // Rising Tackle d,u+C (多段, 更多hits)
   TERRY_RISING_TACKLE_C: {
-    startup: 5, active: 16, recovery: 39,
-    damage: 135, hitstun: 28, blockstun: 22, pushback: 10,
+    startup: 6, active: 16, recovery: 39,
+    damage: 130, hitstun: 28, blockstun: 22, pushback: 10,
     hitLevel: 'MID' as const, knockdown: true, chipDamage: 14,
   },
-  // ── 特瑞DM ── APPROX (OG)
+  // ── 特瑞DM ── Dream Cancel Wiki KOF2002UM 校准数据
   DM_POWER_GEYSER_A: {
+    startup: 16, active: 10, recovery: 43,
+    damage: 200, hitstun: 0, blockstun: 21, pushback: 10,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 20,
+  },
+  DM_POWER_GEYSER_C: {
+    startup: 17, active: 11, recovery: 47,
+    damage: 200, hitstun: 0, blockstun: 21, pushback: 10,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 20,
+  },
+  DM_HIGH_ANGLE_GEYSER_B: {
+    startup: 7, active: 12, recovery: 33,
+    damage: 190, hitstun: 0, blockstun: 21, pushback: 10,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 18,
+  },
+  DM_HIGH_ANGLE_GEYSER_D: {
+    startup: 11, active: 14, recovery: 37,
+    damage: 190, hitstun: 0, blockstun: 21, pushback: 10,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 18,
+  },
+  SDM_TRIPLE_GEYSER: {
+    startup: 17, active: 22, recovery: 36,
+    damage: 340, hitstun: 0, blockstun: 21, pushback: 12,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 30,
+  },
+  // ── 特瑞DM别名 (Terry DM aliases, used by combat system) ──
+  DM_POWER_GEYSER: {
     startup: 17, active: 10, recovery: 43,
     damage: 220, hitstun: 0, blockstun: 21, pushback: 10,
     hitLevel: 'MID' as const, knockdown: true, chipDamage: 22,
   },
-  DM_POWER_GEYSER_C: {
-    startup: 18, active: 11, recovery: 47,
-    damage: 220, hitstun: 0, blockstun: 21, pushback: 10,
-    hitLevel: 'MID' as const, knockdown: true, chipDamage: 22,
-  },
-  DM_HIGH_ANGLE_GEYSER_B: {
+  DM_HIGH_ANGLE_GEYSER: {
     startup: 6, active: 12, recovery: 33,
     damage: 200, hitstun: 0, blockstun: 21, pushback: 10,
     hitLevel: 'MID' as const, knockdown: true, chipDamage: 20,
   },
-  DM_HIGH_ANGLE_GEYSER_D: {
-    startup: 11, active: 14, recovery: 37,
-    damage: 200, hitstun: 0, blockstun: 21, pushback: 10,
-    hitLevel: 'MID' as const, knockdown: true, chipDamage: 20,
-  },
-  SDM_TRIPLE_GEYSER: {
-    startup: 18, active: 22, recovery: 36,
-    damage: 320, hitstun: 0, blockstun: 21, pushback: 12,
-    hitLevel: 'MID' as const, knockdown: true, chipDamage: 30,
-  },
-  // ── 金必杀技 (Kim Kaphwan) ──
+  // ── 金必杀技 (Kim Kaphwan) ── KOF2002UM calibrated
+  // 飛燕斬 dp+B (flash kick, KD)
   KIM_HIENZAN: {
     startup: 5, active: 6, recovery: 25,
     damage: 100, hitstun: 25, blockstun: 20, pushback: 8,
     hitLevel: 'MID' as const, knockdown: true, chipDamage: 12,
   },
+  // 飛燕斬 dp+D (强版, 多段 flash kick, KD)
+  KIM_HIENZAN_D: {
+    startup: 7, active: 10, recovery: 30,
+    damage: 140, hitstun: 26, blockstun: 20, pushback: 10,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 14,
+  },
+  // 半月斬 qcb+B (half-moon kick, overhead)
   KIM_HANGETSU: {
     startup: 7, active: 12, recovery: 29,
     damage: 80, hitstun: 19, blockstun: 17, pushback: 5,
-    hitLevel: 'MID' as const, knockdown: true,
+    hitLevel: 'HIGH' as const, knockdown: true,
   },
+  // 半月斬 qcb+D (强版, slower overhead)
+  KIM_HANGETSU_D: {
+    startup: 9, active: 14, recovery: 31,
+    damage: 110, hitstun: 22, blockstun: 19, pushback: 6,
+    hitLevel: 'HIGH' as const, knockdown: true,
+  },
+  // 覇気蹴り f+B (axe kick, LOW hitlevel)
   KIM_HAKI: {
     startup: 9, active: 5, recovery: 20,
     damage: 65, hitstun: 19, blockstun: 17, pushback: 3,
     hitLevel: 'LOW' as const, knockdown: false,
   },
+  // 飛翔脚 (flash kick cancel, very fast)
   KIM_HISHOU: {
     startup: 2, active: 8, recovery: 14,
     damage: 70, hitstun: 19, blockstun: 17, pushback: 4,
     hitLevel: 'MID' as const, knockdown: true,
   },
+  // 三連蹴り 1段 (triple kick, multi-hit)
   KIM_SANREN: {
-    startup: 8, active: 6, recovery: 24,
+    startup: 8, active: 14, recovery: 24,
     damage: 60, hitstun: 19, blockstun: 17, pushback: 3,
-    hitLevel: 'MID' as const, knockdown: false,
+    hitLevel: 'MID' as const, knockdown: true,
   },
-  // ── DM超必杀技 ──
+  // 三連蹴り 追加 (2nd+3rd hits)
+  KIM_SANREN_2: {
+    startup: 10, active: 12, recovery: 22,
+    damage: 55, hitstun: 19, blockstun: 17, pushback: 3,
+    hitLevel: 'MID' as const, knockdown: true,
+  },
+  // ── DM超必杀技 (Kim) ── KOF2002UM calibrated
+  // 鳳凰脚 (Hou'ou Kyaku, rushing DM)
   DM_YATAGARASU: {
-    startup: 6, active: 16, recovery: 42,
+    startup: 8, active: 16, recovery: 42,
     damage: 200, hitstun: 0, blockstun: 21, pushback: 8,
     hitLevel: 'MID' as const, knockdown: true, chipDamage: 18,
   },
-  DM_POWER_GEYSER: {
-    startup: 17, active: 10, recovery: 43,
-    damage: 200, hitstun: 0, blockstun: 21, pushback: 10,
-    hitLevel: 'MID' as const, knockdown: true, chipDamage: 16,
-  },
+  // 鳳凰天舞脚 (air/ground DM phoenix kick)
   DM_PHOENIX_KICK: {
     startup: 8, active: 13, recovery: 43,
     damage: 200, hitstun: 0, blockstun: 21, pushback: 8,
     hitLevel: 'MID' as const, knockdown: true, chipDamage: 17,
-  },
-  DM_HIGH_ANGLE_GEYSER: {
-    startup: 6, active: 12, recovery: 33,
-    damage: 180, hitstun: 0, blockstun: 21, pushback: 10,
-    hitLevel: 'MID' as const, knockdown: true, chipDamage: 15,
   },
   DM_PHOENIX_HITEN: {
     startup: 8, active: 5, recovery: 30,
     damage: 180, hitstun: 0, blockstun: 21, pushback: 8,
     hitLevel: 'MID' as const, knockdown: true, chipDamage: 14,
   },
-  // ── 坂崎亮必杀技 (Ryo Sakazaki) ──
+  // ── 坂崎亮必杀技 (Ryo Sakazaki) ── KOF2002UM calibrated
+  // 虎煌拳 qcf+A (Ko'ou Ken, projectile)
   RYO_KOOU: {
     startup: 12, active: 18, recovery: 34,
     damage: 75, hitstun: 28, blockstun: 26, pushback: 4,
     hitLevel: 'MID' as const, knockdown: false, chipDamage: 8,
   },
+  // 虎煌拳 qcf+C (Ko'ou Ken, strong projectile)
   RYO_KOOU_C: {
     startup: 13, active: 20, recovery: 32,
     damage: 105, hitstun: 30, blockstun: 28, pushback: 5,
     hitLevel: 'MID' as const, knockdown: false, chipDamage: 10,
   },
+  // 虎煌 dp+A (Kohou, weak DP, KD)
   RYO_KO_HOU: {
     startup: 5, active: 5, recovery: 25,
     damage: 80, hitstun: 22, blockstun: 18, pushback: 6,
-    hitLevel: 'MID' as const, knockdown: false, chipDamage: 10,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 10,
   },
+  // 虎煌 dp+C (Kohou, strong DP, KD)
   RYO_KO_HOU_C: {
     startup: 7, active: 10, recovery: 30,
     damage: 140, hitstun: 28, blockstun: 22, pushback: 10,
     hitLevel: 'MID' as const, knockdown: true, chipDamage: 14,
   },
+  // 飛燕疾風脚 qcb+K (Hien Shippu Kyaku, flying kick)
   RYO_HIEN: {
     startup: 10, active: 8, recovery: 22,
     damage: 95, hitstun: 24, blockstun: 20, pushback: 6,
     hitLevel: 'HIGH' as const, knockdown: true,
   },
+  // 暢連拳 hcb+P (Zanretsu Ken, multi-punch)
   RYO_HAOU: {
-    startup: 6, active: 12, recovery: 18,
-    damage: 60, hitstun: 20, blockstun: 16, pushback: 4,
+    startup: 10, active: 12, recovery: 22,
+    damage: 80, hitstun: 22, blockstun: 18, pushback: 5,
     hitLevel: 'MID' as const, knockdown: false,
   },
+  // DM 霸王翔吼拳 (Haoh Shoukou Ken, projectile DM)
   DM_TEN_HA_OU: {
-    startup: 10, active: 6, recovery: 35,
+    startup: 18, active: 10, recovery: 35,
     damage: 200, hitstun: 0, blockstun: 22, pushback: 10,
     hitLevel: 'MID' as const, knockdown: true, chipDamage: 18,
+  },
+  // DM 龍虎乱舞 (Ryuko Ranbu, rushing DM)
+  DM_RYUKO_RANBU: {
+    startup: 8, active: 10, recovery: 38,
+    damage: 220, hitstun: 0, blockstun: 21, pushback: 10,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 20,
   },
   // ── 莉安娜必杀技 (Leona Heidern) ──
   LEONA_MOON_SLASH: {
@@ -459,108 +498,170 @@ export const FRAME_DATA_CHARS = {
     damage: 210, hitstun: 0, blockstun: 22, pushback: 10,
     hitLevel: 'MID' as const, knockdown: true, chipDamage: 16,
   },
-  // ── 罗伯特必杀技 (Robert Garcia) ──
+  // ── 罗伯特必杀技 (Robert Garcia) ── KOF2002UM 校准数据
+  // 龙撃拳 qcf+A (飞行道具)
   ROBERT_RYU_GEKI: {
-    startup: 12, active: 20, recovery: 28,
-    damage: 70, hitstun: 24, blockstun: 22, pushback: 4,
+    startup: 12, active: 22, recovery: 28,
+    damage: 70, hitstun: 26, blockstun: 24, pushback: 4,
     hitLevel: 'MID' as const, knockdown: false, chipDamage: 8,
   },
+  // 龙撃拳 qcf+C (飞行道具 强版)
   ROBERT_RYU_GEKI_C: {
-    startup: 14, active: 24, recovery: 26,
-    damage: 95, hitstun: 26, blockstun: 24, pushback: 5,
+    startup: 15, active: 25, recovery: 26,
+    damage: 100, hitstun: 28, blockstun: 26, pushback: 5,
     hitLevel: 'MID' as const, knockdown: false, chipDamage: 10,
   },
+  // 龙牙 dp+A (DP 弱版)
   ROBERT_RYU_ZAN: {
-    startup: 5, active: 6, recovery: 24,
+    startup: 5, active: 6, recovery: 26,
     damage: 80, hitstun: 22, blockstun: 18, pushback: 6,
-    hitLevel: 'MID' as const, knockdown: true,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 10,
   },
+  // 龙牙 dp+C (DP 强版)
   ROBERT_RYU_ZAN_C: {
-    startup: 7, active: 10, recovery: 28,
+    startup: 6, active: 10, recovery: 30,
     damage: 130, hitstun: 28, blockstun: 22, pushback: 10,
-    hitLevel: 'MID' as const, knockdown: true,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 14,
   },
+  // 飞燕龍神脚 空中 qcb+K (空中俯冲踢)
   ROBERT_HIEN_RYU_JIN: {
     startup: 8, active: 8, recovery: 18,
     damage: 85, hitstun: 22, blockstun: 18, pushback: 5,
     hitLevel: 'MID' as const, knockdown: true,
   },
+  // 幻影脚 hcf+B (多段踢)
   ROBERT_GENEI_KYAKU: {
-    startup: 10, active: 6, recovery: 22,
-    damage: 75, hitstun: 20, blockstun: 16, pushback: 4,
+    startup: 10, active: 10, recovery: 22,
+    damage: 85, hitstun: 22, blockstun: 18, pushback: 5,
     hitLevel: 'HIGH' as const, knockdown: false,
   },
+  // 飞燕旋风脚 qcb+K (冲刺踢)
   ROBERT_HIEN_RYU_KYAKU: {
-    startup: 8, active: 10, recovery: 22,
-    damage: 90, hitstun: 22, blockstun: 18, pushback: 5,
+    startup: 12, active: 10, recovery: 22,
+    damage: 95, hitstun: 24, blockstun: 20, pushback: 6,
     hitLevel: 'MID' as const, knockdown: false,
   },
+  // 龙虎乱舞 DM qcf,qcf+P
   DM_RYU_KO_RYU: {
-    startup: 8, active: 6, recovery: 36,
-    damage: 220, hitstun: 0, blockstun: 22, pushback: 10,
-    hitLevel: 'MID' as const, knockdown: true, chipDamage: 18,
-  },
-  DM_HAOU_SHOKOU: {
-    startup: 10, active: 8, recovery: 38,
-    damage: 200, hitstun: 0, blockstun: 22, pushback: 10,
+    startup: 8, active: 8, recovery: 36,
+    damage: 220, hitstun: 0, blockstun: 21, pushback: 10,
     hitLevel: 'MID' as const, knockdown: true, chipDamage: 20,
   },
-  // ── 不知火舞必杀技 (Mai Shiranui) ──
+  // 霸王翔吼拳 DM f,hcf+P
+  DM_HAOU_SHOKOU: {
+    startup: 10, active: 10, recovery: 38,
+    damage: 210, hitstun: 0, blockstun: 21, pushback: 10,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 22,
+  },
+  // ── 不知火舞必杀技 (Mai Shiranui) ── KOF2002UM 校准数据
+  // 花蝶扇 qcf+A (飞行道具)
   MAI_KA_CHO_SEN: {
-    startup: 12, active: 18, recovery: 30,
+    startup: 13, active: 20, recovery: 30,
     damage: 70, hitstun: 28, blockstun: 26, pushback: 4,
     hitLevel: 'MID' as const, knockdown: false, chipDamage: 8,
   },
+  // 花蝶扇 qcf+C (飞行道具 强版)
   MAI_KA_CHO_SEN_C: {
-    startup: 14, active: 22, recovery: 28,
+    startup: 16, active: 24, recovery: 28,
     damage: 100, hitstun: 30, blockstun: 28, pushback: 5,
     hitLevel: 'MID' as const, knockdown: false, chipDamage: 10,
   },
+  // 飞翔龍炎陣 dp+K (DP)
   MAI_HISHO_RYU_EN_JIN: {
-    startup: 5, active: 6, recovery: 24,
-    damage: 80, hitstun: 22, blockstun: 18, pushback: 6,
+    startup: 6, active: 6, recovery: 26,
+    damage: 85, hitstun: 22, blockstun: 18, pushback: 6,
     hitLevel: 'MID' as const, knockdown: true, chipDamage: 10,
   },
+  // 龍炎舞 qcb+P (近距离火焰)
   MAI_RYU_EN_BU: {
     startup: 10, active: 8, recovery: 22,
     damage: 85, hitstun: 22, blockstun: 18, pushback: 5,
     hitLevel: 'MID' as const, knockdown: true,
   },
+  // ムササビの舞 空中 qcb+P (空中俯冲扇)
+  MAI_MUSASABI: {
+    startup: 12, active: 10, recovery: 20,
+    damage: 80, hitstun: 22, blockstun: 18, pushback: 5,
+    hitLevel: 'HIGH' as const, knockdown: true,
+  },
+  // 必殺忍蜂 ←↙↓↘→+K (冲刺攻击)
+  MAI_HISSATSU_SHINOBI: {
+    startup: 8, active: 8, recovery: 24,
+    damage: 90, hitstun: 24, blockstun: 20, pushback: 6,
+    hitLevel: 'MID' as const, knockdown: true,
+  },
+  // 花嵐 DM qcf,qcf+K
   DM_HAKA_OTOSHI: {
-    startup: 8, active: 10, recovery: 40,
-    damage: 200, hitstun: 0, blockstun: 22, pushback: 10,
+    startup: 10, active: 12, recovery: 40,
+    damage: 210, hitstun: 0, blockstun: 21, pushback: 10,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 20,
+  },
+  // 超必殺忍蜂 DM qcb,qcb+K
+  DM_CHOU_HISSATSU: {
+    startup: 8, active: 14, recovery: 38,
+    damage: 200, hitstun: 0, blockstun: 21, pushback: 10,
     hitLevel: 'MID' as const, knockdown: true, chipDamage: 18,
   },
-  // K' 必杀技
+  // ── K' 必杀技 (K Dash) ── KOF2002UM calibrated
+  // Ein Trigger qcf+A (standalone punch)
   KDASH_EINS: {
-    startup: 12, active: 25, recovery: 18,
+    startup: 10, active: 25, recovery: 18,
     damage: 60, hitstun: 14, blockstun: 12, pushback: 4,
     hitLevel: 'MID' as const, knockdown: false, chipDamage: 5,
   },
+  // Ein Trigger qcf+C (strong standalone punch)
   KDASH_EINS_C: {
-    startup: 14, active: 30, recovery: 20,
+    startup: 12, active: 30, recovery: 20,
     damage: 75, hitstun: 16, blockstun: 14, pushback: 5,
     hitLevel: 'MID' as const, knockdown: false, chipDamage: 6,
   },
+  // Second Shell qcf+A>K (followup kick from Ein Trigger)
+  KDASH_SECOND_SHELL: {
+    startup: 6, active: 8, recovery: 16,
+    damage: 50, hitstun: 16, blockstun: 14, pushback: 4,
+    hitLevel: 'MID' as const, knockdown: true,
+  },
+  // Second Spike qcf+A>D (low followup from Ein Trigger)
+  KDASH_SECOND_SPIKE: {
+    startup: 8, active: 6, recovery: 18,
+    damage: 45, hitstun: 14, blockstun: 12, pushback: 3,
+    hitLevel: 'LOW' as const, knockdown: false,
+  },
+  // Crow Bites dp+A (DP, KD)
   KDASH_CROW: {
     startup: 5, active: 6, recovery: 22,
     damage: 70, hitstun: 18, blockstun: 14, pushback: 5,
-    hitLevel: 'MID' as const, knockdown: true,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 10,
   },
+  // Crow Bites dp+C (strong DP, KD)
   KDASH_CROW_C: {
     startup: 6, active: 8, recovery: 26,
     damage: 90, hitstun: 20, blockstun: 16, pushback: 6,
-    hitLevel: 'MID' as const, knockdown: true,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 14,
   },
+  // Minute Spike qcb+K (jumping knee)
   KDASH_MINUTE: {
-    startup: 10, active: 6, recovery: 18,
+    startup: 14, active: 6, recovery: 18,
     damage: 65, hitstun: 16, blockstun: 14, pushback: 4,
     hitLevel: 'HIGH' as const, knockdown: false,
   },
+  // Narrow Spike qcb+K>d+K (followup slide)
   KDASH_NARROW: {
     startup: 8, active: 8, recovery: 16,
     damage: 55, hitstun: 14, blockstun: 12, pushback: 3,
-    hitLevel: 'LOW' as const, knockdown: false,
+    hitLevel: 'LOW' as const, knockdown: true,
+  },
+  // DM Chain Drive qcf,qcf+P (rushing DM)
+  DM_CHAIN_DRIVE: {
+    startup: 10, active: 10, recovery: 38,
+    damage: 200, hitstun: 0, blockstun: 21, pushback: 10,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 18,
+  },
+  // DM Heat Drive qcf,qcf+K (projectile DM, slow startup)
+  DM_HEAT_DRIVE: {
+    startup: 22, active: 14, recovery: 40,
+    damage: 210, hitstun: 0, blockstun: 22, pushback: 10,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 20,
   },
   // 库拉必杀技
   KULA_BREATH: {
@@ -639,21 +740,21 @@ export const FRAME_DATA_CHARS = {
     damage: 300, hitstun: 0, blockstun: 22, pushback: 12,
     hitLevel: 'MID' as const, knockdown: true, chipDamage: 28,
   },
-  // ── 罗伯特SDM (Robert Garcia) ──
+  // ── 罗伯特SDM (Robert Garcia) ── KOF2002UM 校准数据
   SDM_RYU_KO_RYU: {
     startup: 8, active: 12, recovery: 36,
-    damage: 320, hitstun: 0, blockstun: 22, pushback: 12,
+    damage: 320, hitstun: 0, blockstun: 21, pushback: 12,
     hitLevel: 'MID' as const, knockdown: true, chipDamage: 30,
   },
   SDM_HAOU_SHOKOU: {
     startup: 10, active: 14, recovery: 38,
-    damage: 300, hitstun: 0, blockstun: 22, pushback: 12,
+    damage: 310, hitstun: 0, blockstun: 21, pushback: 12,
     hitLevel: 'MID' as const, knockdown: true, chipDamage: 32,
   },
-  // ── 不知火舞SDM (Mai Shiranui) ──
+  // ── 不知火舞SDM (Mai Shiranui) ── KOF2002UM 校准数据
   SDM_HAKA_OTOSHI: {
     startup: 8, active: 15, recovery: 40,
-    damage: 300, hitstun: 0, blockstun: 22, pushback: 12,
+    damage: 310, hitstun: 0, blockstun: 21, pushback: 12,
     hitLevel: 'MID' as const, knockdown: true, chipDamage: 28,
   },
   // ── 雅典娜命令通常技 (Athena Asamiya) ──
@@ -710,154 +811,209 @@ export const FRAME_DATA_CHARS = {
     damage: 300, hitstun: 0, blockstun: 22, pushback: 12,
     hitLevel: 'MID' as const, knockdown: true, chipDamage: 30,
   },
-  // ── 克拉克必杀技 (Clark Still) ── APPROX based on KOF2002UM
+  // ── 克拉克必杀技 (Clark Still) ── KOF2002UM 校准数据
+  // Super Argentine Backbreaker hcf+A (指令投)
   CLARK_ARGENTINE: {
-    startup: 5, active: 2, recovery: 30,
+    startup: 3, active: 2, recovery: 30,
     damage: 120, hitstun: 0, blockstun: 0, pushback: 0,
     hitLevel: 'MID' as const, knockdown: true,
   },
+  // Super Argentine Backbreaker hcf+C (指令投 强版)
   CLARK_ARGENTINE_C: {
-    startup: 7, active: 2, recovery: 34,
+    startup: 4, active: 2, recovery: 34,
     damage: 150, hitstun: 0, blockstun: 0, pushback: 0,
     hitLevel: 'MID' as const, knockdown: true,
   },
+  // Flash Elbow dp+P (追击肘)
   CLARK_FLASH_ELBOW: {
-    startup: 8, active: 5, recovery: 20,
+    startup: 7, active: 5, recovery: 20,
     damage: 65, hitstun: 20, blockstun: 16, pushback: 4,
     hitLevel: 'MID' as const, knockdown: true,
   },
-  CLARK_VULCAN: {
-    startup: 10, active: 12, recovery: 24,
-    damage: 80, hitstun: 20, blockstun: 16, pushback: 5,
-    hitLevel: 'MID' as const, knockdown: false,
-  },
-  // ── 克拉克DM/SDM (Clark) ──
-  DM_ARGENTINE_DM: {
-    startup: 6, active: 4, recovery: 40,
-    damage: 200, hitstun: 0, blockstun: 22, pushback: 10,
-    hitLevel: 'MID' as const, knockdown: true, chipDamage: 18,
-  },
-  SDM_ARGENTINE_DM: {
-    startup: 6, active: 8, recovery: 38,
-    damage: 300, hitstun: 0, blockstun: 22, pushback: 12,
-    hitLevel: 'MID' as const, knockdown: true, chipDamage: 30,
-  },
-  // ── 拉尔夫必杀技 (Ralf Jones) ── APPROX based on KOF2002UM
-  RALF_VULCAN: {
-    startup: 8, active: 12, recovery: 24,
-    damage: 55, hitstun: 22, blockstun: 18, pushback: 5,
-    hitLevel: 'MID' as const, knockdown: false, chipDamage: 8,
-  },
-  RALF_VULCAN_C: {
-    startup: 10, active: 18, recovery: 28,
-    damage: 90, hitstun: 26, blockstun: 22, pushback: 8,
-    hitLevel: 'MID' as const, knockdown: true, chipDamage: 12,
-  },
-  RALF_BACKBREAKER: {
-    startup: 6, active: 2, recovery: 30,
-    damage: 120, hitstun: 0, blockstun: 0, pushback: 0,
+  // Napalm Stretch dp+K (对空捕捉)
+  CLARK_NAPALM_STRETCH: {
+    startup: 6, active: 6, recovery: 28,
+    damage: 95, hitstun: 22, blockstun: 18, pushback: 6,
     hitLevel: 'MID' as const, knockdown: true,
   },
+  // Mount Tackle hcf+K (冲刺投)
+  CLARK_MOUNT_TACKLE: {
+    startup: 10, active: 8, recovery: 26,
+    damage: 100, hitstun: 0, blockstun: 0, pushback: 0,
+    hitLevel: 'MID' as const, knockdown: true,
+  },
+  // Franken Steiner close hcf+K (近身投)
+  CLARK_VULCAN: {
+    startup: 5, active: 8, recovery: 24,
+    damage: 80, hitstun: 0, blockstun: 0, pushback: 0,
+    hitLevel: 'MID' as const, knockdown: true,
+  },
+  // ── 克拉克DM/SDM (Clark) ──
+  // Ultra Argentine Backbreaker DM
+  DM_ARGENTINE_DM: {
+    startup: 5, active: 4, recovery: 40,
+    damage: 220, hitstun: 0, blockstun: 0, pushback: 0,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 20,
+  },
+  SDM_ARGENTINE_DM: {
+    startup: 5, active: 8, recovery: 38,
+    damage: 320, hitstun: 0, blockstun: 0, pushback: 0,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 30,
+  },
+  // ── 拉尔夫必杀技 (Ralf Jones) ── KOF2002UM 校准数据
+  // Vulcan Punch qcf+A (机枪拳 多段)
+  RALF_VULCAN: {
+    startup: 10, active: 14, recovery: 24,
+    damage: 60, hitstun: 22, blockstun: 18, pushback: 5,
+    hitLevel: 'MID' as const, knockdown: false, chipDamage: 8,
+  },
+  // Vulcan Punch qcf+C (机枪拳 强版)
+  RALF_VULCAN_C: {
+    startup: 12, active: 20, recovery: 28,
+    damage: 100, hitstun: 26, blockstun: 22, pushback: 8,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 12,
+  },
+  // Bareback Vulcan Punch hcf+P (指令投)
+  RALF_BACKBREAKER: {
+    startup: 4, active: 2, recovery: 30,
+    damage: 130, hitstun: 0, blockstun: 0, pushback: 0,
+    hitLevel: 'MID' as const, knockdown: true,
+  },
+  // Gatling Attack charge b,f+P (冲刺攻击)
+  RALF_GATLING: {
+    startup: 12, active: 10, recovery: 26,
+    damage: 90, hitstun: 24, blockstun: 20, pushback: 7,
+    hitLevel: 'MID' as const, knockdown: true,
+  },
+  // Ralf Kick qcb+K (飞踢)
   RALF_KICK: {
-    startup: 12, active: 8, recovery: 22,
+    startup: 14, active: 8, recovery: 22,
     damage: 85, hitstun: 22, blockstun: 18, pushback: 6,
     hitLevel: 'MID' as const, knockdown: true,
   },
+  // Galactica Phantom DM charge b,f+P
   DM_GALACTICA_PHANTOM: {
-    startup: 12, active: 8, recovery: 40,
-    damage: 220, hitstun: 0, blockstun: 22, pushback: 12,
-    hitLevel: 'MID' as const, knockdown: true, chipDamage: 20,
+    startup: 12, active: 10, recovery: 40,
+    damage: 230, hitstun: 0, blockstun: 21, pushback: 12,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 22,
   },
   SDM_GALACTICA_PHANTOM: {
-    startup: 10, active: 14, recovery: 38,
-    damage: 320, hitstun: 0, blockstun: 22, pushback: 14,
+    startup: 10, active: 16, recovery: 38,
+    damage: 340, hitstun: 0, blockstun: 21, pushback: 14,
     hitLevel: 'MID' as const, knockdown: true, chipDamage: 32,
   },
-  // ── 乔·东必杀技 (Joe Higashi) ── APPROX based on KOF2002UM
+  // ── 乔·东必杀技 (Joe Higashi) ── KOF2002UM 校准数据
+  // Hurricane Upper qcf+A (龙卷风飞行道具)
   JOE_HURRICANE: {
-    startup: 12, active: 22, recovery: 30,
+    startup: 13, active: 22, recovery: 30,
     damage: 75, hitstun: 28, blockstun: 26, pushback: 4,
     hitLevel: 'MID' as const, knockdown: false, chipDamage: 8,
   },
+  // Hurricane Upper qcf+C (龙卷风 强版)
   JOE_HURRICANE_C: {
-    startup: 14, active: 28, recovery: 28,
-    damage: 105, hitstun: 30, blockstun: 28, pushback: 5,
+    startup: 15, active: 28, recovery: 28,
+    damage: 110, hitstun: 30, blockstun: 28, pushback: 5,
     hitLevel: 'MID' as const, knockdown: false, chipDamage: 10,
   },
+  // Tiger Kick dp+B (上升膝击 DP)
   JOE_TIGER_KICK: {
-    startup: 5, active: 6, recovery: 24,
+    startup: 5, active: 6, recovery: 26,
     damage: 85, hitstun: 22, blockstun: 18, pushback: 6,
     hitLevel: 'MID' as const, knockdown: true, chipDamage: 10,
   },
+  // Tiger Kick dp+D (上升膝击 DP 强版)
   JOE_TIGER_KICK_D: {
-    startup: 7, active: 10, recovery: 28,
-    damage: 130, hitstun: 28, blockstun: 22, pushback: 10,
+    startup: 6, active: 10, recovery: 30,
+    damage: 135, hitstun: 28, blockstun: 22, pushback: 10,
     hitLevel: 'MID' as const, knockdown: true, chipDamage: 14,
   },
+  // 爆裂拳 qcf+P连打 (多段拳击)
   JOE_BAKURETSUKEN: {
-    startup: 8, active: 12, recovery: 22,
-    damage: 65, hitstun: 22, blockstun: 18, pushback: 4,
+    startup: 9, active: 14, recovery: 22,
+    damage: 70, hitstun: 22, blockstun: 18, pushback: 4,
     hitLevel: 'MID' as const, knockdown: false,
   },
+  // Slash Kick qcb+K (冲刺踢)
   JOE_OUGON_KAKATO: {
-    startup: 10, active: 8, recovery: 20,
+    startup: 12, active: 8, recovery: 22,
     damage: 90, hitstun: 22, blockstun: 18, pushback: 5,
     hitLevel: 'MID' as const, knockdown: true,
   },
+  // 黄金之踵 ←↙↓↘→+K (黄金脚跟落地)
+  JOE_SLASH_KICK: {
+    startup: 10, active: 10, recovery: 24,
+    damage: 80, hitstun: 22, blockstun: 18, pushback: 5,
+    hitLevel: 'MID' as const, knockdown: false,
+  },
+  // Screw Upper DM qcf,qcf+P
   DM_SCREW_UPPER: {
-    startup: 10, active: 14, recovery: 40,
-    damage: 200, hitstun: 0, blockstun: 22, pushback: 10,
-    hitLevel: 'MID' as const, knockdown: true, chipDamage: 18,
+    startup: 10, active: 16, recovery: 40,
+    damage: 210, hitstun: 0, blockstun: 21, pushback: 10,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 20,
   },
   SDM_SCREW_UPPER: {
-    startup: 8, active: 22, recovery: 38,
-    damage: 300, hitstun: 0, blockstun: 22, pushback: 12,
+    startup: 8, active: 24, recovery: 38,
+    damage: 310, hitstun: 0, blockstun: 21, pushback: 12,
     hitLevel: 'MID' as const, knockdown: true, chipDamage: 30,
   },
-  // ── 安迪必杀技 (Andy Bogard) ── APPROX based on KOF2002UM
+  // ── 安迪必杀技 (Andy Bogard) ── KOF2002UM 校准数据
+  // 飛翔拳 qcf+A (飞行道具)
   ANDY_HISHOU_KEN: {
-    startup: 12, active: 20, recovery: 30,
+    startup: 13, active: 20, recovery: 30,
     damage: 70, hitstun: 28, blockstun: 26, pushback: 4,
     hitLevel: 'MID' as const, knockdown: false, chipDamage: 8,
   },
+  // 飛翔拳 qcf+C (飞行道具 强版)
   ANDY_HISHOU_KEN_C: {
-    startup: 14, active: 24, recovery: 28,
+    startup: 15, active: 24, recovery: 28,
     damage: 100, hitstun: 30, blockstun: 28, pushback: 5,
     hitLevel: 'MID' as const, knockdown: false, chipDamage: 10,
   },
+  // 昇龍弾 dp+A (DP 弱版)
   ANDY_SHOURYUU_DAN: {
-    startup: 5, active: 5, recovery: 25,
+    startup: 5, active: 6, recovery: 26,
     damage: 85, hitstun: 22, blockstun: 18, pushback: 6,
     hitLevel: 'MID' as const, knockdown: false, chipDamage: 10,
   },
+  // 昇龍弾 dp+C (DP 强版)
   ANDY_SHOURYUU_DAN_C: {
     startup: 7, active: 10, recovery: 30,
     damage: 140, hitstun: 28, blockstun: 22, pushback: 10,
     hitLevel: 'MID' as const, knockdown: true, chipDamage: 14,
   },
+  // 斬影拳 qcb+P (影肘突进)
   ANDY_ZANEI_RYUSEI_KEN: {
-    startup: 8, active: 8, recovery: 22,
+    startup: 10, active: 8, recovery: 22,
     damage: 90, hitstun: 22, blockstun: 18, pushback: 6,
     hitLevel: 'MID' as const, knockdown: true,
   },
+  // 斬影拳 qcb+K (影肘突进 强版)
   ANDY_ZANEI_RYUSEI_KEN_D: {
-    startup: 10, active: 12, recovery: 26,
-    damage: 110, hitstun: 26, blockstun: 20, pushback: 8,
+    startup: 12, active: 12, recovery: 26,
+    damage: 115, hitstun: 26, blockstun: 20, pushback: 8,
     hitLevel: 'MID' as const, knockdown: true,
   },
+  // 空破弾 ←↙↓↘→+K (冲刺肘)
   ANDY_GEKI_HISHOU_KEN: {
-    startup: 6, active: 8, recovery: 16,
+    startup: 8, active: 8, recovery: 20,
     damage: 80, hitstun: 22, blockstun: 18, pushback: 5,
     hitLevel: 'MID' as const, knockdown: true,
   },
+  // 上顎 qcb+K (分裂踢)
+  ANDY_KUHADAN: {
+    startup: 12, active: 8, recovery: 22,
+    damage: 85, hitstun: 22, blockstun: 18, pushback: 5,
+    hitLevel: 'MID' as const, knockdown: true,
+  },
+  // 超裂破弾 DM qcb,qcb+P
   DM_CHO_REPPA_DAN: {
     startup: 8, active: 14, recovery: 38,
-    damage: 200, hitstun: 0, blockstun: 22, pushback: 10,
-    hitLevel: 'MID' as const, knockdown: true, chipDamage: 18,
+    damage: 210, hitstun: 0, blockstun: 21, pushback: 10,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 20,
   },
   SDM_CHO_REPPA_DAN: {
     startup: 8, active: 22, recovery: 36,
-    damage: 300, hitstun: 0, blockstun: 22, pushback: 12,
+    damage: 310, hitstun: 0, blockstun: 21, pushback: 12,
     hitLevel: 'MID' as const, knockdown: true, chipDamage: 30,
   },
   // ── 比利必杀技 (Billy Kane) ── APPROX based on KOF2002UM

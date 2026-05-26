@@ -23,6 +23,12 @@ import {
   ROLL_INVINCIBLE_END,
   BACKDASH_DURATION,
   BACKDASH_INVINCIBLE_FRAMES,
+  STUN_GAUGE_MAX,
+  STUN_DECAY_DELAY,
+  STUN_DECAY_RATE,
+  DIZZY_BASE_DURATION_MIN,
+  DIZZY_BASE_DURATION_MAX,
+  DIZZY_MASH_RECOVERY,
 } from '../core/constants.js';
 import { ATTACK_FRAMES } from '../core/attackFrames.js';
 import type { CharacterStats } from '../characters/types.js';
@@ -50,6 +56,12 @@ export class Fighter {
   // Guard gauge (0–100, depleted by blocking attacks)
   guardGauge = 100;
   guardCrushTimer = 0;
+
+  // Stun / Dizzy gauge (0–STUN_GAUGE_MAX, fills on hit, decays when not hit)
+  stunGauge = 0;
+  stunDecayTimer = 0;        // frames since last hit; starts decaying after STUN_DECAY_DELAY
+  dizzyTimer = 0;            // remaining dizzy frames (counts down to recovery)
+  dizzyMashCount = 0;        // accumulated button mashes for faster recovery
 
   // State timers
   hitstunTimer = 0;
@@ -166,7 +178,7 @@ export class Fighter {
   /** Update auto-facing toward opponent */
   updateFacing(opponent: Fighter): void {
     // KOF2002: facing locked during hitstun, knockdown, and attack active phase
-    if (this.state === FighterState.HITSTUN || this.state === FighterState.KNOCKDOWN) return;
+    if (this.state === FighterState.HITSTUN || this.state === FighterState.KNOCKDOWN || this.state === FighterState.DIZZY) return;
     if (this.attackPhase === 'active' || this.attackPhase === 'startup') return;
     this.facing = opponent.x > this.x ? 1 : -1;
   }
@@ -236,6 +248,7 @@ export class Fighter {
     if (this.state === FighterState.AIR_BLOCK) return false;
     if (this.state === FighterState.THROW) return false;
     if (this.state === FighterState.GUARD_CRUSH) return false;
+    if (this.state === FighterState.DIZZY) return false;
     // Guard Cancel Roll is unthrowable (KOF2002)
     if (this.isRolling() && this.isGCRoll) return false;
     // Normal roll: throwable at any point (KOF2002)
@@ -441,6 +454,31 @@ export class Fighter {
     );
   }
 
+  /** Add stun fill from an attack hit. Returns true if gauge just reached max. */
+  addStunFill(amount: number): boolean {
+    this.stunGauge = Math.min(STUN_GAUGE_MAX, this.stunGauge + amount);
+    this.stunDecayTimer = 0; // reset decay timer on each hit
+    return this.stunGauge >= STUN_GAUGE_MAX;
+  }
+
+  /** Apply dizzy state with random duration */
+  applyDizzy(): void {
+    const range = DIZZY_BASE_DURATION_MAX - DIZZY_BASE_DURATION_MIN;
+    this.dizzyTimer = DIZZY_BASE_DURATION_MIN + Math.floor(Math.random() * range);
+    this.dizzyMashCount = 0;
+    this.state = FighterState.DIZZY;
+    this.vx = 0;
+    this.vy = 0;
+    this.resetAttackState();
+    this.resetCancelFlags();
+  }
+
+  /** Mash a button during dizzy to reduce remaining time */
+  mashDizzy(): void {
+    this.dizzyMashCount++;
+    this.dizzyTimer = Math.max(0, this.dizzyTimer - DIZZY_MASH_RECOVERY);
+  }
+
   /** Decrement per-frame timers (call once per logic frame) */
   tickTimers(): void {
     if (this.landingRecovery > 0) this.landingRecovery--;
@@ -463,12 +501,20 @@ export class Fighter {
     // IDLE/WALK: 0.25/F, RUN: 0.15/F (跑步恢复慢), HITSTUN: 不恢复, BLOCK: 不恢复
     if (this.guardGauge < 100) {
       if (this.state === FighterState.BLOCK || this.state === FighterState.HITSTUN
-        || this.state === FighterState.KNOCKDOWN || this.state === FighterState.GUARD_CRUSH) {
-        // 被打/防御中不恢复
+        || this.state === FighterState.KNOCKDOWN || this.state === FighterState.GUARD_CRUSH
+        || this.state === FighterState.DIZZY) {
+        // 被打/防御中/晕眩不恢复
       } else if (this.state === FighterState.RUN) {
         this.guardGauge = Math.min(100, this.guardGauge + 0.15);
       } else {
         this.guardGauge = Math.min(100, this.guardGauge + 0.25);
+      }
+    }
+    // Stun gauge decay: after STUN_DECAY_DELAY frames without being hit, gauge decays
+    if (this.stunGauge > 0 && this.state !== FighterState.DIZZY) {
+      this.stunDecayTimer++;
+      if (this.stunDecayTimer >= STUN_DECAY_DELAY) {
+        this.stunGauge = Math.max(0, this.stunGauge - STUN_DECAY_RATE);
       }
     }
   }
@@ -575,5 +621,9 @@ export class Fighter {
     this.throwInvulnFrames = 0;
     this.invincible = false;
     this.state = FighterState.IDLE;
+    this.stunGauge = 0;
+    this.stunDecayTimer = 0;
+    this.dizzyTimer = 0;
+    this.dizzyMashCount = 0;
   }
 }

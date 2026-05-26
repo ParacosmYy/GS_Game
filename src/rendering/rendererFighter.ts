@@ -309,11 +309,14 @@ export function resolveFighterColors(f: Fighter, globalTick: number): { bodyColo
       break;
     case FighterState.STAND_ATTACK:
     case FighterState.CROUCH_ATTACK:
-    case FighterState.AIR_ATTACK:
-      bodyColor = '#eebb00';
-      outlineColor = '#ffcc0060';
-      glowColor = '#ffaa0030';
+    case FighterState.AIR_ATTACK: {
+      // Character-specific attack color accent — each fighter gets a unique tint
+      const accent = getAttackColorAccent(f.charId ?? '');
+      bodyColor = accent.body;
+      outlineColor = accent.outline;
+      glowColor = accent.glow;
       break;
+    }
     case FighterState.BLOCK:
     case FighterState.AIR_BLOCK:
       bodyColor = '#6688aa';
@@ -335,6 +338,12 @@ export function resolveFighterColors(f: Fighter, globalTick: number): { bodyColo
         outlineColor = '#ff505070';
       }
       break;
+    case FighterState.DIZZY:
+      // KOF2002: dizzy characters flash yellow/white with a dazed look
+      bodyColor = globalTick % 10 < 3 ? '#ffffaa' : globalTick % 10 < 5 ? '#ffffff' : f.color;
+      outlineColor = '#ffcc0060';
+      glowColor = '#ffcc0020';
+      break;
     case FighterState.KNOCKDOWN:
       bodyColor = shiftColor(f.color, -50);
       outlineColor = '#88000040';
@@ -342,6 +351,40 @@ export function resolveFighterColors(f: Fighter, globalTick: number): { bodyColo
   }
 
   return { bodyColor, outlineColor, glowColor };
+}
+
+/** Character-specific attack color accent — each fighter gets a unique highlight during attacks */
+function getAttackColorAccent(charId: string): { body: string; outline: string; glow: string } {
+  switch (charId) {
+    case 'kyo':      return { body: '#ff8822', outline: '#ff660060', glow: '#ff440030' };   // orange fire
+    case 'iori':     return { body: '#aa44dd', outline: '#8800cc60', glow: '#6600aa30' };   // purple claw
+    case 'terry':    return { body: '#44aaff', outline: '#2288ff60', glow: '#0066ff30' };   // blue wolf
+    case 'kim':      return { body: '#eeeeff', outline: '#aabbff60', glow: '#8899ff30' };   // white-blue TKD
+    case 'ryo':      return { body: '#ff9922', outline: '#ff770060', glow: '#ff550030' };   // orange karate
+    case 'leona':    return { body: '#44dd88', outline: '#22bb6660', glow: '#00aa4430' };   // green military
+    case 'kdash':    return { body: '#ff5522', outline: '#ff330060', glow: '#dd110030' };   // red fire
+    case 'kula':     return { body: '#66ccff', outline: '#44aaee60', glow: '#2288dd30' };   // ice blue
+    case 'robert':   return { body: '#44dd88', outline: '#22cc6660', glow: '#00aa4430' };   // green dragon
+    case 'mai':      return { body: '#ff6688', outline: '#ff446660', glow: '#ff224430' };   // pink flame
+    case 'clark':    return { body: '#aacc66', outline: '#88aa4460', glow: '#66882230' };   // olive military
+    case 'ralf':     return { body: '#ffaa44', outline: '#ff882260', glow: '#ff660030' };   // orange explosion
+    case 'joe':      return { body: '#ffbb22', outline: '#ffaa0060', glow: '#ff880030' };   // golden Muay Thai
+    case 'andy':     return { body: '#ffcc44', outline: '#ffbb2260', glow: '#ffaa0030' };   // amber Shiranui
+    case 'billy':    return { body: '#5599dd', outline: '#3377bb60', glow: '#22559930' };   // steel blue staff
+    case 'chang':    return { body: '#cc9944', outline: '#aa772260', glow: '#88660030' };   // heavy iron
+    case 'yashiro':  return { body: '#9966cc', outline: '#7744aa60', glow: '#55228830' };   // dark purple power
+    case 'athena':   return { body: '#ff77aa', outline: '#ff558860', glow: '#ff336630' };   // psychic pink
+    case 'mature':   return { body: '#cc2255', outline: '#aa004460', glow: '#88003330' };   // blood red
+    case 'chris':    return { body: '#ff9955', outline: '#ff773360', glow: '#ff551130' };   // warm orange
+    case 'shermie':  return { body: '#cc55bb', outline: '#aa339960', glow: '#88117730' };   // magenta
+    case 'vice':     return { body: '#7755cc', outline: '#5533aa60', glow: '#33118830' };   // dark violet
+    case 'yamazaki': return { body: '#66bb22', outline: '#44990060', glow: '#22770030' };   // snake green
+    case 'mary':     return { body: '#5599ff', outline: '#3377dd60', glow: '#1155bb30' };   // blue wolf
+    case 'kasumi':   return { body: '#ff7799', outline: '#ff557760', glow: '#ff335530' };   // soft pink
+    case 'xiangfei': return { body: '#ff9977', outline: '#ff775560', glow: '#ff553330' };   // coral
+    case 'choi':     return { body: '#bbcc22', outline: '#99aa0060', glow: '#77880030' };   // acidic yellow
+    default:         return { body: '#eebb00', outline: '#ffcc0060', glow: '#ffaa0030' };   // default gold
+  }
 }
 
 /** Draw afterimage trail for RUN/BACKDASH/ROLL — skeletal pose with per-ghost alpha */

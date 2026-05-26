@@ -26,7 +26,7 @@ import { FighterState, AttackType, CLOSE_RANGE } from '../core/types.js';
 import { spendStocks, gainMeterOnWhiff } from '../combat/meter.js';
 import { isDM as isDMClassified } from '../core/attackClassifier.js';
 
-export { handleBlock, handleAirBlock, handleGuardCrush, handleCounterStance, handleHitstun, handleKnockdown } from './stunStateHandlers.js';
+export { handleBlock, handleAirBlock, handleGuardCrush, handleCounterStance, handleHitstun, handleKnockdown, handleDizzy } from './stunStateHandlers.js';
 
 // ─── Helper predicates ───
 

@@ -322,6 +322,14 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       deps.screenShake.trigger(5, 7, getAttackDirectionBias(attacker, defender, attackType, counterHit));
     }
 
+    // Dizzy: if defender just entered DIZZY state, dramatic flash and burst
+    if (defender.state === FighterState.DIZZY) {
+      deps.screenFlash.trigger('#ffffaa', 0.18, 6);
+      deps.screenShake.trigger(8, 12);
+      // Extra burst at the dizzy point
+      deps.vfx.spawnCharacterHitSparks(hitX, hitY, 12, '#ffff44', 1.2, 1.0, 0.3);
+    }
+
     // 连击数显示 + 高连击冲击环
     if (combo >= 2) deps.vfx.spawnDamageText(defender.x, defender.y - defender.displayHeight - 40, combo);
     // 连击只轻微补一层，不再额外叠满屏中环

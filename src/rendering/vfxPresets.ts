@@ -619,3 +619,27 @@ export function spawnTauntSparks(particles: Particle[], worldX: number, worldY: 
     });
   }
 }
+
+/** KOF2002: Dizzy stars — orbiting stars above the character's head */
+export function spawnDizzyStars(particles: Particle[], worldX: number, worldY: number): void {
+  // 3 stars orbiting above the head
+  const starCount = 3;
+  for (let i = 0; i < starCount; i++) {
+    const angle = (i / starCount) * Math.PI * 2;
+    particles.push({
+      x: worldX + Math.cos(angle) * 15,
+      y: worldY - 15,
+      vx: Math.cos(angle) * 0.8,
+      vy: -0.3,
+      life: 60,
+      maxLife: 60,
+      size: 5 + Math.random() * 3,
+      color: i === 0 ? '#ffff44' : i === 1 ? '#ff44ff' : '#44ffff',
+      type: 'star',
+      gravity: 0,
+      friction: 1.0,
+      rotation: angle,
+      rotSpeed: 0.1,
+    });
+  }
+}
