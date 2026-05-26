@@ -76,7 +76,9 @@ export function resolveProjectileHits(
       if (i === proj.ownerId) continue;
       const defender = fighters[i];
       const attacker = fighters[1 - i];
-      if (!aabbCheck(hitbox, defender.getEffectiveHurtbox() ?? defender.getHurtbox())) continue;
+      const defenderHurt = defender.getEffectiveHurtbox();
+      if (!defenderHurt) continue; // invincible — skip
+      if (!aabbCheck(hitbox, defenderHurt)) continue;
 
       // Roll invincibility — only first portion
       if (defender.isRollInvincible()) { proj.active = false; break; }

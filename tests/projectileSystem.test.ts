@@ -387,7 +387,7 @@ describe('Projectile in Combos', () => {
 // 5. Projectile Edge Cases
 // =====================================================================
 describe('Projectile Edge Cases', () => {
-  it('projectile hits invincible opponent: still hits (resolver uses getHurtbox fallback)', () => {
+  it('projectile passes through invincible opponent (asymmetric null-fallback bug fixed)', () => {
     const [p1, p2] = createFighterPair();
     p2.invincible = true;
 
@@ -397,14 +397,15 @@ describe('Projectile Edge Cases', () => {
 
     resolveProjectileHits(p1, p2, [proj], undefined, ctx);
 
-    // Note: resolveProjectileHits uses getEffectiveHurtbox() ?? getHurtbox()
-    // When invincible=true, getEffectiveHurtbox() returns null, but the nullish
-    // coalescing fallback falls through to getHurtbox() which still returns a box.
-    // This is a known asymmetry with CombatSystem.resolveHit which only uses
-    // getEffectiveHurtbox(). The projectile resolver does damage through the fallback.
-    const projData = FRAME_DATA.SPECIAL_PROJECTILE;
-    expect(p2.health).toBe(initialHealth - projData.damage);
-    expect(proj.active).toBe(false);
+    // Previously the resolver used getEffectiveHurtbox() ?? getHurtbox(), which
+    // fell through to getHurtbox() when invincible=true (getEffectiveHurtbox()
+    // returns null). This was asymmetric with CombatSystem.resolveHit which
+    // respects invincibility via a pre-check. Now the resolver checks
+    // getEffectiveHurtbox() for null and skips the defender, matching the
+    // behavior of melee hit resolution.
+    expect(p2.health).toBe(initialHealth);
+    // Projectile passes through — remains active
+    expect(proj.active).toBe(true);
   });
 
   it('projectile hits blocking opponent: chip damage only', () => {
