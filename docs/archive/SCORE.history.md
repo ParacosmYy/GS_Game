@@ -121,3 +121,9 @@
 ## H68: sprite frame cache机制—骨骼pose→离屏canvas缓存 — 40→41
 
 **commit:** <hash> | SpriteFrameCache类+offscreen canvas 160x200+opt-in blit+SSR安全
+
+---
+
+## H69: feedback manifest逐招Ryo数据—26个攻击类型显式档位映射 — 41→42
+
+**commit:** <hash> | 6light+10heavy+8special+2DM/SDM显式映射替代inferTier fallback

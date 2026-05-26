@@ -172,7 +172,41 @@ export function inferTier(attackType: AttackType): FeedbackTier {
 export const FEEDBACK_MANIFEST: FeedbackManifest = {
   version: 1,
   tiers: FEEDBACK_TIERS,
-  attackTierMap: {},
+  attackTierMap: {
+    // ===== Ryo 通常技 (light) =====
+    STAND_A: 'light',
+    CLOSE_A: 'light',
+    CROUCH_A: 'light',
+    JUMP_A: 'light',
+    JUMP_B: 'light',
+    CLOSE_B: 'light',
+
+    // ===== Ryo 重攻击 (heavy) =====
+    STAND_C: 'heavy',
+    STAND_D: 'heavy',
+    CLOSE_C: 'heavy',
+    CLOSE_D: 'heavy',
+    CROUCH_C: 'heavy',
+    CROUCH_D: 'heavy',
+    STAND_CD: 'heavy',
+    JUMP_C: 'heavy',
+    JUMP_D: 'heavy',
+    JUMP_CD: 'heavy',
+
+    // ===== Ryo 必杀技 (special) =====
+    RYO_KOOU: 'special',
+    RYO_KOOU_C: 'special',
+    RYO_KO_HOU: 'special',
+    RYO_KO_HOU_C: 'special',
+    RYO_HIEN: 'special',
+    RYO_HAOU: 'special',
+    RYO_TSURIZAO: 'special',
+    RYO_ORISHI: 'special',
+
+    // ===== Ryo DM / SDM =====
+    DM_TEN_HA_OU: 'dm',
+    SDM_TEN_HA_OU: 'sdm',
+  } as Partial<Record<AttackType, FeedbackTier>>,
 };
 
 // ===== 查询函数 =====
