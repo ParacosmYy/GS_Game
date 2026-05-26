@@ -1115,3 +1115,9 @@
 ## H221: screenShake—4项验证ScreenShake触发/强度/衰减 — 193→194
 
 **commit:** <hash> | screenShake—4项验证ScreenShake触发/强度/衰减
+
+---
+
+## H222: announceSequence—5项验证播报序列状态机 — 194→195
+
+**commit:** <hash> | announceSequence—5项验证播报序列状态机

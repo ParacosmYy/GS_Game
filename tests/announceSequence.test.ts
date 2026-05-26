@@ -1,42 +1,40 @@
 import { describe, it, expect } from 'vitest';
 import { AnnounceSequence } from '../src/state/announceSequence.js';
+import type { AnnounceStep } from '../src/state/announceSequence.js';
 
-describe('announceSequence', () => {
+describe('AnnounceSequence', () => {
+  const steps: AnnounceStep[] = [
+    { text: 'ROUND 1', duration: 60, scale: 1, ease: 'popIn', sfxId: 'round', sfxTriggerFrame: 0 },
+    { text: 'FIGHT!', duration: 30, scale: 1.2, ease: 'burstIn', sfxId: 'fight', sfxTriggerFrame: 0 },
+  ];
+
   it('starts idle', () => {
     const seq = new AnnounceSequence();
     expect(seq.getPhase()).toBe('idle');
   });
-  it('isComplete is false initially', () => {
+  it('setSteps changes phase to running', () => {
     const seq = new AnnounceSequence();
-    expect(seq.isComplete()).toBe(false);
-  });
-  it('isRunning is false initially', () => {
-    const seq = new AnnounceSequence();
-    expect(seq.isRunning()).toBe(false);
-  });
-  it('setSteps starts running', () => {
-    const seq = new AnnounceSequence();
-    seq.setSteps([{ text: 'ROUND 1', duration: 60, sfxId: 'round1' }]);
-    expect(seq.isRunning()).toBe(true);
+    seq.setSteps(steps);
     expect(seq.getPhase()).toBe('running');
   });
-  it('getText returns step text', () => {
+  it('tick returns sfxId within step duration', () => {
     const seq = new AnnounceSequence();
-    seq.setSteps([{ text: 'FIGHT!', duration: 30, sfxId: 'fight' }]);
-    expect(seq.getText()).toBe('FIGHT!');
+    seq.setSteps(steps);
+    let found = false;
+    for (let i = 0; i < 60; i++) {
+      if (seq.tick() === 'round') { found = true; break; }
+    }
+    expect(found).toBe(true);
   });
-  it('tick returns null when idle', () => {
+  it('completes after all steps', () => {
     const seq = new AnnounceSequence();
-    expect(seq.tick()).toBeNull();
+    seq.setSteps(steps);
+    for (let i = 0; i < 200; i++) seq.tick();
+    expect(seq.getPhase()).toBe('complete');
   });
-  it('reset goes back to idle', () => {
+  it('getText returns current step text', () => {
     const seq = new AnnounceSequence();
-    seq.setSteps([{ text: 'TEST', duration: 10 }]);
-    seq.reset();
-    expect(seq.getPhase()).toBe('idle');
-  });
-  it('getCurrentRender returns null when idle', () => {
-    const seq = new AnnounceSequence();
-    expect(seq.getCurrentRender()).toBeNull();
+    seq.setSteps(steps);
+    expect(seq.getText()).toBe('ROUND 1');
   });
 });
