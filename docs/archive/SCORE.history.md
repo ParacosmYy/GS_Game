@@ -745,3 +745,9 @@
 ## H165: charStrategies—5项验证getCharacterStrategy+ryo/kyo/iori策略 — 137→138
 
 **commit:** <hash> | charStrategies—5项验证getCharacterStrategy+ryo/kyo/iori策略
+
+---
+
+## H166: overlayScreens—5项验证getSuperFlashZoom+updateSuperFlashZoom缩放逻辑 — 138→139
+
+**commit:** <hash> | overlayScreens—5项验证getSuperFlashZoom+updateSuperFlashZoom缩放逻辑
