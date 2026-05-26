@@ -112,7 +112,7 @@ export function drawHighResFrame(
   facing: number,
 ): boolean {
   if (charId !== 'ryo') return false;
-  initIdleFrames();
+  initAllFrames();
 
   const entry = RYO_FRAMES[state];
   if (!entry) return false;
