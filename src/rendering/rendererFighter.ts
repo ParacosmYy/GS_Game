@@ -11,6 +11,7 @@ import { drawSkeletalFighter } from './skeletalFighter.js';
 import { drawAttackLimb } from './attackLimb.js';
 import type { SpriteRenderer } from './spriteRenderer.js';
 import { getCharacterColors } from './manifestRenderData.js';
+import { drawHighResFrame } from './sprites/ryoHighResRender.js';
 
 const fighterDebugOverlayEnabled = isFighterDebugOverlayEnabled();
 
@@ -186,11 +187,15 @@ export function drawFighters(
       ? Math.max(0, f.attackFrame)
       : Math.floor(f.stateAge / ticksPerFrame);
 
-    const spriteRendered = spriteRenderer?.canRender(f.charId)
-      ? spriteRenderer.render(ctx, f.charId, f.state, frameIdx, sx + leanOffsetX, sy, f.facing, getCharacterColors(f.charId ?? '').outfit)
-      : false;
-    if (!spriteRendered) {
-      drawSkeletalFighter(ctx, f, sx + leanOffsetX, sy, bodyColor, outlineColor, globalTick, maxModeActive);
+    // Priority: 1) high-res pixel frames  2) sprite atlas  3) skeletal fallback
+    const highResDrawn = drawHighResFrame(ctx, f.charId ?? '', f.state, f.stateAge, sx + leanOffsetX, sy, f.facing);
+    if (!highResDrawn) {
+      const spriteRendered = spriteRenderer?.canRender(f.charId)
+        ? spriteRenderer.render(ctx, f.charId, f.state, frameIdx, sx + leanOffsetX, sy, f.facing, getCharacterColors(f.charId ?? '').outfit)
+        : false;
+      if (!spriteRendered) {
+        drawSkeletalFighter(ctx, f, sx + leanOffsetX, sy, bodyColor, outlineColor, globalTick, maxModeActive);
+      }
     }
 
     // Hit flash overlay
