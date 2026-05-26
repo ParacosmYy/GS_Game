@@ -48,7 +48,6 @@ const PLAYER_INPUT_KEYS: (keyof PlayerInput)[] = [
   'buttonC',
   'buttonD',
   'throwAttack',
-  'burst',
   'start',
 ];
 
@@ -212,7 +211,7 @@ export class InputLogger {
       buttonC: input.buttonC as boolean,
       buttonD: input.buttonD as boolean,
       throwAttack: input.throwAttack as boolean,
-      burst: input.burst as boolean,
+      burst: typeof input.burst === 'boolean' ? input.burst as boolean : false,
       start: input.start as boolean,
     };
   }

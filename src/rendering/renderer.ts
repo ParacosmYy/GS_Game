@@ -49,7 +49,33 @@ export class Renderer {
     this.spriteRenderer = sr;
   }
 
-  render(fighters: Fighter[], cameraX: number, tick: number, ko: boolean, winner: number | null, shakeX: number, shakeY: number, delayedHealth: [number, number], maxModes?: [MaxModeState, MaxModeState], perfectPlayer: number | null = null, p1Wins: number = 0, p2Wins: number = 0, p1Name: string = '', p2Name: string = '', isTimeOver: boolean = false, currentRound: number = 1, firstAttacker: number | null = null, hitStopDefender: number = -1, hitStopBias: number = 0, charSpecialColors?: [string, string], koTimer: number = 0, koDustParticles: KODustParticle[] = [], cameraZoom: number = 1.0): void {
+  render(
+    fighters: Fighter[],
+    cameraX: number,
+    tick: number,
+    ko: boolean,
+    winner: number | null,
+    shakeX: number,
+    shakeY: number,
+    delayedHealth: [number, number],
+    maxModes?: [MaxModeState, MaxModeState],
+    perfectPlayer: number | null = null,
+    p1Wins: number = 0,
+    p2Wins: number = 0,
+    p1Name: string = '',
+    p2Name: string = '',
+    isTimeOver: boolean = false,
+    currentRound: number = 1,
+    firstAttacker: number | null = null,
+    hitStopDefender: number = -1,
+    hitStopBias: number = 0,
+    charSpecialColors?: [string, string],
+    koTimer: number = 0,
+    koDustParticles: KODustParticle[] = [],
+    cameraZoom: number = 1.0,
+    p1MoveList: CharacterDefinition['moveList'] = [],
+    simplifiedMode: boolean = false,
+  ): void {
     this.frameCount++;
     this.globalTick = tick;
     const now = performance.now();
@@ -98,7 +124,7 @@ export class Renderer {
     // End zoom before HUD — HUD always renders at normal scale
     if (cameraZoom !== 1.0) ctx.restore();
 
-    drawHUD(ctx, fighters, tick, delayedHealth, p1Wins, p2Wins, p1Name, p2Name, currentRound, firstAttacker);
+    drawHUD(ctx, fighters, tick, delayedHealth, p1Wins, p2Wins, p1Name, p2Name, currentRound, firstAttacker, p1MoveList ?? [], simplifiedMode);
 
     if (ko) {
       drawKO(ctx, winner, perfectPlayer, isTimeOver, fighters[0].health, fighters[1].health, fighters[0].maxHealth, koTimer, koDustParticles, cameraX);
@@ -395,7 +421,8 @@ export class Renderer {
       label = `[J]轻拳  [K]轻脚  [U]${names[0]}  [I]${names[1]}  [O]爆气  [L]CD  [P]嘲讽`;
       subLabel = '┗ 爆气激活后，U和I的技能替换为强化版本（DM/大招）';
     } else {
-      label = '[J]轻拳  [K]轻脚  [U]重拳  [I]重脚  [L]CD  [;]投  [P]嘲讽';
+      label = '[J]轻拳  [K]轻脚  [U]重拳  [I]重脚  [K+U]爆气  [O]快捷爆气  [L]CD  [P]嘲讽';
+      subLabel = '┗ 标准爆气用 K+U，O 是快捷键；爆气后可用 DM / SDM 强化招式';
     }
     ctx.fillText(label, CANVAS_WIDTH / 2, 592);
     
@@ -408,7 +435,7 @@ export class Renderer {
     ctx.textAlign = 'left';
   }
 
-  drawTrainingHUD(training: TrainingModeState, comboCount: number, comboDamage: number, tick: number): void {
-    drawTrainingHUD(this.ctx, training, comboCount, comboDamage, tick);
+  drawTrainingHUD(training: TrainingModeState, comboCount: number, comboDamage: number, tick: number, moveList: CharacterDefinition['moveList'] = []): void {
+    drawTrainingHUD(this.ctx, training, comboCount, comboDamage, tick, moveList ?? []);
   }
 }

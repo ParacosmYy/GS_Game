@@ -23,7 +23,7 @@ import { isDM } from '../src/core/attackClassifier.js';
 const noInput: PlayerInput = {
   up: false, down: false, left: false, right: false,
   buttonA: false, buttonB: false, buttonC: false, buttonD: false,
-  throwAttack: false, start: false,
+  throwAttack: false, burst: false, start: false,
 };
 const stubInput: IInputProvider = { getP1Input: () => noInput, getP2Input: () => noInput };
 

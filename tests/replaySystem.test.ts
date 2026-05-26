@@ -17,7 +17,7 @@ function createInput(overrides: Partial<PlayerInput> = {}): PlayerInput {
   return {
     up: false, down: false, left: false, right: false,
     buttonA: false, buttonB: false, buttonC: false, buttonD: false,
-    throwAttack: false, start: false,
+    throwAttack: false, burst: false, start: false,
     ...overrides,
   };
 }

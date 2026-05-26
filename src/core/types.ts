@@ -401,7 +401,14 @@ export interface PlayerInput {
   buttonC: boolean;  // 重拳
   buttonD: boolean;  // 重脚
   throwAttack: boolean;
+  burst: boolean;    // 爆气快捷键 (O / 9)
   start: boolean;    // Start键 — 嘲讽
+}
+
+// ===== Move List =====
+export interface MoveListEntry {
+  name: string;
+  input: string;
 }
 
 // ===== Direction =====

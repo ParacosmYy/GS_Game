@@ -99,7 +99,8 @@ export class DMManager {
 
   /** Check B+C for MAX mode activation */
   checkMaxActivation(input: ResolvedInput, playerIndex: number): void {
-    if (input.buttonB && input.buttonC && (input.buttonBPressed || input.buttonCPressed)) {
+    const comboTriggered = input.buttonB && input.buttonC && (input.buttonBPressed || input.buttonCPressed);
+    if (input.burstPressed || comboTriggered) {
       const { gauges, maxModes, vfx, screenShake, fighters } = this.deps;
       if (activateMaxMode(gauges[playerIndex], maxModes[playerIndex])) {
         const f = fighters[playerIndex];

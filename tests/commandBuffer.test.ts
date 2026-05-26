@@ -19,7 +19,7 @@ function raw(overrides: Partial<RawInput> = {}): RawInput {
   return {
     up: false, down: false, left: false, right: false,
     buttonA: false, buttonB: false, buttonC: false, buttonD: false,
-    throwAttack: false, start: false,
+    throwAttack: false, burst: false, start: false,
     ...overrides,
   };
 }
@@ -110,6 +110,13 @@ describe('Input Resolution', () => {
     const input = raw({ buttonA: true });
     const resolved = resolveInput(input, 1, createPrevAttack());
     expect(resolved.buttonA).toBe(true);
+  });
+
+  it('burst key is preserved through input resolution', () => {
+    const input = raw({ burst: true });
+    const resolved = resolveInput(input, 1, createPrevAttack());
+    expect(resolved.burst).toBe(true);
+    expect(resolved.burstPressed).toBe(true);
   });
 
   it('respects facing direction for left/right', () => {

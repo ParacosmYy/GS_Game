@@ -295,10 +295,11 @@ export class SimpleAI {
     return {
       up: false, down: false, forward: false, back: false,
       buttonA: false, buttonB: false, buttonC: false, buttonD: false,
-      throwAttack: false,
+      throwAttack: false, burst: false,
       buttonAPressed: false, buttonBPressed: false,
       buttonCPressed: false, buttonDPressed: false,
       throwAttackPressed: false,
+      burstPressed: false,
       punchPressed: false, kickPressed: false,
       rollPressed: false, blowbackPressed: false,
       punchJustReleased: false, kickJustReleased: false,

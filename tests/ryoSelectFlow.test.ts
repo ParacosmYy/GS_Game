@@ -32,7 +32,7 @@ const RYO_ROSTER_INDEX = 4;
 const noopInput: PlayerInput = {
   up: false, down: false, left: false, right: false,
   buttonA: false, buttonB: false, buttonC: false, buttonD: false,
-  throwAttack: false, start: false,
+  throwAttack: false, burst: false, start: false,
 };
 
 function makeInput(overrides: Partial<PlayerInput>): PlayerInput {

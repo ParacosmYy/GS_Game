@@ -27,6 +27,7 @@ const NEUTRAL_INPUT: PlayerInput = {
   buttonC: false,
   buttonD: false,
   throwAttack: false,
+  burst: false,
   start: false,
 };
 
@@ -120,9 +121,10 @@ function isPlayerInput(raw: unknown): raw is PlayerInput {
     && typeof input.buttonC === 'boolean'
     && typeof input.buttonD === 'boolean'
     && typeof input.throwAttack === 'boolean'
+    && (typeof input.burst === 'boolean' || typeof input.burst === 'undefined')
     && typeof input.start === 'boolean';
 }
 
 function cloneInput(input: PlayerInput): PlayerInput {
-  return { ...input };
+  return { ...NEUTRAL_INPUT, ...input };
 }

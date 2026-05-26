@@ -66,7 +66,7 @@ import { FRAME_DATA } from '../src/core/constants.js';
 const noopInput: PlayerInput = {
   up: false, down: false, left: false, right: false,
   buttonA: false, buttonB: false, buttonC: false, buttonD: false,
-  throwAttack: false, start: false,
+  throwAttack: false, burst: false, start: false,
 };
 
 function createInputProvider(): IInputProvider {

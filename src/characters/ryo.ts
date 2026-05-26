@@ -28,6 +28,14 @@ export const RyoDef: CharacterDefinition = {
   portrait: '👊',
   pixelPortrait: ryoPortrait,
   winQuotes: ['極限流空手、恐るるに足らず', 'まだ修行が足りんな', '虎の拳を見たか!'],
+  moveList: [
+    { name: '虎煌拳（こおうけん）', input: '↓↘→ + 轻拳(A) / 重拳(C)' },
+    { name: '虎咆（こほう）', input: '→↓↘ + 轻拳(A) / 重拳(C)' },
+    { name: '飛燕疾風脚（ひえんしっぷうきゃく）', input: '←↙↓ + 踢(K)' },
+    { name: '霸王翔吼拳（はおうしょうこうけん）', input: '↓↘→ + 踢(K)' },
+    { name: '天地霸煌拳（DM）', input: '↓↘→↓↘→ + 轻拳/重拳' },
+    { name: '爆气', input: 'O（快捷） / K+U（标准）' },
+  ],
 
   stats: {
     walkSpeed: 4,

@@ -896,6 +896,7 @@ export { GAME_OVER_DURATION };
 // ===== Training Mode HUD =====
 
 import type { TrainingModeState, FrameDataDisplay, InputHistoryEntry } from '../state/trainingMode.js';
+import type { MoveListEntry } from '../core/types.js';
 
 /**
  * Draw the full training mode HUD overlay.
@@ -911,6 +912,7 @@ export function drawTrainingHUD(
   comboCount: number,
   comboDamage: number,
   tick: number,
+  moveList: MoveListEntry[] = [],
 ): void {
   ctx.save();
 
@@ -956,7 +958,7 @@ export function drawTrainingHUD(
   ctx.fillText(`${comboDamage}`, CANVAS_WIDTH - 45, 23);
 
   // ===== Left top panel: Move list =====
-  drawMoveListPanel(ctx);
+  drawMoveListPanel(ctx, moveList);
 
   // ===== Left bottom panel: Input history =====
   if (training.showInputHistory) {
@@ -975,14 +977,13 @@ export function drawTrainingHUD(
 }
 
 /** Quick reference move list panel for current character */
-function drawMoveListPanel(ctx: CanvasRenderingContext2D): void {
-  // Get P1 fighter info from global state (hack: we'll draw a fallback for now)
+function drawMoveListPanel(ctx: CanvasRenderingContext2D, moveList: MoveListEntry[]): void {
   const panelX = 4;
   const panelY = 36;
-  const panelW = 220;
+  const panelW = 240;
   const lineH = 12;
-  const maxLines = 8;
-  const panelH = 18 + maxLines * lineH;
+  const visibleMoves = moveList.slice(0, 6);
+  const panelH = 18 + Math.max(visibleMoves.length, 6) * lineH;
 
   // Background
   ctx.fillStyle = 'rgba(0, 0, 0, 0.65)';
@@ -1000,21 +1001,17 @@ function drawMoveListPanel(ctx: CanvasRenderingContext2D): void {
   ctx.fillStyle = '#88ff88';
   ctx.fillText('MOVE LIST', panelX + 8, panelY + 3);
 
-  // Example moves (in full game, would query character moveList)
-  const exampleMoves = [
-    { name: '荒咬', input: '↓↘→+A' },
-    { name: '75式改', input: '↓↘→+K' },
-    { name: '鬼烧', input: '→↓↘+P' },
-    { name: '大蛇薙[DM]', input: '↓↙←↙↓↘→+P' },
-    { name: '防守', input: '←(or ↙/↖)' },
-    { name: '挑衅', input: 'P键' },
-  ];
-
   ctx.font = '9px "Courier New", monospace';
   ctx.fillStyle = '#ccc';
-  for (let i = 0; i < Math.min(maxLines, exampleMoves.length);  i++) {
+  if (!visibleMoves.length) {
+    ctx.fillText('暂无招式表数据', panelX + 12, panelY + 18);
+    ctx.fillText('请先补充角色 moveList', panelX + 12, panelY + 30);
+    return;
+  }
+
+  for (let i = 0; i < visibleMoves.length; i++) {
     const y = panelY + 16 + i * lineH;
-    const move = exampleMoves[i];
+    const move = visibleMoves[i];
     ctx.fillText(`${move.name}: ${move.input}`, panelX + 12, y);
   }
 }

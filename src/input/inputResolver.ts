@@ -10,11 +10,13 @@ export interface ResolvedInput {
   buttonC: boolean;
   buttonD: boolean;
   throwAttack: boolean;
+  burst: boolean;
   buttonAPressed: boolean;
   buttonBPressed: boolean;
   buttonCPressed: boolean;
   buttonDPressed: boolean;
   throwAttackPressed: boolean;
+  burstPressed: boolean;
   /** Any punch button just pressed (A or C) */
   punchPressed: boolean;
   /** Any kick button just pressed (B or D) */
@@ -41,6 +43,7 @@ export interface RawInput {
   buttonC: boolean;
   buttonD: boolean;
   throwAttack: boolean;
+  burst: boolean;
   start: boolean;
 }
 
@@ -50,10 +53,11 @@ export interface PrevAttack {
   c: boolean;
   d: boolean;
   throwAtk: boolean;
+  burst: boolean;
 }
 
 export function createPrevAttack(): PrevAttack {
-  return { a: false, b: false, c: false, d: false, throwAtk: false };
+  return { a: false, b: false, c: false, d: false, throwAtk: false, burst: false };
 }
 
 export function resolveInput(raw: RawInput, facing: Direction, prev: PrevAttack): ResolvedInput {
@@ -61,6 +65,7 @@ export function resolveInput(raw: RawInput, facing: Direction, prev: PrevAttack)
   const cPressed = raw.buttonC && !prev.c;
   const bPressed = raw.buttonB && !prev.b;
   const dPressed = raw.buttonD && !prev.d;
+  const burstPressed = raw.burst && !prev.burst;
   // Negative Edge: 松键检测
   const aReleased = !raw.buttonA && prev.a;
   const cReleased = !raw.buttonC && prev.c;
@@ -77,11 +82,13 @@ export function resolveInput(raw: RawInput, facing: Direction, prev: PrevAttack)
     buttonC: raw.buttonC,
     buttonD: raw.buttonD,
     throwAttack: raw.throwAttack,
+    burst: raw.burst,
     buttonAPressed: aPressed,
     buttonBPressed: bPressed,
     buttonCPressed: cPressed,
     buttonDPressed: dPressed,
     throwAttackPressed: raw.throwAttack && !prev.throwAtk,
+    burstPressed,
     punchPressed: aPressed || cPressed,
     kickPressed: bPressed || dPressed,
     rollPressed: raw.buttonA && raw.buttonB && (aPressed || bPressed),
@@ -98,6 +105,7 @@ export function updatePrevAttack(prev: PrevAttack, raw: RawInput): void {
   prev.c = raw.buttonC;
   prev.d = raw.buttonD;
   prev.throwAtk = raw.throwAttack;
+  prev.burst = raw.burst;
 }
 
 export function getDirectionInput(input: ResolvedInput): DirectionInput {
@@ -139,6 +147,7 @@ export function getButtonDisplayString(input: ResolvedInput): string {
   if (input.buttonB) buttons.push('B');
   if (input.buttonC) buttons.push('C');
   if (input.buttonD) buttons.push('D');
+  if (input.burst) buttons.push('O');
   return buttons.join(' ');
 }
 
@@ -149,6 +158,7 @@ export function getPressedButtonString(input: ResolvedInput): string[] {
   if (input.buttonBPressed) buttons.push('B');
   if (input.buttonCPressed) buttons.push('C');
   if (input.buttonDPressed) buttons.push('D');
+  if (input.burstPressed) buttons.push('O');
   if (input.rollPressed) buttons.push('A+B');
   if (input.blowbackPressed) buttons.push('C+D');
   return buttons;

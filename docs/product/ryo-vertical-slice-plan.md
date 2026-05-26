@@ -55,6 +55,7 @@ Ryo 必须具备以下 manifest：
 - `animation manifest`：动作名、帧序列、duration、loop。
 - `hitbox manifest`：hurtbox、hitbox、throwbox。
 - `feedback manifest`：命中事件到 hitstop/spark/SFX/shake/pushback 的映射。
+- `move list`：战斗 HUD / 训练 HUD 必须读取的真实招式表数据，禁止写死示例文本。
 
 运行时只能读取 manifest。工具层负责生成和校验 manifest。
 
@@ -68,7 +69,13 @@ Ryo 相关新增数据文件优先落到 [工作区目标架构](../architecture
 4. 保留 fallback。
 5. 验证构建。
 6. 复盘是否更像 KOF。
-7. 通过 [决策门](../process/decision-gates.md) 复盘本轮是否允许 +5。
+7. 通过 [决策门](../process/decision-gates.md) 复盘本轮是否允许 +1。
+
+本阶段还必须同步满足：
+
+- 战斗界面显示当前角色 moveList。
+- 标准爆气说明在 UI 中同时展示 `K+U` 和 `O`。
+- 招式提示与角色定义数据一致，不允许 HUD 文案单独漂移。
 
 ## 6. 退出条件
 

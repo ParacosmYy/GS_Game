@@ -19,6 +19,7 @@ export class InputManager {
     buttonC: 'KeyU',
     buttonD: 'KeyI',
     throwAttack: 'KeyL',
+    burst: 'KeyO',
     start: 'KeyP',
   };
 
@@ -32,6 +33,7 @@ export class InputManager {
     buttonC: 'Numpad3',
     buttonD: 'Numpad0',
     throwAttack: 'NumpadDecimal',
+    burst: 'Numpad9',
     start: 'NumpadEnter',
   };
 
@@ -75,6 +77,7 @@ export class InputManager {
       buttonC: this.keys[keyMap.buttonC] === true,
       buttonD: this.keys[keyMap.buttonD] === true,
       throwAttack: this.keys[keyMap.throwAttack] === true,
+      burst: this.keys[keyMap.burst] === true,
       start: this.keys[keyMap.start] === true,
     };
   }

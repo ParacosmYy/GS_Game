@@ -45,7 +45,7 @@ vi.mock('../src/audio/sampler.js', () => ({
 const noopInput: PlayerInput = {
   up: false, down: false, left: false, right: false,
   buttonA: false, buttonB: false, buttonC: false, buttonD: false,
-  throwAttack: false, start: false,
+  throwAttack: false, burst: false, start: false,
 };
 
 function makeInput(overrides: Partial<PlayerInput>): PlayerInput {

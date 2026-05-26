@@ -6,7 +6,7 @@
  */
 import { Fighter } from '../entities/fighter.js';
 import { Camera } from '../core/camera.js';
-import type { PowerGauge, MaxModeState } from '../core/types.js';
+import type { PowerGauge, MaxModeState, MoveListEntry } from '../core/types.js';
 import {
   CANVAS_WIDTH, CANVAS_HEIGHT, MAX_HEALTH, MAX_STOCKS, ROUND_TIME,
   HUD_BAR_WIDTH, HUD_BAR_HEIGHT, HUD_BAR_Y, HUD_MARGIN,
@@ -235,7 +235,65 @@ function drawHUDPortrait(
   }
 }
 
-export function drawHUD(ctx: CanvasRenderingContext2D, fighters: Fighter[], tick: number, delayedHealth: [number, number], p1Wins: number = 0, p2Wins: number = 0, p1Name: string = '', p2Name: string = '', currentRound: number = 1, firstAttacker: number | null = null): void {
+function drawMoveListPanel(
+  ctx: CanvasRenderingContext2D,
+  moveList: MoveListEntry[],
+  simplifiedMode: boolean,
+): void {
+  const panelX = 12;
+  const panelW = 308;
+  const lineH = 12;
+  const headerH = 18;
+  const footerH = 16;
+  const visibleMoves = moveList.slice(0, 6);
+  const panelH = headerH + visibleMoves.length * lineH + footerH + 12;
+  const panelY = CANVAS_HEIGHT - panelH - 22;
+
+  ctx.save();
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.68)';
+  roundRect(ctx, panelX, panelY, panelW, panelH, 6);
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(200, 168, 50, 0.28)';
+  ctx.lineWidth = 1;
+  roundRect(ctx, panelX, panelY, panelW, panelH, 6);
+  ctx.stroke();
+
+  ctx.font = 'bold 10px "Courier New", monospace';
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'top';
+  ctx.fillStyle = '#ffd36a';
+  ctx.fillText('MOVE LIST', panelX + 8, panelY + 4);
+
+  ctx.font = '9px "Courier New", monospace';
+  ctx.fillStyle = '#d8d8d8';
+  for (let i = 0; i < visibleMoves.length; i++) {
+    const move = visibleMoves[i];
+    const y = panelY + headerH + i * lineH + 4;
+    ctx.fillText(`${move.name}: ${move.input}`, panelX + 10, y);
+  }
+
+  const burstHint = simplifiedMode
+    ? 'O = 爆气'
+    : 'K+U = 爆气  /  O = 快捷';
+  ctx.fillStyle = 'rgba(200, 255, 200, 0.82)';
+  ctx.fillText(burstHint, panelX + 10, panelY + panelH - footerH + 2);
+  ctx.restore();
+}
+
+export function drawHUD(
+  ctx: CanvasRenderingContext2D,
+  fighters: Fighter[],
+  tick: number,
+  delayedHealth: [number, number],
+  p1Wins: number = 0,
+  p2Wins: number = 0,
+  p1Name: string = '',
+  p2Name: string = '',
+  currentRound: number = 1,
+  firstAttacker: number | null = null,
+  p1MoveList: MoveListEntry[] = [],
+  simplifiedMode: boolean = false,
+): void {
   if (fighters.length < 2) return;
 
   // Update damage flash tracking
@@ -454,6 +512,11 @@ export function drawHUD(ctx: CanvasRenderingContext2D, fighters: Fighter[], tick
   // ===== Character name plates below health bars =====
   drawNamePlate(ctx, HUD_MARGIN, HUD_BAR_Y + HUD_BAR_HEIGHT + 26, p1Name, '#ff6644', 'left');
   drawNamePlate(ctx, CANVAS_WIDTH - HUD_MARGIN, HUD_BAR_Y + HUD_BAR_HEIGHT + 26, p2Name, '#4488ff', 'right');
+
+  // ===== P1 move list panel =====
+  if (p1MoveList.length > 0) {
+    drawMoveListPanel(ctx, p1MoveList, simplifiedMode);
+  }
 
   // ===== Screen edge red pulse when time < 10 (stronger at < 5) =====
   if (timeSeconds <= 10) {

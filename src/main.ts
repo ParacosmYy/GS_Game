@@ -548,6 +548,7 @@ function update(): void {
     if (p1Input.buttonCPressed) btns.push('C');
     if (p1Input.buttonDPressed) btns.push('D');
     if (p1Input.throwAttackPressed) btns.push('CD');
+    if (p1Input.burstPressed) btns.push('O');
     // Negative Edge display: show button releases with ~ prefix
     if (p1Input.punchJustReleased && !p1Input.punchPressed) btns.push('~P');
     if (p1Input.kickJustReleased && !p1Input.kickPressed) btns.push('~K');
@@ -562,7 +563,7 @@ function update(): void {
     const simp = resolveSimplified(
       !!rawP1.buttonC && combatSystem.getPrevAttack(0) === null,
       !!rawP1.buttonD && combatSystem.getPrevAttack(0) === null,
-      !!rawP1.throwAttack && combatSystem.getPrevAttack(0) === null,
+      !!rawP1.burst && combatSystem.getPrevAttack(0) === null,
       p1Char, gauges[0], maxModes[0],
     );
     if (simp.activateMax) dmMgr.checkMaxActivation(p1Input, 0);
@@ -846,7 +847,7 @@ function render(): void {
   const p2Char = ROSTER.find(c => c.id === p2.charId) || ROSTER[1];
   renderer.render([p1, p2], camera.x, tickRef.value, gs.phase === GamePhase.KO, gs.winner, screenShake.offsetX, screenShake.offsetY,
     [p1DelayedHealth, p2DelayedHealth], maxModes, perfectPlayer, rounds.p1Wins, rounds.p2Wins, p1Char.nameCn, p2Char.nameCn, gs.isTimeOver, rounds.currentRound, gs.firstAttacker,
-    cinematic.hitStopDefender, cinematic.hitStopBias, [p1Char.specialColor, p2Char.specialColor], gs.koTimer, cinematic.koDustParticles, camera.zoom);
+    cinematic.hitStopDefender, cinematic.hitStopBias, [p1Char.specialColor, p2Char.specialColor], gs.koTimer, cinematic.koDustParticles, camera.zoom, p1Char.moveList, gs.simplifiedMode);
   renderer.drawProjectiles(projectiles, camera);
   vfx.render(ctx, camera.x);
 
@@ -935,7 +936,7 @@ function render(): void {
     renderer.drawDebug([p1, p2], projectiles, camera, tickRef.value, renderer.getFps(), vfx.count, [toHist(p1Cmd), toHist(p2Cmd)]);
   }
   if (gs.isTrainingMode && (gs.phase === GamePhase.FIGHTING || gs.phase === GamePhase.KO)) {
-    renderer.drawTrainingHUD(training, combatSystem.getComboCount(0), combatSystem.getComboDamage(0), tickRef.value);
+    renderer.drawTrainingHUD(training, combatSystem.getComboCount(0), combatSystem.getComboDamage(0), tickRef.value, p1Char.moveList);
   }
 }
 
