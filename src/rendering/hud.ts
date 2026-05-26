@@ -235,6 +235,17 @@ function drawHUDPortrait(
   }
 }
 
+/** Color for each move category */
+const MOVE_TYPE_COLORS: Record<string, string> = {
+  command: '#88ccff',   // blue — command normals
+  special: '#ffcc44',   // gold — specials
+  dm: '#ff8844',        // orange — desperation moves
+  sdm: '#ff4466',       // red — super DM
+  hsdm: '#ff2244',      // bright red — hidden SDM
+  system: '#88ff88',    // green — system (burst etc.)
+  normal: '#d8d8d8',    // white — normal attacks
+};
+
 function drawMoveListPanel(
   ctx: CanvasRenderingContext2D,
   moveList: MoveListEntry[],
@@ -245,7 +256,7 @@ function drawMoveListPanel(
   const lineH = 12;
   const headerH = 18;
   const footerH = 16;
-  const visibleMoves = moveList.slice(0, 6);
+  const visibleMoves = moveList.slice(0, 8);
   const panelH = headerH + visibleMoves.length * lineH + footerH + 12;
   const panelY = CANVAS_HEIGHT - panelH - 22;
 
@@ -265,16 +276,16 @@ function drawMoveListPanel(
   ctx.fillText('MOVE LIST', panelX + 8, panelY + 4);
 
   ctx.font = '9px "Courier New", monospace';
-  ctx.fillStyle = '#d8d8d8';
   for (let i = 0; i < visibleMoves.length; i++) {
     const move = visibleMoves[i];
     const y = panelY + headerH + i * lineH + 4;
+    ctx.fillStyle = MOVE_TYPE_COLORS[move.type ?? 'normal'] ?? '#d8d8d8';
     ctx.fillText(`${move.name}: ${move.input}`, panelX + 10, y);
   }
 
   const burstHint = simplifiedMode
     ? 'O = 爆气'
-    : 'K+U = 爆气  /  O = 快捷';
+    : 'K+U / O = 爆气';
   ctx.fillStyle = 'rgba(200, 255, 200, 0.82)';
   ctx.fillText(burstHint, panelX + 10, panelY + panelH - footerH + 2);
   ctx.restore();

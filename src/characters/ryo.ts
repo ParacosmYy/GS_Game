@@ -29,12 +29,22 @@ export const RyoDef: CharacterDefinition = {
   pixelPortrait: ryoPortrait,
   winQuotes: ['極限流空手、恐るるに足らず', 'まだ修行が足りんな', '虎の拳を見たか!'],
   moveList: [
-    { name: '虎煌拳（こおうけん）', input: '↓↘→ + 轻拳(A) / 重拳(C)' },
-    { name: '虎咆（こほう）', input: '→↓↘ + 轻拳(A) / 重拳(C)' },
-    { name: '飛燕疾風脚（ひえんしっぷうきゃく）', input: '←↙↓ + 踢(K)' },
-    { name: '霸王翔吼拳（はおうしょうこうけん）', input: '↓↘→ + 踢(K)' },
-    { name: '天地霸煌拳（DM）', input: '↓↘→↓↘→ + 轻拳/重拳' },
-    { name: '爆气', input: 'O（快捷） / K+U（标准）' },
+    // 命令通常技
+    { name: '冰柱割り', input: '→ + A', type: 'command' },
+    { name: '落蹴', input: '↘ + B', type: 'command' },
+    // 必杀技
+    { name: '虎煌拳（こおうけん）', input: '↓↘→ + A / C', type: 'special' },
+    { name: '虎咆（こほう）', input: '→↓↘ + A / C', type: 'special' },
+    { name: '飛燕疾風脚（ひえんしっぷうきゃく）', input: '←↙↓ + K', type: 'special' },
+    { name: '霸王翔吼拳（はおうしょうこうけん）', input: '↓↘→ + K', type: 'special' },
+    // 超必杀技
+    { name: '天地霸煌拳', input: '↓↘→↓↘→ + A / C', type: 'dm' },
+    { name: '龍虎乱舞', input: '↓↘→↘↓↙← + A / C', type: 'dm' },
+    // MAX超必杀技
+    { name: '天地霸煌拳（MAX）', input: '↓↘→↓↘→ + AC', type: 'sdm' },
+    { name: '龍虎乱舞（MAX）', input: '↓↘→↘↓↙← + AC', type: 'sdm' },
+    // 系统
+    { name: '爆气', input: 'K+U / O（快捷）', type: 'system' },
   ],
 
   stats: {

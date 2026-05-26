@@ -56,9 +56,9 @@ export const HURTBOX_TABLE: Partial<Record<FighterState, HurtboxDef>> = {
     height: 190,
   },
   [FighterState.STAND_ATTACK]: {
-    offsetX: 0,
+    offsetX: 3,
     offsetY: 0,
-    width: 80,
+    width: 86,
     height: 200,
   },
   [FighterState.BLOCK]: {
@@ -94,9 +94,9 @@ export const HURTBOX_TABLE: Partial<Record<FighterState, HurtboxDef>> = {
     height: 130,
   },
   [FighterState.CROUCH_ATTACK]: {
-    offsetX: 2,
+    offsetX: 4,
     offsetY: 0,
-    width: 88,
+    width: 92,
     height: 130,
   },
 
@@ -126,9 +126,9 @@ export const HURTBOX_TABLE: Partial<Record<FighterState, HurtboxDef>> = {
     height: 160,
   },
   [FighterState.AIR_ATTACK]: {
-    offsetX: 0,
+    offsetX: 3,
     offsetY: 0,
-    width: 75,
+    width: 78,
     height: 150,
   },
   [FighterState.AIR_BLOCK]: {
@@ -140,9 +140,9 @@ export const HURTBOX_TABLE: Partial<Record<FighterState, HurtboxDef>> = {
 
   // ── Hit states ──
   [FighterState.HITSTUN]: {
-    offsetX: 0,
+    offsetX: -3,
     offsetY: 0,
-    width: 85,
+    width: 90,
     height: 200,
   },
 
@@ -179,15 +179,15 @@ export const HURTBOX_TABLE: Partial<Record<FighterState, HurtboxDef>> = {
     height: 200,
   },
   [FighterState.GUARD_CRUSH]: {
-    offsetX: 0,
+    offsetX: -4,
     offsetY: 0,
-    width: 85,
+    width: 90,
     height: 200,
   },
   [FighterState.DIZZY]: {
     offsetX: 0,
     offsetY: 0,
-    width: 80,
+    width: 84,
     height: 200,
   },
 };

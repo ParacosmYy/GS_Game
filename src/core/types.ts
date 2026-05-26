@@ -353,6 +353,9 @@ export enum AttackType {
   SDM_POWER_GEYSER = 'SDM_POWER_GEYSER',     // Power Geyser SDM (Terry)
   SDM_PHOENIX_KICK = 'SDM_PHOENIX_KICK',     // 鳳凰脚SDM (Kim)
   SDM_TEN_HA_OU = 'SDM_TEN_HA_OU',           // 天地霸煌拳SDM (Ryo)
+  DM_RYUKO_RANBU = 'DM_RYUKO_RANBU',          // 龍虎乱舞DM (Ryo)
+  SDM_RYUKO_RANBU = 'SDM_RYUKO_RANBU',        // 龍虎乱舞SDM (Ryo)
+  HSDM_RYUKO_RANBU = 'HSDM_RYUKO_RANBU',      // 龍虎乱舞HSDM (Ryo)
   SDM_V_SLASHER = 'SDM_V_SLASHER',           // V字金锯SDM (Leona)
   SDM_CHAIN_SHOT = 'SDM_CHAIN_SHOT',         // Chain Shot SDM (K')
   SDM_FREEZE = 'SDM_FREEZE',                 // Freeze Execution SDM (Kula)
@@ -406,9 +409,13 @@ export interface PlayerInput {
 }
 
 // ===== Move List =====
+export type MoveCategory = 'normal' | 'command' | 'special' | 'dm' | 'sdm' | 'hsdm' | 'system';
+
 export interface MoveListEntry {
   name: string;
   input: string;
+  /** Move category for display grouping and color coding */
+  type?: MoveCategory;
 }
 
 // ===== Direction =====

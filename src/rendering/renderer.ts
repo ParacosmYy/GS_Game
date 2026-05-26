@@ -419,7 +419,7 @@ export class Renderer {
     if (simplifiedMode) {
       const names = Renderer.SPECIAL_NAMES[charId] ?? ['技能①', '技能②'];
       label = `[J]轻拳  [K]轻脚  [U]${names[0]}  [I]${names[1]}  [O]爆气  [L]CD  [P]嘲讽`;
-      subLabel = '┗ 爆气激活后，U和I的技能替换为强化版本（DM/大招）';
+      subLabel = '┗ K+U 也可爆气；爆气激活后，U和I的技能替换为强化版本（DM/大招）';
     } else {
       label = '[J]轻拳  [K]轻脚  [U]重拳  [I]重脚  [K+U]爆气  [O]快捷爆气  [L]CD  [P]嘲讽';
       subLabel = '┗ 标准爆气用 K+U，O 是快捷键；爆气后可用 DM / SDM 强化招式';

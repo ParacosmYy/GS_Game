@@ -976,13 +976,24 @@ export function drawTrainingHUD(
   ctx.restore();
 }
 
+/** Color for each move category (shared with hud.ts) */
+const MOVE_TYPE_COLORS: Record<string, string> = {
+  command: '#88ccff',   // blue — command normals
+  special: '#ffcc44',   // gold — specials
+  dm: '#ff8844',        // orange — desperation moves
+  sdm: '#ff4466',       // red — super DM
+  hsdm: '#ff2244',      // bright red — hidden SDM
+  system: '#88ff88',    // green — system (burst etc.)
+  normal: '#cccccc',    // white — normal attacks
+};
+
 /** Quick reference move list panel for current character */
 function drawMoveListPanel(ctx: CanvasRenderingContext2D, moveList: MoveListEntry[]): void {
   const panelX = 4;
   const panelY = 36;
   const panelW = 240;
   const lineH = 12;
-  const visibleMoves = moveList.slice(0, 6);
+  const visibleMoves = moveList.slice(0, 8);
   const panelH = 18 + Math.max(visibleMoves.length, 6) * lineH;
 
   // Background
@@ -1002,8 +1013,8 @@ function drawMoveListPanel(ctx: CanvasRenderingContext2D, moveList: MoveListEntr
   ctx.fillText('MOVE LIST', panelX + 8, panelY + 3);
 
   ctx.font = '9px "Courier New", monospace';
-  ctx.fillStyle = '#ccc';
   if (!visibleMoves.length) {
+    ctx.fillStyle = '#ccc';
     ctx.fillText('暂无招式表数据', panelX + 12, panelY + 18);
     ctx.fillText('请先补充角色 moveList', panelX + 12, panelY + 30);
     return;
@@ -1012,6 +1023,7 @@ function drawMoveListPanel(ctx: CanvasRenderingContext2D, moveList: MoveListEntr
   for (let i = 0; i < visibleMoves.length; i++) {
     const y = panelY + 16 + i * lineH;
     const move = visibleMoves[i];
+    ctx.fillStyle = MOVE_TYPE_COLORS[move.type ?? 'normal'] ?? '#cccccc';
     ctx.fillText(`${move.name}: ${move.input}`, panelX + 12, y);
   }
 }
