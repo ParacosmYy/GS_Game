@@ -735,6 +735,7 @@ function update(): void {
       const hitX = (killer.x + loser.x) / 2;
       const hitY = loser.y - loser.displayHeight / 2;
       cinematic.spawnKODust(hitX, hitY, isDMKill ? 30 : 20);
+      camera.triggerKOZoom(hitX, hitY);
       playKO();
       bgm.stop();
       ambient.stop();
@@ -832,7 +833,7 @@ function render(): void {
   const p2Char = ROSTER.find(c => c.id === p2.charId) || ROSTER[1];
   renderer.render([p1, p2], camera.x, tickRef.value, gs.phase === GamePhase.KO, gs.winner, screenShake.offsetX, screenShake.offsetY,
     [p1DelayedHealth, p2DelayedHealth], maxModes, perfectPlayer, rounds.p1Wins, rounds.p2Wins, p1Char.nameCn, p2Char.nameCn, gs.isTimeOver, rounds.currentRound, gs.firstAttacker,
-    cinematic.hitStopDefender, cinematic.hitStopBias, [p1Char.specialColor, p2Char.specialColor], gs.koTimer, cinematic.koDustParticles);
+    cinematic.hitStopDefender, cinematic.hitStopBias, [p1Char.specialColor, p2Char.specialColor], gs.koTimer, cinematic.koDustParticles, camera.zoom);
   renderer.drawProjectiles(projectiles, camera);
   vfx.render(ctx, camera.x);
 

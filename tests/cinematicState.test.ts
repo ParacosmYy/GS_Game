@@ -440,7 +440,64 @@ describe('CinematicState — Damage & PERFECT', () => {
 });
 
 // ===========================================================================
-// 8. Victory Fanfare
+// 8. KO Dust Particles
+// ===========================================================================
+
+describe('CinematicState — KO Dust Particles', () => {
+  it('spawnKODust creates the specified number of particles', () => {
+    const cs = new CinematicState();
+    cs.spawnKODust(300, 200, 20);
+    expect(cs.koDustParticles.length).toBe(20);
+  });
+
+  it('spawnKODust defaults to 20 particles', () => {
+    const cs = new CinematicState();
+    cs.spawnKODust(100, 150);
+    expect(cs.koDustParticles.length).toBe(20);
+  });
+
+  it('spawnKODust particles have required properties', () => {
+    const cs = new CinematicState();
+    cs.spawnKODust(100, 200, 5);
+    for (const p of cs.koDustParticles) {
+      expect(p.life).toBeGreaterThan(0);
+      expect(p.maxLife).toBe(p.life);
+      expect(p.size).toBeGreaterThan(0);
+      expect(p.color).toBeTruthy();
+      // Position should be near spawn point (within 20px offset)
+      expect(Math.abs(p.x - 100)).toBeLessThanOrEqual(20);
+      expect(Math.abs(p.y - 200)).toBeLessThanOrEqual(20);
+    }
+  });
+
+  it('dust particles are updated during slow-mo and decrease in number over time', () => {
+    const cs = new CinematicState();
+    cs.triggerKOSlowMo();
+    cs.spawnKODust(100, 100, 20);
+    expect(cs.koDustParticles.length).toBe(20);
+
+    // Run some frames — particles with shorter life will expire
+    for (let i = 0; i < 100; i++) {
+      cs.shouldSkipFrame();
+    }
+    // Some particles should have expired by now (life ranges 30-60,
+    // each particle decrements life only on run frames = every 3rd call,
+    // so after 100 calls ~33 run frames, particles with life <= 33 are gone)
+    expect(cs.koDustParticles.length).toBeLessThan(20);
+    expect(cs.koDustParticles.length).toBeGreaterThan(0);
+  });
+
+  it('dust particles are cleared by reset', () => {
+    const cs = new CinematicState();
+    cs.spawnKODust(100, 100, 10);
+    expect(cs.koDustParticles.length).toBe(10);
+    cs.reset();
+    expect(cs.koDustParticles.length).toBe(0);
+  });
+});
+
+// ===========================================================================
+// 9. Victory Fanfare
 // ===========================================================================
 
 describe('CinematicState — Victory Fanfare', () => {
