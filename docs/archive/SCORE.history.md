@@ -475,3 +475,21 @@
 ## H127: animationBlender测试—8项验证AnimationBlender+getFighterBlender — 99→100
 
 **commit:** <hash> | animationBlender测试—8项验证AnimationBlender+getFighterBlender
+
+---
+
+## H128: Ryo闭环收尾—超级必杀像素帧+肖像系统+FrameContract补全+collision数据连接 — 100→101
+
+**commit:** db2d210 | Ryo闭环收尾—DM/SDM/HSDM像素帧+多尺寸肖像+13个FrameContract+collision数据
+
+---
+
+## H129: 补全8个通常技FrameContract—stand_b/d+close_b/d+crouch_a/b/c/d — 101→102
+
+**commit:** d51d642 | 8个通常技FrameContract+64项验证测试+resolveFrameKey路由
+
+---
+
+## H130: resolveFrameKey路由补全—stand_b/d/close_b/d/crouch_b正确映射 — 102→103
+
+**commit:** a817ad2 | 新通常技正确映射到最近像素帧
