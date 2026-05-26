@@ -277,3 +277,9 @@
 ## H94: PRNG确定性随机数测试—17项验证 — 66→67
 
 **commit:** <hash> | seed determinism+range+snapshot/restore+clone+gameRng globals
+
+---
+
+## H95: projectile resolver测试—21项验证 — 67→68
+
+**commit:** <hash> | canBlock+guardGaugeDamage+aabbCheck+resolveProjectileHits
