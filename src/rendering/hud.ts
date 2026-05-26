@@ -681,15 +681,19 @@ function drawGuardGauge(ctx: CanvasRenderingContext2D, x: number, y: number, w: 
 
 /**
  * Energy gauge rendering — KOF2002 arcade-authentic segmented power gauge
- * Segments separated by bold black dividers; filled segments glow bright blue-to-gold;
- * MAX mode has strong outer glow + flickering overlay; DM-ready pulses with expanding border.
+ * 3 bold segments separated by 2px black + 1px gold-highlight dividers.
+ * Filled segments: deep blue (#2255aa) to gold-blue (#ffcc44) horizontal gradient.
+ * MAX mode: radialGradient green halo with shadowBlur=15.
+ * DM-ready: double-layer pulsing border (outer gold + inner white).
  */
 export function drawPowerGauges(ctx: CanvasRenderingContext2D, gauges: [PowerGauge, PowerGauge], maxModes: [MaxModeState, MaxModeState]): void {
   const gaugeY = HUD_GAUGE_Y;
   const gaugeW = HUD_GAUGE_WIDTH;
   const gaugeH = HUD_GAUGE_HEIGHT;
-  const segGap = 3; // Wider gap for KOF2002-style bold divider
-  const segW = (gaugeW - (MAX_STOCKS - 1) * segGap) / MAX_STOCKS;
+  // KOF2002 authentic: 3 segments for 3-level super stock gauge
+  const numSegments = 3;
+  const segGap = 5; // total gap width: 2px black + 1px gold highlight on each side
+  const segW = (gaugeW - (numSegments - 1) * segGap) / numSegments;
   const now = Date.now();
 
   for (let p = 0; p < 2; p++) {
@@ -698,13 +702,17 @@ export function drawPowerGauges(ctx: CanvasRenderingContext2D, gauges: [PowerGau
     const isP1 = p === 0;
     const baseX = isP1 ? HUD_MARGIN : CANVAS_WIDTH - HUD_MARGIN - gaugeW;
 
-    // Calculate total meter ratio (0..1 across all stocks)
+    // Map actual stocks/meter onto the 3 visual segments
+    // With MAX_STOCKS=5, we map: stocks 0-1 = seg 0, stocks 2-3 = seg 1, stocks 4+ = seg 2
     const totalMeter = gauge.stocks * gauge.maxMeter + gauge.meter;
     const totalMax = MAX_STOCKS * gauge.maxMeter;
     const meterRatio = totalMeter / totalMax;
 
+    // Calculate per-segment fill: how many of the 3 visual segments are full / charging
+    const filledSegments = Math.min(numSegments, Math.floor(meterRatio * numSegments + 0.001));
+    const partialFill = (meterRatio * numSegments) - filledSegments;
+
     // ---- Outer frame: dark recessed slot with gold beveled border ----
-    // Outer bevel (light top-left, dark bottom-right)
     ctx.fillStyle = '#1a1a28';
     roundRect(ctx, baseX - 4, gaugeY - 4, gaugeW + 8, gaugeH + 8, 6);
     ctx.fill();
@@ -719,13 +727,13 @@ export function drawPowerGauges(ctx: CanvasRenderingContext2D, gauges: [PowerGau
     roundRect(ctx, baseX - 4, gaugeY - 4, gaugeW + 8, gaugeH + 8, 6);
     ctx.stroke();
 
-    // ---- Each stock segment ----
-    for (let s = 0; s < MAX_STOCKS; s++) {
+    // ---- Each visual segment ----
+    for (let s = 0; s < numSegments; s++) {
       const segX = baseX + s * (segW + segGap);
-      const isFilled = s < gauge.stocks;
-      const isCharging = s === gauge.stocks && gauge.meter > 0;
+      const isFilled = s < filledSegments;
+      const isCharging = s === filledSegments && partialFill > 0;
 
-      // Segment recessed background — dark with subtle blue tint (KOF2002 empty look)
+      // Segment recessed background — dark grey-blue (#1a1a2a)
       const emptyGrad = ctx.createLinearGradient(segX, gaugeY, segX, gaugeY + gaugeH);
       emptyGrad.addColorStop(0, '#1a1a2a');
       emptyGrad.addColorStop(0.5, '#12121e');
@@ -734,46 +742,43 @@ export function drawPowerGauges(ctx: CanvasRenderingContext2D, gauges: [PowerGau
       ctx.fillRect(segX, gaugeY, segW, gaugeH);
 
       if (isFilled) {
-        // ---- Filled segment: KOF2002 blue-core to gold-edge gradient ----
-        const glowPhase = Math.sin(now / 150 + s * 0.6);
-        const glowAlpha = 0.75 + 0.25 * glowPhase;
+        // ---- Filled segment: deep blue (#2255aa) to gold-blue (#ffcc44) horizontal gradient ----
+        const pulsePhase = Math.sin(now / 150 + s * 0.8);
+        const pulseAlpha = 0.85 + 0.15 * pulsePhase;
         ctx.save();
-        // Inner glow per segment
-        ctx.shadowColor = `rgba(80, 160, 255, ${glowAlpha * 0.5})`;
-        ctx.shadowBlur = 4 + 2 * glowPhase;
-        // Color: blue center shifting to gold for filled stocks
-        // Earlier stocks = deeper blue, later stocks = more golden
-        const goldShift = s / (MAX_STOCKS - 1); // 0 for first, 1 for last
+        // Per-segment inner glow
+        ctx.shadowColor = `rgba(100, 170, 255, ${pulseAlpha * 0.4})`;
+        ctx.shadowBlur = 3 + 2 * pulsePhase;
+
+        // Horizontal gradient: deep blue -> gold-blue across the segment width
         const segGrad = ctx.createLinearGradient(segX, gaugeY, segX + segW, gaugeY);
-        // Left side: brighter (inner glow)
-        segGrad.addColorStop(0, `rgb(${Math.round(60 + goldShift * 180)}, ${Math.round(140 + goldShift * 60)}, ${Math.round(255 - goldShift * 100)})`);
-        segGrad.addColorStop(0.3, `rgb(${Math.round(100 + goldShift * 140)}, ${Math.round(180 + goldShift * 20)}, ${Math.round(255 - goldShift * 120)})`);
-        segGrad.addColorStop(0.5, `rgb(${Math.round(180 + goldShift * 60)}, ${Math.round(200 - goldShift * 20)}, ${Math.round(220 - goldShift * 160)})`);
-        segGrad.addColorStop(0.7, `rgb(${Math.round(100 + goldShift * 140)}, ${Math.round(180 + goldShift * 20)}, ${Math.round(255 - goldShift * 120)})`);
-        segGrad.addColorStop(1, `rgb(${Math.round(60 + goldShift * 180)}, ${Math.round(140 + goldShift * 60)}, ${Math.round(255 - goldShift * 100)})`);
+        segGrad.addColorStop(0, '#2255aa');
+        segGrad.addColorStop(0.3, '#3377cc');
+        segGrad.addColorStop(0.55, '#88bbee');
+        segGrad.addColorStop(0.75, '#ddbb66');
+        segGrad.addColorStop(1, '#ffcc44');
         ctx.fillStyle = segGrad;
         ctx.fillRect(segX, gaugeY, segW, gaugeH);
         ctx.restore();
 
-        // Top highlight stripe — bright specular
-        ctx.fillStyle = `rgba(200, 220, 255, ${0.25 + 0.1 * glowPhase})`;
+        // Vertical specular highlight on top edge
+        ctx.fillStyle = `rgba(220, 235, 255, ${0.3 + 0.1 * pulsePhase})`;
         ctx.fillRect(segX + 1, gaugeY, segW - 2, 2);
         // Bottom shadow edge
-        ctx.fillStyle = 'rgba(0, 0, 30, 0.35)';
+        ctx.fillStyle = 'rgba(0, 0, 30, 0.4)';
         ctx.fillRect(segX + 1, gaugeY + gaugeH - 2, segW - 2, 2);
       } else if (isCharging) {
-        // ---- Charging segment: partial fill with near-full pulse ----
-        const fillRatio = gauge.meter / gauge.maxMeter;
-        const fillW = fillRatio * segW;
-        const nearFull = fillRatio > 0.75;
-        // Color transitions from dim teal to bright blue as it charges
+        // ---- Charging segment: partial fill, dark teal to bright cyan ----
+        const fillW = partialFill * segW;
+        const nearFull = partialFill > 0.75;
         const chargeBright = nearFull ? 0.7 + 0.3 * Math.sin(now / 100) : 1.0;
         ctx.save();
         ctx.globalAlpha = chargeBright;
+        // Gradient from dark cyan-teal to bright blue as it charges
         const chargeGrad = ctx.createLinearGradient(segX, gaugeY, segX + fillW, gaugeY);
-        chargeGrad.addColorStop(0, nearFull ? '#44aaee' : '#336688');
-        chargeGrad.addColorStop(0.5, nearFull ? '#66ccff' : '#4488aa');
-        chargeGrad.addColorStop(1, nearFull ? '#88ddff' : '#5599bb');
+        chargeGrad.addColorStop(0, nearFull ? '#3377aa' : '#223355');
+        chargeGrad.addColorStop(0.5, nearFull ? '#4499cc' : '#335577');
+        chargeGrad.addColorStop(1, nearFull ? '#66bbee' : '#447799');
         ctx.fillStyle = chargeGrad;
         ctx.fillRect(segX, gaugeY, fillW, gaugeH);
         // Charging specular highlight
@@ -783,15 +788,18 @@ export function drawPowerGauges(ctx: CanvasRenderingContext2D, gauges: [PowerGau
         ctx.restore();
       }
 
-      // ---- Bold black segment divider (2px) between segments ----
-      if (s < MAX_STOCKS - 1) {
-        const divX = segX + segW + (segGap - 2) / 2;
+      // ---- 2px black divider + 1px gold highlight on each side between segments ----
+      if (s < numSegments - 1) {
+        const divX = segX + segW + 1; // 1px padding for gold highlight
+        // Left gold highlight edge (1px)
+        ctx.fillStyle = 'rgba(200, 168, 50, 0.35)';
+        ctx.fillRect(divX - 1, gaugeY - 1, 1, gaugeH + 2);
+        // Center black divider (2px)
         ctx.fillStyle = '#000000';
         ctx.fillRect(divX, gaugeY - 1, 2, gaugeH + 2);
-        // Subtle gold edge on divider for depth
-        ctx.fillStyle = 'rgba(200, 168, 50, 0.15)';
-        ctx.fillRect(divX - 1, gaugeY, 1, gaugeH);
-        ctx.fillRect(divX + 2, gaugeY, 1, gaugeH);
+        // Right gold highlight edge (1px)
+        ctx.fillStyle = 'rgba(200, 168, 50, 0.35)';
+        ctx.fillRect(divX + 2, gaugeY - 1, 1, gaugeH + 2);
       }
 
       // Segment inner border
@@ -813,17 +821,25 @@ export function drawPowerGauges(ctx: CanvasRenderingContext2D, gauges: [PowerGau
       ctx.restore();
     }
 
-    // ---- DM-ready pulse border (at least 1 stock, not MAX) ----
+    // ---- DM-ready: double-layer pulsing border (at least 1 stock, not MAX) ----
     if (gauge.stocks >= 1 && !maxMode.active) {
-      const readyPulse = Math.sin(now / 200) * 0.2 + 0.25;
-      // Double-line pulse: outer gold + inner white
-      ctx.strokeStyle = `rgba(255, 200, 80, ${readyPulse})`;
-      ctx.lineWidth = 1.5;
-      roundRect(ctx, Math.round(baseX) - 2, gaugeY - 2, gaugeW + 4, gaugeH + 4, 5);
-      ctx.stroke();
+      const readyPulse = Math.sin(now / 200) * 0.25 + 0.35;
+      const readyVisible = Math.sin(now / 200) > -0.3;
+      if (readyVisible) {
+        // Outer gold border
+        ctx.strokeStyle = `rgba(255, 200, 80, ${readyPulse})`;
+        ctx.lineWidth = 2;
+        roundRect(ctx, Math.round(baseX) - 3, gaugeY - 3, gaugeW + 6, gaugeH + 6, 6);
+        ctx.stroke();
+        // Inner white border
+        ctx.strokeStyle = `rgba(255, 255, 255, ${readyPulse * 0.5})`;
+        ctx.lineWidth = 1;
+        roundRect(ctx, Math.round(baseX) - 1, gaugeY - 1, gaugeW + 2, gaugeH + 2, 4);
+        ctx.stroke();
+      }
     }
 
-    // ---- Full meter: "MAX" text with strong DM-ready flash ----
+    // ---- Full meter: "MAX" text with strong DM-ready double-layer flash ----
     if (!maxMode.active && gauge.stocks >= MAX_STOCKS) {
       const pulseAlpha = 0.7 + 0.3 * Math.sin(now / 120);
       ctx.save();
@@ -835,47 +851,58 @@ export function drawPowerGauges(ctx: CanvasRenderingContext2D, gauges: [PowerGau
       ctx.globalAlpha = 1;
       ctx.restore();
 
-      // Expanding flash border — DM ready indicator with pulse rhythm
-      const dmFlashPhase = now / 100;
-      const dmFlash = Math.sin(dmFlashPhase) > 0;
+      // Double-layer DM-ready flash border with pulse rhythm
+      const dmFlash = Math.sin(now / 100) > 0;
       if (dmFlash) {
         ctx.save();
-        // Outer glow ring
+        // Outer gold glow ring
         ctx.shadowColor = '#ffcc00';
         ctx.shadowBlur = 18;
         ctx.strokeStyle = 'rgba(255, 200, 0, 0.7)';
         ctx.lineWidth = 2.5;
         roundRect(ctx, baseX - 6, gaugeY - 6, gaugeW + 12, gaugeH + 12, 8);
         ctx.stroke();
-        // Inner bright flash
+        // Inner white flash layer
+        ctx.shadowColor = '#ffffff';
         ctx.shadowBlur = 8;
-        ctx.strokeStyle = 'rgba(255, 255, 200, 0.4)';
-        ctx.lineWidth = 1;
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+        ctx.lineWidth = 1.5;
         roundRect(ctx, baseX - 3, gaugeY - 3, gaugeW + 6, gaugeH + 6, 5);
         ctx.stroke();
         ctx.restore();
       }
     }
 
-    // ---- MAX mode: strong outer glow + flickering overlay ----
+    // ---- MAX mode: radialGradient green halo with shadowBlur=15 ----
     if (maxMode.active) {
       const pct = maxMode.timer / maxMode.maxDuration;
 
-      // Flickering glow overlay on all segments (KOF2002 MAX signature)
+      // Green radialGradient halo covering entire gauge area
+      const centerX = baseX + gaugeW / 2;
+      const centerY = gaugeY + gaugeH / 2;
+      const haloRadius = Math.max(gaugeW, gaugeH) * 0.7;
       const flickerPhase = Math.sin(now / 60);
       const flickerAlpha = 0.15 + 0.12 * flickerPhase;
+
       ctx.save();
+      const greenHalo = ctx.createRadialGradient(
+        centerX, centerY, haloRadius * 0.1,
+        centerX, centerY, haloRadius,
+      );
+      greenHalo.addColorStop(0, `rgba(100, 255, 150, ${flickerAlpha * 1.5})`);
+      greenHalo.addColorStop(0.4, `rgba(50, 255, 100, ${flickerAlpha})`);
+      greenHalo.addColorStop(1, `rgba(0, 200, 80, 0)`);
       ctx.shadowColor = `rgba(0, 255, 100, ${0.5 + 0.3 * flickerPhase})`;
-      ctx.shadowBlur = 20;
-      ctx.fillStyle = `rgba(100, 255, 150, ${flickerAlpha})`;
-      ctx.fillRect(baseX, gaugeY, gaugeW, gaugeH);
+      ctx.shadowBlur = 15;
+      ctx.fillStyle = greenHalo;
+      ctx.fillRect(baseX - 8, gaugeY - 8, gaugeW + 16, gaugeH + 16);
       ctx.restore();
 
-      // Strong green outer glow (double ring)
+      // Outer green glow ring (shadowBlur=15)
       const outerGlow = Math.sin(now / 80) * 0.3 + 0.5;
       ctx.save();
       ctx.shadowColor = `rgba(0, 255, 100, ${outerGlow})`;
-      ctx.shadowBlur = 22;
+      ctx.shadowBlur = 15;
       ctx.strokeStyle = `rgba(100, 255, 150, ${outerGlow * 0.8})`;
       ctx.lineWidth = 2;
       roundRect(ctx, baseX - 6, gaugeY - 6, gaugeW + 12, gaugeH + 12, 8);
@@ -884,7 +911,7 @@ export function drawPowerGauges(ctx: CanvasRenderingContext2D, gauges: [PowerGau
       // Inner glow ring
       ctx.save();
       ctx.shadowColor = `rgba(200, 255, 220, ${outerGlow * 0.5})`;
-      ctx.shadowBlur = 10;
+      ctx.shadowBlur = 15;
       ctx.strokeStyle = `rgba(200, 255, 220, ${outerGlow * 0.4})`;
       ctx.lineWidth = 1;
       roundRect(ctx, baseX - 3, gaugeY - 3, gaugeW + 6, gaugeH + 6, 5);
