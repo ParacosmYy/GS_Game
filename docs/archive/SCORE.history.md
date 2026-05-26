@@ -457,3 +457,9 @@
 ## H124: portraitManifest测试—8项验证PORTRAIT_SIZES+getPortrait+getSelect+getHUD+getVS — 96→97
 
 **commit:** <hash> | portraitManifest测试—8项验证PORTRAIT_SIZES+getPortrait+getSelect+getHUD+getVS
+
+---
+
+## H125: spriteManifest测试—7项验证getAnimation+getFallbackColors+getAnimationNames — 97→98
+
+**commit:** <hash> | spriteManifest测试—7项验证getAnimation+getFallbackColors+getAnimationNames
