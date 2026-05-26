@@ -505,3 +505,9 @@
 ## H129: cinematicState测试—5项验证KO_FLASH+ANNOUNCE+TRANSITION_PAUSE常量 — 101→102
 
 **commit:** <hash> | cinematicState测试—5项验证KO_FLASH+ANNOUNCE+TRANSITION_PAUSE常量
+
+---
+
+## H130: frameContractBuilder测试—8项验证resolveFrameIndex(startup/active/recovery/clamp) — 102→103
+
+**commit:** <hash> | frameContractBuilder测试—8项验证resolveFrameIndex(startup/active/recovery/clamp)
