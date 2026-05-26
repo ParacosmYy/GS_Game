@@ -601,3 +601,9 @@
 ## H143: attackFramesSpecials测试—8项验证KYO/RYO必杀技帧数据+attack字段 — 115→116
 
 **commit:** <hash> | attackFramesSpecials测试—8项验证KYO/RYO必杀技帧数据+attack字段
+
+---
+
+## H144: frameDataChars测试—6项验证FRAME_DATA_CHARS+KYO/RYO/IORI键+startup/damage字段 — 116→117
+
+**commit:** <hash> | frameDataChars测试—6项验证FRAME_DATA_CHARS+KYO/RYO/IORI键+startup/damage字段
