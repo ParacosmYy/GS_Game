@@ -259,3 +259,15 @@
 ## H91: roster验证测试—6项验证27角色 — 63→64
 
 **commit:** <hash> | 27角色+唯一ID+必填字段+Ryo存在性+Ryo属性
+
+---
+
+## H92: frame contract Ryo集成测试—35项验证 — 64→65
+
+**commit:** <hash> | 4关键攻击对齐4数据源(animation+hitbox+feedback+cancel)
+
+---
+
+## H93: state context测试—24项验证 — 65→66
+
+**commit:** <hash> | FighterCtx接口+方向检测+double-tap+hyperJump+closeRange
