@@ -39,6 +39,7 @@ export const MAX_HEALTH = 1000;
 
 // ===== Input Constants =====
 export const COMMAND_WINDOW = 12;          // 单个搓招窗口（正版KOF标准 ≈ 10-14帧, 12为经典值）
+export const RECOVERY_INPUT_BUFFER = 8;   // 受身/防御硬直恢复后输入缓冲帧数（KOF2002: 硬直中输入的方向可在恢复后8帧内继续匹配必杀指令）
 export const HCF_WINDOW = 24;              // 半圆指令窗口（↓↙←↙↓↘→）
 export const DOUBLE_QCF_WINDOW = 28;       // 双QCF指令窗口（正版KOF UM DM窗口 ≈ 28-32帧）
 export const CHARGE_FRAMES_REQUIRED = 40;  // 蓄力帧数要求（正版KOF ≈ 40-55帧, 40为最低值）

@@ -1,5 +1,5 @@
 import { DirectionInput, AttackType } from '../core/types.js';
-import { COMMAND_WINDOW, HCF_WINDOW, DOUBLE_QCF_WINDOW, CHARGE_FRAMES_REQUIRED } from '../core/constants.js';
+import { COMMAND_WINDOW, HCF_WINDOW, DOUBLE_QCF_WINDOW, CHARGE_FRAMES_REQUIRED, RECOVERY_INPUT_BUFFER } from '../core/constants.js';
 
 /** DM motion types detected from command buffer — characters map these to their own DM */
 export type DMMotion = 'QCFx2_P' | 'QCFx2_K' | 'QCBx2_K' | 'QCBx2_P' | null;
@@ -47,6 +47,12 @@ export class CommandBuffer {
     downback: false,
   };
 
+  // Recovery input buffer — tracks hitstun/blockstun state so that
+  // direction inputs recorded during recovery can still match special
+  // commands for RECOVERY_INPUT_BUFFER frames after recovery ends.
+  private recoveryActive = false;
+  private recoveryEndFrame = -1;
+
   /** Record direction input for this frame */
   record(direction: DirectionInput, frame: number): void {
     if (direction !== 'neutral') {
@@ -56,6 +62,80 @@ export class CommandBuffer {
     if (this.history.length > 40) {
       this.history = this.history.slice(-30);
     }
+  }
+
+  /**
+   * Set whether the character is currently in hitstun/blockstun recovery.
+   * When active transitions to false, the recovery end frame is recorded so
+   * that direction inputs buffered during recovery remain valid for
+   * RECOVERY_INPUT_BUFFER frames.
+   *
+   * @param active true when entering hitstun/blockstun, false on recovery
+   * @param currentFrame the current game frame number
+   */
+  setRecoveryWindow(active: boolean, currentFrame: number): void {
+    if (this.recoveryActive && !active) {
+      // Transitioning from recovery to free — record the end frame
+      this.recoveryEndFrame = currentFrame;
+    }
+    this.recoveryActive = active;
+  }
+
+  /**
+   * Whether we are currently within the recovery input buffer window.
+   * Returns true for RECOVERY_INPUT_BUFFER frames after recovery ends.
+   */
+  private isInRecoveryBuffer(currentFrame: number): boolean {
+    if (this.recoveryActive) return true;
+    if (this.recoveryEndFrame < 0) return false;
+    return currentFrame - this.recoveryEndFrame < RECOVERY_INPUT_BUFFER;
+  }
+
+  /**
+   * Get the effective command window for the current frame.
+   * During and shortly after recovery, direction inputs that were recorded
+   * while in recovery are granted an extended window so they can still match.
+   */
+  private getEffectiveCommandWindow(currentFrame: number): number {
+    if (!this.isInRecoveryBuffer(currentFrame)) return COMMAND_WINDOW;
+    // Extend the window to cover inputs recorded during recovery.
+    // The effective window = COMMAND_WINDOW + time since recovery ended
+    // (clamped so inputs before recovery started are not included).
+    if (this.recoveryActive) {
+      // Still in recovery — inputs are buffered, extend to COMMAND_WINDOW
+      // plus enough to cover the full recovery duration up to now.
+      // Use a generous window: COMMAND_WINDOW + RECOVERY_INPUT_BUFFER
+      return COMMAND_WINDOW + RECOVERY_INPUT_BUFFER;
+    }
+    // Post-recovery buffer window
+    const framesSinceRecovery = currentFrame - this.recoveryEndFrame;
+    return COMMAND_WINDOW + RECOVERY_INPUT_BUFFER - framesSinceRecovery;
+  }
+
+  /**
+   * Get the effective DM command window for the current frame.
+   * Same logic as getEffectiveCommandWindow but for DM motions (DOUBLE_QCF_WINDOW).
+   */
+  private getEffectiveDMWindow(currentFrame: number): number {
+    if (!this.isInRecoveryBuffer(currentFrame)) return DOUBLE_QCF_WINDOW;
+    if (this.recoveryActive) {
+      return DOUBLE_QCF_WINDOW + RECOVERY_INPUT_BUFFER;
+    }
+    const framesSinceRecovery = currentFrame - this.recoveryEndFrame;
+    return DOUBLE_QCF_WINDOW + RECOVERY_INPUT_BUFFER - framesSinceRecovery;
+  }
+
+  /**
+   * Get the effective HCF window for the current frame.
+   * Same logic but for HCF motions (HCF_WINDOW).
+   */
+  private getEffectiveHCFWindow(currentFrame: number): number {
+    if (!this.isInRecoveryBuffer(currentFrame)) return HCF_WINDOW;
+    if (this.recoveryActive) {
+      return HCF_WINDOW + RECOVERY_INPUT_BUFFER;
+    }
+    const framesSinceRecovery = currentFrame - this.recoveryEndFrame;
+    return HCF_WINDOW + RECOVERY_INPUT_BUFFER - framesSinceRecovery;
   }
 
   /**
@@ -187,9 +267,11 @@ export class CommandBuffer {
     const kickReleased = this.wasRecentlyReleased('kick', currentFrame);
     if (!attackPressed && !punchReleased && !kickReleased) return null;
 
-    // Get recent directions within command window
+    // Get recent directions within effective command window
+    // (extended during/after recovery for buffered input matching)
+    const effectiveWindow = this.getEffectiveCommandWindow(currentFrame);
     const recent = this.history.filter(
-      (r) => currentFrame - r.frame <= COMMAND_WINDOW,
+      (r) => currentFrame - r.frame <= effectiveWindow,
     );
 
     // Priority 1: Dragon Punch →↓↘+P (3-direction motion)
@@ -226,8 +308,9 @@ export class CommandBuffer {
     const kickEdge = kickPressed || this.wasRecentlyReleased('kick', currentFrame);
     if (!punchEdge && !kickEdge) return null;
 
+    const effectiveDMWindow = this.getEffectiveDMWindow(currentFrame);
     const wideRecent = this.history.filter(
-      (r) => currentFrame - r.frame <= DOUBLE_QCF_WINDOW,
+      (r) => currentFrame - r.frame <= effectiveDMWindow,
     );
 
     // QCFx2 (↓↘→↓↘→): multiple shortcut patterns
@@ -256,8 +339,9 @@ export class CommandBuffer {
   checkKickSpecial(currentFrame: number, kickPressed: boolean): AttackType | null {
     if (!kickPressed && !this.wasRecentlyReleased('kick', currentFrame)) return null;
 
+    const effectiveWindow = this.getEffectiveCommandWindow(currentFrame);
     const recent = this.history.filter(
-      (r) => currentFrame - r.frame <= COMMAND_WINDOW,
+      (r) => currentFrame - r.frame <= effectiveWindow,
     );
 
     // QCB ↓↙←+K → R.E.D. Kick
@@ -276,8 +360,9 @@ export class CommandBuffer {
   /** Check rekka followup: QCF+P during recovery — supports Negative Edge */
   checkRekkaFollowQCF(currentFrame: number, punchPressed: boolean): AttackType | null {
     if (!punchPressed && !this.wasRecentlyReleased('punch', currentFrame)) return null;
+    const effectiveWindow = this.getEffectiveCommandWindow(currentFrame);
     const recent = this.history.filter(
-      (r) => currentFrame - r.frame <= COMMAND_WINDOW,
+      (r) => currentFrame - r.frame <= effectiveWindow,
     );
     if (this.matchSequence(recent, ['down', 'forward'])
       || this.matchSequence(recent, ['down', 'downforward', 'forward'])) {
@@ -289,8 +374,9 @@ export class CommandBuffer {
   /** Check rekka followup: HCB+P during recovery — supports Negative Edge */
   checkRekkaFollowHCB(currentFrame: number, punchPressed: boolean): AttackType | null {
     if (!punchPressed && !this.wasRecentlyReleased('punch', currentFrame)) return null;
+    const effectiveWindow = this.getEffectiveHCFWindow(currentFrame);
     const recent = this.history.filter(
-      (r) => currentFrame - r.frame <= HCF_WINDOW,
+      (r) => currentFrame - r.frame <= effectiveWindow,
     );
     if (this.matchSequence(recent, ['forward', 'down', 'back'])
       || this.matchSequence(recent, ['forward', 'downforward', 'down', 'downback', 'back'])) {
@@ -302,8 +388,9 @@ export class CommandBuffer {
   /** Check dokugami chain followup: HCB+P after 毒咬み — supports Negative Edge */
   checkDokugamiFollow(currentFrame: number, punchPressed: boolean): AttackType | null {
     if (!punchPressed && !this.wasRecentlyReleased('punch', currentFrame)) return null;
+    const effectiveWindow = this.getEffectiveHCFWindow(currentFrame);
     const recent = this.history.filter(
-      (r) => currentFrame - r.frame <= HCF_WINDOW,
+      (r) => currentFrame - r.frame <= effectiveWindow,
     );
     // HCB for 罪詠み
     if (this.matchSequence(recent, ['forward', 'down', 'back'])
@@ -320,8 +407,9 @@ export class CommandBuffer {
 
   /** Check if QCF motion is present in recent history */
   hasQCF(currentFrame: number): boolean {
+    const effectiveWindow = this.getEffectiveCommandWindow(currentFrame);
     const recent = this.history.filter(
-      (r) => currentFrame - r.frame <= COMMAND_WINDOW,
+      (r) => currentFrame - r.frame <= effectiveWindow,
     );
     return this.matchSequence(recent, ['down', 'downforward', 'forward'])
       || this.matchSequenceLenient(recent, ['down', 'forward']);
@@ -329,8 +417,9 @@ export class CommandBuffer {
 
   /** Check if QCB motion is present in recent history */
   hasQCB(currentFrame: number): boolean {
+    const effectiveWindow = this.getEffectiveCommandWindow(currentFrame);
     const recent = this.history.filter(
-      (r) => currentFrame - r.frame <= COMMAND_WINDOW,
+      (r) => currentFrame - r.frame <= effectiveWindow,
     );
     return this.matchSequence(recent, ['down', 'downback', 'back'])
       || this.matchSequenceLenient(recent, ['down', 'back']);
@@ -338,8 +427,9 @@ export class CommandBuffer {
 
   /** Check if HCB motion is present in recent history (→↓←) */
   hasHCB(currentFrame: number): boolean {
+    const effectiveWindow = this.getEffectiveHCFWindow(currentFrame);
     const recent = this.history.filter(
-      (r) => currentFrame - r.frame <= HCF_WINDOW,
+      (r) => currentFrame - r.frame <= effectiveWindow,
     );
     return this.matchSequence(recent, ['forward', 'downforward', 'down', 'downback', 'back'])
       || this.matchSequence(recent, ['forward', 'down', 'back']);
@@ -347,8 +437,9 @@ export class CommandBuffer {
 
   /** Check if ↓↓ motion is present in recent history */
   hasDD(currentFrame: number): boolean {
+    const effectiveWindow = this.getEffectiveCommandWindow(currentFrame);
     const recent = this.history.filter(
-      (r) => currentFrame - r.frame <= COMMAND_WINDOW,
+      (r) => currentFrame - r.frame <= effectiveWindow,
     );
     let downCount = 0;
     for (const r of recent) {
@@ -393,6 +484,8 @@ export class CommandBuffer {
     this.history = [];
     this.chargeFrames = { down: 0, back: 0, downback: 0 };
     this.chargeWasReady = { down: false, back: false, downback: false };
+    this.recoveryActive = false;
+    this.recoveryEndFrame = -1;
   }
 
   /** Get recent N direction records for debug visualization */

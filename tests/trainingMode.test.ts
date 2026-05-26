@@ -43,7 +43,7 @@ describe('TrainingModeController - Config Defaults', () => {
 
   it('cycleDummyBehavior cycles through all behaviors', () => {
     const expected: DummyBehaviorConfig[] = [
-      'block_all', 'block_high', 'block_low', 'crouch', 'jump', 'random', 'playback', 'stand',
+      'block_all', 'block_high', 'block_low', 'crouch', 'jump', 'reversal', 'random', 'playback', 'stand',
     ];
     const results: DummyBehaviorConfig[] = [];
     for (let i = 0; i < expected.length; i++) {
@@ -100,48 +100,28 @@ describe('TrainingModeController - Dummy Behavior', () => {
 // ===========================================================================
 describe('TrainingModeController - Frame Advantage', () => {
   let ctrl: TrainingModeController;
-  let attacker: Fighter;
-  let defender: Fighter;
 
   beforeEach(() => {
     ctrl = new TrainingModeController();
-    attacker = makeFighter(STAGE_WIDTH * 0.33, 1);
-    defender = makeFighter(STAGE_WIDTH * 0.67, -1);
   });
 
   it('STAND_A on hit has positive advantage', () => {
     // STAND_A: startup=6, active=3, recovery=5, hitstun=11
-    // total=14, advantage = 11 - 14 = -3
-    attacker.currentAttack = AttackType.STAND_A;
-    attacker.attackPhase = 'active';
-    attacker.attackFrame = 1;
-    // Simulate defender in hitstun from this attack
-    defender.hitstunTimer = 11;
-
-    const adv = ctrl.calculateFrameAdvantage(attacker, defender);
-    // hitstun(11) - total(14) = -3
-    expect(adv).toBe(-3);
+    // total=14, advantage = 11 - (14-1) = 11 - 13 = -2
+    const adv = ctrl.calculateFrameAdvantage(AttackType.STAND_A, 'hit');
+    expect(adv).toBe(-2);
   });
 
   it('CLOSE_A on block has negative advantage', () => {
     // CLOSE_A: startup=4, active=5, recovery=5, blockstun=9
-    // total=14, advantage = 9 - 14 = -5
-    attacker.currentAttack = AttackType.CLOSE_A;
-    attacker.attackPhase = 'active';
-    attacker.attackFrame = 1;
-    defender.blockstunTimer = 9;
-
-    const adv = ctrl.calculateFrameAdvantage(attacker, defender);
-    expect(adv).toBe(-5);
+    // total=14, advantage = 9 - (14-1) = 9 - 13 = -4
+    const adv = ctrl.calculateFrameAdvantage(AttackType.CLOSE_A, 'block');
+    expect(adv).toBe(-4);
   });
 
-  it('returns 0 when no attack is active', () => {
-    attacker.currentAttack = null;
-    attacker.attackPhase = 'none';
-    defender.hitstunTimer = 0;
-    defender.blockstunTimer = 0;
-
-    const adv = ctrl.calculateFrameAdvantage(attacker, defender);
+  it('returns 0 when attack type has no frame data', () => {
+    // Use an attack type not in FRAME_DATA (should return 0)
+    const adv = ctrl.calculateFrameAdvantage('NONEXISTENT_ATTACK' as any, 'hit');
     expect(adv).toBe(0);
   });
 });

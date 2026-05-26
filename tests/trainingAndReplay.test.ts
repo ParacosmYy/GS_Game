@@ -208,10 +208,16 @@ describe('Training Mode Basics', () => {
     expect(training.dummyBehavior).toBe(DummyBehavior.BLOCK_LOW);
 
     training.cycleDummyBehavior();
+    expect(training.dummyBehavior).toBe(DummyBehavior.BLOCK_HIGH);
+
+    training.cycleDummyBehavior();
     expect(training.dummyBehavior).toBe(DummyBehavior.CROUCH);
 
     training.cycleDummyBehavior();
     expect(training.dummyBehavior).toBe(DummyBehavior.JUMP);
+
+    training.cycleDummyBehavior();
+    expect(training.dummyBehavior).toBe(DummyBehavior.REVERSAL);
 
     // Cycles back to STAND
     training.cycleDummyBehavior();
