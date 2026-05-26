@@ -953,3 +953,9 @@
 ## H194: replayInputSource—5项验证createReplayInputSource+readFrame+isFinished — 166→167
 
 **commit:** <hash> | replayInputSource—5项验证createReplayInputSource+readFrame+isFinished
+
+---
+
+## H195: pixelPortraits—4项验证PixelPortraitData结构(width/height/palette/pixels) — 167→168
+
+**commit:** <hash> | pixelPortraits—4项验证PixelPortraitData结构(width/height/palette/pixels)
