@@ -697,3 +697,9 @@
 ## H157: ryoContentData—8项验证RYO_CHARACTER_DATA id/displayName/weight/walkSpeed/runSpeed — 129→130
 
 **commit:** <hash> | ryoContentData—8项验证RYO_CHARACTER_DATA id/displayName/weight/walkSpeed/runSpeed
+
+---
+
+## H158: ryoAttacks—5项验证RYO_ATTACK_KEYS+getRyoFrameData+getRyoAttackFrameData — 130→131
+
+**commit:** <hash> | ryoAttacks—5项验证RYO_ATTACK_KEYS+getRyoFrameData+getRyoAttackFrameData
