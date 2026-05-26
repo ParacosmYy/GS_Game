@@ -211,3 +211,9 @@
 ## H83: Ryo poses帧数覆盖测试—13项验证 — 55→56
 
 **commit:** <hash> | 8最低pose帧数+3攻击pose+总pose>=15+idle>=8
+
+---
+
+## H84: meter+DM manager测试—41项验证 — 56→57
+
+**commit:** <hash> | meter系统全函数+DMManager canUseDM/isHSDM+Ryo DM/SDM/HSDM类型+meter→DM集成
