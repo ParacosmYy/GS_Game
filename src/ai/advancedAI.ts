@@ -809,11 +809,12 @@ export class AdvancedAI {
 
   private decideFarRange(hasMeter: boolean, rng: SeededRNG): AIAction {
     const r = rng.next();
-    if (this.spacingProfile.hasProjectile && r < 0.35) return 'projectile';
-    if (r < 0.55) return 'approach';
-    if (r < 0.70) return 'jumpIn';
-    if (r < 0.85) return 'special';
-    return 'approach';
+    // 提升远距离时使用special/projectile的频率（大招或特殊技）
+    if (this.spacingProfile.hasProjectile && r < 0.30) return 'projectile';
+    if (r < 0.45) return 'special'; // 更高概率尝试必杀
+    if (r < 0.60) return 'approach';
+    if (r < 0.75) return 'jumpIn';
+    return this.chance(rng, 0.5) ? 'special' : 'approach';
   }
 
   // ═══════════════════════════════════════════
@@ -1126,14 +1127,20 @@ export class AdvancedAI {
               break;
             }
           }
-          if (this.chance(rng, 0.3)) {
+          // Projectile-based special with proper motion
+          if (this.spacingProfile.hasProjectile && this.chance(rng, 0.6)) {
+            // QCF motion for projectile specials: ↓↘→ + P
+            base.down = true;
             base.buttonC = true;
             base.buttonCPressed = true;
             base.punchPressed = true;
           } else {
-            base.buttonD = true;
-            base.buttonDPressed = true;
-            base.kickPressed = true;
+            // DP motion for anti-air specials: →↓↘ + P
+            base.forward = true;
+            base.down = true;
+            base.buttonC = true;
+            base.buttonCPressed = true;
+            base.punchPressed = true;
           }
         }
         break;

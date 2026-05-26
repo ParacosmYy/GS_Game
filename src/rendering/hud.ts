@@ -316,48 +316,82 @@ export function drawHUD(ctx: CanvasRenderingContext2D, fighters: Fighter[], tick
     ctx.globalAlpha = 1;
   }
 
-  // ===== Timer display =====
+  // ===== Timer display — KOF2002 arcade-authentic =====
   const timeSeconds = Math.max(0, ROUND_TIME - Math.floor(tick / 60));
   const timeStr = timeSeconds.toString().padStart(2, '0');
   const timerX = CANVAS_WIDTH / 2;
   const timerY = HUD_BAR_Y + 8;
+  const isUrgent = timeSeconds <= 10;
+  const isCritical = timeSeconds <= 5;
 
-  // "TIME" label above the timer
-  drawSNKText(ctx, 'TIME', timerX, timerY - 16, 9, 'rgba(200, 168, 50, 0.8)', '#000000', 'center');
+  // "TIME" label above the timer — gold with brighter styling
+  const timeLabelColor = isCritical ? '#ff6644' : isUrgent ? '#ffcc44' : 'rgba(200, 168, 50, 0.9)';
+  drawSNKText(ctx, 'TIME', timerX, timerY - 17, 10, timeLabelColor, '#000000', 'center');
 
-  // Timer background — gold bordered, red pulse when urgent
-  const urgentPulse = timeSeconds <= 10 ? (Math.sin(tick * 0.2) * 0.3 + 0.4) : 0;
-  const bgR = Math.round(10 + urgentPulse * 180);
-  ctx.fillStyle = `rgba(${bgR}, 10, 20, 0.9)`;
-  roundRect(ctx, timerX - 30, timerY - 12, 60, 32, 8);
+  // Timer background — recessed slot with bevel
+  const urgentPulse = isUrgent ? (Math.sin(tick * 0.25) * 0.35 + 0.45) : 0;
+  const bgR = Math.round(12 + urgentPulse * 200);
+  const bgG = Math.round(8 + (isCritical ? urgentPulse * 20 : 0));
+  // Outer bevel
+  ctx.fillStyle = isUrgent ? `rgba(${bgR}, ${bgG}, 15, 0.92)` : 'rgba(8, 8, 20, 0.92)';
+  roundRect(ctx, timerX - 33, timerY - 14, 66, 36, 9);
   ctx.fill();
-  ctx.strokeStyle = '#c8a832';
+  // Inner darker area
+  ctx.fillStyle = isUrgent ? `rgba(${Math.round(bgR * 0.6)}, 5, 10, 0.95)` : 'rgba(5, 5, 14, 0.95)';
+  roundRect(ctx, timerX - 30, timerY - 11, 60, 30, 7);
+  ctx.fill();
+
+  // Gold border — pulses brighter when urgent
+  const goldBorderAlpha = isUrgent ? (0.6 + urgentPulse * 0.4) : 0.5;
+  ctx.strokeStyle = isCritical ? `rgba(255, 80, 40, ${goldBorderAlpha})` : `rgba(200, 168, 50, ${goldBorderAlpha})`;
   ctx.lineWidth = 2;
-  roundRect(ctx, timerX - 30, timerY - 12, 60, 32, 8);
+  roundRect(ctx, timerX - 33, timerY - 14, 66, 36, 9);
   ctx.stroke();
-  // Inner gold border
-  ctx.strokeStyle = 'rgba(200, 168, 50, 0.3)';
+  // Inner border
+  ctx.strokeStyle = isUrgent ? `rgba(255, 100, 60, ${goldBorderAlpha * 0.4})` : 'rgba(200, 168, 50, 0.25)';
   ctx.lineWidth = 1;
-  roundRect(ctx, timerX - 27, timerY - 9, 54, 26, 6);
+  roundRect(ctx, timerX - 30, timerY - 11, 60, 30, 7);
   ctx.stroke();
 
-  // Timer text — pixel font (SNK ROM style)
-  const timerColor = timeSeconds <= 10 ? '#ff4444' : timeSeconds <= 30 ? '#ffcc44' : '#eeeeee';
-  const timerScale = timeSeconds <= 10 ? 1.3 : 1.0;
-  if (timeSeconds <= 10) {
-    const blinkSpeed = timeSeconds <= 5 ? 0.4 : 0.15;
-    const blink = Math.sin(tick * blinkSpeed) > -0.3;
+  // Red glow halo when urgent
+  if (isUrgent) {
+    ctx.save();
+    ctx.shadowColor = isCritical ? `rgba(255, 30, 0, ${0.5 + urgentPulse * 0.3})` : `rgba(255, 80, 40, ${urgentPulse * 0.4})`;
+    ctx.shadowBlur = isCritical ? 20 : 12;
+    ctx.strokeStyle = 'rgba(0, 0, 0, 0)';
+    roundRect(ctx, timerX - 33, timerY - 14, 66, 36, 9);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  // Timer text — larger pixel font (SNK ROM style) with color-coded urgency
+  const timerColor = isCritical ? '#ff2222' : isUrgent ? '#ff5533' : timeSeconds <= 30 ? '#ffcc44' : '#eeeeee';
+  const timerScale = isUrgent ? 1.6 : 1.3;
+
+  if (isUrgent) {
+    // Urgent timer: blink + strong red glow + pixel shake
+    const blinkSpeed = isCritical ? 0.5 : 0.25;
+    const blink = Math.sin(tick * blinkSpeed) > -0.2;
     if (blink) {
       ctx.save();
-      ctx.shadowColor = '#ff0000';
-      ctx.shadowBlur = 12;
-      drawPixelText(ctx, timeStr, timerX, timerY - 5, timerScale, timerColor);
+      // Red shadow glow behind digits
+      ctx.shadowColor = isCritical ? '#ff0000' : '#ff4400';
+      ctx.shadowBlur = isCritical ? 18 : 14;
+      // Subtle horizontal shake at critical
+      const shakeX = isCritical ? Math.sin(tick * 1.5) * 1.2 : 0;
+      drawPixelText(ctx, timeStr, timerX + shakeX, timerY - 6, timerScale, timerColor);
       ctx.restore();
-      drawSNKText(ctx, timeStr, timerX, timerY, 24, timerColor);
+      // SNK text fallback layer
+      drawSNKText(ctx, timeStr, timerX + (isCritical ? Math.sin(tick * 1.5) * 1.2 : 0), timerY - 1, 28, timerColor);
     }
   } else {
-    drawPixelText(ctx, timeStr, timerX, timerY - 5, timerScale, timerColor);
-    drawSNKText(ctx, timeStr, timerX, timerY, 24, timerColor);
+    // Normal timer: steady display with subtle glow
+    ctx.save();
+    ctx.shadowColor = 'rgba(200, 168, 50, 0.2)';
+    ctx.shadowBlur = 6;
+    drawPixelText(ctx, timeStr, timerX, timerY - 6, timerScale, timerColor);
+    ctx.restore();
+    drawSNKText(ctx, timeStr, timerX, timerY - 1, 28, timerColor);
   }
 
   // ===== Round indicator — diamond shapes (up to 3 rounds) =====
@@ -408,14 +442,22 @@ export function drawHUD(ctx: CanvasRenderingContext2D, fighters: Fighter[], tick
   drawNamePlate(ctx, HUD_MARGIN, HUD_BAR_Y + HUD_BAR_HEIGHT + 26, p1Name, '#ff6644', 'left');
   drawNamePlate(ctx, CANVAS_WIDTH - HUD_MARGIN, HUD_BAR_Y + HUD_BAR_HEIGHT + 26, p2Name, '#4488ff', 'right');
 
-  // ===== Screen edge red pulse when time < 5 =====
-  if (timeSeconds <= 5) {
-    const vPulse = Math.sin(tick * 0.25) * 0.15 + 0.15;
-    const vGrad = ctx.createRadialGradient(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, CANVAS_WIDTH * 0.35, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, CANVAS_WIDTH * 0.7);
+  // ===== Screen edge red pulse when time < 10 (stronger at < 5) =====
+  if (timeSeconds <= 10) {
+    const intensity = isCritical ? 1.0 : 0.4;
+    const vPulse = Math.sin(tick * (isCritical ? 0.3 : 0.2)) * 0.15 * intensity + 0.12 * intensity;
+    const vGrad = ctx.createRadialGradient(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, CANVAS_WIDTH * 0.3, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, CANVAS_WIDTH * 0.65);
     vGrad.addColorStop(0, 'rgba(255, 0, 0, 0)');
     vGrad.addColorStop(1, `rgba(255, 0, 0, ${vPulse})`);
     ctx.fillStyle = vGrad;
     ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+    // Additional top/bottom edge vignette at critical
+    if (isCritical) {
+      const edgeAlpha = 0.1 + 0.12 * Math.sin(tick * 0.35);
+      ctx.fillStyle = `rgba(180, 0, 0, ${edgeAlpha})`;
+      ctx.fillRect(0, 0, CANVAS_WIDTH, 40);
+      ctx.fillRect(0, CANVAS_HEIGHT - 40, CANVAS_WIDTH, 40);
+    }
   }
 }
 
@@ -638,15 +680,17 @@ function drawGuardGauge(ctx: CanvasRenderingContext2D, x: number, y: number, w: 
 // ===== Power gauge with tick marks, glow, DM-ready flash =====
 
 /**
- * Energy gauge rendering — KOF2002 gold glow
- * Added: 25%/50%/75%/100% tick marks, glow above 50%, DM-ready flashing
+ * Energy gauge rendering — KOF2002 arcade-authentic segmented power gauge
+ * Segments separated by bold black dividers; filled segments glow bright blue-to-gold;
+ * MAX mode has strong outer glow + flickering overlay; DM-ready pulses with expanding border.
  */
 export function drawPowerGauges(ctx: CanvasRenderingContext2D, gauges: [PowerGauge, PowerGauge], maxModes: [MaxModeState, MaxModeState]): void {
   const gaugeY = HUD_GAUGE_Y;
   const gaugeW = HUD_GAUGE_WIDTH;
   const gaugeH = HUD_GAUGE_HEIGHT;
-  const segGap = HUD_GAUGE_SEGMENT_GAP;
+  const segGap = 3; // Wider gap for KOF2002-style bold divider
   const segW = (gaugeW - (MAX_STOCKS - 1) * segGap) / MAX_STOCKS;
+  const now = Date.now();
 
   for (let p = 0; p < 2; p++) {
     const gauge = gauges[p];
@@ -659,150 +703,232 @@ export function drawPowerGauges(ctx: CanvasRenderingContext2D, gauges: [PowerGau
     const totalMax = MAX_STOCKS * gauge.maxMeter;
     const meterRatio = totalMeter / totalMax;
 
-    // Background frame + gold border
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+    // ---- Outer frame: dark recessed slot with gold beveled border ----
+    // Outer bevel (light top-left, dark bottom-right)
+    ctx.fillStyle = '#1a1a28';
+    roundRect(ctx, baseX - 4, gaugeY - 4, gaugeW + 8, gaugeH + 8, 6);
+    ctx.fill();
+    ctx.fillStyle = '#08080f';
     roundRect(ctx, baseX - 3, gaugeY - 3, gaugeW + 6, gaugeH + 6, 5);
     ctx.fill();
-    ctx.strokeStyle = 'rgba(200, 168, 50, 0.3)';
-    ctx.lineWidth = 1;
-    roundRect(ctx, baseX - 3, gaugeY - 3, gaugeW + 6, gaugeH + 6, 5);
+
+    // Gold border — brighter when meter is high
+    const borderBright = Math.min(1, 0.3 + meterRatio * 0.5);
+    ctx.strokeStyle = `rgba(200, 168, 50, ${borderBright})`;
+    ctx.lineWidth = 1.5;
+    roundRect(ctx, baseX - 4, gaugeY - 4, gaugeW + 8, gaugeH + 8, 6);
     ctx.stroke();
 
-    // Meter level tick marks — 25%, 50%, 75%, 100% markers on the gauge background
-    const tickMarks = [0.25, 0.5, 0.75, 1.0];
-    for (const tm of tickMarks) {
-      const tickX = baseX + gaugeW * tm;
-      ctx.strokeStyle = 'rgba(200, 168, 50, 0.2)';
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.moveTo(tickX, gaugeY - 2);
-      ctx.lineTo(tickX, gaugeY + gaugeH + 2);
-      ctx.stroke();
-    }
-
-    // Glow effect when meter above 50%
-    if (meterRatio > 0.5 && !maxMode.active) {
-      const glowPulse = Math.sin(Date.now() / 200) * 0.15 + 0.2;
-      ctx.save();
-      ctx.shadowColor = `rgba(255, 170, 0, ${glowPulse})`;
-      ctx.shadowBlur = 10;
-      ctx.strokeStyle = `rgba(255, 170, 0, ${glowPulse})`;
-      ctx.lineWidth = 2;
-      roundRect(ctx, baseX - 4, gaugeY - 4, gaugeW + 8, gaugeH + 8, 6);
-      ctx.stroke();
-      ctx.restore();
-    }
-
-    // Each stock segment
+    // ---- Each stock segment ----
     for (let s = 0; s < MAX_STOCKS; s++) {
       const segX = baseX + s * (segW + segGap);
       const isFilled = s < gauge.stocks;
       const isCharging = s === gauge.stocks && gauge.meter > 0;
 
-      // Segment background
-      ctx.fillStyle = '#0f0f18';
+      // Segment recessed background — dark with subtle blue tint (KOF2002 empty look)
+      const emptyGrad = ctx.createLinearGradient(segX, gaugeY, segX, gaugeY + gaugeH);
+      emptyGrad.addColorStop(0, '#1a1a2a');
+      emptyGrad.addColorStop(0.5, '#12121e');
+      emptyGrad.addColorStop(1, '#0a0a14');
+      ctx.fillStyle = emptyGrad;
       ctx.fillRect(segX, gaugeY, segW, gaugeH);
 
       if (isFilled) {
-        // Filled segment — gold pulsing glow (KOF2002 signature)
-        const glowPhase = Math.sin(Date.now() / 150 + s * 0.5);
-        const glowAlpha = 0.7 + 0.3 * glowPhase;
+        // ---- Filled segment: KOF2002 blue-core to gold-edge gradient ----
+        const glowPhase = Math.sin(now / 150 + s * 0.6);
+        const glowAlpha = 0.75 + 0.25 * glowPhase;
         ctx.save();
-        ctx.shadowColor = `rgba(255, 180, 0, ${glowAlpha * 0.6})`;
-        ctx.shadowBlur = 6 + 3 * glowPhase;
+        // Inner glow per segment
+        ctx.shadowColor = `rgba(80, 160, 255, ${glowAlpha * 0.5})`;
+        ctx.shadowBlur = 4 + 2 * glowPhase;
+        // Color: blue center shifting to gold for filled stocks
+        // Earlier stocks = deeper blue, later stocks = more golden
+        const goldShift = s / (MAX_STOCKS - 1); // 0 for first, 1 for last
         const segGrad = ctx.createLinearGradient(segX, gaugeY, segX + segW, gaugeY);
-        segGrad.addColorStop(0, '#ff8800');
-        segGrad.addColorStop(0.3, '#ffaa22');
-        segGrad.addColorStop(0.5, '#ffcc00');
-        segGrad.addColorStop(0.7, '#ffaa22');
-        segGrad.addColorStop(1, '#ff8800');
+        // Left side: brighter (inner glow)
+        segGrad.addColorStop(0, `rgb(${Math.round(60 + goldShift * 180)}, ${Math.round(140 + goldShift * 60)}, ${Math.round(255 - goldShift * 100)})`);
+        segGrad.addColorStop(0.3, `rgb(${Math.round(100 + goldShift * 140)}, ${Math.round(180 + goldShift * 20)}, ${Math.round(255 - goldShift * 120)})`);
+        segGrad.addColorStop(0.5, `rgb(${Math.round(180 + goldShift * 60)}, ${Math.round(200 - goldShift * 20)}, ${Math.round(220 - goldShift * 160)})`);
+        segGrad.addColorStop(0.7, `rgb(${Math.round(100 + goldShift * 140)}, ${Math.round(180 + goldShift * 20)}, ${Math.round(255 - goldShift * 120)})`);
+        segGrad.addColorStop(1, `rgb(${Math.round(60 + goldShift * 180)}, ${Math.round(140 + goldShift * 60)}, ${Math.round(255 - goldShift * 100)})`);
         ctx.fillStyle = segGrad;
         ctx.fillRect(segX, gaugeY, segW, gaugeH);
         ctx.restore();
-        // Top highlight
-        ctx.fillStyle = `rgba(255, 255, 200, ${0.2 + 0.1 * glowPhase})`;
-        ctx.fillRect(segX, gaugeY, segW, 2);
-        // Bottom dark edge
-        ctx.fillStyle = 'rgba(100, 50, 0, 0.3)';
-        ctx.fillRect(segX, gaugeY + gaugeH - 1, segW, 1);
+
+        // Top highlight stripe — bright specular
+        ctx.fillStyle = `rgba(200, 220, 255, ${0.25 + 0.1 * glowPhase})`;
+        ctx.fillRect(segX + 1, gaugeY, segW - 2, 2);
+        // Bottom shadow edge
+        ctx.fillStyle = 'rgba(0, 0, 30, 0.35)';
+        ctx.fillRect(segX + 1, gaugeY + gaugeH - 2, segW - 2, 2);
       } else if (isCharging) {
+        // ---- Charging segment: partial fill with near-full pulse ----
         const fillRatio = gauge.meter / gauge.maxMeter;
         const fillW = fillRatio * segW;
         const nearFull = fillRatio > 0.75;
-        const brightPulse = nearFull ? 0.7 + 0.3 * Math.sin(Date.now() / 100) : 1.0;
-        const partialGrad = ctx.createLinearGradient(segX, gaugeY, segX + fillW, gaugeY);
-        partialGrad.addColorStop(0, nearFull ? '#ff9933' : '#cc8844');
-        partialGrad.addColorStop(1, nearFull ? '#ffcc44' : '#ffaa55');
-        ctx.globalAlpha = brightPulse;
-        ctx.fillStyle = partialGrad;
+        // Color transitions from dim teal to bright blue as it charges
+        const chargeBright = nearFull ? 0.7 + 0.3 * Math.sin(now / 100) : 1.0;
+        ctx.save();
+        ctx.globalAlpha = chargeBright;
+        const chargeGrad = ctx.createLinearGradient(segX, gaugeY, segX + fillW, gaugeY);
+        chargeGrad.addColorStop(0, nearFull ? '#44aaee' : '#336688');
+        chargeGrad.addColorStop(0.5, nearFull ? '#66ccff' : '#4488aa');
+        chargeGrad.addColorStop(1, nearFull ? '#88ddff' : '#5599bb');
+        ctx.fillStyle = chargeGrad;
         ctx.fillRect(segX, gaugeY, fillW, gaugeH);
+        // Charging specular highlight
+        ctx.fillStyle = `rgba(150, 200, 255, ${nearFull ? 0.3 : 0.1})`;
+        ctx.fillRect(segX, gaugeY, fillW, 2);
         ctx.globalAlpha = 1;
+        ctx.restore();
       }
 
-      // Segment border
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+      // ---- Bold black segment divider (2px) between segments ----
+      if (s < MAX_STOCKS - 1) {
+        const divX = segX + segW + (segGap - 2) / 2;
+        ctx.fillStyle = '#000000';
+        ctx.fillRect(divX, gaugeY - 1, 2, gaugeH + 2);
+        // Subtle gold edge on divider for depth
+        ctx.fillStyle = 'rgba(200, 168, 50, 0.15)';
+        ctx.fillRect(divX - 1, gaugeY, 1, gaugeH);
+        ctx.fillRect(divX + 2, gaugeY, 1, gaugeH);
+      }
+
+      // Segment inner border
+      ctx.strokeStyle = isFilled ? 'rgba(150, 200, 255, 0.15)' : 'rgba(255, 255, 255, 0.05)';
       ctx.lineWidth = 1;
       ctx.strokeRect(segX, gaugeY, segW, gaugeH);
     }
 
-    // DM-ready pulse border (at least 1 stock and not in MAX mode)
-    if (gauge.stocks >= 1 && !maxMode.active) {
-      const readyPulse = Math.sin(Date.now() / 200) * 0.15 + 0.15;
-      ctx.strokeStyle = `rgba(255, 170, 0, ${readyPulse})`;
-      ctx.lineWidth = 1;
-      ctx.strokeRect(Math.round(baseX) - 1, gaugeY - 1, gaugeW + 2, gaugeH + 2);
+    // ---- Meter-above-50% glow: stronger outer glow effect ----
+    if (meterRatio > 0.5 && !maxMode.active) {
+      const glowPulse = Math.sin(now / 200) * 0.2 + 0.35;
+      ctx.save();
+      ctx.shadowColor = `rgba(80, 160, 255, ${glowPulse})`;
+      ctx.shadowBlur = 14;
+      ctx.strokeStyle = `rgba(100, 180, 255, ${glowPulse * 0.8})`;
+      ctx.lineWidth = 2;
+      roundRect(ctx, baseX - 5, gaugeY - 5, gaugeW + 10, gaugeH + 10, 7);
+      ctx.stroke();
+      ctx.restore();
     }
 
-    // Full meter flashing — "MAX" text with DM-ready flash
+    // ---- DM-ready pulse border (at least 1 stock, not MAX) ----
+    if (gauge.stocks >= 1 && !maxMode.active) {
+      const readyPulse = Math.sin(now / 200) * 0.2 + 0.25;
+      // Double-line pulse: outer gold + inner white
+      ctx.strokeStyle = `rgba(255, 200, 80, ${readyPulse})`;
+      ctx.lineWidth = 1.5;
+      roundRect(ctx, Math.round(baseX) - 2, gaugeY - 2, gaugeW + 4, gaugeH + 4, 5);
+      ctx.stroke();
+    }
+
+    // ---- Full meter: "MAX" text with strong DM-ready flash ----
     if (!maxMode.active && gauge.stocks >= MAX_STOCKS) {
-      const pulseAlpha = 0.7 + 0.3 * Math.sin(Date.now() / 120);
+      const pulseAlpha = 0.7 + 0.3 * Math.sin(now / 120);
       ctx.save();
       ctx.globalAlpha = pulseAlpha;
       ctx.shadowColor = '#ff8800';
-      ctx.shadowBlur = 12 + 4 * Math.sin(Date.now() / 80);
-      drawSNKText(ctx, 'MAX', isP1 ? baseX + gaugeW + 14 : baseX - 14, gaugeY + 6, 13, '#ffcc00', '#000000', isP1 ? 'left' : 'right');
+      ctx.shadowBlur = 16 + 6 * Math.sin(now / 80);
+      drawSNKText(ctx, 'MAX', isP1 ? baseX + gaugeW + 16 : baseX - 16, gaugeY + 7, 14, '#ffcc00', '#000000', isP1 ? 'left' : 'right');
       ctx.shadowBlur = 0;
       ctx.globalAlpha = 1;
       ctx.restore();
 
-      // Flashing border when full — DM ready indicator
-      const dmFlashPhase = Date.now() / 100;
+      // Expanding flash border — DM ready indicator with pulse rhythm
+      const dmFlashPhase = now / 100;
       const dmFlash = Math.sin(dmFlashPhase) > 0;
       if (dmFlash) {
         ctx.save();
+        // Outer glow ring
         ctx.shadowColor = '#ffcc00';
-        ctx.shadowBlur = 14;
-        ctx.strokeStyle = 'rgba(255, 200, 0, 0.6)';
-        ctx.lineWidth = 2;
-        roundRect(ctx, baseX - 5, gaugeY - 5, gaugeW + 10, gaugeH + 10, 7);
+        ctx.shadowBlur = 18;
+        ctx.strokeStyle = 'rgba(255, 200, 0, 0.7)';
+        ctx.lineWidth = 2.5;
+        roundRect(ctx, baseX - 6, gaugeY - 6, gaugeW + 12, gaugeH + 12, 8);
+        ctx.stroke();
+        // Inner bright flash
+        ctx.shadowBlur = 8;
+        ctx.strokeStyle = 'rgba(255, 255, 200, 0.4)';
+        ctx.lineWidth = 1;
+        roundRect(ctx, baseX - 3, gaugeY - 3, gaugeW + 6, gaugeH + 6, 5);
         ctx.stroke();
         ctx.restore();
       }
     }
 
-    // MAX mode timer bar
+    // ---- MAX mode: strong outer glow + flickering overlay ----
     if (maxMode.active) {
       const pct = maxMode.timer / maxMode.maxDuration;
-      const pulseAlpha = 0.7 + Math.sin(Date.now() / 100) * 0.3;
+
+      // Flickering glow overlay on all segments (KOF2002 MAX signature)
+      const flickerPhase = Math.sin(now / 60);
+      const flickerAlpha = 0.15 + 0.12 * flickerPhase;
+      ctx.save();
+      ctx.shadowColor = `rgba(0, 255, 100, ${0.5 + 0.3 * flickerPhase})`;
+      ctx.shadowBlur = 20;
+      ctx.fillStyle = `rgba(100, 255, 150, ${flickerAlpha})`;
+      ctx.fillRect(baseX, gaugeY, gaugeW, gaugeH);
+      ctx.restore();
+
+      // Strong green outer glow (double ring)
+      const outerGlow = Math.sin(now / 80) * 0.3 + 0.5;
+      ctx.save();
+      ctx.shadowColor = `rgba(0, 255, 100, ${outerGlow})`;
+      ctx.shadowBlur = 22;
+      ctx.strokeStyle = `rgba(100, 255, 150, ${outerGlow * 0.8})`;
+      ctx.lineWidth = 2;
+      roundRect(ctx, baseX - 6, gaugeY - 6, gaugeW + 12, gaugeH + 12, 8);
+      ctx.stroke();
+      ctx.restore();
+      // Inner glow ring
+      ctx.save();
+      ctx.shadowColor = `rgba(200, 255, 220, ${outerGlow * 0.5})`;
+      ctx.shadowBlur = 10;
+      ctx.strokeStyle = `rgba(200, 255, 220, ${outerGlow * 0.4})`;
+      ctx.lineWidth = 1;
+      roundRect(ctx, baseX - 3, gaugeY - 3, gaugeW + 6, gaugeH + 6, 5);
+      ctx.stroke();
+      ctx.restore();
+
+      // "MAX" label with green glow
+      const pulseAlpha = 0.8 + Math.sin(now / 100) * 0.2;
       ctx.save();
       ctx.globalAlpha = pulseAlpha;
       ctx.shadowColor = '#00ff44';
-      ctx.shadowBlur = 8;
-      drawSNKText(ctx, 'MAX', isP1 ? baseX + gaugeW + 14 : baseX - 14, gaugeY + 6, 12, '#66ff88', '#000000', isP1 ? 'left' : 'right');
+      ctx.shadowBlur = 12;
+      drawSNKText(ctx, 'MAX', isP1 ? baseX + gaugeW + 16 : baseX - 16, gaugeY + 7, 13, '#66ff88', '#000000', isP1 ? 'left' : 'right');
       ctx.shadowBlur = 0;
       ctx.globalAlpha = 1;
       ctx.restore();
-      const timerBarY = gaugeY + gaugeH + 4;
-      ctx.fillStyle = 'rgba(0,0,0,0.7)';
-      ctx.fillRect(Math.round(baseX), timerBarY, gaugeW, 4);
+
+      // MAX timer bar
+      const timerBarY = gaugeY + gaugeH + 5;
+      ctx.fillStyle = 'rgba(0,0,0,0.8)';
+      roundRect(ctx, Math.round(baseX), timerBarY, gaugeW, 5, 2);
+      ctx.fill();
       const greenGrad = ctx.createLinearGradient(Math.round(baseX), timerBarY, Math.round(baseX + gaugeW * pct), timerBarY);
       greenGrad.addColorStop(0, '#22ff66');
-      greenGrad.addColorStop(1, '#44ff88');
+      greenGrad.addColorStop(0.5, '#44ff88');
+      greenGrad.addColorStop(1, '#88ffaa');
       ctx.fillStyle = greenGrad;
-      ctx.fillRect(Math.round(baseX), timerBarY, gaugeW * pct, 4);
-      ctx.strokeStyle = 'rgba(100, 255, 100, 0.3)';
+      roundRect(ctx, Math.round(baseX), timerBarY, Math.round(gaugeW * pct), 5, 2);
+      ctx.fill();
+      // Timer bar glow when running low
+      if (pct < 0.3) {
+        ctx.save();
+        ctx.shadowColor = 'rgba(255, 60, 60, 0.5)';
+        ctx.shadowBlur = 6;
+        ctx.strokeStyle = 'rgba(255, 60, 60, 0.4)';
+        ctx.lineWidth = 1;
+        roundRect(ctx, Math.round(baseX), timerBarY, gaugeW, 5, 2);
+        ctx.stroke();
+        ctx.restore();
+      }
+      ctx.strokeStyle = 'rgba(100, 255, 100, 0.25)';
       ctx.lineWidth = 1;
-      ctx.strokeRect(Math.round(baseX), timerBarY, gaugeW, 4);
+      roundRect(ctx, Math.round(baseX), timerBarY, gaugeW, 5, 2);
+      ctx.stroke();
       ctx.textAlign = 'left';
       ctx.textBaseline = 'alphabetic';
     }

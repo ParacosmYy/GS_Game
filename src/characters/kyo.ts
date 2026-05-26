@@ -43,6 +43,14 @@ export const KyoDef: CharacterDefinition = {
   portrait: '🔥',
   pixelPortrait: kyoPortrait,
   winQuotes: ['まだまだだな', '俺の炎に焼かれる覚悟はできたか?', '草薙の拳、見せてやるよ'],
+  moveList: [
+    { name: '荒咬（アラガミ）', input: '↓↘→ + 轻拳(A)' },
+    { name: '毒咬（ドクガミ）', input: '↓↘→ + 重拳(C)' },
+    { name: '75式·改', input: '↓↘→ + 踢(K)' },
+    { name: 'R.E.D. KICK', input: '↓↙← + 踢(K)' },
+    { name: '鬼烧（オニヤキ）', input: '→↓↘ + 拳 （或快捷：→↓）' },
+    { name: '大蛇薙（ダイジャナギ）[大招]', input: '↓↙←↙↓↘→ + 拳 （或 ↓↘→↓↘→）' },
+  ],
 
   stats: {
     walkSpeed: 4,

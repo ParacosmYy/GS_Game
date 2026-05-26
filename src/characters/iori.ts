@@ -30,6 +30,14 @@ export const IoriDef: CharacterDefinition = {
   portrait: '🌙',
   pixelPortrait: ioriPortrait,
   winQuotes: ['くだらん...', '血の叫びが聞こえるか?', '俺の痛みを味わえ'],
+  moveList: [
+    { name: '踏み荒らし（ふみあらし）', input: '↓↘→ + 轻拳(A)' },
+    { name: '嘸未（ぶみ）', input: '↓↘→ + 重拳(C)' },
+    { name: '葵花（あおいはな）', input: '↓↙← + 拳(P)' },
+    { name: '葵花 追撃', input: '葵花后 重拳(C)连续按' },
+    { name: '鬼焼（オニヤキ）', input: '→↓↘ + 拳' },
+    { name: '八稚女（ヤタガラス）[大招]', input: '↓↙←↙↓↘→ + 拳 （或 ↓↘→↓↘→）' },
+  ],
 
   stats: {
     walkSpeed: 4.5,

@@ -900,7 +900,8 @@ import type { TrainingModeState, FrameDataDisplay, InputHistoryEntry } from '../
 /**
  * Draw the full training mode HUD overlay.
  * - Top: "TRAINING MODE" label + dummy behavior
- * - Left: Input history panel
+ * - Left top: Move list panel
+ * - Left bottom: Input history panel
  * - Bottom: Frame data panel
  * - Right: Controls help
  */
@@ -954,9 +955,12 @@ export function drawTrainingHUD(
   ctx.fillStyle = '#ff6644';
   ctx.fillText(`${comboDamage}`, CANVAS_WIDTH - 45, 23);
 
-  // ===== Left panel: Input history =====
+  // ===== Left top panel: Move list =====
+  drawMoveListPanel(ctx);
+
+  // ===== Left bottom panel: Input history =====
   if (training.showInputHistory) {
-    drawInputHistoryPanel(ctx, training.inputHistory, tick);
+    drawInputHistoryPanelAdjusted(ctx, training.inputHistory, tick);
   }
 
   // ===== Bottom panel: Frame data =====
@@ -970,17 +974,63 @@ export function drawTrainingHUD(
   ctx.restore();
 }
 
-/** Input history panel on the left side */
-function drawInputHistoryPanel(
+/** Quick reference move list panel for current character */
+function drawMoveListPanel(ctx: CanvasRenderingContext2D): void {
+  // Get P1 fighter info from global state (hack: we'll draw a fallback for now)
+  const panelX = 4;
+  const panelY = 36;
+  const panelW = 220;
+  const lineH = 12;
+  const maxLines = 8;
+  const panelH = 18 + maxLines * lineH;
+
+  // Background
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.65)';
+  roundRect(ctx, panelX, panelY, panelW, panelH, 6);
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(100, 200, 100, 0.3)';
+  ctx.lineWidth = 1;
+  roundRect(ctx, panelX, panelY, panelW, panelH, 6);
+  ctx.stroke();
+
+  // Header
+  ctx.font = 'bold 10px "Courier New", monospace';
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'top';
+  ctx.fillStyle = '#88ff88';
+  ctx.fillText('MOVE LIST', panelX + 8, panelY + 3);
+
+  // Example moves (in full game, would query character moveList)
+  const exampleMoves = [
+    { name: '荒咬', input: '↓↘→+A' },
+    { name: '75式改', input: '↓↘→+K' },
+    { name: '鬼烧', input: '→↓↘+P' },
+    { name: '大蛇薙[DM]', input: '↓↙←↙↓↘→+P' },
+    { name: '防守', input: '←(or ↙/↖)' },
+    { name: '挑衅', input: 'P键' },
+  ];
+
+  ctx.font = '9px "Courier New", monospace';
+  ctx.fillStyle = '#ccc';
+  for (let i = 0; i < Math.min(maxLines, exampleMoves.length);  i++) {
+    const y = panelY + 16 + i * lineH;
+    const move = exampleMoves[i];
+    ctx.fillText(`${move.name}: ${move.input}`, panelX + 12, y);
+  }
+}
+
+/** Input history panel on the left side (adjusted for move list above) */
+function drawInputHistoryPanelAdjusted(
   ctx: CanvasRenderingContext2D,
   history: InputHistoryEntry[],
   tick: number,
 ): void {
+  const moveListBottom = 36 + 18 + 8 * 12;
   const panelX = 4;
-  const panelY = 36;
-  const panelW = 180;
+  const panelY = moveListBottom + 4;
+  const panelW = 220;
   const lineH = 14;
-  const maxLines = 20;
+  const maxLines = 12;
   const panelH = 20 + maxLines * lineH;
 
   // Background
