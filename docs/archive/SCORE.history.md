@@ -893,3 +893,9 @@
 - 所有FighterState不再回退IDLE,每个状态有专属像素帧
 - Visual Frames维度: 42/42=100%
 - 总测试: 3397通过
+
+---
+
+## H185: ryoSpriteBatch3—11项验证crouch/block/damage/special/super/throw/win/dizzy帧 — 157→158
+
+**commit:** <hash> | ryoSpriteBatch3—11项验证crouch/block/damage/special/super/throw/win/dizzy帧
