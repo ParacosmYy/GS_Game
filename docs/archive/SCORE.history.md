@@ -917,3 +917,9 @@
 ## H188: overlayConstants—验证GAME_OVER_DURATION=180 — 160→161
 
 **commit:** <hash> | overlayConstants—验证GAME_OVER_DURATION=180
+
+---
+
+## H189: ryoMovementExt—7项验证roll/guardCrush/maxMode/taunt/counterStance帧 — 161→162
+
+**commit:** <hash> | ryoMovementExt—7项验证roll/guardCrush/maxMode/taunt/counterStance帧
