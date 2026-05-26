@@ -911,3 +911,9 @@
 ## H187: ryoHighResRender—3项验证hasHighResFrame+getResolvedFrameKey — 159→160
 
 **commit:** <hash> | ryoHighResRender—3项验证hasHighResFrame+getResolvedFrameKey
+
+---
+
+## H188: overlayConstants—验证GAME_OVER_DURATION=180 — 160→161
+
+**commit:** <hash> | overlayConstants—验证GAME_OVER_DURATION=180
