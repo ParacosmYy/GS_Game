@@ -727,3 +727,9 @@
 ## H162: ryoAnimations—5项验证getRyoAnimations+getRyoAnimSequence+getRyoAnimSequenceNames — 134→135
 
 **commit:** <hash> | ryoAnimations—5项验证getRyoAnimations+getRyoAnimSequence+getRyoAnimSequenceNames
+
+---
+
+## H163: ryoStats—6项验证RYO_STATS+walkSpeed+runSpeed+jumpVelocity+maxHealth+hopVelocity — 135→136
+
+**commit:** <hash> | ryoStats—6项验证RYO_STATS+walkSpeed+runSpeed+jumpVelocity+maxHealth+hopVelocity
