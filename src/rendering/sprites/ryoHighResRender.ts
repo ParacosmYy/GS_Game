@@ -24,6 +24,11 @@ import { RYO_HURT_FRAMES, RYO_KNOCKDOWN_FRAMES } from './ryoDamageFrames.js';
 import { RYO_CROUCH_FRAMES, RYO_CROUCH_A_FRAMES, RYO_CROUCH_C_FRAMES } from './ryoCrouchFrames.js';
 import { RYO_AIR_A_FRAMES, RYO_AIR_C_FRAMES, RYO_AIR_D_FRAMES } from './ryoAirAttackFrames.js';
 import { RYO_KO_HOU_FRAMES, RYO_KOOU_FRAMES, RYO_HIEN_FRAMES } from './ryoSpecialFrames.js';
+import {
+  RYO_RUN_FRAMES, RYO_BACKDASH_FRAMES, RYO_ROLL_FRAMES, RYO_BACK_ROLL_FRAMES,
+  RYO_GUARD_CRUSH_FRAMES, RYO_MAX_MODE_FRAMES, RYO_TAUNT_FRAMES,
+  RYO_COUNTER_STANCE_FRAMES, RYO_RYUKO_RANBU_FRAMES,
+} from './ryoMovementFrames.js';
 
 // ===== Internal Frame Registry =====
 //
@@ -131,6 +136,21 @@ function initAllFrames(): void {
   registerFrames('KOOU', RYO_KOOU_FRAMES, 16);
   // HIEN: startup=10, active=8, recovery=22 = 40; 5 frames × 8 = 40
   registerFrames('HIEN', RYO_HIEN_FRAMES, 8);
+
+  // MOVEMENT — run, backdash, rolls
+  registerFrames('RUN', RYO_RUN_FRAMES, 3);
+  registerFrames('BACKDASH', RYO_BACKDASH_FRAMES, 3);
+  registerFrames('ROLL', RYO_ROLL_FRAMES, 4);
+  registerFrames('BACK_ROLL', RYO_BACK_ROLL_FRAMES, 4);
+
+  // SUB-STATES — guard crush, MAX mode, taunt, counter
+  registerFrames('GUARD_CRUSH', RYO_GUARD_CRUSH_FRAMES, 8);
+  registerFrames('MAX_MODE', RYO_MAX_MODE_FRAMES, 6);
+  registerFrames('TAUNT', RYO_TAUNT_FRAMES, 12);
+  registerFrames('COUNTER_STANCE', RYO_COUNTER_STANCE_FRAMES, 8);
+
+  // SUPERS — Ryuko Ranbu (SDM/HSDM)
+  registerFrames('RYUKO_RANBU', RYO_RYUKO_RANBU_FRAMES, 5);
 }
 
 // ===== State Resolution =====
@@ -154,6 +174,18 @@ function resolveFrameKey(
     case FighterState.IDLE:
       return 'IDLE';
 
+    case FighterState.RUN:
+      return 'RUN';
+
+    case FighterState.BACKDASH:
+      return 'BACKDASH';
+
+    case FighterState.ROLL:
+      return 'ROLL';
+
+    case FighterState.BACK_ROLL:
+      return 'BACK_ROLL';
+
     case FighterState.WALK:
       // Forward walk: vx has same sign as facing
       // Backward walk: vx has opposite sign to facing
@@ -173,6 +205,12 @@ function resolveFrameKey(
       }
       if (currentAttack === AttackType.RYO_HIEN) {
         return 'HIEN';
+      }
+      // Super moves: Ryuko Ranbu variants
+      if (currentAttack === AttackType.DM_RYUKO_RANBU
+        || currentAttack === AttackType.SDM_RYUKO_RANBU
+        || currentAttack === AttackType.HSDM_RYUKO_RANBU) {
+        return 'RYUKO_RANBU';
       }
       // Default to STAND_A for STAND_A, CLOSE_A, and any other stand attack
       return 'STAND_A';
@@ -222,6 +260,18 @@ function resolveFrameKey(
 
     case FighterState.DIZZY:
       return 'IDLE';
+
+    case FighterState.GUARD_CRUSH:
+      return 'GUARD_CRUSH';
+
+    case FighterState.MAX_MODE:
+      return 'MAX_MODE';
+
+    case FighterState.TAUNT:
+      return 'TAUNT';
+
+    case FighterState.COUNTER_STANCE:
+      return 'COUNTER_STANCE';
 
     default:
       return null;
