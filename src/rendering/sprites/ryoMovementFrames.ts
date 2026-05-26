@@ -221,7 +221,7 @@ TA_F1[21] = r('................12899a1............189a111d1..........1eeeeeee1..
 TA_F1[22] = r('...............12899a1.............1891.d1...........1eeeeeeeee1......');
 TA_F1[23] = r('..............12899a1..............18d1d1..........1eeeeeeeeeee1......');
 // Extended beckoning arm at y=24-28
-TA_F1[24] = r('.............12899b21..............1d8d1.1eeeeeeeeeeeeeeeeeeee1d81.....');
+TA_F1[24] = r('.............12899b21..............1d8d1.1eefeeeeeegeeeeeeefee1d81.....');
 TA_F1[25] = r('............1289b1................1d8d1..1eeeeeeeeeeeeeeee1d8d1........');
 TA_F1[26] = r('...........1289b1.................1d81...1eeeeeeeeeeee1d81.............');
 
@@ -261,17 +261,17 @@ RR_F1[5] = r('...............................................1eeee1.............
 
 const RR_F2 = shiftLeft(clone(IDLE_BASE), 3);
 // Extended rush punch
-RR_F2[20] = r('.............12899a1...........189a1.111eeeeeeeeeeeeeeeeeeeeeeeeee1d81..............');
-RR_F2[21] = r('............12899a1............189a111eeeeeeeeeeeeeeeeeeeeeeeeeee1d81.............');
-RR_F2[22] = r('...........12899a1.............1891.1eeeeeeeeeeeeeeeeeeeeeeeeeeee1d81.............');
-RR_F2[23] = r('..........12899a1..............18d1eeeeeeeeeeeeeeeeeeeeeeeeeeee1d81..............');
+RR_F2[20] = r('.............12899a1...........189a1.111eefeeeeeeeegeeeeeeeeeeefee1d81..............');
+RR_F2[21] = r('............12899a1............189a111eefeeeeeeeeegeeeeeeeeeeefee1d81.............');
+RR_F2[22] = r('...........12899a1.............1891.1eefeeeeeeeeegeeeeeeeeeeeefee1d81.............');
+RR_F2[23] = r('..........12899a1..............18d1eefeeeeeeeeegeeeeeeeeeeeefee1d81..............');
 
 const RR_F3 = shiftLeft(clone(IDLE_BASE), 5);
 // Full commitment final blow
-RR_F3[18] = r('..........12mn21..........12mn2.1111..1eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee188d81..');
-RR_F3[19] = r('.........128921...........12891.111.1eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee188d81...');
-RR_F3[20] = r('........12899a1...........189a1.111eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee188d81....');
-RR_F3[21] = r('.......12899a1............189a111eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee188d81.....');
+RR_F3[18] = r('..........12mn21..........12mn2.1111..1eefeeeeeeeeeeeegeeeeeeeeeeeeeeefee188d81..');
+RR_F3[19] = r('.........128921...........12891.111.1eefeeeeeeeeeeeegeeeeeeeeeeeeeeefee188d81...');
+RR_F3[20] = r('........12899a1...........189a1.111eefeeeeeeeeeeeegeeeeeeeeeeeeeeeefee188d81....');
+RR_F3[21] = r('.......12899a1............189a111eefeeeeeeeeeeeegeeeeeeeeeeeeeeefee188d81.....');
 
 // ═══════════════════════════════════════════════════════════════════
 // Exports
