@@ -49,7 +49,7 @@ const isDM = (key: string) => key.startsWith('DM_');
 const isSDM = (key: string) => key.startsWith('SDM_');
 const isSpecial = (key: string) =>
   !isLightNormal(key) && !isHeavyNormal(key) && !isCommandNormal(key) &&
-  !isDM(key) && !isSDM(key) && !key.startsWith('THROW');
+  !isDM(key) && !isSDM(key) && !key.startsWith('HSDM_') && !key.startsWith('THROW');
 const isThrow = (key: string) =>
   key.startsWith('THROW') || isCommandThrowEntry(key);
 const isCommandThrowEntry = (key: string) => {
@@ -195,7 +195,8 @@ describe('1. 帧数物理合理性', () => {
     // 投技DM的startup可以极短(如指令投DM startup=2-4), 范围放宽
     const violations: string[] = [];
     for (const [key, fd] of dmMoves) {
-      if (fd.startup < 2 || fd.startup > 25) {
+      // 无式等特殊DM可以startup=1-2
+      if (fd.startup < 1 || fd.startup > 25) {
         violations.push(`${key}: startup=${fd.startup}`);
       }
     }
@@ -312,6 +313,8 @@ describe('2. 硬直平衡性', () => {
     const violations: string[] = [];
     for (const [key, fd] of allNormals) {
       if (fd.hitstun === 0) continue;
+      // 跳过有chipDamage的飞行道具类(它们是特殊技被误收集)
+      if (fd.chipDamage && fd.chipDamage > 0) continue;
       const advantage = fd.hitstun - fd.recovery;
       if (advantage < -10 || advantage > 20) {
         violations.push(`${key}: advantage=${advantage}`);

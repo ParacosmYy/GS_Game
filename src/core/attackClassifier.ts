@@ -2,15 +2,18 @@
  * AttackClassifier — 攻击分类器
  *
  * 替代所有硬编码的 startsWith('KYO_') 等角色前缀判断。
- * 分类逻辑由 AttackType 枚举值的命名规则驱动，无需维护角色列表。
+ * 分类逻辑由 AttackType 枚举值的命名规则 + COMMAND_NORMALS 集合驱动。
  *
  * 攻击命名规则：
  * - DM_* / SDM_* / HSDM_*  → 超必杀技
  * - KYO_* / IORI_* / ...    → 角色专属必杀技（角色ID大写 + '_'）
+ *   但如果该值在 COMMAND_NORMALS 中，则属于指令通常技
  * - SPECIAL_*               → 通用必杀技
  * - CMD_*                   → 命令通常技
  * - CLOSE_* / STAND_* / CROUCH_* / JUMP_* → 通常技
  */
+
+import { COMMAND_NORMALS } from './constants.js';
 
 /** 攻击分类 */
 export enum AttackCategory {
@@ -34,8 +37,10 @@ const NORMAL_PREFIXES = new Set([
   'SPECIAL', 'DM', 'SDM', 'HSDM',
 ]);
 
-/** 判断是否为角色专属必杀技（不含 DM/SPECIAL） */
+/** 判断是否为角色专属必杀技（不含 DM/SPECIAL/COMMAND_NORMALS） */
 export function isCharacterSpecial(name: string): boolean {
+  // COMMAND_NORMALS 中的角色前缀条目不是必杀技
+  if (COMMAND_NORMALS.has(name)) return false;
   const match = /^([A-Z][A-Z0-9]+)_/.exec(name);
   if (!match) return false;
   return !NORMAL_PREFIXES.has(match[1]);
@@ -51,7 +56,8 @@ export function classify(name: string): AttackCategory {
   if (isDM(name)) return AttackCategory.DM;
   if (name === 'THROW' || name === 'THROW_FORWARD' || name === 'THROW_BACK') return AttackCategory.THROW;
   if (name === 'STAND_CD' || name === 'JUMP_CD') return AttackCategory.BLOWBACK;
-  if (name.startsWith('CMD_')) return AttackCategory.COMMAND;
+  // COMMAND_NORMALS 包含 CMD_* 前缀和角色前缀的指令通常技（如 IORI_YUMEYUMI）
+  if (COMMAND_NORMALS.has(name) || name.startsWith('CMD_')) return AttackCategory.COMMAND;
   if (isSpecialOrDM(name)) return AttackCategory.SPECIAL;
   if (name.startsWith('CLOSE_') || name.startsWith('STAND_') || name.startsWith('CROUCH_') || name.startsWith('JUMP_')) return AttackCategory.NORMAL;
   return AttackCategory.OTHER;

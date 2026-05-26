@@ -172,36 +172,92 @@ export const NORMAL_ATTACKS: ReadonlySet<string> = new Set([
   'CROUCH_A', 'CROUCH_B', 'CROUCH_C', 'CROUCH_D',
 ]);
 
-/** Command normal attack types (→+B, ↘+D, air↓+C, etc.) */
+/** Command normal attack types (→+A/B, ↘+B, air↓+C, etc.) */
 export const COMMAND_NORMALS: ReadonlySet<string> = new Set([
+  // Kyo
   'CMD_GOFU_YOU',
   'CMD_88SHIKI',
   'CMD_NARAKU',
+  // Iori
   'IORI_YUMEYUMI',
   'IORI_KATANUGI',
   'IORI_YUKIWARUI',
+  // Terry
   'TERRY_BACK_KNCKLE',
   'TERRY_COMBO_BLOW',
+  // Kim
   'KIM_HISHOU_KICK',
   'KIM_HANSEN',
+  // Ryo
   'RYO_TSURIZAO',
   'RYO_ORISHI',
+  // K'
   'KDASH_ONE_INCH',
   'KDASH_TRIGGER',
+  // Kula
   'KULA_ONE_MORE',
   'KULA_SLIDER',
+  // Leona
   'LEONA_STRIKE_ARC',
   'LEONA_STRIKE_DASH',
+  // Robert
   'ROBERT_GENEI_KYAKU_CMD',
   'ROBERT_KOU_SHUTAI',
+  // Mature
   'MATURE_DESPAIR',
   'MATURE_JAB',
+  // Yashiro
   'YASHIRO_SHUU_WANI',
   'YASHIRO_JUU_ZUTSU',
+  // Chris
   'CHRIS_MAKASHIPPO',
   'CHRIS_KAZAGURUMA',
+  // Shermie
   'SHERMIE_STAND',
   'SHERMIE_CLASH',
+  // Mai
+  'MAI_HISSATSU_SHINOBIBACHI',
+  'MAI_YUSURA_UMA',
+  // Athena
+  'ATHENA_PHOENIX_REFLECT',
+  'ATHENA_LOW_B',
+  'ATHENA_AIR_B',
+  // Joe
+  'JOE_KNEE_KICK',
+  'JOE_SLIDE',
+  // Ralf
+  'RALF_SABRE_PUNCH',
+  'RALF_SABRE_KICK',
+  // Andy
+  'ANDY_UWA_AGITO',
+  'ANDY_GEDAN_AGITO',
+  // Billy
+  'BILLY_SANDAN_GEAR',
+  'BILLY_SENSHU_IKKYAKU',
+  // Chang
+  'CHANG_HIKI_NAGE',
+  'CHANG_KYUUSHUU',
+  // Choi
+  'CHOI_SOUTEN_MEKKYAKU',
+  'CHOI_SAN_REN_GEKI',
+  // Vice
+  'VICE_MONSTROSITY',
+  'VICE_OVERKILL',
+  // Xiangfei
+  'XIANGFEI_KYU_HO',
+  'XIANGFEI_KAKU_DA',
+  // Yamazaki
+  'YAMAZAKI_SASHI',
+  'YAMAZAKI_BOKKAI',
+  // Kasumi
+  'KASUMI_KOU_U',
+  'KASUMI_GESHIKI',
+  // Mary
+  'MARY_HAMMER_PUNCH',
+  'MARY_DOUBLE_ROLLING',
+  // Clark
+  'CLARK_DEATH_LAKE',
+  'CLARK_STOMP',
 ]);
 
 // ===== Throw Invincibility (KOF 2002 authentic) =====

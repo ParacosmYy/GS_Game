@@ -469,7 +469,7 @@ describe('Section 2: Frame Data Sanity', () => {
 
   it('DM damage > special move damage (highest special damage)', () => {
     const specialDamages = charEntries
-      .filter(([key]) => !isDM(key) && !isSDM(key) && !isCommandNormal(key))
+      .filter(([key]) => !isDM(key) && !isSDM(key) && !key.startsWith('HSDM_') && !isCommandNormal(key))
       .map(([, fd]) => fd.damage);
     const maxSpecialDamage = Math.max(...specialDamages);
 
@@ -686,6 +686,13 @@ describe('Section 3: Cancel Legality', () => {
   // Known SDM-to-DM mappings where the names don't follow the simple SDM_ -> DM_ pattern
   const SDM_DM_ALIASES: Record<string, string[]> = {
     'SDM_TRIPLE_GEYSER': ['DM_POWER_GEYSER', 'DM_HIGH_ANGLE_GEYSER'],
+    'SDM_POWER_GEYSER_EX': ['DM_POWER_GEYSER', 'DM_POWER_GEYSER_A', 'DM_POWER_GEYSER_C'],
+    'SDM_PHOENIX_HITEN_EX': ['DM_PHOENIX_HITEN'],
+    'SDM_RYUKO_RANBU_EX': ['DM_RYUKO_RANBU'],
+    'SDM_182SHIKI': ['DM_182SHIKI_A', 'DM_182SHIKI_C'],
+    'SDM_SAIHYO_HASSAKU': ['DM_SAIHYO_HASSAKU'],
+    'SDM_YAOTOME': ['DM_YAOTOME'],
+    'SDM_RYUKO_RANBU_ROBERT': ['DM_RYUKO_RANBU_ROBERT'],
   };
 
   it('every SDM has a corresponding DM entry (direct or character variant)', () => {

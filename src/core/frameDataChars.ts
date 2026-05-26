@@ -336,6 +336,45 @@ export const FRAME_DATA_CHARS = {
     knockdown: true,
     chipDamage: 30,
   },
+  // 百八拾二式·SDM — SDM版伤害高于DM_A/C
+  SDM_182SHIKI: {
+    startup: 4,
+    active: 16,
+    recovery: 32,
+    damage: 310,
+    hitstun: 0,
+    blockstun: 21,
+    pushback: 12,
+    hitLevel: "MID" as const,
+    knockdown: true,
+    chipDamage: 30,
+  },
+  // 最終決戦奥義·無式 DM — Kyo最强DM
+  DM_SAIHYO_HASSAKU: {
+    startup: 2,
+    active: 20,
+    recovery: 35,
+    damage: 280,
+    hitstun: 25,
+    blockstun: 21,
+    pushback: 14,
+    hitLevel: "MID" as const,
+    knockdown: true,
+    chipDamage: 25,
+  },
+  // 最終決戦奥義·無式 SDM
+  SDM_SAIHYO_HASSAKU: {
+    startup: 2,
+    active: 24,
+    recovery: 38,
+    damage: 360,
+    hitstun: 30,
+    blockstun: 21,
+    pushback: 16,
+    hitLevel: "MID" as const,
+    knockdown: true,
+    chipDamage: 35,
+  },
   // ── 八神庵必杀技 (Iori Yagami) ── Dream Cancel Wiki KOF2002UM 精确数据
   // 葵花 qcb+A (rekka A版 1段)
   IORI_AOIHANA: {
@@ -534,6 +573,45 @@ export const FRAME_DATA_CHARS = {
     knockdown: true,
     chipDamage: 30,
   },
+  // 八壺·DM — Iori经典DM
+  DM_YAOTOME: {
+    startup: 5,
+    active: 14,
+    recovery: 30,
+    damage: 230,
+    hitstun: 0,
+    blockstun: 0,
+    pushback: 0,
+    hitLevel: "MID" as const,
+    knockdown: true,
+    chipDamage: 22,
+  },
+  // 八壺·SDM
+  SDM_YAOTOME: {
+    startup: 4,
+    active: 18,
+    recovery: 32,
+    damage: 320,
+    hitstun: 0,
+    blockstun: 0,
+    pushback: 0,
+    hitLevel: "MID" as const,
+    knockdown: true,
+    chipDamage: 32,
+  },
+  // 八壺·HSDM — Iori隐藏超必杀
+  HSDM_YAOTOME: {
+    startup: 3,
+    active: 22,
+    recovery: 35,
+    damage: 380,
+    hitstun: 30,
+    blockstun: 21,
+    pushback: 14,
+    hitLevel: "MID" as const,
+    knockdown: true,
+    chipDamage: 40,
+  },
   // ── 特瑞必杀技 (Terry Bogard) ── Dream Cancel Wiki KOF2002UM 校准数据
   // Power Wave qcf+A (地面波)
   TERRY_POWER_WAVE: {
@@ -676,6 +754,42 @@ export const FRAME_DATA_CHARS = {
     knockdown: true,
     chipDamage: 14,
   },
+  // Power Charge hcf+B/D (突进技)
+  TERRY_POWER_CHARGE: {
+    startup: 8,
+    active: 6,
+    recovery: 18,
+    damage: 80,
+    hitstun: 18,
+    blockstun: 16,
+    pushback: 6,
+    hitLevel: "MID" as const,
+    knockdown: false,
+  },
+  // Back Knuckle f+A (指令通常技)
+  TERRY_BACK_KNUCKLE: {
+    startup: 5,
+    active: 4,
+    recovery: 12,
+    damage: 45,
+    hitstun: 12,
+    blockstun: 10,
+    pushback: 3,
+    hitLevel: "MID" as const,
+    knockdown: false,
+  },
+  // Hammer Punch f+C (中段技, overhead)
+  TERRY_HAMMER_PUNCH: {
+    startup: 12,
+    active: 4,
+    recovery: 22,
+    damage: 65,
+    hitstun: 18,
+    blockstun: 16,
+    pushback: 5,
+    hitLevel: "HIGH" as const,
+    knockdown: true,
+  },
   // ── 特瑞DM ── Dream Cancel Wiki KOF2002UM 校准数据
   DM_POWER_GEYSER_A: {
     startup: 16,
@@ -736,6 +850,19 @@ export const FRAME_DATA_CHARS = {
     hitLevel: "MID" as const,
     knockdown: true,
     chipDamage: 30,
+  },
+  // SDM Power Geyser·EX (MAX版强化Power Geyser)
+  SDM_POWER_GEYSER_EX: {
+    startup: 10,
+    active: 20,
+    recovery: 38,
+    damage: 300,
+    hitstun: 0,
+    blockstun: 21,
+    pushback: 12,
+    hitLevel: "MID" as const,
+    knockdown: true,
+    chipDamage: 35,
   },
   // ── 特瑞DM别名 (Terry DM aliases, used by combat system) ──
   DM_POWER_GEYSER: {
@@ -861,6 +988,42 @@ export const FRAME_DATA_CHARS = {
     hitLevel: "MID" as const,
     knockdown: true,
   },
+  // 崩し蹴り f+B (中段技, overhead)
+  KIM_KUZUSHI_GERI: {
+    startup: 10,
+    active: 4,
+    recovery: 20,
+    damage: 50,
+    hitstun: 16,
+    blockstun: 14,
+    pushback: 4,
+    hitLevel: "HIGH" as const,
+    knockdown: false,
+  },
+  // 滑り蹴り df+D (下段技, low slide)
+  KIM_NERICHAGI: {
+    startup: 8,
+    active: 6,
+    recovery: 22,
+    damage: 45,
+    hitstun: 14,
+    blockstun: 12,
+    pushback: 4,
+    hitLevel: "LOW" as const,
+    knockdown: false,
+  },
+  // 回転飛燕斬 (对空flash kick, anti-air)
+  KIM_KAITEN_HIEN_ZAN: {
+    startup: 5,
+    active: 8,
+    recovery: 28,
+    damage: 90,
+    hitstun: 22,
+    blockstun: 18,
+    pushback: 8,
+    hitLevel: "MID" as const,
+    knockdown: true,
+  },
   // ── DM超必杀技 (Kim) ── KOF2002UM calibrated
   // 鳳凰脚 (Hou'ou Kyaku, rushing DM)
   DM_YATAGARASU: {
@@ -912,6 +1075,19 @@ export const FRAME_DATA_CHARS = {
     hitLevel: "MID" as const,
     knockdown: true,
     chipDamage: 22,
+  },
+  // SDM 凤凰飞天·EX (Phoenix Hiten EX SDM, MAX强化版)
+  SDM_PHOENIX_HITEN_EX: {
+    startup: 5,
+    active: 12,
+    recovery: 30,
+    damage: 280,
+    hitstun: 0,
+    blockstun: 21,
+    pushback: 12,
+    hitLevel: "MID" as const,
+    knockdown: true,
+    chipDamage: 28,
   },
   // ── 坂崎亮必杀技 (Ryo Sakazaki) ── KOF2002UM calibrated
   // 虎煌拳 qcf+A (Ko'ou Ken, projectile)
@@ -1003,6 +1179,30 @@ export const FRAME_DATA_CHARS = {
     hitLevel: "MID" as const,
     knockdown: false,
   },
+  // 氷果斬 f+A (突进技)
+  RYO_HIO_HACKER: {
+    startup: 8,
+    active: 6,
+    recovery: 18,
+    damage: 75,
+    hitstun: 16,
+    blockstun: 14,
+    pushback: 5,
+    hitLevel: "MID" as const,
+    knockdown: false,
+  },
+  // 斩裂拳 qcb+P (连打技, damage per hit ×6)
+  RYO_ZANRETSU_KEN: {
+    startup: 4,
+    active: 4,
+    recovery: 16,
+    damage: 12,
+    hitstun: 18,
+    blockstun: 14,
+    pushback: 2,
+    hitLevel: "MID" as const,
+    knockdown: false,
+  },
   // DM 霸王翔吼拳 (Haoh Shoukou Ken, projectile DM)
   DM_TEN_HA_OU: {
     startup: 18,
@@ -1041,6 +1241,32 @@ export const FRAME_DATA_CHARS = {
     hitLevel: "MID" as const,
     knockdown: true,
     chipDamage: 30,
+  },
+  // SDM 龍虎乱舞·EX (Ryuko Ranbu EX SDM, MAX强化版)
+  SDM_RYUKO_RANBU_EX: {
+    startup: 3,
+    active: 18,
+    recovery: 34,
+    damage: 320,
+    hitstun: 0,
+    blockstun: 21,
+    pushback: 14,
+    hitLevel: "MID" as const,
+    knockdown: true,
+    chipDamage: 32,
+  },
+  // HSDM 龍虎乱舞 (Ryuko Ranbu HSDM, hidden super)
+  HSDM_RYUKO_RANBU: {
+    startup: 2,
+    active: 22,
+    recovery: 32,
+    damage: 380,
+    hitstun: 30,
+    blockstun: 21,
+    pushback: 16,
+    hitLevel: "MID" as const,
+    knockdown: true,
+    chipDamage: 40,
   },
   // ── 莉安娜必杀技 (Leona Heidern) ── KOF2002UM 校准数据
   LEONA_MOON_SLASH: {
@@ -1548,6 +1774,57 @@ export const FRAME_DATA_CHARS = {
     knockdown: true,
     chipDamage: 26,
   },
+  // 花蝶扇·D版 qcf+D (飞行道具 D版) — KOF2002UM 校准数据
+  MAI_KACHO_SEN_D: {
+    startup: 14,
+    active: 22,
+    recovery: 30,
+    damage: 80,
+    hitstun: 16,
+    blockstun: 10,
+    pushback: 4,
+    hitLevel: "MID" as const,
+    knockdown: false,
+    chipDamage: 9,
+  },
+  // 飞翔龙炎阵·强 dp+D (对空 DP 强版) — KOF2002UM 校准数据
+  MAI_HISHO_RYU_EN_JIN_C: {
+    startup: 6,
+    active: 10,
+    recovery: 28,
+    damage: 95,
+    hitstun: 24,
+    blockstun: 20,
+    pushback: 8,
+    hitLevel: "MID" as const,
+    knockdown: true,
+    chipDamage: 14,
+  },
+  // 水莲之舞 空中 qcb+K (空中技) — KOF2002UM 校准数据
+  MAI_SUIREI_NO_MAIOCHI: {
+    startup: 4,
+    active: 6,
+    recovery: 18,
+    damage: 70,
+    hitstun: 16,
+    blockstun: 14,
+    pushback: 4,
+    hitLevel: "HIGH" as const,
+    knockdown: true,
+  },
+  // 超必杀忍蜂·HSDM (Chou Hissatsu Shinobi HSDM) — KOF2002UM 校准数据
+  HSDM_CHOU_HISSATSU: {
+    startup: 3,
+    active: 18,
+    recovery: 36,
+    damage: 350,
+    hitstun: 28,
+    blockstun: 21,
+    pushback: 14,
+    hitLevel: "MID" as const,
+    knockdown: true,
+    chipDamage: 36,
+  },
   // ── K' 必杀技 (K Dash) ── KOF2002UM calibrated
   // Ein Trigger qcf+A (standalone punch)
   KDASH_EINS: {
@@ -1726,6 +2003,57 @@ export const FRAME_DATA_CHARS = {
     knockdown: true,
     chipDamage: 30,
   },
+  // Trigger Shell qcf+B (飞行道具) — KOF2002UM 校准数据
+  KDASH_TRIGGER_SHELL: {
+    startup: 10,
+    active: 16,
+    recovery: 26,
+    damage: 65,
+    hitstun: 14,
+    blockstun: 8,
+    pushback: 4,
+    hitLevel: "MID" as const,
+    knockdown: false,
+    chipDamage: 7,
+  },
+  // Trigger Shell·强 qcf+D (飞行道具 强版) — KOF2002UM 校准数据
+  KDASH_TRIGGER_SHELL_C: {
+    startup: 12,
+    active: 20,
+    recovery: 28,
+    damage: 80,
+    hitstun: 16,
+    blockstun: 10,
+    pushback: 5,
+    hitLevel: "MID" as const,
+    knockdown: false,
+    chipDamage: 9,
+  },
+  // Blackout qcb+P (瞬移技) — KOF2002UM 校准数据
+  KDASH_BLACKOUT: {
+    startup: 5,
+    active: 1,
+    recovery: 15,
+    damage: 1,
+    hitstun: 0,
+    blockstun: 0,
+    pushback: 0,
+    hitLevel: "MID" as const,
+    knockdown: false,
+  },
+  // Chain Drive·HSDM qcf,qcf+BD — KOF2002UM 校准数据
+  HSDM_CHAIN_DRIVE: {
+    startup: 3,
+    active: 16,
+    recovery: 38,
+    damage: 350,
+    hitstun: 28,
+    blockstun: 21,
+    pushback: 14,
+    hitLevel: "MID" as const,
+    knockdown: true,
+    chipDamage: 38,
+  },
   // ── 库拉必杀技 (Kula Diamond) ── KOF2002UM 校准数据
   // Diamond Breath qcf+A (冰飞行道具)
   KULA_BREATH: {
@@ -1820,6 +2148,72 @@ export const FRAME_DATA_CHARS = {
     hitLevel: "MID" as const,
     knockdown: true,
     chipDamage: 20,
+  },
+  // ── 库拉追加必杀技 (Kula Diamond 追加) ── KOF2002UM 校准数据
+  // Rei Spin qcb+B (旋转踢) — KOF2002UM 校准数据
+  KULA_REI_SPIN: {
+    startup: 8,
+    active: 6,
+    recovery: 20,
+    damage: 75,
+    hitstun: 18,
+    blockstun: 16,
+    pushback: 5,
+    hitLevel: "MID" as const,
+    knockdown: false,
+    chipDamage: 8,
+  },
+  // Rei Spin·强 qcb+D (旋转踢 强版) — KOF2002UM 校准数据
+  KULA_REI_SPIN_C: {
+    startup: 10,
+    active: 8,
+    recovery: 22,
+    damage: 90,
+    hitstun: 22,
+    blockstun: 18,
+    pushback: 6,
+    hitLevel: "MID" as const,
+    knockdown: true,
+    chipDamage: 10,
+  },
+  // Crow Bite·Kula版 dp+P (对空 DP) — KOF2002UM 校准数据
+  KULA_CROW_BITE_KULA: {
+    startup: 5,
+    active: 8,
+    recovery: 26,
+    damage: 80,
+    hitstun: 20,
+    blockstun: 18,
+    pushback: 6,
+    hitLevel: "MID" as const,
+    knockdown: true,
+    chipDamage: 10,
+  },
+  // 冰之罚 qcb,qcb+P (冰系必杀技) — KOF2002UM 校准数据
+  KULA_ICE_PENALTY: {
+    startup: 6,
+    active: 10,
+    recovery: 28,
+    damage: 95,
+    hitstun: 24,
+    blockstun: 20,
+    pushback: 7,
+    hitLevel: "MID" as const,
+    knockdown: true,
+    chipDamage: 12,
+  },
+  // Freeze Execution·HSDM qcf,qcf+BD — KOF2002UM 校准数据
+  HSDM_FREEZE_EXECUTION: {
+    startup: 2,
+    active: 20,
+    recovery: 38,
+    damage: 360,
+    hitstun: 30,
+    blockstun: 21,
+    pushback: 14,
+    hitLevel: "MID" as const,
+    knockdown: true,
+    chipDamage: 38,
   },
   // ── SDM (Super Desperation Moves — MAX mode only) ──
   SDM_YATAGARASU: {
