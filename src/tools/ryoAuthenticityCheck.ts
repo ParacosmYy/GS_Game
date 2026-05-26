@@ -894,5 +894,5 @@ export function printAuthenticityReport(): void {
   console.log('');
 }
 
-// Auto-run when executed directly
-// (Node ESM does not have require.main === module, so callers should invoke printAuthenticityReport())
+// Auto-run when executed directly via `npx tsx src/tools/ryoAuthenticityCheck.ts`
+printAuthenticityReport();

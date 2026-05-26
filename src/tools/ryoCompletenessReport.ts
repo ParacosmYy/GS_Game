@@ -747,3 +747,6 @@ export function generateRyoExtendedReport(): RyoCompletenessReport & {
     portraitSizes,
   };
 }
+
+// ===== Auto-run when executed directly via `npx tsx src/tools/ryoCompletenessReport.ts` =====
+printRyoReport();

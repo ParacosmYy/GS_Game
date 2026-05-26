@@ -30,8 +30,6 @@ const F = 17; // ms per game frame @60fps
 // placeholder atlasX/atlasY = 0,0; 未来资产管线替换为真实 atlas 坐标
 const STD_W = 80;
 const STD_H = 160;
-const STD_ANCHOR_X = 40;  // 脚底中心 X
-const STD_ANCHOR_Y = 160; // 脚底中心 Y
 
 /**
  * 快速生成 N 个相同尺寸的 placeholder 帧
@@ -45,13 +43,14 @@ function placeholderFrames(
   durationMs: number,
   w = STD_W,
   h = STD_H,
+  atlasRow = 0,
 ): SpriteAnimation['frames'] {
   return Array.from({ length: count }, (_, i) => ({
-    atlasX: 0,
-    atlasY: 0,
+    atlasX: i * w,
+    atlasY: atlasRow * h,
     width: w,
     height: h,
-    anchor: { x: STD_ANCHOR_X, y: STD_ANCHOR_Y },
+    anchor: { x: w / 2, y: h },
     duration: durationMs,
   }));
 }
@@ -71,34 +70,39 @@ function attackFrames(
   recovery: number,
   activeW = STD_W + 40,
   activeH = STD_H,
+  atlasRow = 0,
 ): SpriteAnimation['frames'] {
   const frames: SpriteAnimation['frames'] = [];
+  let col = 0;
   // startup: 蓄力/准备动作
   for (let i = 0; i < startup; i++) {
     frames.push({
-      atlasX: 0, atlasY: 0,
+      atlasX: col * STD_W, atlasY: atlasRow * STD_H,
       width: STD_W, height: STD_H,
-      anchor: { x: STD_ANCHOR_X, y: STD_ANCHOR_Y },
+      anchor: { x: STD_W / 2, y: STD_H },
       duration: F,
     });
+    col++;
   }
   // active: 攻击判定帧，宽度延伸表示攻击范围
   for (let i = 0; i < active; i++) {
     frames.push({
-      atlasX: 0, atlasY: 0,
+      atlasX: col * activeW, atlasY: atlasRow * activeH,
       width: activeW, height: activeH,
-      anchor: { x: STD_ANCHOR_X, y: STD_ANCHOR_Y },
+      anchor: { x: activeW / 2, y: activeH },
       duration: F,
     });
+    col++;
   }
   // recovery: 收招动作
   for (let i = 0; i < recovery; i++) {
     frames.push({
-      atlasX: 0, atlasY: 0,
+      atlasX: col * STD_W, atlasY: atlasRow * STD_H,
       width: STD_W, height: STD_H,
-      anchor: { x: STD_ANCHOR_X, y: STD_ANCHOR_Y },
+      anchor: { x: STD_W / 2, y: STD_H },
       duration: F,
     });
+    col++;
   }
   return frames;
 }
@@ -116,30 +120,31 @@ export const RYO_ANIMATIONS: Record<string, SpriteAnimation> = {
 
   /** 站立待机 — MUGEN参考: 15帧×9ticks=135ticks(~2.25s), 呼吸摇摆
    *  帧节奏: 0-4 微上移(吸气) → 5-7 保持 → 8-14 回落(呼气)
-   *  anchor.y偏移模拟呼吸：±2px垂直微动
+   *  anchor.y偏移模拟呼吸：±1-2px垂直微动
+   *  atlasX: 顺序网格布局, 每帧占 STD_W 像素宽
    */
   idle: {
     name: 'idle',
     loop: true,
     frames: [
       // inhale: body rises slightly
-      { atlasX: 0, atlasY: 0, width: STD_W, height: STD_H, anchor: { x: STD_ANCHOR_X, y: STD_ANCHOR_Y }, duration: 150 },
-      { atlasX: 0, atlasY: 0, width: STD_W, height: STD_H, anchor: { x: STD_ANCHOR_X, y: STD_ANCHOR_Y - 1 }, duration: 150 },
-      { atlasX: 0, atlasY: 0, width: STD_W, height: STD_H, anchor: { x: STD_ANCHOR_X, y: STD_ANCHOR_Y - 2 }, duration: 150 },
-      { atlasX: 0, atlasY: 0, width: STD_W, height: STD_H, anchor: { x: STD_ANCHOR_X, y: STD_ANCHOR_Y - 2 }, duration: 150 },
-      { atlasX: 0, atlasY: 0, width: STD_W, height: STD_H, anchor: { x: STD_ANCHOR_X, y: STD_ANCHOR_Y - 1 }, duration: 150 },
+      { atlasX: 0 * STD_W, atlasY: 0, width: STD_W, height: STD_H, anchor: { x: STD_W / 2, y: STD_H }, duration: 150 },
+      { atlasX: 1 * STD_W, atlasY: 0, width: STD_W, height: STD_H, anchor: { x: STD_W / 2, y: STD_H - 1 }, duration: 150 },
+      { atlasX: 2 * STD_W, atlasY: 0, width: STD_W, height: STD_H, anchor: { x: STD_W / 2, y: STD_H - 2 }, duration: 150 },
+      { atlasX: 3 * STD_W, atlasY: 0, width: STD_W, height: STD_H, anchor: { x: STD_W / 2, y: STD_H - 2 }, duration: 150 },
+      { atlasX: 4 * STD_W, atlasY: 0, width: STD_W, height: STD_H, anchor: { x: STD_W / 2, y: STD_H - 1 }, duration: 150 },
       // hold at peak
-      { atlasX: 0, atlasY: 0, width: STD_W, height: STD_H, anchor: { x: STD_ANCHOR_X, y: STD_ANCHOR_Y - 1 }, duration: 150 },
-      { atlasX: 0, atlasY: 0, width: STD_W, height: STD_H, anchor: { x: STD_ANCHOR_X, y: STD_ANCHOR_Y }, duration: 150 },
-      { atlasX: 0, atlasY: 0, width: STD_W, height: STD_H, anchor: { x: STD_ANCHOR_X, y: STD_ANCHOR_Y }, duration: 150 },
+      { atlasX: 5 * STD_W, atlasY: 0, width: STD_W, height: STD_H, anchor: { x: STD_W / 2, y: STD_H - 1 }, duration: 150 },
+      { atlasX: 6 * STD_W, atlasY: 0, width: STD_W, height: STD_H, anchor: { x: STD_W / 2, y: STD_H }, duration: 150 },
+      { atlasX: 7 * STD_W, atlasY: 0, width: STD_W, height: STD_H, anchor: { x: STD_W / 2, y: STD_H }, duration: 150 },
       // exhale: body settles back
-      { atlasX: 0, atlasY: 0, width: STD_W, height: STD_H, anchor: { x: STD_ANCHOR_X, y: STD_ANCHOR_Y }, duration: 150 },
-      { atlasX: 0, atlasY: 0, width: STD_W, height: STD_H, anchor: { x: STD_ANCHOR_X, y: STD_ANCHOR_Y + 1 }, duration: 150 },
-      { atlasX: 0, atlasY: 0, width: STD_W, height: STD_H, anchor: { x: STD_ANCHOR_X, y: STD_ANCHOR_Y + 1 }, duration: 150 },
-      { atlasX: 0, atlasY: 0, width: STD_W, height: STD_H, anchor: { x: STD_ANCHOR_X, y: STD_ANCHOR_Y }, duration: 150 },
-      { atlasX: 0, atlasY: 0, width: STD_W, height: STD_H, anchor: { x: STD_ANCHOR_X, y: STD_ANCHOR_Y }, duration: 150 },
-      { atlasX: 0, atlasY: 0, width: STD_W, height: STD_H, anchor: { x: STD_ANCHOR_X, y: STD_ANCHOR_Y }, duration: 150 },
-      { atlasX: 0, atlasY: 0, width: STD_W, height: STD_H, anchor: { x: STD_ANCHOR_X, y: STD_ANCHOR_Y }, duration: 150 },
+      { atlasX: 8 * STD_W, atlasY: 0, width: STD_W, height: STD_H, anchor: { x: STD_W / 2, y: STD_H }, duration: 150 },
+      { atlasX: 9 * STD_W, atlasY: 0, width: STD_W, height: STD_H, anchor: { x: STD_W / 2, y: STD_H + 1 }, duration: 150 },
+      { atlasX: 10 * STD_W, atlasY: 0, width: STD_W, height: STD_H, anchor: { x: STD_W / 2, y: STD_H + 1 }, duration: 150 },
+      { atlasX: 11 * STD_W, atlasY: 0, width: STD_W, height: STD_H, anchor: { x: STD_W / 2, y: STD_H }, duration: 150 },
+      { atlasX: 12 * STD_W, atlasY: 0, width: STD_W, height: STD_H, anchor: { x: STD_W / 2, y: STD_H }, duration: 150 },
+      { atlasX: 13 * STD_W, atlasY: 0, width: STD_W, height: STD_H, anchor: { x: STD_W / 2, y: STD_H }, duration: 150 },
+      { atlasX: 14 * STD_W, atlasY: 0, width: STD_W, height: STD_H, anchor: { x: STD_W / 2, y: STD_H }, duration: 150 },
     ],
   },
 
@@ -147,14 +152,14 @@ export const RYO_ANIMATIONS: Record<string, SpriteAnimation> = {
   walk_forward: {
     name: 'walk_forward',
     loop: true,
-    frames: placeholderFrames(10, 83),
+    frames: placeholderFrames(10, 83, STD_W, STD_H, 1),
   },
 
   /** 后走 — MUGEN参考: 10帧×5ticks=50ticks */
   walk_backward: {
     name: 'walk_backward',
     loop: true,
-    frames: placeholderFrames(10, 83),
+    frames: placeholderFrames(10, 83, STD_W, STD_H, 2),
   },
 
   /** 垂直跳 — 8帧非循环 (起跳2 + 上升3 + 下降3) */
@@ -163,16 +168,16 @@ export const RYO_ANIMATIONS: Record<string, SpriteAnimation> = {
     loop: false,
     frames: [
       // Takeoff: crouch-like launch
-      { atlasX: 0, atlasY: 0, width: STD_W, height: STD_H, anchor: { x: STD_ANCHOR_X, y: STD_ANCHOR_Y }, duration: 100 },
-      { atlasX: 0, atlasY: 0, width: STD_W, height: STD_H, anchor: { x: STD_ANCHOR_X, y: STD_ANCHOR_Y }, duration: 100 },
+      { atlasX: 0 * STD_W, atlasY: 3 * STD_H, width: STD_W, height: STD_H, anchor: { x: STD_W / 2, y: STD_H }, duration: 100 },
+      { atlasX: 1 * STD_W, atlasY: 3 * STD_H, width: STD_W, height: STD_H, anchor: { x: STD_W / 2, y: STD_H }, duration: 100 },
       // Ascent: arms up, legs tucked
-      { atlasX: 0, atlasY: 0, width: STD_W, height: STD_H, anchor: { x: STD_ANCHOR_X, y: STD_ANCHOR_Y }, duration: 83 },
-      { atlasX: 0, atlasY: 0, width: STD_W, height: STD_H, anchor: { x: STD_ANCHOR_X, y: STD_ANCHOR_Y }, duration: 83 },
-      { atlasX: 0, atlasY: 0, width: STD_W, height: STD_H, anchor: { x: STD_ANCHOR_X, y: STD_ANCHOR_Y }, duration: 83 },
+      { atlasX: 2 * STD_W, atlasY: 3 * STD_H, width: STD_W, height: STD_H, anchor: { x: STD_W / 2, y: STD_H }, duration: 83 },
+      { atlasX: 3 * STD_W, atlasY: 3 * STD_H, width: STD_W, height: STD_H, anchor: { x: STD_W / 2, y: STD_H }, duration: 83 },
+      { atlasX: 4 * STD_W, atlasY: 3 * STD_H, width: STD_W, height: STD_H, anchor: { x: STD_W / 2, y: STD_H }, duration: 83 },
       // Descent: extending down
-      { atlasX: 0, atlasY: 0, width: STD_W, height: STD_H, anchor: { x: STD_ANCHOR_X, y: STD_ANCHOR_Y }, duration: 83 },
-      { atlasX: 0, atlasY: 0, width: STD_W, height: STD_H, anchor: { x: STD_ANCHOR_X, y: STD_ANCHOR_Y }, duration: 83 },
-      { atlasX: 0, atlasY: 0, width: STD_W, height: STD_H, anchor: { x: STD_ANCHOR_X, y: STD_ANCHOR_Y }, duration: 100 },
+      { atlasX: 5 * STD_W, atlasY: 3 * STD_H, width: STD_W, height: STD_H, anchor: { x: STD_W / 2, y: STD_H }, duration: 83 },
+      { atlasX: 6 * STD_W, atlasY: 3 * STD_H, width: STD_W, height: STD_H, anchor: { x: STD_W / 2, y: STD_H }, duration: 83 },
+      { atlasX: 7 * STD_W, atlasY: 3 * STD_H, width: STD_W, height: STD_H, anchor: { x: STD_W / 2, y: STD_H }, duration: 100 },
     ],
   },
 
@@ -181,14 +186,14 @@ export const RYO_ANIMATIONS: Record<string, SpriteAnimation> = {
     name: 'jump_forward',
     loop: false,
     frames: [
-      { atlasX: 0, atlasY: 0, width: STD_W, height: STD_H, anchor: { x: STD_ANCHOR_X, y: STD_ANCHOR_Y }, duration: 100 },
-      { atlasX: 0, atlasY: 0, width: STD_W, height: STD_H, anchor: { x: STD_ANCHOR_X, y: STD_ANCHOR_Y }, duration: 100 },
-      { atlasX: 0, atlasY: 0, width: STD_W, height: STD_H, anchor: { x: STD_ANCHOR_X, y: STD_ANCHOR_Y }, duration: 83 },
-      { atlasX: 0, atlasY: 0, width: STD_W, height: STD_H, anchor: { x: STD_ANCHOR_X, y: STD_ANCHOR_Y }, duration: 83 },
-      { atlasX: 0, atlasY: 0, width: STD_W, height: STD_H, anchor: { x: STD_ANCHOR_X, y: STD_ANCHOR_Y }, duration: 83 },
-      { atlasX: 0, atlasY: 0, width: STD_W, height: STD_H, anchor: { x: STD_ANCHOR_X, y: STD_ANCHOR_Y }, duration: 83 },
-      { atlasX: 0, atlasY: 0, width: STD_W, height: STD_H, anchor: { x: STD_ANCHOR_X, y: STD_ANCHOR_Y }, duration: 83 },
-      { atlasX: 0, atlasY: 0, width: STD_W, height: STD_H, anchor: { x: STD_ANCHOR_X, y: STD_ANCHOR_Y }, duration: 100 },
+      { atlasX: 0 * STD_W, atlasY: 4 * STD_H, width: STD_W, height: STD_H, anchor: { x: STD_W / 2, y: STD_H }, duration: 100 },
+      { atlasX: 1 * STD_W, atlasY: 4 * STD_H, width: STD_W, height: STD_H, anchor: { x: STD_W / 2, y: STD_H }, duration: 100 },
+      { atlasX: 2 * STD_W, atlasY: 4 * STD_H, width: STD_W, height: STD_H, anchor: { x: STD_W / 2, y: STD_H }, duration: 83 },
+      { atlasX: 3 * STD_W, atlasY: 4 * STD_H, width: STD_W, height: STD_H, anchor: { x: STD_W / 2, y: STD_H }, duration: 83 },
+      { atlasX: 4 * STD_W, atlasY: 4 * STD_H, width: STD_W, height: STD_H, anchor: { x: STD_W / 2, y: STD_H }, duration: 83 },
+      { atlasX: 5 * STD_W, atlasY: 4 * STD_H, width: STD_W, height: STD_H, anchor: { x: STD_W / 2, y: STD_H }, duration: 83 },
+      { atlasX: 6 * STD_W, atlasY: 4 * STD_H, width: STD_W, height: STD_H, anchor: { x: STD_W / 2, y: STD_H }, duration: 83 },
+      { atlasX: 7 * STD_W, atlasY: 4 * STD_H, width: STD_W, height: STD_H, anchor: { x: STD_W / 2, y: STD_H }, duration: 100 },
     ],
   },
 
@@ -197,14 +202,14 @@ export const RYO_ANIMATIONS: Record<string, SpriteAnimation> = {
     name: 'jump_backward',
     loop: false,
     frames: [
-      { atlasX: 0, atlasY: 0, width: STD_W, height: STD_H, anchor: { x: STD_ANCHOR_X, y: STD_ANCHOR_Y }, duration: 100 },
-      { atlasX: 0, atlasY: 0, width: STD_W, height: STD_H, anchor: { x: STD_ANCHOR_X, y: STD_ANCHOR_Y }, duration: 100 },
-      { atlasX: 0, atlasY: 0, width: STD_W, height: STD_H, anchor: { x: STD_ANCHOR_X, y: STD_ANCHOR_Y }, duration: 83 },
-      { atlasX: 0, atlasY: 0, width: STD_W, height: STD_H, anchor: { x: STD_ANCHOR_X, y: STD_ANCHOR_Y }, duration: 83 },
-      { atlasX: 0, atlasY: 0, width: STD_W, height: STD_H, anchor: { x: STD_ANCHOR_X, y: STD_ANCHOR_Y }, duration: 83 },
-      { atlasX: 0, atlasY: 0, width: STD_W, height: STD_H, anchor: { x: STD_ANCHOR_X, y: STD_ANCHOR_Y }, duration: 83 },
-      { atlasX: 0, atlasY: 0, width: STD_W, height: STD_H, anchor: { x: STD_ANCHOR_X, y: STD_ANCHOR_Y }, duration: 83 },
-      { atlasX: 0, atlasY: 0, width: STD_W, height: STD_H, anchor: { x: STD_ANCHOR_X, y: STD_ANCHOR_Y }, duration: 100 },
+      { atlasX: 0 * STD_W, atlasY: 5 * STD_H, width: STD_W, height: STD_H, anchor: { x: STD_W / 2, y: STD_H }, duration: 100 },
+      { atlasX: 1 * STD_W, atlasY: 5 * STD_H, width: STD_W, height: STD_H, anchor: { x: STD_W / 2, y: STD_H }, duration: 100 },
+      { atlasX: 2 * STD_W, atlasY: 5 * STD_H, width: STD_W, height: STD_H, anchor: { x: STD_W / 2, y: STD_H }, duration: 83 },
+      { atlasX: 3 * STD_W, atlasY: 5 * STD_H, width: STD_W, height: STD_H, anchor: { x: STD_W / 2, y: STD_H }, duration: 83 },
+      { atlasX: 4 * STD_W, atlasY: 5 * STD_H, width: STD_W, height: STD_H, anchor: { x: STD_W / 2, y: STD_H }, duration: 83 },
+      { atlasX: 5 * STD_W, atlasY: 5 * STD_H, width: STD_W, height: STD_H, anchor: { x: STD_W / 2, y: STD_H }, duration: 83 },
+      { atlasX: 6 * STD_W, atlasY: 5 * STD_H, width: STD_W, height: STD_H, anchor: { x: STD_W / 2, y: STD_H }, duration: 83 },
+      { atlasX: 7 * STD_W, atlasY: 5 * STD_H, width: STD_W, height: STD_H, anchor: { x: STD_W / 2, y: STD_H }, duration: 100 },
     ],
   },
 
@@ -281,28 +286,28 @@ export const RYO_ANIMATIONS: Record<string, SpriteAnimation> = {
   hurt_standing: {
     name: 'hurt_standing',
     loop: false,
-    frames: placeholderFrames(3, F * 5), // 每帧约5游戏帧时长
+    frames: placeholderFrames(3, F * 5, STD_W, STD_H, 6), // 每帧约5游戏帧时长
   },
 
   /** 蹲受击 — 3帧非循环 */
   hurt_crouching: {
     name: 'hurt_crouching',
     loop: false,
-    frames: placeholderFrames(3, F * 5),
+    frames: placeholderFrames(3, F * 5, STD_W, STD_H, 7),
   },
 
   /** 受击硬直 (通用 hitstun) — 11帧非循环 */
   hitstun: {
     name: 'hitstun',
     loop: false,
-    frames: placeholderFrames(11, F),
+    frames: placeholderFrames(11, F, STD_W, STD_H, 8),
   },
 
   /** 防御硬直 (通用 blockstun) — 9帧非循环 */
   blockstun: {
     name: 'blockstun',
     loop: false,
-    frames: placeholderFrames(9, F),
+    frames: placeholderFrames(9, F, STD_W, STD_H, 9),
   },
 
   /** 倒地 — 5帧非循环 (倒下2 + 躺地3) */
@@ -310,8 +315,8 @@ export const RYO_ANIMATIONS: Record<string, SpriteAnimation> = {
     name: 'knockdown',
     loop: false,
     frames: [
-      ...placeholderFrames(2, F * 3), // 倒下过程, 每帧3游戏帧
-      ...placeholderFrames(3, F * 8), // 躺地, 每帧较长
+      ...placeholderFrames(2, F * 3, STD_W, STD_H, 10), // 倒下过程, 每帧3游戏帧
+      ...placeholderFrames(3, F * 8, STD_W, STD_H, 10), // 躺地, 每帧较长
     ],
   },
 
@@ -319,7 +324,7 @@ export const RYO_ANIMATIONS: Record<string, SpriteAnimation> = {
   wakeup: {
     name: 'wakeup',
     loop: false,
-    frames: placeholderFrames(8, F),
+    frames: placeholderFrames(8, F, STD_W, STD_H, 11),
   },
 
   // ── 胜利 ────────────────────────────────────────────────────────
@@ -328,7 +333,7 @@ export const RYO_ANIMATIONS: Record<string, SpriteAnimation> = {
   win: {
     name: 'win',
     loop: false,
-    frames: placeholderFrames(4, 200),
+    frames: placeholderFrames(4, 200, STD_W, STD_H, 12),
   },
 
   // ── 必杀技 ──────────────────────────────────────────────────────
@@ -438,42 +443,42 @@ export const RYO_ANIMATIONS: Record<string, SpriteAnimation> = {
   run: {
     name: 'run',
     loop: true,
-    frames: placeholderFrames(8, 83),
+    frames: placeholderFrames(8, 83, STD_W, STD_H, 13),
   },
 
   /** 蹲姿 idle — 4帧循环 */
   crouch_idle: {
     name: 'crouch_idle',
     loop: true,
-    frames: placeholderFrames(4, 150),
+    frames: placeholderFrames(4, 150, STD_W, STD_H, 14),
   },
 
   /** 小跳 — 4帧非循环 */
   hop: {
     name: 'hop',
     loop: false,
-    frames: placeholderFrames(4, 100),
+    frames: placeholderFrames(4, 100, STD_W, STD_H, 15),
   },
 
   /** 后闪 — 6帧非循环 */
   backdash: {
     name: 'backdash',
     loop: false,
-    frames: placeholderFrames(6, 67),
+    frames: placeholderFrames(6, 67, STD_W, STD_H, 16),
   },
 
   /** 前滚 — 6帧非循环 */
   roll: {
     name: 'roll',
     loop: false,
-    frames: placeholderFrames(6, 67),
+    frames: placeholderFrames(6, 67, STD_W, STD_H, 17),
   },
 
   /** 后滚 — 6帧非循环 */
   back_roll: {
     name: 'back_roll',
     loop: false,
-    frames: placeholderFrames(6, 67),
+    frames: placeholderFrames(6, 67, STD_W, STD_H, 18),
   },
 
   // ── 近距离攻击 ──────────────────────────────────────────────
@@ -516,14 +521,14 @@ export const RYO_ANIMATIONS: Record<string, SpriteAnimation> = {
   jump_a: {
     name: 'jump_a',
     loop: false,
-    frames: placeholderFrames(9, F),
+    frames: placeholderFrames(9, F, STD_W, STD_H, 19),
   },
 
   /** 跳B — active=7 frames */
   jump_b: {
     name: 'jump_b',
     loop: false,
-    frames: placeholderFrames(7, F),
+    frames: placeholderFrames(7, F, STD_W, STD_H, 20),
   },
 
   /** 跳C — active=3 frames */
@@ -555,21 +560,21 @@ export const RYO_ANIMATIONS: Record<string, SpriteAnimation> = {
   block_stand: {
     name: 'block_stand',
     loop: false,
-    frames: placeholderFrames(1, 200),
+    frames: placeholderFrames(1, 200, STD_W, STD_H, 21),
   },
 
   /** 蹲防 — 1帧 */
   block_crouch: {
     name: 'block_crouch',
     loop: false,
-    frames: placeholderFrames(1, 200),
+    frames: placeholderFrames(1, 200, STD_W, STD_H, 22),
   },
 
   /** 空防 — 1帧 */
   block_air: {
     name: 'block_air',
     loop: false,
-    frames: placeholderFrames(1, 200),
+    frames: placeholderFrames(1, 200, STD_W, STD_H, 23),
   },
 
   // ── Ryo 命令通常技 ──────────────────────────────────────
