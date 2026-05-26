@@ -117,6 +117,9 @@ export const HITBOX_OFFSETS = {
   RYO_HIEN: { offsetX: 55, offsetY: -110, width: 65, height: 50 },
   RYO_HAOU: { offsetX: 60, offsetY: -120, width: 63, height: 50 },
   DM_TEN_HA_OU: { offsetX: 45, offsetY: -130, width: 90, height: 70 },
+  DM_RYUKO_RANBU: { offsetX: 50, offsetY: -120, width: 85, height: 65 },
+  SDM_RYUKO_RANBU: { offsetX: 55, offsetY: -115, width: 95, height: 70 },
+  HSDM_RYUKO_RANBU: { offsetX: 55, offsetY: -115, width: 100, height: 75 },
   // 莉安娜 (Leona)
   LEONA_MOON_SLASH: { offsetX: 70, offsetY: -110, width: 55, height: 40 },
   LEONA_MOON_SLASH_C: { offsetX: 70, offsetY: -110, width: 58, height: 42 },

@@ -21,6 +21,7 @@ const DM_TO_SDM: Partial<Record<AttackType, AttackType>> = {
   [AttackType.DM_V_SLASHER]: AttackType.SDM_V_SLASHER,
   [AttackType.DM_CHAIN_SHOT]: AttackType.SDM_CHAIN_SHOT,
   [AttackType.DM_FREEZE]: AttackType.SDM_FREEZE,
+  [AttackType.DM_RYUKO_RANBU]: AttackType.SDM_RYUKO_RANBU,
 };
 
 /** Dependencies injected from main.ts during wiring (Phase 7) */
