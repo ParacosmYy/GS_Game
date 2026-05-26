@@ -242,6 +242,7 @@ describe('Ryo special move hitbox data', () => {
 
 const RYO_DMS: AttackType[] = [
   AttackType.DM_TEN_HA_OU,
+  AttackType.SDM_TEN_HA_OU,
   AttackType.DM_RYUKO_RANBU,
   AttackType.SDM_RYUKO_RANBU,
   AttackType.HSDM_RYUKO_RANBU,
@@ -309,7 +310,8 @@ const RYO_ALL_ATTACKS: AttackType[] = [
   AttackType.RYO_KO_HOU, AttackType.RYO_KO_HOU_C,
   AttackType.RYO_HIEN, AttackType.RYO_HAOU,
   // DMs
-  AttackType.DM_TEN_HA_OU, AttackType.DM_RYUKO_RANBU,
+  AttackType.DM_TEN_HA_OU, AttackType.SDM_TEN_HA_OU,
+  AttackType.DM_RYUKO_RANBU,
   AttackType.SDM_RYUKO_RANBU, AttackType.HSDM_RYUKO_RANBU,
 ];
 
@@ -389,6 +391,37 @@ describe('Ryo special hitbox progression', () => {
     for (let i = maxIndex; i < widths.length - 1; i++) {
       expect(widths[i]).toBeGreaterThanOrEqual(widths[i + 1]);
     }
+  });
+
+  it('SDM_TEN_HA_OU should have more frames than DM_TEN_HA_OU', () => {
+    const dm = getAttackFrames(AttackType.DM_TEN_HA_OU)!;
+    const sdm = getAttackFrames(AttackType.SDM_TEN_HA_OU)!;
+    expect(sdm.length).toBeGreaterThan(dm.length);
+  });
+
+  it('SDM_TEN_HA_OU hitboxes should expand, sustain, then contract', () => {
+    const frames = getAttackFrames(AttackType.SDM_TEN_HA_OU)!;
+    // All frames should have exactly 1 attack box
+    for (let i = 0; i < frames.length; i++) {
+      expect(frames[i].attack.length).toBe(1);
+    }
+    const widths = frames.map(f => f.attack[0].w);
+
+    // Should start expanding
+    expect(widths[0]).toBeLessThan(widths[5]);
+    // Should have a peak wider than start
+    const peak = Math.max(...widths);
+    expect(peak).toBeGreaterThan(widths[0]);
+    // Should end smaller than peak (dissipation phase)
+    expect(widths[widths.length - 1]).toBeLessThan(peak);
+  });
+
+  it('SDM_TEN_HA_OU peak hitbox should be wider than DM_TEN_HA_OU peak', () => {
+    const dm = getAttackFrames(AttackType.DM_TEN_HA_OU)!;
+    const sdm = getAttackFrames(AttackType.SDM_TEN_HA_OU)!;
+    const dmPeak = Math.max(...dm.map(f => f.attack[0]?.w ?? 0));
+    const sdmPeak = Math.max(...sdm.map(f => f.attack[0].w));
+    expect(sdmPeak).toBeGreaterThan(dmPeak);
   });
 });
 
