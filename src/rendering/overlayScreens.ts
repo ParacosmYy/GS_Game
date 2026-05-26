@@ -563,7 +563,7 @@ export function drawTitle(ctx: CanvasRenderingContext2D, tick: number): void {
   ctx.fillStyle = 'rgba(255, 100, 0, 0.05)';
   ctx.fillRect(0, barY, CANVAS_WIDTH, 2);
 
-  drawSNKText(ctx, 'Enter / J / R to start', CANVAS_WIDTH / 2, 425, 11, '#444455');
+  drawSNKText(ctx, 'J: Select  |  Enter: Mode Select  |  R: Restart', CANVAS_WIDTH / 2, 425, 11, '#444455');
   drawSNKText(ctx, 'Tab: Simplified mode  |  N: Change stage  |  F1: Debug  |  M: Music  |  B: BGM', CANVAS_WIDTH / 2, 545, 10, '#333344');
   drawSNKText(ctx, 'HTML5 Canvas + TypeScript', CANVAS_WIDTH / 2, 565, 10, '#333344');
 

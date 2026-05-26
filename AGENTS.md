@@ -72,7 +72,7 @@
 7. `方案`：写清本轮目标、范围、非目标、文件归属、自侦测结论、深审结论（如有）、验收、回退。
 8. `实施`：只做本轮闭环，不扩张。
 9. `验证`：按 [质量门禁](docs/process/quality-gates.md) 执行。
-10. `复盘评分`：按 [评分规则](docs/process/scoring.md) 说明是否 +5。
+10. `复盘评分`：按 [评分规则](docs/process/scoring.md) 说明是否 +1。
 11. `提交`：按 [Git 规则](docs/process/git-rules.md) 中文 Conventional Commit。
 
 没有验收标准的改动不得实施。不能说明“更接近 KOF 在哪里”的改动不得加分。
@@ -133,6 +133,6 @@ npx vite build
 - [决策门](docs/process/decision-gates.md)：新功能、架构迁移、资产、角色、打击感、换栈的允许条件。
 - [角色模板](docs/process/role-prompts.md)：PM/玩家/研发/测试/架构师模板。
 - [质量门禁](docs/process/quality-gates.md)：验证规则。
-- [评分规则](docs/process/scoring.md)：千分制和 +5 规则。
+- [评分规则](docs/process/scoring.md)：千分制和 +1 规则。
 - [Git 规则](docs/process/git-rules.md)：提交规则。
 - [格斗游戏工程架构参考](docs/reference/fighting-game-architecture-reference.md)：公开可参考的成熟格斗工程分层。

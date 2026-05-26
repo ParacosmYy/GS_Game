@@ -8,6 +8,7 @@ import { ROSTER } from '../characters/index.js';
 import { bone, pose } from '../characters/types.js';
 import type { Pose, BonePose, BodyProportions } from '../characters/types.js';
 import { DEFAULT_PROPORTIONS } from '../characters/types.js';
+import { STAGE_GROUND_Y } from '../core/constants.js';
 import { shiftColor, roundRect } from './utils.js';
 import { getOutfit, drawCharacterHead, setSkeletalPartsTick } from './skeletalParts.js';
 import { drawPixelTorso, drawPixelArm, drawPixelLeg, setBodyPartTick } from './bodyPartRenderer.js';
@@ -702,20 +703,33 @@ export function drawSkeletalFighter(
   // Colors
   const skinColor = '#e8b88a';
 
-  // Draw shadow on ground
-  const shadowY = sy + 2;
-  const shadowW = 60;
+  // Draw shadow on ground — dynamic based on character height above ground
+  // Shadow stays on the ground plane (STAGE_GROUND_Y) regardless of character y position
+  const airDist = Math.max(0, STAGE_GROUND_Y - f.y);
+  // Shadow shrinks and fades as character rises; minimum 0.2 scale at max height
+  const shadowScale = Math.max(0.2, 1 - airDist / 280);
+  const shadowW = 60 * (0.5 + shadowScale * 0.5);
+  const shadowH = 6 * shadowScale;
+  // Alpha: grounded 0.28, maximum height 0.04
+  const shadowAlpha = 0.04 + 0.24 * shadowScale;
+  // Shadow is drawn on the ground plane, not at character feet
+  const shadowY = STAGE_GROUND_Y + 2;
   ctx.save();
-  ctx.globalAlpha = 0.25;
-  ctx.fillStyle = '#000';
+  // Radial gradient: sharp center, soft edges for near-ground; blurry when airborne
+  const shadowGrad = ctx.createRadialGradient(sx, shadowY, 0, sx, shadowY, shadowW);
+  shadowGrad.addColorStop(0, `rgba(0, 0, 0, ${shadowAlpha})`);
+  shadowGrad.addColorStop(0.55, `rgba(0, 0, 0, ${shadowAlpha * 0.55})`);
+  shadowGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+  ctx.fillStyle = shadowGrad;
   ctx.beginPath();
-  ctx.ellipse(sx, shadowY, shadowW, 6, 0, 0, Math.PI * 2);
+  ctx.ellipse(sx, shadowY, shadowW, shadowH, 0, 0, Math.PI * 2);
   ctx.fill();
   ctx.restore();
 
   // Hit flash overlay
   const isFlashing = f.hitFlashFrames > 0;
   const flashOverride = isFlashing ? f.hitFlashColor : undefined;
+  const flashStrength = isFlashing ? Math.min(0.42, 0.18 + f.hitFlashFrames * 0.012) : 0;
 
   const shoulderY = refY + prop.shoulderY * heightFactor;
   const hipY = refY + prop.hipY * heightFactor;
@@ -727,19 +741,7 @@ export function drawSkeletalFighter(
   ctx.save();
   ctx.translate(backArm.x, shoulderY + p.armBack.oy * heightFactor);
   ctx.rotate(backArm.rot);
-  if (isFlashing) {
-    ctx.fillStyle = flashOverride!;
-    roundRect(ctx, -armW * p.armBack.scale / 2, -armH * p.armBack.scale / 2,
-      armW * p.armBack.scale, armH * p.armBack.scale, 3);
-    ctx.fill();
-    ctx.strokeStyle = '#1a1a1a';
-    ctx.lineWidth = 2.5;
-    ctx.lineJoin = 'round';    roundRect(ctx, -armW * p.armBack.scale / 2, -armH * p.armBack.scale / 2,
-      armW * p.armBack.scale, armH * p.armBack.scale, 3);
-    ctx.stroke();
-  } else {
-    drawPixelArm(ctx, f.charId, armW * p.armBack.scale, armH * p.armBack.scale, true, colorIdx);
-  }
+  drawPixelArm(ctx, f.charId, armW * p.armBack.scale, armH * p.armBack.scale, true, colorIdx);
   ctx.restore();
 
   // 2. Back leg (behind body)
@@ -747,19 +749,7 @@ export function drawSkeletalFighter(
   ctx.save();
   ctx.translate(backLeg.x, hipY + p.legBack.oy * heightFactor);
   ctx.rotate(backLeg.rot);
-  if (isFlashing) {
-    ctx.fillStyle = flashOverride!;
-    roundRect(ctx, -legW * p.legBack.scale / 2, -legH * p.legBack.scale / 2,
-      legW * p.legBack.scale, legH * p.legBack.scale, 3);
-    ctx.fill();
-    ctx.strokeStyle = '#1a1a1a';
-    ctx.lineWidth = 2.5;
-    ctx.lineJoin = 'round';    roundRect(ctx, -legW * p.legBack.scale / 2, -legH * p.legBack.scale / 2,
-      legW * p.legBack.scale, legH * p.legBack.scale, 3);
-    ctx.stroke();
-  } else {
-    drawPixelLeg(ctx, f.charId, legW * p.legBack.scale, legH * p.legBack.scale, true, colorIdx);
-  }
+  drawPixelLeg(ctx, f.charId, legW * p.legBack.scale, legH * p.legBack.scale, true, colorIdx);
   ctx.restore();
 
   // 3. Torso (body)
@@ -768,17 +758,7 @@ export function drawSkeletalFighter(
   ctx.save();
   ctx.translate(torsoX, torsoCenterY);
   ctx.rotate(p.body.rot * f.facing);
-  if (isFlashing) {
-    ctx.fillStyle = flashOverride!;
-    roundRect(ctx, -torsoW / 2, -torsoH * heightFactor / 2, torsoW, torsoH * heightFactor, 5);
-    ctx.fill();
-    ctx.strokeStyle = '#1a1a1a';
-    ctx.lineWidth = 2.5;
-    ctx.lineJoin = 'round';    roundRect(ctx, -torsoW / 2, -torsoH * heightFactor / 2, torsoW, torsoH * heightFactor, 5);
-    ctx.stroke();
-  } else {
-    drawPixelTorso(ctx, f.charId, torsoW, torsoH * heightFactor, colorIdx);
-  }
+  drawPixelTorso(ctx, f.charId, torsoW, torsoH * heightFactor, colorIdx);
   ctx.restore();
 
   // 4. Head
@@ -787,12 +767,7 @@ export function drawSkeletalFighter(
   ctx.save();
   ctx.translate(headPos.x, headCenterY);
   ctx.rotate(p.head.rot * f.facing);
-  if (isFlashing) {
-    ctx.fillStyle = '#fff';
-    ctx.beginPath(); ctx.arc(0, 0, headW / 2, 0, Math.PI * 2); ctx.fill();
-  } else {
-    drawCharacterHead(ctx, f.charId, f.facing, skinColor, headW, colorIdx, globalTick);
-  }
+  drawCharacterHead(ctx, f.charId, f.facing, skinColor, headW, colorIdx, globalTick);
   ctx.restore();
 
   // 5. Front leg (in front of body)
@@ -800,19 +775,7 @@ export function drawSkeletalFighter(
   ctx.save();
   ctx.translate(frontLeg.x, hipY + p.legFront.oy * heightFactor);
   ctx.rotate(frontLeg.rot);
-  if (isFlashing) {
-    ctx.fillStyle = flashOverride!;
-    roundRect(ctx, -legW * p.legFront.scale / 2, -legH * p.legFront.scale / 2,
-      legW * p.legFront.scale, legH * p.legFront.scale, 3);
-    ctx.fill();
-    ctx.strokeStyle = '#1a1a1a';
-    ctx.lineWidth = 2.5;
-    ctx.lineJoin = 'round';    roundRect(ctx, -legW * p.legFront.scale / 2, -legH * p.legFront.scale / 2,
-      legW * p.legFront.scale, legH * p.legFront.scale, 3);
-    ctx.stroke();
-  } else {
-    drawPixelLeg(ctx, f.charId, legW * p.legFront.scale, legH * p.legFront.scale, false, colorIdx);
-  }
+  drawPixelLeg(ctx, f.charId, legW * p.legFront.scale, legH * p.legFront.scale, false, colorIdx);
   ctx.restore();
 
   // 6. Front arm (in front of body)
@@ -820,20 +783,28 @@ export function drawSkeletalFighter(
   ctx.save();
   ctx.translate(frontArm.x, shoulderY + p.armFront.oy * heightFactor);
   ctx.rotate(frontArm.rot);
-  if (isFlashing) {
-    ctx.fillStyle = flashOverride!;
-    roundRect(ctx, -armW * p.armFront.scale / 2, -armH * p.armFront.scale / 2,
-      armW * p.armFront.scale, armH * p.armFront.scale, 3);
-    ctx.fill();
-    ctx.strokeStyle = '#1a1a1a';
-    ctx.lineWidth = 2.5;
-    ctx.lineJoin = 'round';    roundRect(ctx, -armW * p.armFront.scale / 2, -armH * p.armFront.scale / 2,
-      armW * p.armFront.scale, armH * p.armFront.scale, 3);
-    ctx.stroke();
-  } else {
-    drawPixelArm(ctx, f.charId, armW * p.armFront.scale, armH * p.armFront.scale, false, colorIdx);
-  }
+  drawPixelArm(ctx, f.charId, armW * p.armFront.scale, armH * p.armFront.scale, false, colorIdx);
   ctx.restore();
+
+  if (isFlashing) {
+    ctx.save();
+    ctx.globalCompositeOperation = 'screen';
+    ctx.globalAlpha = flashStrength;
+    const flashRadius = Math.max(torsoW, torsoH * heightFactor) * 1.25;
+    const flashGrad = ctx.createRadialGradient(
+      torsoX, torsoCenterY, 0,
+      torsoX, torsoCenterY, flashRadius,
+    );
+    flashGrad.addColorStop(0, 'rgba(255, 255, 255, 0.70)');
+    flashGrad.addColorStop(0.3, `${flashOverride ?? '#ffffff'}aa`);
+    flashGrad.addColorStop(0.7, `${flashOverride ?? '#ffffff'}44`);
+    flashGrad.addColorStop(1, 'rgba(255, 255, 255, 0)');
+    ctx.fillStyle = flashGrad;
+    ctx.beginPath();
+    ctx.ellipse(torsoX, torsoCenterY, torsoW * 0.95, torsoH * 0.9, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
 
   // Fist glow on front arm when attacking — character-specific element
   if (!isFlashing && (f.state === FighterState.STAND_ATTACK || f.state === FighterState.CROUCH_ATTACK || f.state === FighterState.AIR_ATTACK)) {

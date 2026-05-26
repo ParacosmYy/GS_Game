@@ -346,13 +346,16 @@ export const RyoDef: CharacterDefinition = {
       pose({ head: bone(2, -2, -0.06), body: bone(4, 0, 0.14), armFront: bone(24, -3, 0.24, 1.22), armBack: bone(-10, 3, -0.48, 0.88), legFront: bone(12, 3, 0.3, 1.08), legBack: bone(-8, -1, -0.24) }),
       // F7: final startup frame
       pose({ head: bone(2, -2, -0.07), body: bone(5, 0, 0.15), armFront: bone(26, -4, 0.26, 1.25), armBack: bone(-10, 2, -0.5, 0.88), legFront: bone(14, 4, 0.35, 1.1), legBack: bone(-8, -1, -0.25) }),
-      // ── Active (frame 8): air strike contact (long active phases clamp here) ──
-      // F8: full extension — air strike contact
-      pose({ head: bone(2, -2, -0.08), body: bone(5, 0, 0.16), armFront: bone(28, -4, 0.28, 1.3), armBack: bone(-10, 2, -0.5, 0.88), legFront: bone(15, 4, 0.38, 1.12), legBack: bone(-8, -1, -0.25) }),
-      // F9-F11: extended startup for JUMP_CD (startup=12)
-      pose({ head: bone(2, -2, -0.08), body: bone(5, 0, 0.15), armFront: bone(26, -4, 0.26, 1.28), armBack: bone(-10, 2, -0.5, 0.88), legFront: bone(14, 4, 0.36, 1.1), legBack: bone(-8, -1, -0.25) }),
-      pose({ head: bone(2, -2, -0.08), body: bone(5, 0, 0.15), armFront: bone(27, -4, 0.27, 1.29), armBack: bone(-10, 2, -0.5, 0.88), legFront: bone(14, 4, 0.37, 1.11), legBack: bone(-8, -1, -0.25) }),
-      pose({ head: bone(2, -2, -0.08), body: bone(5, 0, 0.16), armFront: bone(28, -4, 0.28, 1.3), armBack: bone(-10, 2, -0.5, 0.88), legFront: bone(15, 4, 0.38, 1.12), legBack: bone(-8, -1, -0.25) }),
+      // ── Active (frames 8-10): air strike contact with downward commitment ──
+      // jump_a (light punch): arm thrusts forward-downward with sharp rotation
+      // F8: full extension — jump_a air punch, arm snaps down at -0.4 rot for diagonal punch
+      pose({ head: bone(2, -2, -0.08), body: bone(5, 2, 0.18), armFront: bone(32, -2, -0.4, 1.3), armBack: bone(-10, 2, -0.5, 0.88), legFront: bone(15, 4, 0.38, 1.12), legBack: bone(-8, -1, -0.25) }),
+      // F9: jump_c (heavy punch) — arm reaches further with increased scale and stronger downward angle
+      pose({ head: bone(2, -3, -0.1), body: bone(6, 3, 0.2), armFront: bone(36, 0, -0.35, 1.4), armBack: bone(-10, 3, -0.52, 0.85), legFront: bone(14, 5, 0.4, 1.14), legBack: bone(-8, -2, -0.28) }),
+      // F10: jump_d (heavy kick) — leg extends far forward-downward, arm pulls back for counterbalance
+      pose({ head: bone(2, -3, -0.1), body: bone(6, 3, 0.22), armFront: bone(8, 4, 0.3, 0.9), armBack: bone(-12, 3, -0.55, 0.88), legFront: bone(28, 2, -0.35, 1.35), legBack: bone(-8, -2, -0.3) }),
+      // F11: extended startup for JUMP_CD (startup=12), hold peak active pose
+      pose({ head: bone(2, -3, -0.1), body: bone(6, 3, 0.2), armFront: bone(34, -1, -0.38, 1.38), armBack: bone(-10, 3, -0.52, 0.86), legFront: bone(20, 4, -0.2, 1.2), legBack: bone(-8, -2, -0.28) }),
     ],
     [FighterState.THROW]: [
       // Frame 0: Grab — arms extend forward to grab opponent

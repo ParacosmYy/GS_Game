@@ -307,7 +307,13 @@ export function spawnGroundSlam(particles: Particle[], worldX: number, worldY: n
 
 export function spawnDamageText(particles: Particle[], worldX: number, worldY: number, value: number, overrideColor?: string): void {
   const isCombo = value > 0 && value <= 50;
-  const dmgSize = isCombo ? 18 + Math.min(value, 10) : value >= 120 ? 24 : value >= 80 ? 22 : value >= 50 ? 18 : 14;
+  // KOF2002: damage font size scales with damage — bigger hits produce bigger numbers
+  const dmgSize = isCombo ? 18 + Math.min(value, 10)
+    : value >= 150 ? 28
+    : value >= 120 ? 24
+    : value >= 80 ? 22
+    : value >= 50 ? 18
+    : 14;
   // KOF2002: 伤害数字颜色分级 — 低伤害白色, 中等黄色, 高伤害橙红, 超高纯红
   let color: string;
   if (overrideColor) {
@@ -323,15 +329,21 @@ export function spawnDamageText(particles: Particle[], worldX: number, worldY: n
   } else {
     color = '#ffffff';
   }
-  const driftX = isCombo ? 1.2 : -0.8;
-  const driftY = value >= 120 ? -2.2 : value >= 80 ? -1.8 : -1.2;
+  // KOF2002: float upward from hit position, heavier hits drift less horizontally
+  const driftX = isCombo ? 1.2 : (Math.random() - 0.5) * 1.0;
+  // Upward float speed scales with damage importance — heavy damage rises faster
+  const driftY = isCombo ? -1.4 : value >= 120 ? -2.8 : value >= 80 ? -2.2 : value >= 50 ? -1.6 : -1.2;
+  // Lifetime: heavy damage numbers stay visible longer for readability
+  const lifeSpan = isCombo ? 50 : value >= 120 ? 60 : value >= 80 ? 55 : 50;
   particles.push({
-    x: worldX, y: worldY, vx: driftX + (Math.random() - 0.5) * 0.3, vy: driftY,
-    life: 50, maxLife: 50,
+    x: worldX, y: worldY, vx: driftX, vy: driftY,
+    life: lifeSpan, maxLife: lifeSpan,
     size: dmgSize,
     color,
     type: 'text',
     text: isCombo ? `${value} HITS!` : `-${value}`,
+    gravity: 0.02,
+    friction: 0.99,
   });
 }
 

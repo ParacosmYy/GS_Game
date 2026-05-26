@@ -113,7 +113,6 @@ const FAR_STAND_C_FRAMES: AttackFrame[] = [
   F([{ ox: 30, oy: -70, w: 30, h: 30 }], { ox: 5, oy: 0, w: -10, h: 0 }),
   F([{ ox: 55, oy: -68, w: 50, h: 35 }]),
   F([{ ox: 58, oy: -65, w: 55, h: 35 }]),
-  F([{ ox: 50, oy: -70, w: 45, h: 30 }]),
 ];
 
 const FAR_STAND_D_FRAMES: AttackFrame[] = [
@@ -122,17 +121,24 @@ const FAR_STAND_D_FRAMES: AttackFrame[] = [
   F([{ ox: 48, oy: -25, w: 60, h: 40 }]),
   F([{ ox: 45, oy: -28, w: 55, h: 38 }]),
   F([{ ox: 40, oy: -30, w: 45, h: 35 }]),
+  F([]),
+  F([]),
+  F([]),
 ];
 
 // ===== 站立近距离攻击 (Close Stand) =====
 const CLOSE_A_FRAMES: AttackFrame[] = [
   F([{ ox: 32, oy: -68, w: 30, h: 22 }]),
   F([{ ox: 36, oy: -66, w: 34, h: 24 }]),
+  F([]),
+  F([]),
+  F([]),
 ];
 
 const CLOSE_B_FRAMES: AttackFrame[] = [
   F([{ ox: 30, oy: -35, w: 32, h: 26 }]),
   F([{ ox: 34, oy: -33, w: 36, h: 28 }]),
+  F([]),
 ];
 
 const CLOSE_C_FRAMES: AttackFrame[] = [
@@ -140,6 +146,7 @@ const CLOSE_C_FRAMES: AttackFrame[] = [
   F([{ ox: 42, oy: -62, w: 45, h: 32 }]),
   F([{ ox: 42, oy: -62, w: 45, h: 32 }]),
   F([{ ox: 38, oy: -65, w: 40, h: 30 }]),
+  F([]),
 ];
 
 const CLOSE_D_FRAMES: AttackFrame[] = [
@@ -147,6 +154,8 @@ const CLOSE_D_FRAMES: AttackFrame[] = [
   F([{ ox: 40, oy: -28, w: 45, h: 34 }]),
   F([{ ox: 40, oy: -28, w: 45, h: 34 }]),
   F([{ ox: 36, oy: -30, w: 40, h: 32 }]),
+  F([]),
+  F([]),
 ];
 
 // ===== 命令通常技 =====
@@ -160,11 +169,15 @@ const CMD_88SHIKI_FRAMES: AttackFrame[] = [
   F([{ ox: 35, oy: -22, w: 45, h: 28 }]),
   F([{ ox: 42, oy: -20, w: 52, h: 30 }]),
   F([{ ox: 42, oy: -20, w: 52, h: 30 }]),
+  F([]),
 ];
 
 const CMD_NARAKU_FRAMES: AttackFrame[] = [
   F([{ ox: 32, oy: -30, w: 38, h: 32 }]),
   F([{ ox: 38, oy: -28, w: 44, h: 35 }]),
+  F([]),
+  F([]),
+  F([]),
 ];
 
 // ===== 命令通常技 (Character-specific Command Normals) =====
@@ -172,87 +185,112 @@ const IORI_YUMEYUMI_FRAMES: AttackFrame[] = [
   F([{ ox: 40, oy: -68, w: 38, h: 24 }]),
   F([{ ox: 48, oy: -66, w: 44, h: 26 }]),
   F([{ ox: 48, oy: -66, w: 44, h: 26 }]),
+  F([]),
 ];
 
 const IORI_KATANUGI_FRAMES: AttackFrame[] = [
   F([{ ox: 35, oy: -25, w: 42, h: 28 }]),
   F([{ ox: 42, oy: -22, w: 50, h: 30 }]),
   F([{ ox: 42, oy: -22, w: 50, h: 30 }]),
+  F([]),
 ];
 
 const IORI_YUKIWARUI_FRAMES: AttackFrame[] = [
   F([{ ox: 30, oy: -45, w: 40, h: 35 }]),
   F([{ ox: 38, oy: -42, w: 48, h: 38 }]),
+  F([]),
+  F([]),
+  F([]),
+  F([]),
+  F([]),
 ];
 
 const TERRY_BACK_KNCKLE_FRAMES: AttackFrame[] = [
   F([{ ox: 38, oy: -65, w: 36, h: 24 }]),
   F([{ ox: 46, oy: -63, w: 42, h: 26 }]),
   F([{ ox: 46, oy: -63, w: 42, h: 26 }]),
+  F([]),
 ];
 
 const TERRY_COMBO_BLOW_FRAMES: AttackFrame[] = [
   F([{ ox: 35, oy: -22, w: 42, h: 28 }]),
   F([{ ox: 42, oy: -20, w: 50, h: 30 }]),
+  F([]),
+  F([]),
 ];
 
 const KIM_HISHOU_KICK_FRAMES: AttackFrame[] = [
   F([{ ox: 38, oy: -40, w: 44, h: 30 }]),
   F([{ ox: 45, oy: -38, w: 50, h: 32 }]),
   F([{ ox: 45, oy: -38, w: 50, h: 32 }]),
+  F([]), // Adding an empty frame for KIM_HIENZAN
 ];
 
 const KIM_HANSEN_FRAMES: AttackFrame[] = [
   F([{ ox: 35, oy: -20, w: 48, h: 28 }]),
   F([{ ox: 42, oy: -18, w: 54, h: 30 }]),
   F([{ ox: 42, oy: -18, w: 54, h: 30 }]),
+  F([]),
+  F([]),
 ];
 
 const RYO_TSURIZAO_FRAMES: AttackFrame[] = [
   F([{ ox: 40, oy: -68, w: 38, h: 24 }]),
   F([{ ox: 48, oy: -66, w: 44, h: 26 }]),
   F([{ ox: 48, oy: -66, w: 44, h: 26 }]),
+  F([]),
 ];
 
 const RYO_ORISHI_FRAMES: AttackFrame[] = [
   F([{ ox: 35, oy: -25, w: 42, h: 28 }]),
   F([{ ox: 42, oy: -22, w: 50, h: 30 }]),
   F([{ ox: 42, oy: -22, w: 50, h: 30 }]),
+  F([]),
 ];
 
 const KDASH_ONE_INCH_FRAMES: AttackFrame[] = [
   F([{ ox: 38, oy: -62, w: 40, h: 26 }]),
   F([{ ox: 48, oy: -60, w: 48, h: 28 }]),
   F([{ ox: 48, oy: -60, w: 48, h: 28 }]),
+  F([]),
+  F([]),
 ];
 
 const KDASH_TRIGGER_FRAMES: AttackFrame[] = [
   F([{ ox: 35, oy: -20, w: 46, h: 28 }]),
   F([{ ox: 42, oy: -18, w: 52, h: 30 }]),
   F([{ ox: 42, oy: -18, w: 52, h: 30 }]),
+  F([]),
 ];
 
 const KULA_ONE_MORE_FRAMES: AttackFrame[] = [
   F([{ ox: 38, oy: -40, w: 44, h: 30 }]),
   F([{ ox: 45, oy: -38, w: 50, h: 32 }]),
   F([{ ox: 45, oy: -38, w: 50, h: 32 }]),
+  F([]),
 ];
 
 const KULA_SLIDER_FRAMES: AttackFrame[] = [
   F([{ ox: 35, oy: -18, w: 50, h: 28 }]),
   F([{ ox: 42, oy: -16, w: 56, h: 30 }]),
   F([{ ox: 42, oy: -16, w: 56, h: 30 }]),
+  F([]),
+  F([]),
 ];
 
 const LEONA_STRIKE_ARC_FRAMES: AttackFrame[] = [
   F([{ ox: 38, oy: -40, w: 44, h: 30 }]),
   F([{ ox: 45, oy: -38, w: 50, h: 32 }]),
   F([{ ox: 45, oy: -38, w: 50, h: 32 }]),
+  F([]),
 ];
 
 const LEONA_STRIKE_DASH_FRAMES: AttackFrame[] = [
   F([{ ox: 30, oy: -45, w: 40, h: 35 }]),
   F([{ ox: 38, oy: -42, w: 48, h: 38 }]),
+  F([]),
+  F([]),
+  F([]),
 ];
 
 // Athena 命令通常技
@@ -278,12 +316,14 @@ const MAI_HISSATSU_SHINOBIBACHI_FRAMES: AttackFrame[] = [
   F([{ ox: 38, oy: -40, w: 44, h: 30 }]),
   F([{ ox: 45, oy: -38, w: 50, h: 32 }]),
   F([{ ox: 45, oy: -38, w: 50, h: 32 }]),
+  F([]),
 ];
 
 const MAI_YUSURA_UMA_FRAMES: AttackFrame[] = [
   F([{ ox: 35, oy: -22, w: 42, h: 28 }]),
   F([{ ox: 42, oy: -20, w: 50, h: 30 }]),
   F([{ ox: 42, oy: -20, w: 50, h: 30 }]),
+  F([]),
 ];
 
 // Clark 命令通常技
@@ -291,11 +331,14 @@ const CLARK_DEATH_LAKE_FRAMES: AttackFrame[] = [
   F([{ ox: 40, oy: -62, w: 42, h: 26 }]),
   F([{ ox: 48, oy: -60, w: 48, h: 28 }]),
   F([{ ox: 48, oy: -60, w: 48, h: 28 }]),
+  F([]),
 ];
 
 const CLARK_STOMP_FRAMES: AttackFrame[] = [
   F([{ ox: 38, oy: -18, w: 48, h: 28 }]),
   F([{ ox: 45, oy: -16, w: 55, h: 30 }]),
+  F([]),
+  F([]),
 ];
 
 // Ralf 命令通常技
@@ -303,12 +346,14 @@ const RALF_SABRE_PUNCH_FRAMES: AttackFrame[] = [
   F([{ ox: 42, oy: -60, w: 45, h: 28 }]),
   F([{ ox: 50, oy: -58, w: 52, h: 30 }]),
   F([{ ox: 50, oy: -58, w: 52, h: 30 }]),
+  F([]),
 ];
 
 const RALF_SABRE_KICK_FRAMES: AttackFrame[] = [
   F([{ ox: 38, oy: -20, w: 50, h: 28 }]),
   F([{ ox: 45, oy: -18, w: 58, h: 30 }]),
   F([{ ox: 45, oy: -18, w: 58, h: 30 }]),
+  F([]),
 ];
 
 // Joe 命令通常技
@@ -316,6 +361,7 @@ const JOE_KNEE_KICK_FRAMES: AttackFrame[] = [
   F([{ ox: 40, oy: -55, w: 45, h: 30 }]),
   F([{ ox: 48, oy: -52, w: 52, h: 32 }]),
   F([{ ox: 48, oy: -52, w: 52, h: 32 }]),
+  F([]),
 ];
 
 const JOE_SLIDE_FRAMES: AttackFrame[] = [
@@ -323,6 +369,7 @@ const JOE_SLIDE_FRAMES: AttackFrame[] = [
   F([{ ox: 42, oy: -15, w: 58, h: 28 }]),
   F([{ ox: 42, oy: -15, w: 58, h: 28 }]),
   F([{ ox: 45, oy: -14, w: 60, h: 28 }]),
+  F([]),
 ];
 
 // Andy 命令通常技
@@ -330,12 +377,14 @@ const ANDY_UWA_AGITO_FRAMES: AttackFrame[] = [
   F([{ ox: 40, oy: -68, w: 38, h: 24 }]),
   F([{ ox: 48, oy: -66, w: 44, h: 26 }]),
   F([{ ox: 48, oy: -66, w: 44, h: 26 }]),
+  F([]),
 ];
 
 const ANDY_GEDAN_AGITO_FRAMES: AttackFrame[] = [
   F([{ ox: 35, oy: -22, w: 42, h: 28 }]),
   F([{ ox: 42, oy: -20, w: 50, h: 30 }]),
   F([{ ox: 42, oy: -20, w: 50, h: 30 }]),
+  F([]),
 ];
 
 // Billy 命令通常技
@@ -343,12 +392,14 @@ const BILLY_SANDAN_GEAR_FRAMES: AttackFrame[] = [
   F([{ ox: 42, oy: -72, w: 42, h: 28 }]),
   F([{ ox: 50, oy: -70, w: 48, h: 30 }]),
   F([{ ox: 50, oy: -70, w: 48, h: 30 }]),
+  F([]),
 ];
 
 const BILLY_SENSHU_IKKYAKU_FRAMES: AttackFrame[] = [
   F([{ ox: 38, oy: -18, w: 48, h: 28 }]),
   F([{ ox: 45, oy: -16, w: 55, h: 30 }]),
   F([{ ox: 45, oy: -16, w: 55, h: 30 }]),
+  F([]),
 ];
 
 // Chang 命令通常技
@@ -495,11 +546,16 @@ const YAMAZAKI_BOKKAI_FRAMES: AttackFrame[] = [
 const CROUCH_A_FRAMES: AttackFrame[] = [
   F([{ ox: 35, oy: -30, w: 32, h: 20 }]),
   F([{ ox: 40, oy: -28, w: 36, h: 22 }]),
+  F([]),
+  F([]),
 ];
 
 const CROUCH_B_FRAMES: AttackFrame[] = [
   F([{ ox: 35, oy: -15, w: 38, h: 18 }]),
   F([{ ox: 42, oy: -14, w: 44, h: 20 }]),
+  F([]),
+  F([]),
+  F([]),
 ];
 
 const CROUCH_C_FRAMES: AttackFrame[] = [
@@ -507,6 +563,7 @@ const CROUCH_C_FRAMES: AttackFrame[] = [
   F([{ ox: 48, oy: -25, w: 55, h: 28 }]),
   F([{ ox: 48, oy: -25, w: 55, h: 28 }]),
   F([{ ox: 45, oy: -28, w: 50, h: 26 }]),
+  F([]),
 ];
 
 const CROUCH_D_FRAMES: AttackFrame[] = [
@@ -515,24 +572,36 @@ const CROUCH_D_FRAMES: AttackFrame[] = [
   F([{ ox: 48, oy: -10, w: 62, h: 25 }]),
   F([{ ox: 45, oy: -12, w: 55, h: 22 }]),
   F([{ ox: 40, oy: -12, w: 50, h: 22 }]),
+  F([]),
 ];
 
 // ===== 跳跃攻击 =====
 const JUMP_A_FRAMES: AttackFrame[] = [
   F([{ ox: 30, oy: -40, w: 30, h: 28 }]),
   F([{ ox: 35, oy: -38, w: 34, h: 30 }]),
+  F([{ ox: 35, oy: -38, w: 34, h: 30 }]),
+  F([{ ox: 35, oy: -38, w: 34, h: 30 }]),
+  F([{ ox: 33, oy: -40, w: 32, h: 28 }]),
+  F([{ ox: 33, oy: -40, w: 32, h: 28 }]),
+  F([{ ox: 30, oy: -42, w: 30, h: 26 }]),
+  F([{ ox: 30, oy: -42, w: 30, h: 26 }]),
+  F([{ ox: 28, oy: -44, w: 28, h: 24 }]),
 ];
 
 const JUMP_B_FRAMES: AttackFrame[] = [
   F([{ ox: 32, oy: -20, w: 35, h: 26 }]),
   F([{ ox: 38, oy: -18, w: 40, h: 28 }]),
+  F([{ ox: 38, oy: -18, w: 40, h: 28 }]),
+  F([{ ox: 38, oy: -18, w: 40, h: 28 }]),
+  F([{ ox: 36, oy: -20, w: 38, h: 26 }]),
+  F([{ ox: 34, oy: -22, w: 36, h: 24 }]),
+  F([{ ox: 32, oy: -24, w: 34, h: 22 }]),
 ];
 
 const JUMP_C_FRAMES: AttackFrame[] = [
   F([{ ox: 32, oy: -50, w: 38, h: 32 }]),
   F([{ ox: 40, oy: -48, w: 48, h: 35 }]),
   F([{ ox: 42, oy: -48, w: 50, h: 35 }]),
-  F([{ ox: 40, oy: -50, w: 45, h: 32 }]),
 ];
 
 const JUMP_D_FRAMES: AttackFrame[] = [
@@ -540,18 +609,22 @@ const JUMP_D_FRAMES: AttackFrame[] = [
   F([{ ox: 38, oy: -22, w: 50, h: 32 }]),
   F([{ ox: 40, oy: -22, w: 52, h: 34 }]),
   F([{ ox: 38, oy: -25, w: 48, h: 32 }]),
+  F([]),
 ];
 
 // ===== 投技 =====
 const THROW_FRAMES: AttackFrame[] = [
   F([], null, [{ ox: 35, oy: -50, w: 35, h: 70 }]),
+  F([], null, [{ ox: 35, oy: -50, w: 35, h: 70 }]),
 ];
 
 const THROW_FORWARD_FRAMES: AttackFrame[] = [
   F([], null, [{ ox: 38, oy: -52, w: 38, h: 72 }]),
+  F([], null, [{ ox: 38, oy: -52, w: 38, h: 72 }]),
 ];
 
 const THROW_BACK_FRAMES: AttackFrame[] = [
+  F([], null, [{ ox: 38, oy: -52, w: 38, h: 72 }]),
   F([], null, [{ ox: 38, oy: -52, w: 38, h: 72 }]),
 ];
 
@@ -561,6 +634,7 @@ const STAND_CD_FRAMES: AttackFrame[] = [
   F([{ ox: 45, oy: -52, w: 55, h: 42 }]),
   F([{ ox: 48, oy: -50, w: 58, h: 45 }]),
   F([{ ox: 45, oy: -52, w: 55, h: 42 }]),
+  F([]),
 ];
 
 const JUMP_CD_FRAMES: AttackFrame[] = [

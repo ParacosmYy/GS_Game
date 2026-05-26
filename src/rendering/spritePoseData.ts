@@ -281,12 +281,17 @@ export const CROUCH_POSES: Pose[] = [
 ];
 
 export const JUMP_POSES: Pose[] = [
-  { headOff: 0, bodyLean: 0, armL: -0.3, armR: 0.3, legL: 1, legR: -1, crouch: false },
-  { headOff: 0, bodyLean: 0, armL: -0.5, armR: 0.5, legL: 0, legR: 0, crouch: false },
-  { headOff: 0, bodyLean: 0, armL: -0.8, armR: 0.8, legL: -1, legR: 1, crouch: false },
-  { headOff: 0, bodyLean: 0, armL: -0.7, armR: 0.7, legL: 0, legR: 0, crouch: false },
-  { headOff: 0, bodyLean: 0, armL: -0.4, armR: 0.4, legL: 1, legR: -1, crouch: false },
-  { headOff: 0, bodyLean: 0, armL: -0.2, armR: 0.2, legL: 1, legR: -1, crouch: false },
+  // Phase 1: Takeoff (2 frames) — crouch-like launch, arms back
+  { headOff: 0.2, bodyLean: 0.15, armL: -0.4, armR: 0.4, legL: 1.5, legR: -1.5, crouch: false },
+  { headOff: 0, bodyLean: 0.1, armL: -0.6, armR: 0.6, legL: 0.5, legR: -0.5, crouch: false },
+  // Phase 2: Ascent (3 frames) — arms up, legs tucked, body vertical
+  { headOff: -0.1, bodyLean: 0, armL: -0.8, armR: 0.8, legL: -0.5, legR: 0.5, crouch: false },
+  { headOff: -0.2, bodyLean: 0, armL: -0.9, armR: 0.9, legL: -1, legR: 1, crouch: false },
+  { headOff: -0.1, bodyLean: 0, armL: -0.7, armR: 0.7, legL: -0.5, legR: 0.5, crouch: false },
+  // Phase 3: Descent (3 frames) — arms forward, legs extending, body angled
+  { headOff: 0, bodyLean: -0.1, armL: -0.5, armR: 0.5, legL: 0, legR: 0, crouch: false },
+  { headOff: 0.1, bodyLean: -0.2, armL: -0.3, armR: 0.3, legL: 0.5, legR: -0.5, crouch: false },
+  { headOff: 0.2, bodyLean: -0.3, armL: -0.2, armR: 0.2, legL: 1, legR: -1, crouch: false },
 ];
 
 /** 根据idleStyle生成差异化跳跃姿态 */
@@ -295,10 +300,10 @@ export function getJumpPoses(style: string): Pose[] {
     case 'confident':
       return JUMP_POSES.map((p, i) => ({
         ...p,
-        bodyLean: i < 3 ? 1.2 : 0.1,
+        bodyLean: i < 5 ? 1.2 : 0.1,
         armL: -0.15,
-        armR: i < 3 ? -0.55 : 0.2,
-        legR: i === 2 ? 3 : p.legR,
+        armR: i < 5 ? -0.55 : 0.2,
+        legR: i === 3 ? 3 : p.legR,
       }));
     case 'lazy':
       return JUMP_POSES.map((p, i) => ({
@@ -308,17 +313,17 @@ export function getJumpPoses(style: string): Pose[] {
     case 'fighter':
       return JUMP_POSES.map((p, i) => ({
         ...p, armL: -0.4, armR: -0.6, legL: -2, legR: 2,
-        bodyLean: i < 3 ? 1.5 : -0.5,
+        bodyLean: i < 5 ? 1.5 : -0.5,
       }));
     case 'martial':
       return JUMP_POSES.map((p, i) => ({
         ...p, armL: -0.3, armR: -0.4,
-        legL: i === 2 ? -3 : p.legL, legR: i === 2 ? 4 : p.legR,
+        legL: i === 3 ? -3 : p.legL, legR: i === 3 ? 4 : p.legR,
       }));
     case 'tense':
       return JUMP_POSES.map((p, i) => ({
         ...p, armL: -0.8, armR: -1.0, legL: p.legL, legR: p.legR,
-        bodyLean: i < 3 ? 1 : 0,
+        bodyLean: i < 5 ? 1 : 0,
       }));
     case 'alert':
       return JUMP_POSES.map((p, i) => ({
@@ -338,10 +343,10 @@ export function getJumpPoses(style: string): Pose[] {
       return JUMP_POSES.map((p, i) => ({
         ...p,
         armL: -0.25,
-        armR: i < 3 ? -0.55 : -0.25,
-        bodyLean: i < 3 ? 1.1 : 0.2,
-        legL: i === 2 ? -3 : p.legL,
-        legR: i === 2 ? 3 : p.legR,
+        armR: i < 5 ? -0.55 : -0.25,
+        bodyLean: i < 5 ? 1.1 : 0.2,
+        legL: i === 3 ? -3 : p.legL,
+        legR: i === 3 ? 3 : p.legR,
       }));
     default:
       return JUMP_POSES;

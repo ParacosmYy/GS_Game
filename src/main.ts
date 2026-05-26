@@ -142,7 +142,16 @@ function update(): void {
       gs.titleBgmStarted = true;
       bgm.start('title');
     }
-    if (inputManager.isKeyDown('Enter') || inputManager.isKeyDown('KeyJ') || inputManager.isKeyDown('KeyR')) {
+    const startJ = inputManager.isKeyDown('KeyJ');
+    const startEnter = inputManager.isKeyDown('Enter');
+    const startR = inputManager.isKeyDown('KeyR');
+    if (startJ) {
+      select.primeInputs(inputManager.getP1Input(), inputManager.getP2Input());
+      bgm.stop();
+      gs.titleBgmStarted = false;
+      gs.setPhase(GamePhase.SELECT);
+      initAudio();
+    } else if (startEnter || startR) {
       bgm.stop();
       gs.titleBgmStarted = false;
       gs.setPhase(GamePhase.MODE_SELECT);

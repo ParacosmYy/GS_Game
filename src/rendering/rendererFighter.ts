@@ -165,16 +165,20 @@ export function drawFighters(
       ctx.translate((Math.random() - 0.5) * shakeAmt, (Math.random() - 0.5) * shakeAmt * 0.5);
     }
 
-    // Compute animation frame index: attacks use attackFrame, cyclic states use globalTick
+    // Compute animation frame index: attacks use attackFrame, cyclic states use stateAge
     const isAttackState = f.state === FighterState.STAND_ATTACK
       || f.state === FighterState.CROUCH_ATTACK
       || f.state === FighterState.AIR_ATTACK
       || f.state === FighterState.COUNTER_STANCE
       || f.state === FighterState.THROW
       || f.state === FighterState.MAX_MODE;
+    const isJumpLike = f.state === FighterState.JUMP || f.state === FighterState.HOP
+      || f.state === FighterState.RUN_JUMP || f.state === FighterState.HYPER_JUMP
+      || f.state === FighterState.BACKDASH;
+    const ticksPerFrame = isJumpLike ? 6 : 9;
     const frameIdx = isAttackState
       ? Math.max(0, f.attackFrame)
-      : Math.floor(globalTick / 9); // 9 ticks per frame (MUGEN idle timing)
+      : Math.floor(f.stateAge / ticksPerFrame);
 
     const spriteRendered = spriteRenderer?.canRender(f.charId)
       ? spriteRenderer.render(ctx, f.charId, f.state, frameIdx, sx + leanOffsetX, sy, f.facing, getCharacterColors(f.charId ?? '').outfit)

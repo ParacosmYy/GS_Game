@@ -170,7 +170,13 @@ export class Fighter {
   // Previous frame state tracking (for combo reset detection)
   private _prevState: FighterState = FighterState.IDLE;
   get prevState(): FighterState { return this._prevState; }
-  savePrevState(): void { this._prevState = this.state; }
+  savePrevState(): void {
+    if (this.state !== this._prevState) this.stateAge = 0;
+    this._prevState = this.state;
+  }
+
+  // State-relative animation age — increments each tick, resets on state change
+  stateAge = 0;
 
   // Character stats reference (for per-character throw range etc.)
   private charStats: CharacterStats | null = null;
@@ -520,6 +526,7 @@ export class Fighter {
 
   /** Decrement per-frame timers (call once per logic frame) */
   tickTimers(): void {
+    this.stateAge++;
     if (this.landingRecovery > 0) this.landingRecovery--;
     if (this.runStopTimer > 0) this.runStopTimer--;
     if (this.throwInvincibilityTimer > 0) this.throwInvincibilityTimer--;

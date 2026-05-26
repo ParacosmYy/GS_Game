@@ -191,6 +191,29 @@ export class SelectState {
     return null;
   }
 
+  /**
+   * Prime the previous input snapshot so held buttons from the previous
+   * screen do not instantly confirm on the first frame of select.
+   */
+  primeInputs(rawP1: PlayerInput, rawP2: PlayerInput): void {
+    this.prevP1Left = rawP1.left;
+    this.prevP1Right = rawP1.right;
+    this.prevP1Up = rawP1.up;
+    this.prevP1Down = rawP1.down;
+    this.prevP1A = rawP1.buttonA;
+    this.prevP1B = rawP1.buttonB;
+    this.prevP1C = rawP1.buttonC;
+    this.prevP1D = rawP1.buttonD;
+    this.prevP2Left = rawP2.left;
+    this.prevP2Right = rawP2.right;
+    this.prevP2Up = rawP2.up;
+    this.prevP2Down = rawP2.down;
+    this.prevP2A = rawP2.buttonA;
+    this.prevP2B = rawP2.buttonB;
+    this.prevP2C = rawP2.buttonC;
+    this.prevP2D = rawP2.buttonD;
+  }
+
   /** 解析光标位置的实际角色 (随机格→随机选一个) */
   private resolveChar(cursor: number): CharacterDefinition {
     if (cursor >= ROSTER.length) {
