@@ -145,3 +145,9 @@
 ## H72: animation cancel frames Ryo测试—28项验证覆盖取消帧+无敌帧 — 44→45
 
 **commit:** <hash> | 15攻击取消帧存在+4非攻击空帧+范围验证+isCancelable+无敌帧+DM>specials
+
+---
+
+## H73: Ryo completeness report测试—18项验证覆盖3种报告 — 45→46
+
+**commit:** <hash> | generateRyoReport(8)+generateRyoDimensionReport(7)+generateRyoExtendedReport(4)
