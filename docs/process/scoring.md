@@ -2,7 +2,7 @@
 
 ## 当前分数
 
-当前总分：`458/1000`
+当前总分：`463/1000`
 
 最新完整历史见 [SCORE.history.md](../archive/SCORE.history.md)。
 
