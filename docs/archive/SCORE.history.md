@@ -307,3 +307,9 @@
 ## H99: content loader测试—15项验证hasContent+loadContent+report — 71→72
 
 **commit:** <hash> | content loader测试—15项验证hasContent+loadContent+report
+
+---
+
+## H100: game screens测试—14项验证transition+flow — 72→73
+
+**commit:** <hash> | game screens测试—14项验证transition+flow
