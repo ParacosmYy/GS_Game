@@ -1200,7 +1200,7 @@ export class AdvancedAI {
           if (charId === 'ryo') {
             // Ryo-specific special move selection based on distance and context
             // DM when opponent is low HP or in MAX mode
-            if (this.gauge && this.gauge.stocks >= 1) {
+            if (this.gauge && (this.maxMode?.active || this.gauge.stocks >= 1)) {
               const oppLowHp = this.opponent.health < this.opponent.maxHealth * 0.3;
               const inMax = this.maxMode?.active ?? false;
               if ((oppLowHp || inMax || this.inCombo) && this.chance(rng, 0.4)) {
@@ -1532,7 +1532,7 @@ export class AdvancedAI {
     // DM usage strategy: save for combo finisher or low-HP opponent
     const oppLowHp = this.opponent.health < this.opponent.maxHealth * 0.25;
     const shouldUseDM = oppLowHp || this.inCombo;
-    const dmProb = shouldUseDM && this.gauge && this.gauge.stocks >= 1
+    const dmProb = shouldUseDM && (this.maxMode?.active || (this.gauge && this.gauge.stocks >= 1))
       ? 0.15 * this.config.meterManagementRate
       : 0.03;
 
@@ -1595,7 +1595,7 @@ export class AdvancedAI {
         kasumi: AttackType.SDM_CHO_MUKIGENZAN,
         mary: AttackType.SDM_MARY_TYPHOON,
       };
-      const useSDM = this.maxMode?.active && this.gauge && this.gauge.stocks >= 2;
+      const useSDM = this.maxMode?.active === true;
       const dm = useSDM
         ? sdmMap[this.fighter.charId]
         : dmMap[this.fighter.charId];

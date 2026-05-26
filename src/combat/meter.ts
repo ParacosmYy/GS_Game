@@ -110,6 +110,21 @@ export function tickMaxMode(maxMode: MaxModeState): void {
   }
 }
 
+/**
+ * Spend MAX mode timer by a percentage of the full duration.
+ * Returns true if MAX mode was active and timer was consumed.
+ */
+export function drainMaxModeTimer(maxMode: MaxModeState, ratio: number): boolean {
+  if (!maxMode.active) return false;
+  const drain = Math.max(1, Math.round(maxMode.maxDuration * ratio));
+  maxMode.timer = Math.max(0, maxMode.timer - drain);
+  if (maxMode.timer <= 0) {
+    maxMode.active = false;
+    maxMode.timer = 0;
+  }
+  return true;
+}
+
 /** 风云再起 auto meter regen — called every frame */
 export function tickAutoMeter(gauges: [PowerGauge, PowerGauge]): void {
   for (const g of gauges) {

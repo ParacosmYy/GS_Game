@@ -576,7 +576,9 @@ export class SimpleAI {
 
     // Check DM first — higher probability when opponent is low HP (KOF2002: DM finisher)
     const oppLowHp = this.opponent.health < this.opponent.maxHealth * 0.25;
-    const dmProb = oppLowHp && this.gauge && this.gauge.stocks >= 1 ? 0.15 : 0.05;
+    const canUseBurstDM = oppLowHp || this.maxMode?.active === true;
+    const hasBurstResource = this.maxMode?.active === true || (this.gauge?.stocks ?? 0) >= 1;
+    const dmProb = canUseBurstDM && hasBurstResource ? 0.15 : 0.05;
     if (this.chance(rng, dmProb)) {
       const dmMap: Record<string, AttackType> = {
         kyo: AttackType.DM_OROCHINAGI,
@@ -588,7 +590,7 @@ export class SimpleAI {
         kdash: AttackType.DM_CHAIN_SHOT,
         kula: AttackType.DM_FREEZE,
       };
-      // In MAX mode with ≥2 stocks, upgrade to SDM
+      // In MAX mode, upgrade to SDM using MAX state rather than ordinary stocks
       const sdmMap: Record<string, AttackType> = {
         kyo: AttackType.SDM_OROCHINAGI,
         iori: AttackType.SDM_YATAGARASU,
@@ -599,7 +601,7 @@ export class SimpleAI {
         kdash: AttackType.SDM_CHAIN_SHOT,
         kula: AttackType.SDM_FREEZE,
       };
-      const useSDM = this.maxMode?.active && this.gauge && this.gauge.stocks >= 2;
+      const useSDM = this.maxMode?.active === true;
       const dm = useSDM
         ? sdmMap[this.fighter.charId]
         : dmMap[this.fighter.charId];

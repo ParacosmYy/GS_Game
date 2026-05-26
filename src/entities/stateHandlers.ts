@@ -82,8 +82,8 @@ export function tryAttack(ctx: FighterCtx, input: ResolvedInput): AttackType | n
   const tick = ctx.tickRef.value;
   if (ctx.maxMode && ctx.maxMode.active && f.canAct()) {
     const dmAttack = ctx.character.routeSpecial(input, ctx.cmdBuf, tick, ctx.wasChargingDown);
-    if (dmAttack && isDM(dmAttack as string) && ctx.gauge && ctx.gauge.stocks >= DM_STOCK_COST) {
-      if (spendStocks(ctx.gauge, DM_STOCK_COST)) return dmAttack;
+    if (dmAttack && isDM(dmAttack as string)) {
+      return dmAttack;
     }
   }
   if (f.canAct()) {
