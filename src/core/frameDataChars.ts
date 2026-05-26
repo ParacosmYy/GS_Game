@@ -2409,17 +2409,18 @@ export const FRAME_DATA_CHARS = {
     knockdown: true,
     chipDamage: 10,
   },
+  // 精神剑·强 dp+C (对空 强版)
   ATHENA_PSYCHO_SWORD_C: {
-    startup: 7,
+    startup: 5,
     active: 10,
-    recovery: 30,
-    damage: 140,
-    hitstun: 28,
-    blockstun: 22,
-    pushback: 10,
+    recovery: 28,
+    damage: 90,
+    hitstun: 22,
+    blockstun: 20,
+    pushback: 8,
     hitLevel: "MID" as const,
     knockdown: true,
-    chipDamage: 14,
+    chipDamage: 12,
   },
   ATHENA_PHOENIX_ARROW: {
     startup: 6,
@@ -2822,6 +2823,43 @@ export const FRAME_DATA_CHARS = {
     hitLevel: "MID" as const,
     knockdown: false,
   },
+  // 爆裂拳·强 qcf+K连打 (多段拳击 强版)
+  JOE_BAKURETSUKEN_C: {
+    startup: 6,
+    active: 8,
+    recovery: 24,
+    damage: 90,
+    hitstun: 20,
+    blockstun: 18,
+    pushback: 5,
+    hitLevel: "MID" as const,
+    knockdown: true,
+  },
+  // 黄金之跟 dp+K (上升踢技)
+  JOE_GOLDEN_HEEL: {
+    startup: 8,
+    active: 6,
+    recovery: 22,
+    damage: 75,
+    hitstun: 16,
+    blockstun: 16,
+    pushback: 5,
+    hitLevel: "MID" as const,
+    knockdown: false,
+  },
+  // 爆裂虎·DM qcf,qcf+K
+  DM_BOMBER_TIGER: {
+    startup: 8,
+    active: 10,
+    recovery: 40,
+    damage: 210,
+    hitstun: 0,
+    blockstun: 21,
+    pushback: 10,
+    hitLevel: "MID" as const,
+    knockdown: true,
+    chipDamage: 22,
+  },
   // Screw Upper DM qcf,qcf+P
   DM_SCREW_UPPER: {
     startup: 10,
@@ -2960,6 +2998,31 @@ export const FRAME_DATA_CHARS = {
     hitLevel: "MID" as const,
     knockdown: true,
   },
+  // 不知火流·炎阵 dp+P (对空)
+  ANDY_SHIRANUI_RYUU_EN_JIN: {
+    startup: 6,
+    active: 8,
+    recovery: 24,
+    damage: 80,
+    hitstun: 20,
+    blockstun: 18,
+    pushback: 6,
+    hitLevel: "MID" as const,
+    knockdown: true,
+  },
+  // 飞燕脚·DM qcf,qcf+K
+  DM_HI_EN_KYAKU: {
+    startup: 6,
+    active: 12,
+    recovery: 38,
+    damage: 200,
+    hitstun: 0,
+    blockstun: 21,
+    pushback: 10,
+    hitLevel: "MID" as const,
+    knockdown: true,
+    chipDamage: 20,
+  },
   // 超裂破弾 DM qcb,qcb+P
   DM_CHO_REPPA_DAN: {
     startup: 8,
@@ -3081,6 +3144,31 @@ export const FRAME_DATA_CHARS = {
     hitLevel: "MID" as const,
     knockdown: true,
   },
+  // 大太极拳 qcb+P
+  BILLY_DAI_TAIKYOKU_KEN: {
+    startup: 8,
+    active: 8,
+    recovery: 24,
+    damage: 85,
+    hitstun: 20,
+    blockstun: 18,
+    pushback: 6,
+    hitLevel: "MID" as const,
+    knockdown: true,
+  },
+  // 大三之棍·DM qcf,qcf+P
+  DM_DAISAN_NO_KON: {
+    startup: 10,
+    active: 12,
+    recovery: 40,
+    damage: 200,
+    hitstun: 0,
+    blockstun: 21,
+    pushback: 10,
+    hitLevel: "MID" as const,
+    knockdown: true,
+    chipDamage: 20,
+  },
   DM_KAEN_SENPU_JIN: {
     startup: 10,
     active: 12,
@@ -3177,6 +3265,31 @@ export const FRAME_DATA_CHARS = {
     pushback: 7,
     hitLevel: "MID" as const,
     knockdown: true,
+  },
+  // 铁球石火块 qcb+P
+  CHANG_TEKKYUU_SEKIKAI: {
+    startup: 6,
+    active: 6,
+    recovery: 22,
+    damage: 80,
+    hitstun: 18,
+    blockstun: 16,
+    pushback: 5,
+    hitLevel: "MID" as const,
+    knockdown: true,
+  },
+  // 铁球大杀阵·DM qcf,qcf+P
+  DM_TEKKYUU_DAI_SESSA: {
+    startup: 10,
+    active: 14,
+    recovery: 42,
+    damage: 210,
+    hitstun: 0,
+    blockstun: 21,
+    pushback: 12,
+    hitLevel: "MID" as const,
+    knockdown: true,
+    chipDamage: 22,
   },
   DM_TEKKYUU_DAI_BOUSOU: {
     startup: 10,
@@ -3429,6 +3542,18 @@ export const FRAME_DATA_CHARS = {
     hitLevel: "MID" as const,
     knockdown: false,
     chipDamage: 6,
+  },
+  // Vanilla Rush qcb+P (突进爪击)
+  MATURE_VANILLA_RUSH: {
+    startup: 7,
+    active: 6,
+    recovery: 22,
+    damage: 75,
+    hitstun: 16,
+    blockstun: 16,
+    pushback: 5,
+    hitLevel: "MID" as const,
+    knockdown: false,
   },
   // ── 玛卓DM (Mature) ── KOF2002UM 校准数据
   DM_NOCTURNAL_LIGHT: {

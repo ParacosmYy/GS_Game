@@ -19,7 +19,9 @@ type SampleId =
   | 'block_special' | 'block_dm' | 'special_light' | 'special_heavy'
   | 'ko_hit' | 'landing_heavy'
   | 'accent_fire' | 'accent_purple' | 'accent_ice' | 'accent_generic'
-  | 'dizzy_hit' | 'ground_bounce';
+  | 'dizzy_hit' | 'ground_bounce'
+  | 'perfect_ko' | 'round_start' | 'time_up'
+  | 'battle_bgm';
 
 const samples = new Map<SampleId, AudioBuffer>();
 let initialized = false;
@@ -93,12 +95,19 @@ function bandPass(data: Float32Array, sr: number, low: number, high: number): Fl
 
 // 混合多个层
 function mixLayers(layers: Float32Array[], gains: number[]): Float32Array {
-  const len = layers[0].length;
+  // Use the maximum length among all layers to avoid reading out-of-bounds
+  // (Float32Array out-of-bounds returns undefined, which produces NaN in arithmetic)
+  let len = 0;
+  for (let l = 0; l < layers.length; l++) {
+    if (layers[l].length > len) len = layers[l].length;
+  }
   const out = new Float32Array(len);
   for (let i = 0; i < len; i++) {
     let v = 0;
     for (let l = 0; l < layers.length; l++) {
-      v += layers[l][i] * gains[l];
+      if (i < layers[l].length) {
+        v += layers[l][i] * gains[l];
+      }
     }
     out[i] = v;
   }
@@ -111,11 +120,17 @@ function clamp(v: number): number {
 
 function normalize(data: Float32Array): Float32Array {
   let peak = 0;
-  for (let i = 0; i < data.length; i++) peak = Math.max(peak, Math.abs(data[i]));
+  for (let i = 0; i < data.length; i++) {
+    const v = data[i];
+    if (Number.isFinite(v)) peak = Math.max(peak, Math.abs(v));
+  }
   if (peak < 0.001) return data;
   const scale = 0.95 / peak;
   const out = new Float32Array(data.length);
-  for (let i = 0; i < data.length; i++) out[i] = clamp(data[i] * scale);
+  for (let i = 0; i < data.length; i++) {
+    const v = data[i];
+    out[i] = Number.isFinite(v) ? clamp(v * scale) : 0;
+  }
   return out;
 }
 
@@ -222,7 +237,7 @@ function renderHitHeavy(sr: number): Float32Array {
 }
 
 function renderBlock(sr: number, heavy: boolean): Float32Array {
-  const dur = heavy ? 0.16 : 0.1;
+  const dur = heavy ? 0.18 : 0.1;
   const baseF = heavy ? 850 : 1050;
   // 金属方波主体 — 更高截止模拟沉闷感
   const metal = renderOsc(sr, dur, 'square', t => baseF - baseF * 6 * t, t => expDecay(t, 0.18, heavy ? 12 : 18));
@@ -237,12 +252,32 @@ function renderBlock(sr: number, heavy: boolean): Float32Array {
   const res2P = padTo(res2, Math.ceil(sr * dur));
   const layers = [metal, res, noise, thud, res2P];
   const gains: number[] = [1, 0.4, heavy ? 0.7 : 0.45, heavy ? 0.6 : 0.35, 0.15];
+
+  if (!heavy) {
+    // 轻防御新增：金属碰击高频瞬态 — 模拟手套碰防御壁的清脆"叮"声
+    const metalPing = renderOsc(sr, 0.025, 'triangle', t => 3500 - 60000 * t, t => expDecay(t, 0.15, 55));
+    const metalPingP = padTo(metalPing, Math.ceil(sr * dur));
+    // 高频噪声瞬态 — 手套皮革碰壁的空气挤压
+    const airBurst = bandPass(renderNoise(sr, 0.018, t => expDecay(t, 0.2, 60)), sr, 6000, 11000);
+    const airBurstP = padTo(airBurst, Math.ceil(sr * dur));
+    layers.push(metalPingP, airBurstP);
+    gains.push(0.5, 0.4);
+  }
+
   if (heavy) {
     const lo = renderOsc(sr, 0.14, 'sine', t => 150 - 1000 * t, t => expDecay(t, 0.14, 12));
     const tail = renderOsc(sr, 0.2, 'sine', _t => 800, t => expDecay(t, 0.05, 12));
     const tailP = padTo(tail, Math.ceil(sr * dur), Math.floor(sr * 0.05));
     layers.push(lo, tailP);
     gains.push(0.8, 0.2);
+    // 重防御新增：80Hz低频共振层 — 更深的冲击感
+    const deepResonance = renderOsc(sr, 0.15, 'sine', t => 80 - 40 * t, t => expDecay(t, 0.3, 6));
+    const deepResonanceP = padTo(deepResonance, Math.ceil(sr * dur));
+    // 低频共鸣噪声 — 80-200Hz区间，模拟防御壁震动
+    const resonanceNoise = bandPass(renderNoise(sr, 0.12, t => expDecay(t, 0.2, 10)), sr, 80, 200);
+    const resonanceNoiseP = padTo(resonanceNoise, Math.ceil(sr * dur));
+    layers.push(deepResonanceP, resonanceNoiseP);
+    gains.push(1.0, 0.7);
   }
   return normalize(mixLayers(layers, gains));
 }
@@ -316,9 +351,10 @@ function renderDM(sr: number): Float32Array {
   ));
 }
 
-// KO：扩展低频轰鸣 + 巨大冲击
+// KO：扩展低频轰鸣 + 巨大冲击 + 双重爆炸层
+// v3: 添加初始爆裂+延迟余震双重爆炸层
 function renderKO(sr: number): Float32Array {
-  const dur = 1.0;
+  const dur = 1.2;
   // 主锯齿波 — 大幅下降
   const main = renderOsc(sr, dur, 'sawtooth', t => 200 - 200 * t, t => expDecay(t, 0.5, 3));
   // 宽频噪声 — 冲击质感
@@ -338,6 +374,18 @@ function renderKO(sr: number): Float32Array {
   // 高频碎片 — 延迟0.15s
   const debris = highPass(renderNoise(sr, 0.15, t => t < 0.005 ? 0 : expDecay(t - 0.005, 0.2, 12)), sr, 4000);
 
+  // === v3新增：双重爆炸层 ===
+  // 初始爆裂 — 0.35s处的第一重爆裂，尖锐的上升+急速衰减
+  const initialBlast = renderOsc(sr, 0.12, 'sawtooth', t => 800 - 12000 * t, t => expDecay(t, 0.4, 12));
+  // 初始爆裂噪声 — 宽频冲击波
+  const blastNoise = bandPass(renderNoise(sr, 0.1, t => expDecay(t, 0.35, 8)), sr, 300, 5000);
+  // 延迟余震 — 0.5s处的第二重低频余震，更深沉更慢
+  const aftershockBoom = renderOsc(sr, 0.35, 'sine', t => 35 - 20 * t, t => expDecay(t, 0.45, 1.8));
+  // 余震中频共鸣 — 像爆炸后的空气震动
+  const aftershockMid = renderOsc(sr, 0.25, 'sawtooth', t => 200 - 2000 * t, t => expDecay(t, 0.2, 4));
+  // 余震高频碎片 — 延迟余震中的碎石感
+  const aftershockDebris = highPass(renderNoise(sr, 0.12, t => t < 0.005 ? 0 : expDecay(t - 0.005, 0.15, 14)), sr, 3500);
+
   const total = Math.ceil(sr * dur);
   const noiseP = padTo(noise, total);
   const ringP = padTo(ring, total, Math.floor(sr * 0.1));
@@ -346,10 +394,18 @@ function renderKO(sr: number): Float32Array {
   const rumbleP = padTo(rumble, total, Math.floor(sr * 0.2));
   const boomP = padTo(boom, total);
   const debrisP = padTo(debris, total, Math.floor(sr * 0.15));
+  // 双重爆炸层延迟对齐
+  const initialBlastP = padTo(initialBlast, total, Math.floor(sr * 0.35));
+  const blastNoiseP = padTo(blastNoise, total, Math.floor(sr * 0.35));
+  const aftershockBoomP = padTo(aftershockBoom, total, Math.floor(sr * 0.5));
+  const aftershockMidP = padTo(aftershockMid, total, Math.floor(sr * 0.52));
+  const aftershockDebrisP = padTo(aftershockDebris, total, Math.floor(sr * 0.55));
 
   return normalize(mixLayers(
-    [main, noiseP, sub, ringP, crackP, impact2P, rumbleP, boomP, debrisP],
-    [1, 0.5, 1.3, 0.25, 0.4, 0.55, 0.8, 1.2, 0.35]
+    [main, noiseP, sub, ringP, crackP, impact2P, rumbleP, boomP, debrisP,
+     initialBlastP, blastNoiseP, aftershockBoomP, aftershockMidP, aftershockDebrisP],
+    [1, 0.5, 1.3, 0.25, 0.4, 0.55, 0.8, 1.2, 0.35,
+     0.65, 0.55, 1.0, 0.4, 0.35]
   ));
 }
 
@@ -1096,6 +1152,264 @@ function renderDizzyHit(sr: number): Float32Array {
   ));
 }
 
+// === 新增 SFX: Perfect KO / Round Start / Time Up ===
+
+// Perfect KO：三层SFX — 高频水晶碎裂 + 中频胜利号角 + 低频震撼
+// 适用于完美KO（对手未造成任何伤害时KO对手）
+function renderPerfectKO(sr: number): Float32Array {
+  const dur = 1.5;
+  const total = Math.ceil(sr * dur);
+
+  // 第一层：高频水晶碎裂 — 清脆的玻璃破碎上升音
+  const crystalBreak = renderOsc(sr, 0.15, 'triangle', t => 4000 - 50000 * t, t => expDecay(t, 0.2, 18));
+  // 高频碎裂噪声 — 碎片飞溅
+  const crystalNoise = highPass(renderNoise(sr, 0.12, t => expDecay(t, 0.2, 20)), sr, 6000);
+  // 二次碎裂 — 延迟0.08s
+  const crystal2 = renderOsc(sr, 0.1, 'square', t => 5000 - 60000 * t, t => expDecay(t, 0.15, 25));
+
+  // 第二层：中频胜利号角 — C-E-G-C上行琶音
+  const hornNotes = [523.3, 659.3, 784, 1046.5];
+  const hornDur = 0.4;
+  const hornLen = Math.ceil(sr * (hornNotes.length * 0.12 + hornDur));
+  const hornData = new Float32Array(total);
+  for (let n = 0; n < hornNotes.length; n++) {
+    const offset = Math.floor(sr * (0.15 + n * 0.12));
+    const tone = renderOsc(sr, hornDur, 'square', _t => hornNotes[n], t => expDecay(t, 0.3, 4));
+    const harm = renderOsc(sr, hornDur * 0.6, 'triangle', _t => hornNotes[n] * 2, t => expDecay(t, 0.08, 8));
+    for (let i = 0; i < tone.length && offset + i < total; i++) {
+      hornData[offset + i] += tone[i] * 0.2 + harm[i] * 0.06;
+    }
+  }
+
+  // 第三层：低频震撼 — KO标志性的深沉低频
+  const shock = renderOsc(sr, 0.8, 'sine', t => 50 - 40 * t, t => expDecay(t, 0.5, 2));
+  // 低频共振脉冲
+  const pulse = renderOsc(sr, 0.6, 'sine', t => 35 - 25 * t, t => t < 0.05 ? 0 : expDecay(t - 0.05, 0.4, 1.8));
+  // 中低频冲击波
+  const impact = bandPass(renderNoise(sr, 0.3, t => expDecay(t, 0.35, 5)), sr, 150, 800);
+
+  const crystalP = padTo(crystalBreak, total);
+  const crystalNoiseP = padTo(crystalNoise, total);
+  const crystal2P = padTo(crystal2, total, Math.floor(sr * 0.08));
+  const hornP = padTo(hornData, total);
+  const shockP = padTo(shock, total);
+  const pulseP = padTo(pulse, total, Math.floor(sr * 0.1));
+  const impactP = padTo(impact, total);
+
+  return normalize(mixLayers(
+    [crystalP, crystalNoiseP, crystal2P, hornP, shockP, pulseP, impactP],
+    [0.6, 0.5, 0.4, 1.0, 1.2, 0.8, 0.7]
+  ));
+}
+
+// Round Start：短促金属铃音 + 低频鼓点
+// 用于回合开始时的倒计时结束提示音
+function renderRoundStart(sr: number): Float32Array {
+  const dur = 0.5;
+  const total = Math.ceil(sr * dur);
+
+  // 金属铃音 — 清脆的高频三角波，快速衰减
+  const bell = renderOsc(sr, 0.25, 'triangle', t => 1200 - 800 * t, t => expDecay(t, 0.2, 8));
+  // 铃音泛音 — 高八度
+  const bellHarm = renderOsc(sr, 0.18, 'sine', t => 2400 - 1600 * t, t => expDecay(t, 0.1, 12));
+  // 铃音二次泛音 — 更高频
+  const bellHarm2 = renderOsc(sr, 0.12, 'triangle', t => 3600 - 3000 * t, t => expDecay(t, 0.05, 18));
+
+  // 低频鼓点 — 回合开始的"咚"声
+  const kick = renderOsc(sr, 0.18, 'sine', t => 150 - 1200 * t, t => expDecay(t, 0.35, 10));
+  // 鼓点子低音 — 低频深度
+  const kickSub = renderOsc(sr, 0.15, 'sine', t => 60 - 400 * t, t => expDecay(t, 0.3, 12));
+  // 鼓点冲击瞬态
+  const kickClick = renderOsc(sr, 0.025, 'square', t => 800 - 20000 * t, t => expDecay(t, 0.2, 45));
+
+  const bellP = padTo(bell, total);
+  const bellHarmP = padTo(bellHarm, total);
+  const bellHarm2P = padTo(bellHarm2, total);
+  const kickP = padTo(kick, total);
+  const kickSubP = padTo(kickSub, total);
+  const kickClickP = padTo(kickClick, total);
+
+  return normalize(mixLayers(
+    [bellP, bellHarmP, bellHarm2P, kickP, kickSubP, kickClickP],
+    [1, 0.4, 0.2, 0.9, 0.7, 0.5]
+  ));
+}
+
+// Time Up：下降音阶三角波 + 铃声
+// 用于时间耗尽时的提示音
+function renderTimeUp(sr: number): Float32Array {
+  const dur = 0.8;
+  const total = Math.ceil(sr * dur);
+  const out = new Float32Array(total);
+
+  // 下降音阶 — C-Bb-Ab-G 的三角波，模拟经典的"时间到"音效
+  const notes = [523.3, 466.2, 415.3, 392];
+  for (let n = 0; n < notes.length; n++) {
+    const offset = Math.floor(sr * n * 0.15);
+    const tone = renderOsc(sr, 0.2, 'triangle', _t => notes[n], t => expDecay(t, 0.15, 8));
+    const harm = renderOsc(sr, 0.15, 'sine', _t => notes[n] * 2, t => expDecay(t, 0.06, 12));
+    for (let i = 0; i < tone.length && offset + i < total; i++) {
+      out[offset + i] += tone[i] * 0.25 + harm[i] * 0.08;
+    }
+  }
+
+  // 铃声 — 高频金属泛音，在音阶之后
+  const bell = renderOsc(sr, 0.3, 'sine', _t => 1800, t => t < 0.02 ? t * 5 : expDecay(t - 0.02, 0.12, 6));
+  const bellHarm = renderOsc(sr, 0.2, 'triangle', _t => 3600, t => expDecay(t, 0.06, 10));
+  // 低频尾声 — 缓慢衰减的低沉音
+  const tail = renderOsc(sr, 0.4, 'sine', t => 120 - 80 * t, t => expDecay(t, 0.15, 4));
+
+  const bellP = padTo(bell, total, Math.floor(sr * 0.55));
+  const bellHarmP = padTo(bellHarm, total, Math.floor(sr * 0.58));
+  const tailP = padTo(tail, total, Math.floor(sr * 0.5));
+
+  // 混合音阶输出和铃声层
+  const combined = new Float32Array(total);
+  for (let i = 0; i < total; i++) {
+    combined[i] = out[i] + bellP[i] * 0.3 + bellHarmP[i] * 0.15 + tailP[i] * 0.5;
+  }
+
+  return normalize(combined);
+}
+
+// === 基础 BGM 框架 ===
+
+// 生成简单循环战斗BGM
+// 使用低频bass线(60-120Hz) + 中频旋律三角波 + 高频hihat噪声
+// 120 BPM, 4/4拍, 4小节循环，总时长约8秒(适合循环)
+function generateBattleBGM(sr: number): Float32Array {
+  const bpm = 120;
+  const beatsPerSecond = bpm / 60;
+  const bars = 4;
+  const beatsPerBar = 4;
+  const totalBeats = bars * beatsPerBar;
+  const dur = totalBeats / beatsPerSecond; // 8秒
+  const total = Math.ceil(sr * dur);
+  const out = new Float32Array(total);
+
+  // Bass线音符 — E minor进行：Em - C - G - D
+  // E2=82.4, C3=130.8, G2=98, D3=146.8
+  const bassPattern = [
+    // 第1小节 Em
+    [82.4, 0, 82.4, 0, 82.4, 0, 98, 0],
+    // 第2小节 C
+    [130.8, 0, 130.8, 0, 110, 0, 130.8, 0],
+    // 第3小节 G
+    [98, 0, 98, 0, 110, 0, 123.5, 0],
+    // 第4小节 D
+    [146.8, 0, 130.8, 0, 123.5, 0, 146.8, 0],
+  ];
+
+  // 旋律音符 — 简单的E minor pentatonic旋律
+  // E5=659.3, G5=784, A5=880, B5=987.8, D6=1174.7
+  const melodyPattern = [
+    // 第1小节
+    [659.3, 0, 784, 0, 880, 0, 784, 0],
+    // 第2小节
+    [880, 0, 987.8, 0, 880, 0, 784, 0],
+    // 第3小节
+    [987.8, 0, 1174.7, 0, 987.8, 0, 880, 0],
+    // 第4小节
+    [880, 0, 784, 0, 659.3, 0, 0, 0],
+  ];
+
+  const subBeatDur = 1 / (beatsPerSecond * 2); // 八分音符时值
+
+  // 渲染bass线
+  for (let bar = 0; bar < bars; bar++) {
+    const barBeats = bassPattern[bar];
+    for (let i = 0; i < 8; i++) {
+      if (barBeats[i] === 0) continue;
+      const offset = Math.floor(sr * ((bar * 8 + i) * subBeatDur));
+      const noteDur = subBeatDur * 0.8;
+      const len = Math.ceil(sr * noteDur);
+      // 锯齿波bass + 低通
+      for (let s = 0; s < len && offset + s < total; s++) {
+        const t = s / sr;
+        const phase = (barBeats[i] * t * 2 * Math.PI);
+        // Sawtooth approximation
+        const saw = 2 * ((phase / (2 * Math.PI)) % 1) - 1;
+        // 低通模拟：简单一阶
+        const env = Math.exp(-t * 12);
+        out[offset + s] += saw * env * 0.08;
+      }
+    }
+  }
+
+  // 渲染旋律
+  for (let bar = 0; bar < bars; bar++) {
+    const barMelody = melodyPattern[bar];
+    for (let i = 0; i < 8; i++) {
+      if (barMelody[i] === 0) continue;
+      const offset = Math.floor(sr * ((bar * 8 + i) * subBeatDur));
+      const noteDur = subBeatDur * 1.5;
+      const len = Math.ceil(sr * noteDur);
+      for (let s = 0; s < len && offset + s < total; s++) {
+        const t = s / sr;
+        const phase = barMelody[i] * t * 2 * Math.PI;
+        // Triangle wave
+        const tri = 4 * Math.abs(((phase / (2 * Math.PI)) + 0.25) % 1 - 0.5) - 1;
+        const env = Math.exp(-t * 6);
+        out[offset + s] += tri * env * 0.04;
+      }
+    }
+  }
+
+  // 渲染hihat噪声 — 每个八分音符
+  for (let i = 0; i < totalBeats * 2; i++) {
+    const offset = Math.floor(sr * (i * subBeatDur));
+    const noiseDur = (i % 2 === 0) ? 0.03 : 0.015; // 强拍更长
+    const len = Math.ceil(sr * noiseDur);
+    // 使用确定性种子让每次生成一致
+    let noiseSeed = i * 7919 + 12345;
+    for (let s = 0; s < len && offset + s < total; s++) {
+      noiseSeed = (noiseSeed * 1103515245 + 12345) & 0x7fffffff;
+      const noiseVal = (noiseSeed / 0x3fffffff) - 1;
+      const t = s / sr;
+      const env = Math.exp(-t * 80);
+      // 高通近似：只保留高频变化
+      const filtered = noiseVal - (noiseVal * 0.3);
+      out[offset + s] += filtered * env * 0.025;
+    }
+  }
+
+  // 渲染kick — 每小节第1拍和第3拍
+  for (let bar = 0; bar < bars; bar++) {
+    for (const beat of [0, 2]) {
+      const offset = Math.floor(sr * ((bar * 4 + beat) / beatsPerSecond));
+      const kickDur = 0.12;
+      const len = Math.ceil(sr * kickDur);
+      for (let s = 0; s < len && offset + s < total; s++) {
+        const t = s / sr;
+        const freq = 150 * Math.exp(-t * 30) + 40;
+        const phase = freq * t * 2 * Math.PI;
+        const val = Math.sin(phase);
+        const env = Math.exp(-t * 15);
+        out[offset + s] += val * env * 0.12;
+      }
+    }
+  }
+
+  // 渲染snare — 每小节第2拍和第4拍
+  for (let bar = 0; bar < bars; bar++) {
+    for (const beat of [1, 3]) {
+      const offset = Math.floor(sr * ((bar * 4 + beat) / beatsPerSecond));
+      const snareDur = 0.08;
+      const len = Math.ceil(sr * snareDur);
+      let noiseSeed = bar * 4 + beat + 99999;
+      for (let s = 0; s < len && offset + s < total; s++) {
+        noiseSeed = (noiseSeed * 1103515245 + 12345) & 0x7fffffff;
+        const noiseVal = (noiseSeed / 0x3fffffff) - 1;
+        const t = s / sr;
+        const env = Math.exp(-t * 25);
+        out[offset + s] += noiseVal * env * 0.05;
+      }
+    }
+  }
+
+  return normalize(out);
+}
+
 // === 初始化：预渲染所有采样 ===
 
 export function initSampler(): void {
@@ -1157,6 +1471,12 @@ export function initSampler(): void {
     // 新增：Dizzy Hit + Ground Bounce
     ['dizzy_hit', renderDizzyHit],
     ['ground_bounce', renderGroundBounce],
+    // 新增：Perfect KO / Round Start / Time Up
+    ['perfect_ko', renderPerfectKO],
+    ['round_start', renderRoundStart],
+    ['time_up', renderTimeUp],
+    // 基础BGM
+    ['battle_bgm', generateBattleBGM],
   ];
 
   for (const [id, renderer] of renderers) {
@@ -1329,3 +1649,25 @@ export function playDizzyHit(): void { initSampler(); play('dizzy_hit', 0.8); }
 
 /** 播放Ground Bounce音效 — 角色从地面弹起时 */
 export function playGroundBounce(): void { initSampler(); play('ground_bounce'); }
+
+// === 新增 SFX 公开 API: Perfect KO / Round Start / Time Up ===
+
+/** 播放Perfect KO音效 — 对手未造成任何伤害时KO对手 */
+export function playPerfectKO(): void { initSampler(); play('perfect_ko'); }
+
+/** 播放Round Start音效 — 回合开始提示 */
+export function playRoundStart(): void { initSampler(); play('round_start'); }
+
+/** 播放Time Up音效 — 时间耗尽提示 */
+export function playTimeUp(): void { initSampler(); play('time_up'); }
+
+/** 获取Battle BGM AudioBuffer — 用于循环播放战斗背景音乐 */
+export function getBattleBGM(): AudioBuffer | null {
+  initSampler();
+  return samples.get('battle_bgm') ?? null;
+}
+
+/** 导出样本Map用于测试 */
+export function _getSamples(): Map<SampleId, AudioBuffer> { return samples; }
+/** 导出SampleId类型用于测试 */
+export type { SampleId };
