@@ -343,3 +343,9 @@
 ## H105: announce sequence测试—12项验证state machine+sfx+progress — 77→78
 
 **commit:** <hash> | announce sequence测试—12项验证state machine+sfx+progress
+
+---
+
+## H106: announce presets测试—17项验证popIn+fadeIn+burstIn+sequences — 78→79
+
+**commit:** <hash> | announce presets测试—17项验证popIn+fadeIn+burstIn+sequences
