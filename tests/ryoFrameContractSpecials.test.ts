@@ -460,3 +460,72 @@ describe('Ryo Specials FrameContract: spriteRef naming', () => {
     });
   }
 });
+
+// ═══════════════════════════════════════════════════════════════════
+// SECTION 8: Normals FrameContract verification (stand_b/d, close_b/d, crouch_a/b/c/d)
+// ═══════════════════════════════════════════════════════════════════
+
+const NORMAL_CONTRACTS = [
+  { actionId: 'stand_b', attackType: AttackType.STAND_B, startup: 7, active: 3, recovery: 14, hitLevel: 'MID' as const, knockdown: false },
+  { actionId: 'stand_d', attackType: AttackType.STAND_D, startup: 10, active: 8, recovery: 20, hitLevel: 'HIGH' as const, knockdown: false },
+  { actionId: 'close_b', attackType: AttackType.CLOSE_B, startup: 5, active: 2, recovery: 8, hitLevel: 'MID' as const, knockdown: false },
+  { actionId: 'close_d', attackType: AttackType.CLOSE_D, startup: 6, active: 4, recovery: 12, hitLevel: 'HIGH' as const, knockdown: false },
+  { actionId: 'crouch_a', attackType: AttackType.CROUCH_A, startup: 5, active: 4, recovery: 7, hitLevel: 'LOW' as const, knockdown: false },
+  { actionId: 'crouch_b', attackType: AttackType.CROUCH_B, startup: 5, active: 5, recovery: 5, hitLevel: 'LOW' as const, knockdown: false },
+  { actionId: 'crouch_c', attackType: AttackType.CROUCH_C, startup: 7, active: 5, recovery: 16, hitLevel: 'LOW' as const, knockdown: false },
+  { actionId: 'crouch_d', attackType: AttackType.CROUCH_D, startup: 5, active: 6, recovery: 31, hitLevel: 'LOW' as const, knockdown: true },
+];
+
+describe('Ryo Normals FrameContract', () => {
+  for (const norm of NORMAL_CONTRACTS) {
+    describe(`${norm.actionId}`, () => {
+      it('exists in RYO_ACTION_CONTRACTS', () => {
+        expect(RYO_ACTION_CONTRACTS.has(norm.actionId)).toBe(true);
+      });
+
+      it('frame counts match', () => {
+        const c = RYO_ACTION_CONTRACTS.get(norm.actionId)!;
+        expect(c.startup).toBe(norm.startup);
+        expect(c.active).toBe(norm.active);
+        expect(c.recovery).toBe(norm.recovery);
+        expect(c.totalFrames).toBe(norm.startup + norm.active + norm.recovery);
+      });
+
+      it('hitLevel is correct', () => {
+        const c = RYO_ACTION_CONTRACTS.get(norm.actionId)!;
+        expect(c.hitLevel).toBe(norm.hitLevel);
+      });
+
+      it('knockdown is correct', () => {
+        const c = RYO_ACTION_CONTRACTS.get(norm.actionId)!;
+        expect(c.knockdown).toBe(norm.knockdown);
+      });
+
+      it('active frames have collision data', () => {
+        const c = RYO_ACTION_CONTRACTS.get(norm.actionId)!;
+        for (let i = c.startup; i < c.startup + c.active; i++) {
+          expect(c.frames[i].collision).not.toBeNull();
+        }
+      });
+
+      it('recovery frames have no collision', () => {
+        const c = RYO_ACTION_CONTRACTS.get(norm.actionId)!;
+        const recoveryStart = c.startup + c.active;
+        for (let i = recoveryStart; i < c.totalFrames; i++) {
+          expect(c.frames[i].collision).toBeNull();
+        }
+      });
+
+      it('ATTACK_FRAMES entry exists', () => {
+        const attackFrames = ATTACK_FRAMES[norm.attackType];
+        expect(attackFrames).toBeDefined();
+        expect(attackFrames!.length).toBeGreaterThan(0);
+      });
+
+      it('has cancel windows', () => {
+        const c = RYO_ACTION_CONTRACTS.get(norm.actionId)!;
+        expect(c.cancelWindows.length).toBeGreaterThan(0);
+      });
+    });
+  }
+});

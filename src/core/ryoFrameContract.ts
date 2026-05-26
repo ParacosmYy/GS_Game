@@ -156,6 +156,42 @@ const stand_c: ActionContract = {
   feedbackTierOverride: null,
 };
 
+const stand_b: ActionContract = {
+  characterId: 'ryo',
+  actionId: 'stand_b',
+  state: FighterState.STAND_ATTACK,
+  attackType: AttackType.STAND_B,
+  frames: makeAttackFrames('stand_b', 7, 3, 14, AttackType.STAND_B),
+  hitLevel: 'MID',
+  knockdown: false,
+  startup: 7,
+  active: 3,
+  recovery: 14,
+  totalFrames: 24,
+  cancelWindows: [
+    { frames: [5, 10], targetTypes: ['special'], requiresHit: true, maxOnly: false },
+  ],
+  feedbackTierOverride: null,
+};
+
+const stand_d: ActionContract = {
+  characterId: 'ryo',
+  actionId: 'stand_d',
+  state: FighterState.STAND_ATTACK,
+  attackType: AttackType.STAND_D,
+  frames: makeAttackFrames('stand_d', 10, 8, 20, AttackType.STAND_D),
+  hitLevel: 'HIGH',
+  knockdown: false,
+  startup: 10,
+  active: 8,
+  recovery: 20,
+  totalFrames: 38,
+  cancelWindows: [
+    { frames: [8, 18], targetTypes: ['special', 'super'], requiresHit: true, maxOnly: false },
+  ],
+  feedbackTierOverride: null,
+};
+
 const close_a: ActionContract = {
   characterId: 'ryo',
   actionId: 'close_a',
@@ -192,6 +228,42 @@ const close_c: ActionContract = {
   feedbackTierOverride: null,
 };
 
+const close_b: ActionContract = {
+  characterId: 'ryo',
+  actionId: 'close_b',
+  state: FighterState.STAND_ATTACK,
+  attackType: AttackType.CLOSE_B,
+  frames: makeAttackFrames('close_b', 5, 2, 8, AttackType.CLOSE_B),
+  hitLevel: 'MID',
+  knockdown: false,
+  startup: 5,
+  active: 2,
+  recovery: 8,
+  totalFrames: 15,
+  cancelWindows: [
+    { frames: [4, 7], targetTypes: ['special', 'super', 'normal'], requiresHit: false, maxOnly: false },
+  ],
+  feedbackTierOverride: null,
+};
+
+const close_d: ActionContract = {
+  characterId: 'ryo',
+  actionId: 'close_d',
+  state: FighterState.STAND_ATTACK,
+  attackType: AttackType.CLOSE_D,
+  frames: makeAttackFrames('close_d', 6, 4, 12, AttackType.CLOSE_D),
+  hitLevel: 'HIGH',
+  knockdown: false,
+  startup: 6,
+  active: 4,
+  recovery: 12,
+  totalFrames: 22,
+  cancelWindows: [
+    { frames: [5, 10], targetTypes: ['special', 'super', 'normal'], requiresHit: false, maxOnly: false },
+  ],
+  feedbackTierOverride: null,
+};
+
 const hurt: ActionContract = {
   characterId: 'ryo',
   actionId: 'hurt',
@@ -221,6 +293,82 @@ const knockdown: ActionContract = {
   recovery: 0,
   totalFrames: 16,
   cancelWindows: [],
+  feedbackTierOverride: null,
+};
+
+// ═══════════════════════════════════════════════════════════════════
+// Crouch Normals (Ryo)
+// ═══════════════════════════════════════════════════════════════════
+
+const crouch_a: ActionContract = {
+  characterId: 'ryo',
+  actionId: 'crouch_a',
+  state: FighterState.CROUCH_ATTACK,
+  attackType: AttackType.CROUCH_A,
+  frames: makeAttackFrames('crouch_a', 5, 4, 7, AttackType.CROUCH_A),
+  hitLevel: 'LOW',
+  knockdown: false,
+  startup: 5,
+  active: 4,
+  recovery: 7,
+  totalFrames: 16,
+  cancelWindows: [
+    { frames: [4, 9], targetTypes: ['special'], requiresHit: true, maxOnly: false },
+  ],
+  feedbackTierOverride: null,
+};
+
+const crouch_b: ActionContract = {
+  characterId: 'ryo',
+  actionId: 'crouch_b',
+  state: FighterState.CROUCH_ATTACK,
+  attackType: AttackType.CROUCH_B,
+  frames: makeAttackFrames('crouch_b', 5, 5, 5, AttackType.CROUCH_B),
+  hitLevel: 'LOW',
+  knockdown: false,
+  startup: 5,
+  active: 5,
+  recovery: 5,
+  totalFrames: 15,
+  cancelWindows: [
+    { frames: [4, 10], targetTypes: ['special'], requiresHit: true, maxOnly: false },
+  ],
+  feedbackTierOverride: null,
+};
+
+const crouch_c: ActionContract = {
+  characterId: 'ryo',
+  actionId: 'crouch_c',
+  state: FighterState.CROUCH_ATTACK,
+  attackType: AttackType.CROUCH_C,
+  frames: makeAttackFrames('crouch_c', 7, 5, 16, AttackType.CROUCH_C),
+  hitLevel: 'LOW',
+  knockdown: false,
+  startup: 7,
+  active: 5,
+  recovery: 16,
+  totalFrames: 28,
+  cancelWindows: [
+    { frames: [5, 12], targetTypes: ['special', 'super'], requiresHit: true, maxOnly: false },
+  ],
+  feedbackTierOverride: null,
+};
+
+const crouch_d: ActionContract = {
+  characterId: 'ryo',
+  actionId: 'crouch_d',
+  state: FighterState.CROUCH_ATTACK,
+  attackType: AttackType.CROUCH_D,
+  frames: makeAttackFrames('crouch_d', 5, 6, 31, AttackType.CROUCH_D),
+  hitLevel: 'LOW',
+  knockdown: true,
+  startup: 5,
+  active: 6,
+  recovery: 31,
+  totalFrames: 42,
+  cancelWindows: [
+    { frames: [4, 11], targetTypes: ['special', 'super'], requiresHit: true, maxOnly: false },
+  ],
   feedbackTierOverride: null,
 };
 
@@ -494,10 +642,22 @@ export const RYO_ACTION_CONTRACTS: Map<string, ActionContract> = new Map([
   ['walk_forward', walk_forward],
   ['walk_backward', walk_backward],
   ['jump', jump],
+  // Standing normals
   ['stand_a', stand_a],
+  ['stand_b', stand_b],
   ['stand_c', stand_c],
+  ['stand_d', stand_d],
+  // Close normals
   ['close_a', close_a],
+  ['close_b', close_b],
   ['close_c', close_c],
+  ['close_d', close_d],
+  // Crouch normals
+  ['crouch_a', crouch_a],
+  ['crouch_b', crouch_b],
+  ['crouch_c', crouch_c],
+  ['crouch_d', crouch_d],
+  // Damage states
   ['hurt', hurt],
   ['knockdown', knockdown],
   // Command normals
