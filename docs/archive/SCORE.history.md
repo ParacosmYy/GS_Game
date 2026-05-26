@@ -691,3 +691,9 @@
 ## H156: stage—5项验证generateStars+x/y/brightness/speed — 128→129
 
 **commit:** <hash> | stage—5项验证generateStars+x/y/brightness/speed
+
+---
+
+## H157: ryoContentData—8项验证RYO_CHARACTER_DATA id/displayName/weight/walkSpeed/runSpeed — 129→130
+
+**commit:** <hash> | ryoContentData—8项验证RYO_CHARACTER_DATA id/displayName/weight/walkSpeed/runSpeed
