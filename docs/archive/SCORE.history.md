@@ -619,3 +619,9 @@
 ## H146: kyo测试—8项验证KyoDef id/name/color/winQuotes/stats/poses/moveList — 118→119
 
 **commit:** <hash> | kyo测试—8项验证KyoDef id/name/color/winQuotes/stats/poses/moveList
+
+---
+
+## H147: iori测试—9项验证IoriDef id/name/nameCn/color/winQuotes/stats/poses/moveList/proportions — 119→120
+
+**commit:** <hash> | iori测试—9项验证IoriDef id/name/nameCn/color/winQuotes/stats/poses/moveList/proportions
