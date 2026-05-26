@@ -935,3 +935,9 @@
 ## H191: stageTempleLayers—6项验证shiftHex+hexToRgb颜色工具 — 163→164
 
 **commit:** <hash> | stageTempleLayers—6项验证shiftHex+hexToRgb颜色工具
+
+---
+
+## H192: aiRoutesExt—5项验证AIR_COMBO_ROUTES+applyComboStep输入映射 — 164→165
+
+**commit:** <hash> | aiRoutesExt—5项验证AIR_COMBO_ROUTES+applyComboStep输入映射
