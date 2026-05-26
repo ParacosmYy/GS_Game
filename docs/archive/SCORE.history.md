@@ -433,3 +433,9 @@
 ## H120: spriteFrameCache测试—5项验证SpriteFrameCache has/get/clear/size — 92→93
 
 **commit:** <hash> | spriteFrameCache测试—5项验证SpriteFrameCache has/get/clear/size
+
+---
+
+## H121: attackFrames测试—9项验证ATTACK_FRAMES entries+frame arrays — 93→94
+
+**commit:** <hash> | attackFrames测试—9项验证ATTACK_FRAMES entries+frame arrays
