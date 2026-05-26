@@ -415,3 +415,9 @@
 ## H117: feedbackManifest测试—12项验证FEEDBACK_TIERS+inferTier+getFeedback — 89→90
 
 **commit:** <hash> | feedbackManifest测试—12项验证FEEDBACK_TIERS+inferTier+getFeedback
+
+---
+
+## H118: hurtboxManifest测试—7项验证HURTBOX_TABLE+DEFAULT_HURTBOX+getHurtboxDef — 90→91
+
+**commit:** <hash> | hurtboxManifest测试—7项验证HURTBOX_TABLE+DEFAULT_HURTBOX+getHurtboxDef
