@@ -1109,3 +1109,9 @@
 ## H220: screenFlash—3项验证ScreenFlash触发/更新逻辑 — 192→193
 
 **commit:** <hash> | screenFlash—3项验证ScreenFlash触发/更新逻辑
+
+---
+
+## H221: screenShake—4项验证ScreenShake触发/强度/衰减 — 193→194
+
+**commit:** <hash> | screenShake—4项验证ScreenShake触发/强度/衰减
