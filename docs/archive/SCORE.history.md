@@ -139,3 +139,9 @@
 ## H71: hitbox constants Ryo完整性测试—8项验证覆盖30个攻击 — 43→44
 
 **commit:** <hash> | 攻击存在性+字段完整性+正向offset+DM>specials+SDM>DM+C版>A版+蹲位低位+throw
+
+---
+
+## H72: animation cancel frames Ryo测试—28项验证覆盖取消帧+无敌帧 — 44→45
+
+**commit:** <hash> | 15攻击取消帧存在+4非攻击空帧+范围验证+isCancelable+无敌帧+DM>specials
