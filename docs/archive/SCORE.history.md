@@ -1085,3 +1085,9 @@
 ## H216: frameDataChars—5项验证角色专属帧数据 — 188→189
 
 **commit:** <hash> | frameDataChars—5项验证角色专属帧数据
+
+---
+
+## H217: hudInfo—7项验证inputToNumpad/numpadToArrow输入映射 — 189→190
+
+**commit:** <hash> | hudInfo—7项验证inputToNumpad/numpadToArrow输入映射

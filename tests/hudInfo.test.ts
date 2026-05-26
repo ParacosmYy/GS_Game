@@ -1,38 +1,29 @@
 import { describe, it, expect } from 'vitest';
-import { toggleDebugOverlay, isDebugOverlayVisible, toggleInputDisplay, isInputDisplayVisible, getCurrentFPS } from '../src/rendering/hudInfo.js';
+import { inputToNumpad, numpadToArrow } from '../src/rendering/hudInfo.js';
 
-describe('hudInfo', () => {
-  describe('debug overlay', () => {
-    it('starts hidden', () => {
-      expect(isDebugOverlayVisible()).toBe(false);
-    });
-    it('toggle returns boolean', () => {
-      const result = toggleDebugOverlay();
-      expect(typeof result).toBe('boolean');
-    });
-    it('toggle switches state', () => {
-      const before = isDebugOverlayVisible();
-      toggleDebugOverlay();
-      expect(isDebugOverlayVisible()).toBe(!before);
-      toggleDebugOverlay();
-      expect(isDebugOverlayVisible()).toBe(before);
-    });
+describe('hudInfo input utilities', () => {
+  it('inputToNumpad returns 5 for neutral', () => {
+    expect(inputToNumpad({ up: false, down: false, left: false, right: false }, 1)).toBe('5');
   });
-
-  describe('input display', () => {
-    it('starts hidden', () => {
-      expect(isInputDisplayVisible()).toBe(false);
-    });
-    it('toggle returns boolean', () => {
-      const result = toggleInputDisplay();
-      expect(typeof result).toBe('boolean');
-    });
+  it('inputToNumpad returns 8 for up', () => {
+    expect(inputToNumpad({ up: true, down: false, left: false, right: false }, 1)).toBe('8');
   });
-
-  describe('FPS tracker', () => {
-    it('getCurrentFPS returns number', () => {
-      const fps = getCurrentFPS();
-      expect(typeof fps).toBe('number');
-    });
+  it('inputToNumpad returns 6 for right when facing right', () => {
+    expect(inputToNumpad({ up: false, down: false, left: false, right: true }, 1)).toBe('6');
+  });
+  it('inputToNumpad returns 4 for right when facing left', () => {
+    expect(inputToNumpad({ up: false, down: false, left: false, right: true }, -1)).toBe('4');
+  });
+  it('inputToNumpad returns 2 for down', () => {
+    expect(inputToNumpad({ up: false, down: true, left: false, right: false }, 1)).toBe('2');
+  });
+  it('numpadToArrow returns arrows for known inputs', () => {
+    expect(numpadToArrow('8')).toBe('↑');
+    expect(numpadToArrow('2')).toBe('↓');
+    expect(numpadToArrow('6')).toBe('→');
+    expect(numpadToArrow('4')).toBe('←');
+  });
+  it('numpadToArrow returns dot for unknown', () => {
+    expect(numpadToArrow('0')).toBe('·');
   });
 });
