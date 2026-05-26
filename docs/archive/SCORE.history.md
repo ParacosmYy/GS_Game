@@ -733,3 +733,9 @@
 ## H163: ryoStats—6项验证RYO_STATS+walkSpeed+runSpeed+jumpVelocity+maxHealth+hopVelocity — 135→136
 
 **commit:** <hash> | ryoStats—6项验证RYO_STATS+walkSpeed+runSpeed+jumpVelocity+maxHealth+hopVelocity
+
+---
+
+## H164: aiRoutes—5项验证COMBO_ROUTES+JUMP_IN_ROUTE+attack/delay字段 — 136→137
+
+**commit:** <hash> | aiRoutes—5项验证COMBO_ROUTES+JUMP_IN_ROUTE+attack/delay字段
