@@ -463,3 +463,9 @@
 ## H125: spriteManifest测试—7项验证getAnimation+getFallbackColors+getAnimationNames — 97→98
 
 **commit:** <hash> | spriteManifest测试—7项验证getAnimation+getFallbackColors+getAnimationNames
+
+---
+
+## H126: spriteManifestData测试—10项验证SPRITE_MANIFEST+RYO_ANIMATIONS — 98→99
+
+**commit:** <hash> | spriteManifestData测试—10项验证SPRITE_MANIFEST+RYO_ANIMATIONS
