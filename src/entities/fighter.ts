@@ -110,6 +110,8 @@ export class Fighter {
   isKnockedDown = false;
   isHardKnockdown = false;
   usedQuickStand = false;
+  knockdownDelayUsed = 0;   // frames of delayed get-up consumed
+  knockdownDelayMax = 30;   // max delay (KOF2002: ~0.5s cap)
 
   // Throw invincibility
   throwInvulnFrames: number = 0;  // 投技无敌帧计数器
@@ -677,6 +679,7 @@ export class Fighter {
     this.isKnockedDown = false;
     this.isHardKnockdown = false;
     this.usedQuickStand = false;
+    this.knockdownDelayUsed = 0;
     this.throwInvincibilityTimer = 0;
     this.throwBufferTimer = 0;
     this.isBeingThrown = false;

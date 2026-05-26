@@ -101,9 +101,15 @@ export function drawFighters(
       leanOffsetX = Math.sin(globalTick * 0.015) * 2 * f.facing;
       leanAngle = Math.sin(globalTick * 0.015) * 0.015 * f.facing;
     } else if (f.state === FighterState.WALK) {
-      // KOF2002: 步行时身体微倾
-      leanOffsetX = 3 * f.facing;
-      leanAngle = 0.04 * f.facing;
+      // KOF2002: 前進=前傾, 後退=後傾 (defensive lean)
+      const isWalkingForward = (f.vx > 0 && f.facing > 0) || (f.vx < 0 && f.facing < 0);
+      if (isWalkingForward) {
+        leanOffsetX = 3 * f.facing;
+        leanAngle = 0.04 * f.facing;
+      } else {
+        leanOffsetX = -2 * f.facing;
+        leanAngle = -0.03 * f.facing;
+      }
     }
 
     // Afterimage trail

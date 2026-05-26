@@ -40,10 +40,10 @@ export const COMBO_ROUTES: Record<string, ComboStep[]> = {
     { type: 'special', attack: 'dmPhoenixKick', delay: 4 },
   ],
   ryo: [
-    { type: 'button',  attack: 'closeC',     delay: 0 },
-    { type: 'button',  attack: 'ryoTsurizao', delay: 2 },
-    { type: 'special', attack: 'specialUpper', delay: 3 },
-    { type: 'special', attack: 'dmTenHaOu',   delay: 4 },
+    { type: 'button',  attack: 'closeC',       delay: 0 },
+    { type: 'button',  attack: 'ryoOrishi',    delay: 2 },
+    { type: 'special', attack: 'ryoKoouC',      delay: 3 },
+    { type: 'special', attack: 'dmRyukoRanbu',  delay: 4 },
   ],
   kdash: [
     { type: 'button',  attack: 'closeC',      delay: 0 },
@@ -210,6 +210,8 @@ export function applyComboStep(step: ComboStep, base: ResolvedInput): void {
         base.forward = true; base.buttonB = true; base.buttonBPressed = true; base.kickPressed = true; break;
       case 'ryoTsurizao':
         base.forward = true; base.buttonA = true; base.buttonAPressed = true; base.punchPressed = true; break;
+      case 'ryoOrishi':
+        base.down = true; base.forward = true; base.buttonB = true; base.buttonBPressed = true; base.kickPressed = true; break;
       case 'kdashOneInch':
         base.forward = true; base.buttonA = true; base.buttonAPressed = true; base.punchPressed = true; break;
       case 'kulaOneMore':
@@ -358,6 +360,8 @@ function routeKim(attack: string): AttackType | null {
 
 function routeRyo(attack: string): AttackType | null {
   switch (attack) {
+    case 'ryoKoouC': return AttackType.RYO_KOOU_C;
+    case 'dmRyukoRanbu': return AttackType.DM_RYUKO_RANBU;
     case 'dmTenHaOu': return AttackType.DM_TEN_HA_OU;
     default: return AttackType.RYO_KO_HOU;
   }

@@ -89,12 +89,39 @@ export function handleHitstun(ctx: FighterCtx, input: ResolvedInput): void {
 /** KNOCKDOWN state handler */
 export function handleKnockdown(ctx: FighterCtx, input: ResolvedInput): void {
   const f = ctx.fighter;
-  f.knockdownTimer--;
+
+  // #26 Delayed Get-up: holding down pauses knockdown timer (KOF2002 mindgame tool)
+  // Max delay: 2× original knockdown duration to prevent infinite stall
+  if (!f.isHardKnockdown && input.down && f.knockdownTimer <= 1 && f.knockdownDelayUsed < f.knockdownDelayMax) {
+    f.knockdownDelayUsed++;
+    // Don't decrement timer — fighter stays on the ground
+  } else {
+    f.knockdownTimer--;
+  }
+
+  // #24 Quick Stand: A+B shortens remaining knockdown (not during hard KD)
   if (!f.isHardKnockdown && input.rollPressed && f.knockdownTimer > 3
     && f.knockdownTimer >= 10) {
     f.knockdownTimer = 3;
     f.usedQuickStand = true;
   }
+
+  // #25 Counter Roll: A+B during mid-knockdown transitions directly to ROLL
+  // KOF2002: Unlike quick stand (which just shortens timer), counter roll
+  // wakes up into a rolling animation with invincibility.
+  if (!f.isHardKnockdown && input.rollPressed && f.knockdownTimer > 3
+    && f.knockdownTimer < 10 && !f.usedQuickStand) {
+    f.state = input.back ? FighterState.BACK_ROLL : FighterState.ROLL;
+    f.rollTimer = ROLL_DURATION;
+    f.isKnockedDown = false;
+    f.isHardKnockdown = false;
+    f.usedQuickStand = false;
+    f.vx = (f.state === FighterState.ROLL ? ROLL_SPEED : -ROLL_SPEED) * f.facing;
+    f.displayHeight = 60;
+    ctx.vfx.spawnDust(f.x, STAGE_GROUND_Y);
+    return;
+  }
+
   // Wake-up reversal buffer
   if (f.knockdownTimer <= WAKEUP_BUFFER_WINDOW && f.knockdownTimer > 0) {
     if (input.throwAttackPressed) {
@@ -115,6 +142,7 @@ export function handleKnockdown(ctx: FighterCtx, input: ResolvedInput): void {
       f.throwInvincibilityTimer = Math.round(THROW_INVINCIBILITY_WAKEUP * 0.5);
     }
     f.usedQuickStand = false;
+    f.knockdownDelayUsed = 0;
     // Execute buffered reversal
     if (ctx.wakeupBuffer) {
       const buf = ctx.wakeupBuffer;

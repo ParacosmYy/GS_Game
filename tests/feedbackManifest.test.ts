@@ -331,15 +331,10 @@ describe('Feedback Manifest - Ryo Attack Type Mapping', () => {
     expect(inferTier(AttackType.STAND_CD)).toBe('heavy');
   });
 
-  it('JUMP_CD maps to heavy or light depending on isHeavy logic', () => {
-    // NOTE: isHeavy() checks at.endsWith('_C') || at.endsWith('_D') || at === 'STAND_CD'
-    // but does NOT include JUMP_CD -- it falls through to light.
-    // This is a known behavior gap; document it so future fixes are regression-caught.
+  it('JUMP_CD maps to heavy tier (blowback in air)', () => {
     const tier = inferTier(AttackType.JUMP_CD);
     expect(ALL_TIERS).toContain(tier);
-    // Current behavior: JUMP_CD does not match isHeavy, so it maps to 'light'
-    // If this is fixed to 'heavy', the test below will fail and alert the author
-    expect(tier).toBe('light');
+    expect(tier).toBe('heavy');
   });
 
   it('throws map to light tier (no special prefix)', () => {
