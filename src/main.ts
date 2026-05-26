@@ -1052,7 +1052,7 @@ function render(): void {
   // ===== HUD Info Display (Phase 69) =====
   renderer.updateHUDFps();
 
-  // Match info panel — visible during FIGHTING and INTRO
+  // Match info panel — visible during FIGHTING, INTRO, and KO
   if (gs.phase === GamePhase.FIGHTING || gs.phase === GamePhase.INTRO || gs.phase === GamePhase.KO) {
     renderer.drawMatchInfoPanel({
       gameMode: gs.isTrainingMode ? 'TRAINING' : 'ARCADE',
@@ -1076,7 +1076,7 @@ function render(): void {
     );
   }
 
-  // Input display (F3 toggle)
+  // Input display (F3 toggle, non-training mode)
   if (renderer.isInputDisplayVisible() && (gs.phase === GamePhase.FIGHTING || gs.phase === GamePhase.KO)) {
     renderer.drawHUDInputDisplay(
       inputManager.getP1Input(), inputManager.getP2Input(),
@@ -1084,32 +1084,20 @@ function render(): void {
     );
   }
 
-  // Training mode frame advantage info
+  // Training mode frame advantage info — only when debug overlay is active
   if (gs.isTrainingMode && (gs.phase === GamePhase.FIGHTING || gs.phase === GamePhase.KO) && renderer.isDebugOverlayVisible()) {
-    const p1Attack = p1.currentAttack;
-    let attackInfo: import('./rendering/hudInfo.js').TrainingAttackInfo = {
-      attackName: null, startup: 0, active: 0, recovery: 0,
-      advantageHit: 0, advantageBlock: 0, lastComboDamage: 0,
-      wasHit: false, wasBlocked: false,
-    };
-    if (p1Attack) {
-      const fd = FRAME_DATA[p1Attack as keyof typeof FRAME_DATA];
-      if (fd) {
-        const total = fd.startup + fd.active + fd.recovery;
-        attackInfo = {
-          attackName: p1Attack,
-          startup: fd.startup,
-          active: fd.active,
-          recovery: fd.recovery,
-          advantageHit: fd.hitstun - (total - 1),
-          advantageBlock: fd.blockstun - (total - 1),
-          lastComboDamage: combatSystem.getComboDamage(0),
-          wasHit: p2.hitstunTimer > 0,
-          wasBlocked: p2.blockstunTimer > 0,
-        };
-      }
-    }
-    renderer.drawHUDTrainingInfo(attackInfo);
+    const p1Atk = p1.currentAttack;
+    const atkInfo: import('./rendering/hudInfo.js').TrainingAttackInfo = p1Atk ? (() => {
+      const fd = FRAME_DATA[p1Atk as keyof typeof FRAME_DATA];
+      if (!fd) return { attackName: null, startup: 0, active: 0, recovery: 0, advantageHit: 0, advantageBlock: 0, lastComboDamage: 0, wasHit: false, wasBlocked: false };
+      const total = fd.startup + fd.active + fd.recovery;
+      return {
+        attackName: p1Atk, startup: fd.startup, active: fd.active, recovery: fd.recovery,
+        advantageHit: fd.hitstun - (total - 1), advantageBlock: fd.blockstun - (total - 1),
+        lastComboDamage: combatSystem.getComboDamage(0), wasHit: p2.hitstunTimer > 0, wasBlocked: p2.blockstunTimer > 0,
+      };
+    })() : { attackName: null, startup: 0, active: 0, recovery: 0, advantageHit: 0, advantageBlock: 0, lastComboDamage: 0, wasHit: false, wasBlocked: false };
+    renderer.drawHUDTrainingInfo(atkInfo);
   }
 }
 

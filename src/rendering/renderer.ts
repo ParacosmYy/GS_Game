@@ -32,13 +32,19 @@ import type { StageId } from './stage.js';
 import type { TrainingModeState } from '../state/trainingMode.js';
 import type { PlayerInput } from '../core/types.js';
 import {
-  drawMatchInfoPanel, drawCharacterInfo, drawDebugOverlay,
-  drawInputDisplay, drawTrainingInfo,
-  updateFPSTracker, toggleDebugOverlay, toggleInputDisplay,
-  isDebugOverlayVisible as hudInfoDebugVisible, isInputDisplayVisible as hudInfoInputVisible,
-  collectDebugFighterInfo,
-  type MatchInfoConfig, type TrainingAttackInfo,
+  drawMatchInfoPanel as _drawMatchInfoPanel,
+  drawCharacterInfo as _drawCharacterInfo,
+  drawDebugOverlay as _drawDebugOverlay,
+  drawInputDisplay as _drawInputDisplay,
+  drawTrainingInfo as _drawTrainingInfo,
+  updateFPSTracker as _updateFPSTracker,
+  toggleDebugOverlay as _toggleDebugOverlay,
+  toggleInputDisplay as _toggleInputDisplay,
+  isDebugOverlayVisible as _isDebugOverlayVisible,
+  isInputDisplayVisible as _isInputDisplayVisible,
+  collectDebugFighterInfo as _collectDebugFighterInfo,
 } from './hudInfo.js';
+import type { MatchInfoConfig, TrainingAttackInfo } from './hudInfo.js';
 
 export class Renderer {
   private ctx: CanvasRenderingContext2D;
@@ -462,11 +468,11 @@ export class Renderer {
   // ===== HUD Info Display (Phase 69) =====
 
   drawMatchInfoPanel(config: MatchInfoConfig, tick: number): void {
-    drawMatchInfoPanel(this.ctx, config, tick);
+    _drawMatchInfoPanel(this.ctx, config, tick);
   }
 
   drawCharacterInfo(fighters: Fighter[], gauges: [PowerGauge, PowerGauge], p1Name: string, p2Name: string): void {
-    drawCharacterInfo(this.ctx, fighters, gauges, p1Name, p2Name);
+    _drawCharacterInfo(this.ctx, fighters, gauges, p1Name, p2Name);
   }
 
   drawHUDDebugOverlay(
@@ -478,31 +484,31 @@ export class Renderer {
     comboCounts: number[],
     comboDamages: number[],
   ): void {
-    const infos = collectDebugFighterInfo(fighters);
+    const infos = _collectDebugFighterInfo(fighters);
     for (let i = 0; i < infos.length; i++) {
       infos[i].comboCount = comboCounts[i] ?? 0;
       infos[i].comboDamage = comboDamages[i] ?? 0;
     }
-    drawDebugOverlay(this.ctx, infos, gauges, maxModes, camera, tick, this.currentFps);
+    _drawDebugOverlay(this.ctx, infos, gauges, maxModes, camera, tick, this.currentFps);
   }
 
   drawHUDInputDisplay(
     p1Input: PlayerInput, p2Input: PlayerInput,
     p1Facing: number, p2Facing: number,
   ): void {
-    drawInputDisplay(this.ctx, p1Input, p2Input, p1Facing, p2Facing);
+    _drawInputDisplay(this.ctx, p1Input, p2Input, p1Facing, p2Facing);
   }
 
   drawHUDTrainingInfo(attackInfo: TrainingAttackInfo): void {
-    drawTrainingInfo(this.ctx, attackInfo);
+    _drawTrainingInfo(this.ctx, attackInfo);
   }
 
-  toggleDebugOverlay(): boolean { return toggleDebugOverlay(); }
-  toggleInputDisplay(): boolean { return toggleInputDisplay(); }
-  isDebugOverlayVisible(): boolean { return hudInfoDebugVisible(); }
-  isInputDisplayVisible(): boolean { return hudInfoInputVisible(); }
+  toggleDebugOverlay(): boolean { return _toggleDebugOverlay(); }
+  toggleInputDisplay(): boolean { return _toggleInputDisplay(); }
+  isDebugOverlayVisible(): boolean { return _isDebugOverlayVisible(); }
+  isInputDisplayVisible(): boolean { return _isInputDisplayVisible(); }
 
   updateHUDFps(): void {
-    updateFPSTracker();
+    _updateFPSTracker();
   }
 }
