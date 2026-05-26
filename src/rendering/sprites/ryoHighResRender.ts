@@ -23,7 +23,7 @@ import { RYO_JUMP_FRAMES } from './ryoJumpFrames.js';
 import { RYO_HURT_FRAMES, RYO_KNOCKDOWN_FRAMES } from './ryoDamageFrames.js';
 import { RYO_CROUCH_FRAMES, RYO_CROUCH_A_FRAMES, RYO_CROUCH_C_FRAMES } from './ryoCrouchFrames.js';
 import { RYO_AIR_A_FRAMES, RYO_AIR_C_FRAMES, RYO_AIR_D_FRAMES } from './ryoAirAttackFrames.js';
-import { RYO_KO_HOU_FRAMES, RYO_KOOU_FRAMES } from './ryoSpecialFrames.js';
+import { RYO_KO_HOU_FRAMES, RYO_KOOU_FRAMES, RYO_HIEN_FRAMES } from './ryoSpecialFrames.js';
 
 // ===== Internal Frame Registry =====
 //
@@ -122,9 +122,10 @@ function initAllFrames(): void {
   registerFrames('AIR_C', RYO_AIR_C_FRAMES, 4);
   registerFrames('AIR_D', RYO_AIR_D_FRAMES, 4);
 
-  // SPECIALS — ko_hou (uppercut) and koou (projectile)
+  // SPECIALS — ko_hou (uppercut), koou (projectile), hien (flying kick)
   registerFrames('KO_HOU', RYO_KO_HOU_FRAMES, 4);
   registerFrames('KOOU', RYO_KOOU_FRAMES, 4);
+  registerFrames('HIEN', RYO_HIEN_FRAMES, 4);
 }
 
 // ===== State Resolution =====
@@ -165,6 +166,9 @@ function resolveFrameKey(
       if (currentAttack === AttackType.RYO_KOOU || currentAttack === AttackType.RYO_KOOU_C) {
         return 'KOOU';
       }
+      if (currentAttack === AttackType.RYO_HIEN) {
+        return 'HIEN';
+      }
       // Default to STAND_A for STAND_A, CLOSE_A, and any other stand attack
       return 'STAND_A';
 
@@ -203,6 +207,16 @@ function resolveFrameKey(
     case FighterState.RUN_JUMP:
     case FighterState.HYPER_JUMP:
       return 'JUMP';
+
+    case FighterState.THROW:
+      return 'IDLE';
+
+    case FighterState.BLOCK:
+    case FighterState.AIR_BLOCK:
+      return 'IDLE';
+
+    case FighterState.DIZZY:
+      return 'IDLE';
 
     default:
       return null;

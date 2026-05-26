@@ -3,13 +3,15 @@
  *
  * KO_HOU:  5-frame uppercut (虎咆 →↓↘+P) — anti-air rising fist
  * KOOU:    4-frame projectile (虎煌拳 ↓↘→+P) — energy ball thrust
+ * HIEN:    5-frame flying kick (飛燕疾風脚 ←↙↓+K) — advancing overhead
  *
  * 96x144 px each, 24-color SNK palette.
- * Built from idle/crouch base bodies with pose-specific modifications.
+ * Built from idle/crouch/jump base bodies with pose-specific modifications.
  */
 
 import { RYO_IDLE_FRAMES } from './ryoIdleFrames.js';
 import { RYO_CROUCH_FRAMES } from './ryoCrouchFrames.js';
+import { RYO_JUMP_FRAMES } from './ryoJumpFrames.js';
 
 export interface PixelFrame {
   width: number;
@@ -42,6 +44,7 @@ function r(s: string): number[] {
 // Base bodies
 const IDLE_BASE: number[][] = RYO_IDLE_FRAMES[0].pixels.map(row => row.slice());
 const CROUCH_BASE: number[][] = RYO_CROUCH_FRAMES[0].pixels.map(row => row.slice());
+const JUMP_BASE: number[][] = RYO_JUMP_FRAMES[2].pixels.map(row => row.slice());
 
 function clone(src: number[][]): number[][] {
   return src.map(row => row.slice());
@@ -219,6 +222,63 @@ const KF_F2 = clone(KF_F1);
 const KF_F3 = clone(IDLE_BASE);
 
 // ═══════════════════════════════════════════════════════════════════
+// HIEN — Flying Kick (5 frames)
+//
+// Ryo's advancing overhead kick (飛燕疾風脚).
+// F0: jump launch (body rising from ground)
+// F1: kick extending — body tilting, leg going out
+// F2: full flying kick — body horizontal, leg fully extended (impact)
+// F3: descending — kick retracting
+// F4: recovery — landing stance
+// ═══════════════════════════════════════════════════════════════════
+
+// F0: jump launch — use jump mid-air frame
+const HI_F0 = clone(JUMP_BASE);
+
+// F1: kick extending — body tilted forward, right leg extending
+const HI_F1 = clone(JUMP_BASE);
+// Modify the body to show the kick extending at mid-height
+// The kick leg extends to x~80-88 at about y=50-65 (waist height)
+HI_F1[50] = r('................................................................................');
+HI_F1[51] = r('................................................................................');
+HI_F1[52] = r('.............................1eeeeeeeeeeeeee1d81..............................');
+HI_F1[53] = r('............................1eeeeeeeeeeeeee1d8d1.............................');
+HI_F1[54] = r('...........................1eeeeeeeeeeeeeeee1d81.............................');
+HI_F1[55] = r('..........................1eeeeeeeeeeeeeeee1d81..............................');
+HI_F1[56] = r('.........................1eeeeeeeeeeeeeeeee1d1...............................');
+HI_F1[57] = r('........................1eeeeeeeeeeeeeeeee1d1................................');
+HI_F1[58] = r('.......................1eeeeeeeeeeeeeeeeee11.................................');
+HI_F1[59] = r('......................1eeeeeeeeeeeeeeeee1k1..................................');
+HI_F1[60] = r('.....................1eeeeeeeeeeeeeeee1k1...................................');
+HI_F1[61] = r('....................1eeeeeeeeeeeeee1k1......................................');
+HI_F1[62] = r('...................1eeeeeeeeeeee1k1.......................................');
+
+// F2: full flying kick — maximum extension (impact frame)
+const HI_F2 = clone(JUMP_BASE);
+// Body more horizontal, leg fully extended to x~85-92
+HI_F2[48] = r('................................................................................');
+HI_F2[49] = r('................................................................................');
+HI_F2[50] = r('..........................1eeeeeeeeeeeeeeeeeeeeeeee1d81........................');
+HI_F2[51] = r('.........................1eeeeeeeeeeeeeeeeeeeeeeee1d8d1.......................');
+HI_F2[52] = r('........................1eeeeeeeeeeeeeeeeeeeeeeeee188d81......................');
+HI_F2[53] = r('.......................1eeeeeeeeeeeeeeeeeeeeeeeee1888d81.....................');
+HI_F2[54] = r('......................1eeeeeeeeeeeeeeeeeeeeeeeeee188d81......................');
+HI_F2[55] = r('.....................1eeeeeeeeeeeeeeeeeeeeeeeee1d81........................');
+HI_F2[56] = r('....................1eeeeeeeeeeeeeeeeeeeeeeee1d1.........................');
+HI_F2[57] = r('...................1eeeeeeeeeeeeeeeeeeeeeee11...........................');
+HI_F2[58] = r('..................1eeeeeeeeeeeeeeeeeeeee1k1............................');
+HI_F2[59] = r('.................1eeeeeeeeeeeeeeeeee1k1...................................');
+HI_F2[60] = r('................1eeeeeeeeeeeeeeee1k1......................................');
+HI_F2[61] = r('...............1eeeeeeeeeeeeee1k1.........................................');
+HI_F2[62] = r('..............1eeeeeeeeeeee1k1............................................');
+
+// F3: descending — kick retracting
+const HI_F3 = clone(HI_F1);
+
+// F4: recovery — landing stance (idle)
+const HI_F4 = clone(IDLE_BASE);
+
+// ═══════════════════════════════════════════════════════════════════
 // Exports
 // ═══════════════════════════════════════════════════════════════════
 
@@ -235,4 +295,12 @@ export const RYO_KOOU_FRAMES: PixelFrame[] = [
   { width: 96, height: 144, palette: PALETTE, pixels: KF_F1 },
   { width: 96, height: 144, palette: PALETTE, pixels: KF_F2 },
   { width: 96, height: 144, palette: PALETTE, pixels: KF_F3 },
+];
+
+export const RYO_HIEN_FRAMES: PixelFrame[] = [
+  { width: 96, height: 144, palette: PALETTE, pixels: HI_F0 },
+  { width: 96, height: 144, palette: PALETTE, pixels: HI_F1 },
+  { width: 96, height: 144, palette: PALETTE, pixels: HI_F2 },
+  { width: 96, height: 144, palette: PALETTE, pixels: HI_F3 },
+  { width: 96, height: 144, palette: PALETTE, pixels: HI_F4 },
 ];
