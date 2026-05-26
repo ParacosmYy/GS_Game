@@ -667,3 +667,9 @@
 ## H152: charBatch5—20项验证vice/xiangfei/yamazaki/yashiro — 124→125
 
 **commit:** <hash> | charBatch5—20项验证vice/xiangfei/yamazaki/yashiro
+
+---
+
+## H153: inputRecorder测试—7项验证InputRecorder start/stop/active/frameCount — 125→126
+
+**commit:** <hash> | inputRecorder测试—7项验证InputRecorder start/stop/active/frameCount
