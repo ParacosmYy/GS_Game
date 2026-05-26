@@ -1,46 +1,60 @@
 # Git 规则
 
-## Commit
+## 1. 基本规则
+
+- 每轮一个 commit。
+- 不把多轮迭代混成一个提交。
+- 不提交无关文件。
+- 工作区有他人改动时，只 stage 本轮文件。
+- 禁止 `git reset --hard`、`git checkout --`、`--force`、`--no-verify`，除非用户明确要求。
+
+## 2. Commit 标题
 
 格式：
 
 ```text
 type(scope): 中文标题
-
-- 原因: ...
-- 差异: ...
-- 验证: ...
-- 风险: ...
 ```
 
-常用类型：
+常用 type：
 
+- `docs`
 - `feat`
 - `fix`
 - `refactor`
-- `docs`
 - `test`
 - `chore`
 
-## 禁止
+scope 应体现主线，例如：
 
-- `git reset --hard`
-- `git checkout --`
-- `git push --force`
-- `--no-verify`
-- 交互式 git 控制台
+- `ryo`
+- `asset-pipeline`
+- `frame-contract`
+- `feedback`
+- `docs`
 
-除非用户明确要求，否则不得执行上述操作。
+## 3. Commit 正文
 
-## 分支
+必须包含：
 
-- 当前开发分支：`kof-2002`
-- 不直接修改 `main`
-- 合并到稳定分支前需要用户确认
+```text
+原因：
+- ...
 
-## Tag
+差异：
+- ...
 
-- 只有达到明确里程碑时才打 tag。
-- 1000 分可作为一个里程碑。
-- 打 tag 前必须确认代码已 commit，且质量门禁通过。
+验证：
+- ...
 
+风险：
+- ...
+```
+
+## 4. Ryo 主线提交要求
+
+正文必须额外说明：
+
+- 本轮推进 Ryo 哪个闭环。
+- 是否保留 fallback。
+- 是否触发技术栈决策门。

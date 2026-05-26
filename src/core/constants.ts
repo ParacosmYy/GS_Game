@@ -307,6 +307,7 @@ export const PUSHBLOCK_EXTRA_PUSHBACK = 1.5;         // Pushback multiplier when
 export const PUSHBLOCK_DECAY_FRAMES = 30;            // Frames without blocking before counter resets
 export const WRONG_BLOCK_PUSHBACK_MULT = 1.3;        // Extra pushback multiplier for wrong block type
 export const WRONG_BLOCK_STUN_MULT = 1.2;            // Extra blockstun multiplier for wrong block type
+export const GUARD_GAUGE_WARNING_THRESHOLD = 30;     // Gauge value below which warning flash triggers (KOF2002: gauge flashes when low)
 
 // ===== Hitstop (命中暂停) — KOF2002 分层系统 =====
 export const HITSTOP_LIGHT = 4;      // 轻攻击 (A button normals)

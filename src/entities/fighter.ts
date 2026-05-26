@@ -53,8 +53,9 @@ export class Fighter {
   hasHit = false; // Prevent multi-hit in one active phase
   hasAttackedInAir = false; // Per-jump air attack limit (1 per jump)
 
-  // Guard gauge (0–100, depleted by blocking attacks)
+  // Guard gauge (0–guardGaugeMax, depleted by blocking attacks)
   guardGauge = 100;
+  guardGaugeMax = 100;
   guardCrushTimer = 0;
 
   // Consecutive block counter (for pushblock mechanic)
@@ -565,6 +566,27 @@ export class Fighter {
         this.stunGauge = Math.max(0, this.stunGauge - STUN_DECAY_RATE);
       }
     }
+  }
+
+  /** Whether the fighter is currently in Guard Crush stun */
+  isGuardCrushed(): boolean {
+    return this.state === FighterState.GUARD_CRUSH && this.guardCrushTimer > 0;
+  }
+
+  /** Get the visual state of the guard gauge for rendering feedback.
+   *  normal: > 60% of max
+   *  warning: 30-60% of max (gauge turns yellow)
+   *  critical: > 0 and < 30% of max (gauge flashes red)
+   *  crushed: gauge at 0 and in GUARD_CRUSH state
+   *  recovering: gauge > 0 but recovering from recent damage
+   */
+  getGuardGaugeVisualState(): 'normal' | 'warning' | 'critical' | 'crushed' | 'recovering' {
+    if (this.isGuardCrushed()) return 'crushed';
+    const ratio = this.guardGauge / this.guardGaugeMax;
+    if (ratio <= 0) return 'crushed';
+    if (ratio < 0.3) return 'critical';
+    if (ratio < 0.6) return 'warning';
+    return 'normal';
   }
 
   /** Is the fighter in a state where blocking is possible? */

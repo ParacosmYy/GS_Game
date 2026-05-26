@@ -11,6 +11,7 @@ import type { ResolvedInput, PrevAttack } from '../input/inputResolver.js';
 import { createPrevAttack } from '../input/inputResolver.js';
 import { FighterState, AttackType } from '../core/types.js';
 import type { PowerGauge, MaxModeState } from '../core/types.js';
+import { FRAME_DATA } from '../core/constants.js';
 import { SeededRNG } from '../core/prng.js';
 import { COMBO_ROUTES, applyComboStep, routeComboSpecial } from './aiRoutes.js';
 import type { ComboStep } from './aiRoutes.js';
@@ -87,6 +88,20 @@ function difficultyScalarToConfig(d: number): AIDifficultyConfig {
     aggressionScale: 0.3 + clamp * 0.7,
   };
 }
+
+// ─── Range thresholds for AI strategy ───
+
+const RANGE_CLOSE = 80;     // Close-range distance (px)
+const RANGE_MID = 180;      // Mid-range distance (px)
+const RANGE_FAR = 250;      // Far-range distance (px)
+
+/** Frame advantage thresholds for punish detection */
+const PUNISH_WINDOW_LARGE = 15;  // Heavy punish: opponent recovery >= 15 frames
+const PUNISH_WINDOW_MEDIUM = 8;  // Medium punish: opponent recovery >= 8 frames
+const PUNISH_WINDOW_SMALL = 4;   // Light punish: opponent recovery >= 4 frames
+
+/** Anti-air detection: max vertical distance to consider "jumping at" AI */
+const ANTIAIR_MAX_HEIGHT = 200;  // Opponent must be above this Y offset from ground
 
 // ─── Character spacing profiles ───
 
@@ -220,6 +235,11 @@ export class AdvancedAI {
   // Meter management state
   private lastMeterStocks = 0;
 
+  // Strategic behavior tracking
+  private pendingPunishAttack: AttackType | null = null;
+  private pendingZoneAttack: AttackType | null = null;
+  private pendingMeatyAttack: AttackType | null = null;
+
   constructor(
     fighter: Fighter,
     opponent: Fighter,
@@ -342,8 +362,8 @@ export class AdvancedAI {
       }
     }
 
-    // ── Anti-air: react to opponent jumping ──
-    if (oppAirborne && dist < 180 && canAct
+    // ── Anti-air: react to opponent jumping (using enhanced detection) ──
+    if (canAct && this.shouldAntiAir(this.opponent)
         && this.chance(rng, this.config.antiAirRate)) {
       this.action = 'antiair';
       this.actionFrames = this.config.reactionDelay;
@@ -352,9 +372,11 @@ export class AdvancedAI {
       return this.generateInput('antiair', dist, facingOpp, canAct, oppAttacking, rng);
     }
 
-    // ── Oki detection: opponent knocked down and close ──
+    // ── Oki detection: opponent knocked down and close (enhanced with meaty) ──
     if (canAct && opp.state === FighterState.KNOCKDOWN && dist < 120
       && this.action !== 'okizeme' && this.chance(rng, this.config.okiQuality)) {
+      // Check if we should use a meaty attack on wakeup
+      const meatyAttack = this.shouldMeaty(this.opponent);
       this.action = 'okizeme';
       this.actionFrames = 30;
       this.okiTimer = 0;
@@ -399,6 +421,9 @@ export class AdvancedAI {
     this.okiTimer = 0;
     this.spacingAction = 'idle';
     this.prev = createPrevAttack();
+    this.pendingPunishAttack = null;
+    this.pendingZoneAttack = null;
+    this.pendingMeatyAttack = null;
     // Keep combo records across rounds (experience persists)
   }
 
@@ -429,7 +454,18 @@ export class AdvancedAI {
 
     // ── Whiff punish: opponent missed → rush in ──
     if (oppWhiffing && dist < 200 && this.chance(rng, this.legacyDifficulty * 0.75)) {
+      // Use shouldPunish to pick optimal punish attack when in range
+      const punishAttack = this.shouldPunish(this.opponent);
+      if (punishAttack !== null && dist < 120) {
+        return 'attack';
+      }
       return dist < 90 ? 'attack' : 'approach';
+    }
+
+    // ── Punish detection: opponent in recovery of unsafe move ──
+    this.pendingPunishAttack = this.shouldPunish(this.opponent);
+    if (this.pendingPunishAttack !== null && this.chance(rng, this.config.antiAirRate)) {
+      return 'attack';
     }
 
     // ── Counter stance: opponent attacking at mid range ──
@@ -457,11 +493,201 @@ export class AdvancedAI {
 
     // ── Mid range ──
     if (dist < 180) {
+      // Store zoning info for generateInput to use, but don't consume RNG
+      this.pendingZoneAttack = this.shouldZone(this.opponent);
       return this.decideMidRange(oppLowHp, hasMeter, dist, rng);
     }
 
     // ── Far range ──
+    // Store zoning info but let decideFarRange handle the decision
+    this.pendingZoneAttack = this.shouldZone(this.opponent);
     return this.decideFarRange(hasMeter, rng);
+  }
+
+  // ═══════════════════════════════════════════
+  // Strategic behavior methods
+  // ═══════════════════════════════════════════
+
+  /**
+   * Anti-air detection: returns true when opponent is airborne and within
+   * anti-air range. Uses frame data to identify the fastest anti-air option
+   * (crouch_C typically, DP for characters that have them).
+   */
+  shouldAntiAir(opponent: Fighter): boolean {
+    const opp = opponent;
+    const f = this.fighter;
+
+    // Must be able to act
+    if (!f.canAct()) return false;
+
+    // Opponent must be airborne
+    const oppAirborne = opp.state === FighterState.JUMP
+      || opp.state === FighterState.RUN_JUMP
+      || opp.state === FighterState.HOP
+      || opp.state === FighterState.HYPER_JUMP
+      || opp.state === FighterState.AIR_ATTACK;
+    if (!oppAirborne) return false;
+
+    // Opponent must be within anti-air range (horizontal proximity)
+    const dist = Math.abs(f.x - opp.x);
+    if (dist > 180) return false;
+
+    // Opponent should be within vertical striking range
+    const heightDiff = 510 - opp.y;
+    if (heightDiff > ANTIAIR_MAX_HEIGHT && opp.vy < 0) return false; // too high and going up
+
+    return true;
+  }
+
+  /**
+   * Punish detection: detects when opponent is in recovery frames of an
+   * unsafe move. Returns the best punish attack based on frame advantage.
+   * Prioritizes: DP > heavy normal > light normal based on available punish window.
+   */
+  shouldPunish(opponent: Fighter): AttackType | null {
+    const opp = opponent;
+    const f = this.fighter;
+
+    // Must be able to act
+    if (!f.canAct()) return null;
+
+    // Opponent must be in attack state and in recovery phase
+    const oppAttacking = opp.state === FighterState.STAND_ATTACK
+      || opp.state === FighterState.CROUCH_ATTACK
+      || opp.state === FighterState.AIR_ATTACK;
+    if (!oppAttacking) return null;
+
+    const oppAttackPhase = (opp as Fighter & { attackPhase?: string }).attackPhase;
+    if (oppAttackPhase !== 'recovery') return null;
+
+    // Opponent must not have hit us (whiffed attack)
+    if (opp.hasHit) return null;
+
+    // Calculate remaining recovery frames
+    const oppAttack = opp.currentAttack;
+    if (!oppAttack) return null;
+
+    // Look up frame data for opponent's current attack
+    const frameData = FRAME_DATA[oppAttack as keyof typeof FRAME_DATA];
+    if (!frameData) return null;
+
+    // Calculate punish window: remaining recovery frames
+    const totalRecovery = frameData.recovery as number;
+    const currentFrame = opp.attackFrame;
+    const remainingRecovery = totalRecovery - currentFrame;
+
+    // Check distance: must be close enough to reach
+    const dist = Math.abs(f.x - opp.x);
+    if (dist > 200) return null;
+
+    // Select punish based on available window
+    if (remainingRecovery >= PUNISH_WINDOW_LARGE && dist < 120) {
+      // Large punish window: use DP if available, else heavy normal
+      if (this.spacingProfile.antiAirType === 'dp') {
+        return AttackType.SPECIAL_UPPER;
+      }
+      return AttackType.CLOSE_C;
+    }
+
+    if (remainingRecovery >= PUNISH_WINDOW_MEDIUM && dist < 150) {
+      // Medium punish window: heavy normal
+      if (dist < RANGE_CLOSE) {
+        return AttackType.CLOSE_C;
+      }
+      return AttackType.STAND_C;
+    }
+
+    if (remainingRecovery >= PUNISH_WINDOW_SMALL && dist < 160) {
+      // Small punish window: light normal (fast startup)
+      return AttackType.STAND_A;
+    }
+
+    return null;
+  }
+
+  /**
+   * Zoning behavior: when at far range, prefers projectile/special moves;
+   * when at mid range, prefers pokes (stand_B, stand_D).
+   * Avoids whiffing at max range.
+   */
+  shouldZone(opponent: Fighter): AttackType | null {
+    const opp = opponent;
+    const f = this.fighter;
+
+    // Must be able to act
+    if (!f.canAct()) return null;
+
+    // Don't zone when in active combat (close range)
+    const dist = Math.abs(f.x - opp.x);
+    if (dist < RANGE_CLOSE) return null;
+
+    // Don't zone against an attacking opponent (block instead)
+    const oppAttacking = opp.state === FighterState.STAND_ATTACK
+      || opp.state === FighterState.CROUCH_ATTACK
+      || opp.state === FighterState.AIR_ATTACK;
+    if (oppAttacking && dist < 120) return null;
+
+    // Far range: projectile preference
+    if (dist > RANGE_FAR) {
+      if (this.spacingProfile.hasProjectile) {
+        return AttackType.SPECIAL_PROJECTILE;
+      }
+      // No projectile: approach instead of zoning
+      return null;
+    }
+
+    // Mid range: pokes
+    if (dist > RANGE_CLOSE && dist <= RANGE_MID) {
+      // Use character strategy preferred poke
+      const pokeMove = this.strategy.preferredPoke;
+      if (pokeMove) return pokeMove;
+
+      // Fallback: stand_B is the universal safe poke
+      return AttackType.STAND_B;
+    }
+
+    // Mid-far range: stand_D for range
+    if (dist > RANGE_MID && dist <= RANGE_FAR) {
+      if (this.spacingProfile.hasProjectile && Math.random() < 0.4) {
+        return AttackType.SPECIAL_PROJECTILE;
+      }
+      return AttackType.STAND_D;
+    }
+
+    return null;
+  }
+
+  /**
+   * Wake-up pressure (meaty): when opponent is waking up (KNOCKDOWN state
+   * with low timer), time an attack to hit on first active frame.
+   * Chooses safe-on-block move for meaty.
+   */
+  shouldMeaty(opponent: Fighter): AttackType | null {
+    const opp = opponent;
+    const f = this.fighter;
+
+    // Must be able to act
+    if (!f.canAct()) return null;
+
+    // Opponent must be in knockdown state
+    if (opp.state !== FighterState.KNOCKDOWN) return null;
+
+    // Opponent must be close to waking up (low knockdown timer)
+    // The timer must be low enough that we can time our meaty
+    if (opp.knockdownTimer > 20) return null;
+
+    // Must be close enough to hit on wakeup
+    const dist = Math.abs(f.x - opp.x);
+    if (dist > 120) return null;
+
+    // Select meaty move: prefer safe-on-block normals
+    // Close_C has 2F startup (fastest heavy normal), good for meaty timing
+    if (dist < RANGE_CLOSE) {
+      return AttackType.CLOSE_C;
+    }
+
+    // Slightly further: stand_B is safe on block
+    return AttackType.STAND_B;
   }
 
   private evaluateSpacing(
@@ -722,6 +948,13 @@ export class AdvancedAI {
 
       case 'attack': {
         const route = this.getCurrentRoute();
+
+        // If we have a pending punish attack, execute it directly
+        if (this.pendingPunishAttack !== null && !this.inCombo) {
+          this.applyAttackType(this.pendingPunishAttack, base);
+          this.pendingPunishAttack = null;
+          break;
+        }
 
         if (this.inCombo && this.comboStep < route.length && this.comboDelay <= 0) {
           const dropCombo = this.chance(rng, this.config.comboDropRate);
@@ -1115,6 +1348,28 @@ export class AdvancedAI {
 
   private doApplyComboStep(step: ComboStep, base: ResolvedInput): void {
     applyComboStep(step, base);
+  }
+
+  /** Translate an AttackType from strategic methods into button input */
+  private applyAttackType(attack: AttackType, base: ResolvedInput): void {
+    // Handle special types
+    if (attack === AttackType.SPECIAL_UPPER) {
+      base.forward = true;
+      base.buttonC = true;
+      base.buttonCPressed = true;
+      base.punchPressed = true;
+      return;
+    }
+    if (attack === AttackType.SPECIAL_PROJECTILE) {
+      base.down = true;
+      base.buttonC = true;
+      base.buttonCPressed = true;
+      base.punchPressed = true;
+      return;
+    }
+
+    // Use the existing wakeUpOption helper for normal types
+    this.applyWakeUpOption(attack, base);
   }
 
   /** Direct special move trigger (bypasses command buffer) for AI */

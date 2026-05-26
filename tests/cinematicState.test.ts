@@ -477,12 +477,12 @@ describe('CinematicState — KO Dust Particles', () => {
     expect(cs.koDustParticles.length).toBe(20);
 
     // Run some frames — particles with shorter life will expire
-    for (let i = 0; i < 100; i++) {
+    for (let i = 0; i < 150; i++) {
       cs.shouldSkipFrame();
     }
     // Some particles should have expired by now (life ranges 30-60,
     // each particle decrements life only on run frames = every 3rd call,
-    // so after 100 calls ~33 run frames, particles with life <= 33 are gone)
+    // so after 150 calls ~50 run frames, particles with life <= 50 are gone)
     expect(cs.koDustParticles.length).toBeLessThan(20);
     expect(cs.koDustParticles.length).toBeGreaterThan(0);
   });

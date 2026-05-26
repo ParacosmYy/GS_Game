@@ -1,41 +1,57 @@
 # 质量门禁
 
-## 必跑命令
+质量门禁用于保证每轮改动可验证、可回退、可复盘。
+
+## 1. 最低门禁
+
+每次提交前必须运行：
 
 ```bash
 npx tsc --noEmit
 npx vite build
 ```
 
-涉及测试覆盖的模块，必须运行相关 `vitest`：
+如果这两项失败，不得声称完成。
 
-```bash
-npx vitest run <test-file>
-```
+## 2. 按改动类型增加验证
 
-## 核心反退化检查
+| 改动类型 | 必须增加的验证 |
+| --- | --- |
+| 输入/回放/RNG | 相关 vitest，确认 determinism |
+| combat/frame data | 攻击、命中、防御、cancel、reset 相关测试 |
+| animation manifest | 帧数、duration、loop、actionId 校验 |
+| hitbox/hurtbox | 数据读取、active frame、debug draw 来源校验 |
+| portrait/sprite manifest | 资源引用、尺寸、anchor、fallback 校验 |
+| rendering | 本地手测路径，确认 fallback 可用 |
+| 文档 | 链接一致性、优先级一致性、无冲突规则 |
 
-涉及玩法、流程、输入、渲染时，提交说明里必须覆盖：
+## 3. Ryo 样板专属门禁
 
-- 能进入标题/选人/战斗。
-- P1/P2 或 AI 能正常行动。
-- 攻击、受击、防御、KO 流程不卡死。
-- 控制台没有新运行时错误。
-- 新增 replay/RNG/input 逻辑不破坏 live match。
+涉及 Ryo 主线时必须回答：
 
-## Bug 分级
+- 是否推进 [Ryo Vertical Slice](../product/ryo-vertical-slice-plan.md)？
+- 是否使用或完善 [资产管线架构](../architecture/asset-pipeline.md)？
+- 是否保持 Frame Contract 语义？
+- 是否保留 fallback？
+- 是否避免扩张到非 Ryo 角色？
 
-| 级别 | 定义 | 处理 |
-| --- | --- | --- |
-| P0 | 页面崩溃、流程卡死、无法进入战斗 | 当轮必须修 |
-| P1 | 判定、输入、气槽、取消、状态机错误 | 当轮优先修 |
-| P2 | 明显体验问题、AI 异常、视觉音频异常 | 本轮或下轮 |
-| P3 | 清理、命名、性能小优化 | 进入 backlog |
+## 4. 手测要求
 
-## 不允许退化
+涉及视觉、动作、打击感时，需要说明：
 
-- 不删除已有测试或调试能力。
-- 不降低已实现的打击反馈标准。
-- 不移除角色、招式、流程而不记录原因。
-- 重构改变行为时，commit 必须写明行为差异。
+- 进入哪个页面或模式。
+- 选择哪个角色。
+- 执行哪个动作。
+- 观察哪个反馈。
+- 预期结果是什么。
 
+无法手测时必须写明原因。
+
+## 5. 失败处理
+
+如果验证失败：
+
+- 先定位是否来自本轮改动。
+- 如果来自他人未提交改动，不得回滚，必须说明。
+- 如果来自本轮改动，修复后重跑。
+- 如果无法修复，撤回本轮改动或请求用户决策。
