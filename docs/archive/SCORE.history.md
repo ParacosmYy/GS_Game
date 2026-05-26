@@ -995,3 +995,9 @@
 ## H201: charDefBatch7—25项验证Joe/Kasumi/Kdash/Kim/Kula角色定义 — 173→174
 
 **commit:** <hash> | charDefBatch7—25项验证Joe/Kasumi/Kdash/Kim/Kula角色定义
+
+---
+
+## H202: charDefBatch8—25项验证Leona/Mai/Mary/Mature/Robert角色定义 — 174→175
+
+**commit:** <hash> | charDefBatch8—25项验证Leona/Mai/Mary/Mature/Robert角色定义
