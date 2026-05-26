@@ -173,3 +173,30 @@
 **下一轮最小任务:** stage背景层改善;bodyPartRenderer微调;Ryo AI策略优化
 
 **commit: 607f58f | 下一目标: 35 (stage背景+AI策略)**
+
+---
+
+## H60: Ryo AI策略优化 — 34→35 (+1规则)
+
+**日期:** 2026-05-27
+**commit:** e315907
+
+**本轮类型:** 产品体验迭代 — Ryo样板
+
+**实质性改变:**
+- AI特殊技距离路由：远距KOOU/空中KO_HOU/中距HIEN/近距ORISHI+TSURIZAO
+- DM策略：低血量或MAX模式用DM_TEN_HA_OU
+- 对空路由：Ryo→KO_HOU_C, Kyo/Iori/Terry/Kim/K'各有专属对空
+- 中距poke：Ryo→KOOU区域控制
+
+**本轮提升了哪个维度？** 角色内容(+3)
+
+**为什么只加1分？** AI策略是渐进改善，未改变核心战斗体验
+
+**更像KOF在哪里？** Ryo AI会根据距离选择合适特殊技；升龙拳用于对空；虎煌拳用于远距牵制
+
+**仍不像KOF在哪里？** 骨骼方块;需要手测AI表现
+
+**下一轮最小任务:** Ryo crouch_attack动画帧细节; 胜利/失败台词系统; round间过渡动画
+
+**commit: e315907 | 下一目标: 36 (crouch动画+台词)**
