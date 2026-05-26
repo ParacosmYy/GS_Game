@@ -650,48 +650,68 @@ export const RyoDef: CharacterDefinition = {
 
     // →+A 冰柱割り (Tsurizao — overhead): startup=14, active=4, recovery=18
     [AttackType.RYO_TSURIZAO]: [
-      // Startup (0-13): Wind up, arm rises overhead
+      // Startup (0-7): 手刀举过头顶 — 前手从身前上举，蓄力过顶
       pose({ body: bone(0, 0, 0.0), armFront: bone(8, 14, 0.2), armBack: bone(-6, 12, -0.3), legFront: bone(7, 0, 0.1), legBack: bone(-5, 0, -0.1), head: bone(0, 0) }),
-      pose({ body: bone(2, 0, 0.04), armFront: bone(4, 6, -0.0), armBack: bone(-6, 12, -0.3), legFront: bone(9, 0, 0.14), legBack: bone(-6, 0, -0.12), head: bone(2, -2) }),
-      pose({ body: bone(4, 0, 0.08), armFront: bone(0, -2, -0.2), armBack: bone(-6, 12, -0.3), legFront: bone(11, 0, 0.18), legBack: bone(-8, 0, -0.16), head: bone(3, -4) }),
-      pose({ body: bone(4, 0, 0.08), armFront: bone(-2, -4, -0.3), armBack: bone(-6, 12, -0.3), legFront: bone(11, 0, 0.18), legBack: bone(-8, 0, -0.16), head: bone(3, -4) }),
-      pose({ body: bone(2, 0, 0.04), armFront: bone(0, -2, -0.15), armBack: bone(-6, 12, -0.3), legFront: bone(9, 0, 0.14), legBack: bone(-6, 0, -0.12), head: bone(2, -2) }),
-      pose({ body: bone(0, 0, 0.0), armFront: bone(4, 2, 0.05), armBack: bone(-6, 12, -0.3), legFront: bone(7, 0, 0.1), legBack: bone(-5, 0, -0.08), head: bone(0, 0) }),
-      pose({ body: bone(0, 0, 0.0), armFront: bone(8, 6, 0.15), armBack: bone(-6, 12, -0.3), legFront: bone(7, 0, 0.06), legBack: bone(-5, 0, -0.04), head: bone(0, 0) }),
-      pose({ body: bone(0, 0, 0.0), armFront: bone(12, 10, 0.2), armBack: bone(-6, 12, -0.3), legFront: bone(7, 0, 0.02), legBack: bone(-5, 0, 0.0), head: bone(0, 0) }),
-      // Active (14-17): Downward chop
-      pose({ head: bone(2, 1, 0.06), body: bone(6, 2, 0.15), armFront: bone(24, 10, 0.3, 1.3), armBack: bone(-8, 14, -0.4), legFront: bone(10, 2, 0.15), legBack: bone(-8, 2, -0.12) }),
-      pose({ head: bone(3, 2, 0.08), body: bone(8, 4, 0.2), armFront: bone(26, 12, 0.35, 1.35), armBack: bone(-8, 16, -0.45), legFront: bone(12, 4, 0.18), legBack: bone(-10, 4, -0.15) }),
-      pose({ head: bone(3, 2, 0.08), body: bone(8, 4, 0.2), armFront: bone(26, 12, 0.35, 1.35), armBack: bone(-8, 16, -0.45), legFront: bone(12, 4, 0.18), legBack: bone(-10, 4, -0.15) }),
-      pose({ head: bone(2, 1, 0.06), body: bone(6, 2, 0.15), armFront: bone(24, 10, 0.3, 1.3), armBack: bone(-8, 14, -0.4), legFront: bone(10, 2, 0.15), legBack: bone(-8, 2, -0.12) }),
-      // Recovery (18-35): Return to stance
-      pose({ head: bone(1, 1, 0.04), body: bone(4, 2, 0.1), armFront: bone(18, 10, 0.25, 1.15), armBack: bone(-7, 13, -0.35), legFront: bone(8, 1, 0.1), legBack: bone(-6, 1, -0.08) }),
-      pose({ head: bone(0, 0, 0.02), body: bone(2, 1, 0.06), armFront: bone(14, 12, 0.22, 1.05), armBack: bone(-6, 13, -0.35), legFront: bone(7, 0, 0.06), legBack: bone(-5, 0, -0.06) }),
-      pose({ head: bone(0, 0, 0.01), body: bone(1, 1, 0.04), armFront: bone(12, 14, 0.2, 1.0), armBack: bone(-6, 14, -0.35), legFront: bone(7, 0, 0.04), legBack: bone(-5, 0, -0.04) }),
+      // Frame 1: 前手开始上举 — 身体微前倾
+      pose({ body: bone(2, 0, 0.04), armFront: bone(6, 8, 0.05), armBack: bone(-6, 12, -0.3), legFront: bone(8, 0, 0.12), legBack: bone(-5, 0, -0.1), head: bone(1, -1) }),
+      // Frame 2: 前手继续上举 — 到肩膀高度
+      pose({ body: bone(4, 0, 0.08), armFront: bone(4, 2, -0.1), armBack: bone(-6, 12, -0.3), legFront: bone(10, 0, 0.16), legBack: bone(-7, 0, -0.14), head: bone(2, -3) }),
+      // Frame 3: 前手举到头顶 — 手臂向上延伸
+      pose({ body: bone(4, -2, 0.1), armFront: bone(2, -4, -0.3), armBack: bone(-6, 10, -0.35), legFront: bone(10, 0, 0.16), legBack: bone(-7, 0, -0.14), head: bone(2, -4) }),
+      // Frame 4: 手刀过顶 — 手臂高举过头，蓄力
+      pose({ body: bone(2, -3, 0.08), armFront: bone(0, -8, -0.45, 1.1), armBack: bone(-6, 10, -0.35), legFront: bone(8, 0, 0.12), legBack: bone(-6, 0, -0.12), head: bone(1, -5) }),
+      // Frame 5: 手刀最高点 — 手臂完全过顶，最大蓄力
+      pose({ body: bone(0, -4, 0.06), armFront: bone(-2, -12, -0.55, 1.15), armBack: bone(-6, 8, -0.4), legFront: bone(7, 0, 0.1), legBack: bone(-5, 0, -0.1), head: bone(0, -6) }),
+      // Frame 6: 蓄力保持 — 手臂过顶蓄力，重心微前移
+      pose({ body: bone(2, -3, 0.08), armFront: bone(-2, -10, -0.5, 1.12), armBack: bone(-6, 8, -0.38), legFront: bone(8, 0, 0.12), legBack: bone(-6, 0, -0.1), head: bone(1, -5) }),
+      // Frame 7: 即将下劈 — 身体开始前冲
+      pose({ body: bone(4, -2, 0.12), armFront: bone(0, -6, -0.4, 1.1), armBack: bone(-6, 10, -0.35), legFront: bone(9, 0, 0.14), legBack: bone(-6, 0, -0.12), head: bone(2, -4) }),
+      // Active (8-11): 手刀下劈 — 从头顶全力劈下
+      pose({ head: bone(3, 0, 0.1), body: bone(8, 2, 0.2), armFront: bone(28, 8, 0.4, 1.35), armBack: bone(-8, 14, -0.45), legFront: bone(12, 2, 0.2), legBack: bone(-10, 2, -0.16) }),
+      // Frame 9: 下劈巅峰 — 手刀最大延伸，身体前倾
+      pose({ head: bone(4, 2, 0.12), body: bone(10, 4, 0.24), armFront: bone(30, 12, 0.45, 1.4), armBack: bone(-8, 16, -0.5), legFront: bone(14, 4, 0.22), legBack: bone(-12, 4, -0.18) }),
+      // Frame 10: 下劈维持
+      pose({ head: bone(3, 1, 0.1), body: bone(8, 3, 0.2), armFront: bone(28, 10, 0.42, 1.32), armBack: bone(-8, 15, -0.48), legFront: bone(12, 3, 0.2), legBack: bone(-10, 3, -0.16) }),
+      // Frame 11: 下劈回收
+      pose({ head: bone(2, 1, 0.06), body: bone(6, 2, 0.15), armFront: bone(22, 10, 0.35, 1.22), armBack: bone(-7, 14, -0.42), legFront: bone(10, 2, 0.16), legBack: bone(-8, 2, -0.14) }),
+      // Recovery (12-17): 收回架势
+      pose({ head: bone(1, 1, 0.04), body: bone(4, 2, 0.1), armFront: bone(16, 12, 0.28, 1.12), armBack: bone(-6, 14, -0.38), legFront: bone(8, 1, 0.1), legBack: bone(-6, 1, -0.08) }),
+      pose({ head: bone(0, 0, 0.02), body: bone(2, 1, 0.06), armFront: bone(12, 14, 0.24, 1.05), armBack: bone(-6, 14, -0.36), legFront: bone(7, 0, 0.06), legBack: bone(-5, 0, -0.06) }),
+      pose({ head: bone(0, 0, 0.01), body: bone(1, 1, 0.04), armFront: bone(10, 16, 0.22, 1.0), armBack: bone(-6, 14, -0.35), legFront: bone(7, 0, 0.04), legBack: bone(-5, 0, -0.04) }),
       pose({ head: bone(0, 0), body: bone(0, 0), armFront: bone(10, 16, 0.2), armBack: bone(-6, 14, -0.35), legFront: bone(6, 0, 0.02), legBack: bone(-4, 0, -0.02) }),
     ],
 
     // ↘+B 落蹴 (Orishi — low kick): startup=8, active=4, recovery=20
     [AttackType.RYO_ORISHI]: [
-      // Startup (0-7): Crouch, chamber leg
+      // Startup (0-7): 蹲下蓄力 — 重心下沉，腿折叠蓄力
       pose({ body: bone(0, 6, 0.05), armFront: bone(8, 18, 0.15), armBack: bone(-6, 16, -0.3), legFront: bone(8, 4, 0.2), legBack: bone(-6, 4, -0.15), head: bone(0, 2) }),
-      pose({ body: bone(2, 14, 0.1), armFront: bone(8, 22, 0.1), armBack: bone(-6, 20, -0.25), legFront: bone(12, 12, 0.3), legBack: bone(-10, 8, -0.2), head: bone(1, 4) }),
-      pose({ body: bone(3, 16, 0.12), armFront: bone(8, 24, 0.08), armBack: bone(-6, 22, -0.22), legFront: bone(14, 14, 0.32), legBack: bone(-12, 10, -0.22), head: bone(1, 5) }),
-      pose({ body: bone(2, 14, 0.1), armFront: bone(8, 22, 0.1), armBack: bone(-6, 20, -0.25), legFront: bone(12, 12, 0.3), legBack: bone(-10, 8, -0.2), head: bone(1, 4) }),
-      pose({ body: bone(0, 6, 0.05), armFront: bone(8, 18, 0.15), armBack: bone(-6, 16, -0.3), legFront: bone(8, 4, 0.2), legBack: bone(-6, 4, -0.15), head: bone(0, 2) }),
-      pose({ body: bone(1, 10, 0.08), armFront: bone(8, 20, 0.12), armBack: bone(-6, 18, -0.28), legFront: bone(10, 8, 0.25), legBack: bone(-8, 6, -0.18), head: bone(0, 3) }),
-      pose({ body: bone(2, 14, 0.1), armFront: bone(8, 22, 0.1), armBack: bone(-6, 20, -0.25), legFront: bone(12, 12, 0.3), legBack: bone(-10, 8, -0.2), head: bone(1, 4) }),
-      pose({ body: bone(0, 6, 0.05), armFront: bone(8, 18, 0.15), armBack: bone(-6, 16, -0.3), legFront: bone(8, 4, 0.2), legBack: bone(-6, 4, -0.15), head: bone(0, 2) }),
-      // Active (8-11): Low sweep kick
-      pose({ head: bone(1, 4, 0.06), body: bone(4, 16, 0.14), armFront: bone(8, 24, 0.1), armBack: bone(-6, 22, -0.2), legFront: bone(22, 14, 0.35, 1.2), legBack: bone(-14, 12, -0.25) }),
-      pose({ head: bone(2, 5, 0.08), body: bone(6, 18, 0.16), armFront: bone(8, 26, 0.08), armBack: bone(-6, 24, -0.18), legFront: bone(24, 16, 0.38, 1.25), legBack: bone(-16, 14, -0.28) }),
-      pose({ head: bone(2, 5, 0.08), body: bone(6, 18, 0.16), armFront: bone(8, 26, 0.08), armBack: bone(-6, 24, -0.18), legFront: bone(24, 16, 0.38, 1.25), legBack: bone(-16, 14, -0.28) }),
-      pose({ head: bone(1, 4, 0.06), body: bone(4, 16, 0.14), armFront: bone(8, 24, 0.1), armBack: bone(-6, 22, -0.2), legFront: bone(22, 14, 0.35, 1.2), legBack: bone(-14, 12, -0.25) }),
-      // Recovery (12-31): Retract leg, stand back up
-      pose({ head: bone(1, 3, 0.04), body: bone(3, 14, 0.1), armFront: bone(8, 22, 0.12), armBack: bone(-6, 20, -0.25), legFront: bone(16, 10, 0.25), legBack: bone(-10, 8, -0.2) }),
-      pose({ head: bone(0, 2, 0.02), body: bone(2, 10, 0.06), armFront: bone(8, 20, 0.15), armBack: bone(-6, 18, -0.28), legFront: bone(12, 6, 0.18), legBack: bone(-8, 4, -0.15) }),
-      pose({ head: bone(0, 1, 0.01), body: bone(1, 6, 0.03), armFront: bone(8, 18, 0.18), armBack: bone(-6, 16, -0.3), legFront: bone(9, 2, 0.12), legBack: bone(-6, 2, -0.1) }),
-      pose({ head: bone(0, 0), body: bone(0, 2, 0.01), armFront: bone(8, 16, 0.2), armBack: bone(-6, 14, -0.32), legFront: bone(7, 0, 0.06), legBack: bone(-5, 0, -0.06) }),
+      // Frame 1: 加深蹲 — 重心继续下沉
+      pose({ body: bone(2, 10, 0.08), armFront: bone(8, 20, 0.12), armBack: bone(-6, 18, -0.28), legFront: bone(12, 8, 0.28), legBack: bone(-10, 6, -0.22), head: bone(1, 3) }),
+      // Frame 2: 蹲至最深 — 前腿最大折叠，蓄力巅峰
+      pose({ body: bone(3, 16, 0.12), armFront: bone(8, 24, 0.08), armBack: bone(-6, 22, -0.22), legFront: bone(16, 14, 0.35), legBack: bone(-14, 10, -0.25), head: bone(1, 5) }),
+      // Frame 3: 保持深蹲 — 重心微前移
+      pose({ body: bone(4, 16, 0.14), armFront: bone(8, 22, 0.06), armBack: bone(-6, 20, -0.2), legFront: bone(16, 14, 0.34), legBack: bone(-14, 10, -0.24), head: bone(1, 5) }),
+      // Frame 4: 重心前移 — 准备踢出
+      pose({ body: bone(3, 12, 0.1), armFront: bone(8, 20, 0.1), armBack: bone(-6, 18, -0.24), legFront: bone(14, 10, 0.3), legBack: bone(-12, 8, -0.22), head: bone(1, 4) }),
+      // Frame 5: 即将踢出 — 重心继续前移
+      pose({ body: bone(4, 10, 0.1), armFront: bone(8, 20, 0.1), armBack: bone(-6, 18, -0.24), legFront: bone(14, 8, 0.28), legBack: bone(-12, 6, -0.2), head: bone(1, 3) }),
+      // Frame 6: 踢出前夕 — 身体前倾
+      pose({ body: bone(5, 8, 0.1), armFront: bone(8, 18, 0.12), armBack: bone(-6, 16, -0.26), legFront: bone(14, 6, 0.25), legBack: bone(-12, 4, -0.18), head: bone(1, 3) }),
+      // Frame 7: 踢出瞬间 — 腿即将弹出
+      pose({ body: bone(5, 6, 0.1), armFront: bone(8, 16, 0.14), armBack: bone(-6, 14, -0.28), legFront: bone(14, 4, 0.22), legBack: bone(-12, 2, -0.16), head: bone(1, 2) }),
+      // Active (8-11): 低段扫腿 — 腿低空扫出
+      pose({ head: bone(1, 4, 0.06), body: bone(6, 14, 0.16), armFront: bone(8, 24, 0.1), armBack: bone(-6, 22, -0.2), legFront: bone(28, 10, 0.15, 1.25), legBack: bone(-14, 10, -0.25) }),
+      // Frame 9: 扫腿巅峰 — 腿最大水平延伸
+      pose({ head: bone(2, 5, 0.08), body: bone(8, 16, 0.18), armFront: bone(8, 26, 0.08), armBack: bone(-6, 24, -0.18), legFront: bone(32, 12, 0.1, 1.3), legBack: bone(-16, 12, -0.28) }),
+      // Frame 10: 扫腿维持
+      pose({ head: bone(2, 5, 0.08), body: bone(7, 15, 0.16), armFront: bone(8, 24, 0.1), armBack: bone(-6, 22, -0.2), legFront: bone(30, 11, 0.12, 1.26), legBack: bone(-15, 11, -0.26) }),
+      // Frame 11: 扫腿回收
+      pose({ head: bone(1, 4, 0.06), body: bone(5, 12, 0.12), armFront: bone(8, 22, 0.12), armBack: bone(-6, 20, -0.24), legFront: bone(22, 8, 0.2, 1.15), legBack: bone(-12, 8, -0.22) }),
+      // Recovery (12-16): 收腿起身
+      pose({ head: bone(1, 3, 0.04), body: bone(3, 10, 0.08), armFront: bone(8, 20, 0.15), armBack: bone(-6, 18, -0.28), legFront: bone(16, 6, 0.22), legBack: bone(-10, 6, -0.18) }),
+      pose({ head: bone(0, 2, 0.02), body: bone(2, 6, 0.04), armFront: bone(8, 18, 0.18), armBack: bone(-6, 16, -0.3), legFront: bone(12, 3, 0.16), legBack: bone(-8, 3, -0.12) }),
+      pose({ head: bone(0, 1, 0.01), body: bone(1, 4, 0.02), armFront: bone(8, 16, 0.2), armBack: bone(-6, 14, -0.32), legFront: bone(9, 1, 0.1), legBack: bone(-6, 1, -0.08) }),
+      pose({ head: bone(0, 0), body: bone(0, 2, 0.01), armFront: bone(8, 16, 0.2), armBack: bone(-6, 14, -0.34), legFront: bone(7, 0, 0.06), legBack: bone(-5, 0, -0.06) }),
       pose({ head: bone(0, 0), body: bone(0, 0), armFront: bone(8, 16, 0.2), armBack: bone(-6, 14, -0.35), legFront: bone(6, 0, 0.02), legBack: bone(-4, 0, -0.02) }),
     ],
   },

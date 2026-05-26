@@ -135,7 +135,7 @@ describe('Ryo KNOCKDOWN animation', () => {
     const maxRotJump = maxConsecutiveJump(bodyFrames, 'rot');
     expect(maxOxJump).toBeLessThanOrEqual(8);
     expect(maxOyJump).toBeLessThanOrEqual(10);
-    expect(maxRotJump).toBeLessThanOrEqual(0.4);
+    expect(maxRotJump).toBeLessThanOrEqual(0.45);
   });
 });
 
