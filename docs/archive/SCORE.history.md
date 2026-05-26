@@ -252,3 +252,29 @@
 **下一轮最小任务:** Ryo animation manifest填充idle真实pose数据；骨骼pose→manifest数据驱动
 
 **commit: <hash> | 下一目标: 39 (animation manifest)**
+
+---
+
+## H66: Ryo animation manifest帧数对齐真实pose数据 — 38→39 (+1规则)
+
+**日期:** 2026-05-27
+
+**本轮类型:** 资产管线 — 数据驱动
+
+**实质性改变:**
+- RYO_SEQUENCES帧数从占位数据更新为匹配骨骼pose数组的真实帧数
+- idle: 4→8帧, hitstun: 11→5帧, knockdown: 30→6帧, win: 6→8帧
+- 新增run/crouch/block/air_block/throw/dizzy/guard_crush/taunt/max_mode/ryo_tsurizao/ryo_orishi序列
+- 必杀技帧数对齐真实pose: koou 17帧, ko_hou 15帧, hien 15帧, haou 15帧, DM 35帧
+
+**本轮提升了哪个维度？** 帧数据精度(+3), 角色内容(+2)
+
+**为什么只加1分？** 动画manifest帧数对齐是数据修正，视觉渲染未变
+
+**更像KOF在哪里？** manifest帧数现在反映真实骨骼pose帧数而非占位值；数据与视觉开始统一
+
+**仍不像KOF在哪里？** manifest的offsetX/Y仍为0（需要真实sprite偏移）；骨骼方块
+
+**下一轮最小任务:** Ryo sprite cache机制—骨骼pose渲染到离屏canvas缓存为帧图片
+
+**commit: <hash> | 下一目标: 40 (sprite cache)**
