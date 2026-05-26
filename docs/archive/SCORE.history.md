@@ -199,3 +199,9 @@
 ## H81: Ryo moveList完整性测试—12项验证出招表 — 53→54
 
 **commit:** <hash> | 命令通常技+必杀技+DM/SDM数量+虎煌拳/虎咆/天地霸煌拳/龍虎乱舞
+
+---
+
+## H82: Ryo character metadata测试—16项验证 — 54→55
+
+**commit:** <hash> | basicInfo+colors+winQuotes+pixelPortrait+poses

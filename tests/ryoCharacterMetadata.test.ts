@@ -57,8 +57,8 @@ describe('Ryo Character Metadata', () => {
     });
 
     it('pixelPortrait has correct dimensions', () => {
-      expect(RyoDef.pixelPortrait.width).toBe(64);
-      expect(RyoDef.pixelPortrait.height).toBe(80);
+      expect(RyoDef.pixelPortrait!.width).toBe(64);
+      expect(RyoDef.pixelPortrait!.height).toBe(80);
     });
   });
 
