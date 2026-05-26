@@ -149,12 +149,35 @@ function drawMoon(ctx: CanvasRenderingContext2D, tick: number): void {
   ctx.arc(mx, my, 28, 0, Math.PI * 2);
   ctx.fill();
 
-  // 月球环形山
-  ctx.fillStyle = 'rgba(160, 160, 190, 0.1)';
-  ctx.beginPath(); ctx.arc(mx - 6, my - 4, 6, 0, Math.PI * 2); ctx.fill();
-  ctx.beginPath(); ctx.arc(mx + 8, my + 5, 3.5, 0, Math.PI * 2); ctx.fill();
-  ctx.beginPath(); ctx.arc(mx + 2, my - 8, 4, 0, Math.PI * 2); ctx.fill();
-  ctx.beginPath(); ctx.arc(mx - 3, my + 7, 2.5, 0, Math.PI * 2); ctx.fill();
+  // 月球环形山 — layered craters with depth and rims
+  const craters = [
+    { cx: mx - 7, cy: my - 5, r: 7, depth: 0.10 },
+    { cx: mx + 9, cy: my + 5, r: 4.5, depth: 0.12 },
+    { cx: mx + 2, cy: my - 9, r: 5, depth: 0.08 },
+    { cx: mx - 4, cy: my + 8, r: 3, depth: 0.09 },
+    { cx: mx + 12, cy: my - 2, r: 2.5, depth: 0.07 },
+    { cx: mx - 10, cy: my + 3, r: 3.5, depth: 0.06 },
+    { cx: mx + 5, cy: my + 11, r: 2, depth: 0.05 },
+    { cx: mx - 1, cy: my + 3, r: 8, depth: 0.04 },
+  ];
+  for (const c of craters) {
+    // Crater shadow (inner)
+    ctx.fillStyle = `rgba(140, 140, 170, ${c.depth})`;
+    ctx.beginPath();
+    ctx.arc(c.cx, c.cy, c.r, 0, Math.PI * 2);
+    ctx.fill();
+    // Crater rim highlight (upper-left)
+    ctx.strokeStyle = `rgba(220, 220, 245, ${c.depth * 0.6})`;
+    ctx.lineWidth = 0.5;
+    ctx.beginPath();
+    ctx.arc(c.cx, c.cy, c.r, Math.PI * 0.9, Math.PI * 1.6);
+    ctx.stroke();
+    // Crater floor shadow (bottom-right offset)
+    ctx.fillStyle = `rgba(120, 120, 155, ${c.depth * 0.5})`;
+    ctx.beginPath();
+    ctx.arc(c.cx + c.r * 0.2, c.cy + c.r * 0.2, c.r * 0.6, 0, Math.PI * 2);
+    ctx.fill();
+  }
 
   // 月光照射方向光柱
   const moonLight = ctx.createLinearGradient(mx, my + 28, mx + 80, STAGE_GROUND_Y);
@@ -212,24 +235,41 @@ export function drawClouds(ctx: CanvasRenderingContext2D, tick: number, clouds: 
   }
 }
 
-// ===== Layer 1: Mountains =====
+// ===== Layer 1: Mountains (3 parallax depth layers) =====
 
 export function drawDistantMountains(ctx: CanvasRenderingContext2D, cameraX: number): void {
-  const px = cameraX * 0.1;
-
-  // 远景山脉 — 五层更丰富的山体
-  const layers = [
-    { color: '#10103a', h: 220, ox: -80, w: 450 },
-    { color: '#141440', h: 180, ox: 100, w: 380 },
-    { color: '#1a1a4a', h: 240, ox: 350, w: 420 },
-    { color: '#12123e', h: 160, ox: 550, w: 350 },
-    { color: '#161644', h: 200, ox: 780, w: 370 },
-  ];
-
   const baseY = STAGE_GROUND_Y - 30;
 
-  for (const layer of layers) {
-    const startX = layer.ox - px;
+  // ---- Far layer (parallax 0.06) — lightest, most distant ----
+  const fpx = cameraX * 0.06;
+  const farPeaks = [
+    { color: '#0c0c32', h: 200, ox: -60, w: 500 },
+    { color: '#0e0e38', h: 170, ox: 300, w: 450 },
+    { color: '#0b0b30', h: 190, ox: 650, w: 420 },
+  ];
+  for (const layer of farPeaks) {
+    const startX = layer.ox - fpx;
+    ctx.fillStyle = layer.color;
+    ctx.beginPath();
+    ctx.moveTo(startX, baseY);
+    ctx.quadraticCurveTo(startX + layer.w * 0.15, baseY - layer.h * 0.6, startX + layer.w * 0.3, baseY - layer.h * 0.9);
+    ctx.quadraticCurveTo(startX + layer.w * 0.45, baseY - layer.h * 1.05, startX + layer.w * 0.55, baseY - layer.h * 1.0);
+    ctx.quadraticCurveTo(startX + layer.w * 0.7, baseY - layer.h * 0.8, startX + layer.w * 0.85, baseY - layer.h * 0.45);
+    ctx.quadraticCurveTo(startX + layer.w * 0.95, baseY - layer.h * 0.2, startX + layer.w, baseY);
+    ctx.closePath();
+    ctx.fill();
+  }
+
+  // ---- Mid layer (parallax 0.1) — medium darkness ----
+  const mpx = cameraX * 0.1;
+  const midPeaks = [
+    { color: '#10103a', h: 230, ox: -80, w: 450 },
+    { color: '#141440', h: 190, ox: 180, w: 380 },
+    { color: '#1a1a4a', h: 250, ox: 440, w: 420 },
+    { color: '#12123e', h: 175, ox: 750, w: 350 },
+  ];
+  for (const layer of midPeaks) {
+    const startX = layer.ox - mpx;
     ctx.fillStyle = layer.color;
     ctx.beginPath();
     ctx.moveTo(startX, baseY);
@@ -240,25 +280,45 @@ export function drawDistantMountains(ctx: CanvasRenderingContext2D, cameraX: num
     ctx.closePath();
     ctx.fill();
 
-    // 高峰积雪 — 更自然
-    if (layer.h > 180) {
+    // Snow caps
+    if (layer.h > 200) {
       const peakX = startX + layer.w * 0.45;
       const peakY = baseY - layer.h * 1.05;
-      ctx.fillStyle = 'rgba(200, 200, 230, 0.07)';
+      ctx.fillStyle = 'rgba(200, 200, 230, 0.08)';
       ctx.beginPath();
-      ctx.moveTo(peakX - 40, peakY + 20);
-      ctx.lineTo(peakX - 10, peakY);
-      ctx.lineTo(peakX + 15, peakY + 5);
-      ctx.lineTo(peakX + 35, peakY + 18);
+      ctx.moveTo(peakX - 35, peakY + 18);
+      ctx.lineTo(peakX - 8, peakY);
+      ctx.lineTo(peakX + 12, peakY + 4);
+      ctx.lineTo(peakX + 30, peakY + 15);
       ctx.closePath();
       ctx.fill();
     }
   }
 
-  // 松树剪影层
-  drawPineSilhouettes(ctx, baseY, px);
+  // ---- Near layer (parallax 0.16) — darkest, closest ----
+  const npx = cameraX * 0.16;
+  const nearPeaks = [
+    { color: '#141440', h: 160, ox: -30, w: 400 },
+    { color: '#181848', h: 140, ox: 250, w: 350 },
+    { color: '#151544', h: 170, ox: 500, w: 380 },
+    { color: '#161644', h: 130, ox: 800, w: 320 },
+  ];
+  for (const layer of nearPeaks) {
+    const startX = layer.ox - npx;
+    ctx.fillStyle = layer.color;
+    ctx.beginPath();
+    ctx.moveTo(startX, baseY);
+    ctx.quadraticCurveTo(startX + layer.w * 0.2, baseY - layer.h * 0.7, startX + layer.w * 0.4, baseY - layer.h * 0.95);
+    ctx.quadraticCurveTo(startX + layer.w * 0.5, baseY - layer.h, startX + layer.w * 0.6, baseY - layer.h * 0.9);
+    ctx.quadraticCurveTo(startX + layer.w * 0.8, baseY - layer.h * 0.5, startX + layer.w, baseY);
+    ctx.closePath();
+    ctx.fill();
+  }
 
-  // 雾气层 — 更厚的多层雾
+  // 松树剪影层
+  drawPineSilhouettes(ctx, baseY, cameraX * 0.12);
+
+  // 雾气层 — 多层雾
   const mistGrad1 = ctx.createLinearGradient(0, STAGE_GROUND_Y - 130, 0, STAGE_GROUND_Y - 40);
   mistGrad1.addColorStop(0, 'rgba(25, 20, 50, 0)');
   mistGrad1.addColorStop(0.3, 'rgba(30, 25, 55, 0.08)');
@@ -366,14 +426,15 @@ function drawStoneLanterns(ctx: CanvasRenderingContext2D, cameraX: number, tick:
     ctx.fillStyle = '#333040';
     ctx.fillRect(sx - 3, baseY - lanternH + 10, 6, lanternH - 10);
 
-    // Light chamber
-    const glowAlpha = 0.15 + Math.sin(tick * 0.025 + phase) * 0.05;
-    const chamberGlow = ctx.createRadialGradient(sx, baseY - lanternH, 0, sx, baseY - lanternH, 20);
-    chamberGlow.addColorStop(0, `rgba(255, 200, 100, ${glowAlpha})`);
-    chamberGlow.addColorStop(0.5, `rgba(255, 160, 60, ${glowAlpha * 0.3})`);
-    chamberGlow.addColorStop(1, 'rgba(255, 120, 30, 0)');
+    // Light chamber — pulsing warm orange glow
+    const glowAlpha = 0.18 + Math.sin(tick * 0.025 + phase) * 0.08;
+    const chamberGlow = ctx.createRadialGradient(sx, baseY - lanternH, 0, sx, baseY - lanternH, 28);
+    chamberGlow.addColorStop(0, `rgba(255, 180, 80, ${glowAlpha * 1.2})`);
+    chamberGlow.addColorStop(0.3, `rgba(255, 140, 40, ${glowAlpha * 0.6})`);
+    chamberGlow.addColorStop(0.6, `rgba(255, 100, 20, ${glowAlpha * 0.25})`);
+    chamberGlow.addColorStop(1, 'rgba(255, 80, 10, 0)');
     ctx.fillStyle = chamberGlow;
-    ctx.fillRect(sx - 20, baseY - lanternH - 20, 40, 40);
+    ctx.fillRect(sx - 28, baseY - lanternH - 28, 56, 56);
 
     ctx.fillStyle = '#2a2535';
     ctx.fillRect(sx - 6, baseY - lanternH + 2, 12, 10);

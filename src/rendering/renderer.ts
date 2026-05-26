@@ -21,12 +21,15 @@ import { drawStage, generateStars, getStage } from './stage.js';
 import type { Star } from './stage.js';
 import { drawFighters as drawFightersImpl } from './rendererFighter.js';
 import { drawHUD, drawPowerGauges, drawComboCounters, drawTeamOrder, type TeamDisplayInfo } from './hud.js';
-import { drawCharacterSelect, drawIntro, drawKO, drawWinQuote, drawVSSplash, WIN_QUOTE_DURATION } from './screens.js';
-import { drawSuperFlash, drawMatchEnd, drawModeIndicator, drawStageIndicator, drawTitle, drawContinue, drawModeSelect } from './overlayScreens.js';
+import { drawCharacterSelect, drawIntro, drawKO, drawWinQuote, drawVSSplash, drawStageSelect, drawTeamOrderSelect, drawTransition, WIN_QUOTE_DURATION } from './screens.js';
+import type { KODustParticle } from '../state/cinematicState.js';
+import { drawSuperFlash, drawMatchEnd, drawModeIndicator, drawStageIndicator, drawTitle, drawContinue, drawModeSelect, drawTrainingHUD, drawGameOver } from './overlayScreens.js';
 import { drawProjectiles as drawProjectilesImpl } from './projectileRenderer.js';
 import type { SpriteRenderer } from './spriteRenderer.js';
 import type { SelectState } from '../state/selectState.js';
+import type { CharacterDefinition } from '../characters/types.js';
 import type { StageId } from './stage.js';
+import type { TrainingModeState } from '../state/trainingMode.js';
 
 export class Renderer {
   private ctx: CanvasRenderingContext2D;
@@ -46,7 +49,7 @@ export class Renderer {
     this.spriteRenderer = sr;
   }
 
-  render(fighters: Fighter[], cameraX: number, tick: number, ko: boolean, winner: number | null, shakeX: number, shakeY: number, delayedHealth: [number, number], maxModes?: [MaxModeState, MaxModeState], perfectPlayer: number | null = null, p1Wins: number = 0, p2Wins: number = 0, p1Name: string = '', p2Name: string = '', isTimeOver: boolean = false, currentRound: number = 1, firstAttacker: number | null = null, hitStopDefender: number = -1, hitStopBias: number = 0, charSpecialColors?: [string, string]): void {
+  render(fighters: Fighter[], cameraX: number, tick: number, ko: boolean, winner: number | null, shakeX: number, shakeY: number, delayedHealth: [number, number], maxModes?: [MaxModeState, MaxModeState], perfectPlayer: number | null = null, p1Wins: number = 0, p2Wins: number = 0, p1Name: string = '', p2Name: string = '', isTimeOver: boolean = false, currentRound: number = 1, firstAttacker: number | null = null, hitStopDefender: number = -1, hitStopBias: number = 0, charSpecialColors?: [string, string], koTimer: number = 0, koDustParticles: KODustParticle[] = []): void {
     this.frameCount++;
     this.globalTick = tick;
     const now = performance.now();
@@ -86,7 +89,7 @@ export class Renderer {
     drawHUD(ctx, fighters, tick, delayedHealth, p1Wins, p2Wins, p1Name, p2Name, currentRound, firstAttacker);
 
     if (ko) {
-      drawKO(ctx, winner, perfectPlayer, isTimeOver, fighters[0].health, fighters[1].health, fighters[0].maxHealth);
+      drawKO(ctx, winner, perfectPlayer, isTimeOver, fighters[0].health, fighters[1].health, fighters[0].maxHealth, koTimer, koDustParticles, cameraX);
     }
 
     // KOF2002: 暗角效果 — 聚焦中心, 边缘渐暗 (场景色温)
@@ -195,8 +198,35 @@ export class Renderer {
     drawContinue(this.ctx, secondsLeft, cursorYes);
   }
 
+  drawGameOver(timer: number): void {
+    drawGameOver(this.ctx, timer);
+  }
+
   drawWinQuote(timer: number, charName: string, winQuote: string, charColor: string, pixelPortrait: import('./pixelPortraits.js').PixelPortraitData | undefined): void {
     drawWinQuote(this.ctx, timer, charName, winQuote, charColor, pixelPortrait);
+  }
+
+  drawStageSelect(tick: number, cursor: number, ready: boolean): void {
+    drawStageSelect(this.ctx, tick, cursor, ready);
+  }
+
+  drawTeamOrderSelect(
+    tick: number,
+    p1Team: readonly { charDef: CharacterDefinition }[],
+    p2Team: readonly { charDef: CharacterDefinition }[],
+    p1Slots: number[],
+    p2Slots: number[],
+    cursor: number,
+    swapMode: boolean,
+    swapCursor: number,
+    p1Ready: boolean,
+    p2Ready: boolean,
+  ): void {
+    drawTeamOrderSelect(this.ctx, tick, p1Team, p2Team, p1Slots, p2Slots, cursor, swapMode, swapCursor, p1Ready, p2Ready);
+  }
+
+  drawTransition(tick: number, type: 'wipe' | 'zoom' | 'fade'): boolean {
+    return drawTransition(this.ctx, tick, type, CANVAS_WIDTH, CANVAS_HEIGHT);
   }
 
   // ===== Debug overlay =====
@@ -345,5 +375,9 @@ export class Renderer {
     }
     ctx.fillText(label, CANVAS_WIDTH / 2, 592);
     ctx.textAlign = 'left';
+  }
+
+  drawTrainingHUD(training: TrainingModeState, comboCount: number, comboDamage: number, tick: number): void {
+    drawTrainingHUD(this.ctx, training, comboCount, comboDamage, tick);
   }
 }

@@ -11,8 +11,10 @@ import {
   VS_SPLASH_DURATION,
 } from '../state/selectState.js';
 import type { SelectState } from '../state/selectState.js';
+import type { CharacterDefinition } from '../characters/types.js';
 import type { StageId } from './stage.js';
 import type { AnnounceSequence } from '../state/announceSequence.js';
+import type { KODustParticle } from '../state/cinematicState.js';
 
 // ===== 舞台名称映射 =====
 const STAGE_NAMES: Record<StageId, string> = {
@@ -708,16 +710,30 @@ export function drawIntro(ctx: CanvasRenderingContext2D, phaseTimer: number, cur
 
 // ===== KO Screen =====
 
-export function drawKO(ctx: CanvasRenderingContext2D, winner: number | null, perfectPlayer: number | null = null, isTimeOver: boolean = false, p1Hp: number = 0, p2Hp: number = 0, maxHp: number = 1000): void {
+export function drawKO(
+  ctx: CanvasRenderingContext2D,
+  winner: number | null,
+  perfectPlayer: number | null = null,
+  isTimeOver: boolean = false,
+  p1Hp: number = 0,
+  p2Hp: number = 0,
+  maxHp: number = 1000,
+  koTimer: number = 0,
+  koDustParticles: KODustParticle[] = [],
+  cameraX: number = 0,
+): void {
   ctx.save();
 
-  // Dark overlay with red vignette
-  ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+  // Dark overlay with red pulsing vignette
+  const pulseSpeed = 0.04;
+  const vignettePulse = 0.6 + Math.sin(koTimer * pulseSpeed) * 0.15;
+  ctx.fillStyle = `rgba(0, 0, 0, ${0.55 * vignettePulse})`;
   ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-  const vigGrad = ctx.createRadialGradient(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, 100, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, 400);
+  const vigGrad = ctx.createRadialGradient(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, 80, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, 420);
   vigGrad.addColorStop(0, 'rgba(0,0,0,0)');
-  vigGrad.addColorStop(0.7, 'rgba(80,0,0,0.15)');
-  vigGrad.addColorStop(1, 'rgba(100,0,0,0.3)');
+  vigGrad.addColorStop(0.5, `rgba(80,0,0,${0.12 * vignettePulse})`);
+  vigGrad.addColorStop(0.75, `rgba(120,0,0,${0.25 * vignettePulse})`);
+  vigGrad.addColorStop(1, `rgba(160,0,0,${0.4 * vignettePulse})`);
   ctx.fillStyle = vigGrad;
   ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
@@ -728,61 +744,150 @@ export function drawKO(ctx: CanvasRenderingContext2D, winner: number | null, per
   const titleColor = isTimeOver ? '#ffaa00' : '#ff2200';
   const glowColor = isTimeOver ? '#ff8800' : '#ff0000';
 
-  // KO/Time Over shockwave rings
-  for (let r = 0; r < 3; r++) {
-    const ringR = 60 + r * 50;
-    ctx.globalAlpha = 0.15 - r * 0.04;
-    ctx.strokeStyle = isTimeOver ? '#ffaa00' : '#ff4400';
-    ctx.lineWidth = 3 - r;
+  // KO impact dust particles
+  for (const p of koDustParticles) {
+    const screenX = p.x - cameraX;
+    const alpha = Math.max(0, p.life / p.maxLife) * 0.8;
+    ctx.fillStyle = p.color + Math.round(alpha * 255).toString(16).padStart(2, '0');
     ctx.beginPath();
-    ctx.arc(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 20, ringR, 0, Math.PI * 2);
-    ctx.stroke();
+    ctx.arc(screenX, p.y, p.size * (p.life / p.maxLife), 0, Math.PI * 2);
+    ctx.fill();
   }
-  // KO冲击线
+
+  // KO shockwave rings — expanding outward over time
+  const ringExpandProgress = Math.min(1, koTimer / 60);
+  for (let r = 0; r < 5; r++) {
+    const ringDelay = r * 0.12;
+    const ringProgress = Math.min(1, Math.max(0, ringExpandProgress * 2 - ringDelay));
+    if (ringProgress <= 0) continue;
+    const ringR = 30 + ringProgress * (200 - r * 25);
+    const ringAlpha = Math.max(0, 1 - ringProgress) * (1 - r * 0.15);
+    if (ringAlpha > 0) {
+      ctx.globalAlpha = ringAlpha * 0.4;
+      ctx.strokeStyle = isTimeOver ? '#ffaa00' : '#ff4400';
+      ctx.lineWidth = (4 - Math.min(r, 3)) * (1 - ringProgress) + 1;
+      ctx.beginPath();
+      ctx.arc(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 20, ringR, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+  }
+  ctx.globalAlpha = 1;
+
+  // KO radial impact lines
   ctx.save();
-  ctx.strokeStyle = isTimeOver ? `rgba(255, 170, 0, 0.12)` : `rgba(255, 34, 0, 0.15)`;
+  ctx.strokeStyle = isTimeOver ? 'rgba(255, 170, 0, 0.12)' : 'rgba(255, 34, 0, 0.15)';
   ctx.lineWidth = 2;
-  for (let i = 0; i < 32; i++) {
-    const angle = (i / 32) * Math.PI * 2;
+  const lineCount = 32;
+  const lineProgress = Math.min(1, koTimer / 30);
+  for (let i = 0; i < lineCount; i++) {
+    const angle = (i / lineCount) * Math.PI * 2;
     const innerR = 40;
-    const outerR = 180 + (i % 3) * 30;
+    const outerR = (100 + (i % 3) * 30) * (0.5 + lineProgress * 0.5);
     ctx.beginPath();
     ctx.moveTo(CANVAS_WIDTH / 2 + Math.cos(angle) * innerR, CANVAS_HEIGHT / 2 - 20 + Math.sin(angle) * innerR);
     ctx.lineTo(CANVAS_WIDTH / 2 + Math.cos(angle) * outerR, CANVAS_HEIGHT / 2 - 20 + Math.sin(angle) * outerR);
     ctx.stroke();
   }
   ctx.restore();
+
+  // Title text — dramatic scale from 3x to 1x with bounce
+  const textAppearFrame = 5;
+  const textProgress = Math.max(0, Math.min(1, (koTimer - textAppearFrame) / 20));
+  let textScale = 1;
+  if (textProgress < 0.2) {
+    // Scale from 3x down to 1x
+    textScale = 1 + (1 - textProgress / 0.2) * 2;
+  } else if (textProgress < 0.35) {
+    // Bounce overshoot to 1.15x
+    const bounceProgress = (textProgress - 0.2) / 0.15;
+    textScale = 1 + 0.15 * Math.sin(bounceProgress * Math.PI);
+  } else {
+    textScale = 1;
+  }
+  const textAlpha = Math.min(1, Math.max(0, textProgress * 3));
+  ctx.globalAlpha = textAlpha;
+  const fontSize = Math.round((isTimeOver ? 72 : 100) * textScale);
+  ctx.shadowColor = glowColor;
+  ctx.shadowBlur = 60 + (textScale - 1) * 30;
+  drawSNKText(ctx, titleText, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 20, fontSize, titleColor);
+  ctx.shadowBlur = 0;
   ctx.globalAlpha = 1;
 
-  // Title text
-  ctx.shadowColor = glowColor;
-  ctx.shadowBlur = 60;
-  drawSNKText(ctx, titleText, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 20, isTimeOver ? 72 : 100, titleColor);
-  ctx.shadowBlur = 0;
-
+  // Winner announcement
   if (winner !== null) {
     const wColor = winner === 0 ? '#ff6644' : '#4488ff';
+    const winAlpha = Math.min(1, Math.max(0, (koTimer - 30) / 20));
+    ctx.globalAlpha = winAlpha;
     ctx.shadowColor = wColor;
     ctx.shadowBlur = 12;
     drawSNKText(ctx, `P${winner + 1} WINS`, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 50, 28, wColor);
     ctx.shadowBlur = 0;
+    ctx.globalAlpha = 1;
   } else {
+    const dkAlpha = Math.min(1, Math.max(0, (koTimer - 30) / 20));
+    ctx.globalAlpha = dkAlpha;
     ctx.shadowColor = '#ffcc00';
     ctx.shadowBlur = 12;
     drawSNKText(ctx, 'DOUBLE KO', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 50, 28, '#ffcc00');
     ctx.shadowBlur = 0;
+    ctx.globalAlpha = 1;
   }
 
+  // PERFECT with golden glow and sparkles
   if (perfectPlayer !== null) {
+    const perfAlpha = Math.min(1, Math.max(0, (koTimer - 50) / 20));
+    ctx.globalAlpha = perfAlpha;
+
+    // Golden glow background behind PERFECT text
+    const perfGlowGrad = ctx.createRadialGradient(
+      CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 100, 10,
+      CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 100, 120,
+    );
+    perfGlowGrad.addColorStop(0, `rgba(255, 200, 50, ${0.3 * perfAlpha})`);
+    perfGlowGrad.addColorStop(0.5, `rgba(255, 170, 0, ${0.15 * perfAlpha})`);
+    perfGlowGrad.addColorStop(1, 'rgba(255, 150, 0, 0)');
+    ctx.fillStyle = perfGlowGrad;
+    ctx.fillRect(CANVAS_WIDTH / 2 - 150, CANVAS_HEIGHT / 2 + 40, 300, 120);
+
     ctx.shadowColor = '#ffcc00';
     ctx.shadowBlur = 35;
     drawSNKText(ctx, 'PERFECT!', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 100, 42, '#ffcc00');
     ctx.shadowBlur = 0;
     const perfColor = perfectPlayer === 0 ? '#ff6644' : '#4488ff';
     drawSNKText(ctx, `P${perfectPlayer + 1}`, CANVAS_WIDTH / 2 - 80, CANVAS_HEIGHT / 2 + 100, 16, perfColor);
+
+    // Sparkle particles around PERFECT text
+    const sparkleCount = 8;
+    for (let s = 0; s < sparkleCount; s++) {
+      const sparkleAngle = (s / sparkleCount) * Math.PI * 2 + koTimer * 0.03;
+      const sparkleDist = 60 + Math.sin(koTimer * 0.05 + s) * 20;
+      const sx = CANVAS_WIDTH / 2 + Math.cos(sparkleAngle) * sparkleDist;
+      const sy = CANVAS_HEIGHT / 2 + 100 + Math.sin(sparkleAngle) * sparkleDist * 0.5;
+      const sparkleSize = 2 + Math.sin(koTimer * 0.1 + s * 1.5) * 1.5;
+      const sparkleAlpha = 0.5 + Math.sin(koTimer * 0.08 + s) * 0.3;
+      ctx.fillStyle = `rgba(255, 230, 100, ${sparkleAlpha * perfAlpha})`;
+      ctx.beginPath();
+      // 4-pointed star shape
+      ctx.moveTo(sx, sy - sparkleSize);
+      ctx.lineTo(sx + sparkleSize * 0.3, sy);
+      ctx.lineTo(sx, sy + sparkleSize);
+      ctx.lineTo(sx - sparkleSize * 0.3, sy);
+      ctx.closePath();
+      ctx.fill();
+    }
+
+    // Bonus meter gain visual — golden upward arrows
+    const arrowAlpha = Math.max(0, Math.sin(koTimer * 0.06)) * perfAlpha * 0.6;
+    if (arrowAlpha > 0) {
+      ctx.fillStyle = `rgba(255, 200, 50, ${arrowAlpha})`;
+      ctx.font = 'bold 18px "Courier New", monospace';
+      ctx.fillText('+METER', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 140);
+    }
+
+    ctx.globalAlpha = 1;
   }
 
-  // Time Over血量对比条
+  // Time Over HP comparison bar
   if (isTimeOver && winner !== null) {
     const barY = CANVAS_HEIGHT / 2 + 85;
     const barW = 200;
@@ -807,7 +912,7 @@ export function drawKO(ctx: CanvasRenderingContext2D, winner: number | null, per
 
   ctx.fillStyle = 'rgba(255,255,255,0.4)';
   ctx.font = '13px "Courier New", monospace';
-  ctx.fillText('Press R to restart', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 140);
+  ctx.fillText('Press R to restart', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 170);
 
   ctx.restore();
 }
@@ -971,4 +1076,439 @@ export function drawAnnounceSequence(
 
   ctx.globalAlpha = 1;
   ctx.restore();
+}
+
+// ===== Stage Select Screen =====
+
+const STAGE_PREVIEW_W = 120;
+const STAGE_PREVIEW_H = 80;
+const STAGE_PREVIEW_GAP = 16;
+const ALL_STAGES: StageId[] = ['temple', 'china', 'factory', 'orochi', 'street'];
+
+const STAGE_THEMES: Record<string, { bg1: string; bg2: string; accent: string; pattern: string }> = {
+  temple: { bg1: '#2a1a0a', bg2: '#1a0e05', accent: '#cc6633', pattern: '#cc6633' },
+  china: { bg1: '#3a1515', bg2: '#1a0808', accent: '#ff4444', pattern: '#ffcc00' },
+  factory: { bg1: '#1a2a1a', bg2: '#0a150a', accent: '#66aa66', pattern: '#88cc88' },
+  orochi: { bg1: '#1a1a2a', bg2: '#0a0a15', accent: '#8866cc', pattern: '#aa88ff' },
+  street: { bg1: '#2a2a1a', bg2: '#15150a', accent: '#ccaa33', pattern: '#ffdd66' },
+};
+
+export function drawStageSelect(
+  ctx: CanvasRenderingContext2D,
+  tick: number,
+  cursor: number,
+  ready: boolean,
+): void {
+  ctx.save();
+
+  const bgGrad = ctx.createLinearGradient(0, 0, 0, CANVAS_HEIGHT);
+  bgGrad.addColorStop(0, '#080818');
+  bgGrad.addColorStop(0.5, '#0c0c24');
+  bgGrad.addColorStop(1, '#060614');
+  ctx.fillStyle = bgGrad;
+  ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+  ctx.strokeStyle = 'rgba(255,255,255,0.02)';
+  ctx.lineWidth = 1;
+  for (let i = -20; i < 40; i++) {
+    const xOff = (tick * 0.3) % 60;
+    ctx.beginPath();
+    ctx.moveTo(i * 60 + xOff, 0);
+    ctx.lineTo(i * 60 + xOff - CANVAS_HEIGHT, CANVAS_HEIGHT);
+    ctx.stroke();
+  }
+
+  ctx.fillStyle = 'rgba(0,0,0,0.6)';
+  ctx.fillRect(0, 0, CANVAS_WIDTH, 80);
+  const titleGrad = ctx.createLinearGradient(0, 78, CANVAS_WIDTH, 78);
+  titleGrad.addColorStop(0, '#cc880000');
+  titleGrad.addColorStop(0.3, '#cc880088');
+  titleGrad.addColorStop(0.5, '#ffcc4466');
+  titleGrad.addColorStop(0.7, '#cc880088');
+  titleGrad.addColorStop(1, '#cc880000');
+  ctx.strokeStyle = titleGrad;
+  ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(0, 80); ctx.lineTo(CANVAS_WIDTH, 80); ctx.stroke();
+
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  drawSNKText(ctx, 'SELECT STAGE', CANVAS_WIDTH / 2, 25, 32, '#ffcc00');
+  drawSNKText(ctx, 'A/D: move   Enter: confirm', CANVAS_WIDTH / 2, 58, 10, '#888888');
+
+  const totalSlots = ALL_STAGES.length + 1;
+  const totalW = totalSlots * STAGE_PREVIEW_W + (totalSlots - 1) * STAGE_PREVIEW_GAP;
+  const startX = (CANVAS_WIDTH - totalW) / 2;
+  const previewY = 180;
+
+  for (let i = 0; i < totalSlots; i++) {
+    const isRandom = i === ALL_STAGES.length;
+    const stageId = isRandom ? null : ALL_STAGES[i];
+    const theme = isRandom ? null : STAGE_THEMES[stageId!];
+    const px = startX + i * (STAGE_PREVIEW_W + STAGE_PREVIEW_GAP);
+    const isHovered = i === cursor;
+
+    if (theme) {
+      const thumbGrad = ctx.createLinearGradient(px, previewY, px, previewY + STAGE_PREVIEW_H);
+      thumbGrad.addColorStop(0, theme.bg1);
+      thumbGrad.addColorStop(1, theme.bg2);
+      ctx.fillStyle = thumbGrad;
+    } else {
+      ctx.fillStyle = '#1a1a2e';
+    }
+    roundRect(ctx, px, previewY, STAGE_PREVIEW_W, STAGE_PREVIEW_H, 8);
+    ctx.fill();
+
+    if (theme) {
+      ctx.fillStyle = theme.accent + '44';
+      ctx.fillRect(px + 4, previewY + STAGE_PREVIEW_H - 20, STAGE_PREVIEW_W - 8, 2);
+      ctx.fillStyle = theme.pattern + '22';
+      if (stageId === 'temple') {
+        ctx.beginPath();
+        ctx.moveTo(px + 30, previewY + 20);
+        ctx.lineTo(px + 60, previewY + 10);
+        ctx.lineTo(px + 90, previewY + 20);
+        ctx.lineTo(px + 85, previewY + 30);
+        ctx.lineTo(px + 35, previewY + 30);
+        ctx.closePath();
+        ctx.fill();
+      } else if (stageId === 'china') {
+        for (const lx of [px + 25, px + 60, px + 95]) {
+          ctx.beginPath(); ctx.arc(lx, previewY + 22, 8, 0, Math.PI * 2); ctx.fill();
+        }
+      } else if (stageId === 'factory') {
+        ctx.beginPath(); ctx.arc(px + 40, previewY + 30, 15, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(px + 85, previewY + 25, 10, 0, Math.PI * 2); ctx.fill();
+      } else if (stageId === 'orochi') {
+        ctx.beginPath(); ctx.arc(px + 60, previewY + 25, 18, 0, Math.PI * 2); ctx.fill();
+      } else if (stageId === 'street') {
+        ctx.fillRect(px + 10, previewY + 15, 20, 45);
+        ctx.fillRect(px + 40, previewY + 25, 15, 35);
+        ctx.fillRect(px + 70, previewY + 20, 25, 40);
+        ctx.fillRect(px + 100, previewY + 30, 15, 30);
+      }
+    } else {
+      const pulse = 0.7 + Math.sin(tick * 0.08) * 0.3;
+      ctx.fillStyle = `rgba(255, 204, 0, ${0.15 * pulse})`;
+      roundRect(ctx, px + 4, previewY + 4, STAGE_PREVIEW_W - 8, STAGE_PREVIEW_H - 8, 6);
+      ctx.fill();
+      ctx.font = 'bold 30px "Courier New", monospace';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillStyle = `rgba(255, 204, 0, ${0.6 + pulse * 0.4})`;
+      ctx.fillText('?', px + STAGE_PREVIEW_W / 2, previewY + STAGE_PREVIEW_H / 2 - 4);
+    }
+
+    ctx.strokeStyle = isHovered ? '#ffcc00' : 'rgba(255,255,255,0.08)';
+    ctx.lineWidth = isHovered ? 3 : 1;
+    roundRect(ctx, px, previewY, STAGE_PREVIEW_W, STAGE_PREVIEW_H, 8);
+    ctx.stroke();
+
+    const nameText = isRandom ? 'RANDOM' : STAGE_NAMES[stageId!];
+    const displayName = isRandom ? 'RANDOM' : nameText!.split(' · ')[0];
+    ctx.font = '10px "Courier New", monospace';
+    ctx.textAlign = 'center';
+    ctx.fillStyle = isHovered ? '#ffcc00' : '#888';
+    ctx.fillText(displayName, px + STAGE_PREVIEW_W / 2, previewY + STAGE_PREVIEW_H + 16);
+
+    if (isHovered) {
+      const glowPulse = 0.5 + Math.sin(tick * 0.12) * 0.3;
+      ctx.save();
+      ctx.shadowColor = '#ffcc00';
+      ctx.shadowBlur = 18 * glowPulse;
+      ctx.strokeStyle = `rgba(255, 204, 0, ${0.6 + glowPulse * 0.4})`;
+      ctx.lineWidth = 2;
+      roundRect(ctx, px - 4, previewY - 4, STAGE_PREVIEW_W + 8, STAGE_PREVIEW_H + 8, 12);
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+      ctx.restore();
+    }
+
+    if (ready && isHovered) {
+      const flash = Math.sin(tick * 0.2) * 0.15 + 0.3;
+      ctx.fillStyle = `rgba(255, 204, 0, ${flash})`;
+      roundRect(ctx, px, previewY, STAGE_PREVIEW_W, STAGE_PREVIEW_H, 8);
+      ctx.fill();
+      ctx.font = 'bold 16px "Courier New", monospace';
+      ctx.textAlign = 'center';
+      ctx.fillStyle = '#fff';
+      ctx.fillText('OK!', px + STAGE_PREVIEW_W / 2, previewY + STAGE_PREVIEW_H / 2);
+    }
+  }
+
+  const selectedIdx = cursor;
+  const isSelectedRandom = selectedIdx === ALL_STAGES.length;
+  const selectedStageId = isSelectedRandom ? null : ALL_STAGES[selectedIdx];
+  const selectedTheme = selectedStageId ? STAGE_THEMES[selectedStageId] : null;
+
+  const largePreviewY = 340;
+  const largeW = 280;
+  const largeH = 180;
+  const largeX = CANVAS_WIDTH / 2 - largeW / 2;
+
+  if (selectedTheme) {
+    const lGrad = ctx.createLinearGradient(largeX, largePreviewY, largeX + largeW, largePreviewY + largeH);
+    lGrad.addColorStop(0, selectedTheme.bg1);
+    lGrad.addColorStop(1, selectedTheme.bg2);
+    ctx.fillStyle = lGrad;
+  } else {
+    ctx.fillStyle = '#1a1a2e';
+  }
+  roundRect(ctx, largeX, largePreviewY, largeW, largeH, 10);
+  ctx.fill();
+
+  if (selectedTheme) {
+    ctx.fillStyle = selectedTheme.accent + '33';
+    ctx.fillRect(largeX + 10, largePreviewY + largeH - 40, largeW - 20, 3);
+    ctx.fillStyle = selectedTheme.pattern + '15';
+    ctx.beginPath();
+    ctx.arc(largeX + largeW / 2, largePreviewY + largeH / 2, 60, 0, Math.PI * 2);
+    ctx.fill();
+  } else {
+    const pulse = 0.7 + Math.sin(tick * 0.08) * 0.3;
+    ctx.font = 'bold 72px "Courier New", monospace';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = `rgba(255, 204, 0, ${0.3 + pulse * 0.3})`;
+    ctx.fillText('?', largeX + largeW / 2, largePreviewY + largeH / 2);
+  }
+
+  ctx.strokeStyle = '#ffcc0088';
+  ctx.lineWidth = 2;
+  roundRect(ctx, largeX, largePreviewY, largeW, largeH, 10);
+  ctx.stroke();
+
+  const stageLabel = isSelectedRandom ? '???' : STAGE_NAMES[selectedStageId!];
+  drawSNKText(ctx, stageLabel || 'RANDOM', CANVAS_WIDTH / 2, largePreviewY + largeH + 25, 20, '#ffcc00');
+  if (!isSelectedRandom && stageLabel) {
+    const subLabel = stageLabel.split(' · ')[1] || '';
+    ctx.font = '12px "Courier New", monospace';
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#888';
+    ctx.fillText(subLabel, CANVAS_WIDTH / 2, largePreviewY + largeH + 45);
+  }
+
+  ctx.textAlign = 'left';
+  ctx.restore();
+}
+
+// ===== Team Order Select Screen =====
+
+export function drawTeamOrderSelect(
+  ctx: CanvasRenderingContext2D,
+  tick: number,
+  p1Team: readonly { charDef: CharacterDefinition }[],
+  p2Team: readonly { charDef: CharacterDefinition }[],
+  p1Slots: number[],
+  p2Slots: number[],
+  cursor: number,
+  swapMode: boolean,
+  swapCursor: number,
+  p1Ready: boolean,
+  p2Ready: boolean,
+): void {
+  ctx.save();
+
+  const bgGrad = ctx.createLinearGradient(0, 0, 0, CANVAS_HEIGHT);
+  bgGrad.addColorStop(0, '#080818');
+  bgGrad.addColorStop(0.5, '#0c0c24');
+  bgGrad.addColorStop(1, '#060614');
+  ctx.fillStyle = bgGrad;
+  ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillStyle = 'rgba(0,0,0,0.6)';
+  ctx.fillRect(0, 0, CANVAS_WIDTH, 70);
+  drawSNKText(ctx, 'ORDER SELECT', CANVAS_WIDTH / 2, 22, 28, '#ffcc00');
+  drawSNKText(ctx, 'Left/Right: pick slot   A: select   S: swap', CANVAS_WIDTH / 2, 52, 10, '#888888');
+
+  const slotW = 100;
+  const slotH = 140;
+  const slotGap = 20;
+
+  for (let pi = 0; pi < 2; pi++) {
+    const team = pi === 0 ? p1Team : p2Team;
+    const slots = pi === 0 ? p1Slots : p2Slots;
+    const ready = pi === 0 ? p1Ready : p2Ready;
+    const label = pi === 0 ? 'P1' : 'P2';
+    const labelColor = pi === 0 ? '#22ccaa' : '#ff6644';
+    const baseX = pi === 0 ? 80 : CANVAS_WIDTH - 80 - 3 * slotW - 2 * slotGap;
+
+    drawSNKText(ctx, label, baseX + (3 * slotW + 2 * slotGap) / 2, 95, 18, labelColor);
+
+    for (let si = 0; si < 3; si++) {
+      const charIdx = slots[si];
+      const char = team[charIdx]?.charDef;
+      const sx = baseX + si * (slotW + slotGap);
+      const sy = 120;
+
+      const isActive = !ready && pi === 0 && cursor === si && !swapMode;
+      const isSwapTarget = !ready && pi === 0 && swapMode && swapCursor === si;
+
+      ctx.fillStyle = isActive ? 'rgba(34, 204, 170, 0.15)' : isSwapTarget ? 'rgba(255, 100, 0, 0.15)' : 'rgba(20, 20, 40, 0.8)';
+      roundRect(ctx, sx, sy, slotW, slotH, 8);
+      ctx.fill();
+
+      const borderColor = isActive ? '#22ccaa' : isSwapTarget ? '#ff8800' : ready ? '#44ff4466' : 'rgba(255,255,255,0.1)';
+      ctx.strokeStyle = borderColor;
+      ctx.lineWidth = isActive || isSwapTarget ? 3 : 1;
+      roundRect(ctx, sx, sy, slotW, slotH, 8);
+      ctx.stroke();
+
+      if (isActive || isSwapTarget) {
+        const glowPulse = 0.5 + Math.sin(tick * 0.12) * 0.3;
+        ctx.save();
+        ctx.shadowColor = isActive ? '#22ccaa' : '#ff8800';
+        ctx.shadowBlur = 12 * glowPulse;
+        ctx.strokeStyle = isActive ? `rgba(34, 204, 170, ${0.5 + glowPulse * 0.5})` : `rgba(255, 136, 0, ${0.5 + glowPulse * 0.5})`;
+        ctx.lineWidth = 2;
+        roundRect(ctx, sx - 3, sy - 3, slotW + 6, slotH + 6, 10);
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+        ctx.restore();
+      }
+
+      if (char) {
+        if (char.pixelPortrait) {
+          const pScale = 2.5;
+          const pw = char.pixelPortrait.width * pScale;
+          const ph = char.pixelPortrait.height * pScale;
+          const ppx = sx + (slotW - pw) / 2;
+          const ppy = sy + 10;
+          drawPixelPortrait(ctx, char.pixelPortrait, ppx, ppy, pScale, {
+            frameColor: char.color,
+            backdropColor: 'rgba(8, 8, 18, 0.85)',
+            scanlines: true,
+          });
+        } else {
+          const charGrad = ctx.createLinearGradient(sx + 10, sy + 10, sx + slotW - 10, sy + 90);
+          charGrad.addColorStop(0, char.color);
+          charGrad.addColorStop(1, char.accentColor);
+          ctx.fillStyle = charGrad;
+          roundRect(ctx, sx + 10, sy + 10, slotW - 20, 80, 4);
+          ctx.fill();
+          ctx.font = '28px serif';
+          ctx.textAlign = 'center';
+          ctx.fillStyle = '#fff';
+          ctx.fillText(char.portrait, sx + slotW / 2, sy + 55);
+        }
+        drawSNKText(ctx, char.nameCn, sx + slotW / 2, sy + slotH - 15, 12, '#eee');
+      }
+
+      ctx.font = 'bold 16px "Courier New", monospace';
+      ctx.textAlign = 'center';
+      ctx.fillStyle = labelColor;
+      ctx.fillText(`${si + 1}`, sx + slotW / 2, sy + slotH + 15);
+
+      if (ready) {
+        const flash = Math.sin(tick * 0.15) * 0.3 + 0.7;
+        ctx.fillStyle = `rgba(255, 204, 0, ${flash * 0.3})`;
+        roundRect(ctx, sx, sy, slotW, slotH, 8);
+        ctx.fill();
+        ctx.font = 'bold 14px "Courier New", monospace';
+        ctx.fillStyle = '#ffcc00';
+        ctx.fillText('OK!', sx + slotW / 2, sy + slotH / 2);
+      }
+    }
+  }
+
+  const centerX = CANVAS_WIDTH / 2;
+  ctx.strokeStyle = 'rgba(255, 204, 0, 0.2)';
+  ctx.lineWidth = 1;
+  ctx.setLineDash([4, 4]);
+  ctx.beginPath();
+  ctx.moveTo(centerX, 80);
+  ctx.lineTo(centerX, CANVAS_HEIGHT - 60);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  drawSNKText(ctx, 'VS', centerX, CANVAS_HEIGHT / 2, 36, 'rgba(255,255,255,0.15)');
+
+  if (swapMode) {
+    drawSNKText(ctx, 'SWAP MODE: Select target slot', CANVAS_WIDTH / 2, CANVAS_HEIGHT - 40, 12, '#ff8800');
+  } else if (!p1Ready) {
+    drawSNKText(ctx, 'Select a slot, then press S to swap', CANVAS_WIDTH / 2, CANVAS_HEIGHT - 40, 11, '#666');
+  }
+
+  ctx.textAlign = 'left';
+  ctx.restore();
+}
+
+// ===== Transition Animations =====
+
+const TRANSITION_WIPE_DURATION = 40;
+const TRANSITION_ZOOM_DURATION = 50;
+const TRANSITION_FADE_DURATION = 30;
+
+export function drawTransition(
+  ctx: CanvasRenderingContext2D,
+  tick: number,
+  type: 'wipe' | 'zoom' | 'fade',
+  canvasWidth: number,
+  canvasHeight: number,
+): boolean {
+  ctx.save();
+
+  if (type === 'wipe') {
+    const progress = Math.min(1, tick / TRANSITION_WIPE_DURATION);
+    const wipeX = canvasWidth * (1 - progress);
+    ctx.fillStyle = '#000000';
+    ctx.fillRect(wipeX, 0, canvasWidth - wipeX, canvasHeight);
+    if (progress < 1) {
+      const glowGrad = ctx.createLinearGradient(wipeX - 30, 0, wipeX + 10, 0);
+      glowGrad.addColorStop(0, 'rgba(255, 204, 0, 0)');
+      glowGrad.addColorStop(0.5, 'rgba(255, 204, 0, 0.4)');
+      glowGrad.addColorStop(1, 'rgba(255, 204, 0, 0)');
+      ctx.fillStyle = glowGrad;
+      ctx.fillRect(wipeX - 30, 0, 40, canvasHeight);
+    }
+    ctx.restore();
+    return progress >= 1;
+  }
+
+  if (type === 'zoom') {
+    const progress = Math.min(1, tick / TRANSITION_ZOOM_DURATION);
+    if (progress < 0.5) {
+      const p = progress / 0.5;
+      ctx.fillStyle = `rgba(0, 0, 0, ${p * 0.9})`;
+      ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+      const spotR = (1 - p) * canvasHeight * 0.6;
+      if (spotR > 5) {
+        const spotGrad = ctx.createRadialGradient(canvasWidth / 2, canvasHeight / 2, 0, canvasWidth / 2, canvasHeight / 2, spotR);
+        spotGrad.addColorStop(0, `rgba(255, 204, 0, ${0.3 * (1 - p)})`);
+        spotGrad.addColorStop(0.5, `rgba(255, 100, 0, ${0.15 * (1 - p)})`);
+        spotGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        ctx.fillStyle = spotGrad;
+        ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+      }
+    } else {
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.95)';
+      ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+    }
+    if (progress < 0.15) {
+      const lineAlpha = (1 - progress / 0.15) * 0.6;
+      ctx.strokeStyle = `rgba(255, 204, 0, ${lineAlpha})`;
+      ctx.lineWidth = 3;
+      for (let i = 0; i < 12; i++) {
+        const angle = (i / 12) * Math.PI * 2;
+        ctx.beginPath();
+        ctx.moveTo(canvasWidth / 2, canvasHeight / 2);
+        ctx.lineTo(canvasWidth / 2 + Math.cos(angle) * canvasWidth, canvasHeight / 2 + Math.sin(angle) * canvasHeight);
+        ctx.stroke();
+      }
+    }
+    ctx.restore();
+    return progress >= 1;
+  }
+
+  if (type === 'fade') {
+    const progress = Math.min(1, tick / TRANSITION_FADE_DURATION);
+    ctx.fillStyle = `rgba(0, 0, 0, ${progress})`;
+    ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+    ctx.restore();
+    return progress >= 1;
+  }
+
+  ctx.restore();
+  return true;
 }

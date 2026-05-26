@@ -87,10 +87,13 @@ export function drawChinaStage(
 
   drawSky(ctx, globalTick);
   drawDistantBuildings(ctx, cameraX);
+  drawPagodaBuilding(ctx, cameraX, globalTick);
+  drawBambooGrove(ctx, cameraX, globalTick);
   drawBackgroundCrowd(ctx, cameraX, globalTick);
   drawMarketStalls(ctx, cameraX, globalTick);
   drawSigns(ctx, cameraX, globalTick);
   drawClotheslines(ctx, cameraX, globalTick);
+  drawStoneBridgeAndKoi(ctx, cameraX, globalTick);
   drawGround(ctx, cameraX, globalTick);
   drawParticles(ctx, globalTick);
   drawSparkles(ctx, globalTick);
@@ -759,4 +762,418 @@ function shiftC(color: string, amount: number): string {
   const g = Math.max(0, Math.min(255, parseInt(color.slice(3, 5), 16) + amount));
   const b = Math.max(0, Math.min(255, parseInt(color.slice(5, 7), 16) + amount));
   return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+}
+
+// ===== Pagoda building with multiple tiers =====
+
+function drawPagodaBuilding(ctx: CanvasRenderingContext2D, cameraX: number, tick: number): void {
+  const px = cameraX * 0.18;
+  const baseX = 650 - px;
+  const baseY = STAGE_GROUND_Y - 10;
+  const tiers = 5;
+  const baseW = 110;
+
+  // Stone foundation platform
+  ctx.fillStyle = '#3a2820';
+  ctx.fillRect(baseX - 10, baseY - 8, baseW + 20, 8);
+  ctx.fillStyle = '#4a3528';
+  ctx.fillRect(baseX - 15, baseY - 4, baseW + 30, 4);
+
+  for (let t = 0; t < tiers; t++) {
+    const tierW = baseW - t * 14;
+    const tierH = 28;
+    const ty = baseY - 8 - (t + 1) * tierH - t * 8;
+    const tx = baseX + (baseW - tierW) / 2;
+
+    // Tier body
+    const tierGrad = ctx.createLinearGradient(tx, ty, tx + tierW, ty + tierH);
+    tierGrad.addColorStop(0, '#8B2020');
+    tierGrad.addColorStop(0.5, '#9B2828');
+    tierGrad.addColorStop(1, '#7B1818');
+    ctx.fillStyle = tierGrad;
+    ctx.fillRect(tx + 4, ty + 12, tierW - 8, tierH - 12);
+
+    // Tier body wood paneling
+    ctx.strokeStyle = 'rgba(0,0,0,0.08)';
+    ctx.lineWidth = 0.5;
+    for (let ly = ty + 16; ly < ty + tierH; ly += 5) {
+      ctx.beginPath();
+      ctx.moveTo(tx + 4, ly);
+      ctx.lineTo(tx + tierW - 4, ly);
+      ctx.stroke();
+    }
+
+    // Window on each tier
+    if (t < 4) {
+      const winW = 8;
+      const winH = 12;
+      const winX = tx + tierW / 2 - winW / 2;
+      const winY = ty + 15;
+      const windowGlow = ctx.createRadialGradient(winX + winW / 2, winY + winH / 2, 0, winX + winW / 2, winY + winH / 2, 18);
+      windowGlow.addColorStop(0, `rgba(255, 200, 100, ${0.15 + Math.sin(tick * 0.03 + t) * 0.05})`);
+      windowGlow.addColorStop(1, 'rgba(255, 150, 50, 0)');
+      ctx.fillStyle = windowGlow;
+      ctx.fillRect(winX - 10, winY - 6, winW + 20, winH + 12);
+      ctx.fillStyle = `rgba(255, 180, 80, ${0.2 + Math.sin(tick * 0.025 + t * 1.5) * 0.05})`;
+      ctx.fillRect(winX, winY, winW, winH);
+      ctx.strokeStyle = '#6B1515';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(winX, winY, winW, winH);
+    }
+
+    // Curved roof for each tier
+    const overhang = 18 + t * 2;
+    ctx.fillStyle = '#5a1515';
+    ctx.beginPath();
+    ctx.moveTo(tx - overhang, ty + 14);
+    ctx.quadraticCurveTo(tx - overhang * 0.3, ty - 4, tx + tierW * 0.5, ty - 2);
+    ctx.quadraticCurveTo(tx + tierW + overhang * 0.3, ty - 4, tx + tierW + overhang, ty + 14);
+    ctx.lineTo(tx + tierW + overhang - 2, ty + 18);
+    ctx.quadraticCurveTo(tx + tierW * 0.5, ty + 2, tx - overhang + 2, ty + 18);
+    ctx.closePath();
+    ctx.fill();
+
+    // Roof edge highlight
+    ctx.strokeStyle = 'rgba(200, 140, 60, 0.4)';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(tx - overhang, ty + 14);
+    ctx.quadraticCurveTo(tx - overhang * 0.3, ty - 4, tx + tierW * 0.5, ty - 2);
+    ctx.quadraticCurveTo(tx + tierW + overhang * 0.3, ty - 4, tx + tierW + overhang, ty + 14);
+    ctx.stroke();
+
+    // Corner ornaments
+    for (const cx of [tx - overhang, tx + tierW + overhang]) {
+      ctx.strokeStyle = 'rgba(200, 140, 60, 0.3)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(cx, ty + 14);
+      ctx.quadraticCurveTo(cx + (cx < tx + tierW / 2 ? -6 : 6), ty + 4, cx + (cx < tx + tierW / 2 ? -3 : 3), ty + 8);
+      ctx.stroke();
+    }
+
+    // Wind chime on bottom tier
+    if (t === 0) {
+      const chimeX = tx + tierW / 2;
+      const chimeY = ty + 16;
+      const sway = Math.sin(tick * 0.03) * 2;
+      ctx.strokeStyle = 'rgba(200, 160, 60, 0.4)';
+      ctx.lineWidth = 0.5;
+      ctx.beginPath();
+      ctx.moveTo(chimeX, chimeY);
+      ctx.lineTo(chimeX + sway, chimeY + 10);
+      ctx.stroke();
+      ctx.fillStyle = 'rgba(200, 160, 60, 0.5)';
+      ctx.beginPath();
+      ctx.arc(chimeX + sway, chimeY + 10, 1.5, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  // Spire on top
+  const topTierCenterX = baseX + baseW / 2;
+  const topTierY = baseY - 8 - tiers * 36;
+  ctx.strokeStyle = 'rgba(200, 170, 80, 0.6)';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(topTierCenterX, topTierY);
+  ctx.lineTo(topTierCenterX, topTierY - 25);
+  ctx.stroke();
+  ctx.fillStyle = 'rgba(220, 190, 100, 0.7)';
+  ctx.beginPath();
+  ctx.arc(topTierCenterX, topTierY - 27, 3, 0, Math.PI * 2);
+  ctx.fill();
+  for (const ry of [topTierY - 8, topTierY - 14, topTierY - 20]) {
+    ctx.strokeStyle = 'rgba(200, 170, 80, 0.4)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(topTierCenterX - 5, ry);
+    ctx.lineTo(topTierCenterX + 5, ry);
+    ctx.stroke();
+  }
+  const spireGlow = ctx.createRadialGradient(topTierCenterX, topTierY - 25, 0, topTierCenterX, topTierY - 25, 20);
+  spireGlow.addColorStop(0, 'rgba(220, 190, 100, 0.12)');
+  spireGlow.addColorStop(1, 'rgba(200, 170, 80, 0)');
+  ctx.fillStyle = spireGlow;
+  ctx.fillRect(topTierCenterX - 20, topTierY - 45, 40, 40);
+}
+
+// ===== Bamboo grove with swaying =====
+
+interface BambooStalk {
+  x: number;
+  height: number;
+  thickness: number;
+  phase: number;
+  segments: number;
+  leafClusters: { yRatio: number; side: number; size: number }[];
+}
+
+const bambooStalks: BambooStalk[] = [];
+let bambooInit = false;
+
+function initBamboo(): void {
+  const stalkData = [
+    { x: 40, h: 320, t: 4 }, { x: 70, h: 280, t: 3 }, { x: 95, h: 350, t: 5 },
+    { x: 130, h: 300, t: 3 }, { x: 160, h: 340, t: 4 },
+    { x: 830, h: 310, t: 4 }, { x: 860, h: 350, t: 5 }, { x: 895, h: 270, t: 3 },
+    { x: 920, h: 330, t: 4 }, { x: 950, h: 290, t: 3 },
+  ];
+  for (const s of stalkData) {
+    const segments = 6 + Math.floor(Math.random() * 4);
+    const leafClusters: BambooStalk['leafClusters'] = [];
+    for (let i = 0; i < 5; i++) {
+      leafClusters.push({
+        yRatio: 0.3 + Math.random() * 0.6,
+        side: Math.random() > 0.5 ? 1 : -1,
+        size: 10 + Math.random() * 12,
+      });
+    }
+    bambooStalks.push({
+      x: s.x, height: s.h, thickness: s.t,
+      phase: Math.random() * Math.PI * 2, segments,
+      leafClusters,
+    });
+  }
+  bambooInit = true;
+}
+
+function drawBambooGrove(ctx: CanvasRenderingContext2D, cameraX: number, tick: number): void {
+  if (!bambooInit) initBamboo();
+  const px = cameraX * 0.22;
+
+  for (const stalk of bambooStalks) {
+    const sx = stalk.x - px;
+    if (sx < -40 || sx > CANVAS_WIDTH + 40) continue;
+    const baseY = STAGE_GROUND_Y - 5;
+    const swayAmount = 6 + Math.sin(tick * 0.008 + stalk.phase) * 4;
+
+    // Segmented stalk with sway
+    const segH = stalk.height / stalk.segments;
+    let prevX = sx;
+    let prevY = baseY;
+
+    for (let seg = 0; seg < stalk.segments; seg++) {
+      const t = (seg + 1) / stalk.segments;
+      const segSway = Math.sin(tick * 0.012 + stalk.phase + seg * 0.3) * swayAmount * t * t;
+      const nextX = sx + segSway;
+      const nextY = baseY - (seg + 1) * segH;
+
+      const stalkGrad = ctx.createLinearGradient(prevX - stalk.thickness, 0, prevX + stalk.thickness, 0);
+      stalkGrad.addColorStop(0, '#2a5a20');
+      stalkGrad.addColorStop(0.3, '#3a7a30');
+      stalkGrad.addColorStop(0.6, '#3a7a30');
+      stalkGrad.addColorStop(1, '#2a5a20');
+      ctx.strokeStyle = stalkGrad;
+      ctx.lineWidth = stalk.thickness * (1 - seg * 0.08);
+      ctx.beginPath();
+      ctx.moveTo(prevX, prevY);
+      ctx.lineTo(nextX, nextY);
+      ctx.stroke();
+
+      // Joint node
+      ctx.fillStyle = '#2a6025';
+      ctx.beginPath();
+      ctx.ellipse(nextX, nextY, stalk.thickness * 0.8, 2, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      prevX = nextX;
+      prevY = nextY;
+    }
+
+    // Leaf clusters
+    for (const leaf of stalk.leafClusters) {
+      const leafT = leaf.yRatio;
+      const leafSway = Math.sin(tick * 0.015 + stalk.phase + leaf.yRatio * 3) * swayAmount * leafT * leafT;
+      const leafX = sx + leafSway;
+      const leafY = baseY - stalk.height * leafT;
+      const windBend = Math.sin(tick * 0.02 + stalk.phase + leaf.yRatio) * 0.15;
+
+      ctx.save();
+      ctx.translate(leafX, leafY);
+      ctx.rotate(windBend * leaf.side);
+
+      for (let li = -2; li <= 2; li++) {
+        const leafAngle = li * 0.4 + leaf.side * 0.3;
+        ctx.save();
+        ctx.rotate(leafAngle);
+        ctx.fillStyle = `rgba(50, ${110 + Math.abs(li) * 15}, 35, 0.5)`;
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.quadraticCurveTo(leaf.size * 0.5, -3, leaf.size, -1);
+        ctx.quadraticCurveTo(leaf.size * 0.5, 1, 0, 0);
+        ctx.fill();
+        ctx.restore();
+      }
+
+      ctx.restore();
+    }
+  }
+}
+
+// ===== Stone bridge over water with koi fish =====
+
+interface KoiFish {
+  x: number;
+  y: number;
+  vx: number;
+  size: number;
+  color: string;
+  phase: number;
+  jumpTimer: number;
+  jumping: boolean;
+  jumpVY: number;
+  jumpY: number;
+}
+
+const koiFish: KoiFish[] = [];
+let koiInit = false;
+
+function initKoi(): void {
+  const colors = ['#ff6633', '#ffaa22', '#ff3322', '#ff8844', '#ee5522'];
+  for (let i = 0; i < 5; i++) {
+    koiFish.push({
+      x: 300 + Math.random() * 300,
+      y: STAGE_GROUND_Y + 15 + Math.random() * 8,
+      vx: (Math.random() - 0.5) * 0.6,
+      size: 6 + Math.random() * 4,
+      color: colors[i % colors.length],
+      phase: Math.random() * Math.PI * 2,
+      jumpTimer: 200 + Math.floor(Math.random() * 400),
+      jumping: false,
+      jumpVY: 0,
+      jumpY: 0,
+    });
+  }
+  koiInit = true;
+}
+
+function drawStoneBridgeAndKoi(ctx: CanvasRenderingContext2D, cameraX: number, tick: number): void {
+  if (!koiInit) initKoi();
+  const px = cameraX * 0.35;
+  const bridgeX = 420 - px;
+
+  // Water area
+  const waterY = STAGE_GROUND_Y + 8;
+  const waterW = 200;
+  ctx.fillStyle = 'rgba(30, 50, 80, 0.25)';
+  ctx.fillRect(bridgeX - 20, waterY, waterW, 25);
+
+  // Water shimmer
+  for (let wi = 0; wi < 8; wi++) {
+    const wx = bridgeX - 10 + (wi * 28 + tick * 0.3) % waterW;
+    const wy = waterY + 5 + Math.sin(tick * 0.04 + wi * 1.3) * 2;
+    ctx.fillStyle = `rgba(80, 120, 180, ${0.06 + Math.sin(tick * 0.03 + wi) * 0.03})`;
+    ctx.beginPath();
+    ctx.ellipse(wx, wy, 12, 1.5, 0, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // Stone bridge arch
+  ctx.fillStyle = '#4a4035';
+  ctx.beginPath();
+  ctx.moveTo(bridgeX - 15, waterY + 2);
+  ctx.quadraticCurveTo(bridgeX + waterW / 2, waterY - 18, bridgeX + waterW + 15, waterY + 2);
+  ctx.lineTo(bridgeX + waterW + 15, waterY + 6);
+  ctx.quadraticCurveTo(bridgeX + waterW / 2, waterY - 14, bridgeX - 15, waterY + 6);
+  ctx.closePath();
+  ctx.fill();
+
+  // Bridge railings
+  for (let rp = 0; rp < 7; rp++) {
+    const rt = (rp + 0.5) / 7;
+    const railX = bridgeX - 10 + waterW * rt;
+    const archSag = 18 * Math.sin(rt * Math.PI);
+    const railY = waterY - archSag;
+    ctx.fillStyle = '#5a5045';
+    ctx.fillRect(railX - 2, railY - 14, 4, 16);
+    ctx.fillStyle = '#6a6055';
+    ctx.fillRect(railX - 3, railY - 16, 6, 3);
+  }
+
+  // Top rail
+  ctx.strokeStyle = '#5a5045';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(bridgeX - 10, waterY + 2);
+  for (let rt = 0; rt <= 1; rt += 0.05) {
+    const rx = bridgeX - 10 + (waterW + 20) * rt;
+    const archSag = 18 * Math.sin(rt * Math.PI);
+    ctx.lineTo(rx, waterY - archSag - 14);
+  }
+  ctx.stroke();
+
+  // Bridge reflection
+  ctx.fillStyle = 'rgba(50, 60, 70, 0.08)';
+  ctx.beginPath();
+  ctx.moveTo(bridgeX - 15, waterY + 6);
+  ctx.quadraticCurveTo(bridgeX + waterW / 2, waterY + 24, bridgeX + waterW + 15, waterY + 6);
+  ctx.lineTo(bridgeX + waterW + 15, waterY + 20);
+  ctx.quadraticCurveTo(bridgeX + waterW / 2, waterY + 30, bridgeX - 15, waterY + 20);
+  ctx.closePath();
+  ctx.fill();
+
+  // Koi fish
+  for (const koi of koiFish) {
+    koi.jumpTimer--;
+    if (koi.jumping) {
+      koi.jumpY += koi.jumpVY;
+      koi.jumpVY += 0.3;
+      if (koi.jumpY >= 0) {
+        koi.jumping = false;
+        koi.jumpY = 0;
+      }
+    } else if (koi.jumpTimer <= 0) {
+      if (Math.random() < 0.02) {
+        koi.jumping = true;
+        koi.jumpVY = -4 - Math.random() * 2;
+        koi.jumpY = 0;
+      }
+      koi.jumpTimer = 100 + Math.floor(Math.random() * 300);
+    }
+
+    koi.x += koi.vx;
+    if (koi.x < bridgeX - 10) { koi.x = bridgeX - 10; koi.vx = Math.abs(koi.vx); }
+    if (koi.x > bridgeX + waterW + 10) { koi.x = bridgeX + waterW + 10; koi.vx = -Math.abs(koi.vx); }
+
+    const koiDrawY = koi.y + koi.jumpY;
+    const tailWag = Math.sin(tick * 0.15 + koi.phase) * 0.3;
+    const dir = koi.vx >= 0 ? 1 : -1;
+
+    ctx.save();
+    ctx.translate(koi.x, koiDrawY);
+    ctx.scale(dir, 1);
+
+    const koiR = parseInt(koi.color.slice(1, 3), 16);
+    const koiG = parseInt(koi.color.slice(3, 5), 16);
+    const koiB = parseInt(koi.color.slice(5, 7), 16);
+    ctx.fillStyle = koi.jumping ? koi.color : `rgba(${koiR}, ${koiG}, ${koiB}, 0.4)`;
+    ctx.beginPath();
+    ctx.ellipse(0, 0, koi.size, koi.size * 0.4, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.fillStyle = koi.jumping ? 'rgba(255,255,255,0.5)' : 'rgba(255,255,255,0.15)';
+    ctx.beginPath();
+    ctx.ellipse(koi.size * 0.2, 0, koi.size * 0.3, koi.size * 0.2, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.fillStyle = koi.jumping ? koi.color : `rgba(${koiR}, ${koiG}, ${koiB}, 0.3)`;
+    ctx.beginPath();
+    ctx.moveTo(-koi.size, 0);
+    ctx.lineTo(-koi.size - koi.size * 0.5, -koi.size * 0.4 + tailWag * koi.size);
+    ctx.lineTo(-koi.size - koi.size * 0.5, koi.size * 0.4 + tailWag * koi.size);
+    ctx.closePath();
+    ctx.fill();
+
+    if (koi.jumping && koi.jumpY < -koi.size) {
+      ctx.fillStyle = 'rgba(150, 180, 220, 0.3)';
+      for (let di = 0; di < 3; di++) {
+        ctx.beginPath();
+        ctx.arc(-koi.size * 0.5 - di * 3, koi.size * 0.3 + di * 2 + koi.jumpY * 0.1, 1.5, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    ctx.restore();
+  }
 }

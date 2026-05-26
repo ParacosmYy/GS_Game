@@ -31,9 +31,56 @@ export class GameStateManager {
   firstHitTracked = false;
   announceSequence: AnnounceSequence = new AnnounceSequence();
   titleBgmStarted = false;
+  gameOverTimer = 0;
+
+  // Stage select state
+  stageSelectCursor = 0;       // 0..5 (5 stages + random)
+  stageSelectReady = false;
+  stageSelectConfirmed: string | null = null;
+
+  // Team order state
+  teamOrderSlots: number[][] = [[0, 1, 2], [0, 1, 2]]; // P1/P2 order indices into team
+  teamOrderCursor = 0;
+  teamOrderSwapMode = false;
+  teamOrderSwapCursor = 0;
+  teamOrderReady = [false, false];
+
+  // Transition animation state
+  transitionTimer = 0;
+  transitionType: 'none' | 'wipe' | 'zoom' | 'fade' = 'none';
+  transitionFrom: GamePhase | null = null;
+  transitionTo: GamePhase | null = null;
+
+  // Input repeat throttle (for stage/team select cursor movement)
+  inputRepeatCooldown = 0;
 
   setPhase(p: GamePhase): void {
     this.phase = p;
+  }
+
+  startTransition(type: 'wipe' | 'zoom' | 'fade', from: GamePhase, to: GamePhase): void {
+    this.transitionType = type;
+    this.transitionFrom = from;
+    this.transitionTo = to;
+    this.transitionTimer = 0;
+  }
+
+  isTransitioning(): boolean {
+    return this.transitionType !== 'none';
+  }
+
+  resetStageSelect(): void {
+    this.stageSelectCursor = 0;
+    this.stageSelectReady = false;
+    this.stageSelectConfirmed = null;
+  }
+
+  resetTeamOrder(): void {
+    this.teamOrderSlots = [[0, 1, 2], [0, 1, 2]];
+    this.teamOrderCursor = 0;
+    this.teamOrderSwapMode = false;
+    this.teamOrderSwapCursor = 0;
+    this.teamOrderReady = [false, false];
   }
 
   resetForNewGame(): void {
@@ -49,6 +96,11 @@ export class GameStateManager {
     this.winQuoteTimer = 0;
     this.debugMode = false;
     this.titleBgmStarted = false;
+    this.gameOverTimer = 0;
+    this.transitionType = 'none';
+    this.transitionTimer = 0;
+    this.resetStageSelect();
+    this.resetTeamOrder();
   }
 
   resetForNextRound(): void {

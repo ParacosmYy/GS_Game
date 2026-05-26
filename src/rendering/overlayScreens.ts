@@ -166,70 +166,150 @@ export function drawMatchEnd(
 ): void {
   ctx.save();
 
-  ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+  // Background — dark with subtle radial gradient
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.75)';
   ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+  // Subtle background glow for winner
+  if (winner !== null && winnerColor) {
+    const bgGlow = ctx.createRadialGradient(
+      CANVAS_WIDTH / 2, 200, 30,
+      CANVAS_WIDTH / 2, 200, 250,
+    );
+    bgGlow.addColorStop(0, (winnerColor ?? '#FFD700') + '22');
+    bgGlow.addColorStop(0.5, (winnerColor ?? '#FFD700') + '11');
+    bgGlow.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = bgGlow;
+    ctx.fillRect(0, 0, CANVAS_WIDTH, 400);
+  }
 
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
 
-  // Winner portrait
+  const tickVal = tick || 0;
+  const fadeIn = Math.min(1, tickVal / 30);
+
+  // Winner portrait — larger, centered, with sparkle glow
   if (winner !== null && winnerCharId) {
     const charDef = ROSTER.find(c => c.id === winnerCharId);
     if (charDef?.pixelPortrait) {
-      const portraitScale = 3;
+      const portraitScale = 4;
       const pw = charDef.pixelPortrait.width * portraitScale;
       const ph = charDef.pixelPortrait.height * portraitScale;
       const px = CANVAS_WIDTH / 2 - pw / 2;
-      const py = 40;
+      const py = 20;
+
+      ctx.globalAlpha = fadeIn;
+
+      // Glow aura behind portrait
+      const auraGrad = ctx.createRadialGradient(
+        px + pw / 2, py + ph / 2, pw * 0.3,
+        px + pw / 2, py + ph / 2, pw * 0.9,
+      );
+      const auraPulse = 0.3 + Math.sin(tickVal * 0.06) * 0.1;
+      auraGrad.addColorStop(0, (charDef.color ?? '#ffcc00') + Math.round(auraPulse * 255).toString(16).padStart(2, '0'));
+      auraGrad.addColorStop(0.6, (charDef.color ?? '#ffcc00') + Math.round(auraPulse * 0.4 * 255).toString(16).padStart(2, '0'));
+      auraGrad.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = auraGrad;
+      ctx.fillRect(px - pw * 0.3, py - ph * 0.3, pw * 1.6, ph * 1.6);
+
       // Portrait background frame
-      ctx.fillStyle = 'rgba(20, 20, 40, 0.8)';
-      roundRect(ctx, px - 8, py - 8, pw + 16, ph + 16, 8);
+      ctx.fillStyle = 'rgba(12, 12, 28, 0.9)';
+      roundRect(ctx, px - 10, py - 10, pw + 20, ph + 20, 10);
       ctx.fill();
+      // Animated border glow
+      const borderPulse = 0.5 + Math.sin(tickVal * 0.08) * 0.3;
       ctx.strokeStyle = winnerColor ?? '#FFD700';
       ctx.lineWidth = 2;
-      roundRect(ctx, px - 8, py - 8, pw + 16, ph + 16, 8);
+      ctx.globalAlpha = fadeIn * borderPulse;
+      roundRect(ctx, px - 10, py - 10, pw + 20, ph + 20, 10);
       ctx.stroke();
+      ctx.globalAlpha = fadeIn;
+
       drawPixelPortrait(ctx, charDef.pixelPortrait, px, py, portraitScale, {
         frameColor: charDef.color,
         backdropColor: 'rgba(8, 8, 18, 0.9)',
         scanlines: true,
       });
+
+      // Sparkle particles around portrait
+      const sparkleCount = 12;
+      for (let s = 0; s < sparkleCount; s++) {
+        const sparkleAngle = (s / sparkleCount) * Math.PI * 2 + tickVal * 0.02;
+        const sparkleDist = pw * 0.55 + Math.sin(tickVal * 0.04 + s * 0.8) * 15;
+        const sx = px + pw / 2 + Math.cos(sparkleAngle) * sparkleDist;
+        const sy = py + ph / 2 + Math.sin(sparkleAngle) * sparkleDist * 0.6;
+        const sparkleAlpha = (0.3 + Math.sin(tickVal * 0.07 + s * 1.2) * 0.3) * fadeIn;
+        const sparkleSize = 2 + Math.sin(tickVal * 0.09 + s) * 1;
+        if (sparkleAlpha > 0) {
+          ctx.fillStyle = `rgba(255, 230, 120, ${sparkleAlpha})`;
+          // 4-pointed star
+          ctx.beginPath();
+          ctx.moveTo(sx, sy - sparkleSize);
+          ctx.lineTo(sx + sparkleSize * 0.35, sy);
+          ctx.lineTo(sx, sy + sparkleSize);
+          ctx.lineTo(sx - sparkleSize * 0.35, sy);
+          ctx.closePath();
+          ctx.fill();
+        }
+      }
+
+      ctx.globalAlpha = 1;
     }
   }
 
-  const textOffsetY = (winner !== null && winnerCharId) ? 190 : 0;
+  const portraitOffset = (winner !== null && winnerCharId) ? 180 : 0;
 
-  ctx.shadowColor = '#ff8800';
-  ctx.shadowBlur = 25;
-  drawSNKText(ctx, 'GAME', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 80 + textOffsetY, 72, '#FFD700');
-  ctx.shadowBlur = 0;
-
+  // Winner name — bold, centered
   if (winner !== null) {
     const wColor = winner === 0 ? '#ff6644' : '#4488ff';
-    drawSNKText(ctx, `P${winner + 1} WINS THE MATCH`, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 20 + textOffsetY, 32, wColor);
-    // Winner name
+    const nameAlpha = Math.min(1, Math.max(0, (tickVal - 10) / 20));
+    ctx.globalAlpha = nameAlpha;
+
     if (winnerCharId) {
       const charDef = ROSTER.find(c => c.id === winnerCharId);
       if (charDef) {
-        drawSNKText(ctx, charDef.nameCn, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 12 + textOffsetY, 20, wColor);
+        ctx.shadowColor = wColor;
+        ctx.shadowBlur = 20;
+        drawSNKText(ctx, charDef.nameCn, CANVAS_WIDTH / 2, portraitOffset + 10, 36, wColor);
+        ctx.shadowBlur = 0;
       }
     }
+
+    // "WINS" text
+    const winsAlpha = Math.min(1, Math.max(0, (tickVal - 20) / 20));
+    ctx.globalAlpha = winsAlpha;
+    ctx.shadowColor = '#ffcc00';
+    ctx.shadowBlur = 15;
+    drawSNKText(ctx, 'WINS', CANVAS_WIDTH / 2, portraitOffset + 45, 48, '#FFD700');
+    ctx.shadowBlur = 0;
+
+    ctx.globalAlpha = 1;
   } else {
-    drawSNKText(ctx, 'DRAW GAME', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 20 + textOffsetY, 32, '#ffcc00');
+    const drawAlpha = Math.min(1, Math.max(0, (tickVal - 10) / 20));
+    ctx.globalAlpha = drawAlpha;
+    drawSNKText(ctx, 'DRAW GAME', CANVAS_WIDTH / 2, portraitOffset + 20, 32, '#ffcc00');
+    ctx.globalAlpha = 1;
   }
 
-  if (winQuote && winnerColor) {
+  // Win quote — typewriter effect
+  if (winQuote && winnerColor && winner !== null) {
+    const quoteAlpha = Math.min(1, Math.max(0, (tickVal - 40) / 20));
+    ctx.globalAlpha = quoteAlpha;
     ctx.shadowColor = winnerColor;
     ctx.shadowBlur = 8;
-    const chars = Math.min(winQuote.length, Math.floor((tick || 0) / 3));
+    const chars = Math.min(winQuote.length, Math.floor(Math.max(0, tickVal - 40) / 3));
     const visible = winQuote.substring(0, chars);
-    drawSNKText(ctx, `"${visible}"`, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 45 + textOffsetY, 16, winnerColor);
+    drawSNKText(ctx, `"${visible}"`, CANVAS_WIDTH / 2, portraitOffset + 85, 16, winnerColor);
     ctx.shadowBlur = 0;
+    ctx.globalAlpha = 1;
   }
 
-  // Win markers
-  const dotY = CANVAS_HEIGHT / 2 + 80 + textOffsetY;
+  // Win markers — P1 vs P2 score circles
+  const dotY = portraitOffset + 120;
   const dotSpacing = 22;
+  const dotAlpha = Math.min(1, Math.max(0, (tickVal - 25) / 15));
+  ctx.globalAlpha = dotAlpha;
   for (let i = 0; i < p1Wins; i++) {
     ctx.beginPath();
     ctx.arc(CANVAS_WIDTH / 2 - 50 + i * dotSpacing, dotY, 7, 0, Math.PI * 2);
@@ -248,9 +328,13 @@ export function drawMatchEnd(
     ctx.lineWidth = 2;
     ctx.stroke();
   }
-
   drawSNKText(ctx, 'VS', CANVAS_WIDTH / 2, dotY, 16, 'rgba(255,255,255,0.2)');
-  drawSNKText(ctx, 'Press any key to continue', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 120, 13, 'rgba(255,255,255,0.5)');
+
+  // "Press any key" — pulsing
+  const pressAlpha = 0.3 + Math.sin(tickVal * 0.06) * 0.2;
+  ctx.globalAlpha = pressAlpha;
+  drawSNKText(ctx, 'Press any key to continue', CANVAS_WIDTH / 2, portraitOffset + 155, 13, 'rgba(255,255,255,0.7)');
+  ctx.globalAlpha = 1;
 
   ctx.restore();
 }
@@ -643,22 +727,64 @@ export function drawContinue(ctx: CanvasRenderingContext2D, secondsLeft: number,
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
 
+  // Coin insert visual hint — top area
+  const coinPulse = 0.4 + Math.sin(Date.now() * 0.005) * 0.3;
+  ctx.globalAlpha = coinPulse;
+  // Coin slot rectangle
+  const coinSlotX = CANVAS_WIDTH / 2 - 18;
+  const coinSlotY = 50;
+  ctx.fillStyle = 'rgba(80, 80, 100, 0.6)';
+  roundRect(ctx, coinSlotX, coinSlotY, 36, 48, 6);
+  ctx.fill();
+  ctx.strokeStyle = '#888899';
+  ctx.lineWidth = 1.5;
+  roundRect(ctx, coinSlotX, coinSlotY, 36, 48, 6);
+  ctx.stroke();
+  // Coin slot opening
+  ctx.fillStyle = '#222';
+  roundRect(ctx, coinSlotX + 10, coinSlotY + 6, 16, 4, 2);
+  ctx.fill();
+  // Coin icon
+  ctx.fillStyle = '#ffcc00';
+  ctx.beginPath();
+  ctx.arc(CANVAS_WIDTH / 2, coinSlotY + 28, 10, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = '#cc9900';
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+  ctx.fillStyle = '#cc9900';
+  ctx.font = 'bold 10px "Courier New", monospace';
+  ctx.fillText('$', CANVAS_WIDTH / 2, coinSlotY + 30);
+  ctx.globalAlpha = 1;
+
+  // "INSERT COIN" text
+  drawSNKText(ctx, 'INSERT COIN', CANVAS_WIDTH / 2, coinSlotY + 58, 12, '#888899');
+
+  // CONTINUE? header
   ctx.shadowColor = '#ff2222';
   ctx.shadowBlur = 25;
   drawSNKText(ctx, 'CONTINUE?', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 80, 48, '#ff4444');
   ctx.shadowBlur = 0;
 
-  // 倒计时数字 — 最后3秒脉动效果
+  // Countdown number — flashing effect in last 3 seconds
   const isUrgent = secondsLeft <= 3;
   const countColor = isUrgent ? '#ff2222' : '#ffcc00';
   const countScale = isUrgent ? 1 + Math.sin(Date.now() * 0.015) * 0.1 : 1;
   const countSize = Math.round(72 * countScale);
+  // Flashing effect for urgent countdown
+  if (isUrgent) {
+    const flashPhase = Math.sin(Date.now() * 0.012);
+    if (flashPhase > 0) {
+      ctx.fillStyle = `rgba(255, 50, 50, ${flashPhase * 0.15})`;
+      ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+    }
+  }
   ctx.shadowColor = isUrgent ? '#ff0000' : '#ffaa00';
   ctx.shadowBlur = isUrgent ? 20 : 12;
   drawSNKText(ctx, `${secondsLeft}`, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 10, countSize, countColor);
   ctx.shadowBlur = 0;
 
-  // 进度条 — 可视化倒计时剩余
+  // Progress bar — visual countdown
   const barW = 300;
   const barH = 6;
   const barX = CANVAS_WIDTH / 2 - barW / 2;
@@ -669,9 +795,12 @@ export function drawContinue(ctx: CanvasRenderingContext2D, secondsLeft: number,
   ctx.fill();
   const barColor = isUrgent ? '#ff2222' : '#ffcc00';
   ctx.fillStyle = barColor;
-  roundRect(ctx, barX, barY, barW * ratio, barH, 3);
-  ctx.fill();
+  if (barW * ratio > 0) {
+    roundRect(ctx, barX, barY, barW * ratio, barH, 3);
+    ctx.fill();
+  }
 
+  // YES / NO selection with cursor
   const yesX = CANVAS_WIDTH / 2 - 80;
   const noX = CANVAS_WIDTH / 2 + 80;
   const selY = CANVAS_HEIGHT / 2 + 90;
@@ -697,4 +826,345 @@ export function drawContinue(ctx: CanvasRenderingContext2D, secondsLeft: number,
   drawSNKText(ctx, 'Arrow Keys: Select  |  Enter: Confirm', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 140, 12, '#555566');
 
   ctx.restore();
+}
+
+// ===== Game Over Screen =====
+
+const GAME_OVER_DURATION = 180; // 3 seconds at 60fps
+
+export function drawGameOver(ctx: CanvasRenderingContext2D, timer: number): void {
+  ctx.save();
+
+  // Gradually dimming background
+  const dimProgress = Math.min(1, timer / GAME_OVER_DURATION);
+  ctx.fillStyle = `rgba(0, 0, 0, ${0.7 + dimProgress * 0.25})`;
+  ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+  // Visual decay — scanline effect that intensifies
+  const scanlineAlpha = 0.05 + dimProgress * 0.1;
+  ctx.fillStyle = `rgba(0, 0, 0, ${scanlineAlpha})`;
+  for (let y = 0; y < CANVAS_HEIGHT; y += 3) {
+    ctx.fillRect(0, y, CANVAS_WIDTH, 1);
+  }
+
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+
+  // "GAME OVER" — large red text with dramatic appearance
+  const textProgress = Math.min(1, timer / 30);
+  let textScale = 1;
+  if (textProgress < 0.15) {
+    textScale = 1 + (1 - textProgress / 0.15) * 1.5;
+  } else if (textProgress < 0.3) {
+    const bounceP = (textProgress - 0.15) / 0.15;
+    textScale = 1 + 0.1 * Math.sin(bounceP * Math.PI);
+  }
+  const textAlpha = Math.min(1, textProgress * 2.5);
+  ctx.globalAlpha = textAlpha;
+
+  const fontSize = Math.round(80 * textScale);
+
+  // Red glow behind text
+  const glowGrad = ctx.createRadialGradient(
+    CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 20, 20,
+    CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 20, 200,
+  );
+  glowGrad.addColorStop(0, `rgba(200, 0, 0, ${0.2 * textAlpha})`);
+  glowGrad.addColorStop(0.5, `rgba(150, 0, 0, ${0.1 * textAlpha})`);
+  glowGrad.addColorStop(1, 'rgba(100, 0, 0, 0)');
+  ctx.fillStyle = glowGrad;
+  ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+  ctx.shadowColor = '#ff0000';
+  ctx.shadowBlur = 40;
+  drawSNKText(ctx, 'GAME OVER', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 20, fontSize, '#cc0000');
+  ctx.shadowBlur = 20;
+  drawSNKText(ctx, 'GAME OVER', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 20, fontSize, '#ff2222');
+  ctx.shadowBlur = 0;
+
+  // Subtitle — fades in after main text
+  const subAlpha = Math.min(1, Math.max(0, (timer - 40) / 30));
+  ctx.globalAlpha = subAlpha * 0.6;
+  drawSNKText(ctx, 'RETURNING TO TITLE...', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 50, 14, '#888888');
+  ctx.globalAlpha = 1;
+
+  ctx.restore();
+}
+
+export { GAME_OVER_DURATION };
+
+// ===== Training Mode HUD =====
+
+import type { TrainingModeState, FrameDataDisplay, InputHistoryEntry } from '../state/trainingMode.js';
+
+/**
+ * Draw the full training mode HUD overlay.
+ * - Top: "TRAINING MODE" label + dummy behavior
+ * - Left: Input history panel
+ * - Bottom: Frame data panel
+ * - Right: Controls help
+ */
+export function drawTrainingHUD(
+  ctx: CanvasRenderingContext2D,
+  training: TrainingModeState,
+  comboCount: number,
+  comboDamage: number,
+  tick: number,
+): void {
+  ctx.save();
+
+  // ===== Top bar: TRAINING MODE label =====
+  const topBarH = 30;
+  const topGrad = ctx.createLinearGradient(0, 0, 0, topBarH);
+  topGrad.addColorStop(0, 'rgba(0, 50, 0, 0.75)');
+  topGrad.addColorStop(1, 'rgba(0, 30, 0, 0.5)');
+  ctx.fillStyle = topGrad;
+  ctx.fillRect(0, 0, CANVAS_WIDTH, topBarH);
+  // Bottom border
+  ctx.strokeStyle = 'rgba(68, 255, 68, 0.4)';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(0, topBarH);
+  ctx.lineTo(CANVAS_WIDTH, topBarH);
+  ctx.stroke();
+
+  ctx.font = 'bold 14px "Courier New", monospace';
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'middle';
+  ctx.fillStyle = '#44ff44';
+  ctx.fillText('TRAINING MODE', 12, 16);
+
+  // Dummy behavior display (top right)
+  ctx.textAlign = 'right';
+  ctx.font = '11px "Courier New", monospace';
+  ctx.fillStyle = '#888';
+  ctx.fillText('Dummy:', CANVAS_WIDTH - 140, 11);
+  ctx.fillStyle = '#ffcc00';
+  ctx.font = 'bold 11px "Courier New", monospace';
+  ctx.fillText(training.getDummyBehaviorLabel(), CANVAS_WIDTH - 12, 11);
+
+  // Combo display
+  ctx.fillStyle = '#aaa';
+  ctx.font = '10px "Courier New", monospace';
+  ctx.fillText('Combo:', CANVAS_WIDTH - 140, 23);
+  ctx.fillStyle = '#ffcc00';
+  ctx.fillText(`${comboCount}`, CANVAS_WIDTH - 90, 23);
+  ctx.fillStyle = '#aaa';
+  ctx.fillText('Dmg:', CANVAS_WIDTH - 75, 23);
+  ctx.fillStyle = '#ff6644';
+  ctx.fillText(`${comboDamage}`, CANVAS_WIDTH - 45, 23);
+
+  // ===== Left panel: Input history =====
+  if (training.showInputHistory) {
+    drawInputHistoryPanel(ctx, training.inputHistory, tick);
+  }
+
+  // ===== Bottom panel: Frame data =====
+  if (training.showFrameData) {
+    drawFrameDataPanel(ctx, training.lastFrameData);
+  }
+
+  // ===== Right panel: Controls help =====
+  drawControlsPanel(ctx);
+
+  ctx.restore();
+}
+
+/** Input history panel on the left side */
+function drawInputHistoryPanel(
+  ctx: CanvasRenderingContext2D,
+  history: InputHistoryEntry[],
+  tick: number,
+): void {
+  const panelX = 4;
+  const panelY = 36;
+  const panelW = 180;
+  const lineH = 14;
+  const maxLines = 20;
+  const panelH = 20 + maxLines * lineH;
+
+  // Background
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+  roundRect(ctx, panelX, panelY, panelW, panelH, 6);
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(68, 255, 68, 0.2)';
+  ctx.lineWidth = 1;
+  roundRect(ctx, panelX, panelY, panelW, panelH, 6);
+  ctx.stroke();
+
+  // Header
+  ctx.font = 'bold 10px "Courier New", monospace';
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'top';
+  ctx.fillStyle = '#44ff44';
+  ctx.fillText('INPUT HISTORY', panelX + 8, panelY + 4);
+
+  // Entries
+  ctx.font = '10px "Courier New", monospace';
+  const startIdx = Math.max(0, history.length - maxLines);
+  for (let i = startIdx; i < history.length; i++) {
+    const entry = history[i];
+    const lineIdx = i - startIdx;
+    const y = panelY + 20 + lineIdx * lineH;
+
+    // Fade older entries
+    const age = tick - entry.frame;
+    const alpha = Math.max(0.3, 1 - age / 300);
+    ctx.globalAlpha = alpha;
+
+    // Direction arrow
+    ctx.fillStyle = '#88ccff';
+    ctx.fillText(entry.direction, panelX + 8, y);
+
+    // Buttons
+    if (entry.buttons.length > 0) {
+      ctx.fillStyle = '#ffcc44';
+      ctx.fillText(entry.buttons.join(' '), panelX + 24, y);
+    }
+
+    ctx.globalAlpha = 1;
+  }
+
+  // Empty state
+  if (history.length === 0) {
+    ctx.fillStyle = '#555';
+    ctx.font = '10px "Courier New", monospace';
+    ctx.fillText('(no input yet)', panelX + 8, panelY + 24);
+  }
+}
+
+/** Frame data panel at the bottom */
+function drawFrameDataPanel(
+  ctx: CanvasRenderingContext2D,
+  frameData: FrameDataDisplay | null,
+): void {
+  const panelW = CANVAS_WIDTH - 8;
+  const panelH = 52;
+  const panelX = 4;
+  const panelY = CANVAS_HEIGHT - panelH - 4;
+
+  // Background
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+  roundRect(ctx, panelX, panelY, panelW, panelH, 6);
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(68, 255, 68, 0.2)';
+  ctx.lineWidth = 1;
+  roundRect(ctx, panelX, panelY, panelW, panelH, 6);
+  ctx.stroke();
+
+  if (!frameData) {
+    ctx.font = '12px "Courier New", monospace';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = '#555';
+    ctx.fillText('Attack to see frame data', panelX + panelW / 2, panelY + panelH / 2);
+    return;
+  }
+
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'top';
+
+  // Attack name + phase indicator
+  const phaseColors: Record<string, string> = {
+    startup: '#8888ff',
+    active: '#ff4444',
+    recovery: '#44cc44',
+    none: '#888',
+  };
+  const phaseColor = phaseColors[frameData.phase] || '#888';
+
+  // Row 1: Attack name, phase, current frame
+  ctx.font = 'bold 11px "Courier New", monospace';
+  ctx.fillStyle = '#ffffff';
+  ctx.fillText(frameData.attackName, panelX + 10, panelY + 6);
+
+  // Phase indicator with colored dot
+  ctx.fillStyle = phaseColor;
+  ctx.beginPath();
+  ctx.arc(panelX + 10 + ctx.measureText(frameData.attackName).width + 14, panelY + 12, 4, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = phaseColor;
+  ctx.font = '10px "Courier New", monospace';
+  ctx.fillText(frameData.phase.toUpperCase(), panelX + 10 + ctx.measureText(frameData.attackName).width + 22, panelY + 7);
+
+  // Current frame / total
+  const totalFrames = frameData.startup + frameData.active + frameData.recovery;
+  ctx.fillStyle = '#aaa';
+  ctx.fillText(`f${frameData.currentFrame}/${totalFrames}`, panelX + 10 + ctx.measureText(frameData.attackName).width + 85, panelY + 7);
+
+  // Row 2: Frame data columns
+  const row2Y = panelY + 22;
+  const colW = 85;
+  const cols = [
+    { label: 'STARTUP', value: `${frameData.startup}f`, color: '#8888ff' },
+    { label: 'ACTIVE', value: `${frameData.active}f`, color: '#ff4444' },
+    { label: 'RECOVERY', value: `${frameData.recovery}f`, color: '#44cc44' },
+    { label: 'DAMAGE', value: `${frameData.damage}`, color: '#ff8844' },
+    { label: 'HITSTUN', value: `${frameData.hitstun}f`, color: '#ffcc44' },
+    { label: 'BLOCKSTUN', value: `${frameData.blockstun}f`, color: '#44aaff' },
+  ];
+
+  ctx.font = '9px "Courier New", monospace';
+  for (let i = 0; i < cols.length; i++) {
+    const cx = panelX + 10 + i * colW;
+    ctx.fillStyle = '#666';
+    ctx.fillText(cols[i].label, cx, row2Y);
+    ctx.fillStyle = cols[i].color;
+    ctx.font = 'bold 12px "Courier New", monospace';
+    ctx.fillText(cols[i].value, cx, row2Y + 12);
+    ctx.font = '9px "Courier New", monospace';
+  }
+
+  // Advantage display (right side)
+  const advX = panelX + panelW - 180;
+  ctx.fillStyle = '#666';
+  ctx.fillText('ADV HIT', advX, row2Y);
+  const advHitColor = frameData.advantageHit >= 0 ? '#44ff44' : '#ff4444';
+  ctx.fillStyle = advHitColor;
+  ctx.font = 'bold 12px "Courier New", monospace';
+  ctx.fillText(frameData.advantageHit >= 0 ? `+${frameData.advantageHit}` : `${frameData.advantageHit}`, advX, row2Y + 12);
+
+  ctx.font = '9px "Courier New", monospace';
+  ctx.fillStyle = '#666';
+  ctx.fillText('ADV BLOCK', advX + 80, row2Y);
+  const advBlockColor = frameData.advantageBlock >= 0 ? '#44ff44' : '#ff4444';
+  ctx.fillStyle = advBlockColor;
+  ctx.font = 'bold 12px "Courier New", monospace';
+  ctx.fillText(frameData.advantageBlock >= 0 ? `+${frameData.advantageBlock}` : `${frameData.advantageBlock}`, advX + 80, row2Y + 12);
+}
+
+/** Controls help panel on the right side */
+function drawControlsPanel(ctx: CanvasRenderingContext2D): void {
+  const panelW = 155;
+  const panelH = 100;
+  const panelX = CANVAS_WIDTH - panelW - 4;
+  const panelY = 36;
+
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+  roundRect(ctx, panelX, panelY, panelW, panelH, 6);
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(68, 255, 68, 0.15)';
+  ctx.lineWidth = 1;
+  roundRect(ctx, panelX, panelY, panelW, panelH, 6);
+  ctx.stroke();
+
+  ctx.font = '9px "Courier New", monospace';
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'top';
+
+  const lines = [
+    { key: 'F1', desc: 'Dummy behavior' },
+    { key: 'F2', desc: 'Reset positions' },
+    { key: 'F3', desc: 'Input display' },
+    { key: 'F4', desc: 'Frame data' },
+    { key: 'ESC', desc: 'Back to select' },
+  ];
+
+  for (let i = 0; i < lines.length; i++) {
+    const y = panelY + 6 + i * 18;
+    ctx.fillStyle = '#ffcc00';
+    ctx.fillText(lines[i].key, panelX + 6, y);
+    ctx.fillStyle = '#888';
+    ctx.fillText(lines[i].desc, panelX + 36, y);
+  }
 }

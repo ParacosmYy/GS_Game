@@ -80,7 +80,9 @@ export function drawFactoryStage(
   drawSky(ctx, globalTick);
   drawSmokestacks(ctx, cameraX, globalTick);
   drawCranes(ctx, cameraX, globalTick);
+  drawFluorescentLights(ctx, cameraX, globalTick);
   drawMachinery(ctx, cameraX, globalTick);
+  drawConveyorBoxes(ctx, cameraX, globalTick);
   drawPipes(ctx, cameraX, globalTick);
   drawWarningLights(ctx, cameraX, globalTick);
   drawGround(ctx, cameraX, globalTick);
@@ -830,4 +832,204 @@ function shiftP(color: string, amount: number): string {
   const g = Math.max(0, Math.min(255, parseInt(color.slice(3, 5), 16) + amount));
   const b = Math.max(0, Math.min(255, parseInt(color.slice(5, 7), 16) + amount));
   return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+}
+
+// ===== Fluorescent lights with flickering =====
+
+interface FluorescentLight {
+  x: number;
+  y: number;
+  w: number;
+  flickerPhase: number;
+  flickerSpeed: number;
+  broken: boolean;
+}
+
+const fluorescentLights: FluorescentLight[] = [];
+let lightsInit = false;
+
+function initFluorescentLights(): void {
+  for (let i = 0; i < 10; i++) {
+    fluorescentLights.push({
+      x: 50 + i * 90,
+      y: 70 + (i % 3) * 25,
+      w: 60 + (i % 2) * 20,
+      flickerPhase: Math.random() * Math.PI * 2,
+      flickerSpeed: 0.05 + Math.random() * 0.15,
+      broken: i === 3 || i === 7,
+    });
+  }
+  lightsInit = true;
+}
+
+function drawFluorescentLights(ctx: CanvasRenderingContext2D, cameraX: number, tick: number): void {
+  if (!lightsInit) initFluorescentLights();
+  const px = cameraX * 0.08;
+
+  for (const light of fluorescentLights) {
+    const lx = light.x - px;
+    if (lx < -80 || lx > CANVAS_WIDTH + 80) continue;
+
+    let brightness: number;
+    if (light.broken) {
+      const erratic = Math.sin(tick * 0.3 + light.flickerPhase) * Math.sin(tick * 0.17 + light.flickerPhase * 2);
+      brightness = erratic > 0.3 ? 0.3 : 0;
+    } else {
+      const flickerCycle = Math.sin(tick * light.flickerSpeed + light.flickerPhase);
+      brightness = flickerCycle > -0.8 ? 0.6 + flickerCycle * 0.2 : 0.1;
+    }
+
+    // Fixture housing
+    ctx.fillStyle = '#3a3a45';
+    ctx.fillRect(lx, light.y, light.w, 5);
+    ctx.fillStyle = '#454550';
+    ctx.fillRect(lx - 2, light.y - 2, light.w + 4, 3);
+
+    if (brightness > 0.05) {
+      // Downward light cone
+      const coneGrad = ctx.createLinearGradient(lx + light.w / 2, light.y + 5, lx + light.w / 2, light.y + 120);
+      coneGrad.addColorStop(0, `rgba(200, 220, 255, ${brightness * 0.12})`);
+      coneGrad.addColorStop(0.4, `rgba(180, 200, 240, ${brightness * 0.05})`);
+      coneGrad.addColorStop(1, 'rgba(160, 180, 220, 0)');
+      ctx.fillStyle = coneGrad;
+      ctx.beginPath();
+      ctx.moveTo(lx - 5, light.y + 5);
+      ctx.lineTo(lx + light.w + 5, light.y + 5);
+      ctx.lineTo(lx + light.w + 20, light.y + 120);
+      ctx.lineTo(lx - 20, light.y + 120);
+      ctx.closePath();
+      ctx.fill();
+
+      // Tube
+      ctx.fillStyle = `rgba(220, 235, 255, ${brightness * 0.8})`;
+      ctx.fillRect(lx + 3, light.y + 1, light.w - 6, 3);
+
+      // Glow around tube
+      const tubeGlow = ctx.createRadialGradient(lx + light.w / 2, light.y + 2, 0, lx + light.w / 2, light.y + 2, 25);
+      tubeGlow.addColorStop(0, `rgba(200, 220, 255, ${brightness * 0.2})`);
+      tubeGlow.addColorStop(1, 'rgba(180, 200, 240, 0)');
+      ctx.fillStyle = tubeGlow;
+      ctx.fillRect(lx - 15, light.y - 15, light.w + 30, 35);
+    } else {
+      ctx.fillStyle = 'rgba(60, 65, 75, 0.5)';
+      ctx.fillRect(lx + 3, light.y + 1, light.w - 6, 3);
+    }
+
+    // Mounting wires
+    ctx.strokeStyle = 'rgba(80, 80, 90, 0.3)';
+    ctx.lineWidth = 0.5;
+    ctx.beginPath();
+    ctx.moveTo(lx + 10, light.y - 2);
+    ctx.lineTo(lx + 10, light.y - 12);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(lx + light.w - 10, light.y - 2);
+    ctx.lineTo(lx + light.w - 10, light.y - 12);
+    ctx.stroke();
+  }
+}
+
+// ===== Conveyor belt with moving boxes =====
+
+interface ConveyorBox {
+  worldX: number;
+  w: number;
+  h: number;
+  color: string;
+  speed: number;
+}
+
+const conveyorBoxes: ConveyorBox[] = [];
+let conveyorInit = false;
+
+function initConveyorBoxes(): void {
+  const colors = ['#5a4030', '#4a3828', '#6a4838', '#504030', '#584238'];
+  for (let i = 0; i < 6; i++) {
+    conveyorBoxes.push({
+      worldX: 100 + i * 180 + Math.random() * 60,
+      w: 25 + Math.random() * 20,
+      h: 20 + Math.random() * 15,
+      color: colors[i % colors.length],
+      speed: 0.4 + Math.random() * 0.2,
+    });
+  }
+  conveyorInit = true;
+}
+
+function drawConveyorBoxes(ctx: CanvasRenderingContext2D, cameraX: number, tick: number): void {
+  if (!conveyorInit) initConveyorBoxes();
+  const px = cameraX * 0.4;
+  const conveyorY = STAGE_GROUND_Y - 18;
+  const conveyorStartWorld = 80;
+  const conveyorEndWorld = 950;
+
+  // Conveyor belt structure
+  const beltScreenStart = conveyorStartWorld - px;
+  const beltScreenEnd = conveyorEndWorld - px;
+  const beltTopY = conveyorY;
+
+  // Belt surface
+  const clipStart = Math.max(0, beltScreenStart);
+  const clipEnd = Math.min(CANVAS_WIDTH, beltScreenEnd);
+  ctx.fillStyle = '#1a1a25';
+  ctx.fillRect(clipStart, beltTopY, clipEnd - clipStart, 16);
+
+  // Belt rollers (moving lines)
+  ctx.strokeStyle = 'rgba(60, 60, 70, 0.2)';
+  ctx.lineWidth = 1;
+  const rollerSpacing = 12;
+  const offset = (tick * 1.5) % rollerSpacing;
+  for (let rx = clipStart + offset; rx < clipEnd; rx += rollerSpacing) {
+    ctx.beginPath();
+    ctx.moveTo(rx, beltTopY);
+    ctx.lineTo(rx, beltTopY + 16);
+    ctx.stroke();
+  }
+
+  // Belt edges
+  ctx.fillStyle = '#3a3a4a';
+  ctx.fillRect(clipStart, beltTopY - 2, clipEnd - clipStart, 2);
+  ctx.fillRect(clipStart, beltTopY + 16, clipEnd - clipStart, 2);
+
+  // Support legs
+  for (let legWorld = conveyorStartWorld + 100; legWorld < conveyorEndWorld - 50; legWorld += 200) {
+    const legX = legWorld - px;
+    if (legX < -10 || legX > CANVAS_WIDTH + 10) continue;
+    ctx.fillStyle = '#3a3a4a';
+    ctx.fillRect(legX - 2, beltTopY + 18, 4, STAGE_GROUND_Y - beltTopY - 18);
+  }
+
+  // Moving boxes
+  for (const box of conveyorBoxes) {
+    box.worldX += box.speed;
+    if (box.worldX > conveyorEndWorld + 50) {
+      box.worldX = conveyorStartWorld - box.w - Math.random() * 80;
+    }
+
+    const boxX = box.worldX - px;
+    if (boxX < -50 || boxX > CANVAS_WIDTH + 50) continue;
+    const boxY = beltTopY - box.h;
+
+    // Box body
+    const boxGrad = ctx.createLinearGradient(boxX, boxY, boxX, boxY + box.h);
+    boxGrad.addColorStop(0, shiftP(box.color, 15));
+    boxGrad.addColorStop(0.5, box.color);
+    boxGrad.addColorStop(1, shiftP(box.color, -10));
+    ctx.fillStyle = boxGrad;
+    ctx.fillRect(boxX, boxY, box.w, box.h);
+
+    // Box tape
+    ctx.fillStyle = 'rgba(180, 160, 120, 0.3)';
+    ctx.fillRect(boxX + box.w * 0.4, boxY, box.w * 0.2, box.h);
+    ctx.fillRect(boxX, boxY + box.h * 0.4, box.w, box.h * 0.2);
+
+    // Box edge highlight
+    ctx.fillStyle = 'rgba(255,255,255,0.04)';
+    ctx.fillRect(boxX, boxY, box.w, 2);
+    ctx.fillRect(boxX, boxY, 2, box.h);
+
+    // Box shadow on belt
+    ctx.fillStyle = 'rgba(0,0,0,0.1)';
+    ctx.fillRect(boxX + 2, beltTopY - 1, box.w, 2);
+  }
 }

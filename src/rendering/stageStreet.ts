@@ -104,9 +104,11 @@ export function drawStreetStage(
   drawDistantSkyline(ctx, cameraX);
   drawNeonSigns(ctx, cameraX, globalTick);
   drawBuildings(ctx, cameraX, globalTick);
+  drawMovingCars(ctx, cameraX, globalTick);
   drawFoodStalls(ctx, cameraX, globalTick);
   drawHangingLanterns(ctx, cameraX, globalTick);
   drawAwnings(ctx, cameraX, globalTick);
+  drawUrbanDetails(ctx, cameraX, globalTick);
   drawGround(ctx, cameraX, globalTick);
   drawRain(ctx, globalTick);
   drawPuddleReflections(ctx, globalTick);
@@ -684,4 +686,244 @@ function shiftC(color: string, amount: number): string {
   const g = Math.max(0, Math.min(255, parseInt(color.slice(3, 5), 16) + amount));
   const b = Math.max(0, Math.min(255, parseInt(color.slice(5, 7), 16) + amount));
   return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+}
+
+// ===== Moving cars in background =====
+
+interface BackgroundCar {
+  worldX: number;
+  speed: number;
+  w: number;
+  h: number;
+  color: string;
+  headlightColor: string;
+  direction: number;
+  lane: number;
+}
+
+const bgCars: BackgroundCar[] = [];
+let carsInit = false;
+
+function initCars(): void {
+  const carColors = ['#1a2a3a', '#2a1a1a', '#1a1a2a', '#2a2a1a', '#1a2a2a', '#2a1a2a'];
+  const headlightColors = ['#ffffcc', '#ffeeaa', '#ffeedd'];
+  for (let i = 0; i < 4; i++) {
+    bgCars.push({
+      worldX: 100 + i * 350 + Math.random() * 100,
+      speed: 0.8 + Math.random() * 0.6,
+      w: 50 + Math.random() * 25,
+      h: 22 + Math.random() * 8,
+      color: carColors[i % carColors.length],
+      headlightColor: headlightColors[i % headlightColors.length],
+      direction: i % 2 === 0 ? 1 : -1,
+      lane: i % 2 === 0 ? 0 : 1,
+    });
+  }
+  carsInit = true;
+}
+
+function drawMovingCars(ctx: CanvasRenderingContext2D, cameraX: number, tick: number): void {
+  if (!carsInit) initCars();
+  const px = cameraX * 0.12;
+  const roadY = STAGE_GROUND_Y - 55;
+
+  // Road surface hint
+  ctx.fillStyle = 'rgba(20, 22, 28, 0.4)';
+  ctx.fillRect(0, roadY, CANVAS_WIDTH, 40);
+
+  // Road lane markings
+  ctx.strokeStyle = 'rgba(200, 200, 100, 0.08)';
+  ctx.lineWidth = 1;
+  ctx.setLineDash([15, 20]);
+  const dashOffset = (tick * 0.5) % 35;
+  ctx.lineDashOffset = -dashOffset;
+  ctx.beginPath();
+  ctx.moveTo(0, roadY + 20);
+  ctx.lineTo(CANVAS_WIDTH, roadY + 20);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  for (const car of bgCars) {
+    // Move car
+    car.worldX += car.speed * car.direction;
+    // Wrap
+    if (car.direction > 0 && car.worldX > 1200) car.worldX = -100;
+    if (car.direction < 0 && car.worldX < -100) car.worldX = 1200;
+
+    const cx = car.worldX - px;
+    if (cx < -80 || cx > CANVAS_WIDTH + 80) continue;
+    const cy = roadY + 5 + car.lane * 18;
+
+    // Car body
+    ctx.fillStyle = car.color;
+    ctx.beginPath();
+    ctx.moveTo(cx, cy + car.h);
+    ctx.lineTo(cx, cy + 5);
+    ctx.quadraticCurveTo(cx + 5, cy, cx + car.w * 0.3, cy);
+    ctx.lineTo(cx + car.w * 0.7, cy);
+    ctx.quadraticCurveTo(cx + car.w - 5, cy, cx + car.w, cy + 5);
+    ctx.lineTo(cx + car.w, cy + car.h);
+    ctx.closePath();
+    ctx.fill();
+
+    // Windshield
+    ctx.fillStyle = 'rgba(60, 80, 120, 0.3)';
+    const windshieldX = car.direction > 0 ? cx + car.w * 0.55 : cx + car.w * 0.15;
+    ctx.fillRect(windshieldX, cy + 2, car.w * 0.28, car.h * 0.5);
+
+    // Headlights
+    const headlightX = car.direction > 0 ? cx + car.w : cx;
+    ctx.fillStyle = car.headlightColor;
+    ctx.beginPath();
+    ctx.arc(headlightX, cy + car.h * 0.3, 2, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(headlightX, cy + car.h * 0.7, 2, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Headlight beam
+    const beamDir = car.direction;
+    const beamGrad = ctx.createLinearGradient(headlightX, 0, headlightX + beamDir * 40, 0);
+    beamGrad.addColorStop(0, 'rgba(255, 255, 200, 0.06)');
+    beamGrad.addColorStop(1, 'rgba(255, 255, 200, 0)');
+    ctx.fillStyle = beamGrad;
+    ctx.fillRect(headlightX, cy, beamDir * 40, car.h);
+
+    // Tail lights
+    const tailX = car.direction > 0 ? cx : cx + car.w;
+    ctx.fillStyle = 'rgba(255, 30, 30, 0.6)';
+    ctx.beginPath();
+    ctx.arc(tailX, cy + car.h * 0.3, 1.5, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(tailX, cy + car.h * 0.7, 1.5, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Reflection on wet road
+    ctx.fillStyle = `rgba(${parseInt(car.color.slice(1, 3), 16)}, ${parseInt(car.color.slice(3, 5), 16)}, ${parseInt(car.color.slice(5, 7), 16)}, 0.04)`;
+    ctx.beginPath();
+    ctx.ellipse(cx + car.w / 2, cy + car.h + 8, car.w * 0.6, 6, 0, 0, Math.PI * 2);
+    ctx.fill();
+  }
+}
+
+// ===== Urban details: trash cans, crates, signage =====
+
+function drawUrbanDetails(ctx: CanvasRenderingContext2D, cameraX: number, tick: number): void {
+  const px = cameraX * 0.45;
+
+  const details = [
+    { x: 60, type: 'trashcan' },
+    { x: 180, type: 'crate' },
+    { x: 420, type: 'trashcan' },
+    { x: 580, type: 'hydrant' },
+    { x: 720, type: 'crate' },
+    { x: 850, type: 'trashcan' },
+    { x: 960, type: 'crate' },
+  ];
+
+  for (const detail of details) {
+    const dx = detail.x - px;
+    if (dx < -30 || dx > CANVAS_WIDTH + 30) continue;
+    const baseY = STAGE_GROUND_Y;
+
+    if (detail.type === 'trashcan') {
+      // Trash can body
+      const tcGrad = ctx.createLinearGradient(dx - 8, baseY - 30, dx + 8, baseY);
+      tcGrad.addColorStop(0, '#3a3a42');
+      tcGrad.addColorStop(0.5, '#454550');
+      tcGrad.addColorStop(1, '#353540');
+      ctx.fillStyle = tcGrad;
+      ctx.beginPath();
+      ctx.moveTo(dx - 8, baseY);
+      ctx.lineTo(dx - 7, baseY - 28);
+      ctx.lineTo(dx + 7, baseY - 28);
+      ctx.lineTo(dx + 8, baseY);
+      ctx.closePath();
+      ctx.fill();
+
+      // Lid
+      ctx.fillStyle = '#4a4a55';
+      ctx.fillRect(dx - 9, baseY - 32, 18, 4);
+      // Lid handle
+      ctx.fillStyle = '#555560';
+      ctx.fillRect(dx - 3, baseY - 35, 6, 4);
+
+      // Horizontal bands
+      ctx.strokeStyle = 'rgba(80, 80, 90, 0.3)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(dx - 7, baseY - 15);
+      ctx.lineTo(dx + 7, baseY - 15);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(dx - 8, baseY - 8);
+      ctx.lineTo(dx + 8, baseY - 8);
+      ctx.stroke();
+
+      // Shadow
+      ctx.fillStyle = 'rgba(0,0,0,0.08)';
+      ctx.beginPath();
+      ctx.ellipse(dx, baseY, 10, 3, 0, 0, Math.PI * 2);
+      ctx.fill();
+    } else if (detail.type === 'crate') {
+      // Wooden crate
+      ctx.fillStyle = '#4a3828';
+      ctx.fillRect(dx - 12, baseY - 20, 24, 20);
+
+      // Planks
+      ctx.strokeStyle = 'rgba(80, 60, 40, 0.3)';
+      ctx.lineWidth = 0.5;
+      ctx.beginPath();
+      ctx.moveTo(dx - 12, baseY - 10);
+      ctx.lineTo(dx + 12, baseY - 10);
+      ctx.stroke();
+
+      // Cross brace
+      ctx.strokeStyle = 'rgba(100, 70, 40, 0.2)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(dx - 10, baseY - 18);
+      ctx.lineTo(dx + 10, baseY - 2);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(dx + 10, baseY - 18);
+      ctx.lineTo(dx - 10, baseY - 2);
+      ctx.stroke();
+
+      // Highlight
+      ctx.fillStyle = 'rgba(255,255,255,0.03)';
+      ctx.fillRect(dx - 12, baseY - 20, 24, 3);
+
+      // Shadow
+      ctx.fillStyle = 'rgba(0,0,0,0.1)';
+      ctx.beginPath();
+      ctx.ellipse(dx, baseY + 1, 14, 3, 0, 0, Math.PI * 2);
+      ctx.fill();
+    } else if (detail.type === 'hydrant') {
+      // Fire hydrant
+      ctx.fillStyle = '#882222';
+      ctx.fillRect(dx - 4, baseY - 18, 8, 18);
+
+      // Top dome
+      ctx.fillStyle = '#993333';
+      ctx.beginPath();
+      ctx.arc(dx, baseY - 18, 5, Math.PI, 0);
+      ctx.fill();
+      ctx.fillRect(dx - 5, baseY - 18, 10, 2);
+
+      // Side nozzle
+      ctx.fillStyle = '#772222';
+      ctx.fillRect(dx + 4, baseY - 12, 5, 4);
+      ctx.fillRect(dx - 9, baseY - 12, 5, 4);
+
+      // Highlight
+      ctx.fillStyle = 'rgba(255,255,255,0.06)';
+      ctx.fillRect(dx - 2, baseY - 18, 2, 16);
+
+      // Reflective ring
+      ctx.fillStyle = `rgba(255, 255, 200, ${0.15 + Math.sin(tick * 0.05 + detail.x) * 0.1})`;
+      ctx.fillRect(dx - 5, baseY - 7, 10, 2);
+    }
+  }
 }

@@ -2,6 +2,18 @@
  *  Owns ALL cinematic effect variables; rendering/audio callbacks remain in main.ts. */
 import type { MaxModeState } from '../core/types.js';
 
+/** KO impact dust particle for rendering */
+export interface KODustParticle {
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  life: number;
+  maxLife: number;
+  size: number;
+  color: string;
+}
+
 export class CinematicState {
   hitStop = 0;
   superFlashTimer = 0;
@@ -19,6 +31,8 @@ export class CinematicState {
   koDesaturateTimer = 0;
   /** KO红色暗角剩余帧 — 渲染层读取此值绘制红色边缘渐变 */
   koVignetteTimer = 0;
+  /** KO impact dust particles — spawned at KO hit location */
+  koDustParticles: KODustParticle[] = [];
   victoryFanfarePlayed = false;
   p1DamageTaken = 0;
   p2DamageTaken = 0;
@@ -94,6 +108,25 @@ export class CinematicState {
     this.koVignetteTimer = 90;
   }
 
+  /** Spawn KO impact dust particles at the hit location */
+  spawnKODust(hitX: number, hitY: number, count: number = 20): void {
+    for (let i = 0; i < count; i++) {
+      const angle = (i / count) * Math.PI * 2 + Math.random() * 0.5;
+      const speed = 1.5 + Math.random() * 4;
+      const life = 30 + Math.floor(Math.random() * 30);
+      this.koDustParticles.push({
+        x: hitX + (Math.random() - 0.5) * 20,
+        y: hitY + (Math.random() - 0.5) * 20,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed - 1.5,
+        life,
+        maxLife: life,
+        size: 2 + Math.random() * 4,
+        color: Math.random() > 0.5 ? '#c8a060' : '#a08050',
+      });
+    }
+  }
+
   /** KO slow-mo frame skip: returns true when frame should be skipped */
   shouldSkipFrame(): boolean {
     if (this.koSlowMo <= 0) return false;
@@ -106,7 +139,24 @@ export class CinematicState {
     // 衰减KO视觉效果
     if (this.koDesaturateTimer > 0) this.koDesaturateTimer--;
     if (this.koVignetteTimer > 0) this.koVignetteTimer--;
+    // 更新KO灰尘粒子
+    this.updateKODustParticles();
     return false;
+  }
+
+  /** Update KO dust particles (called during slow-mo frames) */
+  private updateKODustParticles(): void {
+    for (let i = this.koDustParticles.length - 1; i >= 0; i--) {
+      const p = this.koDustParticles[i];
+      p.x += p.vx;
+      p.y += p.vy;
+      p.vy += 0.12; // gravity
+      p.vx *= 0.97; // friction
+      p.life--;
+      if (p.life <= 0) {
+        this.koDustParticles.splice(i, 1);
+      }
+    }
   }
 
   /** Returns true when KO slow-mo has finished */
@@ -141,6 +191,7 @@ export class CinematicState {
     this.koSlowMoFrameCounter = 0;
     this.koDesaturateTimer = 0;
     this.koVignetteTimer = 0;
+    this.koDustParticles = [];
     this.victoryFanfarePlayed = false;
     this.p1DamageTaken = 0;
     this.p2DamageTaken = 0;
@@ -157,6 +208,7 @@ export class CinematicState {
     this.koSlowMoFrameCounter = 0;
     this.koDesaturateTimer = 0;
     this.koVignetteTimer = 0;
+    this.koDustParticles = [];
     this.p1DamageTaken = 0;
     this.p2DamageTaken = 0;
   }

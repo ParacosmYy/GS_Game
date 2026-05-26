@@ -511,12 +511,15 @@ export enum GamePhase {
   TITLE = 'TITLE',     // Title screen (KOF2002 logo + PRESS START)
   MODE_SELECT = 'MODE_SELECT', // Single vs Team battle mode
   SELECT = 'SELECT',   // Character select
+  TEAM_ORDER = 'TEAM_ORDER', // Team order selection (3v3 mode)
+  STAGE_SELECT = 'STAGE_SELECT', // Stage selection
   INTRO = 'INTRO',     // "ROUND 1... FIGHT!" text
   FIGHTING = 'FIGHTING', // Active gameplay
   KO = 'KO',           // KO state
   WIN_QUOTE = 'WIN_QUOTE', // 胜利台词显示
   MATCH_END = 'MATCH_END', // Match complete (best of 3)
   CONTINUE = 'CONTINUE', // Continue? countdown
+  GAME_OVER = 'GAME_OVER', // Game over screen (after continue timeout or NO)
   TRAINING = 'TRAINING', // Training mode (no timer, health regen, input display)
 }
 

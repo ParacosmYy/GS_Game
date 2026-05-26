@@ -87,11 +87,15 @@ export function drawOrochiStage(
   if (!initialized) init();
 
   drawSky(ctx, globalTick);
+  drawDarkVortex(ctx, globalTick);
   drawDistantRuins(ctx, cameraX, globalTick);
   drawShrineStructure(ctx, cameraX, globalTick);
   drawBrokenTorii(ctx, cameraX);
+  drawEnergyPillars(ctx, cameraX, globalTick);
+  drawFloatingDebris(ctx, globalTick);
   drawGlowingOrbs(ctx, globalTick);
-  drawGround(ctx, cameraX);
+  drawLightningFlash(ctx, globalTick);
+  drawGround(ctx, cameraX, globalTick);
   drawMist(ctx, globalTick);
   drawPurpleParticles(ctx, globalTick);
   drawBoundaries(ctx, cameraX);
@@ -526,7 +530,7 @@ function drawGlowingOrbs(ctx: CanvasRenderingContext2D, tick: number): void {
 
 // ===== Layer 4: Ground =====
 
-function drawGround(ctx: CanvasRenderingContext2D, cameraX: number): void {
+function drawGround(ctx: CanvasRenderingContext2D, cameraX: number, tick: number): void {
   // Dark stone ground with moss
   const groundGrad = ctx.createLinearGradient(0, STAGE_GROUND_Y, 0, CANVAS_HEIGHT);
   groundGrad.addColorStop(0, '#18102a');
@@ -559,19 +563,47 @@ function drawGround(ctx: CanvasRenderingContext2D, cameraX: number): void {
     ctx.fill();
   }
 
-  // Cracks in stone
-  ctx.strokeStyle = 'rgba(30, 15, 45, 0.3)';
-  ctx.lineWidth = 1;
-  ctx.beginPath();
-  ctx.moveTo(120, STAGE_GROUND_Y + 5);
-  ctx.lineTo(130, STAGE_GROUND_Y + 15);
-  ctx.lineTo(125, STAGE_GROUND_Y + 30);
-  ctx.stroke();
-  ctx.beginPath();
-  ctx.moveTo(500, STAGE_GROUND_Y + 3);
-  ctx.lineTo(510, STAGE_GROUND_Y + 12);
-  ctx.lineTo(505, STAGE_GROUND_Y + 25);
-  ctx.stroke();
+  // Cracks in stone with glowing fissures
+  const fissures = [
+    { points: [[120, 5], [130, 15], [125, 30], [135, 48], [128, 65]], glow: 0.6 },
+    { points: [[500, 3], [510, 12], [505, 25], [515, 38], [508, 50]], glow: 0.5 },
+    { points: [[300, 4], [295, 18], [305, 32], [298, 45]], glow: 0.7 },
+    { points: [[680, 6], [690, 20], [685, 35], [695, 52], [688, 68]], glow: 0.4 },
+  ];
+  for (const fissure of fissures) {
+    const fissurePulse = fissure.glow * (0.5 + Math.sin(tick * 0.03 + fissure.points[0][0] * 0.1) * 0.3);
+
+    // Glow beneath crack
+    for (let fi = 0; fi < fissure.points.length; fi++) {
+      const fx = fissure.points[fi][0];
+      const fy = STAGE_GROUND_Y + fissure.points[fi][1];
+      const fissGlow = ctx.createRadialGradient(fx, fy, 0, fx, fy, 12);
+      fissGlow.addColorStop(0, `rgba(160, 60, 220, ${fissurePulse * 0.15})`);
+      fissGlow.addColorStop(1, 'rgba(120, 30, 180, 0)');
+      ctx.fillStyle = fissGlow;
+      ctx.fillRect(fx - 12, fy - 8, 24, 16);
+    }
+
+    // Crack line
+    ctx.strokeStyle = `rgba(140, 50, 200, ${fissurePulse * 0.4})`;
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(fissure.points[0][0], STAGE_GROUND_Y + fissure.points[0][1]);
+    for (let fi = 1; fi < fissure.points.length; fi++) {
+      ctx.lineTo(fissure.points[fi][0], STAGE_GROUND_Y + fissure.points[fi][1]);
+    }
+    ctx.stroke();
+
+    // Inner bright line
+    ctx.strokeStyle = `rgba(200, 150, 255, ${fissurePulse * 0.25})`;
+    ctx.lineWidth = 0.5;
+    ctx.beginPath();
+    ctx.moveTo(fissure.points[0][0], STAGE_GROUND_Y + fissure.points[0][1]);
+    for (let fi = 1; fi < fissure.points.length; fi++) {
+      ctx.lineTo(fissure.points[fi][0], STAGE_GROUND_Y + fissure.points[fi][1]);
+    }
+    ctx.stroke();
+  }
 
   // Purple energy line at ground edge
   const edgeGrad = ctx.createLinearGradient(0, STAGE_GROUND_Y - 3, 0, STAGE_GROUND_Y + 5);
@@ -634,7 +666,242 @@ function drawPurpleParticles(ctx: CanvasRenderingContext2D, tick: number): void 
   }
 }
 
-// ===== Boundaries =====
+// ===== Dark swirling vortex =====
+
+function drawDarkVortex(ctx: CanvasRenderingContext2D, tick: number): void {
+  const cx = CANVAS_WIDTH * 0.5;
+  const cy = 180;
+  const rotation = tick * 0.003;
+
+  // Multiple spiral arms
+  for (let arm = 0; arm < 4; arm++) {
+    const armAngle = rotation + (arm / 4) * Math.PI * 2;
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(armAngle);
+
+    for (let i = 0; i < 12; i++) {
+      const t = i / 12;
+      const spiralR = 30 + t * 120;
+      const spiralAngle = t * Math.PI * 1.5;
+      const sx = Math.cos(spiralAngle) * spiralR;
+      const sy = Math.sin(spiralAngle) * spiralR * 0.4; // flatten for perspective
+      const pulse = 0.5 + Math.sin(tick * 0.02 + i * 0.5) * 0.3;
+      const alpha = (1 - t) * 0.06 * pulse;
+
+      ctx.fillStyle = `rgba(100, 30, 160, ${alpha})`;
+      ctx.beginPath();
+      ctx.ellipse(sx, sy, 20 - t * 8, 8 - t * 3, spiralAngle * 0.3, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    ctx.restore();
+  }
+
+  // Center glow
+  const centerPulse = 0.5 + Math.sin(tick * 0.025) * 0.3;
+  const centerGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, 50);
+  centerGrad.addColorStop(0, `rgba(140, 50, 200, ${0.15 * centerPulse})`);
+  centerGrad.addColorStop(0.4, `rgba(100, 30, 160, ${0.08 * centerPulse})`);
+  centerGrad.addColorStop(1, 'rgba(80, 20, 130, 0)');
+  ctx.fillStyle = centerGrad;
+  ctx.fillRect(cx - 50, cy - 50, 100, 100);
+}
+
+// ===== Energy pillars pulsing =====
+
+function drawEnergyPillars(ctx: CanvasRenderingContext2D, cameraX: number, tick: number): void {
+  const px = cameraX * 0.2;
+  const pillars = [
+    { x: 100, h: 200 },
+    { x: 300, h: 240 },
+    { x: 550, h: 220 },
+    { x: 750, h: 250 },
+    { x: 900, h: 210 },
+  ];
+
+  for (let pi = 0; pi < pillars.length; pi++) {
+    const pillar = pillars[pi];
+    const ppx = pillar.x - px;
+    if (ppx < -40 || ppx > CANVAS_WIDTH + 40) continue;
+    const baseY = STAGE_GROUND_Y;
+
+    // Pillar body — translucent energy column
+    const pulse = 0.4 + Math.sin(tick * 0.025 + pi * 1.2) * 0.3;
+    const pillarGrad = ctx.createLinearGradient(ppx, baseY - pillar.h, ppx, baseY);
+    pillarGrad.addColorStop(0, `rgba(120, 40, 180, ${0.02 * pulse})`);
+    pillarGrad.addColorStop(0.2, `rgba(140, 50, 200, ${0.12 * pulse})`);
+    pillarGrad.addColorStop(0.5, `rgba(160, 60, 220, ${0.18 * pulse})`);
+    pillarGrad.addColorStop(0.8, `rgba(140, 50, 200, ${0.12 * pulse})`);
+    pillarGrad.addColorStop(1, `rgba(120, 40, 180, ${0.02 * pulse})`);
+    ctx.fillStyle = pillarGrad;
+    ctx.fillRect(ppx - 10, baseY - pillar.h, 20, pillar.h);
+
+    // Energy rings traveling up the pillar
+    for (let ri = 0; ri < 4; ri++) {
+      const ringProgress = ((tick * 0.015 + ri * 0.25 + pi * 0.3) % 1);
+      const ringY = baseY - ringProgress * pillar.h;
+      const ringAlpha = Math.sin(ringProgress * Math.PI) * 0.3 * pulse;
+      ctx.strokeStyle = `rgba(180, 100, 240, ${ringAlpha})`;
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.ellipse(ppx, ringY, 14 + Math.sin(ringProgress * Math.PI * 4) * 3, 4, 0, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+
+    // Top glow burst
+    const topGlow = ctx.createRadialGradient(ppx, baseY - pillar.h, 0, ppx, baseY - pillar.h, 30);
+    topGlow.addColorStop(0, `rgba(180, 100, 240, ${0.2 * pulse})`);
+    topGlow.addColorStop(0.5, `rgba(140, 60, 200, ${0.08 * pulse})`);
+    topGlow.addColorStop(1, 'rgba(120, 40, 180, 0)');
+    ctx.fillStyle = topGlow;
+    ctx.fillRect(ppx - 30, baseY - pillar.h - 30, 60, 60);
+
+    // Base glow
+    const baseGlow = ctx.createRadialGradient(ppx, baseY, 0, ppx, baseY, 25);
+    baseGlow.addColorStop(0, `rgba(140, 50, 200, ${0.1 * pulse})`);
+    baseGlow.addColorStop(1, 'rgba(120, 40, 180, 0)');
+    ctx.fillStyle = baseGlow;
+    ctx.fillRect(ppx - 25, baseY - 10, 50, 20);
+  }
+}
+
+// ===== Floating debris/rocks =====
+
+interface FloatingDebris {
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  size: number;
+  rotation: number;
+  rotSpeed: number;
+  phase: number;
+  floatBase: number;
+}
+
+const floatingDebris: FloatingDebris[] = [];
+let debrisInit = false;
+
+function initDebris(): void {
+  for (let i = 0; i < 12; i++) {
+    floatingDebris.push({
+      x: Math.random() * CANVAS_WIDTH,
+      y: 150 + Math.random() * 250,
+      vx: (Math.random() - 0.5) * 0.3,
+      vy: 0,
+      size: 3 + Math.random() * 8,
+      rotation: Math.random() * Math.PI * 2,
+      rotSpeed: (Math.random() - 0.5) * 0.02,
+      phase: Math.random() * Math.PI * 2,
+      floatBase: 150 + Math.random() * 250,
+    });
+  }
+  debrisInit = true;
+}
+
+function drawFloatingDebris(ctx: CanvasRenderingContext2D, tick: number): void {
+  if (!debrisInit) initDebris();
+
+  for (const d of floatingDebris) {
+    d.x += d.vx;
+    d.y = d.floatBase + Math.sin(tick * 0.01 + d.phase) * 20;
+    d.rotation += d.rotSpeed;
+
+    // Wrap around
+    if (d.x < -20) d.x = CANVAS_WIDTH + 20;
+    if (d.x > CANVAS_WIDTH + 20) d.x = -20;
+
+    const glowPulse = 0.3 + Math.sin(tick * 0.03 + d.phase) * 0.15;
+
+    // Debris glow
+    const dGlow = ctx.createRadialGradient(d.x, d.y, 0, d.x, d.y, d.size * 3);
+    dGlow.addColorStop(0, `rgba(120, 50, 180, ${glowPulse * 0.15})`);
+    dGlow.addColorStop(1, 'rgba(100, 30, 150, 0)');
+    ctx.fillStyle = dGlow;
+    ctx.fillRect(d.x - d.size * 3, d.y - d.size * 3, d.size * 6, d.size * 6);
+
+    // Rock shape (irregular polygon)
+    ctx.save();
+    ctx.translate(d.x, d.y);
+    ctx.rotate(d.rotation);
+    ctx.fillStyle = `rgba(40, 25, 55, ${0.5 + glowPulse * 0.3})`;
+    ctx.beginPath();
+    const sides = 5 + Math.floor(d.size) % 3;
+    for (let s = 0; s < sides; s++) {
+      const angle = (s / sides) * Math.PI * 2;
+      const r = d.size * (0.7 + Math.sin(s * 2.3 + d.phase) * 0.3);
+      const px = Math.cos(angle) * r;
+      const py = Math.sin(angle) * r;
+      if (s === 0) ctx.moveTo(px, py);
+      else ctx.lineTo(px, py);
+    }
+    ctx.closePath();
+    ctx.fill();
+
+    // Edge glow
+    ctx.strokeStyle = `rgba(160, 80, 220, ${glowPulse * 0.3})`;
+    ctx.lineWidth = 0.5;
+    ctx.stroke();
+
+    ctx.restore();
+  }
+}
+
+// ===== Lightning flash effects =====
+
+let lightningTimer = 0;
+let lightningFlash = 0;
+
+function drawLightningFlash(ctx: CanvasRenderingContext2D, tick: number): void {
+  lightningTimer++;
+
+  // Random lightning trigger
+  if (lightningTimer > 180 + Math.random() * 300) {
+    lightningFlash = 8;
+    lightningTimer = 0;
+  }
+
+  if (lightningFlash > 0) {
+    const intensity = lightningFlash / 8;
+
+    // Screen flash
+    ctx.fillStyle = `rgba(180, 160, 255, ${0.08 * intensity})`;
+    ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+    // Lightning bolt
+    const boltX = CANVAS_WIDTH * 0.3 + Math.random() * CANVAS_WIDTH * 0.4;
+    ctx.save();
+    ctx.strokeStyle = `rgba(200, 180, 255, ${0.4 * intensity})`;
+    ctx.lineWidth = 2 * intensity;
+    ctx.shadowColor = `rgba(180, 120, 255, ${intensity})`;
+    ctx.shadowBlur = 10 * intensity;
+    ctx.beginPath();
+    let bx = boltX;
+    let by = 0;
+    ctx.moveTo(bx, by);
+    for (let seg = 0; seg < 8; seg++) {
+      bx += (Math.random() - 0.5) * 40;
+      by += 30 + Math.random() * 30;
+      ctx.lineTo(bx, by);
+      // Branch
+      if (seg % 3 === 0 && seg > 1) {
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(bx, by);
+        const branchLen = 20 + Math.random() * 30;
+        ctx.lineTo(bx + (Math.random() - 0.5) * branchLen, by + branchLen * 0.5);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(bx, by);
+      }
+    }
+    ctx.stroke();
+    ctx.restore();
+
+    lightningFlash--;
+  }
+}
 
 function drawBoundaries(ctx: CanvasRenderingContext2D, cameraX: number): void {
   ctx.strokeStyle = 'rgba(255, 50, 50, 0.15)';

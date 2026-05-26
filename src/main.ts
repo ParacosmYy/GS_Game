@@ -15,7 +15,7 @@ import { CombatSystem } from './combat/combatSystem.js';
 import { createPowerGauge, createMaxMode, tickMaxMode, tickAutoMeter, gainMeterOnHit, drainMeterByTaunt } from './combat/meter.js';
 import { Renderer } from './rendering/renderer.js';
 import { VFXSystem, ScreenShake, ScreenFlash } from './rendering/vfx.js';
-import { cycleStage, setStage, getStage, type StageId } from './rendering/stage.js';
+import { cycleStage, setStage, getStage, getAllStages, type StageId } from './rendering/stage.js';
 import { drawVictoryPose } from './rendering/skeletalFighter.js';
 import type { TeamDisplayInfo } from './rendering/hud.js';
 import { ROSTER } from './characters/index.js';
@@ -40,6 +40,7 @@ import { gameRandom, gameRandomInt } from './core/prng.js';
 import { InputLogger } from './core/inputLog.js';
 import { ReplaySession } from './core/replaySession.js';
 import { createRoundStartSequence, createKOSequence, createTimeOverSequence, createWinnerSequence } from './state/announcePresets.js';
+import { TrainingModeState } from './state/trainingMode.js';
 
 const canvas = document.getElementById('gameCanvas') as HTMLCanvasElement;
 const ctx = canvas.getContext('2d')!;
@@ -53,6 +54,7 @@ const combatSystem = new CombatSystem(inputManager);
 const renderer = new Renderer(ctx);
 const vfx = new VFXSystem();
 const gs = new GameStateManager();
+const training = new TrainingModeState();
 
 // ===== Sprite System =====
 const spriteManager = new SpriteManager();
@@ -180,11 +182,23 @@ function update(): void {
         announcer.roundStart(1);
         announcer.fight();
       } else {
-        gs.setPhase(GamePhase.TITLE);
+        gs.setPhase(GamePhase.GAME_OVER);
+        gs.gameOverTimer = 0;
       }
     }
     if (gs.continueCountdown <= 0) {
+      gs.setPhase(GamePhase.GAME_OVER);
+      gs.gameOverTimer = 0;
+    }
+    return;
+  }
+
+  if (gs.phase === GamePhase.GAME_OVER) {
+    tickRef.value++;
+    gs.gameOverTimer++;
+    if (gs.gameOverTimer >= 180) {
       gs.setPhase(GamePhase.TITLE);
+      gs.gameOverTimer = 0;
     }
     return;
   }
@@ -197,13 +211,111 @@ function update(): void {
       if (gs.teamMode) {
         p1Team = createTeam(result.p1Team);
         p2Team = createTeam(result.p2Team);
+        // Go to team order select first
+        gs.resetTeamOrder();
+        gs.setPhase(GamePhase.TEAM_ORDER);
+      } else {
+        // Go directly to stage select
+        gs.resetStageSelect();
+        gs.setPhase(GamePhase.STAGE_SELECT);
       }
-      gs.setPhase(GamePhase.INTRO);
-      gs.phaseTimer = 0;
+    }
+    return;
+  }
+
+  if (gs.phase === GamePhase.TEAM_ORDER) {
+    tickRef.value++;
+    const p1Input = inputManager.getP1Input();
+    // Throttle directional input to once every 10 frames
+    if (gs.inputRepeatCooldown > 0) gs.inputRepeatCooldown--;
+    const canRepeat = gs.inputRepeatCooldown === 0;
+
+    if (!gs.teamOrderReady[0]) {
+      if (!gs.teamOrderSwapMode) {
+        if (p1Input.left && canRepeat) { gs.teamOrderCursor = Math.max(0, gs.teamOrderCursor - 1); gs.inputRepeatCooldown = 10; }
+        if (p1Input.right && canRepeat) { gs.teamOrderCursor = Math.min(2, gs.teamOrderCursor + 1); gs.inputRepeatCooldown = 10; }
+        // Press A (buttonA) to enter swap mode
+        if (p1Input.buttonA) {
+          gs.teamOrderSwapMode = true;
+          gs.teamOrderSwapCursor = gs.teamOrderCursor;
+        }
+      } else {
+        // In swap mode: left/right to pick target
+        if (p1Input.left && canRepeat) { gs.teamOrderSwapCursor = Math.max(0, gs.teamOrderSwapCursor - 1); gs.inputRepeatCooldown = 10; }
+        if (p1Input.right && canRepeat) { gs.teamOrderSwapCursor = Math.min(2, gs.teamOrderSwapCursor + 1); gs.inputRepeatCooldown = 10; }
+        // Press A to confirm swap
+        if (p1Input.buttonA && gs.teamOrderSwapCursor !== gs.teamOrderCursor) {
+          const temp = gs.teamOrderSlots[0][gs.teamOrderCursor];
+          gs.teamOrderSlots[0][gs.teamOrderCursor] = gs.teamOrderSlots[0][gs.teamOrderSwapCursor];
+          gs.teamOrderSlots[0][gs.teamOrderSwapCursor] = temp;
+          gs.teamOrderSwapMode = false;
+        }
+        // Press C or D to cancel swap
+        if (p1Input.buttonC || p1Input.buttonD) {
+          gs.teamOrderSwapMode = false;
+        }
+      }
+
+      // Press Enter/KeyJ to confirm order
+      if (inputManager.isKeyDown('KeyJ') || inputManager.isKeyDown('Enter')) {
+        gs.teamOrderReady[0] = true;
+        gs.teamOrderReady[1] = true; // AI confirms instantly
+      }
+    }
+
+    // Both ready -> proceed to stage select
+    if (gs.teamOrderReady[0] && gs.teamOrderReady[1]) {
+      // Apply team order to teams
+      if (p1Team && p2Team) {
+        const p1Old = [...p1Team.members];
+        const p2Old = [...p2Team.members];
+        p1Team.members = gs.teamOrderSlots[0].map(i => p1Old[i]);
+        p1Team.activeIndex = 0;
+        p2Team.members = gs.teamOrderSlots[1].map(i => p2Old[i]);
+        p2Team.activeIndex = 0;
+      }
+      gs.resetStageSelect();
+      gs.setPhase(GamePhase.STAGE_SELECT);
+    }
+    return;
+  }
+
+  if (gs.phase === GamePhase.STAGE_SELECT) {
+    tickRef.value++;
+    const p1Input = inputManager.getP1Input();
+    const allStages = getAllStages();
+    const totalSlots = allStages.length + 1;
+
+    if (gs.inputRepeatCooldown > 0) gs.inputRepeatCooldown--;
+    const canRepeat = gs.inputRepeatCooldown === 0;
+
+    if (!gs.stageSelectReady) {
+      if (p1Input.left && canRepeat) { gs.stageSelectCursor = Math.max(0, gs.stageSelectCursor - 1); gs.inputRepeatCooldown = 10; }
+      if (p1Input.right && canRepeat) { gs.stageSelectCursor = Math.min(totalSlots - 1, gs.stageSelectCursor + 1); gs.inputRepeatCooldown = 10; }
+      if (inputManager.isKeyDown('KeyJ') || inputManager.isKeyDown('Enter') || p1Input.buttonA) {
+        gs.stageSelectReady = true;
+        // Resolve stage
+        if (gs.stageSelectCursor >= allStages.length) {
+          const randomIdx = gameRandomInt(allStages.length);
+          gs.stageSelectConfirmed = allStages[randomIdx];
+        } else {
+          gs.stageSelectConfirmed = allStages[gs.stageSelectCursor];
+        }
+      }
+    }
+
+    if (gs.stageSelectReady) {
+      if (gs.stageSelectConfirmed) {
+        setStage(gs.stageSelectConfirmed as StageId);
+      }
+
+      if (gs.isTrainingMode) training.reset();
       initAudio();
       initSampler();
       rounds.currentRound = 1;
       gs.isTimeOver = false;
+      gs.setPhase(GamePhase.INTRO);
+      gs.phaseTimer = 0;
       p1DelayedHealth = p1.maxHealth;
       p2DelayedHealth = p2.maxHealth;
       p1.savePrevState();
@@ -421,6 +533,19 @@ function update(): void {
   if (p2Input.kickPressed) p2Cmd.recordPress('kick', tickRef.value);
   if (p2Input.punchJustReleased) p2Cmd.recordRelease('punch', tickRef.value);
   if (p2Input.kickJustReleased) p2Cmd.recordRelease('kick', tickRef.value);
+  // Training mode: record P1 input history and update frame data
+  if (gs.isTrainingMode) {
+    const sym: Record<string, string> = { neutral: '·', up: '↑', down: '↓', forward: '→', back: '←', upforward: '↗', upback: '↖', downforward: '↘', downback: '↙' };
+    const dir = sym[getDirectionInput(p1Input)] || '·';
+    const btns: string[] = [];
+    if (p1Input.buttonAPressed) btns.push('A');
+    if (p1Input.buttonBPressed) btns.push('B');
+    if (p1Input.buttonCPressed) btns.push('C');
+    if (p1Input.buttonDPressed) btns.push('D');
+    if (p1Input.throwAttackPressed) btns.push('CD');
+    training.recordInput(dir, btns, tickRef.value);
+    training.updateFrameData(p1, tickRef.value);
+  }
   if (gs.simplifiedMode && !p1.currentAttack && p1.canAct()) {
     const p1Char = ROSTER.find(c => c.id === p1.charId) || ROSTER[0];
     const simp = resolveSimplified(
@@ -441,11 +566,7 @@ function update(): void {
     p2Ctrl.update(aiInput);
     if (p2.canAct() && gameRandom() < 0.02) { const s = p2AI.triggerSpecial(); if (s) p2.startAttack(s); }
   } else if (gs.isTrainingMode) {
-    const dummyInput = { ...p2Input };
-    if (p1.attackPhase === 'active' && p2.canBlock()) {
-      if (p1.x < p2.x) dummyInput.back = true;
-      else dummyInput.forward = true;
-    }
+    const dummyInput = training.getDummyInput(p1, p2, tickRef.value, p2.facing);
     p2Ctrl.update(dummyInput);
   } else {
     p2Ctrl.update(p2Input);
@@ -594,6 +715,7 @@ function update(): void {
   if (!gs.isTrainingMode && (p1.health <= 0 || p2.health <= 0)) {
     if (!cinematic.koSlowMoTriggered) {
       const killer = p1.health <= 0 ? p2 : p1;
+      const loser = p1.health <= 0 ? p1 : p2;
       const killerAttack = killer.currentAttack as string;
       const isDMKill = killerAttack?.startsWith('DM_') || killerAttack?.startsWith('SDM_');
       if (isDMKill) cinematic.triggerDMKOSlowMo();
@@ -603,6 +725,10 @@ function update(): void {
       cinematic.triggerHitStop(isDMKill ? 20 : 15, koDefender, koAttacker.facing);
       screenFlash.trigger('#ff2200', 0.35, 15);
       screenShake.trigger(isDMKill ? 18 : 14, 15);
+      // KO impact dust particles at hit location
+      const hitX = (killer.x + loser.x) / 2;
+      const hitY = loser.y - loser.displayHeight / 2;
+      cinematic.spawnKODust(hitX, hitY, isDMKill ? 30 : 20);
       playKO();
       bgm.stop();
       ambient.stop();
@@ -645,53 +771,6 @@ function update(): void {
   }
 }
 
-// ===== Training Mode HUD =====
-function drawTrainingHUD(
-  ctx: CanvasRenderingContext2D, p1: Fighter, p2: Fighter,
-  cs: CombatSystem, inputDisplay: string, tick: number,
-): void {
-  ctx.save();
-  ctx.fillStyle = 'rgba(0, 80, 0, 0.65)';
-  ctx.fillRect(0, 0, 200, 28);
-  ctx.fillStyle = '#44ff44';
-  ctx.font = 'bold 14px monospace';
-  ctx.textAlign = 'left';
-  ctx.fillText('TRAINING MODE', 10, 19);
-
-  ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
-  ctx.fillRect(CANVAS_WIDTH - 220, 0, 220, 60);
-  ctx.font = '11px monospace';
-  ctx.fillStyle = '#aaa';
-  ctx.fillText('Combo:', CANVAS_WIDTH - 210, 16);
-  ctx.fillStyle = '#ffcc00';
-  ctx.fillText(`${cs.getComboCount(0)}`, CANVAS_WIDTH - 150, 16);
-  ctx.fillStyle = '#aaa';
-  ctx.fillText('Damage:', CANVAS_WIDTH - 210, 32);
-  ctx.fillStyle = '#ff6644';
-  ctx.fillText(`${cs.getComboDamage(0)}`, CANVAS_WIDTH - 140, 32);
-  ctx.fillStyle = '#aaa';
-  ctx.fillText('P1 HP:', CANVAS_WIDTH - 210, 48);
-  ctx.fillStyle = '#44ff44';
-  ctx.fillText(`${Math.round(p1.health)} / ${p1.maxHealth}`, CANVAS_WIDTH - 155, 48);
-
-  ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
-  ctx.fillRect(0, CANVAS_HEIGHT - 40, 400, 40);
-  ctx.font = '12px monospace';
-  ctx.fillStyle = '#888';
-  ctx.fillText('Input:', 8, CANVAS_HEIGHT - 20);
-  ctx.fillStyle = '#ccffcc';
-  ctx.fillText(inputDisplay, 60, CANVAS_HEIGHT - 20);
-
-  if (p1.currentAttack) {
-    const d = FRAME_DATA[p1.currentAttack as keyof typeof FRAME_DATA];
-    if (d) {
-      ctx.fillStyle = '#aaccff';
-      ctx.fillText(`${p1.currentAttack} [${p1.attackPhase}] f${p1.attackFrame}  S:${d.startup} A:${d.active} R:${d.recovery} dmg:${d.damage}`, 8, CANVAS_HEIGHT - 6);
-    }
-  }
-  ctx.restore();
-}
-
 // ===== Render =====
 function render(): void {
   if (gs.phase === GamePhase.TITLE) {
@@ -706,11 +785,38 @@ function render(): void {
     renderer.drawContinue(Math.ceil(gs.continueCountdown / 60), gs.continueCursorYes);
     return;
   }
+  if (gs.phase === GamePhase.GAME_OVER) {
+    renderer.drawGameOver(gs.gameOverTimer);
+    return;
+  }
   if (gs.phase === GamePhase.SELECT) {
     renderer.drawCharacterSelect(select, tickRef.value, gs.simplifiedMode, getStage());
     if (select.vsSplashTimer >= 0) {
       renderer.drawVSSplash(select, tickRef.value);
     }
+    return;
+  }
+
+  if (gs.phase === GamePhase.TEAM_ORDER) {
+    if (p1Team && p2Team) {
+      renderer.drawTeamOrderSelect(
+        tickRef.value,
+        p1Team.members,
+        p2Team.members,
+        gs.teamOrderSlots[0],
+        gs.teamOrderSlots[1],
+        gs.teamOrderCursor,
+        gs.teamOrderSwapMode,
+        gs.teamOrderSwapCursor,
+        gs.teamOrderReady[0],
+        gs.teamOrderReady[1],
+      );
+    }
+    return;
+  }
+
+  if (gs.phase === GamePhase.STAGE_SELECT) {
+    renderer.drawStageSelect(tickRef.value, gs.stageSelectCursor, gs.stageSelectReady);
     return;
   }
   rounds.tickFade();
@@ -720,7 +826,7 @@ function render(): void {
   const p2Char = ROSTER.find(c => c.id === p2.charId) || ROSTER[1];
   renderer.render([p1, p2], camera.x, tickRef.value, gs.phase === GamePhase.KO, gs.winner, screenShake.offsetX, screenShake.offsetY,
     [p1DelayedHealth, p2DelayedHealth], maxModes, perfectPlayer, rounds.p1Wins, rounds.p2Wins, p1Char.nameCn, p2Char.nameCn, gs.isTimeOver, rounds.currentRound, gs.firstAttacker,
-    cinematic.hitStopDefender, cinematic.hitStopBias, [p1Char.specialColor, p2Char.specialColor]);
+    cinematic.hitStopDefender, cinematic.hitStopBias, [p1Char.specialColor, p2Char.specialColor], gs.koTimer, cinematic.koDustParticles);
   renderer.drawProjectiles(projectiles, camera);
   vfx.render(ctx, camera.x);
 
@@ -809,9 +915,7 @@ function render(): void {
     renderer.drawDebug([p1, p2], projectiles, camera, tickRef.value, renderer.getFps(), vfx.count, [toHist(p1Cmd), toHist(p2Cmd)]);
   }
   if (gs.isTrainingMode && (gs.phase === GamePhase.FIGHTING || gs.phase === GamePhase.KO)) {
-    const sym: Record<string, string> = { neutral: '·', up: '↑', down: '↓', forward: '→', back: '←', upforward: '↗', upback: '↖', downforward: '↘', downback: '↙' };
-    const inputStr = p1Cmd.getRecentHistory(16).map(h => sym[h.direction] || '?').join(' ');
-    drawTrainingHUD(ctx, p1, p2, combatSystem, inputStr, tickRef.value);
+    renderer.drawTrainingHUD(training, combatSystem.getComboCount(0), combatSystem.getComboDamage(0), tickRef.value);
   }
 }
 
@@ -832,13 +936,30 @@ function restartGame(): void {
 let f1Down = false;
 window.addEventListener('keydown', e => {
   initAudio();
-  if (e.code === 'F1') { e.preventDefault(); if (!f1Down) { f1Down = true; gs.debugMode = !gs.debugMode; } }
+  if (e.code === 'F1') {
+    e.preventDefault();
+    if (!f1Down) {
+      f1Down = true;
+      if (gs.isTrainingMode) {
+        training.handleKeyShortcuts('F1', true, p1, p2);
+      } else {
+        gs.debugMode = !gs.debugMode;
+      }
+    }
+  }
+  if (gs.isTrainingMode && (e.code === 'F2' || e.code === 'F3' || e.code === 'F4')) {
+    e.preventDefault();
+    training.handleKeyShortcuts(e.code, true, p1, p2);
+  }
   if (e.code === 'KeyM') announcer.toggle();
   if (e.code === 'KeyB') bgm.toggle();
   if (e.code === 'Tab') { e.preventDefault(); gs.simplifiedMode = !gs.simplifiedMode; gs.modeIndicatorTimer = 120; }
   if (e.code === 'KeyN') { const s = cycleStage(); bgm.setStage(s); console.log('Stage:', s); gs.stageIndicatorTimer = 120; }
 });
-window.addEventListener('keyup', e => { if (e.code === 'F1') f1Down = false; });
+window.addEventListener('keyup', e => {
+  if (e.code === 'F1') f1Down = false;
+  if (gs.isTrainingMode) training.handleKeyShortcuts(e.code, false, p1, p2);
+});
 
 // ===== Start =====
 new GameLoop(update, render).start();

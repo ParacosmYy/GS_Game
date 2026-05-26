@@ -43,6 +43,10 @@ export function getStage(): StageId {
   return currentStage;
 }
 
+export function getAllStages(): StageId[] {
+  return ALL_STAGES;
+}
+
 export function cycleStage(): StageId {
   const idx = ALL_STAGES.indexOf(currentStage);
   currentStage = ALL_STAGES[(idx + 1) % ALL_STAGES.length];
