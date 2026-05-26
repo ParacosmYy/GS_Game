@@ -572,9 +572,11 @@ export function drawSkeletalFighter(
   const armW = prop.armW, armH = prop.armH;
   const legW = prop.legW, legH = prop.legH;
 
-  // Reference point
+  // Reference point — anchor visual body so feet touch ground
+  // displayHeight may be larger than actual body proportions; use actual body bottom
+  const bodyBottom = prop.hipY + prop.legH / 2;
   const refX = sx;
-  const refY = sy - f.displayHeight;
+  const refY = sy - bodyBottom;
 
   // Screen position helper
   const boneScreen = (bp: BonePose) => ({
