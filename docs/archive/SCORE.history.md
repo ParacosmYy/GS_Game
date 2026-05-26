@@ -577,3 +577,9 @@
 ## H139: vfx测试—4项验证ScreenFlash构造+trigger+update衰减 — 111→112
 
 **commit:** <hash> | vfx测试—4项验证ScreenFlash构造+trigger+update衰减
+
+---
+
+## H140: charactersTypes测试—6项验证bone+pose+DEFAULT_PROPORTIONS — 112→113
+
+**commit:** <hash> | charactersTypes测试—6项验证bone+pose+DEFAULT_PROPORTIONS
