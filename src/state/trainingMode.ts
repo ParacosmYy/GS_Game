@@ -4,8 +4,9 @@
  * 管理训练模式下的假人行为、输入历史、帧数据展示和 HUD 开关。
  * 所有训练模式专用状态都在这里，不污染通用游戏状态。
  */
-import { FRAME_DATA, STAGE_WIDTH } from '../core/constants.js';
-import type { Fighter } from '../entities/fighter.js';
+import { FRAME_DATA, STAGE_WIDTH, STAGE_GROUND_Y, MAX_HEALTH } from '../core/constants.js';
+import type { AttackType } from '../core/types.js';
+import { Fighter } from '../entities/fighter.js';
 import type { ResolvedInput } from '../input/inputResolver.js';
 
 // ===== Dummy Behavior =====
@@ -53,6 +54,186 @@ export interface FrameDataDisplay {
   advantageBlock: number;  // = blockstun - totalFrames
   currentFrame: number;    // current frame in the attack animation
   phase: string;           // 'startup' | 'active' | 'recovery'
+}
+
+// ===== Training Mode Controller =====
+export type DummyBehaviorConfig =
+  | 'stand'
+  | 'crouch'
+  | 'jump'
+  | 'block_all'
+  | 'block_high'
+  | 'block_low'
+  | 'random'
+  | 'playback';
+
+export interface TrainingModeConfig {
+  dummyBehavior: DummyBehaviorConfig;
+  showHitboxes: boolean;
+  showFrameData: boolean;
+  infiniteTime: boolean;
+  infiniteHealth: boolean;
+  frameAdvance: boolean;
+  inputDisplay: boolean;
+}
+
+export interface FrameDataInfo {
+  startup: number;
+  active: number;
+  recovery: number;
+  advantage: number;
+  cancelOptions: string[];
+  damage: number;
+  stun: number;
+}
+
+const DUMMY_BEHAVIOR_CONFIG_ORDER: DummyBehaviorConfig[] = [
+  'stand',
+  'block_all',
+  'block_high',
+  'block_low',
+  'crouch',
+  'jump',
+  'random',
+  'playback',
+];
+
+export class TrainingModeController {
+  config: TrainingModeConfig;
+
+  constructor() {
+    this.config = {
+      dummyBehavior: 'stand',
+      showHitboxes: false,
+      showFrameData: false,
+      infiniteTime: true,
+      infiniteHealth: true,
+      frameAdvance: false,
+      inputDisplay: true,
+    };
+  }
+
+  /** Reset round state: restore health and positions for both fighters */
+  resetRound(p1: Fighter, p2: Fighter): void {
+    p1.reset(STAGE_WIDTH * 0.33);
+    p2.reset(STAGE_WIDTH * 0.67);
+  }
+
+  /** Apply dummy behavior: modify the dummy fighter state based on config */
+  applyDummyBehavior(dummy: Fighter): void {
+    switch (this.config.dummyBehavior) {
+      case 'stand':
+        // Stand idle: no forced state change
+        break;
+      case 'crouch':
+        // Force crouch state if not in hitstun/knockdown/attack
+        if (dummy.canAct()) {
+          dummy.state = 'CROUCH' as any;
+        }
+        break;
+      case 'block_all':
+      case 'block_high':
+      case 'block_low':
+        // Blocking behavior is handled via getDummyInput, not forced state
+        break;
+      case 'jump':
+        // Jump behavior is handled via getDummyInput tick, not forced state
+        break;
+      case 'random':
+        // Random behavior handled via getDummyInput
+        break;
+      case 'playback':
+        // Playback handled externally
+        break;
+    }
+  }
+
+  /** Calculate frame advantage from last hit (attacker's perspective) */
+  calculateFrameAdvantage(attacker: Fighter, defender: Fighter): number {
+    if (!attacker.currentAttack && attacker.attackPhase === 'none') {
+      // Use last recorded attack data if available
+      return 0;
+    }
+    const attackId = attacker.currentAttack as string;
+    const fd = FRAME_DATA[attackId as keyof typeof FRAME_DATA];
+    if (!fd) return 0;
+
+    const totalFrames = fd.startup + fd.active + fd.recovery;
+    // On hit: advantage = defender hitstun - attacker total frames
+    // On block: advantage = defender blockstun - attacker total frames
+    const defenderStun = defender.blockstunTimer > 0 ? defender.blockstunTimer : defender.hitstunTimer;
+    return defenderStun - totalFrames;
+  }
+
+  /** Get frame data display for a specific attack */
+  getFrameDataDisplay(attackType: AttackType): FrameDataInfo {
+    const fd = FRAME_DATA[attackType as keyof typeof FRAME_DATA];
+    if (!fd) {
+      return {
+        startup: 0,
+        active: 0,
+        recovery: 0,
+        advantage: 0,
+        cancelOptions: [],
+        damage: 0,
+        stun: 0,
+      };
+    }
+
+    const totalFrames = fd.startup + fd.active + fd.recovery;
+    const advantageOnHit = fd.hitstun - totalFrames;
+    const cancelOpts = this._getCancelOptions(attackType as string);
+
+    return {
+      startup: fd.startup,
+      active: fd.active,
+      recovery: fd.recovery,
+      advantage: advantageOnHit,
+      cancelOptions: cancelOpts,
+      damage: fd.damage,
+      stun: fd.hitstun,
+    };
+  }
+
+  /** Toggle hitbox display */
+  toggleHitboxes(): void {
+    this.config.showHitboxes = !this.config.showHitboxes;
+  }
+
+  /** Toggle frame data display */
+  toggleFrameData(): void {
+    this.config.showFrameData = !this.config.showFrameData;
+  }
+
+  /** Toggle infinite time */
+  toggleInfiniteTime(): void {
+    this.config.infiniteTime = !this.config.infiniteTime;
+  }
+
+  /** Toggle infinite health */
+  toggleInfiniteHealth(): void {
+    this.config.infiniteHealth = !this.config.infiniteHealth;
+  }
+
+  /** Cycle dummy behavior to next option */
+  cycleDummyBehavior(): void {
+    const idx = DUMMY_BEHAVIOR_CONFIG_ORDER.indexOf(this.config.dummyBehavior);
+    this.config.dummyBehavior =
+      DUMMY_BEHAVIOR_CONFIG_ORDER[(idx + 1) % DUMMY_BEHAVIOR_CONFIG_ORDER.length];
+  }
+
+  /** Determine cancel options for an attack type */
+  private _getCancelOptions(attackId: string): string[] {
+    const options: string[] = [];
+    if (attackId.startsWith('CLOSE_') || attackId.startsWith('STAND_') || attackId.startsWith('CROUCH_')) {
+      if (attackId.endsWith('_A') || attackId.endsWith('_B')) {
+        options.push('rapid');
+      }
+      options.push('special');
+      options.push('super');
+    }
+    return options;
+  }
 }
 
 /** Create an empty ResolvedInput with all fields false */
