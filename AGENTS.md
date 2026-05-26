@@ -131,6 +131,7 @@ npx vite build
 - [Ryo Vertical Slice](docs/product/ryo-vertical-slice-plan.md)：当前唯一产品主线。
 - [真实性标准](docs/product/authenticity-standard.md)：接近 KOF 的验收标准。
 - [路线图](docs/product/roadmap.md)：阶段路线。
+- [迭代工作区](docs/iteration/README.md)：所有后续迭代文件的统一收纳区。
 - [当前架构](docs/architecture/current-architecture.md)：真实结构。
 - [模块边界](docs/architecture/module-boundaries.md)：依赖和职责。
 - [工作区目标架构](docs/architecture/workspace-architecture-target.md)：大型项目目录目标和迁移阶段。
@@ -138,6 +139,7 @@ npx vite build
 - [未来引擎架构](docs/architecture/future-engine-architecture.md)：换栈决策。
 - [自侦测前置](docs/process/self-detection.md)：3 人前置快筛。
 - [迭代流程](docs/process/iteration-workflow.md)：每轮闭环。
+- [迭代工作区](docs/iteration/README.md)：当前轮、待办、交接、归档的统一文件夹。
 - [决策门](docs/process/decision-gates.md)：新功能、架构迁移、资产、角色、打击感、换栈的允许条件。
 - [角色模板](docs/process/role-prompts.md)：PM/玩家/研发/测试/架构师模板。
 - [质量门禁](docs/process/quality-gates.md)：验证规则。

@@ -110,6 +110,15 @@
 
 不要为了“显得大型”做大搬家。每次只迁移一个领域，并通过 [决策门](docs/process/decision-gates.md) 验收。
 
+所有“后续要继续迭代”的文件、草案、待办、交接和归档，统一放进 [迭代工作区](docs/iteration/README.md)：
+
+- `docs/iteration/active.md`：当前正在推进的内容。
+- `docs/iteration/backlog.md`：未进入本轮的候选项。
+- `docs/iteration/handoff.md`：交接给下一位 AI 的固定说明。
+- `docs/iteration/archive/`：已完成历史记录。
+
+不要把迭代草案散落到仓库根目录、临时 markdown、或无归属的新文档里。
+
 ## 4.3 单角色收口规则
 
 Ryo 仍是当前唯一允许被持续打磨的主线角色。
