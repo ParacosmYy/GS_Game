@@ -186,6 +186,24 @@ describe('Ryo select flow — color palette selection', () => {
     expect(s.p1ColorIndex).toBe(3);
     expect(s.p1Ready).toBe(true);
   });
+
+  it('primed held button does not instantly confirm on the first select frame', () => {
+    const s = createTestSelectState();
+    navigateToSlot(s, RYO_ROSTER_INDEX);
+
+    // Simulate coming from title with J/A already held when SELECT begins.
+    s.primeInputs(
+      makeInput({ buttonA: true }),
+      noopInput,
+    );
+
+    s.update(makeInput({ buttonA: true }), noopInput, false);
+    expect(s.p1Ready).toBe(false);
+
+    s.update(makeInput({ buttonA: false }), noopInput, false);
+    s.update(makeInput({ buttonA: true }), noopInput, false);
+    expect(s.p1Ready).toBe(true);
+  });
 });
 
 // ============================================================
