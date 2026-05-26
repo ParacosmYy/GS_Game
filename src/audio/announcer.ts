@@ -215,6 +215,71 @@ export class Announcer {
   private reverbReady = false;
   private crowdRoarBuffer: AudioBuffer | null = null;
 
+  // Sample-based audio: when real recordings are available, prefer them over synthesis
+  private sampleCache = new Map<string, AudioBuffer>();
+  private samplePaths: Record<string, string> = {};
+  private sampleLoading = new Set<string>();
+
+  /** Register a sample path for a given call. When called, prefers the sample over synthesis. */
+  registerSample(callName: string, path: string): void {
+    this.samplePaths[callName] = path;
+  }
+
+  /** Load a sample into cache. Returns true if loaded successfully. */
+  private async loadSample(callName: string): Promise<boolean> {
+    const path = this.samplePaths[callName];
+    if (!path || this.sampleLoading.has(callName) || this.sampleCache.has(callName)) {
+      return this.sampleCache.has(callName);
+    }
+    this.sampleLoading.add(callName);
+    try {
+      const ctx = getCtx();
+      const resp = await fetch(path);
+      if (!resp.ok) return false;
+      const arrayBuf = await resp.arrayBuffer();
+      const audioBuf = await ctx.decodeAudioData(arrayBuf);
+      this.sampleCache.set(callName, audioBuf);
+      return true;
+    } catch {
+      return false;
+    } finally {
+      this.sampleLoading.delete(callName);
+    }
+  }
+
+  /** Try to play a real sample. Returns true if played, false if no sample available. */
+  private playSample(callName: string, volume: number = 0.5): boolean {
+    const buf = this.sampleCache.get(callName);
+    if (!buf) return false;
+    const ctx = getCtx();
+    if (ctx.state === 'suspended') return false;
+
+    const source = ctx.createBufferSource();
+    source.buffer = buf;
+    const gain = ctx.createGain();
+    gain.gain.value = volume;
+
+    const routing = this.ensureReverb();
+    if (routing) {
+      source.connect(gain);
+      gain.connect(routing.dry);
+      gain.connect(routing.reverb);
+    } else {
+      source.connect(gain);
+      gain.connect(ctx.destination);
+    }
+    source.start();
+    return true;
+  }
+
+  /** Preload all registered samples. Call once at startup. */
+  async preloadSamples(): Promise<void> {
+    const promises = Object.keys(this.samplePaths).map(name =>
+      this.loadSample(name).catch(() => {}),
+    );
+    await Promise.all(promises);
+  }
+
   setEnabled(v: boolean): void { this.enabled = v; }
 
   isEnabled(): boolean { return this.enabled; }
@@ -436,14 +501,17 @@ export class Announcer {
   // ─── Public API (unchanged signatures) ─────────────────────
 
   roundStart(n: number): void {
+    if (this.playSample(`round${n}`, 0.5)) return;
     this.playPhrase(roundNotes(n), 0.16);
   }
 
   fight(): void {
+    if (this.playSample('fight', 0.5)) return;
     this.playPhrase(FIGHT_SYLLABLES, 0.20);
   }
 
   knockOut(): void {
+    if (this.playSample('ko', 0.5)) return;
     this.playPhrase(KO_SYLLABLES, 0.22);
     // Trigger crowd roar slightly after the KO announcement begins
     const ctx = getCtx();
@@ -476,38 +544,47 @@ export class Announcer {
   }
 
   perfect(): void {
+    if (this.playSample('perfect', 0.5)) return;
     this.playPhrase(PERFECT_SYLLABLES, 0.17);
   }
 
   timeOver(): void {
+    if (this.playSample('timeOver', 0.5)) return;
     this.playPhrase(TIME_OVER_SYLLABLES, 0.15);
   }
 
   winner(): void {
+    if (this.playSample('winner', 0.5)) return;
     this.playPhrase(WINNER_SYLLABLES, 0.18);
   }
 
   firstAttack(): void {
+    if (this.playSample('firstAttack', 0.5)) return;
     this.playPhrase(FIRST_ATTACK_SYLLABLES, 0.16);
   }
 
   counter(): void {
+    if (this.playSample('counter', 0.5)) return;
     this.playPhrase(COUNTER_SYLLABLES, 0.17);
   }
 
   guardCrush(): void {
+    if (this.playSample('guardCrush', 0.5)) return;
     this.playPhrase(GUARD_CRUSH_SYLLABLES, 0.18);
   }
 
   superCancel(): void {
+    if (this.playSample('superCancel', 0.5)) return;
     this.playPhrase(SUPER_CANCEL_SYLLABLES, 0.16);
   }
 
   doubleKO(): void {
+    if (this.playSample('doubleKO', 0.5)) return;
     this.playPhrase(DOUBLE_KO_SYLLABLES, 0.20);
   }
 
   newChallenger(): void {
+    if (this.playSample('newChallenger', 0.5)) return;
     this.playPhrase(NEW_CHALLENGER_SYLLABLES, 0.17);
   }
 }

@@ -63,6 +63,16 @@ export const AUDIO_MANIFEST: SoundEntry[] = [
   { id: 'roll', tier: 'ambient', samplePath: null, synth: { baseFreq: 200, oscType: 'triangle', duration: 0.1, volume: 0.1 } },
   { id: 'throw_hit', tier: 'light', samplePath: null, synth: { baseFreq: 120, oscType: 'sine', duration: 0.08, volume: 0.25 } },
   { id: 'quick_stand', tier: 'ambient', samplePath: null, synth: { baseFreq: 400, oscType: 'triangle', duration: 0.06, volume: 0.1 } },
+
+  // Announcer (formant synthesis fallback — register real samples via announcer.registerSample())
+  { id: 'ann_round1', tier: 'system', samplePath: null, synth: { baseFreq: 140, oscType: 'sawtooth', duration: 0.55, volume: 0.16 } },
+  { id: 'ann_round2', tier: 'system', samplePath: null, synth: { baseFreq: 152, oscType: 'sawtooth', duration: 0.55, volume: 0.16 } },
+  { id: 'ann_round3', tier: 'system', samplePath: null, synth: { baseFreq: 164, oscType: 'sawtooth', duration: 0.55, volume: 0.16 } },
+  { id: 'ann_fight', tier: 'system', samplePath: null, synth: { baseFreq: 200, oscType: 'sawtooth', duration: 0.53, volume: 0.2 } },
+  { id: 'ann_ko', tier: 'system', samplePath: null, synth: { baseFreq: 300, oscType: 'sawtooth', duration: 0.6, volume: 0.22 } },
+  { id: 'ann_perfect', tier: 'system', samplePath: null, synth: { baseFreq: 350, oscType: 'sawtooth', duration: 0.6, volume: 0.17 } },
+  { id: 'ann_timeOver', tier: 'system', samplePath: null, synth: { baseFreq: 180, oscType: 'sawtooth', duration: 0.54, volume: 0.15 } },
+  { id: 'ann_winner', tier: 'system', samplePath: null, synth: { baseFreq: 260, oscType: 'sawtooth', duration: 0.7, volume: 0.18 } },
 ];
 
 /** Quick lookup by sound ID */
