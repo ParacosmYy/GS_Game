@@ -493,3 +493,9 @@
 ## H130: resolveFrameKey路由补全—stand_b/d/close_b/d/crouch_b正确映射 — 102→103
 
 **commit:** a817ad2 | 新通常技正确映射到最近像素帧
+
+---
+
+## H128: animationManifestData测试—9项验证ANIMATION_MANIFEST+getCharacterAnimManifest+REQUIRED_SEQUENCES — 100→101
+
+**commit:** <hash> | animationManifestData测试—9项验证ANIMATION_MANIFEST+getCharacterAnimManifest+REQUIRED_SEQUENCES
