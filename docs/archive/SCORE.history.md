@@ -391,3 +391,9 @@
 ## H113: hitboxConstants测试—9项验证HITBOX_OFFSETS字段+width/height正值+拳脚偏移 — 85→86
 
 **commit:** <hash> | hitboxConstants测试—9项验证HITBOX_OFFSETS字段+width/height正值+拳脚偏移
+
+---
+
+## H114: frameDataConstants测试—10项验证FRAME_DATA字段+startup+damage+拳速比较 — 86→87
+
+**commit:** <hash> | frameDataConstants测试—10项验证FRAME_DATA字段+startup+damage+拳速比较
