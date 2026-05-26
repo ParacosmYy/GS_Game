@@ -100,8 +100,10 @@ function initAllFrames(): void {
   registerFrames('WALK_BACKWARD', RYO_WALK_BACKWARD_FRAMES, 6);
 
   // ATTACK — stand_a (light punch) and stand_c (heavy punch)
+  // STAND_A: startup=6, active=3, recovery=5 = 14 total; 4 frames × 4 tpf = 16
   registerFrames('STAND_A', RYO_STAND_A_FRAMES, 4);
-  registerFrames('STAND_C', RYO_STAND_C_FRAMES, 4);
+  // STAND_C: startup=7, active=3, recovery=20 = 30 total; 5 frames × 6 tpf = 30
+  registerFrames('STAND_C', RYO_STAND_C_FRAMES, 6);
 
   // DAMAGE — hurt (5f) and knockdown (6f)
   registerFrames('HURT', RYO_HURT_FRAMES, 4);
@@ -122,10 +124,13 @@ function initAllFrames(): void {
   registerFrames('AIR_C', RYO_AIR_C_FRAMES, 4);
   registerFrames('AIR_D', RYO_AIR_D_FRAMES, 4);
 
-  // SPECIALS — ko_hou (uppercut), koou (projectile), hien (flying kick)
-  registerFrames('KO_HOU', RYO_KO_HOU_FRAMES, 4);
-  registerFrames('KOOU', RYO_KOOU_FRAMES, 4);
-  registerFrames('HIEN', RYO_HIEN_FRAMES, 4);
+  // SPECIALS — ticksPerFrame calibrated to frameData totals
+  // KO_HOU: startup=5, active=5, recovery=25 = 35; 5 frames × 7 = 35
+  registerFrames('KO_HOU', RYO_KO_HOU_FRAMES, 7);
+  // KOOU: startup=12, active=18, recovery=34 = 64; 4 frames × 16 = 64
+  registerFrames('KOOU', RYO_KOOU_FRAMES, 16);
+  // HIEN: startup=10, active=8, recovery=22 = 40; 5 frames × 8 = 40
+  registerFrames('HIEN', RYO_HIEN_FRAMES, 8);
 }
 
 // ===== State Resolution =====
