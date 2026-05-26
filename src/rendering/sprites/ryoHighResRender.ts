@@ -19,6 +19,9 @@ import { drawPixelFrame, type PixelFrame, type PixelPalette } from './pixelFrame
 import { RYO_IDLE_FRAMES } from './ryoIdleFrames.js';
 import { RYO_WALK_FORWARD_FRAMES, RYO_WALK_BACKWARD_FRAMES } from './ryoWalkFrames.js';
 import { RYO_STAND_A_FRAMES, RYO_STAND_C_FRAMES } from './ryoAttackFrames.js';
+import { RYO_STAND_B_FRAMES, RYO_STAND_D_FRAMES } from './ryoKickFrames.js';
+import { RYO_CROUCH_B_FRAMES, RYO_CROUCH_D_FRAMES } from './ryoCrouchKickFrames.js';
+import { RYO_CLOSE_B_FRAMES, RYO_CLOSE_D_FRAMES } from './ryoCloseKickFrames.js';
 import { RYO_JUMP_FRAMES } from './ryoJumpFrames.js';
 import { RYO_HURT_FRAMES, RYO_KNOCKDOWN_FRAMES } from './ryoDamageFrames.js';
 import { RYO_CROUCH_FRAMES, RYO_CROUCH_A_FRAMES, RYO_CROUCH_C_FRAMES } from './ryoCrouchFrames.js';
@@ -117,6 +120,18 @@ function initAllFrames(): void {
   // STAND_C: startup=7, active=3, recovery=20 = 30 total; 5 frames × 6 tpf = 30
   registerFrames('STAND_C', RYO_STAND_C_FRAMES, 6);
 
+  // KICK ATTACKS — stand_b (light kick), stand_d (heavy kick)
+  // STAND_B: startup=7, active=3, recovery=14 = 24 total; 4 frames × 6 tpf = 24
+  registerFrames('STAND_B', RYO_STAND_B_FRAMES, 6);
+  // STAND_D: startup=10, active=8, recovery=20 = 38 total; 5 frames × 8 tpf = 40
+  registerFrames('STAND_D', RYO_STAND_D_FRAMES, 8);
+
+  // CLOSE KICKS — close_b (light knee), close_d (heavy knee/kick)
+  // CLOSE_B: startup=5, active=2, recovery=8 = 15 total; 3 frames × 5 tpf = 15
+  registerFrames('CLOSE_B', RYO_CLOSE_B_FRAMES, 5);
+  // CLOSE_D: startup=6, active=4, recovery=12 = 22 total; 4 frames × 6 tpf = 24
+  registerFrames('CLOSE_D', RYO_CLOSE_D_FRAMES, 6);
+
   // DAMAGE — hurt (5f) and knockdown (6f)
   registerFrames('HURT', RYO_HURT_FRAMES, 4);
   registerFrames('KNOCKDOWN', RYO_KNOCKDOWN_FRAMES, 5);
@@ -130,6 +145,11 @@ function initAllFrames(): void {
   // CROUCH ATTACK — crouch_a (3f low jab) and crouch_c (4f low uppercut)
   registerFrames('CROUCH_A', RYO_CROUCH_A_FRAMES, 4);
   registerFrames('CROUCH_C', RYO_CROUCH_C_FRAMES, 5);
+  // CROUCH KICKS — crouch_b (low kick), crouch_d (sweep)
+  // CROUCH_B: startup=5, active=5, recovery=5 = 15 total; 3 frames × 5 tpf = 15
+  registerFrames('CROUCH_B', RYO_CROUCH_B_FRAMES, 5);
+  // CROUCH_D: startup=5, active=6, recovery=31 = 42 total; 5 frames × 8 tpf = 40
+  registerFrames('CROUCH_D', RYO_CROUCH_D_FRAMES, 8);
 
   // AIR ATTACK — air_a (3f air jab), air_c (4f air heavy), air_d (4f air kick)
   registerFrames('AIR_A', RYO_AIR_A_FRAMES, 4);
@@ -257,24 +277,20 @@ function resolveFrameKey(
         return 'HSDM_RYUKO_RANBU';
       }
       // Default to STAND_A for STAND_A, CLOSE_A, and any other stand attack
-      // STAND_B/CLOSE_B use light punch sprite (no dedicated kick sprite yet)
-      // STAND_D/CLOSE_D use heavy punch sprite
-      if (currentAttack === AttackType.STAND_D || currentAttack === AttackType.CLOSE_D) {
-        return 'STAND_C';
-      }
+      if (currentAttack === AttackType.STAND_B) return 'STAND_B';
+      if (currentAttack === AttackType.STAND_D) return 'STAND_D';
+      if (currentAttack === AttackType.CLOSE_B) return 'CLOSE_B';
+      if (currentAttack === AttackType.CLOSE_D) return 'CLOSE_D';
       return 'STAND_A';
 
     case FighterState.CROUCH:
       return 'CROUCH';
 
     case FighterState.CROUCH_ATTACK:
-      // Resolve crouch attack: C/C/D -> heavy sprite, A/B -> light sprite
-      if (currentAttack === AttackType.CROUCH_C || currentAttack === AttackType.CROUCH_D) {
-        return 'CROUCH_C';
-      }
-      if (currentAttack === AttackType.CROUCH_B) {
-        return 'CROUCH_A'; // no dedicated crouch_b sprite, use crouch_a
-      }
+      // Resolve crouch attack: each has dedicated pixel frames now
+      if (currentAttack === AttackType.CROUCH_B) return 'CROUCH_B';
+      if (currentAttack === AttackType.CROUCH_C) return 'CROUCH_C';
+      if (currentAttack === AttackType.CROUCH_D) return 'CROUCH_D';
       return 'CROUCH_A';
 
     case FighterState.AIR_ATTACK:
