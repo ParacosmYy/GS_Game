@@ -772,3 +772,9 @@
 - 胜利姿势接入WIN_QUOTE/MATCH_END画面循环
 - 完整性报告新增Visual Frames维度(40项)
 - 导出getResolvedFrameKey/drawRyoWinPose供外部使用
+
+---
+
+## H168: animationBlender—8项验证startBlend/update/interpolate/cancel/getFighterBlender — 140→141
+
+**commit:** <hash> | animationBlender—8项验证startBlend/update/interpolate/cancel/getFighterBlender

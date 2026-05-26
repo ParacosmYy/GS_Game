@@ -1,45 +1,54 @@
 import { describe, it, expect } from 'vitest';
-import { AnimationBlender, getFighterBlender } from '../src/rendering/animationBlender.js';
+import { AnimationBlender, getFighterBlender, resetAllBlenders, getBlendDuration } from '../src/rendering/animationBlender.js';
 
 describe('animationBlender', () => {
-  describe('AnimationBlender', () => {
-    it('can be instantiated', () => {
-      const blender = new AnimationBlender();
-      expect(blender).toBeDefined();
-    });
-    it('startBlend does not throw', () => {
-      const blender = new AnimationBlender();
-      expect(() => blender.startBlend('idle', 0, 'walk', 5)).not.toThrow();
-    });
-    it('startBlend with 0 duration is instant', () => {
-      const blender = new AnimationBlender();
-      blender.startBlend('idle', 0, 'walk', 0);
-    });
-    it('update does not throw', () => {
-      const blender = new AnimationBlender();
-      blender.startBlend('idle', 0, 'walk', 5);
-      expect(() => blender.update()).not.toThrow();
-    });
-    it('isBlending returns false initially', () => {
-      const blender = new AnimationBlender();
-      expect(blender.isBlending()).toBe(false);
-    });
-    it('isBlending returns true after startBlend', () => {
-      const blender = new AnimationBlender();
-      blender.startBlend('idle', 0, 'walk', 5);
-      expect(blender.isBlending()).toBe(true);
-    });
+  it('initially not blending', () => {
+    const b = new AnimationBlender();
+    expect(b.isBlending()).toBe(false);
+    expect(b.getBlendState()).toBeNull();
   });
-
-  describe('getFighterBlender', () => {
-    it('returns a blender instance', () => {
-      const blender = getFighterBlender('ryo');
-      expect(blender).toBeInstanceOf(AnimationBlender);
-    });
-    it('returns same instance for same charId', () => {
-      const a = getFighterBlender('ryo');
-      const b = getFighterBlender('ryo');
-      expect(a).toBe(b);
-    });
+  it('startBlend with duration > 0 activates', () => {
+    const b = new AnimationBlender();
+    b.startBlend('idle', 0, 'walk', 4);
+    expect(b.isBlending()).toBe(true);
+    const state = b.getBlendState();
+    expect(state).not.toBeNull();
+    expect(state!.fromAction).toBe('idle');
+    expect(state!.toAction).toBe('walk');
+  });
+  it('startBlend with duration 0 does not blend', () => {
+    const b = new AnimationBlender();
+    b.startBlend('idle', 0, 'walk', 0);
+    expect(b.isBlending()).toBe(false);
+  });
+  it('update progresses blend to completion', () => {
+    const b = new AnimationBlender();
+    b.startBlend('idle', 0, 'walk', 3);
+    b.update(); b.update(); b.update();
+    expect(b.isBlending()).toBe(false);
+  });
+  it('interpolate lerps between positions', () => {
+    const b = new AnimationBlender();
+    b.startBlend('idle', 0, 'walk', 2);
+    b.update(); // progress = 0.5
+    const result = b.interpolate({ offsetX: 0, offsetY: 0 }, { offsetX: 10, offsetY: 20 });
+    expect(result.offsetX).toBeCloseTo(5, 1);
+    expect(result.offsetY).toBeCloseTo(10, 1);
+  });
+  it('cancel stops blending', () => {
+    const b = new AnimationBlender();
+    b.startBlend('idle', 0, 'walk', 4);
+    b.cancel();
+    expect(b.isBlending()).toBe(false);
+  });
+  it('getFighterBlender returns same instance', () => {
+    resetAllBlenders();
+    const a = getFighterBlender(0);
+    const b = getFighterBlender(0);
+    expect(a).toBe(b);
+  });
+  it('getBlendDuration returns number', () => {
+    const d = getBlendDuration('idle', 'walk');
+    expect(typeof d).toBe('number');
   });
 });
