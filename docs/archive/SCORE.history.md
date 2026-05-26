@@ -499,3 +499,9 @@
 ## H128: animationManifestData测试—9项验证ANIMATION_MANIFEST+getCharacterAnimManifest+REQUIRED_SEQUENCES — 100→101
 
 **commit:** <hash> | animationManifestData测试—9项验证ANIMATION_MANIFEST+getCharacterAnimManifest+REQUIRED_SEQUENCES
+
+---
+
+## H129: cinematicState测试—5项验证KO_FLASH+ANNOUNCE+TRANSITION_PAUSE常量 — 101→102
+
+**commit:** <hash> | cinematicState测试—5项验证KO_FLASH+ANNOUNCE+TRANSITION_PAUSE常量
