@@ -325,3 +325,9 @@
 ## H102: replay snapshot测试—16项验证FNV1a+checksum+recorder+verifier — 74→75
 
 **commit:** <hash> | replay snapshot测试—16项验证FNV1a+checksum+recorder+verifier
+
+---
+
+## H103: team state测试—12项验证createTeam+defeat+switch+order — 75→76
+
+**commit:** <hash> | team state测试—12项验证createTeam+defeat+switch+order
