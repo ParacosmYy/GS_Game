@@ -169,3 +169,9 @@
 ## H76: attack frames Ryo完整性测试—45项验证31个攻击 — 48→49
 
 **commit:** <hash> | 31存在性+4结构体+5帧数逻辑+2命令通常技+HSDM_RYUKO_RANBU
+
+---
+
+## H77: hurtbox manifest Ryo测试—13项验证8个状态 — 49→50
+
+**commit:** <hash> | 8状态存在性+结构体(width/height正数)+crouch<idle+jump/hitstun存在
