@@ -344,6 +344,25 @@ content/characters/ryo/
   README.md
 ```
 
+在 `src/content/characters/ryo/` 的过渡结构中，推荐继续细分为：
+
+```text
+src/content/characters/ryo/
+  definition.ts
+  stats.ts
+  completeness.ts
+  commands/
+  moves/
+  attacks/
+  animations/
+  hitboxes/
+  feedback/
+  portraits/
+  reports/
+```
+
+这样可以把“人物定义”“技能说明”“普通攻击”“动作帧”“判定”“反馈”“肖像”“完整度报告”拆到不同目录，避免继续堆在一个大文件里。
+
 ### 3.9 `reports/`
 
 职责：

@@ -137,6 +137,7 @@ npx vite build
 - [工作区目标架构](docs/architecture/workspace-architecture-target.md)：大型项目目录目标和迁移阶段。
 - [资产管线架构](docs/architecture/asset-pipeline.md)：sprite/portrait/frame/hitbox 管线。
 - [未来引擎架构](docs/architecture/future-engine-architecture.md)：换栈决策。
+- [角色内容包架构](docs/architecture/character-content-package.md)：每个人物、每个技能、每个攻击的目录归类方式。
 - [自侦测前置](docs/process/self-detection.md)：3 人前置快筛。
 - [迭代流程](docs/process/iteration-workflow.md)：每轮闭环。
 - [迭代工作区](docs/iteration/README.md)：当前轮、待办、交接、归档的统一文件夹。
