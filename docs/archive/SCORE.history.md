@@ -241,3 +241,9 @@
 ## H88: audio manifest Ryo测试—17项验证 — 60→61
 
 **commit:** <hash> | manifest结构+synth参数+Ryo攻击音效映射(10)+系统音+环境音+播报+tier覆盖
+
+---
+
+## H89: validate tools测试—17项验证 — 61→62
+
+**commit:** <hash> | validateRyoPackage(10)+printValidationReport(1)+manifest validation(6)
