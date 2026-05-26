@@ -14,6 +14,8 @@ import { getOutfit, drawCharacterHead, setSkeletalPartsTick } from './skeletalPa
 import { drawPixelTorso, drawPixelArm, drawPixelLeg, setBodyPartTick } from './bodyPartRenderer.js';
 import { getVictoryPose, drawVictoryVFX } from './victoryPose.js';
 import { spriteFrameCache } from './spriteFrameCache.js';
+import { drawPixelFrame } from './sprites/pixelFrameRenderer.js';
+import { RYO_IDLE_FRAMES } from './sprites/ryoIdleFrames.js';
 
 // ===== Sprite Frame Cache — opt-in cached rendering =====
 // When enabled, completed pose frames are blitted from offscreen canvases
@@ -139,6 +141,14 @@ export function drawSkeletalFighter(
   globalTick: number,
   maxModeActive: boolean = false,
 ): void {
+  // Pixel frame rendering: Ryo idle uses high-res pixel art
+  if (f.charId === 'ryo' && f.state === FighterState.IDLE && RYO_IDLE_FRAMES.length > 0) {
+    const frameIndex = globalTick % RYO_IDLE_FRAMES.length;
+    const frame = RYO_IDLE_FRAMES[frameIndex];
+    drawPixelFrame(ctx, frame, sx, sy, 2, f.facing, frame.palette);
+    return;
+  }
+
   const charDef = ROSTER.find(c => c.id === f.charId);
   const poseSet = charDef?.poses;
   const colorIdx = f.colorIndex;

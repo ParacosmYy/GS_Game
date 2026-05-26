@@ -791,6 +791,9 @@ export const RyoDef: CharacterDefinition = {
     const dmMotion = cmdBuf.checkDMMotion(tick, input.punchPressed, input.kickPressed);
     if (dmMotion === 'QCFx2_P') return AttackType.DM_TEN_HA_OU;
 
+    // DM: QCF×2+K → 龍虎乱舞
+    if (dmMotion === 'QCFx2_K') return AttackType.DM_RYUKO_RANBU;
+
     // DP+P → 虎咆 (弱P/强P区分)
     const special = cmdBuf.checkSpecial(tick, input.punchPressed || input.kickPressed);
     if (special === AttackType.SPECIAL_UPPER) {

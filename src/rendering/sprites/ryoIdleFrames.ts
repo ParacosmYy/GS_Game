@@ -27,6 +27,7 @@ export interface PixelFrame {
   height: number;
   palette: Record<number, string>;
   pixels: number[][]; // height rows × width cols, 0 = transparent
+  anchor: { x: number; y: number };
 }
 
 /* ---------- shared palette ---------- */
@@ -698,12 +699,12 @@ const F7: number[][] = [
 // Export
 // ─────────────────────────────────────────────────────────────
 export const RYO_IDLE_FRAMES: PixelFrame[] = [
-  { width: 48, height: 72, palette: PALETTE, pixels: F0 },
-  { width: 48, height: 72, palette: PALETTE, pixels: F1 },
-  { width: 48, height: 72, palette: PALETTE, pixels: F2 },
-  { width: 48, height: 72, palette: PALETTE, pixels: F3 },
-  { width: 48, height: 72, palette: PALETTE, pixels: F4 },
-  { width: 48, height: 72, palette: PALETTE, pixels: F5 },
-  { width: 48, height: 72, palette: PALETTE, pixels: F6 },
-  { width: 48, height: 72, palette: PALETTE, pixels: F7 },
+  { width: 48, height: 72, palette: PALETTE, pixels: F0, anchor: { x: 24, y: 72 } },
+  { width: 48, height: 72, palette: PALETTE, pixels: F1, anchor: { x: 24, y: 72 } },
+  { width: 48, height: 72, palette: PALETTE, pixels: F2, anchor: { x: 24, y: 72 } },
+  { width: 48, height: 72, palette: PALETTE, pixels: F3, anchor: { x: 24, y: 72 } },
+  { width: 48, height: 72, palette: PALETTE, pixels: F4, anchor: { x: 24, y: 72 } },
+  { width: 48, height: 72, palette: PALETTE, pixels: F5, anchor: { x: 24, y: 72 } },
+  { width: 48, height: 72, palette: PALETTE, pixels: F6, anchor: { x: 24, y: 72 } },
+  { width: 48, height: 72, palette: PALETTE, pixels: F7, anchor: { x: 24, y: 72 } },
 ];

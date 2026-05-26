@@ -191,6 +191,16 @@ export const JUMP_IN_ROUTE: ComboStep[] = [
   { type: 'button',  attack: 'closeC',   delay: 4 },
 ];
 
+/** Character-specific air combo routes (jump-in → ground chain) */
+export const AIR_COMBO_ROUTES: Partial<Record<string, ComboStep[]>> = {
+  ryo: [
+    { type: 'button',  attack: 'closeC',         delay: 0 },
+    { type: 'button',  attack: 'ryoTsurizao',    delay: 3 },
+    { type: 'special', attack: 'ryoKoouC',        delay: 4 },
+    { type: 'special', attack: 'dmRyukoRanbu',    delay: 5 },
+  ],
+};
+
 export function applyComboStep(step: ComboStep, base: ResolvedInput): void {
   if (step.type === 'button') {
     switch (step.attack) {

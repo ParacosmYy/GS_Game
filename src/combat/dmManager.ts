@@ -12,6 +12,11 @@ import type { VFXSystem, ScreenShake } from '../rendering/vfx.js';
 import type { ResolvedInput } from '../input/inputResolver.js';
 
 // DM -> SDM upgrade mapping (all 29 characters)
+// DM -> HSDM upgrade mapping (MAX + desperation)
+const DM_TO_HSDM: Partial<Record<AttackType, AttackType>> = {
+  [AttackType.DM_RYUKO_RANBU]: AttackType.HSDM_RYUKO_RANBU,
+};
+
 const DM_TO_SDM: Partial<Record<AttackType, AttackType>> = {
   // Kyo
   [AttackType.DM_OROCHINAGI]: AttackType.SDM_OROCHINAGI,
@@ -118,12 +123,18 @@ export class DMManager {
         spendStocks(gauges[i], 2);
         cinematic.triggerSuperFlash(f.x, f.y - f.displayHeight / 2, i);
       } else if (maxModes[i].active) {
-        // MAX mode: upgrade DM to SDM and consume MAX timer, not stocks
-        if (DM_TO_SDM[atk]) {
+        const inDesperation = isDesperation(f.health, f.maxHealth);
+        // MAX + desperation: upgrade DM to HSDM (hidden super)
+        if (inDesperation && DM_TO_HSDM[atk]) {
+          f.currentAttack = DM_TO_HSDM[atk]!;
+          drainMaxModeTimer(maxModes[i], FREE_CANCEL_TIMER_COST);
+          cinematic.triggerSuperFlash(f.x, f.y - f.displayHeight / 2, i);
+        } else if (DM_TO_SDM[atk]) {
+          // MAX mode: upgrade DM to SDM and consume MAX timer, not stocks
           f.currentAttack = DM_TO_SDM[atk]!;
+          drainMaxModeTimer(maxModes[i], FREE_CANCEL_TIMER_COST);
+          cinematic.triggerSuperFlash(f.x, f.y - f.displayHeight / 2, i);
         }
-        drainMaxModeTimer(maxModes[i], FREE_CANCEL_TIMER_COST);
-        cinematic.triggerSuperFlash(f.x, f.y - f.displayHeight / 2, i);
       } else {
         // Desperation mode: upgrade DM to SDM (costs 2 stocks instead of 1)
         const inDesperation = isDesperation(f.health, f.maxHealth);

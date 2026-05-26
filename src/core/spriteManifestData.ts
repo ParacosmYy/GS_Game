@@ -336,6 +336,29 @@ export const RYO_ANIMATIONS: Record<string, SpriteAnimation> = {
     frames: placeholderFrames(4, 200, STD_W, STD_H, 12),
   },
 
+  // ── 特殊状态 ────────────────────────────────────────────────────
+
+  /** 眩晕 — 4帧循环, 摇晃动画 */
+  dizzy: {
+    name: 'dizzy',
+    loop: true,
+    frames: placeholderFrames(4, 200, STD_W, STD_H, 24),
+  },
+
+  /** 防御崩坏 — 3帧非循环, 被破防后的硬直 */
+  guard_crush: {
+    name: 'guard_crush',
+    loop: false,
+    frames: placeholderFrames(3, 150, STD_W, STD_H, 25),
+  },
+
+  /** 挑衅 — 6帧非循环, KOF2002 START键挑衅 */
+  taunt: {
+    name: 'taunt',
+    loop: false,
+    frames: placeholderFrames(6, 100, STD_W, STD_H, 26),
+  },
+
   // ── 必杀技 ──────────────────────────────────────────────────────
   // 帧数对齐 FRAME_DATA (frameDataChars.ts RYO_* 系列)
   // 同时保留旧名 (koouken/ko_hou/dm_haou) 与 AttackType 映射名 (ryo_koou/ryo_ko_hou/dm_ten_ha_ou)
@@ -624,6 +647,9 @@ function createMinimalAnimations(): Record<string, SpriteAnimation> {
     hurt:         makeAnim('hurt',         3, false, 100),
     knockdown:    makeAnim('knockdown',    4, false, 150),
     win:          makeAnim('win',          3, false, 200),
+    dizzy:        makeAnim('dizzy',        4, true,  200),
+    guard_crush:  makeAnim('guard_crush',  3, false, 150),
+    taunt:        makeAnim('taunt',        6, false, 100),
   };
 }
 
