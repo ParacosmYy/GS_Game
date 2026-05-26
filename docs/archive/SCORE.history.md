@@ -187,3 +187,9 @@
 ## H79: animation manifest查询函数测试—29项验证 — 51→52
 
 **commit:** <hash> | getSequence+hasSequence+cancelFrame+invincibleFrame+12关键序列存在性
+
+---
+
+## H80: Ryo content package导出集成测试—8项验证barrel — 52→53
+
+**commit:** <hash> | RyoDef+RYO_STATS+3个报告函数+def字段完整性+report有效性
