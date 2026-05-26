@@ -180,6 +180,24 @@ const MINIMUM_ACTIONS: ActionSpec[] = [
   },
 ];
 
+/** Normal moves to track (beyond minimum 8) */
+const NORMAL_MOVE_KEYS: { key: string; label: string }[] = [
+  { key: AttackType.STAND_B, label: 'STAND_B (far B kick)' },
+  { key: AttackType.STAND_D, label: 'STAND_D (far D kick)' },
+  { key: AttackType.CLOSE_A, label: 'CLOSE_A (close A punch)' },
+  { key: AttackType.CLOSE_B, label: 'CLOSE_B (close B kick)' },
+  { key: AttackType.CLOSE_C, label: 'CLOSE_C (close C punch)' },
+  { key: AttackType.CLOSE_D, label: 'CLOSE_D (close D kick)' },
+  { key: AttackType.CROUCH_A, label: 'CROUCH_A (low A)' },
+  { key: AttackType.CROUCH_B, label: 'CROUCH_B (low B)' },
+  { key: AttackType.CROUCH_C, label: 'CROUCH_C (low C)' },
+  { key: AttackType.CROUCH_D, label: 'CROUCH_D (sweep D)' },
+  { key: AttackType.JUMP_A, label: 'JUMP_A (air A)' },
+  { key: AttackType.JUMP_B, label: 'JUMP_B (air B)' },
+  { key: AttackType.JUMP_C, label: 'JUMP_C (air C)' },
+  { key: AttackType.JUMP_D, label: 'JUMP_D (air D)' },
+];
+
 /** Special moves to track (beyond minimum 8, reported separately) */
 const SPECIAL_MOVE_KEYS: { key: string; label: string }[] = [
   { key: AttackType.RYO_KOOU, label: 'RYO_KOOU (QCF+A)' },
@@ -623,6 +641,15 @@ export function printRyoReport(): void {
   }
 
   console.log(dash);
+
+  // Normal moves section (beyond minimum 8)
+  console.log('  NORMAL MOVES (extended):');
+  for (const norm of NORMAL_MOVE_KEYS) {
+    const inFrameData = hasFrameDataEntry(norm.key);
+    const inAttackFrames = hasAttackFrameEntry(norm.key);
+    const status = (inFrameData && inAttackFrames) ? '[OK]' : '[~~]';
+    console.log(`    ${status} ${norm.label} — frameData:${inFrameData} attackFrames:${inAttackFrames}`);
+  }
 
   // Special moves section
   console.log('  SPECIAL MOVES:');
