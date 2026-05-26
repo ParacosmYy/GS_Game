@@ -874,3 +874,22 @@
 ## H184: ryoSpriteBatch2—6项验证攻击/踢/空中/近身像素帧 — 156→157
 
 **commit:** <hash> | ryoSpriteBatch2—6项验证攻击/踢/空中/近身像素帧
+
+---
+
+## H169: Ryo格挡+胜利姿势+完整视觉帧维度 — 141→142
+
+**commit:** d883b3a+88b7fe0 | BLOCK/WIN像素帧+完整性报告视觉维度+胜利接入
+
+---
+
+## H170: Ryo眩晕+投技专属像素帧+全部IDLE回退消除 — 142→143
+
+**commit:** ab770a5 | DIZZY/THROW像素帧+42/42视觉帧100%完成
+
+**变更：**
+- 新增ryoDizzyFrames.ts: 4帧眩晕摇晃(晕眩表情+摆动)
+- 新增ryoThrowFrames.ts: 4帧投技动画(抓取→投掷→恢复)
+- 所有FighterState不再回退IDLE,每个状态有专属像素帧
+- Visual Frames维度: 42/42=100%
+- 总测试: 3397通过
