@@ -595,3 +595,9 @@
 ## H142: roster测试—6项验证ROSTER数组+ryo/kyo/iori存在+id/name一致性 — 114→115
 
 **commit:** <hash> | roster测试—6项验证ROSTER数组+ryo/kyo/iori存在+id/name一致性
+
+---
+
+## H143: attackFramesSpecials测试—8项验证KYO/RYO必杀技帧数据+attack字段 — 115→116
+
+**commit:** <hash> | attackFramesSpecials测试—8项验证KYO/RYO必杀技帧数据+attack字段
