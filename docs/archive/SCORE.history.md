@@ -517,3 +517,9 @@
 ## H131: inputResolver测试—9项验证resolveInput+createPrevAttack+facing方向 — 103→104
 
 **commit:** <hash> | inputResolver测试—9项验证resolveInput+createPrevAttack+facing方向
+
+---
+
+## H132: projectile测试—7项验证Projectile构造+update+active+resolveProjectileClashes — 104→105
+
+**commit:** <hash> | projectile测试—7项验证Projectile构造+update+active+resolveProjectileClashes
