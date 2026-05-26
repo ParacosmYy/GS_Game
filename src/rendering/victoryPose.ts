@@ -41,12 +41,12 @@ export function getVictoryPose(charId: string, tick: number): Pose {
       legBack: { ox: -8, oy: 0, rot: -0.1, scale: 1 },
     };
     case 'ryo': return {
-      head: { ox: 4, oy: bounce * 0.5, rot: -0.05, scale: 1 },
-      body: { ox: 3, oy: bounce * 0.4, rot: -0.05, scale: 1 },
-      armFront: { ox: 22, oy: -5, rot: -0.1, scale: 1.2 },
-      armBack: { ox: -10, oy: 5, rot: -0.8, scale: 0.85 },
-      legFront: { ox: 10, oy: 0, rot: 0.15, scale: 1.05 },
-      legBack: { ox: -8, oy: 0, rot: -0.1, scale: 1 },
+      head: { ox: 5, oy: bounce * 0.6 - 2, rot: 0.06, scale: 1 },
+      body: { ox: 4, oy: bounce * 0.4, rot: -0.08, scale: 1.05 },
+      armFront: { ox: 26, oy: -8, rot: -0.15, scale: 1.25 },
+      armBack: { ox: 20, oy: -6, rot: 0.15, scale: 1.2 },
+      legFront: { ox: 12, oy: 0, rot: 0.18, scale: 1.05 },
+      legBack: { ox: -10, oy: 0, rot: -0.12, scale: 1 },
     };
     case 'leona': return {
       head: { ox: 0, oy: bounce * 0.3, rot: 0, scale: 1 },
@@ -143,12 +143,30 @@ export function drawVictoryVFX(
       break;
     }
     case 'ryo': {
+      // Kyokushen double-fist energy burst — stronger impact feel
       const burst = (tick * 0.03) % 1;
-      ctx.strokeStyle = `rgba(255, 180, 0, ${0.4 * (1 - burst)})`;
-      ctx.lineWidth = 3 * (1 - burst);
+      const burstAlpha = 0.5 * (1 - burst);
+      // Primary expanding ring from the fists
+      ctx.strokeStyle = `rgba(255, 180, 0, ${burstAlpha})`;
+      ctx.lineWidth = 3 * (1 - burst) + 1;
       ctx.beginPath();
-      ctx.arc(sx + 30 * facing, sy - 55, 10 + burst * 30, 0, Math.PI * 2);
+      ctx.arc(sx + 30 * facing, sy - 55, 8 + burst * 35, 0, Math.PI * 2);
       ctx.stroke();
+      // Secondary inner ring for layered depth
+      ctx.strokeStyle = `rgba(255, 220, 80, ${burstAlpha * 0.6})`;
+      ctx.lineWidth = 2 * (1 - burst) + 0.5;
+      ctx.beginPath();
+      ctx.arc(sx + 30 * facing, sy - 55, 4 + burst * 18, 0, Math.PI * 2);
+      ctx.stroke();
+      // Energy glow around both fists
+      const fistGlow = 0.3 + Math.sin(tick * 0.12) * 0.15;
+      ctx.fillStyle = `rgba(255, 200, 60, ${fistGlow})`;
+      ctx.beginPath();
+      ctx.arc(sx + 26 * facing, sy - 58, 6, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(sx + 20 * facing, sy - 56, 5, 0, Math.PI * 2);
+      ctx.fill();
       break;
     }
     case 'leona': {

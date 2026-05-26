@@ -5,6 +5,7 @@
  */
 import { CANVAS_WIDTH, CANVAS_HEIGHT, STAGE_GROUND_Y } from '../core/constants.js';
 import type { Star } from './stage.js';
+import { drawPerspectiveFloorGrid } from './utils.js';
 
 // ===== Particle data =====
 
@@ -562,6 +563,9 @@ function drawGround(ctx: CanvasRenderingContext2D, cameraX: number, tick: number
     ctx.ellipse(mx, STAGE_GROUND_Y + 3, 20, 5, 0, 0, Math.PI * 2);
     ctx.fill();
   }
+
+  // KOF2002 perspective floor grid for depth
+  drawPerspectiveFloorGrid(ctx, cameraX, 'rgba(80, 50, 110, 0.1)');
 
   // Cracks in stone with glowing fissures
   const fissures = [

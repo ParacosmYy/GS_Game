@@ -4,7 +4,7 @@
  * rain effects, puddle reflections, bustling atmosphere
  */
 import { CANVAS_WIDTH, CANVAS_HEIGHT, STAGE_GROUND_Y } from '../core/constants.js';
-import { roundRect } from './utils.js';
+import { roundRect, drawPerspectiveFloorGrid } from './utils.js';
 import type { Star } from './stage.js';
 
 // ===== Rain drop =====
@@ -566,6 +566,9 @@ function drawGround(ctx: CanvasRenderingContext2D, cameraX: number, tick: number
   // Yellow safety strip at edge
   ctx.fillStyle = 'rgba(180, 160, 60, 0.15)';
   ctx.fillRect(0, STAGE_GROUND_Y - 1, CANVAS_WIDTH, 2);
+
+  // KOF2002 perspective floor grid for depth
+  drawPerspectiveFloorGrid(ctx, cameraX, 'rgba(102, 102, 102, 0.1)');
 
   // Puddle base shapes
   for (const puddle of puddles) {

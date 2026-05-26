@@ -5,7 +5,7 @@
  */
 import { CANVAS_WIDTH, CANVAS_HEIGHT, STAGE_GROUND_Y } from '../core/constants.js';
 import type { Star } from './stage.js';
-import { roundRect } from './utils.js';
+import { roundRect, drawPerspectiveFloorGrid } from './utils.js';
 
 interface Particle {
   x: number;
@@ -635,6 +635,9 @@ function drawGround(ctx: CanvasRenderingContext2D, cameraX: number, tick: number
   ctx.fillRect(0, STAGE_GROUND_Y, CANVAS_WIDTH, 3);
   ctx.fillStyle = 'rgba(60, 50, 35, 0.3)';
   ctx.fillRect(0, STAGE_GROUND_Y + 3, CANVAS_WIDTH, 2);
+
+  // KOF2002 perspective floor grid for depth
+  drawPerspectiveFloorGrid(ctx, cameraX, 'rgba(102, 80, 55, 0.1)');
 
   // Ground edge highlight (warm)
   const edgeGrad = ctx.createLinearGradient(0, STAGE_GROUND_Y - 4, 0, STAGE_GROUND_Y + 6);

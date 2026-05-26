@@ -3,7 +3,7 @@
  * Split from stageTemple.ts to keep file size under 600 lines
  */
 import { CANVAS_WIDTH, CANVAS_HEIGHT, STAGE_GROUND_Y } from '../core/constants.js';
-import { roundRect } from './utils.js';
+import { roundRect, drawPerspectiveFloorGrid } from './utils.js';
 import type { Star } from './stageTemple.js';
 
 // ===== Re-exported helpers =====
@@ -919,6 +919,9 @@ export function drawGround(ctx: CanvasRenderingContext2D, cameraX: number): void
     ctx.arc(sx, STAGE_GROUND_Y + 30, 1.5, 0, Math.PI * 2);
     ctx.fill();
   }
+
+  // KOF2002 perspective floor grid for depth
+  drawPerspectiveFloorGrid(ctx, cameraX, 'rgba(102, 80, 55, 0.12)');
 
   // 栏杆
   drawRailing(ctx, cameraX);

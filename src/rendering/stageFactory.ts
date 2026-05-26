@@ -5,6 +5,7 @@
  */
 import { CANVAS_WIDTH, CANVAS_HEIGHT, STAGE_GROUND_Y } from '../core/constants.js';
 import type { Star } from './stage.js';
+import { drawPerspectiveFloorGrid } from './utils.js';
 
 interface Spark {
   x: number;
@@ -663,6 +664,9 @@ function drawGround(ctx: CanvasRenderingContext2D, cameraX: number, tick: number
     ctx.ellipse(ox, STAGE_GROUND_Y + 8, 20, 8, 0, 0, Math.PI * 2);
     ctx.fill();
   }
+
+  // KOF2002 perspective floor grid for depth
+  drawPerspectiveFloorGrid(ctx, cameraX, 'rgba(102, 102, 110, 0.1)');
 
   // Ground edge — industrial yellow safety line with hazard stripes
   ctx.fillStyle = 'rgba(200, 180, 50, 0.3)';
