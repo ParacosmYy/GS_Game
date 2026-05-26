@@ -535,3 +535,9 @@
 ## H134: 踢技像素帧+渲染集成—6个踢技独立像素帧 — 106→107
 
 **commit:** c2e0eeb | stand_b/d+close_b/d+crouch_b/d独立像素帧+resolveFrameKey专用路由
+
+---
+
+## H133: vfxPresets测试—6项验证spawnHitSparks+spawnBlockFlash+getSparkSizeScaleFromDamage — 105→106
+
+**commit:** <hash> | vfxPresets测试—6项验证spawnHitSparks+spawnBlockFlash+getSparkSizeScaleFromDamage
