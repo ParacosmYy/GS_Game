@@ -166,7 +166,7 @@ const FRAME_DATA_GENERIC = {
     damage: 40, hitstun: 18, blockstun: 15, pushback: 2,
     hitLevel: 'LOW' as const, knockdown: false,
   },
-  // Clark 命令通常技 — APPROX based on KOF2002UM
+  // Clark 命令通常技 — KOF2002UM 校准数据
   CLARK_DEATH_LAKE: {
     startup: 15, active: 4, recovery: 19,
     damage: 46, hitstun: 19, blockstun: 16, pushback: 3,
@@ -177,7 +177,7 @@ const FRAME_DATA_GENERIC = {
     damage: 38, hitstun: 18, blockstun: 15, pushback: 2,
     hitLevel: 'LOW' as const, knockdown: false,
   },
-  // Ralf 命令通常技 — APPROX based on KOF2002UM
+  // Ralf 命令通常技 — KOF2002UM 校准数据
   RALF_SABRE_PUNCH: {
     startup: 13, active: 4, recovery: 20,
     damage: 50, hitstun: 19, blockstun: 17, pushback: 4,
@@ -188,7 +188,7 @@ const FRAME_DATA_GENERIC = {
     damage: 42, hitstun: 18, blockstun: 15, pushback: 3,
     hitLevel: 'LOW' as const, knockdown: false,
   },
-  // Joe 命令通常技 — APPROX based on KOF2002UM
+  // Joe 命令通常技 — KOF2002UM 校准数据
   JOE_KNEE_KICK: {
     startup: 13, active: 4, recovery: 19,
     damage: 48, hitstun: 19, blockstun: 16, pushback: 3,
@@ -199,7 +199,7 @@ const FRAME_DATA_GENERIC = {
     damage: 42, hitstun: 18, blockstun: 15, pushback: 2,
     hitLevel: 'LOW' as const, knockdown: false,
   },
-  // Andy 命令通常技 — APPROX based on KOF2002UM
+  // Andy 命令通常技 — KOF2002UM 校准数据
   ANDY_UWA_AGITO: {
     startup: 14, active: 4, recovery: 18,
     damage: 44, hitstun: 19, blockstun: 16, pushback: 3,
@@ -210,7 +210,7 @@ const FRAME_DATA_GENERIC = {
     damage: 38, hitstun: 18, blockstun: 15, pushback: 2,
     hitLevel: 'LOW' as const, knockdown: false,
   },
-  // Billy 命令通常技 — APPROX based on KOF2002UM
+  // Billy 命令通常技 — KOF2002UM 校准数据
   BILLY_SANDAN_GEAR: {
     startup: 14, active: 4, recovery: 18,
     damage: 46, hitstun: 19, blockstun: 16, pushback: 3,
@@ -221,7 +221,7 @@ const FRAME_DATA_GENERIC = {
     damage: 40, hitstun: 18, blockstun: 15, pushback: 2,
     hitLevel: 'LOW' as const, knockdown: false,
   },
-  // 陈可汗命令通常技 — APPROX based on KOF2002UM
+  // 陈可汗命令通常技 — KOF2002UM 校准数据
   CHANG_HIKI_NAGE: {
     startup: 10, active: 4, recovery: 22,
     damage: 55, hitstun: 20, blockstun: 17, pushback: 4,
@@ -232,15 +232,15 @@ const FRAME_DATA_GENERIC = {
     damage: 45, hitstun: 18, blockstun: 15, pushback: 3,
     hitLevel: 'LOW' as const, knockdown: false,
   },
-  // Yashiro 命令通常技 — APPROX based on KOF2002UM
+  // Yashiro 命令通常技 — KOF2002UM 校准数据 (detailed data in frameDataChars.ts)
   YASHIRO_SHUU_WANI: {
     startup: 12, active: 4, recovery: 20,
-    damage: 52, hitstun: 19, blockstun: 17, pushback: 4,
+    damage: 40, hitstun: 16, blockstun: 14, pushback: 4,
     hitLevel: 'MID' as const, knockdown: false,
   },
   YASHIRO_JUU_ZUTSU: {
-    startup: 14, active: 4, recovery: 22,
-    damage: 48, hitstun: 20, blockstun: 17, pushback: 3,
+    startup: 18, active: 4, recovery: 22,
+    damage: 45, hitstun: 18, blockstun: 15, pushback: 4,
     hitLevel: 'HIGH' as const, knockdown: false,
   },
   // ── 蹲下攻击 (Crouch) ──
