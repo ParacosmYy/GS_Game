@@ -311,19 +311,40 @@ export const RYO_KO_HOU_C_FRAMES: AttackFrame[] = [
 ];
 
 export const RYO_HIEN_FRAMES: AttackFrame[] = [
+  // startup kick rising
   F([{ ox: 35, oy: -60, w: 45, h: 35 }]),
   F([{ ox: 42, oy: -55, w: 52, h: 38 }]),
+  // peak extension
   F([{ ox: 45, oy: -52, w: 55, h: 40 }]),
+  // sustained peak
+  F([{ ox: 45, oy: -52, w: 55, h: 40 }]),
+  // descending arc
   F([{ ox: 42, oy: -55, w: 52, h: 38 }]),
   F([{ ox: 38, oy: -58, w: 48, h: 35 }]),
+  // late kick follow-through
+  F([{ ox: 34, oy: -62, w: 44, h: 32 }]),
+  F([{ ox: 30, oy: -65, w: 40, h: 30 }]),
 ];
 
 export const RYO_HAOU_FRAMES: AttackFrame[] = [
-  F([{ ox: 35, oy: -60, w: 42, h: 35 }]),
+  // punch 1: straight right
+  F([{ ox: 38, oy: -60, w: 44, h: 35 }]),
+  F([{ ox: 45, oy: -55, w: 50, h: 40 }]),
+  // punch 2: left hook
   F([{ ox: 42, oy: -58, w: 48, h: 38 }]),
   F([{ ox: 45, oy: -55, w: 50, h: 40 }]),
+  // punch 3: right straight
+  F([{ ox: 40, oy: -57, w: 46, h: 36 }]),
+  F([{ ox: 45, oy: -55, w: 50, h: 40 }]),
+  // punch 4: left upper
+  F([{ ox: 38, oy: -62, w: 44, h: 38 }]),
+  F([{ ox: 42, oy: -60, w: 48, h: 42 }]),
+  // punch 5: right hook
+  F([{ ox: 40, oy: -58, w: 46, h: 36 }]),
+  F([{ ox: 44, oy: -56, w: 50, h: 40 }]),
+  // finish: final thrust
+  F([{ ox: 46, oy: -54, w: 52, h: 42 }]),
   F([{ ox: 42, oy: -58, w: 48, h: 38 }]),
-  F([{ ox: 38, oy: -60, w: 44, h: 35 }]),
 ];
 
 // ===== 莉安娜 =====
@@ -416,15 +437,18 @@ export const DM_PHOENIX_KICK_FRAMES: AttackFrame[] = [
 ];
 
 export const DM_TEN_HA_OU_FRAMES: AttackFrame[] = [
+  // energy blast expanding over 10 active frames
   F([{ ox: 30, oy: -68, w: 58, h: 48 }]),
   F([{ ox: 36, oy: -65, w: 68, h: 52 }]),
   F([{ ox: 40, oy: -62, w: 75, h: 55 }]),
-  F([{ ox: 40, oy: -62, w: 78, h: 58 }]),
-  F([{ ox: 40, oy: -62, w: 78, h: 58 }]),
-  F([{ ox: 38, oy: -64, w: 72, h: 52 }]),
-  ...Array.from({ length: 18 }, (_, i) =>
-    F([{ ox: 28 - i * 0.3, oy: -68 + i * 0.5, w: 58 - i * 1.5, h: 46 - i }])
-  ),
+  F([{ ox: 42, oy: -60, w: 80, h: 58 }]),
+  F([{ ox: 44, oy: -58, w: 82, h: 60 }]),
+  // peak power
+  F([{ ox: 44, oy: -58, w: 82, h: 60 }]),
+  F([{ ox: 42, oy: -60, w: 78, h: 56 }]),
+  F([{ ox: 38, oy: -64, w: 70, h: 50 }]),
+  F([{ ox: 34, oy: -66, w: 62, h: 46 }]),
+  F([{ ox: 30, oy: -68, w: 55, h: 42 }]),
 ];
 
 export const DM_V_SLASHER_FRAMES: AttackFrame[] = [
