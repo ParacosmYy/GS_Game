@@ -862,3 +862,9 @@
 ## H182: charDefBatch5—4项验证vice/xiangfei/yamazaki/yashiro定义 — 154→155
 
 **commit:** <hash> | charDefBatch5—4项验证vice/xiangfei/yamazaki/yashiro定义
+
+---
+
+## H183: ryoSpriteBatch1—6项验证idle/walk/run/jump/crouch像素帧 — 155→156
+
+**commit:** <hash> | ryoSpriteBatch1—6项验证idle/walk/run/jump/crouch像素帧
