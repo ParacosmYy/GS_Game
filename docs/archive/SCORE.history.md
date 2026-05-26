@@ -715,3 +715,9 @@
 ## H160: ryoFeedback—5项验证getRyoFeedbackTiers+getRyoFeedback+RYO_FEEDBACK_SUMMARY — 132→133
 
 **commit:** <hash> | ryoFeedback—5项验证getRyoFeedbackTiers+getRyoFeedback+RYO_FEEDBACK_SUMMARY
+
+---
+
+## H161: ryoHitboxes—5项验证RYO_HITBOX_KEYS+getRyoHitboxOffsets+RYO_ATTACK_FRAME_KEYS — 133→134
+
+**commit:** <hash> | ryoHitboxes—5项验证RYO_HITBOX_KEYS+getRyoHitboxOffsets+RYO_ATTACK_FRAME_KEYS
