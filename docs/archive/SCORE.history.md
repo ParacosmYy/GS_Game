@@ -1043,3 +1043,9 @@
 ## H209: frameData—6项验证FRAME_DATA帧数据(startup/damage/条目数) — 181→182
 
 **commit:** <hash> | frameData—6项验证FRAME_DATA帧数据(startup/damage/条目数)
+
+---
+
+## H210: announcePresets—8项验证popIn/fadeInHoldOut/burstIn/KO序列 — 182→183
+
+**commit:** <hash> | announcePresets—8项验证popIn/fadeInHoldOut/burstIn/KO序列
