@@ -1079,3 +1079,9 @@
 ## H215: skeletalColors—5项验证getHairColor/getHeadbandColor/getEyeColor — 187→188
 
 **commit:** <hash> | skeletalColors—5项验证getHairColor/getHeadbandColor/getEyeColor
+
+---
+
+## H216: frameDataChars—5项验证角色专属帧数据 — 188→189
+
+**commit:** <hash> | frameDataChars—5项验证角色专属帧数据
