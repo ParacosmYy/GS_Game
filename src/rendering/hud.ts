@@ -348,6 +348,7 @@ export function drawHUD(
   const p1DelayedRatio = Math.max(0, delayedHealth[0] / MAX_HEALTH);
   drawHealthBar(ctx, HUD_MARGIN, HUD_BAR_Y, HUD_BAR_WIDTH, HUD_BAR_HEIGHT, p1Ratio, p1DelayedRatio, true, tick, damageFlash[0]);
   drawGuardGauge(ctx, HUD_MARGIN, HUD_BAR_Y + HUD_BAR_HEIGHT + 3, HUD_BAR_WIDTH, 5, fighters[0].guardGauge, true, tick);
+  drawStunIndicator(ctx, HUD_MARGIN, HUD_BAR_Y + HUD_BAR_HEIGHT + 10, HUD_BAR_WIDTH, 3, fighters[0].stunGauge, true, tick);
 
   // P1 low health warning — pulsing red bar outline + exclamation
   if (p1Ratio <= 0.25 && p1Ratio > 0) {
@@ -372,6 +373,7 @@ export function drawHUD(
   const p2DelayedRatio = Math.max(0, delayedHealth[1] / MAX_HEALTH);
   drawHealthBar(ctx, CANVAS_WIDTH - HUD_MARGIN - HUD_BAR_WIDTH, HUD_BAR_Y, HUD_BAR_WIDTH, HUD_BAR_HEIGHT, p2Ratio, p2DelayedRatio, false, tick, damageFlash[1]);
   drawGuardGauge(ctx, CANVAS_WIDTH - HUD_MARGIN - HUD_BAR_WIDTH, HUD_BAR_Y + HUD_BAR_HEIGHT + 3, HUD_BAR_WIDTH, 5, fighters[1].guardGauge, false, tick);
+  drawStunIndicator(ctx, CANVAS_WIDTH - HUD_MARGIN - HUD_BAR_WIDTH, HUD_BAR_Y + HUD_BAR_HEIGHT + 10, HUD_BAR_WIDTH, 3, fighters[1].stunGauge, false, tick);
 
   // P2 low health warning
   if (p2Ratio <= 0.25 && p2Ratio > 0) {
@@ -761,6 +763,31 @@ function drawGuardGauge(ctx: CanvasRenderingContext2D, x: number, y: number, w: 
     ctx.strokeStyle = `rgba(68, 255, 136, ${greenPulse})`;
     ctx.lineWidth = 1;
     ctx.strokeRect(sx - 1, sy - 1, w + 2, h + 2);
+  }
+}
+
+// ===== Stun indicator (thin bar below guard gauge) =====
+
+function drawStunIndicator(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, stunGauge: number, leftAligned: boolean, tick: number = 0): void {
+  const ratio = Math.max(0, Math.min(1, stunGauge / 100));
+  if (ratio <= 0) return;
+  const fillW = w * ratio;
+  ctx.fillStyle = '#0a0a12';
+  ctx.fillRect(x, y, w, h);
+  let color: string;
+  if (ratio > 0.7) {
+    const pulse = Math.sin(tick * 0.4) > 0;
+    color = pulse ? '#ff4444' : '#cc2222';
+  } else if (ratio > 0.4) {
+    color = '#cc8822';
+  } else {
+    color = '#446644';
+  }
+  ctx.fillStyle = color;
+  if (leftAligned) {
+    ctx.fillRect(x, y, fillW, h);
+  } else {
+    ctx.fillRect(x + w - fillW, y, fillW, h);
   }
 }
 
