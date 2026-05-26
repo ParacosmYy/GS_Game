@@ -283,3 +283,9 @@
 ## H95: projectile resolver测试—21项验证 — 67→68
 
 **commit:** <hash> | canBlock+guardGaugeDamage+aabbCheck+resolveProjectileHits
+
+---
+
+## H96: state handlers helper测试—16项验证 — 68→69
+
+**commit:** <hash> | state handlers helper测试—16项验证
