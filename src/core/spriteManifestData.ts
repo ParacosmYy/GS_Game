@@ -15,7 +15,7 @@
  * 归属: core/ — 只依赖 spriteManifest 类型，不持有运行时逻辑
  */
 
-import type { SpriteManifest, SpriteAnimation } from './spriteManifest.js';
+import type { SpriteManifest, SpriteAnimation, CharacterSpriteManifest } from './spriteManifest.js';
 
 export const SPRITE_MANIFEST: SpriteManifest = {
   version: 1,
@@ -149,6 +149,13 @@ export const RYO_ANIMATIONS: Record<string, SpriteAnimation> = {
     frames: placeholderFrames(8, F),
   },
 
+  /** 后跳 — 8帧非循环 */
+  jump_backward: {
+    name: 'jump_backward',
+    loop: false,
+    frames: placeholderFrames(8, F),
+  },
+
   // ── 通常技 ──────────────────────────────────────────────────────
   // 帧数对齐 FRAME_DATA: startup + active + recovery
 
@@ -160,12 +167,28 @@ export const RYO_ANIMATIONS: Record<string, SpriteAnimation> = {
     frames: attackFrames(6, 3, 5),
   },
 
+  /** 远B (远距离轻踢) — startup=7 + active=3 + recovery=14 = 24帧 */
+  stand_b: {
+    name: 'stand_b',
+    loop: false,
+    cancelStartFrame: 10, // startup(7) + active(3) 之后可取消
+    frames: attackFrames(7, 3, 14),
+  },
+
   /** 远C (远距离重拳) — startup=7 + active=3 + recovery=20 = 30帧 */
   stand_c: {
     name: 'stand_c',
     loop: false,
     cancelStartFrame: 10, // startup(7) + active(3) 之后可取消
     frames: attackFrames(7, 3, 20, STD_W + 50),
+  },
+
+  /** 远D (远距离重踢) — startup=10 + active=8 + recovery=20 = 38帧 */
+  stand_d: {
+    name: 'stand_d',
+    loop: false,
+    cancelStartFrame: 18, // startup(10) + active(8) 之后可取消
+    frames: attackFrames(10, 8, 20, STD_W + 30),
   },
 
   /** 蹲A (蹲轻拳) — startup=5 + active=4 + recovery=7 = 16帧 */
@@ -184,7 +207,23 @@ export const RYO_ANIMATIONS: Record<string, SpriteAnimation> = {
     frames: attackFrames(5, 5, 5),
   },
 
-  // ── 受击/倒地 ──────────────────────────────────────────────────
+  /** 蹲C (蹲重拳) — startup=7 + active=5 + recovery=16 = 28帧 */
+  crouch_c: {
+    name: 'crouch_c',
+    loop: false,
+    cancelStartFrame: 12, // startup(7) + active(5) 之后可取消
+    frames: attackFrames(7, 5, 16, STD_W + 40),
+  },
+
+  /** 蹲D (蹲重踢) — startup=5 + active=6 + recovery=31 = 42帧 */
+  crouch_d: {
+    name: 'crouch_d',
+    loop: false,
+    cancelStartFrame: 11, // startup(5) + active(6) 之后可取消
+    frames: attackFrames(5, 6, 31, STD_W + 50),
+  },
+
+  // ── 受击/防御/倒地/起身 ──────────────────────────────────────────
 
   /** 站立受击 — 3帧非循环, 受击反应 */
   hurt_standing: {
@@ -200,6 +239,20 @@ export const RYO_ANIMATIONS: Record<string, SpriteAnimation> = {
     frames: placeholderFrames(3, F * 5),
   },
 
+  /** 受击硬直 (通用 hitstun) — 11帧非循环 */
+  hitstun: {
+    name: 'hitstun',
+    loop: false,
+    frames: placeholderFrames(11, F),
+  },
+
+  /** 防御硬直 (通用 blockstun) — 9帧非循环 */
+  blockstun: {
+    name: 'blockstun',
+    loop: false,
+    frames: placeholderFrames(9, F),
+  },
+
   /** 倒地 — 5帧非循环 (倒下2 + 躺地3) */
   knockdown: {
     name: 'knockdown',
@@ -208,6 +261,13 @@ export const RYO_ANIMATIONS: Record<string, SpriteAnimation> = {
       ...placeholderFrames(2, F * 3), // 倒下过程, 每帧3游戏帧
       ...placeholderFrames(3, F * 8), // 躺地, 每帧较长
     ],
+  },
+
+  /** 起身 — 8帧非循环 */
+  wakeup: {
+    name: 'wakeup',
+    loop: false,
+    frames: placeholderFrames(8, F),
   },
 
   // ── 胜利 ────────────────────────────────────────────────────────
@@ -221,30 +281,68 @@ export const RYO_ANIMATIONS: Record<string, SpriteAnimation> = {
 
   // ── 必杀技 ──────────────────────────────────────────────────────
   // 帧数对齐 FRAME_DATA (frameDataChars.ts RYO_* 系列)
+  // 同时保留旧名 (koouken/ko_hou/dm_haou) 与 AttackType 映射名 (ryo_koou/ryo_ko_hou/dm_ten_ha_ou)
 
-  /** 虎煌拳 (Ko'ou Ken) 波动拳 — startup=12 + active=18 + recovery=34 = 64帧 */
-  koouken: {
-    name: 'koouken',
+  /** 虎煌拳 (Ko'ou Ken) — ryo_koou: startup=12 + active=18 + recovery=34 = 64帧 */
+  ryo_koou: {
+    name: 'ryo_koou',
     loop: false,
     cancelStartFrame: 30, // startup(12) + active(18) 后进入可取消
     frames: attackFrames(12, 18, 34, STD_W + 60, STD_H + 20),
   },
+  /** @deprecated 使用 ryo_koou */
+  koouken: {
+    name: 'koouken',
+    loop: false,
+    cancelStartFrame: 30,
+    frames: attackFrames(12, 18, 34, STD_W + 60, STD_H + 20),
+  },
 
-  /** 虎咆 (Ko Hou) 升龙拳 — startup=5 + active=5 + recovery=25 = 35帧 */
-  ko_hou: {
-    name: 'ko_hou',
+  /** 虎咆 (Ko Hou) — ryo_ko_hou: startup=5 + active=5 + recovery=25 = 35帧 */
+  ryo_ko_hou: {
+    name: 'ryo_ko_hou',
     loop: false,
     cancelStartFrame: 10, // startup(5) + active(5) 后可取消
     frames: attackFrames(5, 5, 25, STD_W + 30, STD_H + 30),
   },
+  /** @deprecated 使用 ryo_ko_hou */
+  ko_hou: {
+    name: 'ko_hou',
+    loop: false,
+    cancelStartFrame: 10,
+    frames: attackFrames(5, 5, 25, STD_W + 30, STD_H + 30),
+  },
+
+  /** 飛燕疾風脚 (Hien) — ryo_hien: startup=10 + active=8 + recovery=22 = 40帧 */
+  ryo_hien: {
+    name: 'ryo_hien',
+    loop: false,
+    cancelStartFrame: 18, // startup(10) + active(8) 后可取消
+    frames: attackFrames(10, 8, 22, STD_W + 40, STD_H + 10),
+  },
+
+  /** 霸王翔吼拳 (Haou) — ryo_haou: startup=10 + active=12 + recovery=22 = 44帧 */
+  ryo_haou: {
+    name: 'ryo_haou',
+    loop: false,
+    cancelStartFrame: 22, // startup(10) + active(12) 后可取消
+    frames: attackFrames(10, 12, 22, STD_W + 50, STD_H + 30),
+  },
 
   // ── 超必杀技 (DM) ───────────────────────────────────────────────
 
-  /** 霸王翔吼拳 (Haou Shoukou Ken) DM — startup=10 + active=12 + recovery=22 = 44帧 */
+  /** 天地霸煌拳 (Ten Ha Ou) DM — dm_ten_ha_ou: startup=18 + active=10 + recovery=35 = 63帧 */
+  dm_ten_ha_ou: {
+    name: 'dm_ten_ha_ou',
+    loop: false,
+    cancelStartFrame: 28, // startup(18) + active(10) 后可取消
+    frames: attackFrames(18, 10, 35, STD_W + 80, STD_H + 40),
+  },
+  /** @deprecated 使用 dm_ten_ha_ou */
   dm_haou: {
     name: 'dm_haou',
     loop: false,
-    cancelStartFrame: 22, // startup(10) + active(12) 后可取消
+    cancelStartFrame: 22,
     frames: attackFrames(10, 12, 22, STD_W + 80, STD_H + 40),
   },
 };
@@ -697,10 +795,26 @@ for (const [charId, colors] of Object.entries(CHARACTER_COLORS)) {
     ? RYO_ANIMATIONS
     : (CHARACTER_ANIMATION_BUILDERS[charId]?.() ?? createMinimalAnimations());
 
-  SPRITE_MANIFEST.characters[charId] = {
+  const base: CharacterSpriteManifest = {
     charId,
     atlasPath: `assets/sprites/${charId}.png`,
     animations,
     fallbackColors: colors,
   };
+
+  // Ryo 作为样板角色，拥有完整的 4 色 palette 变体
+  if (charId === 'ryo') {
+    base.palettes = [
+      // P1: 橙色道服 + 棕发 (默认)
+      ['#DD6600', '#8B4513', '#FFD699', '#222222'],
+      // P2: 红色道服 + 黑发
+      ['#CC2200', '#1A1A2E', '#FFD699', '#333333'],
+      // P3: 白色道服 + 金发
+      ['#DDDDDD', '#DAA520', '#FFD699', '#222222'],
+      // P4: 黑色道服 + 银发
+      ['#222222', '#C0C0C0', '#FFD699', '#444444'],
+    ];
+  }
+
+  SPRITE_MANIFEST.characters[charId] = base;
 }

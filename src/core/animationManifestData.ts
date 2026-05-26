@@ -267,14 +267,23 @@ const RYO_SEQUENCES: Record<string, AnimSequence> = {
   // ── 胜利 ──
   win: onceSequence('win', 6, 10),
 
-  // ── 必杀技 ──
-  koouken:  attackSequence('koouken', 'RYO_KOOU', 28),              // 虎煌拳
-  ko_hou:   attackSequence('ko_hou', 'RYO_KO_HOU', 9, 3),          // 虎咆, startup前3帧无敌
-  hien:     attackSequence('hien', 'RYO_HIEN', 16),                 // 飛燕疾風脚
-  haou:     attackSequence('haou', 'RYO_HAOU', 20),                 // 畅连拳
+  // ── 必杀技 (AttackType 映射名) ──
+  ryo_koou:   attackSequence('ryo_koou', 'RYO_KOOU', 28),             // 虎煌拳 ↓↘→+A
+  ryo_ko_hou: attackSequence('ryo_ko_hou', 'RYO_KO_HOU', 9, 3),       // 虎咆 →↓↘+A, startup前3帧无敌
+  ryo_hien:   attackSequence('ryo_hien', 'RYO_HIEN', 16),             // 飛燕疾風脚 ←↙↓+K
+  ryo_haou:   attackSequence('ryo_haou', 'RYO_HAOU', 20),             // 霸王翔吼拳 ↓↘→+K
 
-  // ── DM ──
-  dm_haou: attackSequence('dm_haou', 'DM_TEN_HA_OU', 26),          // 天地霸煌拳
+  // ── DM (AttackType 映射名) ──
+  dm_ten_ha_ou: attackSequence('dm_ten_ha_ou', 'DM_TEN_HA_OU', 26),   // 天地霸煌拳
+
+  // ── 必杀技 (旧名，向后兼容) ──
+  koouken:  attackSequence('koouken', 'RYO_KOOU', 28),
+  ko_hou:   attackSequence('ko_hou', 'RYO_KO_HOU', 9, 3),
+  hien:     attackSequence('hien', 'RYO_HIEN', 16),
+  haou:     attackSequence('haou', 'RYO_HAOU', 20),
+
+  // ── DM (旧名，向后兼容) ──
+  dm_haou: attackSequence('dm_haou', 'DM_TEN_HA_OU', 26),
 };
 
 // ============================================================================

@@ -45,6 +45,7 @@ export class Fighter {
   state: FighterState = FighterState.IDLE;
   color: string;
   charId: string = 'kyo'; // character ID for visual lookup
+  colorIndex: number = 0; // palette variant index (0=A, 1=B, 2=C, 3=D)
 
   // Attack state
   currentAttack: AttackType | null = null;

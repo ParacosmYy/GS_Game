@@ -17,8 +17,9 @@ export function setBodyPartTick(t: number): void { _tick = t; }
 /** 画像素风格躯干 — 肩宽腰窄梯形 + 角色专属服装细节 */
 export function drawPixelTorso(
   ctx: CanvasRenderingContext2D, charId: string, w: number, h: number,
+  colorIndex?: number,
 ): void {
-  const outfit = getOutfit(charId);
+  const outfit = getOutfit(charId, colorIndex);
   const hw = w / 2, hh = h / 2;
   const shoulderW = hw;
   const waistW = hw * 0.82;
@@ -943,8 +944,9 @@ function drawStarEmblem(
 /** 画像素风格手臂 — 袖口 + 前臂皮肤 + 手 + 角色专属细节 */
 export function drawPixelArm(
   ctx: CanvasRenderingContext2D, charId: string, w: number, h: number, isBack: boolean,
+  colorIndex?: number,
 ): void {
-  const outfit = getOutfit(charId);
+  const outfit = getOutfit(charId, colorIndex);
   const hw = w / 2, hh = h / 2;
   const skinColor = '#e8b88a';
   const skinDark = shiftColor(skinColor, -10);
@@ -1234,8 +1236,9 @@ function drawArmDetail(
 /** 画像素风格腿 — 裤子 + 鞋 + 角色专属细节 */
 export function drawPixelLeg(
   ctx: CanvasRenderingContext2D, charId: string, w: number, h: number, isBack: boolean,
+  colorIndex?: number,
 ): void {
-  const outfit = getOutfit(charId);
+  const outfit = getOutfit(charId, colorIndex);
   const hw = w / 2, hh = h / 2;
   const shoeH = Math.max(6, h * 0.12);
 

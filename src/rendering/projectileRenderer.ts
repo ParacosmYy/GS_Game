@@ -207,6 +207,32 @@ export function drawProjectiles(ctx: CanvasRenderingContext2D, projectiles: Proj
         ctx.stroke();
         break;
       }
+      case 'ryo': {
+        // 虎煌拳 — 旋转 ki 气流线条 + 拳形冲击波
+        ctx.strokeStyle = '#ffdd66';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        for (let s = 0; s < 24; s++) {
+          const sAngle = rotBase * 2.5 + s * 0.45;
+          const sR = radius * (0.3 + s * 0.035);
+          const px = sx + Math.cos(sAngle) * sR * vis.stretch;
+          const py = y + Math.sin(sAngle) * sR;
+          if (s === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+        }
+        ctx.stroke();
+        // 拳形冲击波 — 前方2道弧形冲击线
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 1.5;
+        for (let a = 0; a < 2; a++) {
+          const aOff = a * 6 - 3;
+          const aLen = radius * 0.8 + Math.sin(proj.currentFrame * 0.4 + a) * 2;
+          ctx.beginPath();
+          ctx.moveTo(sx + proj.facing * radius * vis.stretch * 0.3, y + aOff);
+          ctx.lineTo(sx + proj.facing * (radius * vis.stretch * 0.3 + aLen), y + aOff + Math.sin(proj.currentFrame * 0.5 + a) * 2);
+          ctx.stroke();
+        }
+        break;
+      }
       case 'robert': {
         // 龙气旋涡 — 螺旋线条
         ctx.strokeStyle = '#ffaa33';

@@ -6,7 +6,7 @@
 import { FighterState } from '../core/types.js';
 import type { SpriteAnimationMap, SpriteFrame } from './spriteRenderer.js';
 import {
-  PW, PH,
+  PW, PH, PIXEL,
   CHAR_VISUALS, getDefaultVisual,
   type Pose,
   WALK_POSES, ATTACK_POSES, CROUCH_ATTACK_POSES, AIR_ATTACK_POSES,
@@ -127,20 +127,33 @@ export function generatePlaceholderSpritesheet(color: string, charId: string): {
     const poseCount = POSE_MAP_LOCAL[set].length;
     const frames: SpriteFrame[] = [];
     for (let f = 0; f < poseCount; f++) {
+      const pose = POSE_MAP_LOCAL[set][f];
+      const isCrouch = pose.crouch;
+      const baseY = isCrouch ? 15 : 8;
+      const hh = v.headW;
+      const torsoY = baseY + hh + 1;
+      const torsoH = isCrouch ? 5 : 7;
+      const legY = torsoY + torsoH;
+      const scale = isCrouch ? 0.8 : 1;
+      const legLen = Math.floor(v.legLen * scale);
+      const feetY = legY + legLen;
+      
       frames.push({
         sx: f * PW,
         sy: row * PH,
         sw: PW,
         sh: PH,
         ox: -PW / 2,
-        oy: -PH,
+        oy: -(feetY * PIXEL),
       });
     }
     animations[state] = frames;
   }
   // KO特殊帧
+  const koCy = Math.floor(PH / PIXEL) - 6;
+  const koBottomY = koCy + 2; 
   animations[FighterState.KNOCKDOWN] = [{
-    sx: 0, sy: koRow * PH, sw: PW, sh: PH, ox: -PW / 2, oy: -PH,
+    sx: 0, sy: koRow * PH, sw: PW, sh: PH, ox: -PW / 2, oy: -(koBottomY * PIXEL),
   }];
 
   return { image, animations };

@@ -37,11 +37,31 @@ export const CHAR_OUTFIT: Record<string, { shirt: string; pants: string; belt: s
 
 const DEFAULT_OUTFIT = { shirt: '#888', pants: '#556', belt: '#444', shoes: '#333' };
 
-export function getOutfit(charId: string) {
+/** Ryo color palette variants for A/B/C/D button selection */
+export const RYO_PALETTES = [
+  { shirt: '#cc8833', pants: '#cc8833', belt: '#333', shoes: '#443322', headband: '#cc2222', hair: '#8B6914' }, // A: classic orange gi
+  { shirt: '#3366cc', pants: '#3366cc', belt: '#222', shoes: '#222244', headband: '#cc2222', hair: '#8B6914' }, // B: blue gi
+  { shirt: '#cc3333', pants: '#cc3333', belt: '#444', shoes: '#332222', headband: '#ffcc00', hair: '#8B6914' }, // C: red gi
+  { shirt: '#338833', pants: '#338833', belt: '#333', shoes: '#223322', headband: '#cc2222', hair: '#8B6914' }, // D: green gi
+] as const;
+
+/** Required color fields for a Ryo palette variant */
+export type RyoPalette = typeof RYO_PALETTES[number];
+
+export function getOutfit(charId: string, colorIndex?: number): { shirt: string; pants: string; belt: string; shoes: string } {
+  if (charId === 'ryo' && colorIndex !== undefined) {
+    const idx = Math.max(0, Math.min(3, colorIndex));
+    const pal = RYO_PALETTES[idx];
+    return { shirt: pal.shirt, pants: pal.pants, belt: pal.belt, shoes: pal.shoes };
+  }
   return CHAR_OUTFIT[charId] ?? DEFAULT_OUTFIT;
 }
 
-export function getHairColor(charId: string): string {
+export function getHairColor(charId: string, colorIndex?: number): string {
+  if (charId === 'ryo' && colorIndex !== undefined) {
+    const idx = Math.max(0, Math.min(3, colorIndex));
+    return RYO_PALETTES[idx].hair;
+  }
   const colors: Record<string, string> = {
     kyo: '#8B4513', iori: '#8B0000', terry: '#C6A355',
     kim: '#1a1a1a', ryo: '#8B6914', leona: '#DAA520',
@@ -60,6 +80,16 @@ export function getHairColor(charId: string): string {
     kasumi: '#1a1a2a',
   };
   return colors[charId] ?? '#333';
+}
+
+/** Get headband color for a character, supporting palette variants */
+export function getHeadbandColor(charId: string, colorIndex?: number): string {
+  if (charId === 'ryo' && colorIndex !== undefined) {
+    const idx = Math.max(0, Math.min(3, colorIndex));
+    return RYO_PALETTES[idx].headband;
+  }
+  // Default headband colors for other characters (no palette variant)
+  return '#cc2222';
 }
 
 export function getEyeColor(charId: string): string {
@@ -86,6 +116,7 @@ export function getEyeColor(charId: string): string {
 /** Draw character-specific head with detailed features */
 export function drawCharacterHead(
   ctx: CanvasRenderingContext2D, charId: string, facing: number, skinColor: string, headW: number,
+  colorIndex?: number,
 ): void {
   const r = headW / 2;
 
@@ -135,7 +166,7 @@ export function drawCharacterHead(
 
   // Eyebrows — 角色差异化角度和粗细
   const browWidth = isFemale ? 2 : 3;
-  ctx.strokeStyle = getHairColor(charId);
+  ctx.strokeStyle = getHairColor(charId, colorIndex);
   ctx.lineWidth = browWidth;
   const browAngle = getBrowAngle(charId);
   for (const side of [-1, 1]) {
@@ -162,7 +193,7 @@ export function drawCharacterHead(
   }
 
   // === Character-specific hair/accessories ===
-  drawHair(ctx, charId, facing, r, headW);
+  drawHair(ctx, charId, facing, r, headW, colorIndex);
 }
 
 // 眉毛角度 — 正值=内侧低(怒), 负值=内侧高(温和)
@@ -265,7 +296,7 @@ function drawMouth(ctx: CanvasRenderingContext2D, charId: string, r: number, ski
   }
 }
 
-function drawHair(ctx: CanvasRenderingContext2D, charId: string, facing: number, r: number, headW: number): void {
+function drawHair(ctx: CanvasRenderingContext2D, charId: string, facing: number, r: number, headW: number, colorIndex?: number): void {
   if (charId === 'kyo') {
     // Kyo: brown spiky hair sticking up
     ctx.fillStyle = '#8B4513';
@@ -360,8 +391,10 @@ function drawHair(ctx: CanvasRenderingContext2D, charId: string, facing: number,
     ctx.beginPath(); ctx.moveTo(r, -r + 1); ctx.lineTo(r + 6, -r + 5); ctx.stroke();
   } else if (charId === 'ryo') {
     // Ryo: short spiky brown hair swept back + stronger brow + red headband
-    // Hair — swept back spiky style with more volume
-    ctx.fillStyle = '#8B6914';
+    // Hair — palette-aware color
+    const ryoHairColor = getHairColor(charId, colorIndex);
+    const ryoHeadbandColor = getHeadbandColor(charId, colorIndex);
+    ctx.fillStyle = ryoHairColor;
     const spikes = [[-8, -12], [-3, -16], [2, -14], [7, -10]];
     for (const [sx, sy] of spikes) {
       ctx.beginPath();
@@ -372,7 +405,7 @@ function drawHair(ctx: CanvasRenderingContext2D, charId: string, facing: number,
       ctx.fill();
     }
     // Hair base — fuller coverage
-    ctx.fillStyle = '#8B6914';
+    ctx.fillStyle = ryoHairColor;
     ctx.beginPath();
     ctx.moveTo(-r + 2, -r + 3);
     ctx.quadraticCurveTo(-r + 4, -r - 6, 0, -r - 4);
@@ -384,11 +417,11 @@ function drawHair(ctx: CanvasRenderingContext2D, charId: string, facing: number,
     // Darker hair base band
     ctx.fillStyle = '#6B4B14';
     ctx.fillRect(-r + 1, -r + 5, headW - 2, 2);
-    // Red headband — Ryo's signature
-    ctx.fillStyle = '#cc2222';
+    // Red headband — Ryo's signature (palette-aware)
+    ctx.fillStyle = ryoHeadbandColor;
     ctx.fillRect(-r, -r + 2, headW, 4);
     // Headband trailing tails
-    ctx.strokeStyle = '#aa1111';
+    ctx.strokeStyle = shiftColor(ryoHeadbandColor, -30);
     ctx.lineWidth = 2;
     const hbX = -r * facing * 0.6;
     ctx.beginPath();

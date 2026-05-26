@@ -26,7 +26,8 @@ export function drawSkeletalFighter(
 ): void {
   const charDef = ROSTER.find(c => c.id === f.charId);
   const poseSet = charDef?.poses;
-  const outfit = getOutfit(f.charId);
+  const colorIdx = f.colorIndex;
+  const outfit = getOutfit(f.charId, colorIdx);
   const prop: BodyProportions = charDef?.proportions ?? DEFAULT_PROPORTIONS;
 
   // 将动画帧传递给身体部位渲染器（用于呼吸偏移、闪烁等动态效果）
@@ -629,7 +630,7 @@ export function drawSkeletalFighter(
       armW * p.armBack.scale, armH * p.armBack.scale, 3);
     ctx.stroke();
   } else {
-    drawPixelArm(ctx, f.charId, armW * p.armBack.scale, armH * p.armBack.scale, true);
+    drawPixelArm(ctx, f.charId, armW * p.armBack.scale, armH * p.armBack.scale, true, colorIdx);
   }
   ctx.restore();
 
@@ -649,7 +650,7 @@ export function drawSkeletalFighter(
       legW * p.legBack.scale, legH * p.legBack.scale, 3);
     ctx.stroke();
   } else {
-    drawPixelLeg(ctx, f.charId, legW * p.legBack.scale, legH * p.legBack.scale, true);
+    drawPixelLeg(ctx, f.charId, legW * p.legBack.scale, legH * p.legBack.scale, true, colorIdx);
   }
   ctx.restore();
 
@@ -668,7 +669,7 @@ export function drawSkeletalFighter(
     ctx.lineJoin = 'round';    roundRect(ctx, -torsoW / 2, -torsoH * heightFactor / 2, torsoW, torsoH * heightFactor, 5);
     ctx.stroke();
   } else {
-    drawPixelTorso(ctx, f.charId, torsoW, torsoH * heightFactor);
+    drawPixelTorso(ctx, f.charId, torsoW, torsoH * heightFactor, colorIdx);
   }
   ctx.restore();
 
@@ -682,7 +683,7 @@ export function drawSkeletalFighter(
     ctx.fillStyle = '#fff';
     ctx.beginPath(); ctx.arc(0, 0, headW / 2, 0, Math.PI * 2); ctx.fill();
   } else {
-    drawCharacterHead(ctx, f.charId, f.facing, skinColor, headW);
+    drawCharacterHead(ctx, f.charId, f.facing, skinColor, headW, colorIdx);
   }
   ctx.restore();
 
@@ -702,7 +703,7 @@ export function drawSkeletalFighter(
       legW * p.legFront.scale, legH * p.legFront.scale, 3);
     ctx.stroke();
   } else {
-    drawPixelLeg(ctx, f.charId, legW * p.legFront.scale, legH * p.legFront.scale, false);
+    drawPixelLeg(ctx, f.charId, legW * p.legFront.scale, legH * p.legFront.scale, false, colorIdx);
   }
   ctx.restore();
 
@@ -722,7 +723,7 @@ export function drawSkeletalFighter(
       armW * p.armFront.scale, armH * p.armFront.scale, 3);
     ctx.stroke();
   } else {
-    drawPixelArm(ctx, f.charId, armW * p.armFront.scale, armH * p.armFront.scale, false);
+    drawPixelArm(ctx, f.charId, armW * p.armFront.scale, armH * p.armFront.scale, false, colorIdx);
   }
   ctx.restore();
 
@@ -880,6 +881,7 @@ export function drawVictoryPose(
   outlineColor: string,
   tick: number,
   charId: string = 'kyo',
+  colorIndex?: number,
 ): void {
   const victoryPose = getVictoryPose(charId, tick);
   setBodyPartTick(tick);
@@ -923,7 +925,7 @@ export function drawVictoryPose(
   ctx.save();
   ctx.translate(backArm.x, shoulderY + p.armBack.oy);
   ctx.rotate(backArm.rot);
-  drawPixelArm(ctx, charId, armW * p.armBack.scale, armH * p.armBack.scale, true);
+  drawPixelArm(ctx, charId, armW * p.armBack.scale, armH * p.armBack.scale, true, colorIndex);
   ctx.restore();
 
   // Back leg — pixel art
@@ -931,7 +933,7 @@ export function drawVictoryPose(
   ctx.save();
   ctx.translate(backLeg.x, hipY + p.legBack.oy);
   ctx.rotate(backLeg.rot);
-  drawPixelLeg(ctx, charId, legW * p.legBack.scale, legH * p.legBack.scale, true);
+  drawPixelLeg(ctx, charId, legW * p.legBack.scale, legH * p.legBack.scale, true, colorIndex);
   ctx.restore();
 
   // Torso — pixel art
@@ -939,7 +941,7 @@ export function drawVictoryPose(
   ctx.save();
   ctx.translate(refX + p.body.ox * facing, torsoCenterY);
   ctx.rotate(p.body.rot * facing);
-  drawPixelTorso(ctx, charId, torsoW, torsoH);
+  drawPixelTorso(ctx, charId, torsoW, torsoH, colorIndex);
   ctx.restore();
 
   // Head
@@ -947,7 +949,7 @@ export function drawVictoryPose(
   ctx.save();
   ctx.translate(headPos.x, refY + 5 + p.head.oy);
   ctx.rotate(p.head.rot * facing);
-  drawCharacterHead(ctx, charId, facing, skinColor, headW);
+  drawCharacterHead(ctx, charId, facing, skinColor, headW, colorIndex);
   ctx.restore();
 
   // Front leg — pixel art
@@ -955,7 +957,7 @@ export function drawVictoryPose(
   ctx.save();
   ctx.translate(frontLeg.x, hipY + p.legFront.oy);
   ctx.rotate(frontLeg.rot);
-  drawPixelLeg(ctx, charId, legW * p.legFront.scale, legH * p.legFront.scale, false);
+  drawPixelLeg(ctx, charId, legW * p.legFront.scale, legH * p.legFront.scale, false, colorIndex);
   ctx.restore();
 
   // Front arm — pixel art
@@ -963,7 +965,7 @@ export function drawVictoryPose(
   ctx.save();
   ctx.translate(frontArm.x, shoulderY + p.armFront.oy);
   ctx.rotate(frontArm.rot);
-  drawPixelArm(ctx, charId, armW * p.armFront.scale, armH * p.armFront.scale, false);
+  drawPixelArm(ctx, charId, armW * p.armFront.scale, armH * p.armFront.scale, false, colorIndex);
   ctx.restore();
 
   // Character-specific victory VFX

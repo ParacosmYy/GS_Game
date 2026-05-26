@@ -685,12 +685,17 @@ export const RyoDef: CharacterDefinition = {
   },
 
   onAttackActive(fighter, attackType, projectiles, playerIndex) {
-    // 虎煌: spawn projectile (weak/strong)
+    // 虎煌: spawn visible projectile (weak/strong)
+    // Weak (A): 40x30 hitbox, 60 frames travel (~480px)
+    // Strong (C): 50x35 hitbox, 60 frames travel (~480px)
     if ((attackType === AttackType.RYO_KOOU || attackType === AttackType.RYO_KOOU_C) && fighter.attackFrame === 0) {
-      const data = FRAME_DATA[attackType as keyof typeof FRAME_DATA];
+      const isStrong = attackType === AttackType.RYO_KOOU_C;
+      const hitW = isStrong ? 25 : 20;
+      const hitH = isStrong ? 17.5 : 15;
       projectiles.push(new Projectile(
-        fighter.x + 50 * fighter.facing, fighter.y - 50, fighter.facing,
-        data.active, playerIndex, fighter.charId,
+        fighter.x + 60 * fighter.facing, fighter.y - 100, fighter.facing,
+        60, playerIndex, fighter.charId,
+        hitW, hitH,
       ));
       return true;
     }
