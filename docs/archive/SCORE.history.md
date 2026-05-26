@@ -367,3 +367,9 @@
 ## H109: constants测试—24项验证canvas/stage/physics/combat/timing/bounds/hitstop — 81→82
 
 **commit:** <hash> | constants测试—24项验证canvas/stage/physics/combat/timing/bounds/hitstop
+
+---
+
+## H110: damageScaling测试—13项验证DAMAGE_FLOORS+classifyStarter+getComboScale — 82→83
+
+**commit:** <hash> | damageScaling测试—13项验证DAMAGE_FLOORS+classifyStarter+getComboScale
