@@ -247,3 +247,9 @@
 ## H89: validate tools测试—17项验证 — 61→62
 
 **commit:** <hash> | validateRyoPackage(10)+printValidationReport(1)+manifest validation(6)
+
+---
+
+## H90: core types枚举完整性测试—27项验证 — 62→63
+
+**commit:** <hash> | FighterState+AttackType(Ryo全覆盖)+HitHeight+JuggleState+ThrowTarget+GamePhase
