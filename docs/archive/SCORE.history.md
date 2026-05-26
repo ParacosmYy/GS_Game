@@ -439,3 +439,9 @@
 ## H121: attackFrames测试—9项验证ATTACK_FRAMES entries+frame arrays — 93→94
 
 **commit:** <hash> | attackFrames测试—9项验证ATTACK_FRAMES entries+frame arrays
+
+---
+
+## H122: meterEvents测试—6项验证eventBus+reset+snapshotGauge — 94→95
+
+**commit:** <hash> | meterEvents测试—6项验证eventBus+reset+snapshotGauge
