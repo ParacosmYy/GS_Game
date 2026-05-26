@@ -965,3 +965,9 @@
 ## H196: spritePoseDataFuncs—5项验证getIdlePoses/getRunPoses/getJumpPoses/getHitPoses/getBlockPoses — 168→169
 
 **commit:** <hash> | spritePoseDataFuncs—5项验证getIdlePoses/getRunPoses/getJumpPoses/getHitPoses/getBlockPoses
+
+---
+
+## H197: charVisuals—5项验证CHAR_VISUALS角色外观数据 — 169→170
+
+**commit:** <hash> | charVisuals—5项验证CHAR_VISUALS角色外观数据
