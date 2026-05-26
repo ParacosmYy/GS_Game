@@ -151,6 +151,8 @@ function formatSection(name: string, r: SectionResult): string {
   return lines.join('\n');
 }
 
+declare const process: { argv: string[]; exit(code: number): never };
+
 function main(): void {
   const charId = process.argv[2] ?? 'ryo';
   console.log(`\n${charId.toUpperCase()} Manifest Validation\n`);
