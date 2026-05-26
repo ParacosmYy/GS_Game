@@ -114,20 +114,20 @@ describe('Ryo sprite manifest 19 个必要动画', () => {
   });
 
   it('Ryo 的基础动画帧数合理', () => {
-    // idle: 4帧循环
+    // idle: 15帧循环 (MUGEN参考: 15帧×9ticks)
     const idle = getAnimation(SPRITE_MANIFEST, RYO, 'idle');
     expect(idle).toBeDefined();
-    expect(idle!.frames.length).toBe(4);
+    expect(idle!.frames.length).toBe(15);
     expect(idle!.loop).toBe(true);
 
-    // walk_forward: 6帧循环
+    // walk_forward: 10帧循环 (MUGEN参考: 10帧×5ticks)
     const wf = getAnimation(SPRITE_MANIFEST, RYO, 'walk_forward');
-    expect(wf!.frames.length).toBe(6);
+    expect(wf!.frames.length).toBe(10);
     expect(wf!.loop).toBe(true);
 
-    // walk_backward: 6帧循环
+    // walk_backward: 10帧循环
     const wb = getAnimation(SPRITE_MANIFEST, RYO, 'walk_backward');
-    expect(wb!.frames.length).toBe(6);
+    expect(wb!.frames.length).toBe(10);
     expect(wb!.loop).toBe(true);
   });
 });

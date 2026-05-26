@@ -114,25 +114,47 @@ function attackFrames(
 export const RYO_ANIMATIONS: Record<string, SpriteAnimation> = {
   // ── 基础动作 ──────────────────────────────────────────────────────
 
-  /** 站立待机 — 4帧循环, 150ms/帧, 呼吸摇摆 */
+  /** 站立待机 — MUGEN参考: 15帧×9ticks=135ticks(~2.25s), 呼吸摇摆
+   *  帧节奏: 0-4 微上移(吸气) → 5-7 保持 → 8-14 回落(呼气)
+   *  anchor.y偏移模拟呼吸：±2px垂直微动
+   */
   idle: {
     name: 'idle',
     loop: true,
-    frames: placeholderFrames(4, 150),
+    frames: [
+      // inhale: body rises slightly
+      { atlasX: 0, atlasY: 0, width: STD_W, height: STD_H, anchor: { x: STD_ANCHOR_X, y: STD_ANCHOR_Y }, duration: 150 },
+      { atlasX: 0, atlasY: 0, width: STD_W, height: STD_H, anchor: { x: STD_ANCHOR_X, y: STD_ANCHOR_Y - 1 }, duration: 150 },
+      { atlasX: 0, atlasY: 0, width: STD_W, height: STD_H, anchor: { x: STD_ANCHOR_X, y: STD_ANCHOR_Y - 2 }, duration: 150 },
+      { atlasX: 0, atlasY: 0, width: STD_W, height: STD_H, anchor: { x: STD_ANCHOR_X, y: STD_ANCHOR_Y - 2 }, duration: 150 },
+      { atlasX: 0, atlasY: 0, width: STD_W, height: STD_H, anchor: { x: STD_ANCHOR_X, y: STD_ANCHOR_Y - 1 }, duration: 150 },
+      // hold at peak
+      { atlasX: 0, atlasY: 0, width: STD_W, height: STD_H, anchor: { x: STD_ANCHOR_X, y: STD_ANCHOR_Y - 1 }, duration: 150 },
+      { atlasX: 0, atlasY: 0, width: STD_W, height: STD_H, anchor: { x: STD_ANCHOR_X, y: STD_ANCHOR_Y }, duration: 150 },
+      { atlasX: 0, atlasY: 0, width: STD_W, height: STD_H, anchor: { x: STD_ANCHOR_X, y: STD_ANCHOR_Y }, duration: 150 },
+      // exhale: body settles back
+      { atlasX: 0, atlasY: 0, width: STD_W, height: STD_H, anchor: { x: STD_ANCHOR_X, y: STD_ANCHOR_Y }, duration: 150 },
+      { atlasX: 0, atlasY: 0, width: STD_W, height: STD_H, anchor: { x: STD_ANCHOR_X, y: STD_ANCHOR_Y + 1 }, duration: 150 },
+      { atlasX: 0, atlasY: 0, width: STD_W, height: STD_H, anchor: { x: STD_ANCHOR_X, y: STD_ANCHOR_Y + 1 }, duration: 150 },
+      { atlasX: 0, atlasY: 0, width: STD_W, height: STD_H, anchor: { x: STD_ANCHOR_X, y: STD_ANCHOR_Y }, duration: 150 },
+      { atlasX: 0, atlasY: 0, width: STD_W, height: STD_H, anchor: { x: STD_ANCHOR_X, y: STD_ANCHOR_Y }, duration: 150 },
+      { atlasX: 0, atlasY: 0, width: STD_W, height: STD_H, anchor: { x: STD_ANCHOR_X, y: STD_ANCHOR_Y }, duration: 150 },
+      { atlasX: 0, atlasY: 0, width: STD_W, height: STD_H, anchor: { x: STD_ANCHOR_X, y: STD_ANCHOR_Y }, duration: 150 },
+    ],
   },
 
-  /** 前走 — 6帧循环, 100ms/帧 */
+  /** 前走 — MUGEN参考: 10帧×5ticks=50ticks(~0.83s) */
   walk_forward: {
     name: 'walk_forward',
     loop: true,
-    frames: placeholderFrames(6, 100),
+    frames: placeholderFrames(10, 83),
   },
 
-  /** 后走 — 6帧循环, 120ms/帧 */
+  /** 后走 — MUGEN参考: 10帧×5ticks=50ticks */
   walk_backward: {
     name: 'walk_backward',
     loop: true,
-    frames: placeholderFrames(6, 120),
+    frames: placeholderFrames(10, 83),
   },
 
   /** 垂直跳 — 8帧非循环 (启动2 + 上升3 + 下降3) */
