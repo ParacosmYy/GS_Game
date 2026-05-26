@@ -379,3 +379,9 @@
 ## H111: gameConfig测试—10项验证KOF2002_CONFIG+TRAINING_OVERRIDES+getActiveConfig — 83→84
 
 **commit:** <hash> | gameConfig测试—10项验证KOF2002_CONFIG+TRAINING_OVERRIDES+getActiveConfig
+
+---
+
+## H112: gameSpeed测试—9项验证SLOWMO常量+GameSpeedController — 84→85
+
+**commit:** <hash> | gameSpeed测试—9项验证SLOWMO常量+GameSpeedController
