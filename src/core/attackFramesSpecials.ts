@@ -451,6 +451,36 @@ export const DM_TEN_HA_OU_FRAMES: AttackFrame[] = [
   F([{ ox: 30, oy: -68, w: 55, h: 42 }]),
 ];
 
+// SDM 天地霸煌拳 — extended energy blast (active=22)
+export const SDM_TEN_HA_OU_FRAMES: AttackFrame[] = [
+  // Phase 1: rapid expansion (frames 0-5)
+  F([{ ox: 30, oy: -68, w: 58, h: 48 }]),
+  F([{ ox: 36, oy: -65, w: 68, h: 52 }]),
+  F([{ ox: 42, oy: -62, w: 78, h: 58 }]),
+  F([{ ox: 48, oy: -58, w: 88, h: 64 }]),
+  F([{ ox: 52, oy: -55, w: 95, h: 68 }]),
+  F([{ ox: 55, oy: -52, w: 100, h: 72 }]),
+  // Phase 2: sustained peak power (frames 6-13)
+  F([{ ox: 55, oy: -52, w: 100, h: 72 }]),
+  F([{ ox: 55, oy: -52, w: 100, h: 72 }]),
+  F([{ ox: 52, oy: -54, w: 96, h: 68 }]),
+  F([{ ox: 52, oy: -54, w: 96, h: 68 }]),
+  F([{ ox: 55, oy: -52, w: 100, h: 72 }]),
+  F([{ ox: 55, oy: -52, w: 100, h: 72 }]),
+  F([{ ox: 52, oy: -54, w: 96, h: 68 }]),
+  F([{ ox: 52, oy: -54, w: 96, h: 68 }]),
+  // Phase 3: second power surge (frames 14-18)
+  F([{ ox: 58, oy: -50, w: 105, h: 75 }]),
+  F([{ ox: 60, oy: -48, w: 110, h: 78 }]),
+  F([{ ox: 60, oy: -48, w: 110, h: 78 }]),
+  F([{ ox: 58, oy: -50, w: 105, h: 75 }]),
+  F([{ ox: 55, oy: -52, w: 100, h: 72 }]),
+  // Phase 4: final dissipation (frames 19-21)
+  F([{ ox: 48, oy: -56, w: 88, h: 64 }]),
+  F([{ ox: 40, oy: -60, w: 75, h: 55 }]),
+  F([{ ox: 32, oy: -66, w: 60, h: 45 }]),
+];
+
 // DM 龍虎乱舞 — rushing multi-hit DM (active=10)
 export const DM_RYUKO_RANBU_FRAMES: AttackFrame[] = [
   // Rush start — close punch
