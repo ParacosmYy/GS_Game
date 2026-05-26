@@ -8,15 +8,9 @@ import type { PowerGauge } from '../core/types.js';
 import { AttackType, FighterState } from '../core/types.js';
 import {
   FRAME_DATA, STAGE_WIDTH, MAX_STOCKS, METER_PER_STOCK,
-  HITSTOP_LIGHT, HITSTOP_MEDIUM, HITSTOP_SPECIAL, HITSTOP_DM, HITSTOP_SDM, HITSTOP_COUNTER_BONUS,
-  BLOCKSTOP_LIGHT, BLOCKSTOP_HEAVY, BLOCKSTOP_SPECIAL, BLOCKSTOP_DM,
-  SHAKE_LIGHT, SHAKE_HEAVY, SHAKE_COUNTER, SHAKE_SPECIAL, SHAKE_THROW, SHAKE_DM, SHAKE_KO,
-  SHAKE_DURATION_LIGHT, SHAKE_DURATION_HEAVY, SHAKE_DURATION_SPECIAL, SHAKE_DURATION_DM, SHAKE_DURATION_KO,
-  SHAKE_BLOCK_LIGHT, SHAKE_BLOCK_HEAVY, SHAKE_BLOCK_SPECIAL, SHAKE_BLOCK_DM,
-  SHAKE_BLOCK_DURATION_LIGHT, SHAKE_BLOCK_DURATION_HEAVY, SHAKE_BLOCK_DURATION_SPECIAL, SHAKE_BLOCK_DURATION_DM,
-  SPARK_SIZE_LIGHT, SPARK_SIZE_HEAVY, SPARK_SIZE_SPECIAL, SPARK_SIZE_DM, SPARK_SIZE_SDM,
-  SPARK_COUNT_LIGHT, SPARK_COUNT_HEAVY, SPARK_COUNT_SPECIAL, SPARK_COUNT_DM, SPARK_COUNT_SDM, SPARK_COUNT_COUNTER,
+  SHAKE_KO, SHAKE_DURATION_KO,
 } from '../core/constants.js';
+import { getFeedback } from '../core/feedbackManifest.js';
 import { ROSTER } from '../characters/index.js';
 import { isDM as isDMCheck } from '../core/attackClassifier.js';
 import { gainMeterOnHit, gainMeterOnBlock, gainMeterOnHitstun } from './meter.js';
@@ -44,27 +38,16 @@ function classifyAttack(at: AttackType) {
   return { isDM: _isDM, isSDM, isSpecial, isPunch };
 }
 
-function calcHitStop(at: AttackType, isDM: boolean, isSpecial: boolean, ch: boolean): number {
-  const heavy = at === AttackType.STAND_C || at === AttackType.STAND_D || at === AttackType.CLOSE_C
-    || at === AttackType.CLOSE_D || at === AttackType.CROUCH_C || at === AttackType.CROUCH_D
-    || at === AttackType.JUMP_C || at === AttackType.JUMP_D;
-  const s = at as string;
-  const isSDM = s.startsWith('SDM_');
-  const r = isDM ? (isSDM ? HITSTOP_SDM : HITSTOP_DM) : isSpecial ? HITSTOP_SPECIAL : heavy ? HITSTOP_MEDIUM : HITSTOP_LIGHT;
-  return ch ? r + HITSTOP_COUNTER_BONUS : r;
+const HITSTOP_COUNTER_BONUS = 3;
+
+function calcHitStop(at: AttackType, ch: boolean): number {
+  const fb = getFeedback(at);
+  return ch ? fb.hitstop + HITSTOP_COUNTER_BONUS : fb.hitstop;
 }
 
-function calcShake(at: AttackType, isDM: boolean, isSpecial: boolean, ch: boolean, dmg: number): number {
-  const s = at as string;
-  if (isDM) return SHAKE_DM;
-  if (isSpecial) return SHAKE_SPECIAL;
-  if (at === AttackType.THROW) return SHAKE_THROW;
-  if (ch) return SHAKE_COUNTER;
-  if (at === AttackType.STAND_C || at === AttackType.STAND_D
-    || at === AttackType.CLOSE_C || at === AttackType.CLOSE_D
-    || at === AttackType.CROUCH_C || at === AttackType.CROUCH_D) return SHAKE_HEAVY;
-  if (dmg > 50) return 4;
-  return SHAKE_LIGHT;
+function calcShake(at: AttackType, ch: boolean, dmg: number): number {
+  if (ch) return Math.max(getFeedback(at).shakeIntensity, 6);
+  return getFeedback(at).shakeIntensity;
 }
 
 /** 判断是否为重攻击(需要斩击线特效) */
@@ -155,14 +138,14 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       if (blkHeavy || blkDM) {
         deps.vfx.spawnDust(defender.x, defender.y);
       }
-      // 防御顿帧 — 使用分层常量
-      const blkStop = blkDM ? BLOCKSTOP_DM : blkSpecial ? BLOCKSTOP_SPECIAL : blkHeavy ? BLOCKSTOP_HEAVY : BLOCKSTOP_LIGHT;
-      deps.cinematic.triggerHitStop(blkStop, defIdx, attacker.facing);
+      // 防御顿帧 — manifest驱动
+      const blkFb = getFeedback(attackType);
+      deps.cinematic.triggerHitStop(blkFb.blockstop, defIdx, attacker.facing);
       // 防御反馈更偏"硬切"而不是层层铺开
       const blkBias = (blkDM || blkSpecial || blkHeavy) ? attacker.facing * 3 : 0;
       deps.screenShake.trigger(
-        blkDM ? SHAKE_BLOCK_DM : blkSpecial ? SHAKE_BLOCK_SPECIAL : blkHeavy ? SHAKE_BLOCK_HEAVY : SHAKE_BLOCK_LIGHT,
-        blkDM ? SHAKE_BLOCK_DURATION_DM : blkSpecial ? SHAKE_BLOCK_DURATION_SPECIAL : blkHeavy ? SHAKE_BLOCK_DURATION_HEAVY : SHAKE_BLOCK_DURATION_LIGHT,
+        blkFb.blockShakeIntensity,
+        blkFb.blockShakeDuration,
         blkBias,
       );
       gainMeterOnBlock(deps.gauges[atkIdx], attackType);
@@ -188,7 +171,7 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
     const { isDM, isSDM, isSpecial } = classifyAttack(attackType);
     const combo = deps.combatSystem.getComboCount(defIdx);
     const comboDmg = deps.combatSystem.getComboDamage(defIdx);
-    const baseStop = calcHitStop(attackType, isDM, isSpecial, counterHit);
+    const baseStop = calcHitStop(attackType, counterHit);
     // 连击和低血只做轻微补强，避免把命中时间线拖成堆栈
     const comboStop = combo >= 10 ? 1 : 0;
     const criticalStop = defender.health < defender.maxHealth * 0.15 ? 1 : 0;
@@ -205,25 +188,25 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
     const { isPunch } = classifyAttack(attackType);
 
     // === 基于伤害的火花尺寸分级 ===
-    // 取攻击类型分类和伤害分级中的较大值，确保DM/必杀技有足够的辨识度
-    const typeSizeScale = isSDM ? SPARK_SIZE_SDM : isDM ? SPARK_SIZE_DM : isSpecial ? SPARK_SIZE_SPECIAL : isHeavyAttack(attackType) ? SPARK_SIZE_HEAVY : SPARK_SIZE_LIGHT;
+    // manifest驱动基础值，伤害分级取较大值
+    const fb = getFeedback(attackType);
     const dmgSizeScale = getDamageSizeScale(data.damage);
-    const sparkSize = Math.max(typeSizeScale, dmgSizeScale);
+    const sparkSize = Math.max(fb.sparkSize, dmgSizeScale);
     // Counter Hit: 火花尺寸翻倍
     const chSizeBonus = counterHit ? 2.0 : 1.0;
 
     // 火花收口：保留主爆点，砍掉过多补层
     const comboSparkBonus = combo >= 10 ? 3 : combo >= 5 ? 1 : 0;
     const lowHpBonus = defender.health < defender.maxHealth * 0.25 ? 2 : 0;
-    const sparks = (isSDM ? SPARK_COUNT_SDM : isDM ? SPARK_COUNT_DM : isSpecial ? SPARK_COUNT_SPECIAL : counterHit ? SPARK_COUNT_COUNTER : isHeavyAttack(attackType) ? SPARK_COUNT_HEAVY : SPARK_COUNT_LIGHT) + comboSparkBonus + lowHpBonus;
+    const sparks = fb.sparkCount + (counterHit ? 2 : 0) + comboSparkBonus + lowHpBonus;
     // CH时用橙红色调, 重攻击用更亮的颜色
     const sparkColor = counterHit ? '#ff6600' : isSpecial ? atkChar.specialColor : isPunch ? (isHeavyAttack(attackType) ? '#ffcc22' : '#ffdd44') : (isHeavyAttack(attackType) ? '#33bbff' : '#44ddff');
     // 连击中VFX递减: 高连击时火花逐步缩小，避免画面过于密集
     const comboSparkScale = combo >= 6 ? 0.8 : combo >= 3 ? 0.9 : 1.0;
     // KOF2002: 重攻击火花速度稍快，模拟更强冲击感
     const sparkSpeed = isDM ? 1.15 : isSpecial ? 1.05 : isHeavyAttack(attackType) ? 1.0 : 0.9;
-    // 星体比例收紧，避免画面太"烟花化" — 重攻击星体比例稍高
-    const sparkStarRatio = isSDM ? 0.55 : isDM ? 0.45 : isSpecial ? 0.3 : isHeavyAttack(attackType) ? 0.25 : 0.12;
+    // 星体比例 — manifest驱动
+    const sparkStarRatio = fb.sparkStarRatio;
     const sparkLowGrav = !defender.isGrounded() && !isDM;
     // === 传递facing参数，让火花方向基于攻击者朝向 ===
     deps.vfx.spawnCharacterHitSparks(hitX, hitY, sparks, sparkColor, sparkSize * comboSparkScale * chSizeBonus, sparkSpeed, sparkStarRatio, sparkLowGrav, attacker.facing);
@@ -261,7 +244,7 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
     deps.vfx.spawnDamageText(defender.x, defender.y - defender.displayHeight - 20, data.damage, dmgColor);
 
     // 命中确认光效收短，强调"硬切"而不是长时间白闪
-    attacker.hitFlashFrames = isDM ? 4 : isSpecial ? 3 : isHeavyAttack(attackType) ? 2 : 1;
+    attacker.hitFlashFrames = fb.hitFlashFrames;
     attacker.hitFlashColor = isDM ? atkChar.specialColor : '#ffffff';
 
     // 重攻击保留一层短促微闪，不再额外叠更多环
@@ -365,12 +348,8 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       playKOHit();
     }
 
-    // Sidechain duck: lower BGM briefly so SFX cuts through
-    if (isDM) bgm.duck(0.55, 200);
-    else if (isSpecial) bgm.duck(0.65, 150);
-    else if (isThrowAttack(attackType) || counterHit) bgm.duck(0.65, 150);
-    else if (isHeavyAttack(attackType)) bgm.duck(0.72, 120);
-    else bgm.duck(0.78, 100);
+    // Sidechain duck: manifest驱动基础值
+    bgm.duck(fb.bgmDuckVolume, fb.bgmDuckDuration);
 
     // === Counter Hit 增强 ===
     if (counterHit) {
@@ -467,14 +446,13 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       deps.screenFlash.trigger('#ffffff', 0.04, 2);
     }
 
-    // 震屏方向更明确，DM/KO层次拉开 — 使用分层常量
-    const shakeDur = isDM ? SHAKE_DURATION_DM : isSpecial ? SHAKE_DURATION_SPECIAL : isHeavyAttack(attackType) ? SHAKE_DURATION_HEAVY : SHAKE_DURATION_LIGHT;
+    // 震屏 — manifest驱动
     const comboShakeBonus = combo >= 10 ? 1 : 0;
     // 连击中震屏递减: 高连击时震屏强度逐步衰减，最低保留60%
     const comboShakeDecay = combo >= 3 ? Math.max(0.6, 1 - combo * 0.05) : 1;
     deps.screenShake.trigger(
-      Math.round(calcShake(attackType, isDM, isSpecial, counterHit, data.damage) * comboShakeDecay) + comboShakeBonus,
-      shakeDur,
+      Math.round(calcShake(attackType, counterHit, data.damage) * comboShakeDecay) + comboShakeBonus,
+      fb.shakeDuration,
       getAttackDirectionBias(attacker, defender, attackType, counterHit),
     );
     deps.cinematic.trackDamage(defIdx, data.damage);

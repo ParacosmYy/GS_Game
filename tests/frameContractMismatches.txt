@@ -1,0 +1,25 @@
+Frame Contract Validation Status (updated H62)
+
+Ryo: CLEAN (projectile convention excluded)
+  - RYO_KOOU, RYO_KOOU_C: len=1 (projectile spawn frame convention)
+  - RYO_HIEN, RYO_HAOU, DM_TEN_HA_OU: all match (fixed in H56)
+
+Remaining mismatches (113 total, excluding 18 projectile convention):
+
+[generic-normal] (11) — in attackFrames.ts (blocked, uncommitted by another session):
+  STAND_C: active=3 frames=4
+  CROUCH_C: active=5 frames=4
+  CROUCH_D: active=6 frames=5
+  JUMP_A: active=9 frames=2
+  JUMP_B: active=7 frames=2
+  JUMP_C: active=3 frames=4
+  JUMP_D: active=5 frames=4
+  THROW: active=2 frames=1
+  THROW_FORWARD: active=2 frames=1
+  THROW_BACK: active=2 frames=1
+  STAND_CD: active=5 frames=4
+
+[character-special] (75) — in attackFramesSpecials.ts
+[dm-sdm] (27) — in attackFramesSpecials.ts
+
+Total mismatches: 131 raw, 113 real (after projectile convention exclusion)
