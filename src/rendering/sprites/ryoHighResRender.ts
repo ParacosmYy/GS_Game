@@ -23,6 +23,7 @@ import { RYO_JUMP_FRAMES } from './ryoJumpFrames.js';
 import { RYO_HURT_FRAMES, RYO_KNOCKDOWN_FRAMES } from './ryoDamageFrames.js';
 import { RYO_CROUCH_FRAMES, RYO_CROUCH_A_FRAMES, RYO_CROUCH_C_FRAMES } from './ryoCrouchFrames.js';
 import { RYO_AIR_A_FRAMES, RYO_AIR_C_FRAMES, RYO_AIR_D_FRAMES } from './ryoAirAttackFrames.js';
+import { RYO_KO_HOU_FRAMES, RYO_KOOU_FRAMES } from './ryoSpecialFrames.js';
 
 // ===== Internal Frame Registry =====
 //
@@ -120,6 +121,10 @@ function initAllFrames(): void {
   registerFrames('AIR_A', RYO_AIR_A_FRAMES, 4);
   registerFrames('AIR_C', RYO_AIR_C_FRAMES, 4);
   registerFrames('AIR_D', RYO_AIR_D_FRAMES, 4);
+
+  // SPECIALS — ko_hou (uppercut) and koou (projectile)
+  registerFrames('KO_HOU', RYO_KO_HOU_FRAMES, 4);
+  registerFrames('KOOU', RYO_KOOU_FRAMES, 4);
 }
 
 // ===== State Resolution =====
@@ -152,6 +157,13 @@ function resolveFrameKey(
       // Resolve attack type to the correct frame set
       if (currentAttack === AttackType.STAND_C || currentAttack === AttackType.CLOSE_C) {
         return 'STAND_C';
+      }
+      // Special moves: uppercut and projectile
+      if (currentAttack === AttackType.RYO_KO_HOU || currentAttack === AttackType.RYO_KO_HOU_C) {
+        return 'KO_HOU';
+      }
+      if (currentAttack === AttackType.RYO_KOOU || currentAttack === AttackType.RYO_KOOU_C) {
+        return 'KOOU';
       }
       // Default to STAND_A for STAND_A, CLOSE_A, and any other stand attack
       return 'STAND_A';
