@@ -271,3 +271,9 @@
 ## H93: state context测试—24项验证 — 65→66
 
 **commit:** <hash> | FighterCtx接口+方向检测+double-tap+hyperJump+closeRange
+
+---
+
+## H94: PRNG确定性随机数测试—17项验证 — 66→67
+
+**commit:** <hash> | seed determinism+range+snapshot/restore+clone+gameRng globals
