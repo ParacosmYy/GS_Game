@@ -709,3 +709,9 @@
 ## H159: ryoCommands—5项验证RYO_MOVE_LIST+RYO_WIN_QUOTES — 131→132
 
 **commit:** <hash> | ryoCommands—5项验证RYO_MOVE_LIST+RYO_WIN_QUOTES
+
+---
+
+## H160: ryoFeedback—5项验证getRyoFeedbackTiers+getRyoFeedback+RYO_FEEDBACK_SUMMARY — 132→133
+
+**commit:** <hash> | ryoFeedback—5项验证getRyoFeedbackTiers+getRyoFeedback+RYO_FEEDBACK_SUMMARY
