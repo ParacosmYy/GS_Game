@@ -408,7 +408,9 @@ export class VFXSystem {
           slamGrad.addColorStop(0.4, p.color);
           slamGrad.addColorStop(1, 'rgba(0,0,0,0)');
           ctx.fillStyle = slamGrad;
-          ctx.fillRect(sx - p.size, p.y - p.size, p.size * 2, p.size * 2);
+          ctx.beginPath();
+          ctx.ellipse(sx, p.y, p.size * 1.05, p.size * 0.75, 0, 0, Math.PI * 2);
+          ctx.fill();
           // 只保留一条清晰冲击波环
           ctx.globalAlpha = alpha * 0.26;
           const waveR = slamRadius * (0.6 + progress * 0.8);
@@ -420,7 +422,9 @@ export class VFXSystem {
           // 暗色叠加压到更轻，防止画面发脏
           ctx.globalAlpha = alpha > 0.5 ? alpha * 0.18 : alpha * alpha * 0.18;
           ctx.fillStyle = '#000';
-          ctx.fillRect(sx - p.size * 1.2, p.y - p.size * 1.2, p.size * 2.4, p.size * 2.4);
+          ctx.beginPath();
+          ctx.ellipse(sx, p.y, p.size * 1.15, p.size * 0.85, 0, 0, Math.PI * 2);
+          ctx.fill();
           ctx.restore();
           break;
         }
@@ -456,15 +460,36 @@ export class VFXSystem {
           ctx.globalAlpha = alpha * 0.76;
           ctx.translate(sx, p.y);
           ctx.rotate(p.rotation || 0);
-          const slashLen = p.size * (0.45 + alpha * 0.4);
-          // 斩击线收成两层：白核 + 角色色主体
-          const slashW = (2 + alpha * 2.2) * (0.55 + alpha * 0.35);
-          ctx.fillStyle = '#ffffff';
-          ctx.globalAlpha = alpha * 0.88;
-          ctx.fillRect(-slashLen, -slashW * 0.3, slashLen * 2, slashW * 0.6);
+          const slashLen = p.size * (0.42 + alpha * 0.38);
+          const slashW = (2 + alpha * 2.2) * (0.55 + alpha * 0.3);
+          const curve = slashW * 0.65;
+          ctx.lineCap = 'round';
+          ctx.lineJoin = 'round';
+          // 白核：更像撕开的斩痕，不用硬矩形
+          ctx.strokeStyle = '#ffffff';
+          ctx.lineWidth = Math.max(1.5, slashW * 0.55);
+          ctx.globalAlpha = alpha * 0.9;
+          ctx.beginPath();
+          ctx.moveTo(-slashLen, curve * 0.18);
+          ctx.quadraticCurveTo(0, -curve, slashLen, -curve * 0.08);
+          ctx.stroke();
+          // 角色色主体：稍宽、稍偏移，形成有层次的刀光
+          ctx.strokeStyle = p.color;
+          ctx.lineWidth = Math.max(2, slashW);
           ctx.globalAlpha = alpha * 0.72;
+          ctx.beginPath();
+          ctx.moveTo(-slashLen, curve * 0.28);
+          ctx.quadraticCurveTo(0, curve * 0.1, slashLen, -curve * 0.18);
+          ctx.stroke();
+          // 两端收口，让刀光更像“切开”而不是横杠
+          ctx.globalAlpha = alpha * 0.34;
           ctx.fillStyle = p.color;
-          ctx.fillRect(-slashLen, -slashW / 2, slashLen * 2, slashW);
+          ctx.beginPath();
+          ctx.ellipse(-slashLen, curve * 0.18, slashW * 0.55, slashW * 0.32, -0.35, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.beginPath();
+          ctx.ellipse(slashLen, -curve * 0.08, slashW * 0.65, slashW * 0.36, 0.25, 0, Math.PI * 2);
+          ctx.fill();
           ctx.restore();
           break;
         }

@@ -39,7 +39,7 @@ export function spawnHitSparks(particles: Particle[], worldX: number, worldY: nu
 export function spawnBlockFlash(particles: Particle[], worldX: number, worldY: number, scale: number = 1.0): void {
   particles.push({
     x: worldX, y: worldY, vx: 0, vy: 0,
-    life: 8, maxLife: 8, size: 40 * scale,
+    life: 8, maxLife: 8, size: 30 * scale,
     color: '#aaccff', type: 'flash',
   });
 }
@@ -211,17 +211,18 @@ export function spawnImpactRing(particles: Particle[], worldX: number, worldY: n
 
 /** 打击斩击线 — 重攻击命中时的横向闪光. scale: 重1.0, 必杀1.4, DM2.0 */
 export function spawnSlashLine(particles: Particle[], worldX: number, worldY: number, _facing: number, color: string, scale: number = 1.0): void {
+  const baseRotation = _facing !== 0 ? _facing * 0.55 : 0;
   particles.push({
     x: worldX, y: worldY, vx: 0, vy: 0,
     life: 7, maxLife: 7, size: (30 + Math.random() * 16) * scale,
     color, type: 'slash',
-    rotation: (Math.random() - 0.5) * 0.6,
+    rotation: baseRotation + (Math.random() - 0.5) * 0.25,
   });
   particles.push({
     x: worldX, y: worldY, vx: 0, vy: 0,
     life: 7, maxLife: 7, size: (18 + Math.random() * 10) * scale,
     color: '#ffffff', type: 'slash',
-    rotation: (Math.random() - 0.5) * 0.6 - 0.3,
+    rotation: baseRotation * 0.7 + (Math.random() - 0.5) * 0.2 - 0.15,
   });
 }
 
