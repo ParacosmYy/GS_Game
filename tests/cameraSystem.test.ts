@@ -1,12 +1,11 @@
 /**
- * Camera System Tests — KOF2002 摄像机跟踪 + ScreenShake
+ * Camera System Tests — KOF2002 摄像机跟踪 + Zoom + KO特写 + ScreenShake
  *
  * 摄像机系统由两个模块协作：
- *   1. Camera (src/core/camera.ts) — 跟踪两个 fighter 的中点，平滑插值，边界钳制
+ *   1. Camera (src/core/camera.ts) — 跟踪两个 fighter 的中点，距离驱动zoom，KO特写，平滑插值，边界钳制
  *   2. ScreenShake (src/rendering/vfx.ts) — 命中/KO 震屏，方向性偏移，确定性衰减
  *
- * 当前 Camera 只实现了水平跟踪 + lerp 平滑；zoom / KO 特写尚未实现。
- * 测试按实际 API 编写，不测不存在的功能。
+ * Camera 已实现：水平跟踪 + lerp 平滑 + 距离驱动 zoom + KO zoom 特写。
  */
 import { describe, it, expect } from 'vitest';
 import { Camera } from '../src/core/camera.js';
@@ -102,16 +101,18 @@ describe('Camera — worldToScreen', () => {
     const a = makeFighter(400);
     const b = makeFighter(400);
     for (let i = 0; i < 100; i++) cam.update(a, b);
-    // 摄像机居中于 x=400，所以 screenX(400) ≈ CANVAS_WIDTH/2
-    expect(cam.worldToScreen(400)).toBeCloseTo(CANVAS_WIDTH / 2, 1);
+    // 摄像机居中于 x=400，screenX(400) = (400 - cam.x) * zoom
+    // cam.x ≈ 0 (clamped), zoom ≈ 1.15 (角色重叠)
+    expect(cam.worldToScreen(400)).toBeCloseTo((400 - cam.x) * cam.zoom, 2);
   });
 
-  it('世界坐标 0 映射到 -cam.x', () => {
+  it('世界坐标 0 映射到 -cam.x * zoom', () => {
     const cam = new Camera();
     const a = makeFighter(600);
     const b = makeFighter(600);
     for (let i = 0; i < 100; i++) cam.update(a, b);
-    expect(cam.worldToScreen(0)).toBeCloseTo(-cam.x, 4);
+    // worldToScreen(0) = (0 - cam.x) * zoom
+    expect(cam.worldToScreen(0)).toBeCloseTo(-cam.x * cam.zoom, 4);
   });
 
   it('摄像机左边和右边角色都在屏幕可见范围内', () => {
@@ -248,7 +249,8 @@ describe('Camera — 边界条件', () => {
     // 间距 980 > CANVAS_WIDTH 800，所以至少一人会溢出屏幕
     const screenL = cam.worldToScreen(left.x);
     const screenR = cam.worldToScreen(right.x);
-    expect(screenR - screenL).toBeCloseTo(right.x - left.x, 1);
+    // screenR - screenL = (right.x - left.x) * zoom (zoom < 1.0 for far fighters)
+    expect(screenR - screenL).toBeCloseTo((right.x - left.x) * cam.zoom, 1);
   });
 
   it('版边时摄像机不超出边界', () => {
@@ -279,5 +281,158 @@ describe('Camera — 边界条件', () => {
     const expectedTarget = (STAGE_WIDTH - 100) - CANVAS_WIDTH / 2;
     const clampedTarget = Math.max(0, Math.min(expectedTarget, STAGE_WIDTH - CANVAS_WIDTH));
     expect(cam.x).toBeCloseTo(clampedTarget, 1);
+  });
+});
+
+// ===================== 8. Zoom — 距离驱动 (4 tests) =====================
+describe('Camera — Zoom 距离驱动', () => {
+  it('角色靠近时 zoom > 1.0', () => {
+    const cam = new Camera();
+    const a = makeFighter(400);
+    const b = makeFighter(440); // distance = 40, less than DISTANCE_MIN(80)
+    for (let i = 0; i < 200; i++) cam.update(a, b);
+    expect(cam.zoom).toBeGreaterThan(1.0);
+  });
+
+  it('角色远离时 zoom < 1.0', () => {
+    const cam = new Camera();
+    const a = makeFighter(100);
+    const b = makeFighter(100 + CANVAS_WIDTH); // distance = CANVAS_WIDTH => far
+    for (let i = 0; i < 200; i++) cam.update(a, b);
+    expect(cam.zoom).toBeLessThan(1.0);
+  });
+
+  it('角色重叠时 zoom 接近 ZOOM_MAX (1.15)', () => {
+    const cam = new Camera();
+    const a = makeFighter(500);
+    const b = makeFighter(500); // distance = 0
+    for (let i = 0; i < 200; i++) cam.update(a, b);
+    expect(cam.zoom).toBeCloseTo(1.15, 1);
+  });
+
+  it('角色在两端时 zoom 接近 ZOOM_MIN (0.9)', () => {
+    const cam = new Camera();
+    const a = makeFighter(100);
+    const b = makeFighter(100 + CANVAS_WIDTH); // distance >= DISTANCE_MAX
+    for (let i = 0; i < 200; i++) cam.update(a, b);
+    expect(cam.zoom).toBeCloseTo(0.9, 1);
+  });
+});
+
+// ===================== 9. KO Zoom (4 tests) =====================
+describe('Camera — KO Zoom', () => {
+  it('triggerKOZoom 激活 KO zoom 状态', () => {
+    const cam = new Camera();
+    const a = makeFighter(400);
+    const b = makeFighter(600);
+    for (let i = 0; i < 100; i++) cam.update(a, b);
+
+    const zoomBeforeTrigger = cam.zoom;
+    cam.triggerKOZoom(500, 300);
+
+    // KO 触发后，下一次 update 应该进入 KO 分支（不再按 fighter 位置计算）
+    // 先记录 KO 前的位置
+    const xBeforeKO = cam.x;
+
+    // KO 期间 update 不应按 fighter 中点移动
+    a.x = 100;
+    b.x = 100;
+    cam.update(a, b);
+
+    // 摄像机应该朝 KO 目标移动，而不是朝 fighter 新位置
+    // KO 目标 X = 500 - CANVAS_WIDTH/2 = 100
+    // lerp 使 x 向 100 靠近
+    expect(cam.x).not.toBeCloseTo((100 + 100) / 2 - CANVAS_WIDTH / 2, 0);
+  });
+
+  it('KO 期间 zoom 逐渐接近 ZOOM_KO (1.3)', () => {
+    const cam = new Camera();
+    const a = makeFighter(400);
+    const b = makeFighter(600);
+    for (let i = 0; i < 100; i++) cam.update(a, b);
+
+    cam.triggerKOZoom(500, 300);
+
+    // KO duration = 60 帧，在 KO 期间 zoom 应该朝 1.3 增长
+    // 跑 55 帧（仍在 KO 期间）
+    for (let i = 0; i < 55; i++) cam.update(a, b);
+
+    // zoom 应该大于 KO 前的值（靠近时约 1.1），朝 1.3 增长
+    expect(cam.zoom).toBeGreaterThan(1.15);
+  });
+
+  it('KO timer 倒计到 0 后恢复普通模式', () => {
+    const cam = new Camera();
+    const a = makeFighter(400);
+    const b = makeFighter(600);
+    for (let i = 0; i < 100; i++) cam.update(a, b);
+
+    cam.triggerKOZoom(500, 300);
+
+    // 消耗掉全部 60 帧 KO duration
+    for (let i = 0; i < 60; i++) cam.update(a, b);
+
+    // KO 应该结束，后续 update 按正常距离计算
+    // 设置角色靠近
+    a.x = 500;
+    b.x = 500;
+    for (let i = 0; i < 200; i++) cam.update(a, b);
+
+    // zoom 应该回落到距离驱动的值（靠近时 > 1.0，但不是 1.3）
+    expect(cam.zoom).toBeGreaterThan(1.0);
+    expect(cam.zoom).toBeLessThan(1.25);
+  });
+
+  it('KO 后 zoom 回到 1.0（角色中等距离时）', () => {
+    const cam = new Camera();
+    const a = makeFighter(300);
+    const b = makeFighter(700);
+    for (let i = 0; i < 100; i++) cam.update(a, b);
+
+    cam.triggerKOZoom(500, 300);
+
+    // 消耗 KO duration
+    for (let i = 0; i < 60; i++) cam.update(a, b);
+
+    // 中等距离 ~400，应该在 1.0 附近
+    // zoom target = ZOOM_MAX - t*(ZOOM_MAX - ZOOM_MIN)
+    // t = (400 - 80) / (800 - 80) ≈ 0.444
+    // target = 1.15 - 0.444 * 0.25 ≈ 1.039
+    for (let i = 0; i < 200; i++) cam.update(a, b);
+    expect(cam.zoom).toBeCloseTo(1.039, 1);
+  });
+});
+
+// ===================== 10. Zoom Lerp 平滑性 (2 tests) =====================
+describe('Camera — Zoom Lerp 平滑性', () => {
+  it('zoom 变化平滑（不跳变）', () => {
+    const cam = new Camera();
+    const a = makeFighter(400);
+    const b = makeFighter(400);
+    // 初始收敛
+    for (let i = 0; i < 100; i++) cam.update(a, b);
+
+    // 现在角色靠得很近，zoom 应接近 ZOOM_MAX
+    // 突然拉开距离
+    b.x = 400 + CANVAS_WIDTH;
+
+    const zoomBefore = cam.zoom;
+    cam.update(a, b);
+    const zoomAfter = cam.zoom;
+
+    // zoom 不应该一步到位，变化量应很小
+    const zoomDelta = Math.abs(zoomAfter - zoomBefore);
+    expect(zoomDelta).toBeLessThan(0.1); // lerp 系数 0.08，最多变 ~8%
+  });
+
+  it('zoom 收敛到 target 值', () => {
+    const cam = new Camera();
+    const a = makeFighter(400);
+    const b = makeFighter(440);
+    // 给足够帧数让 zoom 完全收敛
+    for (let i = 0; i < 500; i++) cam.update(a, b);
+
+    // distance = 40 < DISTANCE_MIN => t = 0 => targetZoom = ZOOM_MAX = 1.15
+    expect(cam.zoom).toBeCloseTo(1.15, 2);
   });
 });
