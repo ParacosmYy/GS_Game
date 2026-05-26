@@ -589,3 +589,9 @@
 ## H141: ryo测试—9项验证RyoDef id/name/nameCn/color/winQuotes/stats/poses/moveList — 113→114
 
 **commit:** <hash> | ryo测试—9项验证RyoDef id/name/nameCn/color/winQuotes/stats/poses/moveList
+
+---
+
+## H142: roster测试—6项验证ROSTER数组+ryo/kyo/iori存在+id/name一致性 — 114→115
+
+**commit:** <hash> | roster测试—6项验证ROSTER数组+ryo/kyo/iori存在+id/name一致性
