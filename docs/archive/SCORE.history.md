@@ -253,3 +253,9 @@
 ## H90: core types枚举完整性测试—27项验证 — 62→63
 
 **commit:** <hash> | FighterState+AttackType(Ryo全覆盖)+HitHeight+JuggleState+ThrowTarget+GamePhase
+
+---
+
+## H91: roster验证测试—6项验证27角色 — 63→64
+
+**commit:** <hash> | 27角色+唯一ID+必填字段+Ryo存在性+Ryo属性
