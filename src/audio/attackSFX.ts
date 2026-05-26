@@ -32,6 +32,26 @@ export interface AttackSFXEntry {
 // At dispatch time, the most specific match wins (exact type > prefix > '*').
 
 export const ATTACK_SFX_TABLE: AttackSFXEntry[] = [
+  // ── Ryo normals — startup whoosh ──
+  { attackType: 'STAND_A', phase: 'startup', frame: 0, sfx: 'playWhoosh', priority: 2 },
+  { attackType: 'STAND_C', phase: 'startup', frame: 0, sfx: 'playHeavyWhoosh', priority: 2 },
+  { attackType: 'STAND_B', phase: 'startup', frame: 0, sfx: 'playWhoosh', priority: 2 },
+  { attackType: 'STAND_D', phase: 'startup', frame: 0, sfx: 'playHeavyWhoosh', priority: 2 },
+  { attackType: 'CLOSE_A', phase: 'startup', frame: 0, sfx: 'playWhoosh', priority: 2 },
+  { attackType: 'CLOSE_C', phase: 'startup', frame: 0, sfx: 'playHeavyWhoosh', priority: 2 },
+  { attackType: 'CLOSE_B', phase: 'startup', frame: 0, sfx: 'playWhoosh', priority: 2 },
+  { attackType: 'CLOSE_D', phase: 'startup', frame: 0, sfx: 'playHeavyWhoosh', priority: 2 },
+  { attackType: 'CROUCH_A', phase: 'startup', frame: 0, sfx: 'playWhoosh', priority: 2 },
+  { attackType: 'CROUCH_C', phase: 'startup', frame: 0, sfx: 'playHeavyWhoosh', priority: 2 },
+  { attackType: 'CROUCH_B', phase: 'startup', frame: 0, sfx: 'playWhoosh', priority: 2 },
+  { attackType: 'CROUCH_D', phase: 'startup', frame: 0, sfx: 'playHeavyWhoosh', priority: 2 },
+  { attackType: 'JUMP_A', phase: 'startup', frame: 0, sfx: 'playWhoosh', priority: 2 },
+  { attackType: 'JUMP_C', phase: 'startup', frame: 0, sfx: 'playHeavyWhoosh', priority: 2 },
+  { attackType: 'JUMP_B', phase: 'startup', frame: 0, sfx: 'playWhoosh', priority: 2 },
+  { attackType: 'JUMP_D', phase: 'startup', frame: 0, sfx: 'playHeavyWhoosh', priority: 2 },
+  { attackType: 'STAND_CD', phase: 'startup', frame: 0, sfx: 'playHeavyWhoosh', priority: 2 },
+  { attackType: 'JUMP_CD', phase: 'startup', frame: 0, sfx: 'playHeavyWhoosh', priority: 2 },
+
   // ── Ryo specials ──
   { attackType: 'RYO_KOOU', phase: 'startup', frame: 0, sfx: 'playSpecialLight', priority: 2 },
   { attackType: 'RYO_KOOU', phase: 'active', frame: 0, sfx: 'playSpecialHeavy', priority: 2 },
@@ -50,6 +70,10 @@ export const ATTACK_SFX_TABLE: AttackSFXEntry[] = [
   { attackType: 'DM_TEN_HA_OU', phase: 'startup', frame: 0, sfx: 'playSpecialLight', priority: 2 },
   { attackType: 'DM_TEN_HA_OU', phase: 'startup', frame: 6, sfx: 'playSpecialHeavy', priority: 3 },
   { attackType: 'DM_TEN_HA_OU', phase: 'active', frame: 0, sfx: 'playDM', priority: 4 },
+
+  // ── Kyo normals — startup whoosh ──
+  { attackType: 'KYO_STAND_A', phase: 'startup', frame: 0, sfx: 'playWhoosh', priority: 2 },
+  { attackType: 'KYO_STAND_C', phase: 'startup', frame: 0, sfx: 'playHeavyWhoosh', priority: 2 },
 
   // ── Kyo specials ──
   { attackType: 'KYO_ONIYAKI', phase: 'startup', frame: 0, sfx: 'playSpecialLight', priority: 2 },
@@ -122,6 +146,8 @@ export const ATTACK_SFX_TABLE: AttackSFXEntry[] = [
 
   // ── Universal wildcard (lowest priority, matches any attack) ──
   { attackType: '*', phase: 'active', frame: 0, sfx: 'playHit', priority: 1 },
+  // Universal startup whoosh — fallback for any attack without a specific startup SFX
+  { attackType: '*', phase: 'startup', frame: 0, sfx: 'playWhoosh', priority: 0 },
 ];
 
 // ===== Played tracker =====

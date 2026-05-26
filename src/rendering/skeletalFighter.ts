@@ -13,6 +13,43 @@ import { getOutfit, drawCharacterHead } from './skeletalParts.js';
 import { drawPixelTorso, drawPixelArm, drawPixelLeg, setBodyPartTick } from './bodyPartRenderer.js';
 import { getVictoryPose, drawVictoryVFX } from './victoryPose.js';
 
+// ===== State transition blending =====
+// Caches previous pose data per-fighter for smooth interpolation when state changes.
+
+interface TransitionState {
+  /** The state key (FighterState or attack key) on the previous render call */
+  prevState: string;
+  /** The fully-computed pose snapshot from the previous frame */
+  prevPose: Pose;
+  /** Remaining blend frames; decrements each call until 0 */
+  remaining: number;
+}
+
+/** How many frames to blend across when a state transition is detected */
+const TRANSITION_DURATION = 3;
+
+/**
+ * Blend factor per remaining frame.
+ * remaining=3 -> t=0.3, remaining=2 -> t=0.45, remaining=1 -> t=0.65
+ * Higher t = more of the new pose. This progression gives a nice ease-in feel.
+ */
+function blendFactor(remaining: number): number {
+  return 0.3 + (TRANSITION_DURATION - remaining) * 0.175;
+}
+
+/** Linear interpolation between two BonePose values */
+function lerpBone(a: BonePose, b: BonePose, t: number): BonePose {
+  return {
+    ox: a.ox + (b.ox - a.ox) * t,
+    oy: a.oy + (b.oy - a.oy) * t,
+    rot: a.rot + (b.rot - a.rot) * t,
+    scale: a.scale + (b.scale - a.scale) * t,
+  };
+}
+
+/** Module-level cache keyed by Fighter instance — no mutation to Fighter itself */
+const transitionCache = new WeakMap<Fighter, TransitionState>();
+
 /** Draw skeletal body using 6-bone pose system — enhanced rendering */
 export function drawSkeletalFighter(
   ctx: CanvasRenderingContext2D,
@@ -595,6 +632,51 @@ export function drawSkeletalFighter(
     p.body.oy -= 2;
     p.legFront.oy += 2;
   }
+
+  // === State transition blending ===
+  // Determine the composite state key (state + attack phase) for this frame.
+  const currentStateKey = `${f.state}:${f.currentAttack ?? ''}:${f.attackPhase ?? ''}`;
+
+  const cached = transitionCache.get(f);
+  if (cached) {
+    if (cached.prevState !== currentStateKey) {
+      // State changed — snapshot the previous pose as the blend source.
+      // We snapshot the pose *before* the current mutations, so we must use
+      // the last-frame snapshot.  cached.prevPose already holds that.
+      // Re-initialise with the CURRENT pose as the old pose so blending starts
+      // from where the character just was.  However, we already mutated `p`
+      // above for the NEW state, so we need the PREVIOUS frame's final pose.
+      // That's what cached.prevPose already is.  Reset the counter.
+      cached.remaining = TRANSITION_DURATION;
+      cached.prevState = currentStateKey;
+      // prevPose keeps its value (the last-frame snapshot) so blending can start.
+    }
+
+    if (cached.remaining > 0) {
+      const t = blendFactor(cached.remaining);
+      p.head   = lerpBone(cached.prevPose.head,   p.head,   t);
+      p.body   = lerpBone(cached.prevPose.body,   p.body,   t);
+      p.armFront = lerpBone(cached.prevPose.armFront, p.armFront, t);
+      p.armBack  = lerpBone(cached.prevPose.armBack,  p.armBack,  t);
+      p.legFront = lerpBone(cached.prevPose.legFront, p.legFront, t);
+      p.legBack  = lerpBone(cached.prevPose.legBack,  p.legBack,  t);
+      cached.remaining--;
+    }
+  }
+
+  // Snapshot the current (post-blend) pose for next frame's potential transition.
+  transitionCache.set(f, {
+    prevState: currentStateKey,
+    prevPose: {
+      head:     { ...p.head },
+      body:     { ...p.body },
+      armFront: { ...p.armFront },
+      armBack:  { ...p.armBack },
+      legFront: { ...p.legFront },
+      legBack:  { ...p.legBack },
+    },
+    remaining: cached?.remaining ?? 0,
+  });
 
   // === Per-character body dimensions ===
   const headW = prop.headW, headH = prop.headH;

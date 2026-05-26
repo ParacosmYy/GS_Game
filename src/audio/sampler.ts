@@ -21,7 +21,8 @@ type SampleId =
   | 'accent_fire' | 'accent_purple' | 'accent_ice' | 'accent_generic'
   | 'dizzy_hit' | 'ground_bounce'
   | 'perfect_ko' | 'round_start' | 'time_up'
-  | 'battle_bgm';
+  | 'battle_bgm'
+  | 'whoosh' | 'whoosh_heavy' | 'footstep' | 'jump' | 'landing_normal';
 
 const samples = new Map<SampleId, AudioBuffer>();
 let initialized = false;
@@ -1272,6 +1273,113 @@ function renderTimeUp(sr: number): Float32Array {
   return normalize(combined);
 }
 
+// === 运动音效：挥拳风声 / 脚步 / 跳跃 / 落地 ===
+
+// 挥拳风声(轻)：短促的空气切割声，用于轻攻击startup帧
+// 特征：高频带通噪声快速扫过 + 短促的sawtooth上扫
+function renderWhoosh(sr: number): Float32Array {
+  const dur = 0.07;
+  // 高频噪声带 — 空气切割主体
+  const noiseHi = bandPass(renderNoise(sr, dur, t => expDecay(t, 0.15, 45)), sr, 3000, 9000);
+  // 中高频sawtooth上扫 — 挥拳的"嗖"感
+  const sweep = renderOsc(sr, dur, 'sawtooth', t => 800 + 12000 * t, t => expDecay(t, 0.12, 50));
+  // 宽频空气噪声 — 补充质感
+  const air = highPass(renderNoise(sr, dur * 0.7, t => expDecay(t, 0.08, 55)), sr, 2000);
+  // 短促三角波瞬态 — 挥拳起手的清脆感
+  const snap = renderOsc(sr, dur * 0.4, 'triangle', t => 2000 - 30000 * t, t => expDecay(t, 0.1, 60));
+
+  const total = Math.ceil(sr * dur);
+  const snapP = padTo(snap, total);
+
+  return normalize(mixLayers([noiseHi, sweep, air, snapP], [0.8, 0.6, 0.5, 0.4]));
+}
+
+// 蓄力气声(重)：更沉重更长的大幅挥拳风声，用于重攻击startup帧
+// 特征：低频冲击 + 中频呼啸 + 高频撕裂感，蓄力后释放
+function renderWhooshHeavy(sr: number): Float32Array {
+  const dur = 0.14;
+  // 低频体感 — 重挥拳的"呼"声底层
+  const body = renderOsc(sr, dur, 'sine', t => 120 - 800 * t, t => expDecay(t, 0.2, 18));
+  // 中频呼啸噪声 — 更宽的挥拳范围
+  const noiseMid = bandPass(renderNoise(sr, dur, t => expDecay(t, 0.18, 20)), sr, 600, 3500);
+  // 高频撕裂噪声 — 重击的空气撕裂
+  const noiseHi = highPass(renderNoise(sr, dur * 0.7, t => expDecay(t, 0.1, 25)), sr, 4000);
+  // 蓄力上扫sawtooth — 挥拳前的能量蓄积
+  const charge = renderOsc(sr, dur * 0.6, 'sawtooth', t => 200 + 8000 * t, t => t < 0.03 ? t * 5 : expDecay(t - 0.03, 0.15, 30));
+  // 释放瞬态 — 蓄力后的突然释放
+  const release = renderOsc(sr, dur * 0.5, 'triangle', t => 1500 - 20000 * t, t => expDecay(t, 0.12, 35));
+  // 低频冲击波 — 重攻击的力道感
+  const impact = renderOsc(sr, dur * 0.8, 'sine', t => 80 - 500 * t, t => t < 0.04 ? 0 : expDecay(t - 0.04, 0.2, 12));
+
+  const total = Math.ceil(sr * dur);
+  const chargeP = padTo(charge, total);
+  const releaseP = padTo(release, total);
+  const impactP = padTo(impact, total, Math.floor(sr * 0.03));
+
+  return normalize(mixLayers([body, noiseMid, noiseHi, chargeP, releaseP, impactP], [0.9, 1, 0.5, 0.7, 0.6, 0.8]));
+}
+
+// 脚步声：低通噪声 + 短促低频冲击，模拟鞋底踏地
+// 区别于step：更丰富层次，有明显的脚跟/脚掌两层
+function renderFootstep(sr: number): Float32Array {
+  const dur = 0.06;
+  // 脚跟冲击 — 短促低频"咚"
+  const heel = renderOsc(sr, dur, 'sine', t => 150 - 2000 * t, t => expDecay(t, 0.15, 40));
+  // 脚掌摩擦 — 低通噪声，鞋底与地面接触
+  const sole = lowPass(renderNoise(sr, dur, t => expDecay(t, 0.08, 45)), sr, 1200);
+  // 中高频瞬态 — 鞋底与地面的清脆接触
+  const snap = renderOsc(sr, dur * 0.35, 'triangle', t => 600 - 10000 * t, t => expDecay(t, 0.08, 55));
+  // 低频体感 — 踏地的重量
+  const weight = renderOsc(sr, dur * 0.7, 'sine', t => 80 - 500 * t, t => expDecay(t, 0.12, 30));
+
+  const total = Math.ceil(sr * dur);
+  const snapP = padTo(snap, total);
+
+  return normalize(mixLayers([heel, sole, snapP, weight], [1, 0.6, 0.35, 0.7]));
+}
+
+// 跳跃起跳音：上升音调的短促"嗖"声
+// 特征：从低频快速上升到高频，模拟腿部发力离地的感觉
+function renderJump(sr: number): Float32Array {
+  const dur = 0.1;
+  // 上升正弦波 — 离地时的发力感
+  const rise = renderOsc(sr, dur, 'sine', t => 150 + 4000 * t, t => expDecay(t, 0.15, 22));
+  // 脚掌离地噪声 — 短促的摩擦
+  const noise = bandPass(renderNoise(sr, dur * 0.6, t => expDecay(t, 0.1, 30)), sr, 800, 3000);
+  // 高频上扫 — 空气感
+  const air = renderOsc(sr, dur * 0.8, 'sawtooth', t => 400 + 8000 * t, t => expDecay(t, 0.08, 35));
+  // 起跳瞬态冲击 — 脚尖蹬地
+  const push = renderOsc(sr, dur * 0.3, 'triangle', t => 300 - 5000 * t, t => expDecay(t, 0.12, 45));
+
+  const total = Math.ceil(sr * dur);
+  const noiseP = padTo(noise, total);
+  const airP = padTo(air, total);
+  const pushP = padTo(push, total);
+
+  return normalize(mixLayers([rise, noiseP, airP, pushP], [1, 0.5, 0.4, 0.55]));
+}
+
+// 普通落地音(非KO/非重击)：比landing稍重，比landing_heavy轻
+// 区别于landing：更丰富的层次感，有明显的着地双段(脚尖→全脚掌)
+function renderLandingNormal(sr: number): Float32Array {
+  const dur = 0.12;
+  // 脚尖着地 — 第一段较轻的低频
+  const toeDown = renderOsc(sr, dur * 0.5, 'sine', t => 180 - 1500 * t, t => expDecay(t, 0.15, 30));
+  // 全脚掌落地 — 第二段较重的冲击
+  const footFlat = renderOsc(sr, dur, 'sine', t => 100 - 900 * t, t => t < 0.015 ? 0 : expDecay(t - 0.015, 0.2, 18));
+  // 地面尘土噪声 — 着地扬尘
+  const dust = lowPass(renderNoise(sr, dur * 0.5, t => t < 0.01 ? 0 : expDecay(t - 0.01, 0.08, 22)), sr, 1500);
+  // 低频体感 — 着地的重量感
+  const weight = renderOsc(sr, dur * 0.8, 'sine', t => 65 - 400 * t, t => t < 0.015 ? 0 : expDecay(t - 0.015, 0.18, 14));
+
+  const total = Math.ceil(sr * dur);
+  const toeDownP = padTo(toeDown, total);
+  const dustP = padTo(dust, total);
+  const weightP = padTo(weight, total);
+
+  return normalize(mixLayers([toeDownP, footFlat, dustP, weightP], [0.7, 1, 0.5, 0.8]));
+}
+
 // === 基础 BGM 框架 ===
 
 // 生成简单循环战斗BGM
@@ -1477,6 +1585,12 @@ export function initSampler(): void {
     ['time_up', renderTimeUp],
     // 基础BGM
     ['battle_bgm', generateBattleBGM],
+    // 运动音效：挥拳风声 / 脚步 / 跳跃 / 落地
+    ['whoosh', renderWhoosh],
+    ['whoosh_heavy', renderWhooshHeavy],
+    ['footstep', renderFootstep],
+    ['jump', renderJump],
+    ['landing_normal', renderLandingNormal],
   ];
 
   for (const [id, renderer] of renderers) {
@@ -1671,3 +1785,20 @@ export function getBattleBGM(): AudioBuffer | null {
 export function _getSamples(): Map<SampleId, AudioBuffer> { return samples; }
 /** 导出SampleId类型用于测试 */
 export type { SampleId };
+
+// === 运动音效公开 API ===
+
+/** 播放挥拳风声 — 轻攻击startup帧使用 */
+export function playWhoosh(): void { initSampler(); play('whoosh', 0.6); }
+
+/** 播放蓄力气声 — 重攻击startup帧使用 */
+export function playHeavyWhoosh(): void { initSampler(); play('whoosh_heavy', 0.65); }
+
+/** 播放脚步声 — idle/walk/run帧切换时触发 */
+export function playFootstep(): void { initSampler(); play('footstep', 0.4); }
+
+/** 播放起跳音效 — 角色离地瞬间触发 */
+export function playJump(): void { initSampler(); play('jump', 0.55); }
+
+/** 播放普通落地音效 — 角色从跳跃落地时触发(非KO/非重落地) */
+export function playLandingNormal(): void { initSampler(); play('landing_normal', 0.55); }

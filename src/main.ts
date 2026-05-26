@@ -26,8 +26,9 @@ import { SelectState } from './state/selectState.js';
 import { RoundState } from './state/roundState.js';
 import { DMManager } from './combat/dmManager.js';
 import { createHitCallback, triggerKOGroundEffect } from './combat/hitCallback.js';
-import { initAudio, initSampler, playKO, playVictoryFanfare, playMAXActivation, playPerfect, playThrowEscape, playFight, playRoll, playCancel, playQuickStand, playGuardCrush, playHit, playSpecialLight, playSpecialHeavy, playDM } from './audio/sampler.js';
+import { initAudio, initSampler, playKO, playVictoryFanfare, playMAXActivation, playPerfect, playThrowEscape, playFight, playRoll, playCancel, playQuickStand, playGuardCrush, playHit, playSpecialLight, playSpecialHeavy, playDM, playWhoosh, playHeavyWhoosh } from './audio/sampler.js';
 import { tickAttackSFX } from './audio/attackSFX.js';
+import { tickMotionSFX } from './audio/motionSFX.js';
 import { createTeam, defeatActive, switchToNext, activeChar, teamOrderString, type TeamState } from './state/teamState.js';
 import { resolveSimplified } from './input/simplifiedInput.js';
 import { bgm } from './audio/bgm.js';
@@ -595,7 +596,7 @@ function update(): void {
   combatSystem.tickThrowState(p1, p2, onHit);
 
   // Per-frame SFX dispatch: play whoosh/impact sounds at specific attack frames
-  const attackSampler = { playHit, playSpecialLight, playSpecialHeavy, playDM };
+  const attackSampler = { playHit, playSpecialLight, playSpecialHeavy, playDM, playWhoosh, playHeavyWhoosh };
   tickAttackSFX(p1, attackSampler, 0);
   tickAttackSFX(p2, attackSampler, 1);
 
@@ -681,6 +682,9 @@ function update(): void {
   });
 
   updateMovementVfx([p1, p2], vfx, tickRef.value);
+
+  // Motion SFX: footstep, jump, landing sounds based on state transitions
+  tickMotionSFX([p1, p2], tickRef.value);
 
   // Dizzy stars: spawn periodically for fighters in DIZZY state
   for (const f of [p1, p2]) {
