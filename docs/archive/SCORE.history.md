@@ -1061,3 +1061,9 @@
 ## H212: teamState—5项验证队伍创建/切换/淘汰逻辑 — 184→185
 
 **commit:** <hash> | teamState—5项验证队伍创建/切换/淘汰逻辑
+
+---
+
+## H213: selectState—5项验证选人界面常量 — 185→186
+
+**commit:** <hash> | selectState—5项验证选人界面常量

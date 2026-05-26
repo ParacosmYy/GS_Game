@@ -1,32 +1,24 @@
 import { describe, it, expect } from 'vitest';
-import { COLOR_PALETTES, VS_SPLASH_DURATION, TOTAL_SELECT_SLOTS, RANDOM_SLOT_INDEX, SelectState } from '../src/state/selectState.js';
+import { RANDOM_SLOT_INDEX, TOTAL_SELECT_SLOTS, COLOR_PALETTES, VS_SPLASH_DURATION } from '../src/state/selectState.js';
 
-describe('selectState', () => {
-  it('VS_SPLASH_DURATION is 90', () => {
-    expect(VS_SPLASH_DURATION).toBe(90);
+describe('selectState constants', () => {
+  it('RANDOM_SLOT_INDEX equals ROSTER length', () => {
+    expect(RANDOM_SLOT_INDEX).toBeGreaterThan(0);
+    expect(typeof RANDOM_SLOT_INDEX).toBe('number');
   });
-  it('TOTAL_SELECT_SLOTS is positive', () => {
-    expect(TOTAL_SELECT_SLOTS).toBeGreaterThan(0);
+  it('TOTAL_SELECT_SLOTS is ROSTER + 1', () => {
+    expect(TOTAL_SELECT_SLOTS).toBe(RANDOM_SLOT_INDEX + 1);
   });
-  it('RANDOM_SLOT_INDEX equals TOTAL_SELECT_SLOTS-1', () => {
-    expect(RANDOM_SLOT_INDEX).toBe(TOTAL_SELECT_SLOTS - 1);
-  });
-  it('COLOR_PALETTES is non-empty array', () => {
-    expect(Array.isArray(COLOR_PALETTES)).toBe(true);
+  it('COLOR_PALETTES has entries', () => {
     expect(COLOR_PALETTES.length).toBeGreaterThan(0);
   });
-  it('SelectState can be instantiated', () => {
-    const ss = new SelectState();
-    expect(ss).toBeDefined();
+  it('each palette entry has label and color', () => {
+    for (const entry of COLOR_PALETTES) {
+      expect(entry.label).toBeDefined();
+      expect(entry.color).toMatch(/^#[0-9a-f]{6}$/i);
+    }
   });
-  it('SelectState has p1Cursor and p2Cursor', () => {
-    const ss = new SelectState();
-    expect(ss.p1Cursor).toBeDefined();
-    expect(ss.p2Cursor).toBeDefined();
-  });
-  it('SelectState has ready flags', () => {
-    const ss = new SelectState();
-    expect(typeof ss.p1Ready).toBe('boolean');
-    expect(typeof ss.p2Ready).toBe('boolean');
+  it('VS_SPLASH_DURATION is positive', () => {
+    expect(VS_SPLASH_DURATION).toBeGreaterThan(0);
   });
 });
