@@ -410,16 +410,20 @@ function renderCounter(sr: number): Float32Array {
 }
 
 function renderGuardCrush(sr: number): Float32Array {
-  const dur = 0.2;
-  const noise = highPass(renderNoise(sr, dur, t => expDecay(t, 0.35, 9)), sr, 1500);
-  const crunch = renderOsc(sr, dur, 'square', t => 300 - 2200 * t, t => expDecay(t, 0.35, 10));
-  const ring = renderOsc(sr, 0.14, 'sine', t => 2000 - 12000 * t, t => expDecay(t, 0.09, 13));
-  const crack = renderOsc(sr, 0.05, 'sawtooth', t => 3500 - 70000 * t, t => expDecay(t, 0.17, 35));
-  // 碎片散落质感
-  const debris = highPass(renderNoise(sr, 0.08, t => t < 0.01 ? 0 : expDecay(t - 0.01, 0.1, 18)), sr, 3000);
-  const ringP = padTo(ring, Math.ceil(sr * dur));
-  const debrisP = padTo(debris, Math.ceil(sr * dur), Math.floor(sr * 0.04));
-  return normalize(mixLayers([noise, crunch, ringP, crack, debrisP], [1, 1, 0.3, 0.5, 0.35]));
+  const dur = 0.15;
+  // 白噪声 — 金属碎裂的主体质感
+  const noise = highPass(renderNoise(sr, dur, t => expDecay(t, 0.4, 12)), sr, 1500);
+  // 高频共振(2kHz) — 金属碎片共鸣，快速衰减
+  const resonance = renderOsc(sr, dur, 'sine', t => 2000 - 10000 * t, t => expDecay(t, 0.15, 18));
+  // 尖锐裂纹瞬态
+  const crack = renderOsc(sr, 0.04, 'square', t => 4000 - 80000 * t, t => expDecay(t, 0.2, 40));
+  // 低频冲击层 — 碎裂的沉重感
+  const impact = renderOsc(sr, dur * 0.6, 'sine', t => 150 - 1200 * t, t => expDecay(t, 0.3, 14));
+  // 碎片散落噪声
+  const debris = highPass(renderNoise(sr, 0.06, t => t < 0.008 ? 0 : expDecay(t - 0.008, 0.12, 20)), sr, 3500);
+  const resonanceP = padTo(resonance, Math.ceil(sr * dur));
+  const debrisP = padTo(debris, Math.ceil(sr * dur), Math.floor(sr * 0.03));
+  return normalize(mixLayers([noise, resonanceP, crack, impact, debrisP], [1, 1, 0.6, 0.7, 0.4]));
 }
 
 function renderChip(sr: number): Float32Array {
@@ -430,16 +434,34 @@ function renderChip(sr: number): Float32Array {
 }
 
 function renderWallBounce(sr: number): Float32Array {
-  const dur = 0.18;
-  const metal = renderOsc(sr, dur, 'square', t => 600 - 4000 * t, t => expDecay(t, 0.22, 10));
-  const noise = bandPass(renderNoise(sr, 0.12, t => expDecay(t, 0.14, 12)), sr, 1000, 4000);
-  const debris = highPass(renderNoise(sr, 0.05, t => t < 0.003 ? 0 : expDecay(t - 0.003, 0.1, 22)), sr, 3000);
+  const dur = 0.1;
+  // 低频撞击(150Hz) — 墙壁撞击的厚重主体
+  const impact = renderOsc(sr, dur, 'sine', t => 150 - 800 * t, t => expDecay(t, 0.4, 16));
+  // 噪声层 — 撞击的粗糙质感
+  const noise = bandPass(renderNoise(sr, dur, t => expDecay(t, 0.2, 18)), sr, 800, 3500);
+  // 高频碎片瞬态
+  const debris = highPass(renderNoise(sr, 0.03, t => expDecay(t, 0.15, 30)), sr, 4000);
   // 金属回声
-  const echo = renderOsc(sr, 0.08, 'sine', t => 800 - 5000 * t, t => expDecay(t, 0.06, 18));
-  const noiseP = padTo(noise, Math.ceil(sr * dur));
-  const debrisP = padTo(debris, Math.ceil(sr * dur), Math.floor(sr * 0.03));
-  const echoP = padTo(echo, Math.ceil(sr * dur), Math.floor(sr * 0.06));
-  return normalize(mixLayers([metal, noiseP, debrisP, echoP], [1, 0.6, 0.4, 0.3]));
+  const echo = renderOsc(sr, 0.05, 'sine', t => 600 - 4000 * t, t => expDecay(t, 0.08, 22));
+  const debrisP = padTo(debris, Math.ceil(sr * dur));
+  const echoP = padTo(echo, Math.ceil(sr * dur), Math.floor(sr * 0.03));
+  return normalize(mixLayers([impact, noise, debrisP, echoP], [1.2, 0.7, 0.4, 0.3]));
+}
+
+// 地面弹跳声 — 中频弹跳(300Hz) + 快速衰减
+function renderGroundBounce(sr: number): Float32Array {
+  const dur = 0.1;
+  // 中频弹跳(300Hz) — 地面反弹的主体音
+  const bounce = renderOsc(sr, dur, 'sine', t => 300 - 2500 * t, t => expDecay(t, 0.3, 22));
+  // 低频体感 — 弹跳的重量感
+  const body = renderOsc(sr, dur * 0.6, 'sine', t => 100 - 600 * t, t => expDecay(t, 0.25, 18));
+  // 尘土噪声 — 地面摩擦质感
+  const dust = lowPass(renderNoise(sr, dur * 0.5, t => expDecay(t, 0.08, 25)), sr, 1500);
+  // 高频瞬态 — 弹跳的清脆感
+  const snap = renderOsc(sr, 0.02, 'triangle', t => 2000 - 30000 * t, t => expDecay(t, 0.15, 45));
+  const dustP = padTo(dust, Math.ceil(sr * dur));
+  const snapP = padTo(snap, Math.ceil(sr * dur));
+  return normalize(mixLayers([bounce, body, dustP, snapP], [1, 0.8, 0.5, 0.4]));
 }
 
 function renderCancel(sr: number): Float32Array {
@@ -1072,31 +1094,6 @@ function renderDizzyHit(sr: number): Float32Array {
     [impact, body, echo1P, echo2P, hollowP, starsP],
     [0.8, 0.7, 0.5, 0.3, 0.45, 0.35]
   ));
-}
-
-// Ground Bounce：地面弹跳声 — 角色从地面弹起时播放
-// 特征：低频冲击 + 弹性反馈 + 地面摩擦
-function renderGroundBounce(sr: number): Float32Array {
-  const dur = 0.18;
-  // 低频着地冲击 — "砰"
-  const thud = renderOsc(sr, dur, 'sine', t => 80 - 600 * t, t => expDecay(t, 0.2, 15));
-  // 弹性反馈 — 上升的频率曲线模拟弹性
-  const bounce = renderOsc(sr, dur * 0.6, 'triangle',
-    t => 150 + 800 * t - 2000 * t * t,
-    t => expDecay(t, 0.15, 18));
-  // 地面摩擦噪声 — 中低频
-  const friction = bandPass(renderNoise(sr, 0.08, t => expDecay(t, 0.12, 22)), sr, 400, 2000);
-  // 子低音弹跳脉冲
-  const subBounce = renderOsc(sr, 0.12, 'sine', t => 50 - 30 * t, t => expDecay(t, 0.3, 8));
-  // 碎片飞溅 — 高频短暂
-  const debris = highPass(renderNoise(sr, 0.03, t => expDecay(t, 0.1, 40)), sr, 5000);
-
-  const total = Math.ceil(sr * dur);
-  const bounceP = padTo(bounce, total);
-  const frictionP = padTo(friction, total);
-  const debrisP = padTo(debris, total);
-
-  return normalize(mixLayers([thud, bounceP, frictionP, subBounce, debrisP], [1, 0.7, 0.6, 0.8, 0.3]));
 }
 
 // === 初始化：预渲染所有采样 ===

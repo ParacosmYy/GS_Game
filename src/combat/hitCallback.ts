@@ -10,7 +10,7 @@ import { FRAME_DATA, STAGE_WIDTH, MAX_STOCKS, METER_PER_STOCK } from '../core/co
 import { ROSTER } from '../characters/index.js';
 import { isDM as isDMCheck } from '../core/attackClassifier.js';
 import { gainMeterOnHit, gainMeterOnBlock, gainMeterOnHitstun } from './meter.js';
-import { playHit, playBlock, playSpecial, playDM, playThrow, playCounter, playHeavyHit, playSuperFlash, playWire, playJuggleHit, playBlockSpecial, playBlockDM, playSpecialLight, playSpecialHeavy, playKOHit, playHitAccent, playLandingHeavy, playDizzyHit, playGroundBounce } from '../audio/sampler.js';
+import { playHit, playBlock, playSpecial, playDM, playThrow, playCounter, playHeavyHit, playSuperFlash, playWire, playJuggleHit, playBlockSpecial, playBlockDM, playSpecialLight, playSpecialHeavy, playKOHit, playHitAccent, playLandingHeavy, playDizzyHit, playGroundBounce, playWallBounce, playGuardCrush } from '../audio/sampler.js';
 import { bgm } from '../audio/bgm.js';
 import type { CinematicState } from '../state/cinematicState.js';
 
@@ -163,6 +163,11 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       if (blkDM) playBlockDM();
       else if (blkSpecial) playBlockSpecial();
       else playBlock(blkHeavy);
+      // Guard Crush: 防御槽耗尽时播放金属碎裂声
+      // (onGuardCrush回调在main.ts中也会触发VFX，此处补充SFX)
+      if (defender.state === FighterState.GUARD_CRUSH) {
+        playGuardCrush();
+      }
       return;
     }
 
@@ -362,6 +367,15 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       deps.vfx.spawnCharacterHitSparks(hitX, hitY, 6, '#ffffff', 0.7, 0.9, 0.1, false, attacker.facing);
       deps.screenFlash.trigger('#ffcc44', 0.1, 3);
       deps.screenShake.trigger(5, 7, getAttackDirectionBias(attacker, defender, attackType, counterHit));
+    }
+
+    // 壁弹(Counter Wire / CD击飞): 飞向墙壁时播放撞击声
+    if (defender.isCounterWire) {
+      playWallBounce();
+    }
+    // 地面弹跳: 角色从地面弹起时播放弹跳声
+    if (defender.isGroundBounce) {
+      playGroundBounce();
     }
 
     // Dizzy: if defender just entered DIZZY state, dramatic flash and burst

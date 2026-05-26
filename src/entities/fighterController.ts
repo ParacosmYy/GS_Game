@@ -28,6 +28,7 @@ import {
 import { FighterState, AttackType, CLOSE_RANGE, JuggleState } from '../core/types.js';
 import type { PowerGauge, MaxModeState, CounterConfig } from '../core/types.js';
 import { spendStocks } from '../combat/meter.js';
+import { playWallBounce, playGroundBounce } from '../audio/sampler.js';
 import type { VFXSystem } from '../rendering/vfx.js';
 import type { FighterCtx } from './stateContext.js';
 import {
@@ -162,6 +163,8 @@ export class FighterController {
         this.vfx.spawnCounterWireSparks(wallX, f.y - f.displayHeight / 2);
         f.juggleState = JuggleState.FULL;
         f.jugglePoints = 3;
+        // Wall bounce SFX
+        playWallBounce();
       }
     } else if (f.state === FighterState.HITSTUN || f.state === FighterState.BLOCK
         || f.state === FighterState.KNOCKDOWN || f.state === FighterState.GUARD_CRUSH) {
@@ -216,6 +219,8 @@ export class FighterController {
           f.state = FighterState.HITSTUN;
           f.hitstunTimer = f.groundBounceTimer;
           this.vfx.spawnDust(f.x, STAGE_GROUND_Y);
+          // Ground bounce SFX
+          playGroundBounce();
         } else if (this.recoveryRollRequested) {
           f.state = FighterState.IDLE;
           f.isKnockedDown = false;
