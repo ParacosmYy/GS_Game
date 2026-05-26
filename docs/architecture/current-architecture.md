@@ -1,41 +1,55 @@
 # 当前架构
 
-本文描述当前真实代码结构。它是执行约束，不是未来愿景。
+本文描述当前真实工程结构，并指出下一阶段应如何收敛。
 
-## 技术栈
+## 1. 技术栈
 
-- TypeScript + Vite + HTML5 Canvas 2D
-- Vitest 测试
-- 浏览器运行，当前不依赖外部黑盒游戏引擎
+- TypeScript。
+- Vite。
+- HTML5 Canvas 2D。
+- Vitest。
 
-## 当前目录职责
+当前不换栈。优先把角色资产、动作帧、判定帧和反馈数据拆干净。
+
+## 2. 主要目录
 
 ```text
 src/
-  main.ts        组装模块、驱动游戏循环和阶段分发
-  core/          基础类型、常量、帧数据、RNG、回放日志、相机
-  engine/        固定步长循环和可复用引擎雏形
-  input/         原始输入、方向解析、指令缓冲、输入 provider
-  entities/      Fighter / Projectile 实体和通用状态处理
-  combat/        命中判定、伤害、气槽、DM、命中回调
-  characters/    角色定义、招式路由、角色数据
-  state/         游戏阶段、选人、回合、队伍、演出状态
-  rendering/     Canvas 渲染、HUD、舞台、角色绘制、VFX、肖像
-  audio/         音频上下文、BGM、采样/合成音效、播报
-  ai/            AI 决策和角色路线
+  core/          类型、常量、帧数据、manifest、回放数据
+  state/         游戏阶段、回合、演出状态
+  combat/        判定、伤害、能量、命中事件
+  entities/      Fighter、Projectile 等实体
+  characters/    角色定义和招式路由
+  input/         输入采样、解析、指令缓冲
+  rendering/     Canvas 绘制、HUD、舞台、角色 fallback
+  audio/         音效、BGM、播报
+  ai/            AI 决策
 ```
 
-## 当前重要事实
+## 3. 当前关键问题
 
-- 角色仍处于程序化绘制和占位 sprite 混合阶段，尚未完成正版逐帧 sprite 资产管线。
-- `references/mugen/` 是参考资料和工具来源，不是运行时代码。
-- `core/replaySession.ts`、`core/replayInputSource.ts` 已开始形成可复现链路。
-- `main.ts` 仍承担较多流程编排，后续应继续向 `state/` 收口。
+- `characters/` 角色数量较多，但角色完整性不足。
+- `rendering/` 仍有大量骨骼、像素块、placeholder 渲染。
+- `core/*Manifest*` 已有结构，但真实资产接管不足。
+- `combat/` 和 frame data 已有基础，但 hit feedback 还未形成统一矩阵。
+- 文件体积偏大，后续只在服务 Ryo 样板时拆分。
 
-## 当前优先整理方向
+## 4. 下一阶段架构方向
 
-1. 让角色、帧数据、动画、判定框逐步数据化。
-2. 让资产转换和 sprite sheet 生成进入工具链，而不是运行时。
-3. 保持回放、RNG、输入链路可复现。
-4. 保持战斗逻辑与渲染、音频、调试 UI 分离。
+围绕 [Ryo Vertical Slice](../product/ryo-vertical-slice-plan.md) 做：
 
+- 把 Ryo 肖像接入 portrait manifest。
+- 把 Ryo sprite 接入 sprite atlas manifest。
+- 把 Ryo 动作接入 animation manifest。
+- 把 Ryo 判定接入 hitbox manifest。
+- 把 Ryo 命中事件接入 feedback manifest。
+- 用 Frame Contract 连接 rendering/combat/audio/vfx。
+
+## 5. 保持边界
+
+- `core/` 可定义纯数据和纯查询。
+- `combat/` 不导入 `rendering/`。
+- `rendering/` 不决定命中。
+- `audio/` 不决定战斗结果。
+- `tools/` 负责离线资产工作。
+- `characters/` 不承担通用系统职责。

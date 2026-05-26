@@ -1,38 +1,59 @@
-# 角色完整性
+# 角色完整性标准
 
-## 完整角色定义
+本文定义一个角色何时算“完整”。当前只对 Ryo 强制执行。
 
-一个可结算为“完整”的角色至少包含：
+## 1. 完整角色定义
 
-- 站立近/远 A/B/C/D
-- 蹲 A/B/C/D
-- 跳 A/B/C/D
-- 站 CD / 空中 CD
-- 前投 / 后投
-- 至少 1 个命令通常技
-- 至少 2 个必杀技，区分轻重版本
-- 至少 1 个 DM / SDM 路径
-- startup / active / recovery / damage / hitstun / blockstun / pushback
-- hitbox / hurtbox / throwbox / pushbox
-- 取消窗口
-- 命中/防御特效事件引用
-- 头像、站姿、走路、受击、倒地、胜利姿势
-- 至少 2 套配色
+一个完整角色必须具备：
 
-## 样板优先
+- 肖像：select、HUD、VS、win。
+- 基础动作：idle、walk、jump、crouch、turn。
+- 攻击动作：轻/重/蹲/跳/必杀/超必杀。
+- 受击动作：站受击、蹲受击、空中受击、倒地、起身。
+- 判定数据：pushbox、hurtbox、hitbox、throwbox。
+- 输入数据：普通技、特殊技、必杀、DM。
+- 反馈数据：light/heavy/special/DM。
+- 音频事件：挥拳、命中、防御、倒地、胜利。
+- 胜利与失败表现。
 
-默认样板顺序：
+## 2. 当前 Ryo 最小完整性
 
-1. Ryo
-2. Kyo
-3. Iori
+Ryo 第一阶段只要求：
 
-样板未完成时，不应盲目扩角色数量。
+- select 肖像。
+- HUD 肖像。
+- idle。
+- walk_forward。
+- walk_backward。
+- jump。
+- stand_a。
+- stand_c。
+- hurt。
+- knockdown。
+- light feedback。
+- heavy feedback。
+- hitbox/hurtbox 数据可读。
+- fallback 可用。
 
-## 数据驱动
+## 3. 完整度报告
 
-- 角色差异写在角色定义或数据文件。
-- 通用机制写在引擎/系统层。
-- 两个以上角色共享的行为应抽象为模板或共享 helper。
-- 不允许为了新增角色修改通用状态机的角色硬编码。
+后续应提供工具输出：
 
+```text
+Ryo completeness:
+- portrait: select OK, hud OK, vs missing, win missing
+- animation: idle OK, walk_forward OK, stand_a OK, stand_c missing
+- hitbox: stand_a OK, stand_c missing
+- feedback: light OK, heavy missing
+- fallback: available
+```
+
+## 4. 扩展规则
+
+在 Ryo 最小完整性达标前：
+
+- 不新增角色。
+- 不宣称全角色优化完成。
+- 不把 Kyo/Iori 作为主线。
+
+Ryo 达标后，Kyo/Iori 使用同一份完整性标准。

@@ -1,47 +1,84 @@
 # 路线图
 
-## 当前阶段判断
+当前路线图已重排：先 Ryo 样板，再 Kyo/Iori，再扩展系统和角色。
 
-当前不是继续铺功能的阶段，而是整理架构、数据边界、资产管线和真实性验收标准的阶段。
+## P0 方向收敛
 
-## P0 稳定与可复现
+- 固化 `AGENTS.md` / `CLAUDE.md` / `docs/` 的执行链。
+- 停止横向新增角色。
+- 停止把 placeholder 当作正式美术方向。
+- 明确 Ryo Vertical Slice 是唯一主线。
 
-- 清理冲突文档，固定 `AGENTS.md` / `CLAUDE.md` / `docs/` 的职责层级。
-- 输入链路可切换 live/replay。
-- RNG、AI、回放、match envelope 可复现。
-- `main.ts` 阶段编排继续向 `state/` 收口。
-- 测试覆盖 replay/input/prng/command/combat 关键路径。
+## P1 Ryo 资产格式
 
-## P1 正式资产管线
+- 定义 portrait manifest。
+- 定义 sprite atlas manifest。
+- 定义 animation manifest。
+- 定义 hitbox/hurtbox manifest。
+- 定义 feedback manifest。
+- 定义 Frame Contract。
 
-- 定义 portrait manifest，并让头像从 hardcode 走向可替换资源。
-- 建立 sprite atlas 数据格式。
-- 建立 frame data 与视觉帧映射。
-- 建立 hitbox/hurtbox/throwbox 随帧数据。
-- 建立调色板/配色工具链。
-- 从一个样板角色跑通。
+## P2 Ryo 最小动作闭环
 
-## P2 角色与打击感样板
+- `idle`
+- `walk_forward`
+- `walk_backward`
+- `jump`
+- `stand_a`
+- `stand_c`
+- `hurt`
+- `knockdown`
 
-- Ryo/Kyo/Iori 三角色样板。
-- 先以 Ryo 跑通一套完整角色闭环，再复制结构到 Kyo/Iori。
-- 站姿、走路、攻击、受击、倒地、胜利动作统一气质。
-- hitstop、shake、spark、SFX 分层。
+每个动作必须完成视觉帧、判定帧、反馈或状态语义。
 
-## P3 深层机制
+## P3 Ryo 打击感样板
 
-- Guard Crush
-- GC Roll / GC CD
-- MAX Free Cancel
-- Juggle / Scaling
-- Quick Stand
-- Counter Wire
+- light feedback：stand A。
+- heavy feedback：stand C。
+- special feedback：选择一个 Ryo 必杀技。
+- 统一 hitstop / spark / shake / sfx / pushback。
 
-## P4 流程与产品化
+## P4 Ryo 完整度工具
 
-- Order Select
-- Special Intro
-- Win Quote
-- Continue
-- Training Mode
-- Replay Playback UI
+- 角色完整度报告。
+- manifest 校验。
+- frame contract 校验。
+- hitbox 可视化来源校验。
+- fallback 覆盖率报告。
+
+## P5 复制到 Kyo / Iori
+
+前置条件：
+
+- Ryo 8 个基础动作全部完成。
+- Ryo light/heavy 反馈完成。
+- 肖像 select/HUD 完成。
+- 构建和测试通过。
+
+复制原则：
+
+- 复制格式和工具。
+- 不复制 Ryo 具体动作。
+- 不把角色名写进通用逻辑。
+
+## P6 深层机制
+
+在 Ryo/Kyo/Iori 样板稳定后再做：
+
+- MAX。
+- Free Cancel。
+- Guard Cancel。
+- Juggle。
+- Counter Wire。
+- Training / Replay UI。
+
+## P7 技术栈升级
+
+仅在真实资产管线跑通后评估：
+
+- PixiJS。
+- WebGL2。
+- Godot。
+- Rust/WASM。
+
+不得在 placeholder 阶段以“更专业”为理由换栈。

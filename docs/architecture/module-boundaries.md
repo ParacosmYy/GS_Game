@@ -1,48 +1,66 @@
 # 模块边界
 
-## 依赖原则
+本文是代码修改时的职责边界。任何新功能必须先归属模块。
 
-- `core/` 不依赖其他业务目录。
-- `entities/` 不依赖 `rendering/`、`audio/`、DOM。
-- `combat/` 不依赖 `rendering/`、`audio/`、DOM。
-- `input/` 不包含角色专属逻辑。
-- `characters/` 负责角色数据和角色差异，不反向污染通用引擎。
-- `rendering/` 只读取状态并绘制，不决定战斗结果。
-- `audio/` 只响应事件或参数，不拥有战斗状态。
-- `references/`、`tools/`、`docs/` 不得被运行时业务代码 import。
+## 1. 依赖方向
 
-## 禁止事项
+允许方向：
 
-- 禁止 `window.__*` 调试全局。
-- 禁止在通用系统中写 `if (charId === 'kyo')` 这类角色硬编码。
-- 禁止在 `combat/` 中直接绘制、播放音频或访问浏览器事件。
-- 禁止为了通过类型检查使用 `as any`。
-- 禁止把 SFF/ACT/PNG 解析器塞进游戏主循环。
-- 禁止把受版权保护的 MUGEN/QF/KOF 素材或角色包直接并入运行时。
+```text
+main -> state -> combat -> entities -> core
+characters -> core/input types
+input -> core
+rendering -> core/entities/readonly data
+audio -> core events
+tools -> assets/core schema
+```
 
-## 文件大小建议
+禁止方向：
 
-| 类型 | 建议上限 | 处理方式 |
-| --- | ---: | --- |
-| 入口编排 | 300 行 | 拆到 `state/` 或系统模块 |
-| 状态模块 | 200 行 | 按阶段或职责拆分 |
-| combat 系统 | 250 行 | 拆 resolver / calculator / event |
-| rendering 文件 | 400 行 | 拆绘制子模块 |
-| 角色定义 | 350 行 | 拆为角色目录 |
-| 测试文件 | 300 行 | 按行为拆分 |
+- `combat` 导入 `rendering`。
+- `combat` 导入 `audio`。
+- `entities` 导入 `rendering`。
+- `core` 导入业务模块。
+- `input` 认识具体角色。
+- 通用模块通过角色名分支实现角色行为。
 
-## 状态归属
+## 2. Ryo 主线归属
 
-新增状态变量必须说明：
+| 任务 | 归属 |
+| --- | --- |
+| Ryo 肖像 manifest | `core/` schema + asset data，`rendering/` 只读 |
+| Ryo sprite atlas | `core/` schema，`tools/` 生成，`rendering/` 绘制 |
+| Ryo animation | `core/` manifest，`characters/` 只引用动作语义 |
+| Ryo hitbox | `core/` 数据，`combat/` 读取 |
+| Ryo feedback | `core/` 数据，`combat` 发事件，`rendering/audio` 响应 |
+| 完整度报告 | `tools/` 或 `tests/` |
 
-- 谁创建它
-- 谁更新它
-- 谁读取它
-- 何时 reset
-- 是否要进入 replay/snapshot
-- 是否影响确定性
+## 3. Frame Contract 边界
 
-## 资产边界
+Frame Contract 是多个模块的共享协议：
 
-运行时只消费已经转换好的资产索引、JSON、PNG/WebP、音频文件。SFF 解包、ACT 调色板解析、sprite sheet 生成、CSV 导出等属于离线工具链。
+- `core` 定义类型和数据。
+- `tools` 生成和校验。
+- `combat` 读取 hitbox/hurtbox 和 feedback key。
+- `rendering` 读取 spriteRef/anchor/offset。
+- `audio` 读取 eventTags。
+- `vfx` 读取 feedback key。
 
+任何模块不得绕过 contract 私自推导另一层信息。
+
+## 4. Placeholder 规则
+
+- placeholder 可以存在。
+- placeholder 必须可替换。
+- placeholder 不得成为新主线。
+- 修改 placeholder 只能为 fallback 或迁移服务。
+
+## 5. 文件大小
+
+现有大文件暂不为了数字拆分。只有当拆分服务以下目标时才做：
+
+- Ryo 样板线。
+- Frame Contract。
+- 资产管线。
+- 测试可读性。
+- 模块边界修复。
