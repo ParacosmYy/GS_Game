@@ -685,3 +685,9 @@
 ## H155: comboTrialData—6项验证COMBO_TRIALS+getTrialsForCharacter+getTrialById — 127→128
 
 **commit:** <hash> | comboTrialData—6项验证COMBO_TRIALS+getTrialsForCharacter+getTrialById
+
+---
+
+## H156: stage—5项验证generateStars+x/y/brightness/speed — 128→129
+
+**commit:** <hash> | stage—5项验证generateStars+x/y/brightness/speed
