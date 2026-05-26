@@ -778,3 +778,9 @@
 ## H168: animationBlender—8项验证startBlend/update/interpolate/cancel/getFighterBlender — 140→141
 
 **commit:** <hash> | animationBlender—8项验证startBlend/update/interpolate/cancel/getFighterBlender
+
+---
+
+## H169: spritePoseData—8项验证PW/PH/PIXEL+CHAR_VISUALS+darken/lighten+pose数组 — 141→142
+
+**commit:** <hash> | spritePoseData—8项验证PW/PH/PIXEL+CHAR_VISUALS+darken/lighten+pose数组

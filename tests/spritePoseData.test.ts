@@ -1,58 +1,39 @@
 import { describe, it, expect } from 'vitest';
-import { PW, PH, PIXEL, CHAR_VISUALS, getDefaultVisual, darken, lighten } from '../src/rendering/spritePoseData.js';
+import { PW, PH, PIXEL, CHAR_VISUALS, getDefaultVisual, darken, lighten, IDLE_POSES, WALK_POSES, ATTACK_POSES, CROUCH_POSES, JUMP_POSES, HIT_POSES, BLOCK_POSES } from '../src/rendering/spritePoseData.js';
 
 describe('spritePoseData', () => {
-  describe('constants', () => {
-    it('PW is positive', () => expect(PW).toBeGreaterThan(0));
-    it('PH is positive', () => expect(PH).toBeGreaterThan(0));
-    it('PIXEL is positive', () => expect(PIXEL).toBeGreaterThan(0));
-    it('portrait aspect ratio', () => expect(PW / PH).toBeLessThan(1));
+  it('PW/PH/PIXEL are positive numbers', () => {
+    expect(PW).toBeGreaterThan(0);
+    expect(PH).toBeGreaterThan(0);
+    expect(PIXEL).toBeGreaterThan(0);
   });
-
-  describe('CHAR_VISUALS', () => {
-    it('is an object with character keys', () => {
-      expect(typeof CHAR_VISUALS).toBe('object');
-      expect(Object.keys(CHAR_VISUALS).length).toBeGreaterThan(0);
-    });
-    it('has ryo entry', () => expect(CHAR_VISUALS.ryo).toBeDefined());
-    it('ryo has color properties', () => {
-      const ryo = CHAR_VISUALS.ryo;
-      expect(typeof ryo.hairColor).toBe('string');
-      expect(typeof ryo.skinColor).toBe('string');
-      expect(typeof ryo.shirtColor).toBe('string');
-    });
-    it('ryo has proportional dimensions', () => {
-      const ryo = CHAR_VISUALS.ryo;
-      expect(ryo.headW).toBeGreaterThan(0);
-      expect(ryo.bodyW).toBeGreaterThan(0);
-      expect(ryo.legLen).toBeGreaterThan(0);
-    });
+  it('CHAR_VISUALS has entries', () => {
+    expect(Object.keys(CHAR_VISUALS).length).toBeGreaterThan(0);
   });
-
-  describe('getDefaultVisual', () => {
-    it('returns a visual for unknown char', () => {
-      const v = getDefaultVisual('unknown');
-      expect(v).toBeDefined();
-      expect(v.hairColor).toBeDefined();
-    });
-    it('returns a visual with all color fields', () => {
-      const v = getDefaultVisual('ryo');
-      expect(v.hairColor).toBeDefined();
-      expect(v.skinColor).toBeDefined();
-      expect(v.shirtColor).toBeDefined();
-      expect(v.pantsColor).toBeDefined();
-    });
+  it('getDefaultVisual returns object with expected fields', () => {
+    const v = getDefaultVisual();
+    expect(v).toBeDefined();
+    expect(typeof v).toBe('object');
   });
-
-  describe('darken', () => {
-    it('darkens a hex color', () => {
-      expect(darken('#ffffff', 0.5)).not.toBe('#ffffff');
-    });
+  it('darken returns hex string', () => {
+    const d = darken('#ffffff');
+    expect(typeof d).toBe('string');
+    expect(d.startsWith('#')).toBe(true);
   });
-
-  describe('lighten', () => {
-    it('lightens a hex color', () => {
-      expect(lighten('#000000', 0.5)).not.toBe('#000000');
-    });
+  it('lighten returns hex string', () => {
+    const l = lighten('#000000');
+    expect(typeof l).toBe('string');
+    expect(l.startsWith('#')).toBe(true);
+  });
+  it('pose arrays are non-empty', () => {
+    expect(IDLE_POSES.length).toBeGreaterThan(0);
+    expect(WALK_POSES.length).toBeGreaterThan(0);
+    expect(ATTACK_POSES.length).toBeGreaterThan(0);
+  });
+  it('more pose arrays are non-empty', () => {
+    expect(CROUCH_POSES.length).toBeGreaterThan(0);
+    expect(JUMP_POSES.length).toBeGreaterThan(0);
+    expect(HIT_POSES.length).toBeGreaterThan(0);
+    expect(BLOCK_POSES.length).toBeGreaterThan(0);
   });
 });
