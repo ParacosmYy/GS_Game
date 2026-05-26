@@ -583,3 +583,9 @@
 ## H140: charactersTypes测试—6项验证bone+pose+DEFAULT_PROPORTIONS — 112→113
 
 **commit:** <hash> | charactersTypes测试—6项验证bone+pose+DEFAULT_PROPORTIONS
+
+---
+
+## H141: ryo测试—9项验证RyoDef id/name/nameCn/color/winQuotes/stats/poses/moveList — 113→114
+
+**commit:** <hash> | ryo测试—9项验证RyoDef id/name/nameCn/color/winQuotes/stats/poses/moveList
