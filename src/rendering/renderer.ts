@@ -311,6 +311,7 @@ export class Renderer {
       }
       if (f.hitstunTimer > 0) { ctx.fillStyle = '#ff8888'; ctx.fillText(` hitstun:${f.hitstunTimer}`, 4, y); y += 13; }
       if (f.blockstunTimer > 0) { ctx.fillStyle = '#8888ff'; ctx.fillText(` blockstun:${f.blockstunTimer}`, 4, y); y += 13; }
+      if (f.stunGauge > 0) { ctx.fillStyle = f.stunGauge > 70 ? '#ff4444' : '#ccaa22'; ctx.fillText(` stun:${f.stunGauge.toFixed(0)} guard:${f.guardGauge.toFixed(0)}`, 4, y); y += 13; }
     }
     ctx.fillStyle = '#0f0';
     ctx.fillText(`tick:${tick} fps:${fps} proj:${projectiles.length} vfx:${vfxCount}`, 4, y);
