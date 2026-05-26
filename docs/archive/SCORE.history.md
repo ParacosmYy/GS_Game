@@ -205,3 +205,9 @@
 ## H82: Ryo character metadata测试—16项验证 — 54→55
 
 **commit:** <hash> | basicInfo+colors+winQuotes+pixelPortrait+poses
+
+---
+
+## H83: Ryo poses帧数覆盖测试—13项验证 — 55→56
+
+**commit:** <hash> | 8最低pose帧数+3攻击pose+总pose>=15+idle>=8
