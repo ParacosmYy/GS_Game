@@ -41,6 +41,8 @@ import {
 } from './ryoMovementFrames.js';
 import { RYO_BLOCK_FRAMES } from './ryoBlockFrames.js';
 import { RYO_WIN_FRAMES } from './ryoWinFrames.js';
+import { RYO_DIZZY_FRAMES } from './ryoDizzyFrames.js';
+import { RYO_THROW_FRAMES } from './ryoThrowFrames.js';
 
 // ===== Internal Frame Registry =====
 //
@@ -188,8 +190,10 @@ function initAllFrames(): void {
   registerFrames('ROLL', RYO_ROLL_FRAMES, 4);
   registerFrames('BACK_ROLL', RYO_BACK_ROLL_FRAMES, 4);
 
-  // SUB-STATES — guard crush, MAX mode, taunt, counter, block
+  // SUB-STATES — guard crush, MAX mode, taunt, counter, block, dizzy, throw
   registerFrames('BLOCK', RYO_BLOCK_FRAMES, 8);
+  registerFrames('DIZZY', RYO_DIZZY_FRAMES, 10);
+  registerFrames('THROW', RYO_THROW_FRAMES, 6);
   registerFrames('GUARD_CRUSH', RYO_GUARD_CRUSH_FRAMES, 8);
   registerFrames('MAX_MODE', RYO_MAX_MODE_FRAMES, 6);
   registerFrames('TAUNT', RYO_TAUNT_FRAMES, 12);
@@ -330,14 +334,14 @@ function resolveFrameKey(
       return 'JUMP';
 
     case FighterState.THROW:
-      return 'IDLE';
+      return 'THROW';
 
     case FighterState.BLOCK:
     case FighterState.AIR_BLOCK:
       return 'BLOCK';
 
     case FighterState.DIZZY:
-      return 'IDLE';
+      return 'DIZZY';
 
     case FighterState.GUARD_CRUSH:
       return 'GUARD_CRUSH';
