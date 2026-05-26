@@ -888,6 +888,30 @@ export function spawnHaouFlash(particles: Particle[], x: number, y: number, _cha
 }
 
 /**
+ * 命中招式名显示 — KOF2002风格, 命中时在命中位置上方浮动显示招式名
+ * 从命中位置向上飘并淡出, 字体大小根据攻击类型分级:
+ * - heavy (重通常技): 16px, 白色
+ * - special (必杀技): 20px, 角色色
+ * - DM/SDM (超必杀技): 26px, 金色
+ */
+export function spawnMoveNameText(particles: Particle[], worldX: number, worldY: number, moveName: string, color: string, fontSize: number): void {
+  // KOF2002: 招式名弹出 — 先短暂放大再恢复, 然后上浮淡出
+  const lifeSpan = fontSize >= 26 ? 65 : fontSize >= 20 ? 55 : 45;
+  const driftY = fontSize >= 26 ? -2.2 : fontSize >= 20 ? -1.8 : -1.4;
+  particles.push({
+    x: worldX, y: worldY,
+    vx: 0, vy: driftY,
+    life: lifeSpan, maxLife: lifeSpan,
+    size: fontSize,
+    color,
+    type: 'text',
+    text: moveName,
+    gravity: 0.01,
+    friction: 0.995,
+  });
+}
+
+/**
  * 浮动连击文本 — 在被击方头顶显示当前连击数和累计伤害
  * - 2-4 hits: 白色
  * - 5-9 hits: 黄色

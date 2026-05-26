@@ -14,9 +14,78 @@ import { getFeedback } from '../core/feedbackManifest.js';
 import { ROSTER } from '../characters/index.js';
 import { isDM as isDMCheck } from '../core/attackClassifier.js';
 import { gainMeterOnHit, gainMeterOnBlock, gainMeterOnHitstun } from './meter.js';
-import { playHit, playBlock, playSpecial, playDM, playThrow, playCounter, playHeavyHit, playSuperFlash, playWire, playJuggleHit, playBlockSpecial, playBlockDM, playSpecialLight, playSpecialHeavy, playKOHit, playHitAccent, playLandingHeavy, playDizzyHit, playGroundBounce, playWallBounce, playGuardCrush } from '../audio/sampler.js';
+import { playHit, playBlock, playSpecial, playDM, playThrow, playCounter, playHeavyHit, playSuperFlash, playWire, playJuggleHit, playBlockSpecial, playBlockDM, playSpecialLight, playSpecialHeavy, playKOHit, playHitAccent, playLandingHeavy, playDizzyHit, playGroundBounce, playWallBounce, playGuardCrush, playKoouken, playKoHou, playHien, playHaou } from '../audio/sampler.js';
 import { bgm } from '../audio/bgm.js';
 import type { CinematicState } from '../state/cinematicState.js';
+
+// ===== KOF2002: 命中招式名映射 =====
+// AttackType → 中文招式名, 按角色分组
+// 只包含必杀技/DM级别, 通常技不显示招式名
+const MOVE_NAME_MAP: Partial<Record<AttackType, string>> = {
+  // Ryo (坂崎亮)
+  [AttackType.RYO_KOOU]: '虎煌拳',
+  [AttackType.RYO_KOOU_C]: '虎煌拳',
+  [AttackType.RYO_KO_HOU]: '虎咆',
+  [AttackType.RYO_KO_HOU_C]: '虎咆',
+  [AttackType.RYO_HIEN]: '飛燕疾風脚',
+  [AttackType.RYO_HAOU]: '霸王翔吼拳',
+  [AttackType.DM_TEN_HA_OU]: '天地霸煌拳',
+  [AttackType.SDM_TEN_HA_OU]: '天地霸煌拳',
+  [AttackType.SDM_RYUKO_RANBU]: '龍虎乱舞',
+  [AttackType.HSDM_RYUKO_RANBU]: '龍虎乱舞',
+  // Kyo (草薙京)
+  [AttackType.KYO_ARAGAMI]: '荒咬み',
+  [AttackType.KYO_DOKUGAMI]: '毒咬み',
+  [AttackType.KYO_ONIYAKI]: '鬼焼き',
+  [AttackType.KYO_ONIYAKI_C]: '鬼焼き',
+  [AttackType.KYO_NANASE]: '七瀬',
+  [AttackType.KYO_KOTO_TSUKI]: '琴月陽',
+  [AttackType.KYO_YAKISOGI]: '破砕',
+  [AttackType.KYO_BATSUYOMI]: '罰詠み',
+  [AttackType.KYO_TSUMIYOMI]: '罪詠み',
+  [AttackType.KYO_RED_KICK]: 'R.E.D.KICK',
+  [AttackType.DM_OROCHINAGI]: '大蛇薙',
+  [AttackType.SDM_OROCHINAGI]: '大蛇薙',
+  // Iori (八神庵)
+  [AttackType.DM_YATAGARASU]: '八稚女',
+  [AttackType.SDM_YATAGARASU]: '八稚女',
+  [AttackType.IORI_AOIHANA]: '葵花',
+  [AttackType.IORI_AOIHANA_2]: '葵花',
+  [AttackType.IORI_AOIHANA_3]: '葵花',
+  [AttackType.IORI_KOTOTSUKI]: '琴月陰',
+  [AttackType.IORI_ONIYAKI]: '鬼焼き',
+  [AttackType.IORI_ONIYAKI_C]: '鬼焼き',
+  [AttackType.IORI_KUZUKAZE]: '屑風',
+  // Terry (テリー・ボガード)
+  [AttackType.TERRY_BURN_KNUCKLE]: 'Burn Knuckle',
+  [AttackType.TERRY_RISING_TACKLE]: 'Rising Tackle',
+  [AttackType.TERRY_POWER_DUNK]: 'Power Dunk',
+  [AttackType.TERRY_POWER_WAVE]: 'Power Wave',
+  [AttackType.TERRY_CRACK_SHOT]: 'Crack Shot',
+  [AttackType.DM_POWER_GEYSER]: 'Power Geyser',
+  [AttackType.SDM_POWER_GEYSER]: 'Power Geyser',
+  // Kim (キム・カッファン)
+  [AttackType.KIM_HIENZAN]: '飛燕斬',
+  [AttackType.KIM_HISHOU]: '飛翔脚',
+  [AttackType.KIM_HANGETSU]: '半月斬',
+  [AttackType.KIM_HAKI]: '覇気脚',
+  [AttackType.KIM_SANREN]: '三連撃',
+  [AttackType.SDM_PHOENIX_KICK]: '鳳凰脚',
+};
+
+/** 根据攻击类型获取招式名样式 */
+function getMoveNameStyle(at: AttackType, charSpecialColor: string): { color: string; fontSize: number } | null {
+  const atStr = at as string;
+  const isSDM = atStr.startsWith('SDM_') || atStr.startsWith('HSDM_');
+  const _isDM = atStr.startsWith('DM_') || isSDM;
+
+  if (_isDM) {
+    // DM/SDM: 金色, 26px
+    return { color: '#ffd700', fontSize: 26 };
+  }
+  // 必杀技: 角色色, 20px
+  return { color: charSpecialColor, fontSize: 20 };
+}
 
 function classifyAttack(at: AttackType) {
   const s = at as string;
@@ -243,6 +312,20 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
     const dmgColor = isDM ? atkChar.specialColor : counterHit ? '#ff8800' : undefined;
     deps.vfx.spawnDamageText(defender.x, defender.y - defender.displayHeight - 20, data.damage, dmgColor);
 
+    // === KOF2002: 命中招式名显示 ===
+    // 必杀技/DM命中时在命中位置上方浮动显示招式名
+    if (isSpecial || isDM) {
+      const moveName = MOVE_NAME_MAP[attackType];
+      if (moveName) {
+        const style = getMoveNameStyle(attackType, atkChar.specialColor);
+        if (style) {
+          // 位置: 被击方头顶上方偏移, 避免与伤害数字重叠
+          const nameY = defender.y - defender.displayHeight - 45;
+          deps.vfx.spawnMoveNameText(defender.x, nameY, moveName, style.color, style.fontSize);
+        }
+      }
+    }
+
     // 命中确认光效收短，强调"硬切"而不是长时间白闪
     attacker.hitFlashFrames = fb.hitFlashFrames;
     attacker.hitFlashColor = isDM ? atkChar.specialColor : '#ffffff';
@@ -320,6 +403,19 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
 
     // SFX
     if (isDM) { playSuperFlash(isSDM); playDM(); }
+    // Ryo 必杀技差异化音效 — 优先于通用 special 分支
+    else if (atkName === 'RYO_KOOU' || atkName === 'RYO_KOOU_C' || atkName === 'RYO_KOOUKEN_D') {
+      playKoouken(); if (combo > 0) playHit(0.5, combo);
+    }
+    else if (atkName === 'RYO_KO_HOU' || atkName === 'RYO_KO_HOU_C') {
+      playKoHou(); if (combo > 0) playHit(0.5, combo);
+    }
+    else if (atkName === 'RYO_HIEN') {
+      playHien(); if (combo > 0) playHit(0.5, combo);
+    }
+    else if (atkName === 'RYO_HAOU') {
+      playHaou(); if (combo > 0) playHit(0.5, combo);
+    }
     else if (isThrowAttack(attackType)) {
       playThrow();
       // 投技保留一层主火花，减少蓝白多段铺开

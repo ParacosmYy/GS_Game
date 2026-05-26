@@ -32,6 +32,11 @@ vi.mock('../src/audio/sampler.js', () => ({
   playWallBounce: () => {},
   playBlockSpecial: () => {},
   playBlockDM: () => {},
+  playKoouken: () => {},
+  playKoHou: () => {},
+  playHien: () => {},
+  playHaou: () => {},
+  playProjectileLaunch: () => {},
 }));
 
 vi.mock('../src/audio/bgm.js', () => ({
@@ -121,6 +126,7 @@ function createMockVFX(): VFXSystem & Record<string, ReturnType<typeof vi.fn>> {
     spawnHienTrail: vi.fn(),
     spawnDMTenHaOuVFX: vi.fn(),
     spawnHaouFlash: vi.fn(),
+    spawnMoveNameText: vi.fn(),
     update: vi.fn(),
     render: vi.fn(),
   } as unknown as VFXSystem & Record<string, ReturnType<typeof vi.fn>>;

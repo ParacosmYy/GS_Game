@@ -40,6 +40,10 @@ vi.mock('../src/audio/sampler.js', () => ({
   playBlockSpecial: () => { sfxLog.push('playBlockSpecial'); },
   playBlockDM: () => { sfxLog.push('playBlockDM'); },
   playProjectileLaunch: () => { sfxLog.push('playProjectileLaunch'); },
+  playKoouken: () => { sfxLog.push('playKoouken'); },
+  playKoHou: () => { sfxLog.push('playKoHou'); },
+  playHien: () => { sfxLog.push('playHien'); },
+  playHaou: () => { sfxLog.push('playHaou'); },
 }));
 
 vi.mock('../src/audio/bgm.js', () => ({
@@ -125,6 +129,7 @@ function createMockVFX(): VFXSystem & Record<string, ReturnType<typeof vi.fn>> {
     spawnHienTrail: vi.fn(),
     spawnDMTenHaOuVFX: vi.fn(),
     spawnHaouFlash: vi.fn(),
+    spawnMoveNameText: vi.fn(),
     update: vi.fn(),
     render: vi.fn(),
   } as unknown as VFXSystem & Record<string, ReturnType<typeof vi.fn>>;
@@ -192,32 +197,31 @@ function createDepsWithRyo(): {
 describe('Ko\'ou Ken (虎煌拳) SFX', () => {
   beforeEach(() => { sfxLog.length = 0; });
 
-  it('RYO_KOOU hit triggers playSpecialLight (damage 75 < 90)', () => {
+  it('RYO_KOOU hit triggers playKoouken (character-specific SFX)', () => {
     const { deps } = createDepsWithRyo();
     const cb = createHitCallback(deps);
     cb(deps.fighters[0], deps.fighters[1], AttackType.RYO_KOOU, false, false);
-    expect(sfxLog).toContain('playSpecialLight');
+    expect(sfxLog).toContain('playKoouken');
     // Also gets generic accent for ryo
     expect(sfxLog.some(e => e.startsWith('playHitAccent:ryo,'))).toBe(true);
   });
 
-  it('RYO_KOOU_C hit triggers playSpecialHeavy (damage 105 >= 90)', () => {
+  it('RYO_KOOU_C hit triggers playKoouken (character-specific SFX)', () => {
     const { deps } = createDepsWithRyo();
     const cb = createHitCallback(deps);
     cb(deps.fighters[0], deps.fighters[1], AttackType.RYO_KOOU_C, false, false);
-    expect(sfxLog).toContain('playSpecialHeavy');
+    expect(sfxLog).toContain('playKoouken');
   });
 
-  it('Ko\'ou Ken SFX is distinct from normal hit SFX (uses special path, not playHit)', () => {
+  it('Ko\'ou Ken SFX is distinct from normal hit SFX (uses character-specific path)', () => {
     const { deps } = createDepsWithRyo();
     const cb = createHitCallback(deps);
     cb(deps.fighters[0], deps.fighters[1], AttackType.RYO_KOOU, false, false);
-    // Special moves do NOT trigger playHit as primary (they use playSpecialLight/Heavy)
-    // playHit may appear from combo count, but primary SFX is special
-    const hasSpecial = sfxLog.some(e =>
-      e === 'playSpecialLight' || e === 'playSpecialHeavy'
+    // Ryo specials use character-specific SFX (playKoouken) instead of generic playHit
+    const hasRyoSFX = sfxLog.some(e =>
+      e === 'playKoouken'
     );
-    expect(hasSpecial).toBe(true);
+    expect(hasRyoSFX).toBe(true);
   });
 
   it('GAP: no per-frame projectile fire/launch/hit SFX in hitCallback', () => {
@@ -241,19 +245,18 @@ describe('Ko\'ou Ken (虎煌拳) SFX', () => {
 describe('Ko Hou (虎咲) SFX', () => {
   beforeEach(() => { sfxLog.length = 0; });
 
-  it('RYO_KO_HOU hit triggers playSpecialHeavy (damage 80 < 90 → actually playSpecialLight)', () => {
+  it('RYO_KO_HOU hit triggers playKoHou (character-specific SFX)', () => {
     const { deps } = createDepsWithRyo();
     const cb = createHitCallback(deps);
     cb(deps.fighters[0], deps.fighters[1], AttackType.RYO_KO_HOU, false, false);
-    // damage 80 < 90, so playSpecialLight
-    expect(sfxLog).toContain('playSpecialLight');
+    expect(sfxLog).toContain('playKoHou');
   });
 
-  it('RYO_KO_HOU_C hit triggers playSpecialHeavy (damage 140 >= 90)', () => {
+  it('RYO_KO_HOU_C hit triggers playKoHou (character-specific SFX)', () => {
     const { deps } = createDepsWithRyo();
     const cb = createHitCallback(deps);
     cb(deps.fighters[0], deps.fighters[1], AttackType.RYO_KO_HOU_C, false, false);
-    expect(sfxLog).toContain('playSpecialHeavy');
+    expect(sfxLog).toContain('playKoHou');
   });
 
   it('Ko Hou SFX timing matches FRAME_DATA startup/active/recovery', () => {
@@ -277,11 +280,11 @@ describe('Ko Hou (虎咲) SFX', () => {
 describe('Hien (飛燕疾風脚) SFX', () => {
   beforeEach(() => { sfxLog.length = 0; });
 
-  it('RYO_HIEN hit triggers playSpecialHeavy (damage 95 >= 90)', () => {
+  it('RYO_HIEN hit triggers playHien (character-specific SFX)', () => {
     const { deps } = createDepsWithRyo();
     const cb = createHitCallback(deps);
     cb(deps.fighters[0], deps.fighters[1], AttackType.RYO_HIEN, false, false);
-    expect(sfxLog).toContain('playSpecialHeavy');
+    expect(sfxLog).toContain('playHien');
   });
 
   it('RYO_HIEN hit triggers character accent (ryo generic)', () => {
@@ -307,12 +310,11 @@ describe('Hien (飛燕疾風脚) SFX', () => {
 describe('Haou (霸王翔吼拳) SFX', () => {
   beforeEach(() => { sfxLog.length = 0; });
 
-  it('RYO_HAOU hit triggers playSpecialHeavy (damage 80 < 90 → playSpecialLight)', () => {
+  it('RYO_HAOU hit triggers playHaou (character-specific SFX)', () => {
     const { deps } = createDepsWithRyo();
     const cb = createHitCallback(deps);
     cb(deps.fighters[0], deps.fighters[1], AttackType.RYO_HAOU, false, false);
-    // damage 80 < 90 → playSpecialLight
-    expect(sfxLog).toContain('playSpecialLight');
+    expect(sfxLog).toContain('playHaou');
   });
 
   it('RYO_HAOU is classified as a Rekka finisher (enhanced VFX)', () => {

@@ -42,6 +42,7 @@ import {
   spawnHienTrail,
   spawnDMTenHaOuVFX,
   spawnHaouFlash,
+  spawnMoveNameText,
 } from './vfxPresets.js';
 import type { Particle } from './vfxPresets.js';
 
@@ -264,6 +265,11 @@ export class VFXSystem {
   /** Ryo: Haou Shou Kou Ken (霸王翔吼拳) counter activation flash */
   spawnHaouFlash(worldX: number, worldY: number, charId: string): void {
     spawnHaouFlash(this.particles, worldX, worldY, charId);
+  }
+
+  /** 命中招式名显示 — KOF2002风格浮动文本 */
+  spawnMoveNameText(worldX: number, worldY: number, moveName: string, color: string, fontSize: number): void {
+    spawnMoveNameText(this.particles, worldX, worldY, moveName, color, fontSize);
   }
 
   update(): void {
