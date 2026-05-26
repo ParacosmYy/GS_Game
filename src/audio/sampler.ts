@@ -16,7 +16,9 @@ type SampleId =
   | 'quick_stand' | 'step'
   | 'hit_crit' | 'dust' | 'air_hit' | 'wall_bounce_heavy'
   | 'guard_break' | 'charge_up'
-  | 'block_special' | 'block_dm' | 'special_light' | 'special_heavy';
+  | 'block_special' | 'block_dm' | 'special_light' | 'special_heavy'
+  | 'ko_hit' | 'landing_heavy'
+  | 'accent_fire' | 'accent_purple' | 'accent_ice' | 'accent_generic';
 
 const samples = new Map<SampleId, AudioBuffer>();
 let initialized = false;
@@ -137,71 +139,74 @@ function padTo(src: Float32Array, totalLen: number, offset: number = 0): Float32
 
 // === 各音效预渲染函数 ===
 
-// 轻击：多层噪声纹理 + 中频体感 + 高频打击感
+// 轻击：短促清脆，快速衰减 — A/B按钮打击感
 function renderHitLight(sr: number): Float32Array {
-  const dur = 0.08;
-  // 低频噪声纹理 — 中频质感
-  const noiseMid = bandPass(renderNoise(sr, dur, t => expDecay(t, 0.4, 28)), sr, 800, 3000);
-  // 高频噪声纹理 — 空气冲击感
-  const noiseHi = bandPass(renderNoise(sr, dur, t => expDecay(t, 0.2, 35)), sr, 3000, 8000);
-  // 低频体感 — 拳肉接触的低频
-  const body = renderOsc(sr, dur, 'sine', t => 180 - 2800 * t, t => expDecay(t, 0.35, 25));
-  // 高频打击瞬态
-  const snap = renderOsc(sr, dur * 0.5, 'triangle', t => 1200 - 18000 * t, t => expDecay(t, 0.18, 55));
-  // 中频共鸣层
-  const mid = renderOsc(sr, dur * 0.6, 'sine', t => 400 - 4000 * t, t => expDecay(t, 0.1, 30));
+  const dur = 0.065;
+  // 中频噪声 — 紧凑肉体冲击
+  const noiseMid = bandPass(renderNoise(sr, dur, t => expDecay(t, 0.45, 35)), sr, 900, 3500);
+  // 高频噪声 — 快速衰减的空气噼啪感
+  const noiseHi = bandPass(renderNoise(sr, dur, t => expDecay(t, 0.22, 45)), sr, 3500, 9000);
+  // 低频体感 — 短促的拳肉接触低频
+  const body = renderOsc(sr, dur, 'sine', t => 200 - 3500 * t, t => expDecay(t, 0.38, 32));
+  // 高频打击瞬态 — 清脆起手
+  const snap = renderOsc(sr, dur * 0.45, 'triangle', t => 1400 - 22000 * t, t => expDecay(t, 0.2, 65));
+  // 中频共鸣 — 更快衰减
+  const mid = renderOsc(sr, dur * 0.5, 'sine', t => 450 - 5500 * t, t => expDecay(t, 0.12, 38));
   const snapP = padTo(snap, Math.ceil(sr * dur));
   const midP = padTo(mid, Math.ceil(sr * dur));
-  return normalize(mixLayers([noiseMid, noiseHi, body, snapP, midP], [1, 0.6, 0.8, 0.5, 0.35]));
+  return normalize(mixLayers([noiseMid, noiseHi, body, snapP, midP], [1, 0.55, 0.7, 0.55, 0.3]));
 }
 
-// 重击：子低音轰鸣 + 金属质感 + 多层噪声
+// 重击：更深更重，更多低频，更长衰减 — C/D按钮打击感
 function renderHitHeavy(sr: number): Float32Array {
-  const dur = 0.18;
-  // 中频噪声带 — 肉体冲击质感
-  const noiseMid = bandPass(renderNoise(sr, dur, t => expDecay(t, 0.45, 10)), sr, 300, 2000);
+  const dur = 0.22;
+  // 低频噪声带 — 深沉肉体冲击
+  const noiseMid = bandPass(renderNoise(sr, dur, t => expDecay(t, 0.5, 8)), sr, 250, 1800);
   // 高频噪声 — 空气爆裂
-  const noiseHi = highPass(renderNoise(sr, dur * 0.6, t => expDecay(t, 0.15, 20)), sr, 3000);
-  // 低频体感
-  const body = renderOsc(sr, dur, 'sine', t => 100 - 600 * t, t => expDecay(t, 0.55, 10));
-  // 子低音隆隆声
-  const sub = renderOsc(sr, dur, 'sine', t => 55 - 80 * t, t => expDecay(t, 0.4, 6));
+  const noiseHi = highPass(renderNoise(sr, dur * 0.5, t => expDecay(t, 0.18, 18)), sr, 3000);
+  // 低频体感 — 更深的低频
+  const body = renderOsc(sr, dur, 'sine', t => 80 - 500 * t, t => expDecay(t, 0.6, 8));
+  // 子低音隆隆声 — 更强的低频深度
+  const sub = renderOsc(sr, dur * 1.2, 'sine', t => 45 - 60 * t, t => expDecay(t, 0.45, 4.5));
   // 裂纹瞬态
-  const crack = renderOsc(sr, dur * 0.3, 'triangle', t => 500 - 14000 * t, t => expDecay(t, 0.3, 35));
-  // 金属泛音
-  const metal = renderOsc(sr, dur * 0.5, 'sine', t => 1800 - 30000 * t, t => expDecay(t, 0.06, 22));
-  // 谐波层
-  const harm = renderOsc(sr, dur * 0.4, 'sawtooth', t => 800 - 10000 * t, t => expDecay(t, 0.1, 22));
+  const crack = renderOsc(sr, dur * 0.25, 'triangle', t => 450 - 12000 * t, t => expDecay(t, 0.35, 30));
+  // 金属泛音 — 更明显的金属质感
+  const metal = renderOsc(sr, dur * 0.4, 'sine', t => 1600 - 25000 * t, t => expDecay(t, 0.07, 18));
+  // 谐波层 — 加厚冲击感
+  const harm = renderOsc(sr, dur * 0.35, 'sawtooth', t => 700 - 9000 * t, t => expDecay(t, 0.12, 18));
   // 高频瞬态
-  const hi = renderOsc(sr, 0.03, 'square', t => 2500 - 60000 * t, t => expDecay(t, 0.08, 60));
+  const hi = renderOsc(sr, 0.025, 'square', t => 2200 - 55000 * t, t => expDecay(t, 0.09, 65));
+  // 50-120Hz权重层 — 可感知的打击深度
+  const weight = renderOsc(sr, dur * 0.8, 'sine', t => 90 - 100 * t, t => expDecay(t, 0.5, 5));
   const crackP = padTo(crack, Math.ceil(sr * dur));
   const metalP = padTo(metal, Math.ceil(sr * dur));
   const harmP = padTo(harm, Math.ceil(sr * dur));
   const hiP = padTo(hi, Math.ceil(sr * dur));
+  const weightP = padTo(weight, Math.ceil(sr * dur));
   return normalize(mixLayers(
-    [noiseMid, noiseHi, body, sub, crackP, metalP, harmP, hiP],
-    [1, 0.4, 1.2, 0.8, 0.7, 0.25, 0.3, 0.2]
+    [noiseMid, noiseHi, body, sub, crackP, metalP, harmP, hiP, weightP],
+    [1, 0.35, 1.3, 1.0, 0.65, 0.3, 0.35, 0.22, 0.9]
   ));
 }
 
 function renderBlock(sr: number, heavy: boolean): Float32Array {
   const dur = heavy ? 0.16 : 0.1;
-  const baseF = heavy ? 900 : 1100;
-  // 金属方波主体
+  const baseF = heavy ? 850 : 1050;
+  // 金属方波主体 — 更高截止模拟沉闷感
   const metal = renderOsc(sr, dur, 'square', t => baseF - baseF * 6 * t, t => expDecay(t, 0.18, heavy ? 12 : 18));
-  // 共鸣泛音 — 模拟金属共振
+  // 共鸣泛音
   const res = renderOsc(sr, dur, 'sine', t => 2200 - 3000 * t, t => expDecay(t, 0.07, heavy ? 18 : 25));
-  // 高频噪声 — 冲击质感
-  const noise = highPass(renderNoise(sr, dur, t => expDecay(t, heavy ? 0.2 : 0.12, heavy ? 18 : 28)), sr, heavy ? 2000 : 2500);
-  // 二次泛音 — 更丰富的金属质感
+  // 高频噪声 — 更高截止的沉闷冲击
+  const noise = highPass(renderNoise(sr, dur, t => expDecay(t, heavy ? 0.22 : 0.13, heavy ? 16 : 26)), sr, heavy ? 1800 : 2200);
+  // 中低频沉闷层 — 填充"木闷"质感
+  const thud = bandPass(renderNoise(sr, dur, t => expDecay(t, heavy ? 0.25 : 0.15, heavy ? 10 : 16)), sr, 300, 1200);
+  // 二次泛音
   const res2 = renderOsc(sr, dur * 0.7, 'triangle', t => 3500 - 15000 * t, t => expDecay(t, 0.04, 20));
   const res2P = padTo(res2, Math.ceil(sr * dur));
-  const layers = [metal, res, noise, res2P];
-  const gains: number[] = [1, 0.4, heavy ? 0.8 : 0.5, 0.15];
+  const layers = [metal, res, noise, thud, res2P];
+  const gains: number[] = [1, 0.4, heavy ? 0.7 : 0.45, heavy ? 0.6 : 0.35, 0.15];
   if (heavy) {
-    // 重防御低频层 — 厚重感
     const lo = renderOsc(sr, 0.14, 'sine', t => 150 - 1000 * t, t => expDecay(t, 0.14, 12));
-    // 金属尾音
     const tail = renderOsc(sr, 0.2, 'sine', _t => 800, t => expDecay(t, 0.05, 12));
     const tailP = padTo(tail, Math.ceil(sr * dur), Math.floor(sr * 0.05));
     layers.push(lo, tailP);
@@ -210,10 +215,10 @@ function renderBlock(sr: number, heavy: boolean): Float32Array {
   return normalize(mixLayers(layers, gains));
 }
 
-// 必杀技：蓄能呼啸 + 冲击 + 金属质感
+// 必杀技：蓄能呼啸 + 冲击 + 更强金属质感 + 贝斯层
 function renderSpecial(sr: number): Float32Array {
   const dur = 0.3;
-  // 能量蓄积呼啸 — 频率上升后下降
+  // 能量蓄积呼啸
   const whoosh = renderOsc(sr, dur, 'sawtooth',
     t => t < 0.1 ? 200 + 8000 * t : 1000 - 3500 * (t - 0.1),
     t => t < 0.1 ? 0.15 + t * 0.8 : expDecay(t - 0.1, 0.25, 7));
@@ -221,36 +226,46 @@ function renderSpecial(sr: number): Float32Array {
   const noiseMid = bandPass(renderNoise(sr, dur * 0.7, t => expDecay(t, 0.14, 8)), sr, 400, 3500);
   // 高频噪声 — 空气撕裂感
   const noiseHi = highPass(renderNoise(sr, dur * 0.4, t => expDecay(t, 0.1, 12)), sr, 4000);
-  // 金属瞬态
-  const metal = renderOsc(sr, 0.08, 'triangle', t => 2400 - 28000 * t, t => expDecay(t, 0.09, 30));
+  // 金属瞬态 — 更强的金属质感 + 延音
+  const metal = renderOsc(sr, 0.12, 'triangle', t => 2600 - 30000 * t, t => expDecay(t, 0.1, 22));
   // 低频冲击波
   const impact = renderOsc(sr, 0.15, 'sine', t => 120 - 1000 * t, t => expDecay(t, 0.3, 12));
+  // 贝斯层 — 50-120Hz深度
+  const bass = renderOsc(sr, 0.2, 'sine', t => 70 - 80 * t, t => expDecay(t, 0.35, 5));
+  // 金属泛音 — 延迟0.04s
+  const metalHarmonic = renderOsc(sr, 0.06, 'sine', t => 5000 - 40000 * t, t => expDecay(t, 0.05, 25));
   const nMidP = padTo(noiseMid, Math.ceil(sr * dur));
   const nHiP = padTo(noiseHi, Math.ceil(sr * dur));
   const metalP = padTo(metal, Math.ceil(sr * dur));
   const impactP = padTo(impact, Math.ceil(sr * dur), Math.floor(sr * 0.06));
-  return normalize(mixLayers([whoosh, nMidP, nHiP, metalP, impactP], [1, 0.6, 0.3, 0.5, 0.7]));
+  const bassP = padTo(bass, Math.ceil(sr * dur), Math.floor(sr * 0.03));
+  const metalHP = padTo(metalHarmonic, Math.ceil(sr * dur), Math.floor(sr * 0.04));
+  return normalize(mixLayers([whoosh, nMidP, nHiP, metalP, impactP, bassP, metalHP], [1, 0.6, 0.3, 0.6, 0.7, 0.8, 0.25]));
 }
 
-// DM：戏剧性能量蓄积 + 大规模爆炸
+// DM：爆炸分层 — 噪声爆发 + 低音爆炸 + 高频噼啪声
 function renderDM(sr: number): Float32Array {
-  const dur = 0.6;
+  const dur = 0.7;
   // 低频扫频 — 能量蓄积
-  const bass = renderOsc(sr, dur, 'sawtooth', t => 80 - 150 * t, t => expDecay(t, 0.35, 4));
+  const bass = renderOsc(sr, dur, 'sawtooth', t => 80 - 150 * t, t => expDecay(t, 0.35, 3.5));
   // 中频方波 — 攻击性质感
-  const mid = renderOsc(sr, 0.25, 'square', t => 1200 - 5000 * t, t => expDecay(t, 0.14, 7));
-  // 宽频噪声 — 爆炸质感
-  const noise = bandPass(renderNoise(sr, 0.3, t => expDecay(t, 0.4, 5)), sr, 200, 3000);
-  // 子低音层 — 身体可感知的低频
-  const sub = renderOsc(sr, 0.5, 'sine', t => 60 - 130 * t, t => expDecay(t, 0.45, 3));
+  const mid = renderOsc(sr, 0.28, 'square', t => 1200 - 5000 * t, t => expDecay(t, 0.16, 6));
+  // 宽频噪声 — 主爆炸冲击波
+  const noise = bandPass(renderNoise(sr, 0.35, t => expDecay(t, 0.45, 4)), sr, 200, 3500);
+  // 子低音层 — 身体可感知的低频爆炸
+  const sub = renderOsc(sr, 0.55, 'sine', t => 50 - 100 * t, t => expDecay(t, 0.5, 2.5));
   // 二次爆发 — 延迟0.1s
-  const burst = highPass(renderNoise(sr, 0.12, t => t < 0.001 ? 0 : expDecay(t - 0.001, 0.18, 12)), sr, 2000);
-  // 高频碎裂 — 延迟0.15s
-  const shatter = renderOsc(sr, 0.08, 'sawtooth', t => 3000 - 35000 * t, t => expDecay(t, 0.1, 25));
-  // 能量上升音 — 正弦波上升
-  const rise = renderOsc(sr, 0.12, 'sine', t => 200 + 15000 * t, t => expDecay(t, 0.12, 8));
+  const burst = highPass(renderNoise(sr, 0.14, t => t < 0.001 ? 0 : expDecay(t - 0.001, 0.2, 10)), sr, 2000);
+  // 高频碎裂/噼啪声 — 延迟0.15s
+  const shatter = renderOsc(sr, 0.1, 'sawtooth', t => 3500 - 40000 * t, t => expDecay(t, 0.12, 22));
+  // 能量上升音
+  const rise = renderOsc(sr, 0.14, 'sine', t => 200 + 16000 * t, t => expDecay(t, 0.13, 7));
   // 冲击波尾音 — 低频余震
-  const aftershock = renderOsc(sr, 0.3, 'sine', t => 40 - 50 * t, t => t < 0.02 ? 0 : expDecay(t - 0.02, 0.2, 3));
+  const aftershock = renderOsc(sr, 0.35, 'sine', t => 35 - 40 * t, t => t < 0.02 ? 0 : expDecay(t - 0.02, 0.22, 2.5));
+  // 额外高频噼啪层 — DM特征性的高频"炸裂"感
+  const crackLayer = highPass(renderNoise(sr, 0.08, t => t < 0.002 ? 0 : expDecay(t - 0.002, 0.25, 15)), sr, 6000);
+  // 低频轰隆爆炸层
+  const boom = renderOsc(sr, 0.3, 'sine', t => 40 - 50 * t, t => expDecay(t, 0.55, 2));
 
   const total = Math.ceil(sr * dur);
   const midP = padTo(mid, total);
@@ -259,30 +274,36 @@ function renderDM(sr: number): Float32Array {
   const shatterP = padTo(shatter, total, Math.floor(sr * 0.15));
   const riseP = padTo(rise, total);
   const aftershockP = padTo(aftershock, total, Math.floor(sr * 0.25));
+  const crackP = padTo(crackLayer, total, Math.floor(sr * 0.04));
+  const boomP = padTo(boom, total);
 
   return normalize(mixLayers(
-    [bass, midP, noiseP, sub, burstP, shatterP, riseP, aftershockP],
-    [1, 0.4, 1, 1.2, 0.45, 0.3, 0.35, 0.6]
+    [bass, midP, noiseP, sub, burstP, shatterP, riseP, aftershockP, crackP, boomP],
+    [1, 0.4, 1, 1.3, 0.5, 0.35, 0.35, 0.65, 0.3, 1.1]
   ));
 }
 
-// KO：戏剧性低频轰鸣 + 高冲击裂纹
+// KO：扩展低频轰鸣 + 巨大冲击
 function renderKO(sr: number): Float32Array {
-  const dur = 0.8;
+  const dur = 1.0;
   // 主锯齿波 — 大幅下降
-  const main = renderOsc(sr, dur, 'sawtooth', t => 200 - 250 * t, t => expDecay(t, 0.45, 3.5));
+  const main = renderOsc(sr, dur, 'sawtooth', t => 200 - 200 * t, t => expDecay(t, 0.5, 3));
   // 宽频噪声 — 冲击质感
-  const noise = renderNoise(sr, 0.5, t => expDecay(t, 0.25, 5));
-  // 子低音隆隆声 — 身体可感知
-  const sub = renderOsc(sr, 0.65, 'sine', t => 50 - 60 * t, t => expDecay(t, 0.4, 2.8));
+  const noise = renderNoise(sr, 0.6, t => expDecay(t, 0.28, 4));
+  // 子低音隆隆声 — 更长更深
+  const sub = renderOsc(sr, 0.8, 'sine', t => 40 - 40 * t, t => expDecay(t, 0.45, 2.2));
   // 金属质感回响 — 延迟0.1s
-  const ring = renderOsc(sr, 0.5, 'triangle', t => t < 0.01 ? 1800 : 1800 - 3500 * (t - 0.01), t => t < 0.08 ? 0.07 : expDecay(t - 0.08, 0.06, 7));
+  const ring = renderOsc(sr, 0.6, 'triangle', t => t < 0.01 ? 1800 : 1800 - 3500 * (t - 0.01), t => t < 0.08 ? 0.07 : expDecay(t - 0.08, 0.06, 6));
   // 高冲击裂纹 — 瞬态
-  const crack = renderOsc(sr, 0.04, 'square', t => 4000 - 80000 * t, t => expDecay(t, 0.2, 40));
+  const crack = renderOsc(sr, 0.05, 'square', t => 4000 - 80000 * t, t => expDecay(t, 0.22, 35));
   // 二次冲击 — 延迟0.08s
-  const impact2 = renderOsc(sr, 0.15, 'sine', t => 300 - 2000 * t, t => expDecay(t, 0.3, 8));
-  // 低频余震
-  const rumble = renderOsc(sr, 0.5, 'sine', t => 35 - 30 * t, t => t < 0.15 ? 0 : expDecay(t - 0.15, 0.15, 2));
+  const impact2 = renderOsc(sr, 0.18, 'sine', t => 300 - 2000 * t, t => expDecay(t, 0.35, 7));
+  // 低频余震 — 更长延展
+  const rumble = renderOsc(sr, 0.7, 'sine', t => 30 - 25 * t, t => t < 0.12 ? 0 : expDecay(t - 0.12, 0.18, 1.8));
+  // 扩展低频轰鸣层 — KO标志性的"BOOM"
+  const boom = renderOsc(sr, 0.6, 'sine', t => 55 - 50 * t, t => expDecay(t, 0.5, 2));
+  // 高频碎片 — 延迟0.15s
+  const debris = highPass(renderNoise(sr, 0.15, t => t < 0.005 ? 0 : expDecay(t - 0.005, 0.2, 12)), sr, 4000);
 
   const total = Math.ceil(sr * dur);
   const noiseP = padTo(noise, total);
@@ -290,45 +311,57 @@ function renderKO(sr: number): Float32Array {
   const crackP = padTo(crack, total);
   const impact2P = padTo(impact2, total, Math.floor(sr * 0.08));
   const rumbleP = padTo(rumble, total, Math.floor(sr * 0.2));
+  const boomP = padTo(boom, total);
+  const debrisP = padTo(debris, total, Math.floor(sr * 0.15));
 
   return normalize(mixLayers(
-    [main, noiseP, sub, ringP, crackP, impact2P, rumbleP],
-    [1, 0.5, 1.2, 0.25, 0.35, 0.5, 0.7]
+    [main, noiseP, sub, ringP, crackP, impact2P, rumbleP, boomP, debrisP],
+    [1, 0.5, 1.3, 0.25, 0.4, 0.55, 0.8, 1.2, 0.35]
   ));
 }
 
-// Counter：尖锐裂纹 + 延迟回声
+// Counter：明亮金属质感 + 额外延音
 function renderCounter(sr: number): Float32Array {
-  const dur = 0.25;
-  // 尖锐方波瞬态
-  const osc1 = renderOsc(sr, 0.08, 'square',
-    t => t < 0.02 ? 1800 : 2200,
-    t => expDecay(t, 0.18, 22));
+  const dur = 0.3;
+  // 尖锐方波瞬态 — 更高频率
+  const osc1 = renderOsc(sr, 0.09, 'square',
+    t => t < 0.02 ? 2200 : 2600,
+    t => expDecay(t, 0.2, 18));
   // 锯齿波裂纹 — 延迟0.05s
-  const osc2 = renderOsc(sr, 0.1, 'sawtooth',
-    t => 2500 - 28000 * t,
-    t => expDecay(t, 0.12, 18));
+  const osc2 = renderOsc(sr, 0.12, 'sawtooth',
+    t => 2800 - 30000 * t,
+    t => expDecay(t, 0.14, 15));
+  // 金属延音层 — 更长的持续共鸣
+  const sustain = renderOsc(sr, dur * 0.8, 'sine',
+    _t => 1800,
+    t => expDecay(t, 0.1, 6));
   // 回声层 — 延迟0.1s，衰减
-  const echo = renderOsc(sr, 0.08, 'triangle',
-    t => 1500 - 10000 * t,
-    t => expDecay(t, 0.08, 25));
-  // 高频闪亮感
-  const sparkle = renderOsc(sr, 0.04, 'sine',
-    t => 4000 - 30000 * t,
-    t => expDecay(t, 0.06, 40));
+  const echo = renderOsc(sr, 0.1, 'triangle',
+    t => 1800 - 12000 * t,
+    t => expDecay(t, 0.09, 20));
+  // 高频闪亮感 — 更明显
+  const sparkle = renderOsc(sr, 0.05, 'sine',
+    t => 5000 - 35000 * t,
+    t => expDecay(t, 0.08, 35));
   // 噪声层 — 尖锐打击感
-  const noiseHit = highPass(renderNoise(sr, 0.05, t => expDecay(t, 0.15, 30)), sr, 5000);
+  const noiseHit = highPass(renderNoise(sr, 0.06, t => expDecay(t, 0.18, 25)), sr, 5000);
+  // 金属泛音 — 延迟0.04s
+  const metalOvertone = renderOsc(sr, 0.08, 'triangle',
+    t => 3600 - 20000 * t,
+    t => expDecay(t, 0.06, 22));
 
   const total = Math.ceil(sr * dur);
+  const osc1P = padTo(osc1, total);
   const osc2P = padTo(osc2, total, Math.floor(sr * 0.05));
+  const sustainP = padTo(sustain, total, Math.floor(sr * 0.03));
   const echoP = padTo(echo, total, Math.floor(sr * 0.12));
   const sparkleP = padTo(sparkle, total, Math.floor(sr * 0.03));
   const noiseP = padTo(noiseHit, total);
-  const osc1P = padTo(osc1, total);
+  const metalP = padTo(metalOvertone, total, Math.floor(sr * 0.04));
 
   return normalize(mixLayers(
-    [osc1P, osc2P, echoP, sparkleP, noiseP],
-    [1, 0.7, 0.4, 0.3, 0.5]
+    [osc1P, osc2P, sustainP, echoP, sparkleP, noiseP, metalP],
+    [1, 0.7, 0.5, 0.4, 0.4, 0.5, 0.35]
   ));
 }
 
@@ -473,11 +506,16 @@ function renderRoll(sr: number): Float32Array {
 }
 
 function renderLanding(sr: number): Float32Array {
-  const dur = 0.07;
-  const thud = renderOsc(sr, dur, 'sine', t => 80 - 800 * t, t => expDecay(t, 0.1, 25));
-  const dust = renderNoise(sr, 0.04, t => expDecay(t, 0.06, 30));
+  const dur = 0.09;
+  // 低频着地冲击 — 更明显的"砰"
+  const thud = renderOsc(sr, dur, 'sine', t => 90 - 900 * t, t => expDecay(t, 0.12, 22));
+  // 地面尘土噪声
+  const dust = bandPass(renderNoise(sr, 0.05, t => expDecay(t, 0.07, 28)), sr, 600, 2500);
+  // 低频体感层 — 着地重量感
+  const weight = renderOsc(sr, dur * 0.6, 'sine', t => 60 - 400 * t, t => expDecay(t, 0.15, 18));
   const dustP = new Float32Array(Math.ceil(sr * dur)); dustP.set(dust);
-  return normalize(mixLayers([thud, dustP], [1, 0.5]));
+  const weightP = padTo(weight, Math.ceil(sr * dur));
+  return normalize(mixLayers([thud, dustP, weightP], [1, 0.55, 0.7]));
 }
 
 function renderProjectile(sr: number): Float32Array {
@@ -803,6 +841,144 @@ function renderSpecialHeavy(sr: number): Float32Array {
   return normalize(mixLayers([whoosh, nMidP, nHiP, metalP, impactP, subP], [1, 0.6, 0.3, 0.5, 0.7, 1.0]));
 }
 
+// === KO命中音效 — 击中KO时的独立音效 ===
+
+// KO命中：扩展低频轰鸣 + 巨大冲击 (用于KO最后一击命中时)
+function renderKOHit(sr: number): Float32Array {
+  const dur = 0.5;
+  // 初始冲击裂纹 — 极尖锐瞬态
+  const crack = renderOsc(sr, 0.04, 'square', t => 4500 - 90000 * t, t => expDecay(t, 0.25, 35));
+  // 扩展低频轰鸣
+  const rumble = renderOsc(sr, 0.45, 'sine', t => 50 - 55 * t, t => expDecay(t, 0.5, 2.2));
+  // 子低音爆炸
+  const sub = renderOsc(sr, 0.4, 'sine', t => 35 - 35 * t, t => expDecay(t, 0.45, 2));
+  // 宽频噪声冲击波
+  const noise = bandPass(renderNoise(sr, 0.25, t => expDecay(t, 0.4, 4)), sr, 200, 4000);
+  // 高频碎片
+  const debris = highPass(renderNoise(sr, 0.1, t => t < 0.005 ? 0 : expDecay(t - 0.005, 0.2, 15)), sr, 5000);
+  // 金属回响 — 延迟
+  const metal = renderOsc(sr, 0.15, 'triangle', t => 2000 - 15000 * t, t => expDecay(t, 0.1, 12));
+  // 中频冲击
+  const impact = renderOsc(sr, 0.12, 'sine', t => 200 - 1500 * t, t => expDecay(t, 0.35, 8));
+
+  const total = Math.ceil(sr * dur);
+  const crackP = padTo(crack, total);
+  const debrisP = padTo(debris, total, Math.floor(sr * 0.03));
+  const metalP = padTo(metal, total, Math.floor(sr * 0.06));
+  const impactP = padTo(impact, total, Math.floor(sr * 0.04));
+
+  return normalize(mixLayers(
+    [crackP, rumble, sub, noise, debrisP, metalP, impactP],
+    [0.5, 1.3, 1.2, 1, 0.4, 0.35, 0.7]
+  ));
+}
+
+// 重落地：从高空落地的重击声
+function renderLandingHeavy(sr: number): Float32Array {
+  const dur = 0.14;
+  // 深沉低频着地冲击
+  const thud = renderOsc(sr, dur, 'sine', t => 70 - 700 * t, t => expDecay(t, 0.15, 16));
+  // 低频体感层
+  const sub = renderOsc(sr, dur * 0.8, 'sine', t => 45 - 300 * t, t => expDecay(t, 0.2, 12));
+  // 地面尘土噪声 — 更强
+  const dust = bandPass(renderNoise(sr, 0.08, t => expDecay(t, 0.1, 20)), sr, 500, 3000);
+  // 中频冲击层
+  const impact = renderOsc(sr, dur * 0.5, 'triangle', t => 200 - 2500 * t, t => expDecay(t, 0.12, 25));
+  // 高频碎片 — 地面碎片飞溅感
+  const debris = highPass(renderNoise(sr, 0.04, t => expDecay(t, 0.06, 35)), sr, 4000);
+
+  const total = Math.ceil(sr * dur);
+  const dustP = padTo(dust, total);
+  const impactP = padTo(impact, total);
+  const debrisP = padTo(debris, total);
+
+  return normalize(mixLayers([thud, sub, dustP, impactP, debrisP], [1, 0.8, 0.6, 0.5, 0.3]));
+}
+
+// === 角色特有音效点缀 ===
+
+// 火焰噼啪声 — Kyo/Mai/Chris等火属性角色特殊技/DM命中叠加
+function renderAccentFire(sr: number): Float32Array {
+  const dur = 0.18;
+  // 火焰噪声 — 中高频不规则噼啪
+  const crackle = bandPass(renderNoise(sr, dur, t => expDecay(t, 0.2, 12)), sr, 1500, 6000);
+  // 火焰嘶嘶声 — 高频
+  const hiss = highPass(renderNoise(sr, dur * 0.6, t => expDecay(t, 0.1, 18)), sr, 5000);
+  // 热浪低频 — 隐约的隆隆声
+  const warmth = renderOsc(sr, dur * 0.7, 'sine', t => 120 - 800 * t, t => expDecay(t, 0.12, 15));
+  // 噼啪瞬态 — 模拟火星爆裂
+  const pop = renderOsc(sr, 0.02, 'square', t => 3000 - 60000 * t, t => expDecay(t, 0.15, 50));
+  // 高频闪烁
+  const sparkle = renderOsc(sr, 0.04, 'sine', t => 5000 - 40000 * t, t => expDecay(t, 0.06, 35));
+
+  const total = Math.ceil(sr * dur);
+  const hissP = padTo(hiss, total);
+  const warmthP = padTo(warmth, total);
+  const popP = padTo(pop, total);
+  const sparkleP = padTo(sparkle, total, Math.floor(sr * 0.02));
+
+  return normalize(mixLayers([crackle, hissP, warmthP, popP, sparkleP], [1, 0.5, 0.6, 0.4, 0.3]));
+}
+
+// 紫色能量闪烁 — Iori/Mature/Vice等暗能量角色
+function renderAccentPurple(sr: number): Float32Array {
+  const dur = 0.2;
+  // 能量嗡鸣 — 低中频
+  const hum = renderOsc(sr, dur, 'sine', t => 300 - 1500 * t, t => expDecay(t, 0.15, 10));
+  // 暗能量闪烁 — 高频噪声
+  const shimmer = highPass(renderNoise(sr, dur * 0.7, t => expDecay(t, 0.12, 15)), sr, 4000);
+  // 暗能量脉冲 — 中频三角波
+  const pulse = renderOsc(sr, dur * 0.5, 'triangle', t => 800 - 8000 * t, t => expDecay(t, 0.1, 20));
+  // 空洞回响 — 模拟暗能量的"空间感"
+  const void_echo = renderOsc(sr, dur, 'sine', t => 200 - 1000 * t, t => t < 0.03 ? 0 : expDecay(t - 0.03, 0.08, 12));
+
+  const total = Math.ceil(sr * dur);
+  const shimmerP = padTo(shimmer, total);
+  const pulseP = padTo(pulse, total);
+  const echoP = padTo(void_echo, total);
+
+  return normalize(mixLayers([hum, shimmerP, pulseP, echoP], [1, 0.6, 0.7, 0.4]));
+}
+
+// 冰晶声音 — Kula等冰属性角色
+function renderAccentIce(sr: number): Float32Array {
+  const dur = 0.2;
+  // 高音冰晶碎裂 — 更高音调的结晶质感
+  const crystal = renderOsc(sr, dur * 0.6, 'triangle', t => 4500 - 35000 * t, t => expDecay(t, 0.1, 22));
+  // 冰面碎裂噪声 — 高频闪烁
+  const crackle = highPass(renderNoise(sr, dur * 0.5, t => expDecay(t, 0.12, 20)), sr, 6000);
+  // 冷冻共鸣 — 高频正弦
+  const ring = renderOsc(sr, dur, 'sine', t => 3000 - 15000 * t, t => expDecay(t, 0.08, 15));
+  // 颤音 — 模拟冰面震颤
+  const vibrato = renderOsc(sr, dur * 0.4, 'sine',
+    t => 2500 + 800 * Math.sin(t * 120),
+    t => expDecay(t, 0.08, 25));
+
+  const total = Math.ceil(sr * dur);
+  const crackleP = padTo(crackle, total);
+  const ringP = padTo(ring, total);
+  const vibratoP = padTo(vibrato, total);
+
+  return normalize(mixLayers([crystal, crackleP, ringP, vibratoP], [1, 0.5, 0.6, 0.4]));
+}
+
+// 通用能量点缀 — 非火/冰/暗角色的默认能量点缀
+function renderAccentGeneric(sr: number): Float32Array {
+  const dur = 0.12;
+  // 中频能量脉冲
+  const pulse = renderOsc(sr, dur, 'sine', t => 400 - 3000 * t, t => expDecay(t, 0.12, 18));
+  // 高频闪烁
+  const sparkle = highPass(renderNoise(sr, dur * 0.6, t => expDecay(t, 0.08, 25)), sr, 5000);
+  // 短冲击
+  const snap = renderOsc(sr, dur * 0.3, 'triangle', t => 1800 - 20000 * t, t => expDecay(t, 0.1, 30));
+
+  const total = Math.ceil(sr * dur);
+  const sparkleP = padTo(sparkle, total);
+  const snapP = padTo(snap, total);
+
+  return normalize(mixLayers([pulse, sparkleP, snapP], [1, 0.4, 0.5]));
+}
+
 // === 初始化：预渲染所有采样 ===
 
 export function initSampler(): void {
@@ -853,6 +1029,14 @@ export function initSampler(): void {
     ['block_dm', renderBlockDM],
     ['special_light', renderSpecialLight],
     ['special_heavy', renderSpecialHeavy],
+    // KO命中 + 重落地
+    ['ko_hit', renderKOHit],
+    ['landing_heavy', renderLandingHeavy],
+    // 角色特有音效点缀
+    ['accent_fire', renderAccentFire],
+    ['accent_purple', renderAccentPurple],
+    ['accent_ice', renderAccentIce],
+    ['accent_generic', renderAccentGeneric],
   ];
 
   for (const [id, renderer] of renderers) {
@@ -865,7 +1049,7 @@ export function initSampler(): void {
 
 /** Add EQ boost for hit-type samples (3kHz peaking, +3dB). */
 function addHitEQ(ctx: AudioContext, sampleId: string, destination: AudioNode): AudioNode {
-  if (sampleId.startsWith('hit_')) {
+  if (sampleId.startsWith('hit_') || sampleId === 'ko_hit') {
     const eq = ctx.createBiquadFilter();
     eq.type = 'peaking';
     eq.frequency.value = 3000;
@@ -881,7 +1065,8 @@ function addHitEQ(ctx: AudioContext, sampleId: string, destination: AudioNode): 
 function addSubBassPulse(ctx: AudioContext, sampleId: string, now: number): void {
   if (sampleId === 'dm' || sampleId === 'ko' || sampleId === 'guard_break'
     || sampleId === 'wall_bounce_heavy' || sampleId === 'super_flash'
-    || sampleId === 'super_flash_sdm' || sampleId === 'max_activation') {
+    || sampleId === 'super_flash_sdm' || sampleId === 'max_activation'
+    || sampleId === 'ko_hit' || sampleId === 'landing_heavy') {
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
     osc.type = 'sine';
@@ -973,3 +1158,47 @@ export function playBlockSpecial(): void { initSampler(); play('block_special');
 export function playBlockDM(): void { initSampler(); play('block_dm'); }
 export function playSpecialLight(): void { initSampler(); play('special_light'); }
 export function playSpecialHeavy(): void { initSampler(); play('special_heavy'); }
+
+// KO命中 + 重落地公开API
+export function playKOHit(): void { initSampler(); play('ko_hit'); }
+export function playLandingHeavy(): void { initSampler(); play('landing_heavy'); }
+
+// === 角色特有音效点缀系统 ===
+
+/** 角色属性分类 — 决定使用哪种能量点缀音效 */
+type CharacterAccent = 'fire' | 'purple' | 'ice' | 'generic';
+
+/** 根据角色ID返回其能量属性 */
+function getCharacterAccent(charId: string): CharacterAccent {
+  switch (charId) {
+    // 火属性: Kyo, Mai, Chris, Joe, K', Andy
+    case 'kyo': case 'mai': case 'chris': case 'joe': case 'kdash': case 'andy':
+      return 'fire';
+    // 暗能量: Iori, Mature, Vice, Yamazaki
+    case 'iori': case 'mature': case 'vice': case 'yamazaki':
+      return 'purple';
+    // 冰属性: Kula
+    case 'kula':
+      return 'ice';
+    // 默认: 所有其他角色
+    default:
+      return 'generic';
+  }
+}
+
+/** 播放角色特有的能量点缀音效 — 叠加在必杀技/DM命中音效上 */
+export function playHitAccent(charId: string, isDM: boolean = false): void {
+  initSampler();
+  const accent = getCharacterAccent(charId);
+  const accentMap: Record<CharacterAccent, SampleId> = {
+    fire: 'accent_fire',
+    purple: 'accent_purple',
+    ice: 'accent_ice',
+    generic: 'accent_generic',
+  };
+  // DM时音量更大
+  play(accentMap[accent], isDM ? 0.9 : 0.55);
+}
+
+/** 播放重落地音效 — KO落地或从高处落下时使用 */
+export function playHeavyLanding(): void { initSampler(); play('landing_heavy'); }

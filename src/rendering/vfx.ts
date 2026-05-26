@@ -36,11 +36,13 @@ import {
   spawnTauntSparks,
   spawnCancelFlash,
   spawnDizzyStars,
+  spawnFloatingComboText,
 } from './vfxPresets.js';
 import type { Particle } from './vfxPresets.js';
 
 // re-export Particle接口, 保持外部导入路径不变
 export type { Particle } from './vfxPresets.js';
+export { getSparkSizeScaleFromDamage } from './vfxPresets.js';
 
 /** 全屏冲击闪光叠加层 */
 export class ScreenFlash {
@@ -91,9 +93,9 @@ export class VFXSystem {
     spawnBlockFlash(this.particles, worldX, worldY, scale);
   }
 
-  /** 角色专属命中火花 — KOF风格, 更大更亮 */
-  spawnCharacterHitSparks(worldX: number, worldY: number, count: number, charColor: string, sizeScale?: number, speedScale?: number, starRatio?: number, lowGravity?: boolean): void {
-    spawnCharacterHitSparks(this.particles, worldX, worldY, count, charColor, sizeScale, speedScale, starRatio, lowGravity);
+  /** 角色专属命中火花 — KOF风格, 更大更亮. facing: 攻击者朝向(1右/-1左)控制飞散方向 */
+  spawnCharacterHitSparks(worldX: number, worldY: number, count: number, charColor: string, sizeScale?: number, speedScale?: number, starRatio?: number, lowGravity?: boolean, facing?: number): void {
+    spawnCharacterHitSparks(this.particles, worldX, worldY, count, charColor, sizeScale, speedScale, starRatio, lowGravity, facing);
   }
 
   spawnGuardCrushSparks(worldX: number, worldY: number): void {
@@ -227,6 +229,11 @@ export class VFXSystem {
   /** Dizzy stars — orbiting stars above character's head during stun */
   spawnDizzyStars(worldX: number, worldY: number): void {
     spawnDizzyStars(this.particles, worldX, worldY);
+  }
+
+  /** 浮动连击文本 — "N HIT (totalDmg)" 格式, 2-4白色/5-9黄色/10+红色 */
+  spawnFloatingComboText(worldX: number, worldY: number, combo: number, totalDamage: number): void {
+    spawnFloatingComboText(this.particles, worldX, worldY, combo, totalDamage);
   }
 
   update(): void {

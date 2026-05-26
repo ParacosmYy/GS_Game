@@ -248,6 +248,7 @@ function update(): void {
       gs.firstHitTracked = false;
       gs.firstAttacker = null;
       gs.koGroundSlamDone = false;
+      bgm.setStage(getStage());
       bgm.start();
       ambient.start(getStage());
     }
@@ -768,6 +769,29 @@ function render(): void {
   }
   if (rounds.fadeAlpha > 0) { ctx.fillStyle = `rgba(0,0,0,${rounds.fadeAlpha})`; ctx.fillRect(0, 0, canvas.width, canvas.height); }
   screenFlash.render(ctx, canvas.width, canvas.height);
+  // KO去饱和闪光 + 红色暗角 — 由CinematicState控制
+  if (cinematic.koDesaturateTimer > 0) {
+    const desatAlpha = cinematic.koDesaturateTimer / 12;
+    ctx.save();
+    ctx.globalAlpha = Math.min(0.6, desatAlpha * 0.6);
+    ctx.fillStyle = '#888888';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.restore();
+  }
+  if (cinematic.koVignetteTimer > 0) {
+    const vigAlpha = Math.min(0.5, cinematic.koVignetteTimer / 90 * 0.5);
+    ctx.save();
+    const vigGrad = ctx.createRadialGradient(
+      canvas.width / 2, canvas.height / 2, canvas.height * 0.25,
+      canvas.width / 2, canvas.height / 2, canvas.width * 0.8,
+    );
+    vigGrad.addColorStop(0, 'rgba(0,0,0,0)');
+    vigGrad.addColorStop(0.5, `rgba(80,0,0,${vigAlpha * 0.3})`);
+    vigGrad.addColorStop(1, `rgba(120,0,0,${vigAlpha})`);
+    ctx.fillStyle = vigGrad;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.restore();
+  }
   if (gs.modeIndicatorTimer > 0) {
     renderer.drawModeIndicator(gs.simplifiedMode, Math.min(1, gs.modeIndicatorTimer / 60));
     gs.modeIndicatorTimer--;
@@ -812,7 +836,7 @@ window.addEventListener('keydown', e => {
   if (e.code === 'KeyM') announcer.toggle();
   if (e.code === 'KeyB') bgm.toggle();
   if (e.code === 'Tab') { e.preventDefault(); gs.simplifiedMode = !gs.simplifiedMode; gs.modeIndicatorTimer = 120; }
-  if (e.code === 'KeyN') { const s = cycleStage(); console.log('Stage:', s); gs.stageIndicatorTimer = 120; }
+  if (e.code === 'KeyN') { const s = cycleStage(); bgm.setStage(s); console.log('Stage:', s); gs.stageIndicatorTimer = 120; }
 });
 window.addEventListener('keyup', e => { if (e.code === 'F1') f1Down = false; });
 

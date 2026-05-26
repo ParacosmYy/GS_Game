@@ -10,7 +10,7 @@ import { FRAME_DATA, STAGE_WIDTH, MAX_STOCKS, METER_PER_STOCK } from '../core/co
 import { ROSTER } from '../characters/index.js';
 import { isDM as isDMCheck } from '../core/attackClassifier.js';
 import { gainMeterOnHit, gainMeterOnBlock, gainMeterOnHitstun } from './meter.js';
-import { playHit, playBlock, playSpecial, playDM, playThrow, playCounter, playHeavyHit, playSuperFlash, playWire, playJuggleHit, playBlockSpecial, playBlockDM, playSpecialLight, playSpecialHeavy } from '../audio/sampler.js';
+import { playHit, playBlock, playSpecial, playDM, playThrow, playCounter, playHeavyHit, playSuperFlash, playWire, playJuggleHit, playBlockSpecial, playBlockDM, playSpecialLight, playSpecialHeavy, playKOHit, playHitAccent, playLandingHeavy } from '../audio/sampler.js';
 import { bgm } from '../audio/bgm.js';
 import type { CinematicState } from '../state/cinematicState.js';
 
@@ -79,6 +79,22 @@ function getAttackDirectionBias(attacker: Fighter, defender: Fighter, attackType
   return attacker.facing * 2;
 }
 
+/**
+ * 基于伤害量的火花尺寸分级:
+ * - Light (damage < 50): small spark (radius 8-12)
+ * - Medium (50-100): medium spark (radius 14-20)
+ * - Heavy (100-150): large spark (radius 22-30)
+ * - Special (150+): extra large with ring burst
+ * - DM (200+): screen-wide flash + massive spark
+ */
+function getDamageSizeScale(damage: number): number {
+  if (damage >= 200) return 1.7;
+  if (damage >= 150) return 1.4;
+  if (damage >= 100) return 1.1;
+  if (damage >= 50) return 0.8;
+  return 0.5;
+}
+
 export interface HitCallbackDeps {
   fighters: [Fighter, Fighter];
   vfx: VFXSystem;
@@ -120,10 +136,10 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       const blkFlashScale = blkDM ? 1.5 : blkSpecial ? 1.15 : blkHeavy ? 1.05 : 0.9;
       deps.vfx.spawnBlockFlash(blkX, blkY, blkFlashScale);
       if (blkDM) {
-        deps.vfx.spawnCharacterHitSparks(blkX, blkY, 12, blkColor, 1.3);
+        deps.vfx.spawnCharacterHitSparks(blkX, blkY, 12, blkColor, 1.3, undefined, undefined, undefined, attacker.facing);
         deps.screenFlash.trigger('#4466ff', 0.1, 3);
       } else if (blkSpecial) {
-        deps.vfx.spawnCharacterHitSparks(blkX, blkY, 4, blkColor, 1.0);
+        deps.vfx.spawnCharacterHitSparks(blkX, blkY, 4, blkColor, 1.0, undefined, undefined, undefined, attacker.facing);
       }
       // KOF2002: 重攻击/必杀防御时脚下尘土
       if (blkHeavy || blkDM) {
@@ -152,6 +168,7 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
 
     const { isDM, isSDM, isSpecial } = classifyAttack(attackType);
     const combo = deps.combatSystem.getComboCount(defIdx);
+    const comboDmg = deps.combatSystem.getComboDamage(defIdx);
     const baseStop = calcHitStop(attackType, isDM, isSpecial, counterHit);
     // 连击和低血只做轻微补强，避免把命中时间线拖成堆栈
     const comboStop = combo >= 10 ? 1 : 0;
@@ -167,19 +184,48 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       ? ROSTER.find(c => c.id === p1.charId) || ROSTER[0]
       : ROSTER.find(c => c.id === p2.charId) || ROSTER[1];
     const { isPunch } = classifyAttack(attackType);
+
+    // === 基于伤害的火花尺寸分级 ===
+    // 取攻击类型分类和伤害分级中的较大值，确保DM/必杀技有足够的辨识度
+    const typeSizeScale = isSDM ? 1.5 : isDM ? 1.3 : isSpecial ? 1.1 : isHeavyAttack(attackType) ? 0.85 : 0.55;
+    const dmgSizeScale = getDamageSizeScale(data.damage);
+    const sparkSize = Math.max(typeSizeScale, dmgSizeScale);
+    // Counter Hit: 火花尺寸翻倍
+    const chSizeBonus = counterHit ? 2.0 : 1.0;
+
     // 火花收口：保留主爆点，砍掉过多补层
     const comboSparkBonus = combo >= 10 ? 3 : combo >= 5 ? 1 : 0;
     const lowHpBonus = defender.health < defender.maxHealth * 0.25 ? 2 : 0;
     const sparks = (isSDM ? 18 : isDM ? 14 : isSpecial ? 10 : counterHit ? 8 : 6) + comboSparkBonus + lowHpBonus;
-    const sparkColor = isSpecial ? atkChar.specialColor : isPunch ? '#ffdd44' : '#44ddff';
-    const sparkSize = isSDM ? 1.5 : isDM ? 1.3 : isSpecial ? 1.1 : isHeavyAttack(attackType) ? 0.85 : 0.55;
+    // CH时用橙红色调
+    const sparkColor = counterHit ? '#ff6600' : isSpecial ? atkChar.specialColor : isPunch ? '#ffdd44' : '#44ddff';
     // 连击中VFX递减: 高连击时火花逐步缩小，避免画面过于密集
     const comboSparkScale = combo >= 6 ? 0.8 : combo >= 3 ? 0.9 : 1.0;
     const sparkSpeed = isDM ? 1.15 : isSpecial ? 1.05 : 0.95;
     // 星体比例收紧，避免画面太"烟花化"
     const sparkStarRatio = isSDM ? 0.55 : isDM ? 0.45 : isSpecial ? 0.3 : isHeavyAttack(attackType) ? 0.2 : 0.15;
     const sparkLowGrav = !defender.isGrounded() && !isDM;
-    deps.vfx.spawnCharacterHitSparks(hitX, hitY, sparks, sparkColor, sparkSize * comboSparkScale, sparkSpeed, sparkStarRatio, sparkLowGrav);
+    // === 传递facing参数，让火花方向基于攻击者朝向 ===
+    deps.vfx.spawnCharacterHitSparks(hitX, hitY, sparks, sparkColor, sparkSize * comboSparkScale * chSizeBonus, sparkSpeed, sparkStarRatio, sparkLowGrav, attacker.facing);
+
+    // === DM (200+ damage): 屏幕宽闪光 + 巨大火花 ===
+    if (isDM) {
+      deps.vfx.spawnSuperBurst(hitX, hitY, atkChar.specialColor, atkChar.specialGlow, isSDM);
+      if (defender.isGrounded()) {
+        deps.vfx.spawnHeavyDust(hitX, defender.y, 6);
+        deps.vfx.spawnImpactRing(hitX, defender.y, 2.0);
+      } else {
+        deps.vfx.spawnCharacterHitSparks(hitX, hitY - 16, 4, atkChar.specialGlow, 0.6, 0.75, 0.18, true, attacker.facing);
+      }
+      if (isSDM) {
+        // SDM: 全屏明亮闪光
+        deps.screenFlash.trigger('#ffdd44', 0.35, 10);
+        deps.vfx.spawnImpactRing(hitX, hitY, 1.1);
+      } else {
+        deps.screenFlash.trigger('#fffde8', 0.25, 6);
+      }
+    }
+
     // 冲击环只保留主环，连击只轻微放大，不再堆双环
     const ringScale = sparkSize + (combo >= 5 ? 0.2 : 0);
     deps.vfx.spawnImpactRing(hitX, hitY, ringScale);
@@ -188,23 +234,6 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
     if (isHeavyAttack(attackType) || isSpecial) {
       const slashScale = isDM ? 1.6 : isSpecial ? 1.2 : 1.0;
       deps.vfx.spawnSlashLine(hitX, hitY, attacker.facing, sparkColor, slashScale);
-    }
-
-    // DM: 只保留最有辨识度的爆点，删掉多余二次铺层
-    if (isDM) {
-      deps.vfx.spawnSuperBurst(hitX, hitY, atkChar.specialColor, atkChar.specialGlow, isSDM);
-      if (defender.isGrounded()) {
-        deps.vfx.spawnHeavyDust(hitX, defender.y, 6);
-        deps.vfx.spawnImpactRing(hitX, defender.y, 2.0);
-      } else {
-        deps.vfx.spawnCharacterHitSparks(hitX, hitY - 16, 4, atkChar.specialGlow, 0.6, 0.75, 0.18, true);
-      }
-      if (isSDM) {
-        deps.screenFlash.trigger('#ffdd44', 0.32, 10);
-        deps.vfx.spawnImpactRing(hitX, hitY, 1.1);
-      } else {
-        deps.screenFlash.trigger('#fffde8', 0.22, 6);
-      }
     }
 
     // 伤害数字 — KOF2002: DM用角色色, CH用橙色, 通常用默认分级色
@@ -236,9 +265,9 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       || attackType === AttackType.KIM_HIENZAN
       || attackType === AttackType.RYO_HIEN;
     if (isRekkaFinisher) {
-      deps.vfx.spawnCharacterHitSparks(hitX, hitY, 10, atkChar.specialGlow, 1.0);
+      deps.vfx.spawnCharacterHitSparks(hitX, hitY, 10, atkChar.specialGlow, 1.0, undefined, undefined, undefined, attacker.facing);
       deps.vfx.spawnImpactRing(hitX, hitY, 1.1);
-      deps.vfx.spawnCharacterHitSparks(hitX, hitY, 4, atkChar.specialColor, 0.6);
+      deps.vfx.spawnCharacterHitSparks(hitX, hitY, 4, atkChar.specialColor, 0.6, undefined, undefined, undefined, attacker.facing);
       deps.screenFlash.trigger(atkChar.specialColor, 0.1, 4);
       deps.screenShake.trigger(6, 8, getAttackDirectionBias(attacker, defender, attackType, counterHit));
     }
@@ -249,7 +278,7 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       playThrow();
       // 投技保留一层主火花，减少蓝白多段铺开
       const throwColor = atkChar.specialColor;
-      deps.vfx.spawnCharacterHitSparks(hitX, hitY, 8, throwColor, 0.95, 0.95, 0.25);
+      deps.vfx.spawnCharacterHitSparks(hitX, hitY, 8, throwColor, 0.95, 0.95, 0.25, false, attacker.facing);
       deps.vfx.spawnImpactRing(hitX, hitY, 0.95);
       deps.screenFlash.trigger('#aaddff', 0.1, 4);
       if (defender.isGrounded()) {
@@ -262,6 +291,17 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
     else if (!defender.isGrounded()) playJuggleHit(combo);
     else playHit(data.damage > 50 ? 1.2 : 1.0, combo);
 
+    // 角色特有能量点缀 — 必杀技/DM命中时叠加角色属性音效
+    if (isDM || isSpecial) {
+      playHitAccent(attacker.charId, isDM);
+    }
+
+    // KO命中检测 — 最后一击将对手击至0血时播放KO命中音效
+    const isKOHit = defender.health <= 0;
+    if (isKOHit) {
+      playKOHit();
+    }
+
     // Sidechain duck: lower BGM briefly so SFX cuts through
     if (isDM) bgm.duck(0.55, 200);
     else if (isSpecial) bgm.duck(0.65, 150);
@@ -269,19 +309,21 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
     else if (isHeavyAttack(attackType)) bgm.duck(0.72, 120);
     else bgm.duck(0.78, 100);
 
-    // Counter Hit — KOF2002: CH额外顿帧+橙色爆发+冲击波
+    // === Counter Hit 增强 ===
     if (counterHit) {
+      // CH文字 — 位置在被击方头顶上方
       deps.vfx.spawnCounterText(defender.x, defender.y - defender.displayHeight - 55);
-      deps.screenFlash.trigger('#ffaa00', 0.12, 4);
-      // CH保留一个橙色爆点，不再额外堆双环
-      deps.vfx.spawnCharacterHitSparks(hitX, hitY, 6, '#ff8800', 0.9, 1.0, 0.22);
+      // CH: 橙色2帧屏幕闪光
+      deps.screenFlash.trigger('#ff8800', 0.18, 2);
+      // CH: 橙红色爆发 + 双倍尺寸
+      deps.vfx.spawnCharacterHitSparks(hitX, hitY, 6, '#ff8800', 0.9 * 2, 1.0, 0.22, false, attacker.facing);
       deps.vfx.spawnImpactRing(hitX, hitY, 1.15);
       playCounter();
       bgm.duck(0.6, 180);
     }
     if (counterHit && (data as { counterWire?: boolean }).counterWire) {
       deps.vfx.spawnWireText(defender.x, defender.y - defender.displayHeight - 55);
-      deps.vfx.spawnCharacterHitSparks(hitX, hitY, 10, '#ff6600', 0.95, 1.0, 0.2);
+      deps.vfx.spawnCharacterHitSparks(hitX, hitY, 10, '#ff6600', 0.95, 1.0, 0.2, false, attacker.facing);
       deps.vfx.spawnImpactRing(hitX, hitY, 1.0);
       deps.screenFlash.trigger('#ff6600', 0.12, 4);
       deps.screenShake.trigger(8, 8, getAttackDirectionBias(attacker, defender, attackType, counterHit));
@@ -301,7 +343,7 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
     // 空中命中只保留轻飘粒子和一个很弱的辅助环，避免层数过多
     if (!defender.isGrounded() && !isDM) {
       const airBonus = combo >= 5 ? 2 : 0;
-      deps.vfx.spawnCharacterHitSparks(hitX, hitY - 14, 4 + airBonus, '#aaddff', 0.65, 0.75, 0.15, true);
+      deps.vfx.spawnCharacterHitSparks(hitX, hitY - 14, 4 + airBonus, '#aaddff', 0.65, 0.75, 0.15, true, attacker.facing);
       if (combo >= 5) deps.vfx.spawnImpactRing(hitX, hitY, 0.45);
     }
     // KOF2002: 站立被通常技命中时脚下尘土
@@ -315,9 +357,9 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
 
     // CD击飞攻击: 更强的冲击反馈
     if (attackType === AttackType.STAND_CD || attackType === AttackType.JUMP_CD) {
-      deps.vfx.spawnCharacterHitSparks(hitX, hitY, 10, '#ffaa00', 0.95, 1.0, 0.25);
+      deps.vfx.spawnCharacterHitSparks(hitX, hitY, 10, '#ffaa00', 0.95, 1.0, 0.25, false, attacker.facing);
       deps.vfx.spawnImpactRing(hitX, hitY);
-      deps.vfx.spawnCharacterHitSparks(hitX, hitY, 6, '#ffffff', 0.7, 0.9, 0.1);
+      deps.vfx.spawnCharacterHitSparks(hitX, hitY, 6, '#ffffff', 0.7, 0.9, 0.1, false, attacker.facing);
       deps.screenFlash.trigger('#ffcc44', 0.1, 3);
       deps.screenShake.trigger(5, 7, getAttackDirectionBias(attacker, defender, attackType, counterHit));
     }
@@ -327,18 +369,27 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       deps.screenFlash.trigger('#ffffaa', 0.18, 6);
       deps.screenShake.trigger(8, 12);
       // Extra burst at the dizzy point
-      deps.vfx.spawnCharacterHitSparks(hitX, hitY, 12, '#ffff44', 1.2, 1.0, 0.3);
+      deps.vfx.spawnCharacterHitSparks(hitX, hitY, 12, '#ffff44', 1.2, 1.0, 0.3, false, attacker.facing);
     }
 
-    // 连击数显示 + 高连击冲击环
-    if (combo >= 2) deps.vfx.spawnDamageText(defender.x, defender.y - defender.displayHeight - 40, combo);
+    // === 浮动连击文本 ===
+    // combo >= 2 时在防守方头顶显示 "N HIT (totalDmg)" 格式的浮动文本
+    if (combo >= 2) {
+      // 保留旧版数字显示(向后兼容)
+      deps.vfx.spawnDamageText(defender.x, defender.y - defender.displayHeight - 40, combo);
+      // 新增: 浮动连击文本 — 位置在头顶偏上，显示连击数+累计伤害
+      deps.vfx.spawnFloatingComboText(
+        defender.x, defender.y - defender.displayHeight - 55,
+        combo, comboDmg,
+      );
+    }
     // 连击只轻微补一层，不再额外叠满屏中环
     if (combo >= 5 && combo < 10) {
       deps.vfx.spawnImpactRing(hitX, hitY, 1.1);
     }
     if (combo >= 10) {
       deps.vfx.spawnImpactRing(hitX, hitY, 1.4);
-      deps.vfx.spawnCharacterHitSparks(hitX, hitY, 4, '#ffffff', 0.45, 1.6, 0.1);
+      deps.vfx.spawnCharacterHitSparks(hitX, hitY, 4, '#ffffff', 0.45, 1.6, 0.1, false, attacker.facing);
       deps.screenFlash.trigger('#ffffff', 0.04, 2);
     }
 
@@ -365,6 +416,8 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
 
 /** KO落地特效触发 — 从main.ts调用 */
 export function triggerKOGroundEffect(deps: { vfx: VFXSystem; screenFlash: ScreenFlash; screenShake: ScreenShake }, defender: Fighter): void {
+  // KO落地重击音效 — 区别于普通落地
+  playLandingHeavy();
   deps.vfx.spawnGroundSlam(defender.x, defender.y);
   deps.vfx.spawnHeavyDust(defender.x, defender.y, 16);
   // KOF2002: KO落地冲击环+白色火花
@@ -372,6 +425,9 @@ export function triggerKOGroundEffect(deps: { vfx: VFXSystem; screenFlash: Scree
   // KOF2002: KO落地暗红色脉冲环 — 最终终结感
   deps.vfx.spawnImpactRing(defender.x, defender.y, 3.0);
   deps.vfx.spawnCharacterHitSparks(defender.x, defender.y - 20, 16, '#ff4400', 1.2, 1.5);
+  // KO: 去饱和闪光 — 先白色2帧模拟去色, 再暗红脉冲
+  deps.screenFlash.trigger('#ffffff', 0.25, 2);
+  // 短暂延迟后叠加红色(通过延长闪光时间实现)
   deps.screenFlash.trigger('#ff2200', 0.35, 14);
   // KOF2002: KO落地震屏55帧, 模拟地面冲击波持续感
   deps.screenShake.trigger(22, 55);

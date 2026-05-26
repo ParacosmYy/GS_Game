@@ -44,8 +44,24 @@ export function spawnBlockFlash(particles: Particle[], worldX: number, worldY: n
   });
 }
 
-/** 角色专属命中火花 — KOF风格, 更大更亮. starRatio: DM 0.7, 必杀 0.5, 重攻击 0.35, 轻攻击 0.25 */
-export function spawnCharacterHitSparks(particles: Particle[], worldX: number, worldY: number, count: number, charColor: string, sizeScale: number = 1.0, speedScale: number = 1.0, starRatio: number = 0.2, lowGravity: boolean = false): void {
+/**
+ * 基于伤害量的火花尺寸分级:
+ * - Light (damage < 50): small spark, sizeScale ~0.5
+ * - Medium (50-100): medium spark, sizeScale ~0.8
+ * - Heavy (100-150): large spark, sizeScale ~1.1
+ * - Special (150-200): extra large + ring burst, sizeScale ~1.4
+ * - DM (200+): screen flash + massive spark, sizeScale ~1.7
+ */
+export function getSparkSizeScaleFromDamage(damage: number): number {
+  if (damage >= 200) return 1.7;
+  if (damage >= 150) return 1.4;
+  if (damage >= 100) return 1.1;
+  if (damage >= 50) return 0.8;
+  return 0.5;
+}
+
+/** 角色专属命中火花 — KOF风格, 更大更亮. facing: 攻击者朝向(1右/-1左), 控制火花飞散方向 */
+export function spawnCharacterHitSparks(particles: Particle[], worldX: number, worldY: number, count: number, charColor: string, sizeScale: number = 1.0, speedScale: number = 1.0, starRatio: number = 0.2, lowGravity: boolean = false, facing: number = 0): void {
   particles.push({
     x: worldX, y: worldY, vx: 0, vy: 0,
     life: 6, maxLife: 6, size: 24 * sizeScale,
@@ -58,15 +74,37 @@ export function spawnCharacterHitSparks(particles: Particle[], worldX: number, w
     color: '#ffffff', type: 'flash',
   });
   const grav = lowGravity ? 0.04 : 0.12;
-  // KOF2002: 火花方向偏置 — 向上扩散为主(前半球偏重), 更自然
+  // KOF2002: 火花方向偏置 — 根据攻击者朝向, 火花向被击者身后飞散
+  // facing > 0: 攻击者面向右, 火花应向右扩散 (命中点右侧)
+  // facing < 0: 攻击者面向左, 火花应向左扩散 (命中点左侧)
+  // facing === 0: 保持旧版向上偏置 (向后兼容)
+  const dirBias = facing !== 0 ? facing : 0;
   for (let i = 0; i < count; i++) {
-    const angle = -Math.PI * 0.8 + Math.random() * Math.PI * 1.6;
+    let angle: number;
+    let speedX: number;
+    if (dirBias !== 0) {
+      // 方向性扩散: 主方向朝被击者身后, 带上下扩散
+      // facing=1(右): 火花向右飞散, 角度范围 -PI/3 到 PI/3
+      // facing=-1(左): 火花向左飞散, 角度范围 PI*2/3 到 PI*4/3
+      angle = dirBias > 0
+        ? -Math.PI / 3 + Math.random() * Math.PI * 2 / 3  // -60° to +60° (向右)
+        : Math.PI * 2 / 3 + Math.random() * Math.PI * 2 / 3;  // 120° to 240° (向左)
+      speedX = Math.cos(angle) * (2.5 + Math.random() * 6) * sizeScale * speedScale;
+    } else {
+      // 旧版: 向上半球偏置
+      angle = -Math.PI * 0.8 + Math.random() * Math.PI * 1.6;
+      speedX = Math.cos(angle) * (2.5 + Math.random() * 6) * sizeScale * speedScale;
+    }
+    const speedY = (dirBias !== 0
+      ? Math.sin(angle) * (2 + Math.random() * 4)
+      : Math.sin(angle) * (2.5 + Math.random() * 6) * sizeScale * speedScale - 3 * sizeScale
+    );
     const speed = (2.5 + Math.random() * 6) * sizeScale * speedScale;
     const isStar = Math.random() < starRatio;
     particles.push({
       x: worldX, y: worldY,
-      vx: Math.cos(angle) * speed,
-      vy: Math.sin(angle) * speed - 3 * sizeScale,
+      vx: dirBias !== 0 ? speedX : Math.cos(angle) * speed,
+      vy: dirBias !== 0 ? speedY - 2 * sizeScale : Math.sin(angle) * speed - 3 * sizeScale,
       life: Math.floor((12 + Math.random() * 8) * sizeScale),
       maxLife: Math.floor(20 * sizeScale),
       size: (isStar ? 3.5 + Math.random() * 4 : 2 + Math.random() * 2.5) * sizeScale,
@@ -642,4 +680,32 @@ export function spawnDizzyStars(particles: Particle[], worldX: number, worldY: n
       rotSpeed: 0.1,
     });
   }
+}
+
+/**
+ * 浮动连击文本 — 在被击方头顶显示当前连击数和累计伤害
+ * - 2-4 hits: 白色
+ * - 5-9 hits: 黄色
+ * - 10+ hits: 红色
+ * 格式: "5 HIT (234)" — 连击数 + 累计伤害
+ */
+export function spawnFloatingComboText(particles: Particle[], worldX: number, worldY: number, combo: number, totalDamage: number): void {
+  let color: string;
+  if (combo >= 10) color = '#ff3333';
+  else if (combo >= 5) color = '#ffcc00';
+  else color = '#ffffff';
+
+  const size = combo >= 10 ? 20 : combo >= 5 ? 17 : 14;
+  const text = `${combo} HIT (${totalDamage})`;
+
+  // 主文字 — 弹出+上浮+淡出
+  particles.push({
+    x: worldX, y: worldY,
+    vx: 0, vy: -1.8,
+    life: 50, maxLife: 50,
+    size,
+    color,
+    type: 'text',
+    text,
+  });
 }

@@ -15,6 +15,10 @@ export class CinematicState {
   koSlowMo = 0;
   koSlowMoTriggered = false;
   koSlowMoFrameCounter = 0;
+  /** KO去饱和闪光剩余帧 — 渲染层读取此值绘制灰度覆盖 */
+  koDesaturateTimer = 0;
+  /** KO红色暗角剩余帧 — 渲染层读取此值绘制红色边缘渐变 */
+  koVignetteTimer = 0;
   victoryFanfarePlayed = false;
   p1DamageTaken = 0;
   p2DamageTaken = 0;
@@ -75,6 +79,9 @@ export class CinematicState {
     this.koSlowMoTriggered = true;
     this.koSlowMo = 40;
     this.koSlowMoFrameCounter = 0;
+    // KO视觉序列: 去饱和闪光(8帧) + 红色暗角(整个慢动作期间)
+    this.koDesaturateTimer = 8;
+    this.koVignetteTimer = 60;
   }
 
   /** Trigger DM KO slow-motion — enhanced (60 frames, every 4th frame runs) */
@@ -82,6 +89,9 @@ export class CinematicState {
     this.koSlowMoTriggered = true;
     this.koSlowMo = 60;
     this.koSlowMoFrameCounter = 0;
+    // DM KO: 更长的去饱和(12帧) + 更强烈的暗角(90帧)
+    this.koDesaturateTimer = 12;
+    this.koVignetteTimer = 90;
   }
 
   /** KO slow-mo frame skip: returns true when frame should be skipped */
@@ -93,6 +103,9 @@ export class CinematicState {
     if (this.koSlowMoFrameCounter < skipRate) return true;
     this.koSlowMoFrameCounter = 0;
     this.koSlowMo--;
+    // 衰减KO视觉效果
+    if (this.koDesaturateTimer > 0) this.koDesaturateTimer--;
+    if (this.koVignetteTimer > 0) this.koVignetteTimer--;
     return false;
   }
 
@@ -126,6 +139,8 @@ export class CinematicState {
     this.koSlowMo = 0;
     this.koSlowMoTriggered = false;
     this.koSlowMoFrameCounter = 0;
+    this.koDesaturateTimer = 0;
+    this.koVignetteTimer = 0;
     this.victoryFanfarePlayed = false;
     this.p1DamageTaken = 0;
     this.p2DamageTaken = 0;
@@ -140,6 +155,8 @@ export class CinematicState {
     this.koSlowMoTriggered = false;
     this.koSlowMo = 0;
     this.koSlowMoFrameCounter = 0;
+    this.koDesaturateTimer = 0;
+    this.koVignetteTimer = 0;
     this.p1DamageTaken = 0;
     this.p2DamageTaken = 0;
   }

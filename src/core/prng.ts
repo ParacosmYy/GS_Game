@@ -1,6 +1,39 @@
 /**
  * Seeded PRNG — xorshift32 衍生
+ *
  * 同一 seed 产生同一序列。逻辑层(AI/战斗)必须用 gameRng。
+ *
+ * === RNG Usage Order (Determinism Contract) ===
+ *
+ * To maintain replay determinism, RNG consumption must happen in a fixed order
+ * every frame. The current consumption order is:
+ *
+ * 1. Per-frame game loop (main.ts gameLoop tick):
+ *    a. AI decision: gameRandom() < 0.02 for special move trigger (main.ts:441)
+ *    b. Win quote selection: gameRandomInt() after KO (main.ts:125)
+ *
+ * 2. Select screen (state/selectState.ts):
+ *    a. AI cursor selection: gameRandomInt(TOTAL_SELECT_SLOTS) (selectState.ts:141)
+ *    b. P2 color index: gameRandomInt(4) (selectState.ts:143)
+ *    c. Random character: gameRandomInt(ROSTER.length) (selectState.ts:197)
+ *
+ * Rules for adding new RNG consumers:
+ * - ALWAYS use gameRandom/gameRandomInt/gameRandomRange, never Math.random().
+ * - NEVER call RNG from rendering, audio, or UI code.
+ * - NEVER call RNG from inside toString, valueOf, or other implicit methods.
+ * - Document the call site here when adding a new consumer.
+ * - When consuming RNG conditionally, ensure the condition is itself deterministic
+ *   (derived only from input + prior RNG results + game state).
+ *
+ * Replay determinism is verified via frame checksum snapshots
+ * (see core/replaySnapshot.ts). If a snapshot mismatch occurs, check whether
+ * a new RNG call was added or the call order changed.
+ *
+ * === PRNG Algorithm ===
+ *
+ * xorshift32 with seed normalization and 16-iteration warm-up.
+ * The warm-up ensures that similar seeds diverge quickly.
+ * State is kept as unsigned 32-bit integer (>>> 0).
  */
 
 export interface RNGSnapshot {
