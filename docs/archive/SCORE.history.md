@@ -790,3 +790,9 @@
 ## H170: renderUtils—6项验证parseColor+shiftColor+clamp — 142→143
 
 **commit:** <hash> | renderUtils—6项验证parseColor+shiftColor+clamp
+
+---
+
+## H171: manifestRenderData—5项验证getCharacterRenderData/getCharacterColors/hasPortraitForSize — 143→144
+
+**commit:** <hash> | manifestRenderData—5项验证getCharacterRenderData/getCharacterColors/hasPortraitForSize
