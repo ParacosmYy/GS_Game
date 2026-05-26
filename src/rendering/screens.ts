@@ -14,7 +14,8 @@ import type { SelectState } from '../state/selectState.js';
 import type { CharacterDefinition } from '../characters/types.js';
 import type { StageId } from './stage.js';
 import type { AnnounceSequence } from '../state/announceSequence.js';
-import type { KODustParticle } from '../state/cinematicState.js';
+import type { KODustParticle, KOPhase } from '../state/cinematicState.js';
+import { KO_FLASH_DURATION, KO_ANNOUNCE_DURATION, KO_TRANSITION_PAUSE } from '../state/cinematicState.js';
 
 // ===== 舞台名称映射 =====
 const STAGE_NAMES: Record<StageId, string> = {
@@ -725,6 +726,14 @@ export function drawIntro(ctx: CanvasRenderingContext2D, phaseTimer: number, cur
 
 // ===== KO Screen =====
 
+/**
+ * Extended KO draw function with KO phase state machine support.
+ * Renders different visuals depending on the KO phase:
+ *  PENDING: Slow-mo in progress, no KO overlay yet
+ *  FLASH:   Screen darkens, dramatic flash, "K.O." text scales 0.5x → 1.5x → 1.0x
+ *  ANNOUNCE: "K.O." text settled at 1.0x, white with red outline, 90 ticks
+ *  DONE:    Fade out, round result shown
+ */
 export function drawKO(
   ctx: CanvasRenderingContext2D,
   winner: number | null,
@@ -736,6 +745,8 @@ export function drawKO(
   koTimer: number = 0,
   koDustParticles: KODustParticle[] = [],
   cameraX: number = 0,
+  koPhase?: KOPhase,
+  koPhaseTimer: number = 0,
 ): void {
   ctx.save();
 
@@ -805,26 +816,76 @@ export function drawKO(
   }
   ctx.restore();
 
-  // Title text — dramatic scale from 3x to 1x with bounce
-  const textAppearFrame = 5;
-  const textProgress = Math.max(0, Math.min(1, (koTimer - textAppearFrame) / 20));
+  // Title text — phase-aware scale animation
+  const effectivePhase = koPhase ?? (koTimer > 5 ? 'ANNOUNCE' : 'FLASH');
+  const effectivePhaseTimer = koPhase ? koPhaseTimer : koTimer;
+
   let textScale = 1;
-  if (textProgress < 0.2) {
-    // Scale from 3x down to 1x
-    textScale = 1 + (1 - textProgress / 0.2) * 2;
-  } else if (textProgress < 0.35) {
-    // Bounce overshoot to 1.15x
-    const bounceProgress = (textProgress - 0.2) / 0.15;
-    textScale = 1 + 0.15 * Math.sin(bounceProgress * Math.PI);
-  } else {
-    textScale = 1;
+  let textAlpha = 1;
+
+  if (effectivePhase === 'FLASH' || (!koPhase && koTimer <= 5)) {
+    // FLASH phase: scale from 0.5x → 1.5x → settle at 1.0x
+    const flashProgress = Math.min(1, effectivePhaseTimer / KO_FLASH_DURATION);
+    if (flashProgress < 0.3) {
+      // 0→30%: scale from 0.5x up to 1.5x
+      const t = flashProgress / 0.3;
+      textScale = 0.5 + t * 1.0;
+    } else if (flashProgress < 0.5) {
+      // 30→50%: scale from 1.5x down to 0.9x (bounce undershoot)
+      const t = (flashProgress - 0.3) / 0.2;
+      textScale = 1.5 - t * 0.6;
+    } else if (flashProgress < 0.7) {
+      // 50→70%: scale from 0.9x back to 1.05x (small overshoot)
+      const t = (flashProgress - 0.5) / 0.2;
+      textScale = 0.9 + t * 0.15;
+    } else {
+      // 70→100%: settle at 1.0x
+      const t = (flashProgress - 0.7) / 0.3;
+      textScale = 1.05 - t * 0.05;
+    }
+    textAlpha = Math.min(1, flashProgress * 4);
+  } else if (effectivePhase === 'ANNOUNCE') {
+    // ANNOUNCE phase: stable at 1.0x, full alpha, subtle pulse
+    const announceProgress = effectivePhaseTimer / KO_ANNOUNCE_DURATION;
+    textScale = 1.0 + Math.sin(effectivePhaseTimer * 0.08) * 0.02;
+    // Start fading near end of announce phase
+    if (announceProgress > 0.85) {
+      textAlpha = Math.max(0, (1 - announceProgress) / 0.15);
+    }
+  } else if (effectivePhase === 'DONE') {
+    // DONE phase: fade out
+    textAlpha = Math.max(0, 1 - effectivePhaseTimer / 30);
+    textScale = 1.0;
   }
-  const textAlpha = Math.min(1, Math.max(0, textProgress * 3));
   ctx.globalAlpha = textAlpha;
   const fontSize = Math.round((isTimeOver ? 72 : 100) * textScale);
-  ctx.shadowColor = glowColor;
-  ctx.shadowBlur = 60 + (textScale - 1) * 30;
-  drawSNKText(ctx, titleText, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 20, fontSize, titleColor);
+
+  // Enhanced K.O. text: white fill with red outline (Phase 52 spec)
+  if (!isTimeOver) {
+    // Red outline layer — thicker stroke for dramatic effect
+    ctx.save();
+    ctx.font = `bold ${fontSize}px "Courier New", monospace`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.shadowColor = glowColor;
+    ctx.shadowBlur = 60 + (textScale - 1) * 30;
+    // Red outline
+    ctx.strokeStyle = '#cc0000';
+    ctx.lineWidth = Math.max(4, Math.round(fontSize / 12));
+    ctx.lineJoin = 'round';
+    ctx.strokeText(titleText, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 20);
+    // White fill
+    ctx.fillStyle = '#ffffff';
+    ctx.fillText(titleText, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 20);
+    ctx.shadowBlur = 0;
+    ctx.restore();
+  } else {
+    // TIME OVER: keep original gold styling
+    ctx.shadowColor = glowColor;
+    ctx.shadowBlur = 60 + (textScale - 1) * 30;
+    drawSNKText(ctx, titleText, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 20, fontSize, titleColor);
+    ctx.shadowBlur = 0;
+  }
   ctx.shadowBlur = 0;
   ctx.globalAlpha = 1;
 
@@ -848,9 +909,22 @@ export function drawKO(
     ctx.globalAlpha = 1;
   }
 
-  // PERFECT with golden glow and sparkles
+  // PERFECT with golden glow and sparkles — enhanced with gold flash
   if (perfectPlayer !== null) {
     const perfAlpha = Math.min(1, Math.max(0, (koTimer - 50) / 20));
+    ctx.globalAlpha = perfAlpha;
+
+    // Phase 52: Gold flash burst behind PERFECT text
+    const goldBurstR = 80 + Math.sin(koTimer * 0.06) * 20;
+    const goldBurstGrad = ctx.createRadialGradient(
+      CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 100, 5,
+      CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 100, goldBurstR,
+    );
+    goldBurstGrad.addColorStop(0, `rgba(255, 220, 100, ${0.5 * perfAlpha})`);
+    goldBurstGrad.addColorStop(0.3, `rgba(255, 200, 50, ${0.3 * perfAlpha})`);
+    goldBurstGrad.addColorStop(1, 'rgba(255, 180, 0, 0)');
+    ctx.fillStyle = goldBurstGrad;
+    ctx.fillRect(CANVAS_WIDTH / 2 - goldBurstR, CANVAS_HEIGHT / 2 + 100 - goldBurstR, goldBurstR * 2, goldBurstR * 2);
     ctx.globalAlpha = perfAlpha;
 
     // Golden glow background behind PERFECT text

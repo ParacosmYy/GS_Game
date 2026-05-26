@@ -274,6 +274,16 @@ export const WAKEUP_REVERSAL_WINDOW = 5;  // KOF2002: ~5帧起身反转窗口
 export const WAKEUP_BUFFER_WINDOW = 5;    // 起身前5帧可缓冲输入
 export const WAKEUP_FULL_INVINCIBILITY = 5; // KOF2002: 正常起身(非Quick Stand)前5帧完全无敌
 
+// ===== Knockdown / Getup System (KOF2002 authentic) =====
+export const HARD_KNOCKDOWN_GROUND_TICKS = 40;  // Hard KD: must lie on ground 40 ticks before getup
+export const SOFT_KNOCKDOWN_GROUND_TICKS = 25;  // Soft KD: 25 ticks on ground, can quick-rise
+export const GETUP_ANIMATION_TICKS = 15;        // Getup animation duration (lying → standing)
+export const QUICK_RISE_INPUT_START = 10;       // Earliest frame for quick-rise input (soft KD)
+export const QUICK_RISE_INPUT_END = 20;         // Latest frame for quick-rise input (soft KD)
+export const TECH_ROLL_DISTANCE = 40;           // Tech roll forward distance in pixels
+export const OTG_DAMAGE_MULTIPLIER = 0.75;      // OTG hits deal 75% damage
+export const OTG_MAX_HITS = 2;                  // Max OTG hits before knockdown timer resets
+
 // ===== Stun / Dizzy System (KOF2002 authentic) =====
 // Stun gauge fills when hit; when full the character enters dizzy state.
 export const STUN_GAUGE_MAX = 100;                // Stun gauge max value

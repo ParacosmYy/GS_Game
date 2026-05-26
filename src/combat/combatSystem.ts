@@ -31,6 +31,8 @@ import {
   WRONG_BLOCK_PUSHBACK_MULT, WRONG_BLOCK_STUN_MULT,
   MAX_MODE_DAMAGE_BONUS, MAX_MODE_DEFENSE_BONUS,
   DESPERATION_HEALTH_THRESHOLD, DESPERATION_DM_DAMAGE_BONUS,
+  OTG_DAMAGE_MULTIPLIER, OTG_MAX_HITS,
+  SOFT_KNOCKDOWN_GROUND_TICKS, HARD_KNOCKDOWN_GROUND_TICKS,
 } from '../core/constants.js';
 import { CLOSE_RANGE } from '../core/types.js';
 import { FighterState, AttackType, JuggleState } from '../core/types.js';
@@ -352,6 +354,22 @@ export class CombatSystem {
     // Backdash invincibility — first 5 frames of backdash are strike-invincible
     if (defender.isBackdashInvincible()) return;
 
+    // OTG check — hitting a grounded opponent (knocked down)
+    const isOTG = defender.isOTGVulnerable();
+    if (isOTG) {
+      // Only low attacks and specific specials can hit grounded opponents
+      const hitLevel = data.hitLevel as HitLevel;
+      const isLowAttack = hitLevel === 'LOW';
+      const isSpecialAtk = isSpecialMoveCheck(attackType);
+      if (!isLowAttack && !isSpecialAtk) return; // Can't OTG with mid/high normals
+      // Max OTG hits per knockdown
+      if (defender.otgHitCount >= OTG_MAX_HITS) return;
+      defender.otgHitCount++;
+    }
+
+    // GETUP invincibility — fighter rising from knockdown is invincible to strikes
+    if (defender.state === FighterState.GETUP) return;
+
     // B7: Juggle check — if defender is airborne, check juggle budget
     if (!defender.isGrounded()) {
       if (defender.juggleState === JuggleState.NONE) return; // Can't hit airborne
@@ -499,6 +517,11 @@ export class CombatSystem {
     // Damage
     let damage = this.scaledDamage(data.damage, defIdx, attackType);
     let hitstunFrames: number = data.hitstun;
+
+    // OTG damage penalty: hits on grounded opponent deal 75% damage
+    if (isOTG) {
+      damage = Math.round(damage * OTG_DAMAGE_MULTIPLIER);
+    }
 
     // KOF2002: aerial defender hitstun reduced (harder to combo airborne opponents)
     if (!defender.isGrounded()) {

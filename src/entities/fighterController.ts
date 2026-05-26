@@ -35,7 +35,7 @@ import {
   handleIdleWalk, handleRun, handleBackdash, handleRoll,
   handleHop, handleJump, handleCrouch, handleAttack,
   handleBlock, handleAirBlock, handleGuardCrush,
-  handleCounterStance, handleHitstun, handleKnockdown, handleTaunt, handleDizzy,
+  handleCounterStance, handleHitstun, handleKnockdown, handleGetup, handleTaunt, handleDizzy,
 } from './stateHandlers.js';
 
 /**
@@ -167,7 +167,8 @@ export class FighterController {
         playWallBounce();
       }
     } else if (f.state === FighterState.HITSTUN || f.state === FighterState.BLOCK
-        || f.state === FighterState.KNOCKDOWN || f.state === FighterState.GUARD_CRUSH) {
+        || f.state === FighterState.KNOCKDOWN || f.state === FighterState.GETUP
+        || f.state === FighterState.GUARD_CRUSH) {
       f.x += f.vx;
       f.vx *= 0.75;
       if (Math.abs(f.vx) < 0.1) f.vx = 0;
@@ -365,6 +366,9 @@ export class FighterController {
         break;
       case FighterState.KNOCKDOWN:
         handleKnockdown(ctx, input);
+        break;
+      case FighterState.GETUP:
+        handleGetup(ctx, input);
         break;
       case FighterState.DIZZY:
         handleDizzy(ctx, input);

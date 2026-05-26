@@ -13,6 +13,7 @@ import { shiftColor, roundRect } from './utils.js';
 import { getOutfit, drawCharacterHead, setSkeletalPartsTick } from './skeletalParts.js';
 import { drawPixelTorso, drawPixelArm, drawPixelLeg, setBodyPartTick } from './bodyPartRenderer.js';
 import { getVictoryPose, drawVictoryVFX } from './victoryPose.js';
+import { drawMAXModeAura } from './maxModeVfx.js';
 import { spriteFrameCache } from './spriteFrameCache.js';
 
 // ===== Sprite Frame Cache — opt-in cached rendering =====
@@ -138,6 +139,7 @@ export function drawSkeletalFighter(
   outlineColor: string,
   globalTick: number,
   maxModeActive: boolean = false,
+  playerIdx: 0 | 1 = 0,
 ): void {
   const charDef = ROSTER.find(c => c.id === f.charId);
   const poseSet = charDef?.poses;
@@ -959,6 +961,11 @@ export function drawSkeletalFighter(
 
   // === MAX mode glow aura — KOF2002 style ===
   if (maxModeActive) {
+    // Blue-white pulsing aura with energy wisps (Phase 50)
+    drawMAXModeAura(ctx, sx, sy, f.displayHeight, globalTick,
+      { active: true, timer: 1, maxDuration: 1 },
+      playerIdx);
+
     const glowPulse = 0.3 + Math.sin(globalTick / 4) * 0.12;
 
     // ── 1. Outer pulse ring: expands every 60 frames ──

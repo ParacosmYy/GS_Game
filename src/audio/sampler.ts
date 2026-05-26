@@ -9,7 +9,7 @@ type SampleId =
   | 'hit_light' | 'hit_heavy' | 'block' | 'block_heavy'
   | 'special' | 'dm' | 'ko' | 'counter' | 'guard_crush'
   | 'chip' | 'wall_bounce' | 'cancel' | 'wire' | 'juggle'
-  | 'super_flash' | 'super_flash_sdm'
+  | 'super_flash' | 'super_flash_sdm' | 'super_flash_hsdm'
   | 'throw' | 'throw_escape' | 'select' | 'victory'
   | 'roll' | 'landing' | 'projectile' | 'max_activation'
   | 'round_call' | 'time_over' | 'perfect' | 'fight'
@@ -571,6 +571,27 @@ function renderSuperFlash(sr: number, isSDM: boolean): Float32Array {
     gains.push(0.3);
   }
   return normalize(mixLayers(layers, gains));
+}
+
+/** HSDM super flash — 最长最激烈的闪光音效, 红黑色调 */
+function renderSuperFlashHSDM(sr: number): Float32Array {
+  const dur = 0.65;
+  // 主振荡器: 更低沉的扫频 + 更长的持续
+  const osc = renderOsc(sr, dur, 'sawtooth',
+    t => t < 0.15 ? 200 + 16000 * t : t < 0.3 ? 2600 - 12000 * (t - 0.15) : 400,
+    t => t < 0.12 ? 0.25 + t * 2.5 : expDecay(t - 0.12, 0.45, 3.5));
+  // 高频shimmer: 更密集
+  const shimmer = highPass(renderNoise(sr, 0.3, t => expDecay(t, 0.2, 7)), sr, 3000);
+  const shimmerP = padTo(shimmer, Math.ceil(sr * dur));
+  // 低频轰鸣
+  const rumble = renderOsc(sr, dur, 'sine', t => 80 + 40 * Math.sin(t * 20),
+    t => t < 0.08 ? 0.15 : expDecay(t - 0.08, 0.5, 4));
+  // 高频钟鸣 (HSDM特征)
+  const chime = renderOsc(sr, 0.4, 'sine',
+    t => t < 0.06 ? 660 : t < 0.18 ? 660 + 12000 * (t - 0.06) : 2100 - 6000 * (t - 0.18),
+    t => t < 0.06 ? 0 : expDecay(t - 0.06, 0.12, 5));
+  const chimeP = padTo(chime, Math.ceil(sr * dur), Math.floor(sr * 0.06));
+  return normalize(mixLayers([osc, shimmerP, rumble, chimeP], [1, 0.45, 0.6, 0.35]));
 }
 
 function renderThrow(sr: number): Float32Array {
@@ -1516,6 +1537,56 @@ function renderHaou(sr: number): Float32Array {
   ));
 }
 
+// 钓瓶打 (TSURIZAO): →+A 冰柱割り — sharp knife-hand slice
+// 特征：清脆的"切"声，高频瞬态 + 中频刃风，模拟手刀劈下的凌厉感
+function renderTsurizao(sr: number): Float32Array {
+  const dur = 0.18;
+  // 高频瞬态 — 手刀劈下的清脆"嗖"
+  const slice = highPass(renderNoise(sr, 0.06, t => expDecay(t, 0.2, 35)), sr, 4000);
+  // 中频刃风 — 劈下的风声
+  const wind = bandPass(renderNoise(sr, 0.1, t => expDecay(t, 0.15, 20)), sr, 800, 3500);
+  // 上升频率 sweep — 手刀下劈的动态
+  const sweep = renderOsc(sr, 0.08, 'sawtooth',
+    t => 1500 + 12000 * t,
+    t => expDecay(t, 0.18, 25));
+  // 低频打击body — 劈击的重量感
+  const body = renderOsc(sr, 0.07, 'sine', t => 140 - 1500 * t, t => expDecay(t, 0.22, 20));
+
+  const total = Math.ceil(sr * dur);
+  const windP = padTo(wind, total, Math.floor(sr * 0.02));
+  const sweepP = padTo(sweep, total);
+  const bodyP = padTo(body, total, Math.floor(sr * 0.03));
+
+  return normalize(mixLayers(
+    [slice, windP, sweepP, bodyP],
+    [1, 0.7, 0.6, 0.8]
+  ));
+}
+
+// 落蹴 (ORISHI): ↘+B — low sweeping kick thud
+// 特征：低沉的"咚"踢击声，中低频冲击 + 短促噪声，模拟低扫踢的闷响感
+function renderOrishi(sr: number): Float32Array {
+  const dur = 0.15;
+  // 低频冲击 — 踢击的闷响"咚"
+  const thud = renderOsc(sr, 0.1, 'sine', t => 100 - 800 * t, t => expDecay(t, 0.3, 15));
+  // 中低频噪声 — 踢击扫过地面的沙沙声
+  const sweep = lowPass(renderNoise(sr, 0.08, t => expDecay(t, 0.2, 25)), sr, 2000);
+  // 短促中频瞬态 — 踢击命中的"啪"
+  const snap = bandPass(renderNoise(sr, 0.04, t => expDecay(t, 0.25, 40)), sr, 1200, 5000);
+  // 子低音 — 低扫踢的深层体感
+  const sub = renderOsc(sr, 0.12, 'sine', t => 55 - 30 * t, t => expDecay(t, 0.35, 8));
+
+  const total = Math.ceil(sr * dur);
+  const sweepP = padTo(sweep, total, Math.floor(sr * 0.02));
+  const snapP = padTo(snap, total, Math.floor(sr * 0.02));
+  const subP = padTo(sub, total);
+
+  return normalize(mixLayers(
+    [thud, sweepP, snapP, subP],
+    [1, 0.6, 0.5, 0.9]
+  ));
+}
+
 // === 基础 BGM 框架 ===
 
 // 生成简单循环战斗BGM
@@ -1678,6 +1749,7 @@ export function initSampler(): void {
     ['juggle', renderJuggle],
     ['super_flash', sr => renderSuperFlash(sr, false)],
     ['super_flash_sdm', sr => renderSuperFlash(sr, true)],
+    ['super_flash_hsdm', sr => renderSuperFlashHSDM(sr)],
     ['throw', renderThrow],
     ['throw_escape', renderThrowEscape],
     ['select', renderSelect],
@@ -1732,6 +1804,8 @@ export function initSampler(): void {
     ['ryo_ko_hou', renderKoHou],
     ['ryo_hien', renderHien],
     ['ryo_haou', renderHaou],
+    ['ryo_tsurizao', renderTsurizao],
+    ['ryo_orishi', renderOrishi],
   ];
 
   for (const [id, renderer] of renderers) {
@@ -1760,7 +1834,8 @@ function addHitEQ(ctx: AudioContext, sampleId: string, destination: AudioNode): 
 function addSubBassPulse(ctx: AudioContext, sampleId: string, now: number): void {
   if (sampleId === 'dm' || sampleId === 'ko' || sampleId === 'guard_break'
     || sampleId === 'wall_bounce_heavy' || sampleId === 'super_flash'
-    || sampleId === 'super_flash_sdm' || sampleId === 'max_activation'
+    || sampleId === 'super_flash_sdm' || sampleId === 'super_flash_hsdm'
+    || sampleId === 'max_activation'
     || sampleId === 'ko_hit' || sampleId === 'landing_heavy'
     || sampleId === 'ground_bounce') {
     const osc = ctx.createOscillator();
@@ -1814,8 +1889,11 @@ export function playBlock(heavy: boolean = false): void {
 export function playSpecial(): void { initSampler(); play('special'); }
 export function playDM(): void { initSampler(); play('dm'); }
 export function playKO(): void { initSampler(); play('ko'); }
-export function playSuperFlash(isSDM: boolean = false): void {
-  initSampler(); play(isSDM ? 'super_flash_sdm' : 'super_flash');
+export function playSuperFlash(flashType: 'DM' | 'SDM' | 'HSDM' = 'DM'): void {
+  initSampler();
+  if (flashType === 'HSDM') play('super_flash_hsdm');
+  else if (flashType === 'SDM') play('super_flash_sdm');
+  else play('super_flash');
 }
 export function playCounter(): void { initSampler(); play('counter'); }
 export function playGuardCrush(): void { initSampler(); play('guard_crush'); }
@@ -1957,3 +2035,9 @@ export function playHien(): void { initSampler(); play('ryo_hien'); }
 
 /** 播放霸王翔吼拳音效 — 强力能量弹：比 KOOU 更厚重 */
 export function playHaou(): void { initSampler(); play('ryo_haou'); }
+
+/** 播放钓瓶打音效 — →+A 手刀劈击：清脆slice声 */
+export function playSlice(): void { initSampler(); play('ryo_tsurizao', 0.65); }
+
+/** 播放落蹴音效 — ↘+B 低扫踢：低沉thud声 */
+export function playThudKick(): void { initSampler(); play('ryo_orishi', 0.6); }

@@ -509,6 +509,54 @@ export function drawHUD(
     }
   }
 
+  // ===== Per-player round win dots (Phase 53: filled circles for rounds won, empty for remaining) =====
+  // P1 dots: left of center, P2 dots: right of center
+  const roundsNeededToWin = 2; // best of 3
+  const p1DotsX = timerX - 55;
+  const p2DotsX = timerX + 55;
+  const dotR = 4;
+  const dotGap = 14;
+
+  for (let i = 0; i < roundsNeededToWin; i++) {
+    // P1 round dot
+    const p1dx = p1DotsX + i * dotGap;
+    ctx.beginPath();
+    ctx.arc(p1dx, dotY, dotR, 0, Math.PI * 2);
+    if (i < p1Wins) {
+      // Filled — P1 won this round
+      const winGlow = 0.7 + 0.3 * Math.sin(tick * 0.08 + i);
+      ctx.fillStyle = `rgba(255, 100, 60, ${winGlow})`;
+      ctx.fill();
+      ctx.strokeStyle = '#ff6644';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+    } else {
+      // Empty — round not yet won
+      ctx.strokeStyle = 'rgba(255, 100, 60, 0.3)';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    }
+
+    // P2 round dot
+    const p2dx = p2DotsX + i * dotGap;
+    ctx.beginPath();
+    ctx.arc(p2dx, dotY, dotR, 0, Math.PI * 2);
+    if (i < p2Wins) {
+      // Filled — P2 won this round
+      const winGlow = 0.7 + 0.3 * Math.sin(tick * 0.08 + i);
+      ctx.fillStyle = `rgba(68, 136, 255, ${winGlow})`;
+      ctx.fill();
+      ctx.strokeStyle = '#4488ff';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+    } else {
+      // Empty — round not yet won
+      ctx.strokeStyle = 'rgba(68, 136, 255, 0.3)';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    }
+  }
+
   // ===== Win marks — KOF2002 diamond style =====
   const winMarkerY = HUD_BAR_Y + HUD_BAR_HEIGHT + 16;
   const winSpacing = HUD_WIN_MARKER_SIZE * 3;
@@ -1043,30 +1091,42 @@ export function drawPowerGauges(ctx: CanvasRenderingContext2D, gauges: [PowerGau
       ctx.globalAlpha = 1;
       ctx.restore();
 
-      // MAX timer bar
+      // MAX timer bar — blue, flashes red when < 100 ticks remaining
       const timerBarY = gaugeY + gaugeH + 5;
+      const isLowTimer = maxMode.timer < 100;
+      const timerFlashRed = isLowTimer && Math.sin(Date.now() * 0.015) > 0;
       ctx.fillStyle = 'rgba(0,0,0,0.8)';
       roundRect(ctx, Math.round(baseX), timerBarY, gaugeW, 5, 2);
       ctx.fill();
-      const greenGrad = ctx.createLinearGradient(Math.round(baseX), timerBarY, Math.round(baseX + gaugeW * pct), timerBarY);
-      greenGrad.addColorStop(0, '#22ff66');
-      greenGrad.addColorStop(0.5, '#44ff88');
-      greenGrad.addColorStop(1, '#88ffaa');
-      ctx.fillStyle = greenGrad;
+      if (timerFlashRed) {
+        // Red flash when low
+        const redGrad = ctx.createLinearGradient(Math.round(baseX), timerBarY, Math.round(baseX + gaugeW * pct), timerBarY);
+        redGrad.addColorStop(0, '#ff3333');
+        redGrad.addColorStop(0.5, '#ff5544');
+        redGrad.addColorStop(1, '#ff8866');
+        ctx.fillStyle = redGrad;
+      } else {
+        // Blue timer bar (KOF2002 MAX mode color)
+        const blueGrad = ctx.createLinearGradient(Math.round(baseX), timerBarY, Math.round(baseX + gaugeW * pct), timerBarY);
+        blueGrad.addColorStop(0, '#2266ff');
+        blueGrad.addColorStop(0.5, '#4488ff');
+        blueGrad.addColorStop(1, '#66aaff');
+        ctx.fillStyle = blueGrad;
+      }
       roundRect(ctx, Math.round(baseX), timerBarY, Math.round(gaugeW * pct), 5, 2);
       ctx.fill();
       // Timer bar glow when running low
-      if (pct < 0.3) {
+      if (isLowTimer) {
         ctx.save();
-        ctx.shadowColor = 'rgba(255, 60, 60, 0.5)';
-        ctx.shadowBlur = 6;
-        ctx.strokeStyle = 'rgba(255, 60, 60, 0.4)';
-        ctx.lineWidth = 1;
+        ctx.shadowColor = timerFlashRed ? 'rgba(255, 30, 30, 0.7)' : 'rgba(255, 60, 60, 0.5)';
+        ctx.shadowBlur = 8;
+        ctx.strokeStyle = timerFlashRed ? 'rgba(255, 30, 30, 0.6)' : 'rgba(255, 60, 60, 0.4)';
+        ctx.lineWidth = 1.5;
         roundRect(ctx, Math.round(baseX), timerBarY, gaugeW, 5, 2);
         ctx.stroke();
         ctx.restore();
       }
-      ctx.strokeStyle = 'rgba(100, 255, 100, 0.25)';
+      ctx.strokeStyle = isLowTimer ? 'rgba(255, 100, 100, 0.3)' : 'rgba(100, 180, 255, 0.3)';
       ctx.lineWidth = 1;
       roundRect(ctx, Math.round(baseX), timerBarY, gaugeW, 5, 2);
       ctx.stroke();
@@ -1186,22 +1246,36 @@ function drawWinDiamond(ctx: CanvasRenderingContext2D, x: number, y: number, siz
 function drawNamePlate(ctx: CanvasRenderingContext2D, x: number, y: number, name: string, playerColor: string, align: 'left' | 'right'): void {
   if (!name) return;
   const text = `${playerColor === '#ff6644' ? 'P1' : 'P2'}: ${name}`;
-  const plateW = 80;
-  const plateH = 13;
+  const plateW = 90;
+  const plateH = 14;
   const plateX = align === 'left' ? x : x - plateW;
-  // Semi-transparent background
-  ctx.fillStyle = 'rgba(0, 0, 0, 0.55)';
+  // Semi-transparent background with slight gradient
+  const plateGrad = ctx.createLinearGradient(plateX, y - 2, plateX + plateW, y - 2);
+  if (align === 'left') {
+    plateGrad.addColorStop(0, 'rgba(0, 0, 0, 0.6)');
+    plateGrad.addColorStop(1, 'rgba(0, 0, 0, 0.35)');
+  } else {
+    plateGrad.addColorStop(0, 'rgba(0, 0, 0, 0.35)');
+    plateGrad.addColorStop(1, 'rgba(0, 0, 0, 0.6)');
+  }
+  ctx.fillStyle = plateGrad;
   roundRect(ctx, plateX, y - 2, plateW, plateH, 3);
   ctx.fill();
-  // Player color side bar
+  // Player color side bar — wider for better visibility
   ctx.fillStyle = playerColor;
   if (align === 'left') {
-    ctx.fillRect(plateX, y - 2, 2, plateH);
+    ctx.fillRect(plateX, y - 2, 2.5, plateH);
   } else {
-    ctx.fillRect(plateX + plateW - 2, y - 2, 2, plateH);
+    ctx.fillRect(plateX + plateW - 2.5, y - 2, 2.5, plateH);
   }
-  // Name text — bold
-  drawSNKText(ctx, text, align === 'left' ? plateX + 5 : plateX + plateW - 5, y + 5, 9, 'rgba(220, 220, 220, 0.9)', '#000000', align);
+  // Name text — white with shadow for readability
+  ctx.save();
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
+  ctx.shadowBlur = 2;
+  ctx.shadowOffsetX = 1;
+  ctx.shadowOffsetY = 1;
+  drawSNKText(ctx, text, align === 'left' ? plateX + 6 : plateX + plateW - 6, y + 5, 9, 'rgba(230, 230, 230, 0.95)', '#000000', align);
+  ctx.restore();
 }
 
 // ===== Combo counter — KOF2002 arcade-authentic =====

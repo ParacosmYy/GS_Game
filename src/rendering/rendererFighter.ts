@@ -12,8 +12,12 @@ import { drawAttackLimb } from './attackLimb.js';
 import type { SpriteRenderer } from './spriteRenderer.js';
 import { getCharacterColors } from './manifestRenderData.js';
 import { drawHighResFrame } from './sprites/ryoHighResRender.js';
+import { getFighterBlender } from './animationBlender.js';
 
 const fighterDebugOverlayEnabled = isFighterDebugOverlayEnabled();
+
+// Track previous state per fighter for blend trigger
+const prevStateMap = new Map<number, string>();
 
 /** Draw all fighters with shadows, glows, trails, and attack limbs */
 export function drawFighters(
@@ -51,6 +55,29 @@ export function drawFighters(
 
     const { bodyColor, outlineColor, glowColor } = resolveFighterColors(f, globalTick);
 
+    // ── Animation blending: check state transition and interpolate offset ──
+    const blender = getFighterBlender(playerIdx);
+    const currentStateKey = f.state;
+    const prevFighterState = prevStateMap.get(playerIdx);
+    if (prevFighterState !== undefined && prevFighterState !== currentStateKey) {
+      blender.startBlendFromProfile(prevFighterState, 0, currentStateKey);
+    }
+    prevStateMap.set(playerIdx, currentStateKey);
+    blender.update();
+
+    // Apply blend offset to screen position
+    let blendOffsetX = 0;
+    let blendOffsetY = 0;
+    if (blender.isBlending()) {
+      const bs = blender.getBlendState()!;
+      // The blend creates a subtle position interpolation:
+      // Blend from a small offset (representing the old pose's offset) toward 0 (the new pose).
+      // This creates a smooth drift rather than a snap.
+      const t = 1 - bs.blendProgress; // inverted: starts at 1, goes to 0
+      blendOffsetX = t * 3 * f.facing; // slight drift from the old facing direction
+      blendOffsetY = t * 1; // subtle vertical settle
+    }
+
     // Glow behind body
     if (glowColor) {
       const glowPulse = maxModeActive ? 1 + Math.sin(globalTick * 0.12) * 0.3 : 1;
@@ -84,31 +111,31 @@ export function drawFighters(
       ctx.translate(sx, STAGE_GROUND_Y);
       ctx.scale(1, -0.15);
       ctx.translate(-sx, -STAGE_GROUND_Y);
-      drawSkeletalFighter(ctx, f, sx, f.y, getCharacterColors(f.charId ?? '').outfit, '#000000', globalTick, maxModeActive);
+      drawSkeletalFighter(ctx, f, sx, f.y, getCharacterColors(f.charId ?? '').outfit, '#000000', globalTick, maxModeActive, playerIdx);
       ctx.restore();
     }
 
-    // Lean offset
-    let leanOffsetX = 0;
+    // Lean offset (includes blend transition offset)
+    let leanOffsetX = blendOffsetX;
     let leanAngle = 0;
     if (f.state === FighterState.RUN) {
-      leanOffsetX = 8 * f.facing;
+      leanOffsetX = 8 * f.facing + blendOffsetX;
       leanAngle = 0.12 * f.facing;
     } else if (f.state === FighterState.BACKDASH) {
-      leanOffsetX = -6 * f.facing;
+      leanOffsetX = -6 * f.facing + blendOffsetX;
       leanAngle = -0.08 * f.facing;
     } else if (f.state === FighterState.IDLE) {
       // KOF2002: 待机微弱重心偏移 — 每3秒缓慢左右移重
-      leanOffsetX = Math.sin(globalTick * 0.015) * 2 * f.facing;
+      leanOffsetX = Math.sin(globalTick * 0.015) * 2 * f.facing + blendOffsetX;
       leanAngle = Math.sin(globalTick * 0.015) * 0.015 * f.facing;
     } else if (f.state === FighterState.WALK) {
       // KOF2002: 前進=前傾, 後退=後傾 (defensive lean)
       const isWalkingForward = (f.vx > 0 && f.facing > 0) || (f.vx < 0 && f.facing < 0);
       if (isWalkingForward) {
-        leanOffsetX = 3 * f.facing;
+        leanOffsetX = 3 * f.facing + blendOffsetX;
         leanAngle = 0.04 * f.facing;
       } else {
-        leanOffsetX = -2 * f.facing;
+        leanOffsetX = -2 * f.facing + blendOffsetX;
         leanAngle = -0.03 * f.facing;
       }
     }
@@ -194,7 +221,7 @@ export function drawFighters(
         ? spriteRenderer.render(ctx, f.charId, f.state, frameIdx, sx + leanOffsetX, sy, f.facing, getCharacterColors(f.charId ?? '').outfit)
         : false;
       if (!spriteRendered) {
-        drawSkeletalFighter(ctx, f, sx + leanOffsetX, sy, bodyColor, outlineColor, globalTick, maxModeActive);
+        drawSkeletalFighter(ctx, f, sx + leanOffsetX, sy, bodyColor, outlineColor, globalTick, maxModeActive, playerIdx);
       }
     }
 
@@ -474,7 +501,7 @@ function drawAfterimageTrail(
     ctx.globalAlpha = 0.32 / i;
     const trailX = sx - leanOffsetX * i * 1.5 - f.facing * 12 * i;
     // 用完整骨骼 pose 渲染残影，角色颜色略偏残影色调
-    drawSkeletalFighter(ctx, f, trailX, f.y, trailColor, trailOutline, globalTick, maxModeActive);
+    drawSkeletalFighter(ctx, f, trailX, f.y, trailColor, trailOutline, globalTick, maxModeActive, playerIdx);
     ctx.restore();
   }
 }

@@ -423,17 +423,43 @@ function drawRyoKoHou(
 ): void {
   const isStrong = f.currentAttack === AttackType.RYO_KO_HOU_C;
   const reach = limbLen * (isStrong ? 1.5 : 1.3);
+  const tipX = sx + 10 * f.facing;
+  const tipY = sy - f.displayHeight * 0.5 - reach;
+
+  // Afterimage (残影) effect — fading ghost copies of the uppercut arm arc
+  const ghostCount = isStrong ? 4 : 3;
+  for (let g = ghostCount; g >= 1; g--) {
+    const ghostAlpha = 0.15 / g;
+    const ghostOffset = g * 8 * f.facing; // each ghost trails behind
+    ctx.globalAlpha = ghostAlpha;
+    ctx.strokeStyle = '#ffaa22';
+    ctx.lineWidth = isStrong ? 16 : 12;
+    ctx.shadowColor = '#ff8800';
+    ctx.shadowBlur = 10;
+    ctx.beginPath();
+    ctx.moveTo(sx + 5 * f.facing - ghostOffset, sy - f.displayHeight * 0.5 + g * 6);
+    ctx.lineTo(tipX - ghostOffset, tipY + g * 4);
+    ctx.stroke();
+    // Ghost glow at tip
+    ctx.fillStyle = '#ffcc0033';
+    ctx.beginPath();
+    ctx.arc(tipX - ghostOffset, tipY + g * 4, 8 + progress * 4, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // Restore full alpha for main limb
+  ctx.globalAlpha = 1;
   ctx.strokeStyle = '#ffaa22';
   ctx.shadowColor = '#ff8800';
   ctx.shadowBlur = isStrong ? 28 : 20;
   ctx.lineWidth = isStrong ? 18 : 14;
   ctx.beginPath();
   ctx.moveTo(sx + 5 * f.facing, sy - f.displayHeight * 0.5);
-  ctx.lineTo(sx + 10 * f.facing, sy - f.displayHeight * 0.5 - reach);
+  ctx.lineTo(tipX, tipY);
   ctx.stroke();
   ctx.fillStyle = '#ffcc0066';
   ctx.beginPath();
-  ctx.arc(sx + 10 * f.facing, sy - f.displayHeight * 0.5 - reach,
+  ctx.arc(tipX, tipY,
     (isStrong ? 16 : 12) + progress * (isStrong ? 12 : 8), 0, Math.PI * 2);
   ctx.fill();
 }

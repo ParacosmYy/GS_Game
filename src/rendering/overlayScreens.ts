@@ -6,6 +6,27 @@ import { ROSTER } from '../characters/index.js';
 import { roundRect, drawSNKText } from './utils.js';
 import { drawPixelPortrait } from './pixelPortraits.js';
 
+// ===== Super Flash camera zoom state =====
+let superFlashZoom = 1.0;
+
+/** Get current super flash zoom factor (for canvas transform) */
+export function getSuperFlashZoom(): number { return superFlashZoom; }
+
+/** Update super flash zoom — call each tick with the current timer */
+export function updateSuperFlashZoom(timer: number, maxTimer: number): void {
+  if (timer > 0 && timer >= maxTimer - 8) {
+    // Zoom in over 8 ticks from 1.0 to 1.08
+    const progress = (maxTimer - timer) / 8;
+    superFlashZoom = 1.0 + 0.08 * Math.min(1, progress);
+  } else if (timer <= 0 && superFlashZoom > 1.001) {
+    // Snap back after flash ends
+    superFlashZoom = 1.0 + (superFlashZoom - 1.0) * 0.7;
+    if (superFlashZoom < 1.001) superFlashZoom = 1.0;
+  } else if (timer <= 0) {
+    superFlashZoom = 1.0;
+  }
+}
+
 // ===== Super Flash =====
 
 export function drawSuperFlash(

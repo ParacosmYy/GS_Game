@@ -1108,6 +1108,123 @@ export function spawnMoveNameText(particles: Particle[], worldX: number, worldY:
 }
 
 /**
+ * 天地霸煌拳 命中时能量爆炸 — 大型扩展能量爆破 + 全屏白色闪光
+ * 命中后在命中位置产生巨大能量球扩展 + 全屏白色闪烁 + 强力震屏触发
+ */
+export function spawnTenHaOuBlast(particles: Particle[], x: number, y: number, facing: number): void {
+  // Stage 1: 巨型白色核心闪光
+  particles.push({
+    x, y: y - 20, vx: 0, vy: 0,
+    life: 16, maxLife: 16, size: 120,
+    color: '#ffffff', type: 'superburst',
+  });
+  // Stage 2: 金色能量球持续扩展
+  particles.push({
+    x, y: y - 20, vx: 0, vy: 0,
+    life: 25, maxLife: 25, size: 150,
+    color: '#ffcc00', type: 'superburst',
+  });
+  // Stage 3: 外环扩散冲击波 (3层)
+  for (let r = 0; r < 3; r++) {
+    particles.push({
+      x, y: y - 20, vx: 0, vy: 0,
+      life: 18 + r * 6, maxLife: 18 + r * 6, size: 8 + r * 4,
+      color: r === 0 ? '#ffffff' : r === 1 ? '#ffee44' : '#ffaa00',
+      type: 'ring',
+    });
+  }
+  // Stage 4: 放射状星粒子 (40个)
+  for (let i = 0; i < 40; i++) {
+    const angle = (i / 40) * Math.PI * 2 + Math.random() * 0.1;
+    const speed = 4 + Math.random() * 9;
+    particles.push({
+      x, y: y - 20,
+      vx: Math.cos(angle) * speed * (facing !== 0 ? (facing > 0 ? 1.2 : 0.8) : 1),
+      vy: Math.sin(angle) * speed - 2.5,
+      life: 20 + Math.floor(Math.random() * 16),
+      maxLife: 38,
+      size: 3 + Math.random() * 6,
+      color: i % 5 === 0 ? '#ffffff' : i % 3 === 0 ? '#ffee66' : '#ffaa00',
+      type: 'star',
+      gravity: 0.08,
+      friction: 0.93,
+      rotation: angle,
+      rotSpeed: (Math.random() - 0.5) * 0.6,
+    });
+  }
+  // Stage 5: 方向性冲击波 — 面向方向扩展更快
+  for (let i = 0; i < 8; i++) {
+    const spreadAngle = (Math.random() - 0.5) * Math.PI * 0.6;
+    const speed = 8 + Math.random() * 6;
+    particles.push({
+      x, y: y - 20,
+      vx: Math.cos(spreadAngle) * speed * facing,
+      vy: Math.sin(spreadAngle) * speed - 2,
+      life: 14 + Math.floor(Math.random() * 10),
+      maxLife: 24,
+      size: 5 + Math.random() * 4,
+      color: '#ffffff',
+      type: 'star',
+      gravity: 0.05,
+      friction: 0.92,
+      rotation: spreadAngle,
+      rotSpeed: (Math.random() - 0.5) * 0.3,
+    });
+  }
+}
+
+/**
+ * 屏幕裂纹效果 — HSDM激活时产生裂纹线粒子
+ * 从中心向四周扩展的黑色/红色裂纹线
+ */
+export function spawnScreenCracks(particles: Particle[], x: number, y: number): void {
+  // 裂纹线 — 从中心向外放射
+  const crackCount = 12;
+  for (let i = 0; i < crackCount; i++) {
+    const angle = (i / crackCount) * Math.PI * 2 + (Math.random() - 0.5) * 0.3;
+    const length = 80 + Math.random() * 120;
+    // 用slash类型模拟裂纹线
+    particles.push({
+      x: x + Math.cos(angle) * 20,
+      y: y + Math.sin(angle) * 20,
+      vx: Math.cos(angle) * 3,
+      vy: Math.sin(angle) * 3,
+      life: 18 + Math.floor(Math.random() * 10),
+      maxLife: 28,
+      size: length * 0.3,
+      color: i % 3 === 0 ? '#ff2244' : i % 2 === 0 ? '#220011' : '#440022',
+      type: 'slash',
+      rotation: angle,
+    });
+  }
+  // 中心暗红闪光
+  particles.push({
+    x, y, vx: 0, vy: 0,
+    life: 12, maxLife: 12, size: 60,
+    color: '#ff1133', type: 'flash',
+  });
+  // 二次裂纹碎片 — 小型星粒子
+  for (let i = 0; i < 16; i++) {
+    const angle = Math.random() * Math.PI * 2;
+    const speed = 2 + Math.random() * 5;
+    particles.push({
+      x, y,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed - 1.5,
+      life: 12 + Math.floor(Math.random() * 8),
+      maxLife: 20,
+      size: 2 + Math.random() * 3,
+      color: i % 3 === 0 ? '#ff4466' : '#110011',
+      type: 'star',
+      gravity: 0.1,
+      friction: 0.94,
+      rotation: Math.random() * Math.PI * 2,
+      rotSpeed: (Math.random() - 0.5) * 0.5,
+    });
+  }
+}
+
+/**
  * 浮动连击文本 — 在被击方头顶显示当前连击数和累计伤害
  * - 2-4 hits: 白色
  * - 5-9 hits: 黄色

@@ -841,17 +841,24 @@ export const RyoDef: CharacterDefinition = {
   },
 
   onAttackActive(fighter, attackType, projectiles, playerIndex) {
-    // 虎煌: spawn visible projectile (weak/strong)
-    // Weak (A): 40x30 hitbox, 60 frames travel (~480px)
-    // Strong (C): 50x35 hitbox, 60 frames travel (~480px)
+    // 虎煌: spawn visible projectile with level system
+    // Weak (A): speed 6px/frame, 40x30 hitbox, 60 frames, level='weak'
+    // Strong (C): speed 8px/frame, 50x35 hitbox, 60 frames, level='weak'
+    // EX (MAX mode): speed 10px/frame, 60x45 hitbox, 70 frames, level='strong'
     if ((attackType === AttackType.RYO_KOOU || attackType === AttackType.RYO_KOOU_C) && fighter.attackFrame === 0) {
       const isStrong = attackType === AttackType.RYO_KOOU_C;
-      const hitW = isStrong ? 25 : 20;
-      const hitH = isStrong ? 17.5 : 15;
+      const isEX = fighter.inMaxMode;
+      const hitW = isEX ? 30 : isStrong ? 25 : 20;
+      const hitH = isEX ? 22.5 : isStrong ? 17.5 : 15;
+      const speed = isEX ? 10 : isStrong ? 8 : 6;
+      const frames = isEX ? 70 : 60;
+      const level = isEX ? 'strong' : 'weak';
+      const damage = isEX ? 130 : isStrong ? 105 : 75;
       projectiles.push(new Projectile(
         fighter.x + 60 * fighter.facing, fighter.y - 100, fighter.facing,
-        60, playerIndex, fighter.charId,
-        hitW, hitH,
+        frames, playerIndex, fighter.charId,
+        hitW, hitH, speed, isStrong ? 'C' : 'A',
+        level, damage, isEX,
       ));
       return true;
     }
@@ -862,6 +869,19 @@ export const RyoDef: CharacterDefinition = {
     }
     if (attackType === AttackType.RYO_KO_HOU_C) {
       fighter.vy = -8;
+      return true;
+    }
+    // 龍虎乱舞 DM/SDM/HSDM: 前冲 — 攻击活跃期间每帧前移
+    if (attackType === AttackType.DM_RYUKO_RANBU) {
+      fighter.vx = fighter.facing * 4.5;
+      return true;
+    }
+    if (attackType === AttackType.SDM_RYUKO_RANBU) {
+      fighter.vx = fighter.facing * 5.0;
+      return true;
+    }
+    if (attackType === AttackType.HSDM_RYUKO_RANBU) {
+      fighter.vx = fighter.facing * 5.5;
       return true;
     }
     return false;

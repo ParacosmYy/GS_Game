@@ -12,6 +12,12 @@ import {
   THROW_INVINCIBILITY_WAKEUP,
   WAKEUP_BUFFER_WINDOW,
   WAKEUP_FULL_INVINCIBILITY,
+  HARD_KNOCKDOWN_GROUND_TICKS,
+  SOFT_KNOCKDOWN_GROUND_TICKS,
+  GETUP_ANIMATION_TICKS,
+  QUICK_RISE_INPUT_START,
+  QUICK_RISE_INPUT_END,
+  TECH_ROLL_DISTANCE,
 } from '../core/constants.js';
 import { FighterState, AttackType } from '../core/types.js';
 import { spendStocks } from '../combat/meter.js';
@@ -90,8 +96,12 @@ export function handleHitstun(ctx: FighterCtx, input: ResolvedInput): void {
 export function handleKnockdown(ctx: FighterCtx, input: ResolvedInput): void {
   const f = ctx.fighter;
 
+  // Total ground time: original knockdown timer
+  // Hard knockdown: fighter must fully lie on ground (longer timer)
+  // Soft knockdown: can quick-rise during the input window
+
   // #26 Delayed Get-up: holding down pauses knockdown timer (KOF2002 mindgame tool)
-  // Max delay: 2× original knockdown duration to prevent infinite stall
+  // Max delay: 2x original knockdown duration to prevent infinite stall
   if (!f.isHardKnockdown && input.down && f.knockdownTimer <= 1 && f.knockdownDelayUsed < f.knockdownDelayMax) {
     f.knockdownDelayUsed++;
     // Don't decrement timer — fighter stays on the ground
@@ -99,16 +109,16 @@ export function handleKnockdown(ctx: FighterCtx, input: ResolvedInput): void {
     f.knockdownTimer--;
   }
 
-  // #24 Quick Stand: A+B shortens remaining knockdown (not during hard KD)
-  if (!f.isHardKnockdown && input.rollPressed && f.knockdownTimer > 3
-    && f.knockdownTimer >= 10) {
+  // #24 Quick Stand: A+B during frames QUICK_RISE_INPUT_START..QUICK_RISE_INPUT_END
+  // Soft knockdown only: shortens remaining knockdown to 3 ticks
+  if (!f.isHardKnockdown && input.rollPressed && !f.usedQuickStand
+    && f.knockdownTimer >= QUICK_RISE_INPUT_START
+    && f.knockdownTimer <= QUICK_RISE_INPUT_END) {
     f.knockdownTimer = 3;
     f.usedQuickStand = true;
   }
 
-  // #25 Counter Roll: A+B during mid-knockdown transitions directly to ROLL
-  // KOF2002: Unlike quick stand (which just shortens timer), counter roll
-  // wakes up into a rolling animation with invincibility.
+  // #25 Counter Roll: A+B during late knockdown transitions directly to ROLL
   if (!f.isHardKnockdown && input.rollPressed && f.knockdownTimer > 3
     && f.knockdownTimer < 10 && !f.usedQuickStand) {
     f.state = input.back ? FighterState.BACK_ROLL : FighterState.ROLL;
@@ -116,10 +126,22 @@ export function handleKnockdown(ctx: FighterCtx, input: ResolvedInput): void {
     f.isKnockedDown = false;
     f.isHardKnockdown = false;
     f.usedQuickStand = false;
+    f.otgHitCount = 0;
     f.vx = (f.state === FighterState.ROLL ? ROLL_SPEED : -ROLL_SPEED) * f.facing;
     f.displayHeight = 60;
     ctx.vfx.spawnDust(f.x, STAGE_GROUND_Y);
     return;
+  }
+
+  // Tech Roll: →+A+B during ground bounce (soft knockdown only)
+  // Rolls forward TECH_ROLL_DISTANCE pixels, then enters getup
+  if (!f.isHardKnockdown && input.forward && input.rollPressed
+    && f.knockdownTimer <= QUICK_RISE_INPUT_END
+    && f.knockdownTimer >= 5
+    && !f.usedQuickStand) {
+    f.x += TECH_ROLL_DISTANCE * f.facing;
+    f.usedQuickStand = true;
+    // Fall through to getup transition below
   }
 
   // Wake-up reversal buffer
@@ -132,10 +154,13 @@ export function handleKnockdown(ctx: FighterCtx, input: ResolvedInput): void {
       ctx.wakeupBuffer = input;
     }
   }
+
   if (f.knockdownTimer <= 0) {
-    f.state = FighterState.IDLE; f.isKnockedDown = false; f.isHardKnockdown = false; f.displayHeight = 100; f.vx = 0;
+    // Transition to GETUP animation instead of instantly becoming IDLE
+    f.applyGetup(GETUP_ANIMATION_TICKS);
+    // Wakeup invincibility: throw invincible during getup
+    f.throwInvincibilityTimer = THROW_INVINCIBILITY_WAKEUP;
     if (!f.usedQuickStand) {
-      f.throwInvincibilityTimer = THROW_INVINCIBILITY_WAKEUP;
       f.invincible = true;
       f.wakeupInvulnFrames = WAKEUP_FULL_INVINCIBILITY;
     } else {
@@ -143,6 +168,35 @@ export function handleKnockdown(ctx: FighterCtx, input: ResolvedInput): void {
     }
     f.usedQuickStand = false;
     f.knockdownDelayUsed = 0;
+    ctx.vfx.spawnDust(f.x, STAGE_GROUND_Y);
+  }
+}
+
+/** GETUP state handler — rising from knockdown to standing */
+export function handleGetup(ctx: FighterCtx, input: ResolvedInput): void {
+  const f = ctx.fighter;
+  f.getupTimer--;
+
+  // Gradually restore displayHeight from lying (low) to standing
+  const progress = 1 - (f.getupTimer / f.getupDuration);
+  // Interpolate displayHeight from 40 (lying) to FIGHTER_HEIGHT (standing)
+  f.displayHeight = 40 + (100 - 40) * progress;
+
+  // Wake-up reversal buffer (also active during getup)
+  if (f.getupTimer <= WAKEUP_BUFFER_WINDOW && f.getupTimer > 0) {
+    if (input.punchPressed || input.kickPressed || input.rollPressed || input.blowbackPressed) {
+      ctx.wakeupBuffer = input;
+    }
+  }
+
+  if (f.getupTimer <= 0) {
+    f.state = FighterState.IDLE;
+    f.isKnockedDown = false;
+    f.isHardKnockdown = false;
+    f.displayHeight = 100;
+    f.vx = 0;
+    f.otgHitCount = 0;
+
     // Execute buffered reversal
     if (ctx.wakeupBuffer) {
       const buf = ctx.wakeupBuffer;

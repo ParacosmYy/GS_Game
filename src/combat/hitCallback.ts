@@ -405,7 +405,7 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
     }
 
     // SFX
-    if (isDM) { playSuperFlash(isSDM); playDM(); }
+    if (isDM) { playSuperFlash(isSDM ? 'SDM' : 'DM'); playDM(); }
     // Ryo 必杀技差异化音效 — 优先于通用 special 分支
     else if (atkName === 'RYO_KOOU' || atkName === 'RYO_KOOU_C' || atkName === 'RYO_KOOUKEN_D') {
       playKoouken(); if (combo > 0) playHit(0.5, combo);

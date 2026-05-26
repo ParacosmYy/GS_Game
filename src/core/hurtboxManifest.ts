@@ -153,6 +153,14 @@ export const HURTBOX_TABLE: Partial<Record<FighterState, HurtboxDef>> = {
     height: 40,
   },
 
+  // ── Getup: transitioning from lying to standing ──
+  [FighterState.GETUP]: {
+    offsetX: 0,
+    offsetY: -10,
+    width: 100,
+    height: 60,
+  },
+
   // ── Special states ──
   [FighterState.ROLL]: {
     offsetX: 0,

@@ -261,3 +261,80 @@ export function hasBeenPlayed(fighterId: number, _attackType: string, phase: Att
   if (!set) return false;
   return set.has(`${phase}:${frame}`);
 }
+
+// ===== Frame Contract Event Tag → SFX Dispatch =====
+/**
+ * Maps FrameContract eventTags to sampler functions.
+ * Called by game loop after tickAttackSFX when a contract is available.
+ */
+const EVENT_TAG_SFX_MAP: Record<string, string> = {
+  'footstep': 'playStep',
+  'swing': 'playWhoosh',
+  'hit': 'playHit',
+  'land': 'playLandingNormal',
+  'super_flash': 'playSuperFlash',
+  'vfx_spawn': 'playHit',
+  'cancel_point': 'playCancel',
+  'chain_point': 'playCancel',
+  'sound': 'playWhoosh',
+};
+
+/** Contract event dedup tracker: fighterId -> Set of tag:absFrame */
+const contractPlayedSet = new Map<number, Set<string>>();
+const contractLastAttack = new Map<number, string | null>();
+
+/**
+ * Dispatch SFX based on FrameContract eventTags.
+ * This supplements the phase-based ATTACK_SFX_TABLE by reading eventTags
+ * directly from the contract data.
+ *
+ * @param fighterId  Unique fighter index (0=P1, 1=P2)
+ * @param attackType Current attack type string
+ * @param eventTags  Array of event tags from the contract for the current frame
+ * @param absFrame   Absolute frame index within the action (for dedup)
+ * @param sampler    Sampler object with play functions
+ */
+export function dispatchContractSFX(
+  fighterId: number,
+  attackType: string,
+  eventTags: string[],
+  absFrame: number,
+  sampler: Record<string, (...args: any[]) => void>,
+): void {
+  if (eventTags.length === 0) return;
+
+  // Detect new attack
+  const prev = contractLastAttack.get(fighterId) ?? null;
+  if (attackType !== prev) {
+    const set = contractPlayedSet.get(fighterId);
+    if (set) set.clear();
+    contractLastAttack.set(fighterId, attackType);
+  }
+
+  // Get or create played set
+  let played = contractPlayedSet.get(fighterId);
+  if (!played) {
+    played = new Set();
+    contractPlayedSet.set(fighterId, played);
+  }
+
+  for (const tag of eventTags) {
+    const key = `${tag}:${absFrame}`;
+    if (played.has(key)) continue;
+    played.add(key);
+
+    const sfxFn = EVENT_TAG_SFX_MAP[tag];
+    if (sfxFn) {
+      const fn = sampler[sfxFn];
+      if (typeof fn === 'function') {
+        fn();
+      }
+    }
+  }
+}
+
+/** Reset contract SFX tracking for a fighter */
+export function resetContractSFXTracking(fighterId: number): void {
+  const set = contractPlayedSet.get(fighterId);
+  if (set) set.clear();
+}

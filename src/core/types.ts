@@ -21,6 +21,7 @@ export enum FighterState {
   GUARD_CRUSH = 'GUARD_CRUSH',
   HITSTUN = 'HITSTUN',
   KNOCKDOWN = 'KNOCKDOWN',
+  GETUP = 'GETUP',        // 起身动画 (从倒地恢复站立)
   DIZZY = 'DIZZY',          // 气绝/晕眩 (stun gauge满)
   MAX_MODE = 'MAX_MODE',  // MAX模式激活动画 (短暂)
   TAUNT = 'TAUNT',        // 嘲讽 (Start键，削减对手气槽)

@@ -105,9 +105,9 @@ export function drawSpecialAttackLimb2(
     return true;
   }
 
-  // ── DM 超必杀 visuals ──
+  // ── DM/SDM/HSDM 超必杀 visuals ──
   const name = f.currentAttack as string;
-  if (name.startsWith('DM_') || name.startsWith('SDM_')) {
+  if (name.startsWith('DM_') || name.startsWith('SDM_') || name.startsWith('HSDM_')) {
     drawDmLimb(ctx, f, sx, sy, progress, limbLen, name);
     return true;
   }

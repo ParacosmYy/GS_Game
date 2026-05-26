@@ -75,19 +75,20 @@ const PALETTE: Record<number, string> = {
 };
 
 // ─────────────────────────────────────────────────────────────
-// Encoding: each char maps to a palette index
-// '.' = 0 (transparent)
-// '0'-'9' = indices 0-9
-// 'a'-'n' = indices 10-23
+// Encoding (direct mapping, no offset):
+//   '.' -> 0 (transparent)
+//   '0'->0  '1'->1  '2'->2  ...  '9'->9
+//   'a'->10 'b'->11 'c'->12 ...  'n'->23
 // ─────────────────────────────────────────────────────────────
 
-const CHARS = '.0123456789abcdefghijklmn'.split('');
 const W = 96;
 function r(s: string): number[] {
   const padded = s.padEnd(W, '.').slice(0, W);
   return padded.split('').map(ch => {
-    const idx = CHARS.indexOf(ch);
-    return idx >= 0 ? idx : 0;
+    if (ch === '.') return 0;
+    if (ch >= '0' && ch <= '9') return ch.charCodeAt(0) - 48; // '0'=0, '1'=1, ...
+    if (ch >= 'a' && ch <= 'n') return ch.charCodeAt(0) - 87; // 'a'=10, 'b'=11, ...
+    return 0;
   });
 }
 

@@ -209,12 +209,21 @@ export function drawProjectiles(ctx: CanvasRenderingContext2D, projectiles: Proj
       }
       case 'ryo': {
         // 虎煌拳 — 旋转 ki 气流线条 + 拳形冲击波
+        // Frame-based pulsation: cycle through 4 size phases (3 frames each)
+        const ryoPulsePhase = (proj.currentFrame % 12);
+        let ryoSizeMod = 1.0;
+        if (ryoPulsePhase < 3) ryoSizeMod = 1.0 + ryoPulsePhase * 0.04;
+        else if (ryoPulsePhase < 6) ryoSizeMod = 1.12 - (ryoPulsePhase - 3) * 0.04;
+        else if (ryoPulsePhase < 9) ryoSizeMod = 1.0 - (ryoPulsePhase - 6) * 0.03;
+        else ryoSizeMod = 0.91 + (ryoPulsePhase - 9) * 0.03;
+        const ryoR = radius * ryoSizeMod;
+
         ctx.strokeStyle = '#ffdd66';
         ctx.lineWidth = 2;
         ctx.beginPath();
         for (let s = 0; s < 24; s++) {
           const sAngle = rotBase * 2.5 + s * 0.45;
-          const sR = radius * (0.3 + s * 0.035);
+          const sR = ryoR * (0.3 + s * 0.035);
           const px = sx + Math.cos(sAngle) * sR * vis.stretch;
           const py = y + Math.sin(sAngle) * sR;
           if (s === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
@@ -225,11 +234,28 @@ export function drawProjectiles(ctx: CanvasRenderingContext2D, projectiles: Proj
         ctx.lineWidth = 1.5;
         for (let a = 0; a < 2; a++) {
           const aOff = a * 6 - 3;
-          const aLen = radius * 0.8 + Math.sin(proj.currentFrame * 0.4 + a) * 2;
+          const aLen = ryoR * 0.8 + Math.sin(proj.currentFrame * 0.4 + a) * 2;
           ctx.beginPath();
-          ctx.moveTo(sx + proj.facing * radius * vis.stretch * 0.3, y + aOff);
-          ctx.lineTo(sx + proj.facing * (radius * vis.stretch * 0.3 + aLen), y + aOff + Math.sin(proj.currentFrame * 0.5 + a) * 2);
+          ctx.moveTo(sx + proj.facing * ryoR * vis.stretch * 0.3, y + aOff);
+          ctx.lineTo(sx + proj.facing * (ryoR * vis.stretch * 0.3 + aLen), y + aOff + Math.sin(proj.currentFrame * 0.5 + a) * 2);
           ctx.stroke();
+        }
+        // C version: trailing flame particles behind the projectile
+        if (proj.version === 'C') {
+          const flameParticleCount = 6;
+          for (let p = 0; p < flameParticleCount; p++) {
+            const pAge = (proj.currentFrame * 3 + p * 7) % 20;
+            const pAlpha = Math.max(0, 0.6 - pAge * 0.03);
+            const pDist = 10 + p * 12 + pAge * 2;
+            const pSpread = Math.sin(proj.currentFrame * 0.8 + p * 1.5) * 8;
+            const pSize = Math.max(1, 5 - pAge * 0.2);
+            ctx.globalAlpha = pAlpha * fadeIn;
+            const pColor = p < 3 ? '#ff8833' : '#ffcc44';
+            ctx.fillStyle = pColor;
+            ctx.beginPath();
+            ctx.arc(sx - proj.facing * pDist, y + pSpread, pSize, 0, Math.PI * 2);
+            ctx.fill();
+          }
         }
         break;
       }

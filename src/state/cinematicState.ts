@@ -14,6 +14,36 @@ export interface KODustParticle {
   color: string;
 }
 
+/** KO state machine phases — tracks the KO sequence progression */
+export type KOPhase = 'PENDING' | 'FLASH' | 'ANNOUNCE' | 'DONE';
+
+/**
+ * KO state machine — manages the full KO sequence from detection to round end.
+ * PENDING: KO detected, waiting for slow-mo to finish
+ * FLASH:   Screen freeze with dramatic flash (30 ticks)
+ * ANNOUNCE: "K.O." text displayed (90 ticks)
+ * DONE:    KO sequence complete, ready for round transition
+ */
+export interface KOStateMachine {
+  phase: KOPhase;
+  /** Timer within the current phase (counts up) */
+  timer: number;
+  /** Which player was KO'd (0=P1, 1=P2, -1=double KO) */
+  koPlayer: number;
+  /** Whether this was a PERFECT KO */
+  isPerfect: boolean;
+}
+
+/** Create a default KO state machine */
+function createKOStateMachine(): KOStateMachine {
+  return { phase: 'PENDING', timer: 0, koPlayer: -1, isPerfect: false };
+}
+
+/** KO phase durations in ticks */
+export const KO_FLASH_DURATION = 30;
+export const KO_ANNOUNCE_DURATION = 90;
+export const KO_TRANSITION_PAUSE = 60;
+
 export class CinematicState {
   hitStop = 0;
   superFlashTimer = 0;
@@ -38,6 +68,10 @@ export class CinematicState {
   victoryFanfarePlayed = false;
   p1DamageTaken = 0;
   p2DamageTaken = 0;
+  /** KO state machine — tracks the full KO sequence */
+  koState: KOStateMachine = createKOStateMachine();
+  /** Whether perfect KO meter bonus has been awarded */
+  perfectMeterAwarded = false;
 
   /** Tick MAX mode timers (always ticks, even during hit-stop) */
   tickMaxModes(maxModes: [MaxModeState, MaxModeState]): void {
@@ -110,6 +144,64 @@ export class CinematicState {
     // DM KO: 更长的去饱和(12帧) + 更强烈的暗角(90帧)
     this.koDesaturateTimer = 12;
     this.koVignetteTimer = 90;
+  }
+
+  /** Initialize KO state machine when KO is detected */
+  triggerKOSequence(koPlayer: number, isPerfect: boolean): void {
+    this.koState = {
+      phase: 'PENDING',
+      timer: 0,
+      koPlayer,
+      isPerfect,
+    };
+    this.perfectMeterAwarded = false;
+  }
+
+  /** Advance KO state machine by one tick. Returns the current phase. */
+  tickKOState(): KOPhase {
+    const ks = this.koState;
+    ks.timer++;
+
+    switch (ks.phase) {
+      case 'PENDING':
+        // PENDING phase ends when slow-mo finishes
+        if (this.koSlowMo <= 0) {
+          ks.phase = 'FLASH';
+          ks.timer = 0;
+          // Trigger a dramatic hit-stop for the flash phase
+          this.hitStop = KO_FLASH_DURATION;
+        }
+        break;
+      case 'FLASH':
+        // FLASH phase: freeze for KO_FLASH_DURATION ticks
+        if (ks.timer >= KO_FLASH_DURATION) {
+          ks.phase = 'ANNOUNCE';
+          ks.timer = 0;
+        }
+        break;
+      case 'ANNOUNCE':
+        // ANNOUNCE phase: K.O. text displayed for KO_ANNOUNCE_DURATION ticks
+        if (ks.timer >= KO_ANNOUNCE_DURATION) {
+          ks.phase = 'DONE';
+          ks.timer = 0;
+        }
+        break;
+      case 'DONE':
+        // DONE phase: waiting for round transition
+        break;
+    }
+
+    return ks.phase;
+  }
+
+  /** Get the KO state machine's current phase */
+  getKOPhase(): KOPhase {
+    return this.koState.phase;
+  }
+
+  /** Get the KO state machine timer */
+  getKOTimer(): number {
+    return this.koState.timer;
   }
 
   /** Spawn KO impact dust particles at the hit location */
@@ -200,6 +292,8 @@ export class CinematicState {
     this.victoryFanfarePlayed = false;
     this.p1DamageTaken = 0;
     this.p2DamageTaken = 0;
+    this.koState = createKOStateMachine();
+    this.perfectMeterAwarded = false;
   }
 
   /** Reset between rounds: slow-mo + hit-stop + superFlash + damage, keep victory fanfare */
@@ -217,5 +311,7 @@ export class CinematicState {
     this.koDustParticles = [];
     this.p1DamageTaken = 0;
     this.p2DamageTaken = 0;
+    this.koState = createKOStateMachine();
+    this.perfectMeterAwarded = false;
   }
 }

@@ -10,6 +10,8 @@ import { IoriDef } from './iori.js';
 import { TerryDef } from './terry.js';
 import { KimDef } from './kim.js';
 import { RyoDef } from './ryo.js';
+import { RYO_ACTION_CONTRACTS } from '../core/ryoFrameContract.js';
+import { registerCharacterContracts } from '../entities/fighter.js';
 import { LeonaDef } from './leona.js';
 import { KulaDef } from './kula.js';
 import { KdashDef } from './kdash.js';
@@ -64,3 +66,8 @@ export const ROSTER: CharacterDefinition[] = [
   KasumiDef,
   MaryDef,
 ];
+
+// ===== Frame Contract Registration =====
+// Register each character's ActionContracts into the global lookup.
+// Runtime systems (combat, rendering, audio) query contracts via getCharacterActionContract().
+registerCharacterContracts('ryo', RYO_ACTION_CONTRACTS);

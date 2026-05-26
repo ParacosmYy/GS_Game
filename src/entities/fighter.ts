@@ -32,7 +32,50 @@ import {
 } from '../core/constants.js';
 import { ATTACK_FRAMES } from '../core/attackFrames.js';
 import { getHurtboxDef } from '../core/hurtboxManifest.js';
+import type { ActionContract } from '../core/frameContract.js';
+import {
+  getCollisionAtFrame,
+  phaseFrameToAbsolute,
+  getActiveEvents,
+  getCurrentPhase,
+} from '../core/frameContractBuilder.js';
 import type { CharacterStats } from '../characters/types.js';
+
+// ===== Frame Contract Registry =====
+// Module-level registry for ActionContracts, keyed by characterId -> actionId.
+// Populated at init time by each character's content package.
+const contractRegistry = new Map<string, Map<string, ActionContract>>();
+
+/** Register a character's action contracts into the global registry */
+export function registerCharacterContracts(
+  characterId: string,
+  actions: Map<string, ActionContract>,
+): void {
+  contractRegistry.set(characterId, actions);
+}
+
+/** Look up an ActionContract for a given character + attack type */
+export function getCharacterActionContract(
+  characterId: string,
+  attackType: string,
+): ActionContract | null {
+  const charActions = contractRegistry.get(characterId);
+  if (!charActions) return null;
+  return charActions.get(attackType) ?? null;
+}
+
+/** Get active event tags from the FrameContract for the fighter's current state */
+export function getContractEventTags(
+  characterId: string,
+  attackType: string,
+  phase: 'startup' | 'active' | 'recovery',
+  phaseFrame: number,
+): string[] {
+  const contract = getCharacterActionContract(characterId, attackType);
+  if (!contract) return [];
+  const absFrame = phaseFrameToAbsolute(contract, phase, phaseFrame);
+  return getActiveEvents(contract, absFrame);
+}
 
 export class Fighter {
   x: number;
@@ -53,6 +96,7 @@ export class Fighter {
   attackFrame = 0;
   attackPhase: AttackPhase = 'none';
   hasHit = false; // Prevent multi-hit in one active phase
+  multiHit = false; // When true, hasHit resets each active frame (for multi-hit moves like Hien)
   hasAttackedInAir = false; // Per-jump air attack limit (1 per jump)
 
   // Guard gauge (0–guardGaugeMax, depleted by blocking attacks)
@@ -114,6 +158,13 @@ export class Fighter {
   usedQuickStand = false;
   knockdownDelayUsed = 0;   // frames of delayed get-up consumed
   knockdownDelayMax = 30;   // max delay (KOF2002: ~0.5s cap)
+
+  // Getup phase tracking
+  getupTimer = 0;            // ticks remaining in getup animation (GETUP state)
+  getupDuration = 15;        // total getup animation ticks
+
+  // OTG tracking
+  otgHitCount = 0;           // number of OTG hits taken this knockdown
 
   // Throw invincibility
   throwInvulnFrames: number = 0;  // 投技无敌帧计数器
@@ -206,7 +257,7 @@ export class Fighter {
   /** Update auto-facing toward opponent */
   updateFacing(opponent: Fighter): void {
     // KOF2002: facing locked during hitstun, knockdown, and attack active phase
-    if (this.state === FighterState.HITSTUN || this.state === FighterState.KNOCKDOWN || this.state === FighterState.DIZZY) return;
+    if (this.state === FighterState.HITSTUN || this.state === FighterState.KNOCKDOWN || this.state === FighterState.GETUP || this.state === FighterState.DIZZY) return;
     if (this.attackPhase === 'active' || this.attackPhase === 'startup') return;
     this.facing = opponent.x > this.x ? 1 : -1;
   }
@@ -273,6 +324,7 @@ export class Fighter {
     if (!this.isGrounded()) return false; // KOF2002: 空中不可被地面投技
     if (this.state === FighterState.HITSTUN) return false;
     if (this.state === FighterState.KNOCKDOWN) return false;
+    if (this.state === FighterState.GETUP) return false;  // KOF2002: getup invincible to throws
     if (this.state === FighterState.BLOCK) return false;
     if (this.state === FighterState.AIR_BLOCK) return false;
     if (this.state === FighterState.THROW) return false;
@@ -328,6 +380,23 @@ export class Fighter {
   getActiveHitboxes(): { x: number; y: number; width: number; height: number }[] {
     if (this.attackPhase !== 'active' || !this.currentAttack) return [];
 
+    // === Frame Contract path: use contract data if available ===
+    const contract = getCharacterActionContract(this.charId, this.currentAttack as string);
+    if (contract) {
+      const absFrame = phaseFrameToAbsolute(contract, 'active', this.attackFrame);
+      const collision = getCollisionAtFrame(contract, absFrame);
+      if (collision && collision.hitboxes.length > 0) {
+        return collision.hitboxes.map(box => ({
+          x: this.x + box.ox * this.facing,
+          y: this.y + box.oy,
+          width: box.w,
+          height: box.h,
+        }));
+      }
+      // Contract exists but no hitbox data at this frame → fall through to ATTACK_FRAMES
+    }
+
+    // === Legacy path: ATTACK_FRAMES table ===
     const perFrame = ATTACK_FRAMES[this.currentAttack];
     if (perFrame && this.attackFrame < perFrame.length) {
       const frame = perFrame[this.attackFrame];
@@ -425,6 +494,20 @@ export class Fighter {
       this.state = FighterState.STAND_ATTACK;
     }
 
+    // KOF2002: Invincibility on startup for DP-type moves
+    // RYO_KO_HOU (A version): frames 1-5 upper body invincible (full invincible for simplicity)
+    // RYO_KO_HOU_C (C version): frames 1-8 full body invincible
+    if (attackType === AttackType.RYO_KO_HOU) {
+      this.invincible = true;
+      this.wakeupInvulnFrames = 5; // repurpose as general invincibility countdown
+    } else if (attackType === AttackType.RYO_KO_HOU_C) {
+      this.invincible = true;
+      this.wakeupInvulnFrames = 8;
+    }
+
+    // Multi-hit moves: each active frame can connect independently
+    this.multiHit = attackType === AttackType.RYO_HIEN;
+
     // Set rekka chain state for followup tracking
     if (attackType === AttackType.KYO_ARAGAMI) {
       this.rekkaChain = 'aragami';
@@ -451,12 +534,17 @@ export class Fighter {
     } else if (this.attackPhase === 'recovery' && this.attackFrame >= data.recovery) {
       this.endAttack();
     }
+    // Multi-hit: reset hasHit each active frame so each frame can connect independently
+    if (this.multiHit && this.attackPhase === 'active' && this.attackFrame > 0) {
+      this.hasHit = false;
+    }
     if (this.throwInvulnFrames > 0) this.throwInvulnFrames--;
   }
 
   endAttack(): void {
     this.resetAttackState();
     this.hasHit = false;
+    this.multiHit = false;
     this.resetCancelFlags();
     this.isCounterWire = false;
     this.state = FighterState.IDLE;
@@ -488,8 +576,23 @@ export class Fighter {
     this.knockdownTimer = frames;
     this.isKnockedDown = true;
     this.isHardKnockdown = hard;
+    this.otgHitCount = 0;
     this.resetAttackState();
     this.resetCancelFlags();
+  }
+
+  /** Apply getup animation (transition from lying down to standing) */
+  applyGetup(duration: number = 15): void {
+    this.state = FighterState.GETUP;
+    this.getupTimer = duration;
+    this.getupDuration = duration;
+    this.isKnockedDown = false;
+    this.resetAttackState();
+  }
+
+  /** Whether fighter is on the ground and can be hit by OTG attacks */
+  isOTGVulnerable(): boolean {
+    return this.state === FighterState.KNOCKDOWN && this.isKnockedDown && this.isGrounded();
   }
 
   /** Can the fighter act (accept input) right now? */
@@ -684,6 +787,9 @@ export class Fighter {
     this.isHardKnockdown = false;
     this.usedQuickStand = false;
     this.knockdownDelayUsed = 0;
+    this.getupTimer = 0;
+    this.getupDuration = 15;
+    this.otgHitCount = 0;
     this.throwInvincibilityTimer = 0;
     this.throwBufferTimer = 0;
     this.isBeingThrown = false;
