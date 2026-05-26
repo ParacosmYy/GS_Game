@@ -983,3 +983,9 @@
 ## H199: athenaDef—5项验证Athena角色定义 — 171→172
 
 **commit:** <hash> | athenaDef—5项验证Athena角色定义
+
+---
+
+## H200: charDefBatch6—25项验证Billy/Chang/Choi/Chris/Clark角色定义 — 172→173
+
+**commit:** <hash> | charDefBatch6—25项验证Billy/Chang/Choi/Chris/Clark角色定义
