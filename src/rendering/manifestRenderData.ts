@@ -18,7 +18,13 @@ import {
   PORTRAIT_MANIFEST,
   getHUDPortrait,
   getSelectPortrait,
+  getVSPortrait,
+  getWinPortrait,
+  hasPixelPortraitData,
+  getPortraitFallbackColor,
+  getPortraitFallbackAccent,
   type PortraitEntry,
+  type PortraitSize,
 } from '../core/portraitManifest.js';
 
 /** 角色渲染用的完整数据包 */
@@ -40,6 +46,12 @@ export interface CharacterRenderData {
   hudPortrait: PortraitEntry | undefined;
   /** 选人画面肖像数据（可选） */
   selectPortrait: PortraitEntry | undefined;
+  /** VS 画面肖像数据（可选） */
+  vsPortrait: PortraitEntry | undefined;
+  /** 胜利画面肖像数据（可选） */
+  winPortrait: PortraitEntry | undefined;
+  /** 是否有真实像素肖像数据可用 */
+  hasPixelPortrait: boolean;
 }
 
 /**
@@ -59,6 +71,9 @@ export function getCharacterRenderData(charId: string): CharacterRenderData {
   const animationNames = getAnimationNames(SPRITE_MANIFEST, charId);
   const hudPortrait = getHUDPortrait(PORTRAIT_MANIFEST, charId);
   const selectPortrait = getSelectPortrait(PORTRAIT_MANIFEST, charId);
+  const vsPortrait = getVSPortrait(PORTRAIT_MANIFEST, charId);
+  const winPortrait = getWinPortrait(PORTRAIT_MANIFEST, charId);
+  const pixelAvailable = hasPixelPortraitData(PORTRAIT_MANIFEST, charId);
 
   return {
     charId,
@@ -67,6 +82,9 @@ export function getCharacterRenderData(charId: string): CharacterRenderData {
     found,
     hudPortrait,
     selectPortrait,
+    vsPortrait,
+    winPortrait,
+    hasPixelPortrait: pixelAvailable,
   };
 }
 

@@ -90,6 +90,68 @@ export function getHUDPortrait(
   return getPortrait(manifest, charId, 'hud');
 }
 
+/**
+ * 查询 VS 画面肖像（convenience）
+ * @returns PortraitEntry 或 undefined
+ */
+export function getVSPortrait(
+  manifest: PortraitManifest,
+  charId: string,
+): PortraitEntry | undefined {
+  return getPortrait(manifest, charId, 'vs');
+}
+
+/**
+ * 查询胜利画面肖像（convenience）
+ * @returns PortraitEntry 或 undefined
+ */
+export function getWinPortrait(
+  manifest: PortraitManifest,
+  charId: string,
+): PortraitEntry | undefined {
+  return getPortrait(manifest, charId, 'win');
+}
+
+/**
+ * 判断角色是否有真实像素肖像数据可用
+ *
+ * 检查 manifest 中 hasPixelPortrait 标志，
+ * UI 层可据此决定使用 pixelPortrait 渲染还是 fallback 色块。
+ *
+ * @returns true 表示 CharacterDefinition.pixelPortrait 可用
+ */
+export function hasPixelPortraitData(
+  manifest: PortraitManifest,
+  charId: string,
+  size: PortraitSize = 'hud',
+): boolean {
+  return getPortrait(manifest, charId, size)?.hasPixelPortrait === true;
+}
+
+/**
+ * 获取角色指定尺寸的 fallback 颜色（outfit 主色）
+ * @returns fallbackColor 或 undefined
+ */
+export function getPortraitFallbackColor(
+  manifest: PortraitManifest,
+  charId: string,
+  size: PortraitSize = 'hud',
+): string | undefined {
+  return getPortrait(manifest, charId, size)?.fallbackColor;
+}
+
+/**
+ * 获取角色指定尺寸的 fallback 强调色（hair 发色）
+ * @returns fallbackAccent 或 undefined
+ */
+export function getPortraitFallbackAccent(
+  manifest: PortraitManifest,
+  charId: string,
+  size: PortraitSize = 'hud',
+): string | undefined {
+  return getPortrait(manifest, charId, size)?.fallbackAccent;
+}
+
 // ===== 数据 =====
 
 /**

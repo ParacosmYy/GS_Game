@@ -24,18 +24,87 @@ interface TransitionState {
   prevPose: Pose;
   /** Remaining blend frames; decrements each call until 0 */
   remaining: number;
+  /** Total blend duration for the current transition */
+  duration: number;
+  /** Blend curve type controlling how t progresses over the duration */
+  curve: 'ease-in' | 'ease-out' | 'snap' | 'linear';
 }
 
-/** How many frames to blend across when a state transition is detected */
-const TRANSITION_DURATION = 3;
+/**
+ * Per-transition blend parameters based on (previousState, newState) pairs.
+ *
+ * Design rationale:
+ *   - IDLE<->WALK: gradual ease-in so the character shifts weight naturally
+ *   - IDLE->JUMP: snappy but not jarring; the player pressed a button, respond fast
+ *   - ->HITSTUN: near-instant snap; being hit is sudden and violent
+ *   - ->KNOCKDOWN: fast start (impact shock) then controlled settle
+ *   - Attacks: quick commitment so the strike reads clearly
+ *   - All others: moderate default blend
+ */
+interface TransitionProfile {
+  duration: number;
+  curve: 'ease-in' | 'ease-out' | 'snap' | 'linear';
+}
+
+function getTransitionProfile(from: string, to: string): TransitionProfile {
+  // ── Hit reactions: near-instant snap ──
+  if (to === FighterState.HITSTUN) return { duration: 1, curve: 'snap' };
+  if (to === FighterState.KNOCKDOWN) return { duration: 2, curve: 'snap' };
+  if (to === FighterState.GUARD_CRUSH) return { duration: 1, curve: 'snap' };
+
+  // ── IDLE <-> WALK: gradual weight shift ──
+  if (from === FighterState.IDLE && to === FighterState.WALK) return { duration: 5, curve: 'ease-in' };
+  if (from === FighterState.WALK && to === FighterState.IDLE) return { duration: 4, curve: 'ease-out' };
+
+  // ── IDLE <-> RUN: faster commitment than walk but still smooth ──
+  if (from === FighterState.IDLE && to === FighterState.RUN) return { duration: 3, curve: 'ease-in' };
+  if (from === FighterState.RUN && to === FighterState.IDLE) return { duration: 3, curve: 'ease-out' };
+  if (from === FighterState.WALK && to === FighterState.RUN) return { duration: 2, curve: 'ease-in' };
+
+  // ── Jump launch: snappy but not jarring ──
+  if (to === FighterState.JUMP || to === FighterState.HOP || to === FighterState.HYPER_JUMP || to === FighterState.RUN_JUMP) {
+    return { duration: 2, curve: 'ease-out' };
+  }
+
+  // ── Attacks: quick commitment so the strike reads clearly ──
+  if (to === FighterState.STAND_ATTACK || to === FighterState.CROUCH_ATTACK || to === FighterState.AIR_ATTACK) {
+    return { duration: 2, curve: 'ease-out' };
+  }
+
+  // ── Crouch transitions: moderate ──
+  if (to === FighterState.CROUCH || from === FighterState.CROUCH) {
+    return { duration: 3, curve: 'ease-in' };
+  }
+
+  // ── Block: quick guard raise ──
+  if (to === FighterState.BLOCK || to === FighterState.AIR_BLOCK) {
+    return { duration: 2, curve: 'ease-out' };
+  }
+
+  // ── Default: moderate linear blend ──
+  return { duration: 3, curve: 'linear' };
+}
 
 /**
- * Blend factor per remaining frame.
- * remaining=3 -> t=0.3, remaining=2 -> t=0.45, remaining=1 -> t=0.65
- * Higher t = more of the new pose. This progression gives a nice ease-in feel.
+ * Compute blend factor (t) given remaining frames, total duration, and curve type.
+ * t=0 means fully old pose, t=1 means fully new pose.
  */
-function blendFactor(remaining: number): number {
-  return 0.3 + (TRANSITION_DURATION - remaining) * 0.175;
+function blendFactor(remaining: number, duration: number, curve: string): number {
+  const progress = 1 - remaining / duration; // 0 at start, 1 at end
+  switch (curve) {
+    case 'snap':
+      // Near-instant: jump to mostly-new on the first frame
+      return 0.85 + progress * 0.15;
+    case 'ease-in':
+      // Slow start, accelerating: t follows a quadratic ease-in curve
+      return progress * progress;
+    case 'ease-out':
+      // Fast start, decelerating: t follows a quadratic ease-out curve
+      return 1 - (1 - progress) * (1 - progress);
+    case 'linear':
+    default:
+      return progress;
+  }
 }
 
 /** Linear interpolation between two BonePose values */
@@ -638,24 +707,23 @@ export function drawSkeletalFighter(
   // === State transition blending ===
   // Determine the composite state key (state + attack phase) for this frame.
   const currentStateKey = `${f.state}:${f.currentAttack ?? ''}:${f.attackPhase ?? ''}`;
+  const currBaseState = f.state;
 
   const cached = transitionCache.get(f);
   if (cached) {
     if (cached.prevState !== currentStateKey) {
-      // State changed — snapshot the previous pose as the blend source.
-      // We snapshot the pose *before* the current mutations, so we must use
-      // the last-frame snapshot.  cached.prevPose already holds that.
-      // Re-initialise with the CURRENT pose as the old pose so blending starts
-      // from where the character just was.  However, we already mutated `p`
-      // above for the NEW state, so we need the PREVIOUS frame's final pose.
-      // That's what cached.prevPose already is.  Reset the counter.
-      cached.remaining = TRANSITION_DURATION;
+      // State changed — look up the appropriate transition profile
+      const prevBaseState = cached.prevState.split(':')[0];
+      const profile = getTransitionProfile(prevBaseState, currBaseState);
+      cached.remaining = profile.duration;
+      cached.duration = profile.duration;
+      cached.curve = profile.curve;
       cached.prevState = currentStateKey;
       // prevPose keeps its value (the last-frame snapshot) so blending can start.
     }
 
     if (cached.remaining > 0) {
-      const t = blendFactor(cached.remaining);
+      const t = blendFactor(cached.remaining, cached.duration, cached.curve);
       p.head   = lerpBone(cached.prevPose.head,   p.head,   t);
       p.body   = lerpBone(cached.prevPose.body,   p.body,   t);
       p.armFront = lerpBone(cached.prevPose.armFront, p.armFront, t);
@@ -678,6 +746,8 @@ export function drawSkeletalFighter(
       legBack:  { ...p.legBack },
     },
     remaining: cached?.remaining ?? 0,
+    duration: cached?.duration ?? 3,
+    curve: cached?.curve ?? 'linear',
   });
 
   // === Per-character body dimensions ===

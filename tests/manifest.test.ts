@@ -10,6 +10,9 @@ import { describe, it, expect } from 'vitest';
 import {
   PORTRAIT_MANIFEST, PORTRAIT_SIZES,
   getPortrait, getSelectPortrait, getHUDPortrait,
+  getVSPortrait, getWinPortrait,
+  hasPixelPortraitData, getPortraitFallbackColor, getPortraitFallbackAccent,
+  type PortraitSize,
 } from '../src/core/portraitManifest.js';
 import {
   getAnimation, getFallbackColors, getAnimationNames,
@@ -37,6 +40,90 @@ describe('Portrait Manifest', () => {
 
   it('getPortrait returns undefined for missing character', () => {
     expect(getPortrait(PORTRAIT_MANIFEST, 'nonexistent', 'hud')).toBeUndefined();
+  });
+
+  it('getVSPortrait returns entry for known character', () => {
+    const entry = getVSPortrait(PORTRAIT_MANIFEST, 'ryo');
+    expect(entry).toBeDefined();
+    expect(entry!.size).toBe('vs');
+    expect(entry!.width).toBe(PORTRAIT_SIZES.vs.width);
+    expect(entry!.height).toBe(PORTRAIT_SIZES.vs.height);
+  });
+
+  it('getWinPortrait returns entry for known character', () => {
+    const entry = getWinPortrait(PORTRAIT_MANIFEST, 'ryo');
+    expect(entry).toBeDefined();
+    expect(entry!.size).toBe('win');
+    expect(entry!.width).toBe(PORTRAIT_SIZES.win.width);
+    expect(entry!.height).toBe(PORTRAIT_SIZES.win.height);
+  });
+
+  it('getVSPortrait returns undefined for missing character', () => {
+    expect(getVSPortrait(PORTRAIT_MANIFEST, 'nonexistent')).toBeUndefined();
+  });
+
+  it('getWinPortrait returns undefined for missing character', () => {
+    expect(getWinPortrait(PORTRAIT_MANIFEST, 'nonexistent')).toBeUndefined();
+  });
+
+  it('hasPixelPortraitData returns true for ryo', () => {
+    expect(hasPixelPortraitData(PORTRAIT_MANIFEST, 'ryo')).toBe(true);
+    expect(hasPixelPortraitData(PORTRAIT_MANIFEST, 'ryo', 'select')).toBe(true);
+    expect(hasPixelPortraitData(PORTRAIT_MANIFEST, 'ryo', 'vs')).toBe(true);
+    expect(hasPixelPortraitData(PORTRAIT_MANIFEST, 'ryo', 'win')).toBe(true);
+  });
+
+  it('hasPixelPortraitData returns false for missing character', () => {
+    expect(hasPixelPortraitData(PORTRAIT_MANIFEST, 'nonexistent')).toBe(false);
+  });
+
+  it('getPortraitFallbackColor returns valid hex for ryo', () => {
+    const color = getPortraitFallbackColor(PORTRAIT_MANIFEST, 'ryo');
+    expect(color).toBeDefined();
+    expect(color).toBe('#DD6600');
+  });
+
+  it('getPortraitFallbackAccent returns valid hex for ryo', () => {
+    const accent = getPortraitFallbackAccent(PORTRAIT_MANIFEST, 'ryo');
+    expect(accent).toBeDefined();
+    expect(accent).toBe('#8B4513');
+  });
+
+  it('all 4 size variants are present for ryo with correct dimensions', () => {
+    const sizes: PortraitSize[] = ['select', 'vs', 'hud', 'win'];
+    for (const size of sizes) {
+      const entry = getPortrait(PORTRAIT_MANIFEST, 'ryo', size);
+      expect(entry, `ryo missing ${size} portrait`).toBeDefined();
+      expect(entry!.width).toBe(PORTRAIT_SIZES[size].width);
+      expect(entry!.height).toBe(PORTRAIT_SIZES[size].height);
+      expect(entry!.hasPixelPortrait).toBe(true);
+    }
+  });
+
+  it('each portrait entry has required fields', () => {
+    const entry = getSelectPortrait(PORTRAIT_MANIFEST, 'ryo');
+    expect(entry).toBeDefined();
+    expect(entry!.charId).toBe('ryo');
+    expect(entry!.size).toBe('select');
+    expect(entry!.atlasX).toBeGreaterThanOrEqual(0);
+    expect(entry!.atlasY).toBeGreaterThanOrEqual(0);
+    expect(typeof entry!.fallbackColor).toBe('string');
+    expect(typeof entry!.fallbackAccent).toBe('string');
+    expect(HEX_COLOR_RE.test(entry!.fallbackColor)).toBe(true);
+    expect(HEX_COLOR_RE.test(entry!.fallbackAccent)).toBe(true);
+  });
+
+  it('all 27 characters have all 4 portrait sizes', () => {
+    const sizes: PortraitSize[] = ['select', 'vs', 'hud', 'win'];
+    const charCount = Object.keys(PORTRAIT_MANIFEST.portraits).length;
+    expect(charCount).toBe(27);
+    for (const [charId, charPortraits] of Object.entries(PORTRAIT_MANIFEST.portraits)) {
+      for (const size of sizes) {
+        expect(charPortraits[size], `${charId} missing ${size}`).toBeDefined();
+        expect(charPortraits[size].charId).toBe(charId);
+        expect(charPortraits[size].size).toBe(size);
+      }
+    }
   });
 });
 
