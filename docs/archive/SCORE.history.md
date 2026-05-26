@@ -977,3 +977,9 @@
 ## H198: andyDef—5项验证Andy角色定义id/name/stats/poses — 170→171
 
 **commit:** <hash> | andyDef—5项验证Andy角色定义id/name/stats/poses
+
+---
+
+## H199: athenaDef—5项验证Athena角色定义 — 171→172
+
+**commit:** <hash> | athenaDef—5项验证Athena角色定义
