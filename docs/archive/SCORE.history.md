@@ -217,3 +217,9 @@
 ## H84: meter+DM manager测试—41项验证 — 56→57
 
 **commit:** <hash> | meter系统全函数+DMManager canUseDM/isHSDM+Ryo DM/SDM/HSDM类型+meter→DM集成
+
+---
+
+## H85: hit callback combat测试—37项验证 — 57→58
+
+**commit:** <hash> | classifyAttack+getDamageSizeScale+hitstop层级+Ryo VFX+combo scaling+KO ground effect
