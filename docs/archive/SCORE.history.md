@@ -361,3 +361,9 @@
 ## H108: rendering utils测试—5项验证parseColor+shiftColor — 80→81
 
 **commit:** <hash> | rendering utils测试—5项验证parseColor+shiftColor
+
+---
+
+## H109: constants测试—24项验证canvas/stage/physics/combat/timing/bounds/hitstop — 81→82
+
+**commit:** <hash> | constants测试—24项验证canvas/stage/physics/combat/timing/bounds/hitstop
