@@ -84,6 +84,8 @@ export class Fighter {
 
   // Run stop delay (A5: can't instantly block out of run)
   runStopTimer = 0;
+  // Run latch timer — keeps a short forward dash alive after double-tap release
+  runLatchTimer = 0;
 
   // Backdash timer (for invincibility window tracking)
   backdashTimer = 0;
@@ -531,6 +533,7 @@ export class Fighter {
     this.stateAge++;
     if (this.landingRecovery > 0) this.landingRecovery--;
     if (this.runStopTimer > 0) this.runStopTimer--;
+    if (this.runLatchTimer > 0) this.runLatchTimer--;
     if (this.throwInvincibilityTimer > 0) this.throwInvincibilityTimer--;
     if (this.hitConfirmDelay > 0) this.hitConfirmDelay--;
     if (this.hitFlashFrames > 0) this.hitFlashFrames--;
@@ -676,6 +679,7 @@ export class Fighter {
     this.knockdownTimer = 0;
     this.landingRecovery = 0;
     this.displayHeight = FIGHTER_HEIGHT;
+    this.runLatchTimer = 0;
     this.isKnockedDown = false;
     this.isHardKnockdown = false;
     this.usedQuickStand = false;

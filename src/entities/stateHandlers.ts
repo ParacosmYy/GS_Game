@@ -7,6 +7,7 @@ import {
   STAGE_GROUND_Y,
   BACKDASH_VX, BACKDASH_VY, BACKDASH_DURATION, BACKDASH_INVINCIBLE_FRAMES,
   DOUBLE_TAP_WINDOW, HYPER_CHARGE_WINDOW,
+  RUN_LATCH_FRAMES,
   HOP_THRESHOLD,
   ROLL_SPEED, ROLL_DURATION, ROLL_RECOVERY,
   LANDING_RECOVERY,
@@ -188,7 +189,10 @@ export function handleIdleWalk(ctx: FighterCtx, input: ResolvedInput): void {
     f.displayHeight = 80; ctx.vfx.spawnDust(f.x, STAGE_GROUND_Y); return;
   }
   if (dblFwd(ctx, input) && f.canAct() && f.isGrounded()) {
-    f.state = FighterState.RUN; f.vx = ctx.stats.runSpeed * f.facing; return;
+    f.state = FighterState.RUN;
+    f.runLatchTimer = RUN_LATCH_FRAMES;
+    f.vx = ctx.stats.runSpeed * f.facing;
+    return;
   }
   if (upReleased(ctx, input) && f.isGrounded() && ctx.upHoldFrames > 0) {
     f.throwInvincibilityTimer = THROW_INVINCIBILITY_JUMP_STARTUP;
@@ -238,7 +242,8 @@ export function handleIdleWalk(ctx: FighterCtx, input: ResolvedInput): void {
 /** RUN state handler */
 export function handleRun(ctx: FighterCtx, input: ResolvedInput): void {
   const f = ctx.fighter;
-  f.displayHeight = 100; f.vx = ctx.stats.runSpeed * f.facing;
+  f.displayHeight = 100;
+  if (input.forward) f.runLatchTimer = RUN_LATCH_FRAMES;
   if (input.up && f.isGrounded()) {
     f.state = FighterState.RUN_JUMP; f.vy = ctx.stats.jumpVelocity; f.vx = ctx.stats.jumpForwardSpeed * 1.5 * f.facing;
     f.throwInvincibilityTimer = THROW_INVINCIBILITY_JUMP_STARTUP;
@@ -252,7 +257,11 @@ export function handleRun(ctx: FighterCtx, input: ResolvedInput): void {
     return;
   }
   if (f.canAct()) { const atk = tryAttack(ctx, input); if (atk) { f.startAttack(atk); return; } }
-  if (!input.forward) { f.vx = 0; f.state = FighterState.IDLE; f.runStopTimer = 3; }
+  const keepRunning = input.forward || (f.runLatchTimer > 0 && !input.back);
+  if (!keepRunning) {
+    f.vx = 0; f.state = FighterState.IDLE; f.runStopTimer = 3; return;
+  }
+  f.vx = ctx.stats.runSpeed * f.facing;
 }
 
 /** BACKDASH state handler */

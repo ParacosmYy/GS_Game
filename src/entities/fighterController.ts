@@ -277,6 +277,9 @@ export class FighterController {
     this.counterStanceTimer = ctx.counterStanceTimer;
     this.wakeupBuffer = ctx.wakeupBuffer;
     this.cancelSpecialBuffer = ctx.cancelSpecialBuffer;
+    this.lastForwardTick = ctx.lastForwardTick;
+    this.lastBackTick = ctx.lastBackTick;
+    this.lastDownTick = ctx.lastDownTick;
   }
 
   private checkProximityGuard(input: ResolvedInput): boolean {

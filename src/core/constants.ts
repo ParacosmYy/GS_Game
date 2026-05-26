@@ -18,6 +18,7 @@ export const STAGE_LEFT = FIGHTER_WIDTH / 2;
 export const STAGE_RIGHT = STAGE_WIDTH - FIGHTER_WIDTH / 2;
 export const WALK_SPEED = 4;
 export const RUN_SPEED = 7;
+export const RUN_LATCH_FRAMES = 6;      // 双击后即使短暂松开，也保留短冲刺惯性
 export const BACKDASH_VX = 8;
 export const BACKDASH_VY = -8;
 export const BACKDASH_DURATION = 18;

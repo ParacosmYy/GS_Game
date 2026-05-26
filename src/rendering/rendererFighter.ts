@@ -196,24 +196,57 @@ export function drawFighters(
     // Hit flash overlay
     if (f.hitFlashFrames > 0) {
       ctx.save();
-      ctx.globalCompositeOperation = 'source-atop';
-      ctx.globalAlpha = 0.7;
-      ctx.fillStyle = f.hitFlashColor || '#ffffff';
-      ctx.fillRect(sx + leanOffsetX - 80, sy - 250, 160, 260);
-      ctx.restore();
-      // KOF2002: 命中闪光外发光 — 角色外围白色辉光
-      ctx.save();
       ctx.globalCompositeOperation = 'screen';
-      ctx.globalAlpha = 0.2;
+      ctx.globalAlpha = 0.24;
+      ctx.fillStyle = f.hitFlashColor || '#ffffff';
+      const flashX = sx + leanOffsetX;
+      const flashY = sy - f.displayHeight * 0.56;
+      const flashW = Math.max(18, hw * 0.55);
+      const flashH = Math.max(28, f.displayHeight * 0.26);
       const flashGrad = ctx.createRadialGradient(
-        sx + leanOffsetX, sy - f.displayHeight / 2, 5,
-        sx + leanOffsetX, sy - f.displayHeight / 2, f.displayHeight * 0.8,
+        flashX, flashY, 2,
+        flashX, flashY, Math.max(flashW, flashH) * 1.6,
       );
-      flashGrad.addColorStop(0, '#ffffff');
-      flashGrad.addColorStop(0.4, 'rgba(255,255,255,0.3)');
+      flashGrad.addColorStop(0, 'rgba(255,255,255,0.95)');
+      flashGrad.addColorStop(0.45, 'rgba(255,255,255,0.40)');
       flashGrad.addColorStop(1, 'rgba(255,255,255,0)');
       ctx.fillStyle = flashGrad;
-      ctx.fillRect(sx + leanOffsetX - 80, sy - f.displayHeight - 30, 160, f.displayHeight + 50);
+      ctx.beginPath();
+      ctx.ellipse(flashX, flashY, flashW, flashH, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.globalAlpha = 0.14;
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.ellipse(flashX, flashY, flashW * 1.1, flashH * 1.05, 0, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.restore();
+      // KOF2002: 命中闪光外发光 — 角色躯干附近的局部辉光，避免整块白框
+      ctx.save();
+      ctx.globalCompositeOperation = 'screen';
+      ctx.globalAlpha = 0.12;
+      const auraGrad = ctx.createRadialGradient(
+        flashX, flashY, 6,
+        flashX, flashY, Math.max(flashW, flashH) * 2.2,
+      );
+      auraGrad.addColorStop(0, 'rgba(255,255,255,0.35)');
+      auraGrad.addColorStop(0.6, 'rgba(255,255,255,0.18)');
+      auraGrad.addColorStop(1, 'rgba(255,255,255,0)');
+      ctx.fillStyle = auraGrad;
+      ctx.beginPath();
+      ctx.ellipse(flashX, flashY, flashW * 1.5, flashH * 1.35, 0, 0, Math.PI * 2);
+      ctx.fill();
+      const innerGrad = ctx.createRadialGradient(
+        flashX, flashY, 5,
+        flashX, flashY, f.displayHeight * 0.45,
+      );
+      innerGrad.addColorStop(0, '#ffffff');
+      innerGrad.addColorStop(0.4, 'rgba(255,255,255,0.3)');
+      innerGrad.addColorStop(1, 'rgba(255,255,255,0)');
+      ctx.fillStyle = innerGrad;
+      ctx.beginPath();
+      ctx.ellipse(flashX, flashY, flashW * 0.9, flashH * 0.9, 0, 0, Math.PI * 2);
+      ctx.fill();
       ctx.restore();
     }
     // MAX glow
