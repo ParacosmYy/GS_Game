@@ -523,3 +523,15 @@
 ## H132: projectile测试—7项验证Projectile构造+update+active+resolveProjectileClashes — 104→105
 
 **commit:** <hash> | projectile测试—7项验证Projectile构造+update+active+resolveProjectileClashes
+
+---
+
+## H133: 完整性报告增加14项通常技追踪 — 105→106
+
+**commit:** 9e01e84 | 完整性报告增加14项通常技追踪—normal moves扩展覆盖
+
+---
+
+## H134: 踢技像素帧+渲染集成—6个踢技独立像素帧 — 106→107
+
+**commit:** c2e0eeb | stand_b/d+close_b/d+crouch_b/d独立像素帧+resolveFrameKey专用路由
