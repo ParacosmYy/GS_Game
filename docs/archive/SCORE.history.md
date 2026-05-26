@@ -1007,3 +1007,9 @@
 ## H203: charDefBatch9—30项验证Shermie/Terry/Vice/Xiangfei/Yamazaki/Yashiro角色定义 — 175→176
 
 **commit:** <hash> | charDefBatch9—30项验证Shermie/Terry/Vice/Xiangfei/Yamazaki/Yashiro角色定义
+
+---
+
+## H204: roster—5项验证ROSTER注册表(26+角色/唯一id/stats) — 176→177
+
+**commit:** <hash> | roster—5项验证ROSTER注册表(26+角色/唯一id/stats)

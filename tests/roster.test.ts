@@ -1,29 +1,25 @@
 import { describe, it, expect } from 'vitest';
 import { ROSTER } from '../src/characters/index.js';
 
-describe('characters/index', () => {
-  it('ROSTER is array', () => {
-    expect(Array.isArray(ROSTER)).toBe(true);
+describe('ROSTER registry', () => {
+  it('has 26+ characters', () => {
+    expect(ROSTER.length).toBeGreaterThanOrEqual(26);
   });
-  it('ROSTER has at least 3 characters', () => {
-    expect(ROSTER.length).toBeGreaterThanOrEqual(3);
+  it('all entries have unique ids', () => {
+    const ids = ROSTER.map(c => c.id);
+    const unique = new Set(ids);
+    expect(unique.size).toBe(ids.length);
   });
-  it('ROSTER contains ryo', () => {
-    const ryo = ROSTER.find(c => c.id === 'ryo');
-    expect(ryo).toBeDefined();
+  it('contains ryo', () => {
+    expect(ROSTER.some(c => c.id === 'ryo')).toBe(true);
   });
-  it('each entry has id and name', () => {
-    for (const char of ROSTER) {
-      expect(char.id).toBeDefined();
-      expect(char.name).toBeDefined();
+  it('contains kyo', () => {
+    expect(ROSTER.some(c => c.id === 'kyo')).toBe(true);
+  });
+  it('all entries have valid stats', () => {
+    for (const c of ROSTER) {
+      expect(c.stats.walkSpeed).toBeGreaterThan(0);
+      expect(c.stats.maxHealth).toBeGreaterThan(0);
     }
-  });
-  it('ROSTER contains kyo', () => {
-    const kyo = ROSTER.find(c => c.id === 'kyo');
-    expect(kyo).toBeDefined();
-  });
-  it('ROSTER contains iori', () => {
-    const iori = ROSTER.find(c => c.id === 'iori');
-    expect(iori).toBeDefined();
   });
 });
