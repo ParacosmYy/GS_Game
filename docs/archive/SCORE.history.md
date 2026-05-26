@@ -637,3 +637,9 @@
 ## H149: charBatch2—25项验证chris/clark/joe/kasumi/kdash — 121→122
 
 **commit:** <hash> | charBatch2—25项验证chris/clark/joe/kasumi/kdash
+
+---
+
+## H150: charBatch3—25项验证kim/kula/leona/mai/mary — 122→123
+
+**commit:** <hash> | charBatch3—25项验证kim/kula/leona/mai/mary
