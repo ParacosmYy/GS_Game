@@ -923,3 +923,9 @@
 ## H189: ryoMovementExt—7项验证roll/guardCrush/maxMode/taunt/counterStance帧 — 161→162
 
 **commit:** <hash> | ryoMovementExt—7项验证roll/guardCrush/maxMode/taunt/counterStance帧
+
+---
+
+## H190: ryoSpriteBatch4—6项验证SDM/HSDM/heavyAttack像素帧 — 162→163
+
+**commit:** <hash> | ryoSpriteBatch4—6项验证SDM/HSDM/heavyAttack像素帧
