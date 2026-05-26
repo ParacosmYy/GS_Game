@@ -989,3 +989,9 @@
 ## H200: charDefBatch6—25项验证Billy/Chang/Choi/Chris/Clark角色定义 — 172→173
 
 **commit:** <hash> | charDefBatch6—25项验证Billy/Chang/Choi/Chris/Clark角色定义
+
+---
+
+## H201: charDefBatch7—25项验证Joe/Kasumi/Kdash/Kim/Kula角色定义 — 173→174
+
+**commit:** <hash> | charDefBatch7—25项验证Joe/Kasumi/Kdash/Kim/Kula角色定义
