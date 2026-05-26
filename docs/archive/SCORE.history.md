@@ -1091,3 +1091,9 @@
 ## H217: hudInfo—7项验证inputToNumpad/numpadToArrow输入映射 — 189→190
 
 **commit:** <hash> | hudInfo—7项验证inputToNumpad/numpadToArrow输入映射
+
+---
+
+## H218: meter—6项验证PowerGauge/MaxMode/isDesperation — 190→191
+
+**commit:** <hash> | meter—6项验证PowerGauge/MaxMode/isDesperation
