@@ -229,3 +229,9 @@
 ## H86: combat system类型和常量测试—73项验证 — 58→59
 
 **commit:** <hash> | cancelWindow+attackClassifier+combatConstants+stunDizzy+guardCrush+attackSets+Ryo validation+enum completeness
+
+---
+
+## H87: input buffer指令系统测试—84项验证 — 59→60
+
+**commit:** <hash> | commandBuffer全函数+motion检测(QCF/DP/QCB/HCB/charge/DM)+inputResolver+display helpers
