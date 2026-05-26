@@ -108,14 +108,25 @@ export interface Pose {
 }
 
 export const IDLE_POSES: Pose[] = [
-  { headOff: 0, bodyLean: 0, armL: 0.3, armR: -0.3, legL: -1, legR: 1, crouch: false },
-  { headOff: 0, bodyLean: 0, armL: 0.32, armR: -0.28, legL: -1, legR: 1, crouch: false },
-  { headOff: 0, bodyLean: 0, armL: 0.35, armR: -0.25, legL: -1, legR: 1, crouch: false },
-  { headOff: 0, bodyLean: 0, armL: 0.36, armR: -0.24, legL: -1, legR: 1, crouch: false },
-  { headOff: 0, bodyLean: 0, armL: 0.35, armR: -0.25, legL: -1, legR: 1, crouch: false },
-  { headOff: 0, bodyLean: 0, armL: 0.32, armR: -0.28, legL: -1, legR: 1, crouch: false },
-  { headOff: 0, bodyLean: 0, armL: 0.28, armR: -0.32, legL: -1, legR: 1, crouch: false },
-  { headOff: 0, bodyLean: 0, armL: 0.25, armR: -0.35, legL: -1, legR: 1, crouch: false },
+  // MUGEN参考: 15帧×9ticks呼吸循环
+  // inhale (0-4): arms tighten, slight body lift
+  { headOff: 0,    bodyLean: 0, armL: 0.30, armR: -0.30, legL: -1, legR: 1, crouch: false },
+  { headOff: -0.1, bodyLean: 0, armL: 0.31, armR: -0.29, legL: -1, legR: 1, crouch: false },
+  { headOff: -0.2, bodyLean: 0, armL: 0.33, armR: -0.27, legL: -1, legR: 1, crouch: false },
+  { headOff: -0.2, bodyLean: 0, armL: 0.35, armR: -0.25, legL: -1, legR: 1, crouch: false },
+  { headOff: -0.1, bodyLean: 0, armL: 0.36, armR: -0.24, legL: -1, legR: 1, crouch: false },
+  // hold at peak (5-7)
+  { headOff: -0.1, bodyLean: 0, armL: 0.35, armR: -0.25, legL: -1, legR: 1, crouch: false },
+  { headOff: 0,    bodyLean: 0, armL: 0.33, armR: -0.27, legL: -1, legR: 1, crouch: false },
+  { headOff: 0,    bodyLean: 0, armL: 0.30, armR: -0.30, legL: -1, legR: 1, crouch: false },
+  // exhale (8-14): relax, slight settle
+  { headOff: 0,    bodyLean: 0, armL: 0.28, armR: -0.32, legL: -1, legR: 1, crouch: false },
+  { headOff: 0.1,  bodyLean: 0, armL: 0.26, armR: -0.34, legL: -1, legR: 1, crouch: false },
+  { headOff: 0.1,  bodyLean: 0, armL: 0.25, armR: -0.35, legL: -1, legR: 1, crouch: false },
+  { headOff: 0,    bodyLean: 0, armL: 0.27, armR: -0.33, legL: -1, legR: 1, crouch: false },
+  { headOff: 0,    bodyLean: 0, armL: 0.28, armR: -0.32, legL: -1, legR: 1, crouch: false },
+  { headOff: 0,    bodyLean: 0, armL: 0.29, armR: -0.31, legL: -1, legR: 1, crouch: false },
+  { headOff: 0,    bodyLean: 0, armL: 0.30, armR: -0.30, legL: -1, legR: 1, crouch: false },
 ];
 
 /** 根据角色idleStyle生成差异化待机姿态偏移 */

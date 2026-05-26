@@ -165,8 +165,19 @@ export function drawFighters(
       ctx.translate((Math.random() - 0.5) * shakeAmt, (Math.random() - 0.5) * shakeAmt * 0.5);
     }
 
+    // Compute animation frame index: attacks use attackFrame, cyclic states use globalTick
+    const isAttackState = f.state === FighterState.STAND_ATTACK
+      || f.state === FighterState.CROUCH_ATTACK
+      || f.state === FighterState.AIR_ATTACK
+      || f.state === FighterState.COUNTER_STANCE
+      || f.state === FighterState.THROW
+      || f.state === FighterState.MAX_MODE;
+    const frameIdx = isAttackState
+      ? Math.max(0, f.attackFrame)
+      : Math.floor(globalTick / 9); // 9 ticks per frame (MUGEN idle timing)
+
     const spriteRendered = spriteRenderer?.canRender(f.charId)
-      ? spriteRenderer.render(ctx, f.charId, f.state, Math.max(0, f.attackFrame), sx + leanOffsetX, sy, f.facing, getCharacterColors(f.charId ?? '').outfit)
+      ? spriteRenderer.render(ctx, f.charId, f.state, frameIdx, sx + leanOffsetX, sy, f.facing, getCharacterColors(f.charId ?? '').outfit)
       : false;
     if (!spriteRendered) {
       drawSkeletalFighter(ctx, f, sx + leanOffsetX, sy, bodyColor, outlineColor, globalTick, maxModeActive);
