@@ -18,6 +18,7 @@ import { Renderer } from './rendering/renderer.js';
 import { VFXSystem, ScreenShake, ScreenFlash } from './rendering/vfx.js';
 import { cycleStage, setStage, getStage, getAllStages, type StageId } from './rendering/stage.js';
 import { drawVictoryPose } from './rendering/skeletalFighter.js';
+import { drawRyoWinPose } from './rendering/sprites/ryoHighResRender.js';
 import type { TeamDisplayInfo } from './rendering/hud.js';
 import { ROSTER } from './characters/index.js';
 import { SpriteManager, SpriteRenderer } from './rendering/spriteRenderer.js';
@@ -991,7 +992,11 @@ function render(): void {
   if (gs.phase === GamePhase.WIN_QUOTE && gs.winner !== null) {
     const winner = gs.winner === 0 ? p1 : p2;
     // KOF2002: 胜利姿势动画显示在胜利台词背景
-    drawVictoryPose(ctx, winner.x - camera.x, winner.y, winner.facing, winner.color, '#ffffff30', tickRef.value, winner.charId);
+    const wx = winner.x - camera.x;
+    const wy = winner.y;
+    if (!drawRyoWinPose(ctx, gs.winQuoteTimer, wx, wy, winner.facing)) {
+      drawVictoryPose(ctx, wx, wy, winner.facing, winner.color, '#ffffff30', tickRef.value, winner.charId);
+    }
     const charDef = ROSTER.find(c => c.id === winner.charId);
     renderer.drawWinQuote(
       gs.winQuoteTimer,
@@ -1003,7 +1008,13 @@ function render(): void {
   }
 
   if (gs.phase === GamePhase.MATCH_END) {
-    if (gs.winner !== null) { const w = gs.winner === 0 ? p1 : p2; drawVictoryPose(ctx, w.x - camera.x, w.y, w.facing, w.color, '#ffffff30', tickRef.value, w.charId); }
+    if (gs.winner !== null) {
+      const w = gs.winner === 0 ? p1 : p2;
+      const wx = w.x - camera.x;
+      if (!drawRyoWinPose(ctx, gs.phaseTimer, wx, w.y, w.facing)) {
+        drawVictoryPose(ctx, wx, w.y, w.facing, w.color, '#ffffff30', tickRef.value, w.charId);
+      }
+    }
     renderer.drawMatchEnd(gs.winner, rounds.p1Wins, rounds.p2Wins, gs.currentWinQuote || undefined, gs.winner !== null ? (gs.winner === 0 ? '#ff6644' : '#4488ff') : undefined, gs.phaseTimer, gs.winner !== null ? (gs.winner === 0 ? p1 : p2).charId ?? undefined : undefined);
     if (gs.announceSequence.isRunning()) {
       drawAnnounceSequence(ctx, gs.announceSequence, canvas.width, canvas.height);
