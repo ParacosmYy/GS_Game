@@ -295,3 +295,9 @@
 ## H97: attack classifier测试—34项验证isDM+classify全类别 — 69→70
 
 **commit:** <hash> | attack classifier测试—34项验证isDM+classify全类别
+
+---
+
+## H98: simplified input测试—15项验证Ryo+Kyo+Iori+MAX激活 — 70→71
+
+**commit:** <hash> | simplified input测试—15项验证Ryo+Kyo+Iori+MAX激活
