@@ -188,7 +188,7 @@ export function drawFighters(
       : Math.floor(f.stateAge / ticksPerFrame);
 
     // Priority: 1) high-res pixel frames  2) sprite atlas  3) skeletal fallback
-    const highResDrawn = drawHighResFrame(ctx, f.charId ?? '', f.state, f.stateAge, sx + leanOffsetX, sy, f.facing);
+    const highResDrawn = drawHighResFrame(ctx, f.charId ?? '', f.state, f.stateAge, sx + leanOffsetX, sy, f.facing, f.currentAttack, f.vx);
     if (!highResDrawn) {
       const spriteRendered = spriteRenderer?.canRender(f.charId)
         ? spriteRenderer.render(ctx, f.charId, f.state, frameIdx, sx + leanOffsetX, sy, f.facing, getCharacterColors(f.charId ?? '').outfit)
