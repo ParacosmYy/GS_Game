@@ -337,3 +337,9 @@
 ## H104: combo trial测试—21项验证cancel+damage+runtime+eval+validate — 76→77
 
 **commit:** <hash> | combo trial测试—21项验证cancel+damage+runtime+eval+validate
+
+---
+
+## H105: announce sequence测试—12项验证state machine+sfx+progress — 77→78
+
+**commit:** <hash> | announce sequence测试—12项验证state machine+sfx+progress
