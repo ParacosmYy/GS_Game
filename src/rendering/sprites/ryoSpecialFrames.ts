@@ -205,10 +205,10 @@ KF_F1[17] = r('..................mn1mmn2.1mn....1.2nm21.111.....................
 // Lower arm: gi sleeve + skin palm at x~75-83
 KF_F1[18] = r('...................12mn21..........12mn2.111..1eefeefeefegeeefeefeeefee18bd81.');
 KF_F1[19] = r('..................128921...........12891.111.1eefeefefegegeeefefegeefee18bd81.');
-KF_F1[20] = r('.................1289la1...........189a1.111eefeefeeefegeeefefeeeffee1888d81.');
-KF_F1[21] = r('................1289ka1............18ka111eeieeefefgjegeeefefefgefee1888d81.');
-KF_F1[22] = r('...............12899a1.............1891.1eeieeefeefgegeefeefeefgeefee1888d81.');
-KF_F1[23] = r('..............12899a1..............18d1eeieeefeefeeegeefeefefegeefee1888d81.');
+KF_F1[20] = r('.................1289la1...........189a1.111eefeefeeefegeeefefeeeffee188bd81.');
+KF_F1[21] = r('................1289ka1............18ka111eeieeefefgjegeeefefefgefee188bd81.');
+KF_F1[22] = r('...............12899a1.............1891.1eeieeefeefgegeefeefeefgeefee188bd81.');
+KF_F1[23] = r('..............12899a1..............18d1eeieeefeefeeegeefeefefegeefee188bd81.');
 KF_F1[24] = r('.............12899b21..............1d8eeieeefefegeegefegefeeefeefee1d91.....');
 KF_F1[25] = r('............1289b1................1d8eeieeefeeefegefgjefeeefeefee1d91.........');
 KF_F1[26] = r('...........1289b1.................1d8eefeefefgjegeeefefefgefee1d91...........');
@@ -261,7 +261,7 @@ HI_F2[49] = r('.................................................................
 HI_F2[50] = r('..........................1eefefeefegeeefeegeefee1d91........................');
 HI_F2[51] = r('.........................1efefgefefegeefefefe1d8d1.......................');
 HI_F2[52] = r('........................1eefeefeeefgeeefeegeefee18bd81......................');
-HI_F2[53] = r('.......................1eefeefefgegeeefeegeefee1888d81.....................');
+HI_F2[53] = r('.......................1eefeefefgegeeefeegeefee188bd81.....................');
 HI_F2[54] = r('......................1eefeefeefegeeefeefgeefee18bd81......................');
 HI_F2[55] = r('.....................1eefeefeefegeeefeegeefee1d91........................');
 HI_F2[56] = r('....................1efefgefefegeefefefe1d1.........................');
@@ -370,8 +370,8 @@ const KFC_F1 = clone(KF_F1); // Start from KOOU thrust frame
 // Replace the thrust arm area with wider orange-glowing energy ball
 // The existing arms extend to x~90 area; we add a larger energy ball
 KFC_F1[18] = r('...................12mn21..........12mn2.111..1eefefegeegefefgefee18bd81.');
-KFC_F1[19] = r('..................128921...........12891.111.1eefeeefeegeeeffeefee1888d81.');
-KFC_F1[20] = r('.................1289la1...........189a1.111eefefegjegefgeieeefee1888d81.');
+KFC_F1[19] = r('..................128921...........12891.111.1eefeeefeegeeeffeefee188bd81.');
+KFC_F1[20] = r('.................1289la1...........189a1.111eefefegjegefgeieeefee188bd81.');
 KFC_F1[21] = r('................1289ka1............18ka111eefeefeefegeeefeegeefee18d81..');
 KFC_F1[22] = r('...............12899a1.............1891.1eeeeeefefeeeemm22meeee1d91....');
 KFC_F1[23] = r('..............12899a1..............18d1efeefefegeem2222222mee1d91.....');
