@@ -13,6 +13,8 @@
 import { FighterState } from '../../core/types.js';
 import { drawPixelFrame, type PixelFrame, type PixelPalette } from './pixelFrameRenderer.js';
 import { RYO_IDLE_FRAMES } from './ryoIdleFrames.js';
+import { RYO_WALK_FORWARD_FRAMES, RYO_WALK_BACKWARD_FRAMES } from './ryoWalkFrames.js';
+import { RYO_STAND_A_FRAMES, RYO_STAND_C_FRAMES } from './ryoAttackFrames.js';
 
 // ===== Frame Registry =====
 
@@ -50,9 +52,28 @@ function initIdleFrames(): void {
   if (converted.length === 0) return;
   RYO_FRAMES[FighterState.IDLE] = {
     frames: converted.map(c => c.frame),
-    palette: converted[0].palette, // shared palette across all idle frames
-    ticksPerFrame: 9, // match the skeletal renderer's default cyclic rate
+    palette: converted[0].palette,
+    ticksPerFrame: 9,
   };
+}
+
+/** Register a set of frames for a given state */
+function registerFrames(state: FighterState, rawFrames: { width: number; height: number; palette: Record<number, string>; pixels: number[][] }[], ticksPerFrame: number): void {
+  if (RYO_FRAMES[state]) return;
+  const converted = rawFrames.map(convertIdleFrame);
+  if (converted.length === 0) return;
+  RYO_FRAMES[state] = {
+    frames: converted.map(c => c.frame),
+    palette: converted[0].palette,
+    ticksPerFrame,
+  };
+}
+
+// Initialize all available frame sets
+function initAllFrames(): void {
+  initIdleFrames();
+  registerFrames(FighterState.WALK, RYO_WALK_FORWARD_FRAMES, 6);
+  registerFrames(FighterState.STAND_ATTACK, RYO_STAND_A_FRAMES, 4);
 }
 
 // ===== Public API =====
@@ -65,7 +86,7 @@ export const RYO_HIGHRES_SCALE = 2;
  */
 export function hasHighResFrame(charId: string, state: FighterState): boolean {
   if (charId !== 'ryo') return false;
-  initIdleFrames();
+  initAllFrames();
   return RYO_FRAMES[state] !== undefined;
 }
 
