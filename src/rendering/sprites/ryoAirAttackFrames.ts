@@ -37,9 +37,9 @@ const PALETTE: Record<number, string> = {
   13: '#785028',   // skin darkest
   14: '#faf8f4',   // gi lightest
   15: '#f0ece4',   // gi light
-  16: '#c4b8a4',   // gi mid-light
+  16: '#c8b498',   // gi mid-light
   17: '#d0c4b0',   // gi mid
-  18: '#9a8a78',   // gi dark
+  18: '#987860',   // gi dark
   19: '#a09484',   // gi darkest
   20: '#181410',   // belt / eyes black
   21: '#ffffff',   // eye white / highlight
