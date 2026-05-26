@@ -349,3 +349,9 @@
 ## H106: announce presets测试—17项验证popIn+fadeIn+burstIn+sequences — 78→79
 
 **commit:** <hash> | announce presets测试—17项验证popIn+fadeIn+burstIn+sequences
+
+---
+
+## H107: sprite pose data测试—12项验证constants+charVisuals+darken+lighten — 79→80
+
+**commit:** <hash> | sprite pose data测试—12项验证constants+charVisuals+darken+lighten
