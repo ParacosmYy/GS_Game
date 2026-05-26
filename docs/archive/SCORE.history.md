@@ -905,3 +905,9 @@
 ## H186: victoryPose—5项验证getVictoryPose+角色区分+tick动画 — 158→159
 
 **commit:** <hash> | victoryPose—5项验证getVictoryPose+角色区分+tick动画
+
+---
+
+## H187: ryoHighResRender—3项验证hasHighResFrame+getResolvedFrameKey — 159→160
+
+**commit:** <hash> | ryoHighResRender—3项验证hasHighResFrame+getResolvedFrameKey
