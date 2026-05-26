@@ -500,8 +500,8 @@ describe('Feedback Manifest - Query Function Consistency', () => {
 
   it('attackTierMap contains Ryo explicit mappings', () => {
     const keys = Object.keys(FEEDBACK_MANIFEST.attackTierMap);
-    // Ryo 通常技(6) + 重攻击(10) + 必杀技(8) + DM/SDM/HSDM(5) = 29
-    expect(keys).toHaveLength(29);
+    // Ryo 通常技(8) + 重攻击(10) + 必杀技(8) + DM/SDM/HSDM(5) = 31
+    expect(keys).toHaveLength(31);
     expect(FEEDBACK_MANIFEST.attackTierMap[AttackType.RYO_KOOU]).toBe('special');
     expect(FEEDBACK_MANIFEST.attackTierMap[AttackType.DM_TEN_HA_OU]).toBe('dm');
     expect(FEEDBACK_MANIFEST.attackTierMap[AttackType.SDM_TEN_HA_OU]).toBe('sdm');

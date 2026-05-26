@@ -36,6 +36,7 @@ import { CLOSE_RANGE } from '../core/types.js';
 import { FighterState, AttackType, JuggleState } from '../core/types.js';
 import type { HitLevel } from '../core/types.js';
 import { isDM, isSpecialOrDM, isCharacterSpecial } from '../core/attackClassifier.js';
+import { getFeedback } from '../core/feedbackManifest.js';
 import { resolveProjectileHits } from './projectileResolver.js';
 import type { ProjectileResolverContext, HitCallback, GuardCrushCallback } from './projectileResolver.js';
 export type { HitCallback, GuardCrushCallback } from './projectileResolver.js';
@@ -386,7 +387,8 @@ export class CombatSystem {
       defender.consecutiveBlockCount++;
       defender.consecutiveBlockDecayTimer = PUSHBLOCK_DECAY_FRAMES;
       const pushblockMult = defender.consecutiveBlockCount >= PUSHBLOCK_THRESHOLD ? PUSHBLOCK_EXTRA_PUSHBACK : 1.0;
-      defender.applyAirBlockstun(data.blockstun, data.pushback * pushblockMult);
+      const airFb = getFeedback(attackType);
+      defender.applyAirBlockstun(data.blockstun, data.pushback * pushblockMult * airFb.blockPushbackScale);
       // KOF2002: 空中防御chip damage比地面少30%
       const chipData = data as { chipDamage?: number };
       const chip = chipData.chipDamage ?? Math.round(data.damage * CHIP_DAMAGE_RATIO * 0.7);
@@ -423,7 +425,8 @@ export class CombatSystem {
         this.onGuardCrush?.(defender, hitX, hitY);
       } else {
         defender.guardGauge = Math.min(100, defender.guardGauge + GUARD_GAUGE_METER_BONUS_ON_BLOCK);
-        defender.applyBlockstun(data.blockstun, data.pushback * pushblockMult);
+        const fb = getFeedback(attackType);
+        defender.applyBlockstun(data.blockstun, data.pushback * pushblockMult * fb.blockPushbackScale);
       }
       const chipData = data as { chipDamage?: number };
       const chip = chipData.chipDamage ?? Math.round(data.damage * CHIP_DAMAGE_RATIO);
@@ -609,7 +612,8 @@ export class CombatSystem {
       const comboScale = this.comboHits[defIdx] <= 1 ? 1.0
         : this.comboHits[defIdx] === 2 ? 0.85
         : this.comboHits[defIdx] === 3 ? 0.70 : 0.55;
-      const effectivePushback = data.pushback * comboScale;
+      const fb = getFeedback(attackType);
+      const effectivePushback = data.pushback * comboScale * fb.hitPushbackScale;
       defender.applyHitstun(hitstunFrames, effectivePushback);
     }
 

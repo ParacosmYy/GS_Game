@@ -880,7 +880,7 @@ function render(): void {
   vfx.render(ctx, camera.x);
 
   if (cinematic.superFlashTimer > 0)
-    renderer.drawSuperFlash(ctx, cinematic.superFlashTimer, cinematic.superFlashX - camera.x, cinematic.superFlashY, maxModes[cinematic.superFlashAttacker].active ? 'SDM' : 'DM');
+    renderer.drawSuperFlash(ctx, cinematic.superFlashTimer, cinematic.superFlashX - camera.x, cinematic.superFlashY, cinematic.superFlashType);
   renderer.drawPowerGauges(gauges, maxModes);
   if (gs.phase === GamePhase.INTRO) {
     if (gs.announceSequence.isRunning()) {

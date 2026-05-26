@@ -20,6 +20,8 @@ export class CinematicState {
   superFlashX = 0;
   superFlashY = 0;
   superFlashAttacker = 0; // 0=p1, 1=p2
+  /** Flash type for current super flash */
+  superFlashType: 'DM' | 'SDM' | 'HSDM' = 'DM';
   /** Defender index during hit-stop (for jitter rendering). -1 = none */
   hitStopDefender = -1;
   /** Directional bias for defender jitter (attacker's facing direction) */
@@ -80,12 +82,14 @@ export class CinematicState {
   }
 
   /** Trigger Super Flash (dark screen freeze) on DM startup */
-  triggerSuperFlash(x: number, y: number, attacker: number): void {
-    this.superFlashTimer = 28;
+  triggerSuperFlash(x: number, y: number, attacker: number, duration?: number, flashType?: 'DM' | 'SDM' | 'HSDM'): void {
+    const dur = duration ?? 28;
+    this.superFlashTimer = dur;
     this.superFlashX = x;
     this.superFlashY = y;
     this.superFlashAttacker = attacker;
-    this.hitStop = 28;
+    this.superFlashType = flashType ?? 'DM';
+    this.hitStop = dur;
   }
 
   /** Trigger KO slow-motion (40 frames, every 3rd frame runs) */
@@ -186,6 +190,7 @@ export class CinematicState {
     this.superFlashX = 0;
     this.superFlashY = 0;
     this.superFlashAttacker = 0;
+    this.superFlashType = 'DM';
     this.koSlowMo = 0;
     this.koSlowMoTriggered = false;
     this.koSlowMoFrameCounter = 0;
@@ -203,6 +208,7 @@ export class CinematicState {
     this.hitStopDefender = -1;
     this.hitStopBias = 0;
     this.superFlashTimer = 0;
+    this.superFlashType = 'DM';
     this.koSlowMoTriggered = false;
     this.koSlowMo = 0;
     this.koSlowMoFrameCounter = 0;

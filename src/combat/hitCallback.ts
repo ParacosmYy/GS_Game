@@ -280,6 +280,8 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
     const sparkLowGrav = !defender.isGrounded() && !isDM;
     // === 传递facing参数，让火花方向基于攻击者朝向 ===
     deps.vfx.spawnCharacterHitSparks(hitX, hitY, sparks, sparkColor, sparkSize * comboSparkScale * chSizeBonus, sparkSpeed, sparkStarRatio, sparkLowGrav, attacker.facing);
+    // FR-2: Tier-differentiated sparks from manifest
+    deps.vfx.spawnTierSparks(hitX, hitY, fb.sparkCount, fb.sparkType, fb.sparkPalette, fb.sparkSpeed);
 
     // === DM (200+ damage): 屏幕宽闪光 + 巨大火花 ===
     if (isDM) {

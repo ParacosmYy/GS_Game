@@ -107,13 +107,17 @@ export class DMManager {
       const atk = f.currentAttack;
       if (!atk || f.attackPhase !== 'startup' || f.attackFrame !== 0) continue;
 
-      if (!this.isDMAttack(atk) && !this.isSDMAttack(atk)) continue;
+      if (!this.isDMAttack(atk) && !this.isSDMAttack(atk) && !this.isHSDMAttack(atk)) continue;
 
-      if (this.isSDMAttack(atk)) {
+      if (this.isHSDMAttack(atk)) {
+        // HSDM: longest flash, most dramatic
+        drainMaxModeTimer(maxModes[i], FREE_CANCEL_TIMER_COST);
+        cinematic.triggerSuperFlash(f.x, f.y - f.displayHeight / 2, i, 32, 'HSDM');
+      } else if (this.isSDMAttack(atk)) {
         const inDesperation = isDesperation(f.health, f.maxHealth);
         if (maxModes[i].active) {
           drainMaxModeTimer(maxModes[i], FREE_CANCEL_TIMER_COST);
-          cinematic.triggerSuperFlash(f.x, f.y - f.displayHeight / 2, i);
+          cinematic.triggerSuperFlash(f.x, f.y - f.displayHeight / 2, i, 28, 'SDM');
           continue;
         }
         if (!inDesperation || gauges[i].stocks < 2) {
@@ -121,19 +125,19 @@ export class DMManager {
           continue;
         }
         spendStocks(gauges[i], 2);
-        cinematic.triggerSuperFlash(f.x, f.y - f.displayHeight / 2, i);
+        cinematic.triggerSuperFlash(f.x, f.y - f.displayHeight / 2, i, 28, 'SDM');
       } else if (maxModes[i].active) {
         const inDesperation = isDesperation(f.health, f.maxHealth);
         // MAX + desperation: upgrade DM to HSDM (hidden super)
         if (inDesperation && DM_TO_HSDM[atk]) {
           f.currentAttack = DM_TO_HSDM[atk]!;
           drainMaxModeTimer(maxModes[i], FREE_CANCEL_TIMER_COST);
-          cinematic.triggerSuperFlash(f.x, f.y - f.displayHeight / 2, i);
+          cinematic.triggerSuperFlash(f.x, f.y - f.displayHeight / 2, i, 32, 'HSDM');
         } else if (DM_TO_SDM[atk]) {
           // MAX mode: upgrade DM to SDM and consume MAX timer, not stocks
           f.currentAttack = DM_TO_SDM[atk]!;
           drainMaxModeTimer(maxModes[i], FREE_CANCEL_TIMER_COST);
-          cinematic.triggerSuperFlash(f.x, f.y - f.displayHeight / 2, i);
+          cinematic.triggerSuperFlash(f.x, f.y - f.displayHeight / 2, i, 28, 'SDM');
         }
       } else {
         // Desperation mode: upgrade DM to SDM (costs 2 stocks instead of 1)
@@ -141,11 +145,11 @@ export class DMManager {
         if (inDesperation && gauges[i].stocks >= 2 && DM_TO_SDM[atk]) {
           f.currentAttack = DM_TO_SDM[atk]!;
           spendStocks(gauges[i], 2);
-          cinematic.triggerSuperFlash(f.x, f.y - f.displayHeight / 2, i);
+          cinematic.triggerSuperFlash(f.x, f.y - f.displayHeight / 2, i, 28, 'SDM');
         } else if (gauges[i].stocks >= DM_STOCK_COST) {
           // Non-MAX, non-desperation: consume 1 stock for DM
           this.useDM(i);
-          cinematic.triggerSuperFlash(f.x, f.y - f.displayHeight / 2, i);
+          cinematic.triggerSuperFlash(f.x, f.y - f.displayHeight / 2, i, 24, 'DM');
         } else {
           f.endAttack(); // Not enough meter -> cancel
         }

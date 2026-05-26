@@ -104,6 +104,7 @@ function createMockVFX(): VFXSystem & Record<string, ReturnType<typeof vi.fn>> {
     spawnImpactRing: vi.fn(),
     spawnSlashLine: vi.fn(),
     spawnSuperBurst: vi.fn(),
+    spawnTierSparks: vi.fn(),
     spawnGroundSlam: vi.fn(),
     spawnDamageText: vi.fn(),
     spawnCounterText: vi.fn(),

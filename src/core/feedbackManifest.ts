@@ -211,8 +211,10 @@ export const FEEDBACK_MANIFEST: FeedbackManifest = {
   attackTierMap: {
     // ===== Ryo 通常技 (light) =====
     STAND_A: 'light',
+    STAND_B: 'light',
     CLOSE_A: 'light',
     CROUCH_A: 'light',
+    CROUCH_B: 'light',
     JUMP_A: 'light',
     JUMP_B: 'light',
     CLOSE_B: 'light',

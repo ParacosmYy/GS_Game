@@ -43,6 +43,7 @@ import {
   spawnDMTenHaOuVFX,
   spawnHaouFlash,
   spawnMoveNameText,
+  spawnTierSparks,
 } from './vfxPresets.js';
 import type { Particle } from './vfxPresets.js';
 
@@ -102,6 +103,11 @@ export class VFXSystem {
   /** 角色专属命中火花 — KOF风格, 更大更亮. facing: 攻击者朝向(1右/-1左)控制飞散方向 */
   spawnCharacterHitSparks(worldX: number, worldY: number, count: number, charColor: string, sizeScale?: number, speedScale?: number, starRatio?: number, lowGravity?: boolean, facing?: number): void {
     spawnCharacterHitSparks(this.particles, worldX, worldY, count, charColor, sizeScale, speedScale, starRatio, lowGravity, facing);
+  }
+
+  /** Tier-aware spark spawning — distinct patterns per sparkType */
+  spawnTierSparks(x: number, y: number, count: number, sparkType: 'small' | 'medium' | 'large' | 'burst' | 'mega', sparkPalette: string[], sparkSpeed: number): void {
+    spawnTierSparks(this.particles, x, y, count, sparkType, sparkPalette, sparkSpeed);
   }
 
   spawnGuardCrushSparks(worldX: number, worldY: number): void {

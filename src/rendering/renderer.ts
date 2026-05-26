@@ -177,7 +177,7 @@ export class Renderer {
     drawKO(this.ctx, winner, perfectPlayer);
   }
 
-  drawSuperFlash(ctx: CanvasRenderingContext2D, timer: number, flashScreenX: number, flashScreenY: number, flashType: 'DM' | 'SDM' = 'DM'): void {
+  drawSuperFlash(ctx: CanvasRenderingContext2D, timer: number, flashScreenX: number, flashScreenY: number, flashType: 'DM' | 'SDM' | 'HSDM' = 'DM'): void {
     drawSuperFlash(ctx, timer, flashScreenX, flashScreenY, flashType);
   }
 

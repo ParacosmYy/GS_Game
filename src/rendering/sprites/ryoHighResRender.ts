@@ -18,6 +18,9 @@ import { RYO_IDLE_FRAMES } from './ryoIdleFrames.js';
 import { RYO_WALK_FORWARD_FRAMES, RYO_WALK_BACKWARD_FRAMES } from './ryoWalkFrames.js';
 import { RYO_STAND_A_FRAMES, RYO_STAND_C_FRAMES } from './ryoAttackFrames.js';
 import { RYO_JUMP_FRAMES } from './ryoJumpFrames.js';
+import { RYO_HURT_FRAMES, RYO_KNOCKDOWN_FRAMES } from './ryoDamageFrames.js';
+import { RYO_CROUCH_FRAMES, RYO_CROUCH_A_FRAMES, RYO_CROUCH_C_FRAMES } from './ryoCrouchFrames.js';
+import { RYO_AIR_A_FRAMES, RYO_AIR_C_FRAMES, RYO_AIR_D_FRAMES } from './ryoAirAttackFrames.js';
 
 // ===== Internal Frame Registry =====
 //
@@ -97,29 +100,24 @@ function initAllFrames(): void {
   registerFrames('STAND_A', RYO_STAND_A_FRAMES, 4);
   registerFrames('STAND_C', RYO_STAND_C_FRAMES, 4);
 
-  // DAMAGE / JUMP — will be registered when their frame files exist.
-  // The tryRegister() calls below handle optional imports gracefully.
-  tryRegisterDamageFrames();
-  tryRegisterJumpFrames();
-}
+  // DAMAGE — hurt (5f) and knockdown (6f)
+  registerFrames('HURT', RYO_HURT_FRAMES, 4);
+  registerFrames('KNOCKDOWN', RYO_KNOCKDOWN_FRAMES, 5);
 
-/** Attempt to register HURT and KNOCKDOWN frames if ryoDamageFrames.ts exists. */
-function tryRegisterDamageFrames(): void {
-  try {
-    // Dynamic import would require async; use conditional require-style
-    // detection instead. Since the module may not exist yet, we check
-    // at build time by attempting static import.
-    // When ryoDamageFrames.ts is created, add the static import at the
-    // top and the registerFrames() calls here.
-  } catch {
-    // Module does not exist yet — frames will not be registered
-  }
-}
-
-/** Register JUMP frames (6-frame jump arc). */
-function tryRegisterJumpFrames(): void {
-  // JUMP — crouch prep, launch, rising, peak, falling, landing
+  // JUMP — 6-frame jump arc
   registerFrames('JUMP', RYO_JUMP_FRAMES, 5);
+
+  // CROUCH — crouch idle (4f loop)
+  registerFrames('CROUCH', RYO_CROUCH_FRAMES, 9);
+
+  // CROUCH ATTACK — crouch_a (3f low jab) and crouch_c (4f low uppercut)
+  registerFrames('CROUCH_A', RYO_CROUCH_A_FRAMES, 4);
+  registerFrames('CROUCH_C', RYO_CROUCH_C_FRAMES, 5);
+
+  // AIR ATTACK — air_a (3f air jab), air_c (4f air heavy), air_d (4f air kick)
+  registerFrames('AIR_A', RYO_AIR_A_FRAMES, 4);
+  registerFrames('AIR_C', RYO_AIR_C_FRAMES, 4);
+  registerFrames('AIR_D', RYO_AIR_D_FRAMES, 4);
 }
 
 // ===== State Resolution =====
