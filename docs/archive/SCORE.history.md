@@ -110,3 +110,8 @@
 ## H66: animation manifest帧数对齐真实pose — 38→39
 
 **commit:** 0e8d12a | idle 4→8帧, hitstun 11→5帧, 新增11个Ryo动作序列, 必杀技帧数对齐pose数组**
+---
+
+## H67: sprite manifest帧数对齐+atlas坐标布局 — 39→40
+
+**commit:** <hash> | Ryo idle 15帧sequential atlasX+所有动画atlas行分配+anchor居中校正
