@@ -445,3 +445,9 @@
 ## H122: meterEvents测试—6项验证eventBus+reset+snapshotGauge — 94→95
 
 **commit:** <hash> | meterEvents测试—6项验证eventBus+reset+snapshotGauge
+
+---
+
+## H123: camera测试—5项验证Camera实例化+update+默认值 — 95→96
+
+**commit:** <hash> | camera测试—5项验证Camera实例化+update+默认值
