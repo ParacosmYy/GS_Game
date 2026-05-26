@@ -13,6 +13,14 @@ import { shiftColor, roundRect } from './utils.js';
 import { getOutfit, drawCharacterHead, setSkeletalPartsTick } from './skeletalParts.js';
 import { drawPixelTorso, drawPixelArm, drawPixelLeg, setBodyPartTick } from './bodyPartRenderer.js';
 import { getVictoryPose, drawVictoryVFX } from './victoryPose.js';
+import { spriteFrameCache } from './spriteFrameCache.js';
+
+// ===== Sprite Frame Cache — opt-in cached rendering =====
+// When enabled, completed pose frames are blitted from offscreen canvases
+// instead of being re-drawn every frame. Default: off (live rendering).
+/** Set to true to use cached sprite frames instead of live skeletal rendering */
+export let useFrameCache = false;
+export function setFrameCacheEnabled(enabled: boolean): void { useFrameCache = enabled; }
 
 // ===== State transition blending =====
 // Caches previous pose data per-fighter for smooth interpolation when state changes.
@@ -750,6 +758,39 @@ export function drawSkeletalFighter(
     curve: cached?.curve ?? 'linear',
   });
 
+  // === Sprite frame cache — opt-in blit ===
+  // Determine the frame index for cache lookup.
+  // For array poses: use the resolved index. For single poses: 0.
+  let cacheFrameIdx = 0;
+  if (Array.isArray(rawPose)) {
+    const frames = rawPose as Pose[];
+    if (f.attackPhase === 'active' || f.attackPhase === 'startup' || f.attackPhase === 'recovery') {
+      cacheFrameIdx = Math.min(f.attackFrame, frames.length - 1);
+    } else {
+      cacheFrameIdx = globalTick % frames.length;
+    }
+  }
+  const cacheStateKey = attackKey || f.state;
+  const cacheCharId = f.charId ?? 'unknown';
+
+  if (useFrameCache) {
+    const used = spriteFrameCache.blitCachedFrame(
+      ctx, sx, sy,
+      (drawCtx) => {
+        // This drawFn is called on cache miss to render into the offscreen canvas.
+        // It receives a context translated so (0,0) = character feet center.
+        drawCachedSkeletalFrame(drawCtx, p, prop, widthFactor, heightFactor,
+          f, sx, sy, globalTick, maxModeActive);
+      },
+      cacheCharId,
+      cacheStateKey,
+      cacheFrameIdx,
+      colorIdx,
+    );
+    if (used) return; // Cached frame was blitted — skip live rendering
+    // Cache unavailable (SSR/test) — fall through to live rendering
+  }
+
   // === Per-character body dimensions ===
   const headW = prop.headW, headH = prop.headH;
   const torsoW = prop.torsoW * widthFactor, torsoH = prop.torsoH;
@@ -1098,6 +1139,148 @@ export function drawSkeletalFighter(
     dangerGrad.addColorStop(1, 'rgba(255, 0, 0, 0)');
     ctx.fillStyle = dangerGrad;
     ctx.fillRect(Math.round(sx - 55), Math.round(sy - f.displayHeight - 20), 110, f.displayHeight + 40);
+  }
+}
+
+/**
+ * Draw a skeletal frame into an offscreen canvas context for caching.
+ * The context is pre-translated so (0,0) = character feet center.
+ * This mirrors the body-part drawing from drawSkeletalFighter but adapts
+ * coordinates for the offscreen canvas (no shadow, no danger pulse).
+ */
+function drawCachedSkeletalFrame(
+  ctx: CanvasRenderingContext2D,
+  p: Pose,
+  prop: BodyProportions,
+  widthFactor: number,
+  heightFactor: number,
+  f: Fighter,
+  _sx: number,  // original screen x (unused in cached context — origin is at 0,0)
+  _sy: number,  // original screen y
+  globalTick: number,
+  maxModeActive: boolean,
+): void {
+  const colorIdx = f.colorIndex;
+  const charId = f.charId ?? 'unknown';
+
+  const headW = prop.headW, headH = prop.headH;
+  const torsoW = prop.torsoW * widthFactor, torsoH = prop.torsoH;
+  const armW = prop.armW, armH = prop.armH;
+  const legW = prop.legW, legH = prop.legH;
+
+  // In cached context, (0,0) = feet center = (sx, sy) in original coords
+  const sx = 0;
+  const sy = 0;
+  const bodyBottom = prop.hipY + prop.legH / 2;
+  const refX = sx;
+  const refY = sy - bodyBottom;
+
+  const boneScreen = (bp: BonePose) => ({
+    x: refX + bp.ox * f.facing,
+    y: refY + bp.oy * heightFactor,
+    rot: bp.rot * f.facing,
+    scale: bp.scale,
+  });
+
+  const skinColor = '#e8b88a';
+
+  // Hit flash overlay
+  const isFlashing = f.hitFlashFrames > 0;
+
+  const shoulderY = refY + prop.shoulderY * heightFactor;
+  const hipY = refY + prop.hipY * heightFactor;
+
+  // Layer order: back → body → front
+
+  // 1. Back arm
+  const backArm = boneScreen(p.armBack);
+  ctx.save();
+  ctx.translate(backArm.x, shoulderY + p.armBack.oy * heightFactor);
+  ctx.rotate(backArm.rot);
+  drawPixelArm(ctx, charId, armW * p.armBack.scale, armH * p.armBack.scale, true, colorIdx);
+  ctx.restore();
+
+  // 2. Back leg
+  const backLeg = boneScreen(p.legBack);
+  ctx.save();
+  ctx.translate(backLeg.x, hipY + p.legBack.oy * heightFactor);
+  ctx.rotate(backLeg.rot);
+  drawPixelLeg(ctx, charId, legW * p.legBack.scale, legH * p.legBack.scale, true, colorIdx);
+  ctx.restore();
+
+  // 3. Torso
+  const torsoCenterY = refY + prop.torsoCenterY * heightFactor + p.body.oy * heightFactor;
+  const torsoX = refX + p.body.ox * f.facing;
+  ctx.save();
+  ctx.translate(torsoX, torsoCenterY);
+  ctx.rotate(p.body.rot * f.facing);
+  drawPixelTorso(ctx, charId, torsoW, torsoH * heightFactor, colorIdx);
+  ctx.restore();
+
+  // 4. Head
+  const headPos = boneScreen(p.head);
+  const headCenterY = refY + prop.headCenterY * heightFactor + p.head.oy * heightFactor;
+  ctx.save();
+  ctx.translate(headPos.x, headCenterY);
+  ctx.rotate(p.head.rot * f.facing);
+  drawCharacterHead(ctx, charId, f.facing, skinColor, headW, colorIdx, globalTick);
+  ctx.restore();
+
+  // 5. Front leg
+  const frontLeg = boneScreen(p.legFront);
+  ctx.save();
+  ctx.translate(frontLeg.x, hipY + p.legFront.oy * heightFactor);
+  ctx.rotate(frontLeg.rot);
+  drawPixelLeg(ctx, charId, legW * p.legFront.scale, legH * p.legFront.scale, false, colorIdx);
+  ctx.restore();
+
+  // 6. Front arm
+  const frontArm = boneScreen(p.armFront);
+  ctx.save();
+  ctx.translate(frontArm.x, shoulderY + p.armFront.oy * heightFactor);
+  ctx.rotate(frontArm.rot);
+  drawPixelArm(ctx, charId, armW * p.armFront.scale, armH * p.armFront.scale, false, colorIdx);
+  ctx.restore();
+
+  // Hit flash overlay (simplified — no radial gradient for cache)
+  if (isFlashing) {
+    ctx.save();
+    ctx.globalCompositeOperation = 'screen';
+    ctx.globalAlpha = 0.3;
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    ctx.ellipse(torsoX, torsoCenterY, torsoW * 0.95, torsoH * 0.9, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  // Fist glow during attacks
+  if (!isFlashing && (f.state === FighterState.STAND_ATTACK || f.state === FighterState.CROUCH_ATTACK || f.state === FighterState.AIR_ATTACK)) {
+    ctx.save();
+    ctx.translate(frontArm.x, shoulderY + p.armFront.oy * heightFactor);
+    ctx.rotate(frontArm.rot);
+    const fistR = armW * 0.45;
+    const fistY = armH * p.armFront.scale / 2 - 2;
+    drawFistGlow(ctx, charId, fistR, fistY, globalTick);
+    ctx.restore();
+  }
+
+  // MAX mode outline glow (simplified for cache)
+  if (maxModeActive) {
+    ctx.save();
+    ctx.shadowColor = '#ffcc00';
+    ctx.shadowBlur = 6;
+    ctx.strokeStyle = 'rgba(255, 200, 60, 0.4)';
+    ctx.lineWidth = 1.5;
+
+    // Torso glow
+    ctx.translate(torsoX, torsoCenterY);
+    ctx.rotate(p.body.rot * f.facing);
+    if (!isFlashing) {
+      roundRect(ctx, -torsoW / 2, -torsoH * heightFactor / 2, torsoW, torsoH * heightFactor, 5);
+      ctx.stroke();
+    }
+    ctx.restore();
   }
 }
 

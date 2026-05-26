@@ -115,3 +115,9 @@
 ## H67: sprite manifest帧数对齐+atlas坐标布局 — 39→40
 
 **commit:** <hash> | Ryo idle 15帧sequential atlasX+所有动画atlas行分配+anchor居中校正
+
+---
+
+## H68: sprite frame cache机制—骨骼pose→离屏canvas缓存 — 40→41
+
+**commit:** <hash> | SpriteFrameCache类+offscreen canvas 160x200+opt-in blit+SSR安全
