@@ -355,3 +355,9 @@
 ## H107: sprite pose data测试—12项验证constants+charVisuals+darken+lighten — 79→80
 
 **commit:** <hash> | sprite pose data测试—12项验证constants+charVisuals+darken+lighten
+
+---
+
+## H108: rendering utils测试—5项验证parseColor+shiftColor — 80→81
+
+**commit:** <hash> | rendering utils测试—5项验证parseColor+shiftColor
