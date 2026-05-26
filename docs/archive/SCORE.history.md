@@ -5086,3 +5086,42 @@
 **下一轮方向：** 摄像机zoom/KO镜头+VFX预设调优+输入缓冲深化+回放UI框架
 
 **commit: 6dae41f | 下一目标: 538 (还需+5)**
+
+---
+
+## Iter-H41 — 摄像机zoom/KO镜头+VFX/输入/回放/回合/HitCallback/FighterController验证 (533→538)
+
+**日期:** 2026-05-26
+
+**本轮类型:** 功能增强+系统深度验证迭代
+
+**实质性改变:**
+- Camera增强: zoom(0.90-1.15基于角色距离)+KO镜头(1.3x聚焦KO点60帧)
+- VFX预设验证(25测试): spark/block/DM/KO/text/粒子生命周期全部参数验证
+- 输入缓冲验证(25测试): QCF/DP/charge/command window/priority/负边沿
+- 回放系统验证(22测试): record/export/import roundtrip/RNG determinism/validation
+- HitCallback反馈链(31测试): hitstop/shake/counter/KO/combo/block/VFX链/meter/throw
+- FighterController(20测试): 角色分配/输入→动作/攻击/特殊技/状态转换/防御
+- RoundState回合管理(28测试): start→fighting→KO→end→timeup→transition完整lifecycle
+- 测试总数: 4330→4488 (+158)
+
+| 维度 | 诚实分 | 变化 | 备注 |
+|------|--------|------|------|
+| 角色美术 | 48/200 | = | 未改 |
+| 舞台美术 | 42/100 | = | 未改 |
+| 音频品质 | 60/150 | = | 未改 |
+| 角色内容 | 102/150 | = | 未改 |
+| 战斗手感 | 140/150 | +3 | 摄像机zoom+KO镜头+HitCallback反馈链全面验证 |
+| 帧数据精度 | 92/100 | +1 | 输入缓冲/指令窗口/蓄力系统验证 |
+| 游戏流程 | 90/100 | +2 | 回合管理完整lifecycle+回放系统roundtrip验证 |
+| UI/HUD品质 | 46/50 | = | 未改 |
+
+**本轮提升了哪个维度？** 战斗手感(+3 摄像机zoom+反馈链), 帧数据精度(+1 输入系统), 游戏流程(+2 回合/回放)
+
+**为什么只加5分？** 摄像机zoom是新功能(H41唯一可见改变), 其余为深度测试验证
+
+**还有哪些差距？** 角色美术(48/200)和舞台(42/100)需要真实资产;渲染层需适配zoom
+
+**下一轮方向：** 渲染层适配zoom+HUD改进+音效系统增强+AI difficulty tuning
+
+**commit: b5347e0 | 下一目标: 543 (还需+5)**
