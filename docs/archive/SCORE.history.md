@@ -193,3 +193,9 @@
 ## H80: Ryo content package导出集成测试—8项验证barrel — 52→53
 
 **commit:** <hash> | RyoDef+RYO_STATS+3个报告函数+def字段完整性+report有效性
+
+---
+
+## H81: Ryo moveList完整性测试—12项验证出招表 — 53→54
+
+**commit:** <hash> | 命令通常技+必杀技+DM/SDM数量+虎煌拳/虎咆/天地霸煌拳/龍虎乱舞
