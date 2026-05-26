@@ -613,3 +613,9 @@
 ## H145: selectState测试—7项验证VS_SPLASH_DURATION+COLOR_PALETTES+SelectState+cursor+ready — 117→118
 
 **commit:** <hash> | selectState测试—7项验证VS_SPLASH_DURATION+COLOR_PALETTES+SelectState+cursor+ready
+
+---
+
+## H146: kyo测试—8项验证KyoDef id/name/color/winQuotes/stats/poses/moveList — 118→119
+
+**commit:** <hash> | kyo测试—8项验证KyoDef id/name/color/winQuotes/stats/poses/moveList
