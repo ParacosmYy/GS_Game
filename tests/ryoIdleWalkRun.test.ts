@@ -59,14 +59,20 @@ describe('Ryo IDLE animation', () => {
     expect(maxExhale).toBeGreaterThan(neutral);
   });
 
-  it('arms are in karate guard position (front arm high, back arm low)', () => {
-    // In every frame, armFront.oy should be less than armBack.oy
-    // (front hand at chest height, back hand at waist)
+  it('arms are in karate guard position (front arm forward, back arm near chin)', () => {
+    // Kyokushin stance: front arm extended forward (positive ox, higher oy),
+    // back arm near chin (negative ox, lower oy)
     for (let i = 0; i < idle.length; i++) {
+      // Front arm extends forward
       expect(
-        idle[i].armFront.oy,
-        `Frame ${i}: front arm oy (${idle[i].armFront.oy}) should be < back arm oy (${idle[i].armBack.oy})`,
-      ).toBeLessThan(idle[i].armBack.oy);
+        idle[i].armFront.ox,
+        `Frame ${i}: front arm ox should be positive (extended forward)`,
+      ).toBeGreaterThan(0);
+      // Back arm stays back
+      expect(
+        idle[i].armBack.ox,
+        `Frame ${i}: back arm ox should be negative (guard position)`,
+      ).toBeLessThan(0);
     }
   });
 

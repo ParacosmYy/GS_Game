@@ -29,7 +29,7 @@ const FRAME_DATA_GENERIC = {
   },
   STAND_D: {
     startup: 10, active: 8, recovery: 20,
-    damage: 75, hitstun: 19, blockstun: 15, pushback: 7,
+    damage: 75, hitstun: 19, blockstun: 15, pushback: 9,
     hitLevel: 'MID' as const, knockdown: false,
   },
   // ── 近距离站立 (Close Stand) ── SuperCombo Wiki KOF2002
@@ -45,7 +45,7 @@ const FRAME_DATA_GENERIC = {
   },
   CLOSE_C: {
     startup: 2, active: 5, recovery: 11,
-    damage: 100, hitstun: 19, blockstun: 15, pushback: 6,
+    damage: 100, hitstun: 19, blockstun: 15, pushback: 8,
     hitLevel: 'MID' as const, knockdown: false,
   },
   CLOSE_D: {

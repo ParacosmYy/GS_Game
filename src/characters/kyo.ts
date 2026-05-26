@@ -202,9 +202,9 @@ export const KyoDef: CharacterDefinition = {
   },
 
   routeSpecial(input, cmdBuf, tick, _hasChargeRelease = false) {
-    // DM: QCF×2+P → 大蛇薙
+    // DM: QCB HCF+P (↓↙←↙↓↘→+P) or QCFx2+P → 大蛇薙
     const dmMotion = cmdBuf.checkDMMotion(tick, input.punchPressed, input.kickPressed);
-    if (dmMotion === 'QCFx2_P') return AttackType.DM_OROCHINAGI;
+    if (dmMotion === 'QCFx2_P' || dmMotion === 'QCB_HCF_P') return AttackType.DM_OROCHINAGI;
 
     // Dragon Punch →↓↘+P → 鬼焼き (弱P/强P区分)
     const special = cmdBuf.checkSpecial(tick, input.punchPressed || input.kickPressed);

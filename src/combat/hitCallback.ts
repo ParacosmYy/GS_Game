@@ -15,7 +15,7 @@ import {
   SHAKE_BLOCK_LIGHT, SHAKE_BLOCK_HEAVY, SHAKE_BLOCK_SPECIAL, SHAKE_BLOCK_DM,
   SHAKE_BLOCK_DURATION_LIGHT, SHAKE_BLOCK_DURATION_HEAVY, SHAKE_BLOCK_DURATION_SPECIAL, SHAKE_BLOCK_DURATION_DM,
   SPARK_SIZE_LIGHT, SPARK_SIZE_HEAVY, SPARK_SIZE_SPECIAL, SPARK_SIZE_DM, SPARK_SIZE_SDM,
-  SPARK_COUNT_LIGHT, SPARK_COUNT_SPECIAL, SPARK_COUNT_DM, SPARK_COUNT_SDM, SPARK_COUNT_COUNTER,
+  SPARK_COUNT_LIGHT, SPARK_COUNT_HEAVY, SPARK_COUNT_SPECIAL, SPARK_COUNT_DM, SPARK_COUNT_SDM, SPARK_COUNT_COUNTER,
 } from '../core/constants.js';
 import { ROSTER } from '../characters/index.js';
 import { isDM as isDMCheck } from '../core/attackClassifier.js';
@@ -215,14 +215,15 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
     // 火花收口：保留主爆点，砍掉过多补层
     const comboSparkBonus = combo >= 10 ? 3 : combo >= 5 ? 1 : 0;
     const lowHpBonus = defender.health < defender.maxHealth * 0.25 ? 2 : 0;
-    const sparks = (isSDM ? SPARK_COUNT_SDM : isDM ? SPARK_COUNT_DM : isSpecial ? SPARK_COUNT_SPECIAL : counterHit ? SPARK_COUNT_COUNTER : SPARK_COUNT_LIGHT) + comboSparkBonus + lowHpBonus;
-    // CH时用橙红色调
-    const sparkColor = counterHit ? '#ff6600' : isSpecial ? atkChar.specialColor : isPunch ? '#ffdd44' : '#44ddff';
+    const sparks = (isSDM ? SPARK_COUNT_SDM : isDM ? SPARK_COUNT_DM : isSpecial ? SPARK_COUNT_SPECIAL : counterHit ? SPARK_COUNT_COUNTER : isHeavyAttack(attackType) ? SPARK_COUNT_HEAVY : SPARK_COUNT_LIGHT) + comboSparkBonus + lowHpBonus;
+    // CH时用橙红色调, 重攻击用更亮的颜色
+    const sparkColor = counterHit ? '#ff6600' : isSpecial ? atkChar.specialColor : isPunch ? (isHeavyAttack(attackType) ? '#ffcc22' : '#ffdd44') : (isHeavyAttack(attackType) ? '#33bbff' : '#44ddff');
     // 连击中VFX递减: 高连击时火花逐步缩小，避免画面过于密集
     const comboSparkScale = combo >= 6 ? 0.8 : combo >= 3 ? 0.9 : 1.0;
-    const sparkSpeed = isDM ? 1.15 : isSpecial ? 1.05 : 0.95;
-    // 星体比例收紧，避免画面太"烟花化"
-    const sparkStarRatio = isSDM ? 0.55 : isDM ? 0.45 : isSpecial ? 0.3 : isHeavyAttack(attackType) ? 0.2 : 0.15;
+    // KOF2002: 重攻击火花速度稍快，模拟更强冲击感
+    const sparkSpeed = isDM ? 1.15 : isSpecial ? 1.05 : isHeavyAttack(attackType) ? 1.0 : 0.9;
+    // 星体比例收紧，避免画面太"烟花化" — 重攻击星体比例稍高
+    const sparkStarRatio = isSDM ? 0.55 : isDM ? 0.45 : isSpecial ? 0.3 : isHeavyAttack(attackType) ? 0.25 : 0.12;
     const sparkLowGrav = !defender.isGrounded() && !isDM;
     // === 传递facing参数，让火花方向基于攻击者朝向 ===
     deps.vfx.spawnCharacterHitSparks(hitX, hitY, sparks, sparkColor, sparkSize * comboSparkScale * chSizeBonus, sparkSpeed, sparkStarRatio, sparkLowGrav, attacker.facing);
@@ -299,10 +300,26 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
     // Ko Hou (虎咲) uppercut — flame column
     if (atkName.startsWith('RYO_KO_HOU')) {
       deps.vfx.spawnKoHouVFX(attacker.x, attacker.y, attacker.charId);
+      // KOF2002: 虎咲C版命中 — 强化反馈: 额外hitstop + 更强shake + 冲击环
+      if (atkName === 'RYO_KO_HOU_C') {
+        deps.cinematic.addHitStop(3, defIdx);
+        deps.screenShake.trigger(10, 10, attacker.facing * 6);
+        deps.vfx.spawnImpactRing(hitX, hitY, 1.3);
+        deps.screenFlash.trigger('#ffaa33', 0.12, 4);
+      }
     }
     // Hien (飛燕) flying kick — speed line trail
     if (atkName === 'RYO_HIEN') {
       deps.vfx.spawnHienTrail(attacker.x, attacker.y, attacker.facing, attacker.charId);
+      // KOF2002: 飛燕命中 — 强化反馈: 额外hitstop + 踢击方向shake
+      deps.cinematic.addHitStop(2, defIdx);
+      deps.screenShake.trigger(9, 8, attacker.facing * 5);
+      deps.vfx.spawnImpactRing(hitX, hitY, 1.1);
+    }
+    // RYO_KOOUKEN_D (强虎煌拳D版) — 击倒版本强化反馈
+    if (atkName === 'RYO_KOOUKEN_D') {
+      deps.cinematic.addHitStop(2, defIdx);
+      deps.screenShake.trigger(9, 9, attacker.facing * 5);
     }
     // DM Ten Ha Ou (天地霸煌拳) — massive energy burst + screen flash
     if (atkName === 'DM_TEN_HA_OU') {
@@ -313,6 +330,9 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
     // Haou Shou Kou Ken (霸王翔吼拳) counter flash
     if (atkName === 'RYO_HAOU') {
       deps.vfx.spawnHaouFlash(attacker.x, attacker.y, attacker.charId);
+      // 霸王翔吼拳命中 — 额外冲击反馈
+      deps.cinematic.addHitStop(2, defIdx);
+      deps.vfx.spawnImpactRing(hitX, hitY, 1.0);
     }
 
     // SFX

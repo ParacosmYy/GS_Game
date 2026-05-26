@@ -253,7 +253,31 @@ function drawTorsoDetail(
     ctx.beginPath(); ctx.moveTo(PX * 1.5, -hh + PX * 3); ctx.lineTo(PX * 2.2, hh * 0.35); ctx.stroke();
 
   } else if (charId === 'ryo') {
-    // 亮: 橙色空手道道服+黑色腰带+道服V领+破烂袖口暗示
+    // 亮: 橙色空手道道服+黑色腰带+道服V领+强肩线+粗壮躯干感
+    // 肩线强调 — Ryo的宽肩是极限流空手道家的标志
+    ctx.strokeStyle = shiftColor(outfit.shirt, -25);
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(-sw + 2, -hh + 2);
+    ctx.lineTo(-sw * 0.5, -hh + PX * 0.5);
+    ctx.lineTo(0, -hh + PX);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(sw - 2, -hh + 2);
+    ctx.lineTo(sw * 0.5, -hh + PX * 0.5);
+    ctx.lineTo(0, -hh + PX);
+    ctx.stroke();
+    // 肩部肌肉暗示 — 三角肌线条
+    ctx.strokeStyle = shiftColor(outfit.shirt, -12);
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(-sw * 0.9, -hh + PX * 0.8);
+    ctx.quadraticCurveTo(-sw * 0.6, -hh + PX * 1.5, -sw * 0.3, -hh + PX * 2);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(sw * 0.9, -hh + PX * 0.8);
+    ctx.quadraticCurveTo(sw * 0.6, -hh + PX * 1.5, sw * 0.3, -hh + PX * 2);
+    ctx.stroke();
     // 道服V领 — 粗线条清晰可见的空手道V领
     ctx.strokeStyle = shiftColor(outfit.shirt, -30);
     ctx.lineWidth = 2.5;
@@ -1058,10 +1082,10 @@ function drawArmDetail(
   } else if (charId === 'ryo') {
     // 亮: 黑色空手道护手 + 正宗空手道拳 (knuckles forward, closed fist)
     // ── Karate fist shape: wider at knuckles, narrower at wrist ──
-    const fistTop = fistY - 3;
-    const fistBottom = fistY + h * 0.12;
-    const fistKnuckleW = hw * 0.92; // wider at top (knuckles)
-    const fistWristW = hw * 0.72;   // narrower at bottom (wrist)
+    const fistTop = fistY - 4;
+    const fistBottom = fistY + h * 0.14;
+    const fistKnuckleW = hw * 1.0;   // wider knuckles — heavier fist for kyokugen power
+    const fistWristW = hw * 0.75;    // narrower at wrist
     // Main fist shape — trapezoid for proper karate fist silhouette
     ctx.fillStyle = shiftColor(skinColor, 5);
     ctx.beginPath();
@@ -1071,6 +1095,9 @@ function drawArmDetail(
     ctx.lineTo(-fistWristW, fistBottom);
     ctx.closePath();
     ctx.fill();
+    // Forearm muscle definition — thicker forearm for kyokugen karateka
+    ctx.fillStyle = shiftColor(skinColor, -6);
+    ctx.fillRect(-hw * 0.9, -hh + sleeveH + h * 0.15, w * 0.25, h * 0.3);
     // Knuckle ridge — 2-3 horizontal lines across the top of the fist
     ctx.strokeStyle = shiftColor(skinColor, -15);
     ctx.lineWidth = 0.7;
@@ -1080,22 +1107,22 @@ function drawArmDetail(
     ctx.beginPath(); ctx.moveTo(-fistKnuckleW * 0.8, knuckleLineY1); ctx.lineTo(fistKnuckleW * 0.8, knuckleLineY1); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(-fistWristW * 0.75, knuckleLineY2); ctx.lineTo(fistWristW * 0.75, knuckleLineY2); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(-fistWristW * 0.65, knuckleLineY3); ctx.lineTo(fistWristW * 0.65, knuckleLineY3); ctx.stroke();
-    // Knuckle bumps — small raised areas at the top
+    // Knuckle bumps — 4 prominent knuckles for a powerful karate fist
     ctx.fillStyle = shiftColor(skinColor, 10);
     for (let i = 0; i < 4; i++) {
       const bumpX = -fistKnuckleW * 0.6 + i * fistKnuckleW * 0.4;
       ctx.beginPath();
-      ctx.arc(bumpX, fistTop + 1, fistKnuckleW * 0.15, 0, Math.PI * 2);
+      ctx.arc(bumpX, fistTop + 1, fistKnuckleW * 0.16, 0, Math.PI * 2);
       ctx.fill();
     }
     // Thumb outline — small bump on side of fist
     const thumbSide = isBack ? 1 : -1;
     ctx.fillStyle = shiftColor(skinColor, -5);
     ctx.beginPath();
-    ctx.ellipse(thumbSide * fistKnuckleW * 0.85, fistTop + (fistBottom - fistTop) * 0.35,
-      fistKnuckleW * 0.2, fistKnuckleW * 0.3, thumbSide * 0.3, 0, Math.PI * 2);
+    ctx.ellipse(thumbSide * fistKnuckleW * 0.88, fistTop + (fistBottom - fistTop) * 0.35,
+      fistKnuckleW * 0.22, fistKnuckleW * 0.32, thumbSide * 0.3, 0, Math.PI * 2);
     ctx.fill();
-    // Hand wraps (bandage) — multiple layers
+    // Hand wraps (bandage) — multiple layers crossing
     ctx.strokeStyle = '#fff';
     ctx.lineWidth = 0.8;
     ctx.beginPath(); ctx.moveTo(-hw * 0.5, fistY - 4); ctx.lineTo(hw * 0.3, fistY - 1); ctx.stroke();
@@ -1325,10 +1352,32 @@ function drawLegDetail(
     ctx.fillStyle = shiftColor(outfit.pants, -15);
     ctx.fillRect(-hw + 1, hh - shoeH - 4, w - 2, 3);
   } else if (charId === 'ryo') {
-    // 亮: 橙色空手道道裤+中线+折痕+裤脚收口
+    // 亮: 橙色空手道道裤+中线+折痕+粗腿肌肉暗示+裤脚收口
+    // 大腿肌肉暗示 — 粗壮的空手道家腿部
+    ctx.fillStyle = shiftColor(pantsColor, 10);
+    ctx.fillRect(-hw * 0.3, -hh + h * 0.1, w * 0.2, h * 0.25);
+    // 内侧肌肉线条
+    ctx.strokeStyle = shiftColor(pantsColor, 8);
+    ctx.lineWidth = 0.6;
+    ctx.beginPath(); ctx.moveTo(-hw * 0.1, -hh + h * 0.15); ctx.lineTo(-hw * 0.05, -hh + h * 0.45); ctx.stroke();
+    // 膝盖线 — 空手道家粗壮膝盖暗示
+    ctx.strokeStyle = shiftColor(outfit.pants, -8);
+    ctx.lineWidth = 0.8;
+    ctx.beginPath();
+    ctx.moveTo(-hw * 0.35, -hh + h * 0.48);
+    ctx.lineTo(hw * 0.35, -hh + h * 0.48);
+    ctx.stroke();
+    // 膝盖下方肌肉收缩线
+    ctx.strokeStyle = shiftColor(outfit.pants, 12);
+    ctx.lineWidth = 0.5;
+    ctx.beginPath();
+    ctx.moveTo(-hw * 0.25, -hh + h * 0.52);
+    ctx.lineTo(hw * 0.25, -hh + h * 0.52);
+    ctx.stroke();
+    // 中线熨烫线
     ctx.strokeStyle = shiftColor(outfit.pants, 20);
     ctx.lineWidth = 0.8;
-    ctx.beginPath(); ctx.moveTo(0, -hh + 4); ctx.lineTo(0, hh - shoeH - 2); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(0, -hh + h * 0.15); ctx.lineTo(0, hh - shoeH - 2); ctx.stroke();
     // 道裤折痕 — 空手道裤特征性褶皱
     ctx.strokeStyle = shiftColor(outfit.pants, 15);
     ctx.lineWidth = 0.5;
@@ -1340,7 +1389,7 @@ function drawLegDetail(
     ctx.beginPath(); ctx.moveTo(-hw * 0.4, -hh + h * 0.35); ctx.lineTo(-hw * 0.3, -hh + h * 0.4); ctx.stroke();
     // 裤脚收口 — 道裤底部绑带
     ctx.fillStyle = shiftColor(outfit.pants, -12);
-    ctx.fillRect(-hw + 2, hh - shoeH - 3, w - 4, 2);
+    ctx.fillRect(-hw + 2, hh - shoeH - 4, w - 4, 3);
   } else if (charId === 'leona') {
     // 莉安娜: 军裤+侧口袋+绑带
     ctx.strokeStyle = shiftColor(outfit.pants, -12);

@@ -44,22 +44,22 @@ export const RyoDef: CharacterDefinition = {
 
   poses: {
     [FighterState.IDLE]: [
-      // Frame 0: 中立 — 极限流空手宽站姿，前手护胸，后手收腰，重心居中
-      pose({ head: bone(0, 0, -0.02), body: bone(0, 0, -0.05), armFront: bone(12, 8, 0.3), armBack: bone(-6, 18, -0.4), legFront: bone(8, 0, 0.05), legBack: bone(-6, 0, -0.05) }),
-      // Frame 1: 吸气开始 — 身体微升，胸膛扩张，力量蓄积
-      pose({ head: bone(0, -1, -0.02), body: bone(0, -1, -0.04), armFront: bone(12, 7, 0.28), armBack: bone(-6, 17, -0.38), legFront: bone(8, -1, 0.04), legBack: bone(-6, -1, -0.04) }),
-      // Frame 2: 吸气巅峰 — 最大上升，拳位收紧，肩膀微抬
-      pose({ head: bone(0, -1, -0.03), body: bone(0, -2, -0.03), armFront: bone(11, 6, 0.25), armBack: bone(-5, 16, -0.36), legFront: bone(7, -1, 0.03), legBack: bone(-5, -1, -0.03) }),
-      // Frame 3: 屏息 — 短暂紧张保持，蓄力感
-      pose({ head: bone(0, -1, -0.02), body: bone(0, -2, -0.05), armFront: bone(12, 7, 0.3), armBack: bone(-6, 17, -0.4), legFront: bone(8, -1, 0.05), legBack: bone(-6, -1, -0.05) }),
-      // Frame 4: 呼气开始 — 身体回落，重心下沉
-      pose({ head: bone(0, 0, -0.02), body: bone(0, -1, -0.05), armFront: bone(12, 8, 0.3), armBack: bone(-6, 18, -0.4), legFront: bone(8, 0, 0.05), legBack: bone(-6, 0, -0.05) }),
-      // Frame 5: 呼气下沉 — 重心下沉，扎根地面
-      pose({ head: bone(0, 1, -0.01), body: bone(0, 1, -0.06), armFront: bone(13, 9, 0.32), armBack: bone(-7, 19, -0.42), legFront: bone(8, 1, 0.06), legBack: bone(-6, 1, -0.06) }),
-      // Frame 6: 呼气完成 — 最大下沉，力量沉稳，手臂微调
-      pose({ head: bone(0, 1, -0.01), body: bone(0, 2, -0.06), armFront: bone(13, 10, 0.33), armBack: bone(-7, 20, -0.43), legFront: bone(9, 1, 0.06), legBack: bone(-7, 1, -0.06) }),
+      // Frame 0: 极限流空手宽站姿 — 前拳收胸，后拳护颌，双脚宽于肩，重心居中
+      pose({ head: bone(1, 0, -0.03), body: bone(0, 0, -0.06), armFront: bone(14, 4, 0.45), armBack: bone(-4, 2, -0.6), legFront: bone(10, 0, 0.08), legBack: bone(-8, 0, -0.06) }),
+      // Frame 1: 吸气开始 — 身体微升，前拳微张，后拳收紧
+      pose({ head: bone(1, -1, -0.03), body: bone(0, -1, -0.05), armFront: bone(14, 3, 0.42), armBack: bone(-4, 1, -0.58), legFront: bone(10, -1, 0.06), legBack: bone(-8, -1, -0.05) }),
+      // Frame 2: 吸气巅峰 — 最大上升，前拳前伸蓄力，后拳贴颌
+      pose({ head: bone(1, -1, -0.04), body: bone(0, -2, -0.04), armFront: bone(15, 2, 0.38), armBack: bone(-3, 0, -0.55), legFront: bone(9, -1, 0.05), legBack: bone(-7, -1, -0.04) }),
+      // Frame 3: 屏息 — 短暂紧张保持，重心微沉，拳位稳定
+      pose({ head: bone(1, -1, -0.03), body: bone(0, -2, -0.06), armFront: bone(14, 3, 0.44), armBack: bone(-4, 1, -0.58), legFront: bone(10, -1, 0.07), legBack: bone(-8, -1, -0.05) }),
+      // Frame 4: 呼气开始 — 身体回落，重心开始下沉
+      pose({ head: bone(1, 0, -0.03), body: bone(0, -1, -0.06), armFront: bone(14, 4, 0.45), armBack: bone(-4, 2, -0.6), legFront: bone(10, 0, 0.08), legBack: bone(-8, 0, -0.06) }),
+      // Frame 5: 呼气下沉 — 重心下沉，扎根地面，前拳微回收
+      pose({ head: bone(1, 1, -0.02), body: bone(0, 1, -0.07), armFront: bone(13, 5, 0.46), armBack: bone(-5, 3, -0.62), legFront: bone(10, 1, 0.1), legBack: bone(-8, 1, -0.07) }),
+      // Frame 6: 呼气完成 — 最大下沉，力量沉稳，腿微屈
+      pose({ head: bone(1, 1, -0.02), body: bone(0, 2, -0.07), armFront: bone(13, 6, 0.47), armBack: bone(-5, 4, -0.63), legFront: bone(11, 1, 0.1), legBack: bone(-9, 1, -0.07) }),
       // Frame 7: 微重置 — 重心回升过渡，准备回到Frame 0
-      pose({ head: bone(0, 0, -0.02), body: bone(0, 1, -0.05), armFront: bone(12, 9, 0.31), armBack: bone(-6, 19, -0.41), legFront: bone(8, 1, 0.05), legBack: bone(-6, 1, -0.05) }),
+      pose({ head: bone(1, 0, -0.03), body: bone(0, 1, -0.06), armFront: bone(14, 5, 0.46), armBack: bone(-4, 3, -0.61), legFront: bone(10, 1, 0.09), legBack: bone(-8, 1, -0.06) }),
     ],
     [FighterState.WALK]: [
       // Frame 0: 左脚前迈，重心在后脚，前手护胸后手收腰
@@ -165,48 +165,48 @@ export const RyoDef: CharacterDefinition = {
     //
     [FighterState.STAND_ATTACK]: [
       // ── Startup (frames 0-9): wind-up progression ──
-      // F0: subtle weight shift, fists tighten
-      pose({ head: bone(1, 0, 0.02), body: bone(2, 0, 0.04), armFront: bone(12, 12, 0.15, 1.0), armBack: bone(-8, 14, -0.55, 0.95), legFront: bone(7, 0, 0.08), legBack: bone(-6, 0, -0.1) }),
-      // F1: pull front arm back slightly, begin torso twist
-      pose({ head: bone(1, 0, 0.02), body: bone(1, 0, 0.06), armFront: bone(8, 10, 0.08, 1.0), armBack: bone(-10, 14, -0.65, 0.95), legFront: bone(7, 0, 0.08), legBack: bone(-6, 0, -0.1) }),
-      // F2: deeper wind-up, arm pulls back further
-      pose({ head: bone(1, 0, 0.03), body: bone(0, 1, 0.08), armFront: bone(5, 10, -0.05, 1.0), armBack: bone(-10, 16, -0.7, 0.95), legFront: bone(6, 1, 0.06), legBack: bone(-7, 0, -0.12) }),
-      // F3: arm fully cocked back, torso twisted, weight loaded
-      pose({ head: bone(0, 1, 0.03), body: bone(-2, 2, 0.1), armFront: bone(2, 12, -0.15, 1.0), armBack: bone(-10, 18, -0.75, 0.95), legFront: bone(5, 1, 0.04), legBack: bone(-8, 1, -0.14) }),
-      // F4: start unwinding, power transfers from back leg
-      pose({ head: bone(1, 0, 0.04), body: bone(0, 1, 0.08), armFront: bone(6, 10, 0.02, 1.05), armBack: bone(-10, 16, -0.7, 0.95), legFront: bone(6, 0, 0.06), legBack: bone(-7, 1, -0.12) }),
-      // F5: accelerating forward, arm starting to extend
-      pose({ head: bone(2, 0, 0.04), body: bone(3, 0, 0.1), armFront: bone(14, 6, 0.12, 1.08), armBack: bone(-10, 15, -0.65, 0.92), legFront: bone(7, 0, 0.1), legBack: bone(-7, 0, -0.12) }),
-      // F6: approaching full speed, arm mostly extended
-      pose({ head: bone(2, 0, 0.05), body: bone(4, 0, 0.12), armFront: bone(20, 5, 0.2, 1.12), armBack: bone(-10, 14, -0.6, 0.9), legFront: bone(7, 0, 0.12), legBack: bone(-7, 0, -0.13) }),
-      // F7: near peak extension, body committed
-      pose({ head: bone(3, 0, 0.05), body: bone(5, 0, 0.14), armFront: bone(25, 5, 0.24, 1.2), armBack: bone(-11, 13, -0.6, 0.9), legFront: bone(8, 0, 0.13), legBack: bone(-8, 0, -0.14) }),
-      // F8: full wind-up for heavy attacks, maximal pull-back
-      pose({ head: bone(3, 1, 0.05), body: bone(5, 1, 0.15), armFront: bone(27, 5, 0.25, 1.25), armBack: bone(-12, 13, -0.65, 0.9), legFront: bone(8, 0, 0.14), legBack: bone(-8, 0, -0.14) }),
-      // F9: final startup frame, on the edge of contact
-      pose({ head: bone(3, 0, 0.06), body: bone(6, 0, 0.16), armFront: bone(29, 5, 0.26, 1.28), armBack: bone(-12, 12, -0.7, 0.9), legFront: bone(8, 0, 0.14), legBack: bone(-8, 0, -0.15) }),
+      // F0: subtle weight shift — fists tighten, body coiled in kyokugen stance
+      pose({ head: bone(1, 0, 0.02), body: bone(2, 0, 0.04), armFront: bone(10, 5, 0.4, 1.0), armBack: bone(-6, 4, -0.55, 0.95), legFront: bone(9, 0, 0.08), legBack: bone(-7, 0, -0.08) }),
+      // F1: pull front fist back — begin torso rotation for punch, rear fist guards chin
+      pose({ head: bone(1, 0, 0.02), body: bone(1, 0, 0.06), armFront: bone(6, 4, 0.35, 1.0), armBack: bone(-6, 3, -0.6, 0.95), legFront: bone(9, 0, 0.07), legBack: bone(-7, 0, -0.09) }),
+      // F2: deeper wind-up — front arm pulled to chest, body twists to load power
+      pose({ head: bone(1, 0, 0.03), body: bone(0, 1, 0.08), armFront: bone(4, 4, 0.3, 1.0), armBack: bone(-6, 3, -0.62, 0.95), legFront: bone(8, 1, 0.06), legBack: bone(-8, 0, -0.1) }),
+      // F3: fully cocked — fist at hip, torso rotated, weight loaded on back leg
+      pose({ head: bone(0, 1, 0.03), body: bone(-2, 2, 0.1), armFront: bone(2, 6, 0.2, 1.0), armBack: bone(-5, 4, -0.58, 0.95), legFront: bone(7, 1, 0.05), legBack: bone(-8, 1, -0.12) }),
+      // F4: start unwinding — power transfers from back leg, hips drive forward
+      pose({ head: bone(1, 0, 0.04), body: bone(0, 1, 0.08), armFront: bone(8, 4, 0.35, 1.05), armBack: bone(-5, 4, -0.58, 0.95), legFront: bone(8, 0, 0.07), legBack: bone(-8, 1, -0.1) }),
+      // F5: accelerating forward — arm snapping out, body rotating
+      pose({ head: bone(2, 0, 0.04), body: bone(3, 0, 0.1), armFront: bone(18, 2, 0.45, 1.08), armBack: bone(-5, 4, -0.55, 0.92), legFront: bone(9, 0, 0.1), legBack: bone(-8, 0, -0.1) }),
+      // F6: approaching full speed — arm mostly extended, committed strike
+      pose({ head: bone(2, 0, 0.05), body: bone(4, 0, 0.12), armFront: bone(24, 1, 0.5, 1.12), armBack: bone(-5, 5, -0.55, 0.9), legFront: bone(10, 0, 0.12), legBack: bone(-8, 0, -0.12) }),
+      // F7: near peak extension — body fully committed to strike
+      pose({ head: bone(3, 0, 0.05), body: bone(5, 0, 0.14), armFront: bone(30, 1, 0.55, 1.2), armBack: bone(-6, 5, -0.58, 0.9), legFront: bone(10, 0, 0.13), legBack: bone(-9, 0, -0.13) }),
+      // F8: full wind-up for heavy attacks — maximal pull-back for rear hand power
+      pose({ head: bone(3, 1, 0.05), body: bone(5, 1, 0.15), armFront: bone(32, 1, 0.56, 1.25), armBack: bone(-6, 5, -0.6, 0.9), legFront: bone(10, 0, 0.14), legBack: bone(-9, 0, -0.14) }),
+      // F9: final startup frame — on the edge of contact, full power loaded
+      pose({ head: bone(3, 0, 0.06), body: bone(6, 0, 0.16), armFront: bone(34, 0, 0.58, 1.28), armBack: bone(-6, 5, -0.62, 0.9), legFront: bone(10, 0, 0.14), legBack: bone(-9, 0, -0.14) }),
       // ── Active (frames 10-17): strike / contact / follow-through ──
-      // F10: full extension — contact moment, maximum reach and power
-      pose({ head: bone(4, 1, 0.06), body: bone(6, 0, 0.18), armFront: bone(32, 5, 0.28, 1.35), armBack: bone(-12, 12, -0.8, 0.88), legFront: bone(8, 0, 0.15), legBack: bone(-8, 0, -0.16) }),
-      // F11: peak impact — deepest stance, arm at max reach
-      pose({ head: bone(4, 1, 0.07), body: bone(7, 1, 0.2), armFront: bone(34, 6, 0.3, 1.35), armBack: bone(-12, 12, -0.82, 0.88), legFront: bone(9, 0, 0.16), legBack: bone(-9, 0, -0.17) }),
-      // F12: follow-through — arm starts to slow, body weight transferring
-      pose({ head: bone(4, 1, 0.06), body: bone(6, 1, 0.18), armFront: bone(32, 6, 0.28, 1.3), armBack: bone(-12, 12, -0.8, 0.88), legFront: bone(8, 0, 0.15), legBack: bone(-8, 0, -0.16) }),
-      // F13: early retraction — pulling back from full extension
-      pose({ head: bone(3, 1, 0.05), body: bone(5, 0, 0.15), armFront: bone(28, 6, 0.25, 1.22), armBack: bone(-11, 13, -0.75, 0.9), legFront: bone(8, 0, 0.13), legBack: bone(-8, 0, -0.14) }),
-      // F14: mid-retraction — arm returning to guard
-      pose({ head: bone(3, 0, 0.04), body: bone(4, 0, 0.12), armFront: bone(22, 8, 0.2, 1.15), armBack: bone(-10, 14, -0.65, 0.92), legFront: bone(7, 0, 0.11), legBack: bone(-7, 0, -0.12) }),
-      // F15: late active — arm coming back, body settling
-      pose({ head: bone(2, 0, 0.04), body: bone(3, 0, 0.1), armFront: bone(18, 10, 0.18, 1.08), armBack: bone(-10, 14, -0.6, 0.93), legFront: bone(7, 0, 0.1), legBack: bone(-7, 0, -0.11) }),
+      // F10: full extension — contact moment, maximum reach, arm horizontal
+      pose({ head: bone(4, 1, 0.06), body: bone(6, 0, 0.18), armFront: bone(38, 0, 0.6, 1.35), armBack: bone(-6, 6, -0.65, 0.88), legFront: bone(10, 0, 0.15), legBack: bone(-9, 0, -0.15) }),
+      // F11: peak impact — deepest kyokugen stance, arm at max reach
+      pose({ head: bone(4, 1, 0.07), body: bone(7, 1, 0.2), armFront: bone(40, 1, 0.62, 1.35), armBack: bone(-6, 6, -0.68, 0.88), legFront: bone(11, 0, 0.16), legBack: bone(-10, 0, -0.16) }),
+      // F12: follow-through — arm starts to slow, body weight transferring back
+      pose({ head: bone(4, 1, 0.06), body: bone(6, 1, 0.18), armFront: bone(36, 1, 0.58, 1.3), armBack: bone(-6, 6, -0.65, 0.88), legFront: bone(10, 0, 0.15), legBack: bone(-9, 0, -0.15) }),
+      // F13: early retraction — pulling back from full extension, guard reforming
+      pose({ head: bone(3, 1, 0.05), body: bone(5, 0, 0.15), armFront: bone(30, 2, 0.5, 1.22), armBack: bone(-6, 5, -0.6, 0.9), legFront: bone(10, 0, 0.13), legBack: bone(-9, 0, -0.14) }),
+      // F14: mid-retraction — arm returning to kyokugen guard
+      pose({ head: bone(3, 0, 0.04), body: bone(4, 0, 0.12), armFront: bone(22, 3, 0.45, 1.15), armBack: bone(-5, 4, -0.58, 0.92), legFront: bone(9, 0, 0.11), legBack: bone(-8, 0, -0.11) }),
+      // F15: late active — arm back to guard height, body settling
+      pose({ head: bone(2, 0, 0.04), body: bone(3, 0, 0.1), armFront: bone(18, 4, 0.42, 1.08), armBack: bone(-5, 4, -0.55, 0.93), legFront: bone(9, 0, 0.1), legBack: bone(-8, 0, -0.1) }),
       // F16: final active — arm nearly back to ready position
-      pose({ head: bone(2, 0, 0.03), body: bone(3, 0, 0.08), armFront: bone(15, 12, 0.16, 1.04), armBack: bone(-9, 14, -0.55, 0.94), legFront: bone(7, 0, 0.09), legBack: bone(-6, 0, -0.1) }),
-      // F17: end active — back to neutral-ready
-      pose({ head: bone(1, 0, 0.02), body: bone(2, 0, 0.06), armFront: bone(12, 13, 0.14, 1.02), armBack: bone(-8, 14, -0.5, 0.95), legFront: bone(7, 0, 0.08), legBack: bone(-6, 0, -0.1) }),
+      pose({ head: bone(2, 0, 0.03), body: bone(3, 0, 0.08), armFront: bone(16, 4, 0.44, 1.04), armBack: bone(-5, 3, -0.58, 0.94), legFront: bone(9, 0, 0.09), legBack: bone(-8, 0, -0.08) }),
+      // F17: end active — back to neutral-ready kyokugen stance
+      pose({ head: bone(1, 0, 0.02), body: bone(2, 0, 0.06), armFront: bone(14, 4, 0.45, 1.02), armBack: bone(-4, 3, -0.58, 0.95), legFront: bone(10, 0, 0.08), legBack: bone(-8, 0, -0.06) }),
       // ── Recovery (frames 18-19): return to idle (long recovery clamps to F19) ──
-      // F18: settling, weight redistributing
-      pose({ head: bone(1, 0, 0.02), body: bone(1, 1, 0.04), armFront: bone(10, 14, 0.12, 1.0), armBack: bone(-8, 14, -0.48, 0.96), legFront: bone(7, 0, 0.08), legBack: bone(-6, 1, -0.1) }),
+      // F18: settling, weight redistributing back to stance
+      pose({ head: bone(1, 0, 0.02), body: bone(1, 1, 0.04), armFront: bone(14, 4, 0.45, 1.0), armBack: bone(-4, 2, -0.58, 0.96), legFront: bone(10, 0, 0.08), legBack: bone(-8, 1, -0.06) }),
       // F19: back to idle-like neutral (long recovery attacks clamp here)
-      pose({ head: bone(0, 0, 0.01), body: bone(0, 1, 0.02), armFront: bone(9, 15, 0.18, 1.0), armBack: bone(-8, 15, -0.45, 0.97), legFront: bone(7, 0, 0.1), legBack: bone(-5, 1, -0.1) }),
+      pose({ head: bone(1, 0, 0.01), body: bone(0, 1, 0.02), armFront: bone(14, 4, 0.45, 1.0), armBack: bone(-4, 2, -0.6, 0.97), legFront: bone(10, 0, 0.08), legBack: bone(-8, 1, -0.06) }),
     ],
 
     // CROUCH_ATTACK covers: CROUCH_A/B/C/D
@@ -631,10 +631,10 @@ export const RyoDef: CharacterDefinition = {
 
   proportions: {
     headW: 44, headH: 48,
-    torsoW: 58, torsoH: 82,
-    armW: 24, armH: 58,
-    legW: 28, legH: 72,
-    shoulderY: 16, hipY: 78,
+    torsoW: 64, torsoH: 82,
+    armW: 26, armH: 60,
+    legW: 30, legH: 74,
+    shoulderY: 14, hipY: 78,
     torsoCenterY: 42, headCenterY: 8,
   },
 

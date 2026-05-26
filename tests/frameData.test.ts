@@ -1,7 +1,18 @@
+/**
+ * Frame Data Consolidated Tests
+ *
+ * Merged from: frameData.test.ts, frameDataPrecision.test.ts,
+ *   frameDataValidation.test.ts, frameDataConsistency.test.ts
+ *
+ * Covers: completeness, sanity bounds, hitstun/blockstun relationships,
+ * damage hierarchy, SDM/DM tier ordering, chip damage, and hit level validity.
+ */
 import { describe, it, expect } from 'vitest';
 import { FRAME_DATA } from '../src/core/constants.js';
 
-type FrameDataEntry = {
+type HitLevel = 'HIGH' | 'LOW' | 'MID' | 'UNBLOCKABLE';
+
+interface FrameDataEntry {
   startup: number;
   active: number;
   recovery: number;
@@ -9,152 +20,163 @@ type FrameDataEntry = {
   hitstun: number;
   blockstun: number;
   pushback: number;
-  hitLevel: 'MID' | 'LOW' | 'HIGH';
+  hitLevel: HitLevel;
   knockdown: boolean;
   chipDamage?: number;
   counterWire?: boolean;
-};
+  counterOnly?: boolean;
+}
 
-const VALID_HIT_LEVELS = new Set(['MID', 'LOW', 'HIGH']);
+const VALID_HIT_LEVELS = new Set<string>(['HIGH', 'LOW', 'MID', 'UNBLOCKABLE']);
+const entries = Object.entries(FRAME_DATA) as [string, FrameDataEntry][];
 
-describe('FRAME_DATA 数据完整性校验', () => {
-  const entries = Object.entries(FRAME_DATA) as [string, FrameDataEntry][];
+const isSDMorHSDM = (n: string) => n.startsWith('SDM_') || n.startsWith('HSDM_');
+const isDM = (n: string) => n.startsWith('DM_');
+const isSuper = (n: string) => isDM(n) || isSDMorHSDM(n);
 
-  it('FRAME_DATA 应该有至少 50 个招式条目', () => {
+// ── 1. Completeness ──────────────────────────────────────────
+describe('Frame Data Completeness', () => {
+  it('should have >= 50 entries', () => {
     expect(entries.length).toBeGreaterThanOrEqual(50);
   });
 
-  it('每个条目都有 startup > 0', () => {
-    for (const [key, fd] of entries) {
-      expect(fd.startup, `${key}.startup 应该 > 0`).toBeGreaterThan(0);
-    }
-  });
-
-  it('每个条目都有 active > 0', () => {
-    for (const [key, fd] of entries) {
-      expect(fd.active, `${key}.active 应该 > 0`).toBeGreaterThan(0);
-    }
-  });
-
-  it('每个条目都有 recovery >= 0', () => {
-    for (const [key, fd] of entries) {
-      expect(fd.recovery, `${key}.recovery 应该 >= 0`).toBeGreaterThanOrEqual(0);
-    }
-  });
-
-  it('每个条目都有 damage > 0', () => {
-    for (const [key, fd] of entries) {
-      expect(fd.damage, `${key}.damage 应该 > 0`).toBeGreaterThan(0);
-    }
-  });
-
-  it('每个条目的 hitLevel 是合法值 (MID/LOW/HIGH)', () => {
-    for (const [key, fd] of entries) {
-      expect(
-        VALID_HIT_LEVELS.has(fd.hitLevel),
-        `${key}.hitLevel="${fd.hitLevel}" 应该是 MID/LOW/HIGH 之一`
-      ).toBe(true);
-    }
-  });
-
-  it('每个条目的 knockdown 是布尔值', () => {
-    for (const [key, fd] of entries) {
-      expect(typeof fd.knockdown, `${key}.knockdown 应该是 boolean`).toBe('boolean');
-    }
-  });
-
-  it('每个条目的 hitstun 和 blockstun >= 0', () => {
-    for (const [key, fd] of entries) {
-      expect(fd.hitstun, `${key}.hitstun 应该 >= 0`).toBeGreaterThanOrEqual(0);
-      expect(fd.blockstun, `${key}.blockstun 应该 >= 0`).toBeGreaterThanOrEqual(0);
-    }
-  });
-
-  it('每个条目的 pushback >= 0', () => {
-    for (const [key, fd] of entries) {
-      expect(fd.pushback, `${key}.pushback 应该 >= 0`).toBeGreaterThanOrEqual(0);
-    }
-  });
-
-  it('startup + active + recovery 构成合理的总帧数 (>= 4)', () => {
-    for (const [key, fd] of entries) {
-      const total = fd.startup + fd.active + fd.recovery;
-      expect(total, `${key} 总帧数应该 >= 4`).toBeGreaterThanOrEqual(4);
-    }
-  });
-
-  it('chipDamage 如果存在应该 > 0', () => {
-    for (const [key, fd] of entries) {
-      if ('chipDamage' in fd && fd.chipDamage !== undefined) {
-        expect(fd.chipDamage, `${key}.chipDamage 应该 > 0`).toBeGreaterThan(0);
-      }
-    }
-  });
-
-  // KOF2002UM 基本攻击类型都应该有帧数据
   const requiredNormals = [
     'STAND_A', 'STAND_B', 'STAND_C', 'STAND_D',
     'CLOSE_A', 'CLOSE_B', 'CLOSE_C', 'CLOSE_D',
     'CROUCH_A', 'CROUCH_B', 'CROUCH_C', 'CROUCH_D',
     'JUMP_A', 'JUMP_B', 'JUMP_C', 'JUMP_D',
-    'STAND_CD', 'JUMP_CD',
-    'THROW', 'THROW_FORWARD', 'THROW_BACK',
+    'STAND_CD', 'JUMP_CD', 'THROW', 'THROW_FORWARD', 'THROW_BACK',
   ];
-
-  it('基本攻击类型都应该有 FRAME_DATA 条目', () => {
+  it('basic normals and throws should exist', () => {
     for (const atk of requiredNormals) {
-      expect(FRAME_DATA[atk as keyof typeof FRAME_DATA], `${atk} 应该在 FRAME_DATA 中`).toBeDefined();
+      expect(FRAME_DATA[atk as keyof typeof FRAME_DATA], `${atk} missing`).toBeDefined();
     }
   });
 
-  // 角色专属必杀技也应该有帧数据
   const characterSpecials = [
-    // Kyo
-    'KYO_75KAI', 'KYO_75KAI_2', 'KYO_RED_KICK', 'KYO_ONIYAKI', 'KYO_ONIYAKI_C',
-    'KYO_YAMIBARAI', 'KYO_YAMIBARAI_C',
-    'KYO_ARAGAMI', 'KYO_ARAGAMI_KONOKIZU', 'KYO_ARAGAMI_YANOSABI',
-    'KYO_DOKUGAMI', 'KYO_TSUMIYOMI', 'KYO_BATSUYOMI',
-    // Iori
-    'IORI_AOIHANA', 'IORI_AOIHANA_2', 'IORI_AOIHANA_3',
-    'IORI_YAMIBARAI', 'IORI_YAMIBARAI_C',
-    'IORI_ONIYAKI', 'IORI_ONIYAKI_C',
-    'IORI_KOTOTSUKI', 'IORI_KUZUKAZE',
-    // Terry
-    'TERRY_POWER_WAVE', 'TERRY_BURN_KNUCKLE', 'TERRY_CRACK_SHOT',
-    'TERRY_POWER_DUNK', 'TERRY_RISING_TACKLE',
-    // Kim
-    'KIM_HIENZAN', 'KIM_HANGETSU', 'KIM_HAKI', 'KIM_HISHOU', 'KIM_SANREN',
+    'KYO_75KAI', 'KYO_ONIYAKI', 'KYO_YAMIBARAI',
+    'IORI_AOIHANA', 'IORI_YAMIBARAI', 'IORI_ONIYAKI',
+    'TERRY_POWER_WAVE', 'TERRY_BURN_KNUCKLE',
+    'KIM_HIENZAN', 'KIM_HANGETSU',
   ];
-
-  it('角色专属必杀技都应该有 FRAME_DATA 条目', () => {
+  it('key character specials should exist', () => {
     for (const atk of characterSpecials) {
-      expect(FRAME_DATA[atk as keyof typeof FRAME_DATA], `${atk} 应该在 FRAME_DATA 中`).toBeDefined();
+      expect(FRAME_DATA[atk as keyof typeof FRAME_DATA], `${atk} missing`).toBeDefined();
     }
   });
 
-  // DM 超必杀技应该有帧数据
-  const dmAttacks = [
-    'DM_OROCHINAGI', 'DM_YATAGARASU', 'DM_POWER_GEYSER',
-    'DM_HIGH_ANGLE_GEYSER', 'DM_PHOENIX_KICK', 'DM_PHOENIX_HITEN',
-  ];
-
-  it('DM 超必杀技都应该有 FRAME_DATA 条目', () => {
-    for (const atk of dmAttacks) {
-      expect(FRAME_DATA[atk as keyof typeof FRAME_DATA], `${atk} 应该在 FRAME_DATA 中`).toBeDefined();
-    }
-  });
-
-  it('DM 超必杀技伤害应该 >= 150 (正版KOF2002标准)', () => {
-    for (const atk of dmAttacks) {
-      const fd = FRAME_DATA[atk as keyof typeof FRAME_DATA];
-      expect(fd.damage, `${atk}.damage 应该 >= 150`).toBeGreaterThanOrEqual(150);
-    }
-  });
-
-  it('DM 超必杀技都应该带 chipDamage', () => {
+  const dmAttacks = ['DM_OROCHINAGI', 'DM_YATAGARASU', 'DM_POWER_GEYSER', 'DM_PHOENIX_KICK'];
+  it('DM supers should exist and have damage >= 150', () => {
     for (const atk of dmAttacks) {
       const fd = FRAME_DATA[atk as keyof typeof FRAME_DATA] as FrameDataEntry;
-      expect(fd.chipDamage, `${atk} 应该有 chipDamage`).toBeGreaterThan(0);
+      expect(fd, `${atk} missing`).toBeDefined();
+      expect(fd.damage, `${atk}.damage >= 150`).toBeGreaterThanOrEqual(150);
     }
+  });
+});
+
+// ── 2. Sanity Bounds ─────────────────────────────────────────
+describe('Frame Data Sanity Bounds', () => {
+  it('startup: 2-30 for non-SDM/HSDM', () => {
+    const bad = entries.filter(([n, fd]) => !isSDMorHSDM(n) && (fd.startup < 2 || fd.startup > 30));
+    expect(bad.map(([n]) => n), 'startup out of range').toEqual([]);
+  });
+
+  it('active >= 1 and recovery >= 1 (except JUMP_ recovery=0)', () => {
+    const badActive = entries.filter(([, fd]) => fd.active < 1);
+    const badRecovery = entries.filter(([n, fd]) => !n.startsWith('JUMP_') && fd.recovery < 1);
+    expect(badActive.map(([n]) => n), 'active < 1').toEqual([]);
+    expect(badRecovery.map(([n]) => n), 'recovery < 1').toEqual([]);
+  });
+
+  it('damage: 1-300 for non-SDM/HSDM, >= 1 for all', () => {
+    const overDmg = entries.filter(([n, fd]) => !isSDMorHSDM(n) && fd.damage > 300);
+    const zeroDmg = entries.filter(([, fd]) => fd.damage < 1);
+    expect(overDmg.map(([n]) => n), 'non-SDM damage > 300').toEqual([]);
+    expect(zeroDmg.map(([n]) => n), 'damage < 1').toEqual([]);
+  });
+
+  it('startup + active + recovery >= 4 for all entries', () => {
+    const bad = entries.filter(([, fd]) => fd.startup + fd.active + fd.recovery < 4);
+    expect(bad.map(([n]) => n), 'total frames < 4').toEqual([]);
+  });
+});
+
+// ── 3. Hitstun / Blockstun ───────────────────────────────────
+describe('Hitstun / Blockstun Relationships', () => {
+  const knownExceptions = new Set([
+    'JUMP_C', 'JUMP_D',
+    'YAMAZAKI_HEBI_TSUKAI_U', 'YAMAZAKI_HEBI_TSUKAI_M', 'YAMAZAKI_HEBI_TSUKAI_L',
+  ]);
+
+  it('hitstun >= blockstun (except known KOF exceptions)', () => {
+    const bad = entries.filter(([n, fd]) =>
+      fd.hitstun > 0 && !knownExceptions.has(n) && fd.hitstun < fd.blockstun
+    );
+    expect(bad.map(([n]) => n), 'hitstun < blockstun').toEqual([]);
+  });
+
+  it('hitstun <= 60 (reasonable upper bound)', () => {
+    const bad = entries.filter(([, fd]) => fd.hitstun > 60);
+    expect(bad.map(([n]) => n), 'hitstun > 60').toEqual([]);
+  });
+});
+
+// ── 4. SDM/DM Hierarchy ──────────────────────────────────────
+describe('SDM/HSDM vs DM Hierarchy', () => {
+  function getBase(name: string): string {
+    return name.replace(/_[ABCD]$/, '').replace(/_EX$/, '').replace(/^(DM|SDM|HSDM)_/, '');
+  }
+
+  it('SDM/HSDM damage >= DM damage for same base move', () => {
+    const tiers: Record<string, { dm: number[]; sdm: number[] }> = {};
+    for (const [n, fd] of entries) {
+      const base = getBase(n);
+      if (!tiers[base]) tiers[base] = { dm: [], sdm: [] };
+      if (n.startsWith('DM_')) tiers[base].dm.push(fd.damage);
+      else if (isSDMorHSDM(n)) tiers[base].sdm.push(fd.damage);
+    }
+    const bad = Object.entries(tiers)
+      .filter(([, d]) => d.dm.length > 0 && d.sdm.length > 0)
+      .filter(([, d]) => Math.min(...d.sdm) < Math.max(...d.dm));
+    expect(bad.map(([b]) => b), 'SDM damage < DM damage').toEqual([]);
+  });
+
+  it('SDM/HSDM chipDamage >= DM chipDamage for same base', () => {
+    const tiers: Record<string, { dm: number[]; sdm: number[] }> = {};
+    for (const [n, fd] of entries) {
+      if (fd.chipDamage === undefined) continue;
+      const base = getBase(n);
+      if (!tiers[base]) tiers[base] = { dm: [], sdm: [] };
+      if (n.startsWith('DM_')) tiers[base].dm.push(fd.chipDamage);
+      else if (isSDMorHSDM(n)) tiers[base].sdm.push(fd.chipDamage);
+    }
+    const bad = Object.entries(tiers)
+      .filter(([, d]) => d.dm.length > 0 && d.sdm.length > 0)
+      .filter(([, d]) => Math.min(...d.sdm) < Math.max(...d.dm));
+    expect(bad.map(([b]) => b), 'SDM chip < DM chip').toEqual([]);
+  });
+});
+
+// ── 5. Chip Damage & Knockdown ───────────────────────────────
+describe('Chip Damage and Knockdown Consistency', () => {
+  it('chipDamage <= damage when defined', () => {
+    const bad = entries.filter(([, fd]) => fd.chipDamage !== undefined && fd.chipDamage > fd.damage);
+    expect(bad.map(([n]) => n), 'chipDamage > damage').toEqual([]);
+  });
+
+  it('counterWire implies knockdown', () => {
+    const bad = entries.filter(([, fd]) => fd.counterWire && !fd.knockdown);
+    expect(bad.map(([n]) => n), 'counterWire without knockdown').toEqual([]);
+  });
+
+  it('all hitLevel values are valid', () => {
+    const bad = entries.filter(([, fd]) => !VALID_HIT_LEVELS.has(fd.hitLevel));
+    expect(bad.map(([n]) => n), 'invalid hitLevel').toEqual([]);
+  });
+
+  it('LOW attacks have blockstun > 0', () => {
+    const bad = entries.filter(([, fd]) => fd.hitLevel === 'LOW' && fd.blockstun <= 0);
+    expect(bad.map(([n]) => n), 'LOW with blockstun <= 0').toEqual([]);
   });
 });

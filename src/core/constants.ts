@@ -38,10 +38,10 @@ export const PUSH_BOX_WIDTH = 60;
 export const MAX_HEALTH = 1000;
 
 // ===== Input Constants =====
-export const COMMAND_WINDOW = 12;          // 单个搓招窗口（正版KOF标准 ≈ 10-14帧, 12为经典值）
-export const RECOVERY_INPUT_BUFFER = 8;   // 受身/防御硬直恢复后输入缓冲帧数（KOF2002: 硬直中输入的方向可在恢复后8帧内继续匹配必杀指令）
-export const HCF_WINDOW = 24;              // 半圆指令窗口（↓↙←↙↓↘→）
-export const DOUBLE_QCF_WINDOW = 28;       // 双QCF指令窗口（正版KOF UM DM窗口 ≈ 28-32帧）
+export const COMMAND_WINDOW = 18;          // 单个搓招窗口（放宽到 18 帧，降低键盘输入难度）
+export const RECOVERY_INPUT_BUFFER = 10;   // 受身/防御硬直恢复后输入缓冲帧数
+export const HCF_WINDOW = 35;              // 半圆指令窗口（放宽到 35 帧）
+export const DOUBLE_QCF_WINDOW = 45;       // 双QCF指令窗口（放宽到 45 帧）
 export const CHARGE_FRAMES_REQUIRED = 40;  // 蓄力帧数要求（正版KOF ≈ 40-55帧, 40为最低值）
 
 // ===== Game Loop Constants =====
@@ -311,7 +311,7 @@ export const GUARD_GAUGE_WARNING_THRESHOLD = 30;     // Gauge value below which 
 
 // ===== Hitstop (命中暂停) — KOF2002 分层系统 =====
 export const HITSTOP_LIGHT = 4;      // 轻攻击 (A button normals)
-export const HITSTOP_MEDIUM = 7;     // 重攻击 (C/D button normals)
+export const HITSTOP_MEDIUM = 8;     // 重攻击 (C/D button normals) — KOF2002: 8F
 export const HITSTOP_SPECIAL = 13;   // 必杀技
 export const HITSTOP_DM = 19;        // DM超必杀
 export const HITSTOP_SDM = 22;       // SDM超必杀
@@ -324,8 +324,8 @@ export const BLOCKSTOP_SPECIAL = 5;  // 必杀技防御
 export const BLOCKSTOP_DM = 8;       // DM防御
 
 // ===== Screen Shake (画面震动) — KOF2002 分层系统 =====
-export const SHAKE_LIGHT = 3;               // 轻攻击
-export const SHAKE_HEAVY = 6;               // 重攻击
+export const SHAKE_LIGHT = 2;               // 轻攻击 — KOF2002: 微弱震感
+export const SHAKE_HEAVY = 7;               // 重攻击 — KOF2002: 明显震感
 export const SHAKE_COUNTER = 6;             // Counter Hit (非重攻击)
 export const SHAKE_SPECIAL = 8;             // 必杀技
 export const SHAKE_THROW = 8;               // 投技
@@ -334,7 +334,7 @@ export const SHAKE_KO = 22;                 // KO落地
 export const SHAKE_DMG_THRESHOLD = 50;      // 伤害>50时用中等震动
 
 export const SHAKE_DURATION_LIGHT = 4;      // 轻攻击震动持续
-export const SHAKE_DURATION_HEAVY = 8;      // 重攻击震动持续
+export const SHAKE_DURATION_HEAVY = 6;      // 重攻击震动持续 — KOF2002: 短促有力
 export const SHAKE_DURATION_SPECIAL = 10;   // 必杀技震动持续
 export const SHAKE_DURATION_DM = 16;        // DM震动持续
 export const SHAKE_DURATION_KO = 55;        // KO落地震动持续
@@ -366,7 +366,7 @@ export const SPARK_SIZE_SDM = 1.5;
 
 // ===== Spark Count 分级 =====
 export const SPARK_COUNT_LIGHT = 6;
-export const SPARK_COUNT_HEAVY = 6;
+export const SPARK_COUNT_HEAVY = 8;         // 重攻击火花数 — KOF2002: 比轻攻击更密集
 export const SPARK_COUNT_SPECIAL = 10;
 export const SPARK_COUNT_DM = 14;
 export const SPARK_COUNT_SDM = 18;

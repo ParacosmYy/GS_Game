@@ -2,7 +2,7 @@ import { DirectionInput, AttackType } from '../core/types.js';
 import { COMMAND_WINDOW, HCF_WINDOW, DOUBLE_QCF_WINDOW, CHARGE_FRAMES_REQUIRED, RECOVERY_INPUT_BUFFER } from '../core/constants.js';
 
 /** DM motion types detected from command buffer — characters map these to their own DM */
-export type DMMotion = 'QCFx2_P' | 'QCFx2_K' | 'QCBx2_K' | 'QCBx2_P' | null;
+export type DMMotion = 'QCFx2_P' | 'QCFx2_K' | 'QCBx2_K' | 'QCBx2_P' | 'QCB_HCF_P' | 'QCB_HCF_K' | null;
 
 /** Charge direction type for charge motion detection */
 export type ChargeDirection = 'down' | 'back' | 'downback';
@@ -332,6 +332,15 @@ export class CommandBuffer {
     if (hasDoubleQCB && kickEdge) return 'QCBx2_K';
     if (hasDoubleQCB && punchEdge) return 'QCBx2_P';
 
+    // QCB HCF (↓↙←↙↓↘→): common KOF ultra input (like Orochinagi, Ya Otome)
+    const hasQcbHcf = this.matchSequence(wideRecent, ['down', 'back', 'down', 'forward'])
+      || this.matchSequence(wideRecent, ['down', 'downback', 'back', 'down', 'downforward', 'forward'])
+      || this.matchSequence(wideRecent, ['down', 'back', 'down', 'downforward', 'forward'])
+      || this.matchSequence(wideRecent, ['down', 'downback', 'back', 'down', 'forward']);
+
+    if (hasQcbHcf && punchEdge) return 'QCB_HCF_P';
+    if (hasQcbHcf && kickEdge) return 'QCB_HCF_K';
+
     return null;
   }
 
@@ -528,7 +537,7 @@ export class CommandBuffer {
     sequence: DirectionInput[],
   ): boolean {
     if (recent.length < sequence.length) return false;
-    const LENIENCY_FRAMES = 6;
+    const LENIENCY_FRAMES = 10; // 给跳键盘缺对角线的留更多宽限
 
     let seqIdx = 0;
     let matchStartFrame = -1;
