@@ -971,3 +971,9 @@
 ## H197: charVisuals—5项验证CHAR_VISUALS角色外观数据 — 169→170
 
 **commit:** <hash> | charVisuals—5项验证CHAR_VISUALS角色外观数据
+
+---
+
+## H198: andyDef—5项验证Andy角色定义id/name/stats/poses — 170→171
+
+**commit:** <hash> | andyDef—5项验证Andy角色定义id/name/stats/poses
