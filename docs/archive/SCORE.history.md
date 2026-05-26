@@ -832,3 +832,9 @@
 ## H177: portraitBatch5—8项验证剩余角色肖像+ryoPortraits多尺寸 — 149→150
 
 **commit:** <hash> | portraitBatch5—8项验证剩余角色肖像+ryoPortraits多尺寸
+
+---
+
+## H178: charDefBatch1—5项验证andy/athena/billy/chang/choi定义文件 — 150→151
+
+**commit:** <hash> | charDefBatch1—5项验证andy/athena/billy/chang/choi定义文件
