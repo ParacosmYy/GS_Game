@@ -161,6 +161,12 @@ npx vite build
 
 按 [Git 规则](git-rules.md) 提交。每轮一个 commit。
 
+补充节奏：
+
+- 每累计 5 个 commit，尝试 push 一次。
+- 若首次 push 失败，继续正常 commit，不要停在推送错误上。
+- push 失败要记录原因，后续再补推。
+
 ## 3. 停止条件
 
 遇到以下情况停止实施，先向用户说明：

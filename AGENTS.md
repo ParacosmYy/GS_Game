@@ -81,6 +81,12 @@
 10. `复盘评分`：按 [评分规则](docs/process/scoring.md) 说明是否 +1。
 11. `提交`：按 [Git 规则](docs/process/git-rules.md) 中文 Conventional Commit。
 
+补充节奏：
+
+- 每累计 5 个 commit，尝试 push 一次。
+- 如果首次 push 失败，继续正常 commit，不要停在推送错误上。
+- push 失败要记录原因，后续再补推。
+
 没有验收标准的改动不得实施。不能说明“更接近 KOF 在哪里”的改动不得加分。
 
 如果工具环境无法创建子 agent，必须显式记录失败原因，并由主 agent 按同样角色清单补齐结论。不得伪造“已调用”。
