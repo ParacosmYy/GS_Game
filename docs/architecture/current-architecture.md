@@ -11,6 +11,8 @@
 
 当前不换栈。优先把角色资产、动作帧、判定帧和反馈数据拆干净。
 
+长期目标结构见 [工作区目标架构](workspace-architecture-target.md)。本文描述当前现实，目标架构描述未来迁移方向。
+
 ## 2. 主要目录
 
 ```text
@@ -33,6 +35,7 @@ src/
 - `core/*Manifest*` 已有结构，但真实资产接管不足。
 - `combat/` 和 frame data 已有基础，但 hit feedback 还未形成统一矩阵。
 - 文件体积偏大，后续只在服务 Ryo 样板时拆分。
+- `src/` 仍按技术层粗分，没有形成大型项目中常见的 `app/engine/simulation/content/tools` 边界。
 
 ## 4. 下一阶段架构方向
 
@@ -44,6 +47,7 @@ src/
 - 把 Ryo 判定接入 hitbox manifest。
 - 把 Ryo 命中事件接入 feedback manifest。
 - 用 Frame Contract 连接 rendering/combat/audio/vfx。
+- 逐步迁移到 `content/characters/ryo` 和 `simulation/`，但每轮只迁一个领域。
 
 ## 5. 保持边界
 

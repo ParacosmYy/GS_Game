@@ -31,6 +31,8 @@ scope 应体现主线，例如：
 - `asset-pipeline`
 - `frame-contract`
 - `feedback`
+- `architecture`
+- `decision`
 - `docs`
 
 ## 3. Commit 正文
@@ -58,3 +60,4 @@ scope 应体现主线，例如：
 - 本轮推进 Ryo 哪个闭环。
 - 是否保留 fallback。
 - 是否触发技术栈决策门。
+- 是否符合工作区目标架构。

@@ -31,6 +31,8 @@ npx vite build
 
 - 是否推进 [Ryo Vertical Slice](../product/ryo-vertical-slice-plan.md)？
 - 是否使用或完善 [资产管线架构](../architecture/asset-pipeline.md)？
+- 是否符合 [工作区目标架构](../architecture/workspace-architecture-target.md)？
+- 是否通过 [决策门](decision-gates.md)？
 - 是否保持 Frame Contract 语义？
 - 是否保留 fallback？
 - 是否避免扩张到非 Ryo 角色？

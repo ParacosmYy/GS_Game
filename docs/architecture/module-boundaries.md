@@ -2,6 +2,8 @@
 
 本文是代码修改时的职责边界。任何新功能必须先归属模块。
 
+目录迁移的最终目标见 [工作区目标架构](workspace-architecture-target.md)。本文约束当前模块边界，目标架构约束未来目录形态。
+
 ## 1. 依赖方向
 
 允许方向：
@@ -48,14 +50,30 @@ Frame Contract 是多个模块的共享协议：
 
 任何模块不得绕过 contract 私自推导另一层信息。
 
-## 4. Placeholder 规则
+## 4. 目标目录归属
+
+新增文件优先按以下规则放置：
+
+| 文件类型 | 目标目录 |
+| --- | --- |
+| 角色定义/数据 | `src/content/characters/<id>/` |
+| 纯模拟逻辑 | `src/simulation/` |
+| 通用运行时 | `src/engine/` |
+| 浏览器组装 | `src/app/` |
+| Canvas 绘制 | `src/rendering/canvas2d/` |
+| Debug overlay | `src/rendering/debug/` |
+| 离线工具 | `tools/` |
+| 原始资产 | `assets/source/` |
+| 生成资产 | `assets/generated/` |
+
+## 5. Placeholder 规则
 
 - placeholder 可以存在。
 - placeholder 必须可替换。
 - placeholder 不得成为新主线。
 - 修改 placeholder 只能为 fallback 或迁移服务。
 
-## 5. 文件大小
+## 6. 文件大小
 
 现有大文件暂不为了数字拆分。只有当拆分服务以下目标时才做：
 

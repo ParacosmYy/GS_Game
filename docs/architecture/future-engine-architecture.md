@@ -21,6 +21,7 @@
 - combat/input/state 不依赖 rendering。
 - fallback 清晰。
 - 有性能或能力瓶颈证据。
+- 当前代码已经朝 [工作区目标架构](workspace-architecture-target.md) 收敛，至少 simulation/content/rendering 边界清楚。
 
 ## 3. 触发条件
 
@@ -50,6 +51,7 @@
 - 保留 combat/input/state 测试。
 - 先做渲染后端替换实验，不重写全部游戏。
 - 必须有回退方案。
+- 必须通过 [决策门](../process/decision-gates.md)。
 
 ## 6. 禁止
 

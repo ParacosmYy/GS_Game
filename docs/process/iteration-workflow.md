@@ -35,15 +35,19 @@
 - `CLAUDE.md`
 - [Ryo Vertical Slice](../product/ryo-vertical-slice-plan.md)
 - 本文件
+- [决策门](decision-gates.md)
 
 按需读：
 
 - [资产管线架构](../architecture/asset-pipeline.md)
+- [工作区目标架构](../architecture/workspace-architecture-target.md)
 - [模块边界](../architecture/module-boundaries.md)
 - [真实性标准](../product/authenticity-standard.md)
 - [质量门禁](quality-gates.md)
 
 ### 2.3 研究
+
+实施前先通过 [决策门](decision-gates.md)。如果本轮属于架构迁移、资产管线、角色扩展、打击感、换栈或文档修改，必须写明为什么允许。
 
 - 先查 `references/mugen/` 和本地代码。
 - 可以查公开资料，但只能学习工程结构、数据组织、验收标准。
@@ -71,6 +75,7 @@
 
 - 本轮目标。
 - 主线归属。
+- 决策类型和允许理由。
 - 改动文件。
 - 不改文件。
 - 验收标准。

@@ -47,6 +47,8 @@
    - `CLAUDE.md`
    - `docs/product/ryo-vertical-slice-plan.md`
    - `docs/process/iteration-workflow.md`
+   - `docs/process/decision-gates.md`
+   - `docs/architecture/workspace-architecture-target.md`
    - 本轮相关架构/产品文档
 4. 判断本轮属于哪一类：
    - 资产格式
@@ -58,6 +60,20 @@
    - 文档约束
 5. 输出本轮 PM/玩家/研发/测试/架构结论。
 6. 写方案后再实施。
+
+## 4.1 大型项目化方向
+
+所有后续迁移都必须朝 [工作区目标架构](docs/architecture/workspace-architecture-target.md) 收敛：
+
+- `app/` 只负责启动和依赖组装。
+- `engine/` 只负责通用运行时。
+- `simulation/` 只负责纯游戏模拟。
+- `content/` 承载角色、舞台、manifest 和 frame contract 数据。
+- `rendering/` 只读快照和 manifest。
+- `audio/` 只响应事件。
+- `tools/` 负责离线资产生成、校验和报告。
+
+不要为了“显得大型”做大搬家。每次只迁移一个领域，并通过 [决策门](docs/process/decision-gates.md) 验收。
 
 ## 5. 每轮禁止事项
 
@@ -100,6 +116,8 @@ PM 结论：
 架构结论：
 - 是否保持 Frame Contract？
 - 是否保持运行时和工具链分离？
+- 是否符合工作区目标架构？
+- 是否通过对应决策门？
 
 验收标准：
 - ...

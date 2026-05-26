@@ -58,6 +58,8 @@ Ryo 必须具备以下 manifest：
 
 运行时只能读取 manifest。工具层负责生成和校验 manifest。
 
+Ryo 相关新增数据文件优先落到 [工作区目标架构](../architecture/workspace-architecture-target.md) 规定的 `src/content/characters/ryo/` 方向；如果暂时留在旧目录，必须说明迁移原因和回退方式。
+
 ## 5. 每轮推进顺序
 
 1. 定义或修正数据格式。
@@ -66,6 +68,7 @@ Ryo 必须具备以下 manifest：
 4. 保留 fallback。
 5. 验证构建。
 6. 复盘是否更像 KOF。
+7. 通过 [决策门](../process/decision-gates.md) 复盘本轮是否允许 +5。
 
 ## 6. 退出条件
 

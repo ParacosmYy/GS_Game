@@ -124,6 +124,8 @@ tools/
     report-character-completeness.ts
 ```
 
+目录迁移和工具落点必须符合 [工作区目标架构](workspace-architecture-target.md)。
+
 ## 6. 验收
 
 资产管线改动必须至少满足：
@@ -133,6 +135,7 @@ tools/
 - Ryo 有一个动作或一个肖像尺寸被实际接入。
 - fallback 仍可用。
 - 不破坏 `npx tsc --noEmit` 和 `npx vite build`。
+- 通过 [决策门](../process/decision-gates.md) 的资产管线决策门。
 
 ## 7. 授权边界
 

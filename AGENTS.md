@@ -65,13 +65,14 @@
 
 1. `启动检查`：查看 `git status --short`，识别用户/他人未提交改动，不得误改。
 2. `读取约束`：读 `AGENTS.md`、`CLAUDE.md`、[Ryo 样板线](docs/product/ryo-vertical-slice-plan.md)、[迭代流程](docs/process/iteration-workflow.md)。
-3. `研究参考`：查 `references/mugen/` 或公开资料，只学习数据组织和工具链，不复制受保护素材。
-4. `角色评审`：按 [角色协同模板](docs/process/role-prompts.md) 输出 PM、玩家、研发、测试、架构结论。
-5. `方案`：写清本轮目标、范围、非目标、文件归属、验收、回退。
-6. `实施`：只做本轮闭环，不扩张。
-7. `验证`：按 [质量门禁](docs/process/quality-gates.md) 执行。
-8. `复盘评分`：按 [评分规则](docs/process/scoring.md) 说明是否 +5。
-9. `提交`：按 [Git 规则](docs/process/git-rules.md) 中文 Conventional Commit。
+3. `决策门`：按 [决策门](docs/process/decision-gates.md) 判断本轮是否允许实施。
+4. `研究参考`：查 `references/mugen/` 或公开资料，只学习数据组织和工具链，不复制受保护素材。
+5. `角色评审`：按 [角色协同模板](docs/process/role-prompts.md) 输出 PM、玩家、研发、测试、架构结论。
+6. `方案`：写清本轮目标、范围、非目标、文件归属、验收、回退。
+7. `实施`：只做本轮闭环，不扩张。
+8. `验证`：按 [质量门禁](docs/process/quality-gates.md) 执行。
+9. `复盘评分`：按 [评分规则](docs/process/scoring.md) 说明是否 +5。
+10. `提交`：按 [Git 规则](docs/process/git-rules.md) 中文 Conventional Commit。
 
 没有验收标准的改动不得实施。不能说明“更接近 KOF 在哪里”的改动不得加分。
 
@@ -87,6 +88,8 @@
 - 新状态必须声明归属、生命周期、reset、snapshot/replay 影响。
 
 模块细则见 [模块边界](docs/architecture/module-boundaries.md)，资产细则见 [资产管线架构](docs/architecture/asset-pipeline.md)。
+
+大型项目目标结构见 [工作区目标架构](docs/architecture/workspace-architecture-target.md)。新增目录、迁移文件、拆分大文件前必须先对照该文档。
 
 ## 6. Ryo 样板线硬规则
 
@@ -119,9 +122,11 @@ npx vite build
 - [路线图](docs/product/roadmap.md)：阶段路线。
 - [当前架构](docs/architecture/current-architecture.md)：真实结构。
 - [模块边界](docs/architecture/module-boundaries.md)：依赖和职责。
+- [工作区目标架构](docs/architecture/workspace-architecture-target.md)：大型项目目录目标和迁移阶段。
 - [资产管线架构](docs/architecture/asset-pipeline.md)：sprite/portrait/frame/hitbox 管线。
 - [未来引擎架构](docs/architecture/future-engine-architecture.md)：换栈决策。
 - [迭代流程](docs/process/iteration-workflow.md)：每轮闭环。
+- [决策门](docs/process/decision-gates.md)：新功能、架构迁移、资产、角色、打击感、换栈的允许条件。
 - [角色模板](docs/process/role-prompts.md)：PM/玩家/研发/测试/架构师模板。
 - [质量门禁](docs/process/quality-gates.md)：验证规则。
 - [评分规则](docs/process/scoring.md)：千分制和 +5 规则。

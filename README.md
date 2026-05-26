@@ -45,11 +45,13 @@ npx vitest run
 3. [Ryo Vertical Slice](docs/product/ryo-vertical-slice-plan.md)：当前唯一产品主线。
 4. [迭代流程](docs/process/iteration-workflow.md)：每轮闭环。
 5. [角色协同模板](docs/process/role-prompts.md)：PM、玩家、研发、测试、架构评审。
+6. [决策门](docs/process/decision-gates.md)：每类重大决策的允许条件。
 
 架构相关：
 
 - [当前架构](docs/architecture/current-architecture.md)
 - [模块边界](docs/architecture/module-boundaries.md)
+- [工作区目标架构](docs/architecture/workspace-architecture-target.md)
 - [资产管线架构](docs/architecture/asset-pipeline.md)
 - [未来引擎架构](docs/architecture/future-engine-architecture.md)
 
