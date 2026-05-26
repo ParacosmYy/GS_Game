@@ -127,3 +127,9 @@
 ## H69: feedback manifest逐招Ryo数据—26个攻击类型显式档位映射 — 41→42
 
 **commit:** <hash> | 6light+10heavy+8special+2DM/SDM显式映射替代inferTier fallback
+
+---
+
+## H70: portrait manifest测试+Ryo像素肖像数据完整性验证 — 42→43
+
+**commit:** <hash> | 23测试覆盖manifest结构+查询函数+便捷getter+Ryo 64x80像素数据
