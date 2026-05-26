@@ -607,3 +607,9 @@
 ## H144: frameDataChars测试—6项验证FRAME_DATA_CHARS+KYO/RYO/IORI键+startup/damage字段 — 116→117
 
 **commit:** <hash> | frameDataChars测试—6项验证FRAME_DATA_CHARS+KYO/RYO/IORI键+startup/damage字段
+
+---
+
+## H145: selectState测试—7项验证VS_SPLASH_DURATION+COLOR_PALETTES+SelectState+cursor+ready — 117→118
+
+**commit:** <hash> | selectState测试—7项验证VS_SPLASH_DURATION+COLOR_PALETTES+SelectState+cursor+ready
