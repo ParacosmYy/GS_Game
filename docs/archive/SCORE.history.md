@@ -757,3 +757,18 @@
 ## H167: announcerOverlay—6项验证trigger/tick/isActive/getCurrentEventType/clear/queue — 139→140
 
 **commit:** <hash> | announcerOverlay—6项验证trigger/tick/isActive/getCurrentEventType/clear/queue
+
+---
+
+## H168: Ryo格挡+胜利姿势像素帧+完整性报告视觉维度 — 140→141
+
+**commit:** d883b3a | Ryo格挡+胜利姿势像素帧+完整性报告视觉维度
+**commit:** 88b7fe0 | 胜利姿势接入WIN_QUOTE/MATCH_END画面
+
+**变更：**
+- 新增ryoBlockFrames.ts: 3帧格挡动画(双臂交叉护体)
+- 新增ryoWinFrames.ts: 4帧胜利动画(双手叉腰自信姿态)
+- BLOCK/AIR_BLOCK不再回退IDLE，有专属格挡帧
+- 胜利姿势接入WIN_QUOTE/MATCH_END画面循环
+- 完整性报告新增Visual Frames维度(40项)
+- 导出getResolvedFrameKey/drawRyoWinPose供外部使用
