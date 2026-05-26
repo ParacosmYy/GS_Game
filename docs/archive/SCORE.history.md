@@ -631,3 +631,9 @@
 ## H148: charBatch1测试—25项验证andy/athena/billy/chang/choi角色定义 — 120→121
 
 **commit:** <hash> | charBatch1测试—25项验证andy/athena/billy/chang/choi角色定义
+
+---
+
+## H149: charBatch2—25项验证chris/clark/joe/kasumi/kdash — 121→122
+
+**commit:** <hash> | charBatch2—25项验证chris/clark/joe/kasumi/kdash
