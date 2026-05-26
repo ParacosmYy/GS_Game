@@ -1,0 +1,7 @@
+/**
+ * Content Package — Top-level barrel export
+ *
+ * The content package provides typed access to character data, manifests,
+ * and completeness reports. Structure follows workspace-architecture-target.md.
+ */
+export * from './characters/index.js';

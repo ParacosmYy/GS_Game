@@ -226,3 +226,29 @@
 **下一轮最小任务:** Ryo空气攻击(jump_a/jump_c)动画帧优化; 伤害数字飘字改善; 角色阴影改善
 
 **commit: ab0b86f | 下一目标: 37 (空中攻击+飘字+阴影)**
+
+---
+
+## H65: SCORE.md分数修复+Ryo content包目录建立 — 37→38 (+1规则)
+
+**日期:** 2026-05-27
+
+**本轮类型:** 文档修复+架构基础
+
+**实质性改变:**
+- 修复SCORE.md从603→38（消除旧制通胀残留）
+- 建立src/content/characters/ryo/内容包目录（definition/stats/completeness）
+- Ryo stats和definition从content包re-export，验证导出完整性
+- 新增ryoContentPackage.test.ts验证content包7个测试用例
+
+**本轮提升了哪个维度？** 架构稳定性+文档一致性
+
+**为什么只加1分？** 目录建立和数据re-export是基础设施，不直接改变玩家体验；分数修复是文档纠正
+
+**更像KOF在哪里？** 评分系统恢复可信；Ryo内容开始有单一归属方向；content包为后续manifest数据迁移铺路
+
+**仍不像KOF在哪里？** content包只有re-export没有新数据；骨骼方块仍是核心视觉问题
+
+**下一轮最小任务:** Ryo animation manifest填充idle真实pose数据；骨骼pose→manifest数据驱动
+
+**commit: <hash> | 下一目标: 39 (animation manifest)**
