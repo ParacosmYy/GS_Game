@@ -547,3 +547,9 @@
 ## H134: gameStateManager测试—8项验证phase+phaseTimer+winner+isTrainingMode初始值 — 106→107
 
 **commit:** <hash> | gameStateManager测试—8项验证phase+phaseTimer+winner+isTrainingMode初始值
+
+---
+
+## H135: hudInfo测试—6项验证toggleDebugOverlay+toggleInputDisplay+getCurrentFPS — 107→108
+
+**commit:** <hash> | hudInfo测试—6项验证toggleDebugOverlay+toggleInputDisplay+getCurrentFPS
