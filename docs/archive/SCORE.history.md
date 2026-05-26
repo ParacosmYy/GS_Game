@@ -421,3 +421,9 @@
 ## H118: hurtboxManifest测试—7项验证HURTBOX_TABLE+DEFAULT_HURTBOX+getHurtboxDef — 90→91
 
 **commit:** <hash> | hurtboxManifest测试—7项验证HURTBOX_TABLE+DEFAULT_HURTBOX+getHurtboxDef
+
+---
+
+## H119: animationManifest测试—9项验证getSequence+getSequenceNames+hasSequence — 91→92
+
+**commit:** <hash> | animationManifest测试—9项验证getSequence+getSequenceNames+hasSequence
