@@ -328,6 +328,8 @@ const RYO_VISUAL_FRAME_STATES: { key: string; label: string }[] = [
   { key: 'TAUNT', label: 'TAUNT' },
   { key: 'COUNTER_STANCE', label: 'COUNTER_STANCE' },
   { key: 'WIN', label: 'WIN' },
+  { key: 'DIZZY', label: 'DIZZY' },
+  { key: 'THROW', label: 'THROW' },
 ];
 
 // ===== Helper Functions =====
@@ -607,6 +609,8 @@ export function generateRyoDimensionReport(): RyoDimensionReport {
     TAUNT: { state: FighterState.TAUNT },
     COUNTER_STANCE: { state: FighterState.COUNTER_STANCE },
     WIN: { state: FighterState.IDLE }, // WIN uses dedicated 'WIN' key, not a FighterState
+    DIZZY: { state: FighterState.DIZZY },
+    THROW: { state: FighterState.THROW },
   };
   const visualFrames = buildDimension(
     'Visual Frames',
