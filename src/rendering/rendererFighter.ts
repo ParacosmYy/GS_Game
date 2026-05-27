@@ -799,8 +799,17 @@ export function drawFighters(
     // KOF2002: 重击累积暗化 — hitstunTimer越大身体越暗(重击效果)
     if (f.state === FighterState.HITSTUN && f.hitstunTimer > 10) {
       const darkAlpha = Math.min((f.hitstunTimer - 10) * 0.005, 0.08);
-      ctx.fillStyle = 'rgba(80, 0, 0, ' + darkAlpha + ')';
-      ctx.fillRect(sx + leanOffsetX - hw - 3, sy - f.displayHeight - 3, (hw + 3) * 2, f.displayHeight + 6);
+      ctx.fillStyle = 'rgba(0, 0, 0, ' + darkAlpha + ')';
+      ctx.fillRect(sx + leanOffsetX - hw, sy - f.displayHeight, hw * 2, f.displayHeight);
+    }
+    // KOF2002: 眩晕槽警告 — stunGauge>70%时身体微黄闪烁
+    if (f.stunGauge > 70 && f.state !== FighterState.DIZZY && f.state !== FighterState.KNOCKDOWN) {
+      ctx.save();
+      ctx.globalCompositeOperation = 'screen';
+      ctx.globalAlpha = (f.stunGauge - 70) / 100 * 0.08;
+      ctx.fillStyle = '#ffaa44';
+      ctx.fillRect(sx + leanOffsetX - hw, sy - f.displayHeight, hw * 2, f.displayHeight);
+      ctx.restore();
     }
 
     // KOF2002: 削血致死警告 — HP<10%且防御中时脉冲红光
