@@ -15,7 +15,6 @@ import { type FeedbackTier } from '../core/feedbackManifest.js';
 import { RYO_MOVE_LIST } from '../content/characters/ryo/commands/ryoCommands.js';
 import { KYO_MOVE_LIST } from '../content/characters/kyo/commands/kyoCommands.js';
 import { IORI_MOVE_LIST } from '../content/characters/iori/commands/ioriCommands.js';
-import { MOVE_NAME_MAP } from '../combat/hitCallback.js';
 
 // ─── Move name registry ─────────────────────────────────────────
 
@@ -24,7 +23,7 @@ interface MoveNameEntry {
   tier: FeedbackTier;
 }
 
-/** Build AttackType → MoveNameEntry map from a move list, using Chinese names from MOVE_NAME_MAP */
+/** Build AttackType → MoveNameEntry map from a move list, preferring Chinese names */
 function buildMap(
   list: ReadonlyArray<{ name: string; type: string; attackTypeKey?: string }>,
 ): Partial<Record<string, MoveNameEntry>> {
@@ -33,10 +32,37 @@ function buildMap(
     if (!entry.attackTypeKey) continue;
     const tier = entry.type as FeedbackTier;
     if (tier !== 'special' && tier !== 'dm' && tier !== 'sdm' && tier !== 'hsdm') continue;
-    map[entry.attackTypeKey] = { displayName: entry.name, tier };
+    const cnName = CN_MOVE_NAMES[entry.attackTypeKey];
+    map[entry.attackTypeKey] = { displayName: cnName ?? entry.name, tier };
   }
   return map;
 }
+
+/** Chinese move name registry — KOF2002 authentic naming */
+const CN_MOVE_NAMES: Record<string, string> = {
+  // Ryo
+  RYO_KOOU: '虎煌拳', RYO_KOOU_C: '虎煌拳', RYO_KO_HOU: '虎咆', RYO_KO_HOU_C: '虎咆',
+  RYO_HIEN: '飛燕疾風脚', RYO_HAOU: '霸王翔吼拳', RYO_KOOUKEN_D: '虎煌拳',
+  RYO_HIO_HACKER: '氷果斬', RYO_ZANRETSU_KEN: '斩裂拳',
+  DM_TEN_HA_OU: '天地霸煌拳', SDM_TEN_HA_OU: '天地霸煌拳',
+  DM_RYUKO_RANBU: '龍虎乱舞', SDM_RYUKO_RANBU: '龍虎乱舞', HSDM_RYUKO_RANBU: '龍虎乱舞',
+  RYO_TSURIZAO: '釣瓶打', RYO_ORISHI: '卸し',
+  // Kyo
+  KYO_YAMIBARAI: '闇払い', KYO_YAMIBARAI_C: '闇払い', KYO_ONIYAKI: '鬼焼き', KYO_ONIYAKI_C: '鬼焼き',
+  KYO_75KAI: '七拾五式・改', KYO_75KAI_2: '七拾五式・改', KYO_RED_KICK: 'R.E.D.KICK',
+  KYO_ARAGAMI: '荒咬み', KYO_ARAGAMI_KONOKIZU: '九傷', KYO_ARAGAMI_YANOSABI: '八錆',
+  KYO_NANASE: '七瀬', KYO_KOTO_TSUKI: '琴月陽', KYO_YAKISOGI: '破砕',
+  KYO_DOKUGAMI: '毒咬み', KYO_TSUMIYOMI: '罪詠み', KYO_BATSUYOMI: '罰詠み',
+  CMD_GOFU_YOU: '轟斧陽', CMD_88SHIKI: '八拾八式', CMD_NARAKU: '奈落落とし',
+  DM_OROCHINAGI: '大蛇薙', SDM_OROCHINAGI: '大蛇薙', HSDM_OROCHINAGI: '大蛇薙',
+  // Iori
+  IORI_YAMIBARAI: '闇払い', IORI_YAMIBARAI_C: '闇払い', IORI_ONIYAKI: '鬼焼き', IORI_ONIYAKI_C: '鬼焼き',
+  IORI_KOTOTSUKI: '琴月陰', IORI_KOTOTSUKI_D: '琴月陰', IORI_KUZUKAZE: '屑風',
+  IORI_AOIHANA: '葵花', IORI_AOIHANA_2: '葵花', IORI_AOIHANA_3: '葵花',
+  IORI_AOIHANA_C: '葵花', IORI_AOIHANA_C_2: '葵花', IORI_AOIHANA_C_3: '葵花',
+  IORI_YUMEYUMI: '弓月', IORI_KATANUGI: '鉈薙', IORI_YUKIWARUI: '雪割',
+  DM_YATAGARASU: '八咫烏', SDM_YATAGARASU: '八咫烏', HSDM_YAOTOME: '八咫烏',
+};
 
 const MOVE_NAMES: Record<string, Partial<Record<string, MoveNameEntry>>> = {
   ryo: buildMap(RYO_MOVE_LIST),
@@ -129,12 +155,10 @@ function drawSNKText(
   ctx.font = `bold ${size}px "Courier New", monospace`;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  // Black stroke outline
   ctx.strokeStyle = '#000000';
   ctx.lineWidth = Math.max(2, size * 0.08);
   ctx.lineJoin = 'round';
   ctx.strokeText(text, x, y);
-  // Color fill
   ctx.fillStyle = color;
   ctx.fillText(text, x, y);
 }
@@ -145,7 +169,7 @@ export function drawMoveNameDisplay(ctx: CanvasRenderingContext2D): void {
   const progress = state.timer / state.duration;
   ctx.save();
 
-  // Alpha curve: burst in at 0-10%, hold 10-60%, fade out 60-100%
+  // Alpha curve: burst in 0-10%, hold 10-60%, fade out 60-100%
   let alpha: number;
   if (progress < 0.1) {
     alpha = progress / 0.1;
@@ -158,7 +182,6 @@ export function drawMoveNameDisplay(ctx: CanvasRenderingContext2D): void {
 
   const y = 88;
 
-  // Tier-specific styling
   switch (state.tier) {
     case 'hsdm': {
       // Full-screen golden flash on first 8 frames
@@ -184,7 +207,6 @@ export function drawMoveNameDisplay(ctx: CanvasRenderingContext2D): void {
       ctx.shadowColor = '#ffcc00';
       ctx.shadowBlur = 30;
       drawSNKText(ctx, state.text, state.x, y, fontSize, '#ffcc00');
-      // Second layer for brightness
       ctx.shadowBlur = 15;
       drawSNKText(ctx, state.text, state.x, y, fontSize, '#ffffff');
       ctx.shadowBlur = 0;
@@ -223,7 +245,6 @@ export function drawMoveNameDisplay(ctx: CanvasRenderingContext2D): void {
       break;
     }
     case 'dm': {
-      // Burst-in with character color
       const burstScale = state.timer < 4 ? 1 + (1 - state.timer / 4) * 0.6 : 1;
       const fontSize = Math.round(22 * burstScale);
       ctx.shadowColor = state.charColor;
