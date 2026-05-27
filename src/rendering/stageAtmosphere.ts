@@ -29,6 +29,8 @@ interface StageAtmosphere {
   particleColor: string;
   /** Ground fog tint [r, g, b] */
   fogTint: [number, number, number];
+  /** Dust particle colors [primary, secondary] */
+  dustColors: [string, string];
 }
 
 const STAGE_ATMOSPHERE: Record<StageId, StageAtmosphere> = {
@@ -41,6 +43,7 @@ const STAGE_ATMOSPHERE: Record<StageId, StageAtmosphere> = {
     vigTint: [40, 20, 5],
     particleColor: '#ffddaa',
     fogTint: [200, 170, 130],
+    dustColors: ['#c8a882', '#a08868'],
   },
   china: {
     gradeColor: [255, 80, 40, 0.05],
@@ -51,6 +54,7 @@ const STAGE_ATMOSPHERE: Record<StageId, StageAtmosphere> = {
     vigTint: [50, 12, 12],
     particleColor: '#ffaaaa',
     fogTint: [200, 150, 130],
+    dustColors: ['#c89070', '#a07050'],
   },
   factory: {
     gradeColor: [60, 100, 180, 0.05],
@@ -61,6 +65,7 @@ const STAGE_ATMOSPHERE: Record<StageId, StageAtmosphere> = {
     vigTint: [8, 18, 35],
     particleColor: '#aaddff',
     fogTint: [130, 140, 160],
+    dustColors: ['#7788aa', '#607088'],
   },
   orochi: {
     gradeColor: [120, 40, 180, 0.06],
@@ -71,6 +76,7 @@ const STAGE_ATMOSPHERE: Record<StageId, StageAtmosphere> = {
     vigTint: [25, 5, 35],
     particleColor: '#cc88ff',
     fogTint: [150, 120, 170],
+    dustColors: ['#8866aa', '#665088'],
   },
   street: {
     gradeColor: [255, 140, 40, 0.04],
@@ -81,11 +87,17 @@ const STAGE_ATMOSPHERE: Record<StageId, StageAtmosphere> = {
     vigTint: [35, 15, 5],
     particleColor: '#ffcc88',
     fogTint: [170, 150, 130],
+    dustColors: ['#aa9070', '#887060'],
   },
 };
 
 export function getStageAtmosphere(stageId: StageId): StageAtmosphere {
-  return STAGE_ATMOSPHERE[stageId];
+  return STAGE_ATMOSPHERE[stageId] || STAGE_ATMOSPHERE.temple;
+}
+
+/** Get stage-specific dust particle colors */
+export function getStageDustColors(stageId: StageId): [string, string] {
+  return STAGE_ATMOSPHERE[stageId]?.dustColors || ['#aaaabb', '#888899'];
 }
 
 /** Draw the color grading overlay for a stage */

@@ -48,6 +48,8 @@ import {
   spawnTierSparks,
   spawnScreenCracks,
 } from './vfxPresets.js';
+import { getStageDustColors } from './stageAtmosphere.js';
+import { getStage } from './stage.js';
 import type { Particle } from './vfxPresets.js';
 
 // re-export Particle接口, 保持外部导入路径不变
@@ -227,7 +229,8 @@ export class VFXSystem {
   }
 
   spawnDust(worldX: number, worldY: number): void {
-    spawnDust(this.particles, worldX, worldY);
+    const dustColors = getStageDustColors(getStage());
+    spawnDust(this.particles, worldX, worldY, dustColors);
   }
 
   spawnHeavyDust(worldX: number, worldY: number, count?: number): void {

@@ -753,8 +753,9 @@ export function spawnRecoverySpark(particles: Particle[], worldX: number, worldY
   }
 }
 
-export function spawnDust(particles: Particle[], worldX: number, worldY: number): void {
-  // KOF2002: 尘土更飘散 — 10个粒子, 更宽分布
+export function spawnDust(particles: Particle[], worldX: number, worldY: number, dustColors?: [string, string]): void {
+  // KOF2002: 尘土更飘散 — 10个粒子, 更宽分布, stage-specific colors
+  const colors = dustColors || ['#aaaabb', '#888899'];
   for (let i = 0; i < 10; i++) {
     const dir = (i - 5) * 1.5;
     particles.push({
@@ -763,7 +764,7 @@ export function spawnDust(particles: Particle[], worldX: number, worldY: number)
       life: 15 + Math.floor(Math.random() * 8),
       maxLife: 23,
       size: 3 + Math.random() * 5,
-      color: i % 3 === 0 ? '#aaaabb' : '#888899', type: 'spark', gravity: 0.04, friction: 0.94,
+      color: i % 3 === 0 ? colors[0] : colors[1], type: 'spark', gravity: 0.04, friction: 0.94,
     });
   }
 }
