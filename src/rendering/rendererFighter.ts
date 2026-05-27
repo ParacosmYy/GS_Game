@@ -381,6 +381,13 @@ export function drawFighters(
       ctx.scale(1 + breathe, 1 - breathe);
       ctx.translate(0, sy);
     }
+    // KOF2002: 蹲姿呼吸 — CROUCH时更慢更深的呼吸
+    if (f.state === FighterState.CROUCH) {
+      const crouchBreathe = Math.sin(globalTick * 0.05) * 0.005;
+      ctx.translate(0, -sy);
+      ctx.scale(1 + crouchBreathe, 1 - crouchBreathe);
+      ctx.translate(0, sy);
+    }
 
     // KOF2002: Hit-stop defender jitter — 确定性正弦抖动产生稳定震动感
     if (hitStopDefender >= 0 && playerIdx === hitStopDefender) {
@@ -957,6 +964,16 @@ export function drawFighters(
       ctx.beginPath();
       ctx.ellipse(sx, sy - f.displayHeight / 2, hw + 8, f.displayHeight / 2 + 5, 0, 0, Math.PI * 2);
       ctx.fill();
+      // KOF2002: 蓄力上升粒子 — COUNTER_STANCE时蓝色微粒向上漂浮
+      if (f.stateAge % 3 === 0) {
+        const particleX = sx + (Math.random() - 0.5) * hw * 2;
+        const particleY = sy - Math.random() * f.displayHeight * 0.5;
+        ctx.globalAlpha = 0.3;
+        ctx.fillStyle = '#66aaff';
+        ctx.beginPath();
+        ctx.arc(particleX, particleY, 1.5, 0, Math.PI * 2);
+        ctx.fill();
+      }
       ctx.restore();
     }
 
