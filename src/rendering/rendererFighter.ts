@@ -583,6 +583,19 @@ export function drawFighters(
       ctx.restore();
     }
 
+    // KOF2002: 反击架势蓄力发光 — COUNTER_STANCE时身体蓄力蓝色光环
+    if (f.state === FighterState.COUNTER_STANCE && f.stateAge > 5) {
+      ctx.save();
+      ctx.globalCompositeOperation = 'screen';
+      const chargeAlpha = Math.min((f.stateAge - 5) * 0.01, 0.12);
+      ctx.globalAlpha = chargeAlpha + Math.sin(globalTick * 0.3) * 0.03;
+      ctx.fillStyle = '#4488ff';
+      ctx.beginPath();
+      ctx.ellipse(sx, sy - f.displayHeight / 2, hw + 8, f.displayHeight / 2 + 5, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+
     // KOF2002: KO状态红色覆盖 — 倒地后身体发红
     if (f.health <= 0) {
       ctx.fillStyle = 'rgba(180, 20, 20, 0.15)';
