@@ -1,0 +1,100 @@
+/**
+ * Kyo win pose animation — 2-frame victory stance
+ * 48x72 px, shared Kyo palette.
+ */
+
+import type { PixelFrame } from './kyoIdleFrames.js';
+import { KYO_PALETTE } from './kyoIdleFrames.js';
+
+const W = 48;
+function r(s: string): number[] {
+  const padded = s.padEnd(W, '.').slice(0, W);
+  return padded.split('').map(ch => {
+    if (ch === '.') return 0;
+    if (ch >= '0' && ch <= '9') return ch.charCodeAt(0) - 48;
+    if (ch >= 'a' && ch <= 'n') return ch.charCodeAt(0) - 87;
+    return 0;
+  });
+}
+
+// Victory pose — fist raised, confident stance
+const WIN0: number[][] = [
+  r(''),
+  r(''),
+  r('..............132'),
+  r('.............135531'),
+  r('............12566521'),
+  r('...........123566532'),
+  r('..........1234566532'),
+  r('.........11234556521'),
+  r('........11234556521'),
+  r('.......1123445651'),
+  r('......1123345651'),
+  r('.....1123454651'),
+  r('....1123n8a91'),
+  r('...112389a91'),
+  r('..112389a91'),
+  r('.112389a91'),
+  r('112389b91'),
+  r('1c9b1'),
+  r('1c8a1'),
+  r('1d9b1'),
+  r('.1c8a12'),
+  r('.1d9a12'),
+  r('..1c8b1pq'),
+  r('..1d9a1opq'),
+  r('...1c8nopq'),
+  r('...1d9mnop'),
+  r('...1c8klmn'),
+  r('...1d9jklm'),
+  r('...1c8a1'),
+  r('...1d9b1'),
+  r('...1c8a1'),
+  r('..1d9b1'),
+  r('..1c8a1'),
+  r('.1klm1'),
+  r('.1klmk1'),
+  r('1klmklmk1'),
+  r('1klmklm1'),
+  r('1klmkl1'),
+  r('1klmk1'),
+  r('.1n1'),
+  r('.1n1'),
+  r(''),
+  r(''),
+  r(''),
+  r(''),
+  r(''),
+  r(''),
+  r(''),
+  r(''),
+  r(''),
+  r(''),
+  r(''),
+  r(''),
+  r(''),
+  r(''),
+  r(''),
+  r(''),
+  r(''),
+  r(''),
+  r(''),
+  r(''),
+  r(''),
+  r(''),
+  r(''),
+  r(''),
+  r(''),
+  r(''),
+  r(''),
+  r(''),
+  r(''),
+  r(''),
+];
+
+const WIN1: number[][] = WIN0.map(row => [...row]);
+
+export const KYO_WIN_FRAMES: PixelFrame[] = [WIN0, WIN1].map(pixels => ({
+  width: W, height: 72, palette: KYO_PALETTE, pixels,
+  anchor: { x: Math.floor(W / 2), y: 72 },
+}));

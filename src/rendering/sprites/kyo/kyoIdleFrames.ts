@@ -61,7 +61,7 @@ export interface PixelFrame {
 }
 
 /* ---------- shared palette ---------- */
-const PALETTE: Record<number, string> = {
+export const KYO_PALETTE: Record<number, string> = {
   0: 'transparent',
   1: '#080604',
   2: '#1a1208',
@@ -577,7 +577,7 @@ const F5: number[][] = [
 export const KYO_IDLE_FRAMES: PixelFrame[] = [F0, F1, F2, F3, F4, F5].map(pixels => ({
   width: W,
   height: 72,
-  palette: PALETTE,
+  palette: KYO_PALETTE,
   pixels,
   anchor: { x: Math.floor(W / 2), y: 72 },
 }));

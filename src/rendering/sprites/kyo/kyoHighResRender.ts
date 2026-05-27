@@ -33,6 +33,10 @@ import { KYO_CROUCH_A_FRAMES, KYO_CROUCH_C_FRAMES, KYO_CROUCH_B_FRAMES, KYO_CROU
 import { KYO_AIR_A_FRAMES, KYO_AIR_C_FRAMES, KYO_AIR_D_FRAMES } from './kyoAirAttackFrames.js';
 import { KYO_CLOSE_A_FRAMES, KYO_CLOSE_C_FRAMES, KYO_CLOSE_B_FRAMES, KYO_CLOSE_D_FRAMES } from './kyoCloseAttackFrames.js';
 import { KYO_ONIYAKI_FRAMES, KYO_ONIYAKI_C_FRAMES, KYO_YAMIBARAI_FRAMES, KYO_RED_KICK_FRAMES, KYO_75KAI_FRAMES, KYO_ARAGAMI_FRAMES, KYO_DOKUGAMI_FRAMES, KYO_OROCHINAGI_DM_FRAMES, KYO_OROCHINAGI_SDM_FRAMES } from './kyoSpecialFrames.js';
+import { KYO_RUN_FRAMES, KYO_BACKDASH_FRAMES, KYO_ROLL_FRAMES, KYO_BACK_ROLL_FRAMES, KYO_GUARD_CRUSH_FRAMES, KYO_MAX_MODE_FRAMES, KYO_TAUNT_FRAMES, KYO_COUNTER_STANCE_FRAMES } from './kyoMovementFrames.js';
+import { KYO_DIZZY_FRAMES } from './kyoDizzyFrames.js';
+import { KYO_THROW_FRAMES } from './kyoThrowFrames.js';
+import { KYO_WIN_FRAMES } from './kyoWinFrames.js';
 
 // ===== Registry & Cache =====
 
@@ -102,6 +106,21 @@ function initKyoFrames(): void {
   registerVariableFrames('OROCHINAGI_DM', KYO_OROCHINAGI_DM_FRAMES, [8, 4, 14, 8, 12]);
   registerVariableFrames('OROCHINAGI_SDM', KYO_OROCHINAGI_SDM_FRAMES, [10, 6, 20, 12, 8, 10]);
 
+  // Movement
+  registerVariableFrames('RUN', KYO_RUN_FRAMES, [3, 3, 2, 2, 3, 2]);
+  registerVariableFrames('BACKDASH', KYO_BACKDASH_FRAMES, [2, 2, 3, 4]);
+  registerVariableFrames('ROLL', KYO_ROLL_FRAMES, [3, 3, 4, 5]);
+  registerVariableFrames('BACK_ROLL', KYO_BACK_ROLL_FRAMES, [3, 3, 4, 5]);
+
+  // Status / misc
+  registerVariableFrames('DIZZY', KYO_DIZZY_FRAMES, [8, 10, 8, 12, 8, 10, 8, 14]);
+  registerVariableFrames('THROW', KYO_THROW_FRAMES, [3, 4, 5, 6, 8, 10]);
+  registerVariableFrames('GUARD_CRUSH', KYO_GUARD_CRUSH_FRAMES, [4, 10]);
+  registerVariableFrames('MAX_MODE', KYO_MAX_MODE_FRAMES, [3, 4, 8]);
+  registerVariableFrames('TAUNT', KYO_TAUNT_FRAMES, [10, 14, 12, 16]);
+  registerVariableFrames('COUNTER_STANCE', KYO_COUNTER_STANCE_FRAMES, [4, 6, 10]);
+  registerVariableFrames('WIN', KYO_WIN_FRAMES, [6, 30]);
+
   // Damage
   registerVariableFrames('HURT', KYO_HURT_FRAMES, [3, 5, 6, 4]);
   registerVariableFrames('KNOCKDOWN', KYO_KNOCKDOWN_FRAMES, [4, 5, 6, 8, 10, 12]);
@@ -120,6 +139,14 @@ function resolveKyoFrameKey(
       return 'IDLE';
     case FighterState.WALK:
       return (vx * facing > 0) ? 'WALK_FORWARD' : 'WALK_BACKWARD';
+    case FighterState.RUN:
+      return 'RUN';
+    case FighterState.BACKDASH:
+      return 'BACKDASH';
+    case FighterState.ROLL:
+      return 'ROLL';
+    case FighterState.BACK_ROLL:
+      return 'BACK_ROLL';
     case FighterState.STAND_ATTACK:
       if (currentAttack === AttackType.KYO_ONIYAKI) return 'ONIYAKI';
       if (currentAttack === AttackType.KYO_ONIYAKI_C) return 'ONIYAKI_C';
@@ -164,6 +191,23 @@ function resolveKyoFrameKey(
       return 'HURT';
     case FighterState.KNOCKDOWN:
       return 'KNOCKDOWN';
+    case FighterState.GETUP:
+      return 'KNOCKDOWN';
+    case FighterState.THROW:
+      return 'THROW';
+    case FighterState.BLOCK:
+    case FighterState.AIR_BLOCK:
+      return 'BLOCK';
+    case FighterState.DIZZY:
+      return 'DIZZY';
+    case FighterState.GUARD_CRUSH:
+      return 'GUARD_CRUSH';
+    case FighterState.MAX_MODE:
+      return 'MAX_MODE';
+    case FighterState.TAUNT:
+      return 'TAUNT';
+    case FighterState.COUNTER_STANCE:
+      return 'COUNTER_STANCE';
     default:
       return null;
   }
