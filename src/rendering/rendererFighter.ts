@@ -1305,6 +1305,8 @@ export function resolveFighterColors(f: Fighter, globalTick: number): { bodyColo
     outlineColor = '#4488ff50';
     glowColor = '#4466ff20';
   }
+  // KOF2002: 浮空受击下落粒子
+  // Note: particles rendered in drawFighter, color only here
 
   return { bodyColor, outlineColor, glowColor };
 }
