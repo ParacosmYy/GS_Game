@@ -606,6 +606,12 @@ export function resolveFighterColors(f: Fighter, globalTick: number): { bodyColo
       break;
   }
 
+  // KOF2002: Counter hit发光 — 反击命中后短暂橙色轮廓
+  if (f.counterGlowFrames > 0) {
+    glowColor = '#ff8800';
+    outlineColor = '#ff660088';
+  }
+
   return { bodyColor, outlineColor, glowColor };
 }
 

@@ -420,6 +420,9 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       deps.screenFlash.trigger('#ffffcc', 0.05, 2);
     }
 
+    // KOF2002: Counter hit发光轮廓 — 反击命中时攻击者短暂橙色轮廓
+    if (counterHit) { attacker.counterGlowFrames = 6; }
+
     // 取消点闪光 — 命中(非投技)时在攻击者身上显示可取消提示
     if (!isThrowAttack(attackType)) {
       deps.vfx.spawnCancelFlash(attacker.x, attacker.y, attacker.displayHeight);

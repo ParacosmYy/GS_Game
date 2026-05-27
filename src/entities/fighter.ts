@@ -228,6 +228,9 @@ export class Fighter {
   // Super move background flash: DM/SDM hit causes brief screen dim
   superBgFlashFrames = 0;
 
+  // Counter hit outline glow: counter hit causes brief bright outline
+  counterGlowFrames = 0;
+
   // Previous frame state tracking (for combo reset detection)
   private _prevState: FighterState = FighterState.IDLE;
   get prevState(): FighterState { return this._prevState; }
@@ -647,6 +650,7 @@ export class Fighter {
     if (this.hitConfirmDelay > 0) this.hitConfirmDelay--;
     if (this.hitFlashFrames > 0) this.hitFlashFrames--;
     if (this.superBgFlashFrames > 0) this.superBgFlashFrames--;
+    if (this.counterGlowFrames > 0) this.counterGlowFrames--;
     if (this.throwBufferTimer > 0) this.throwBufferTimer--;
     // Ground bounce timer: when expired, fighter lands normally
     if (this.groundBounceTimer > 0) {
