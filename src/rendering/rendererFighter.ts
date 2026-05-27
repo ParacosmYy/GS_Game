@@ -225,6 +225,15 @@ export function drawFighters(
     if (f.invincible || f.throwInvulnFrames > 0) {
       ctx.globalAlpha = 0.6 + Math.sin(globalTick * 0.5) * 0.15;
     }
+    // KOF2002: 挑衅微光 — TAUNT时身体微弱金色闪烁
+    if (f.state === FighterState.TAUNT) {
+      ctx.save();
+      ctx.globalCompositeOperation = 'screen';
+      ctx.globalAlpha = 0.06 + Math.sin(globalTick * 0.2) * 0.03;
+      ctx.fillStyle = '#ffcc44';
+      ctx.fillRect(sx + leanOffsetX - hw, sy - f.displayHeight, hw * 2, f.displayHeight);
+      ctx.restore();
+    }
     // KOF2002: 投技无敌金色轮廓 — throwInvuln期间金色边框
     if (f.throwInvulnFrames > 0 && !f.invincible) {
       ctx.save();
@@ -410,8 +419,9 @@ export function drawFighters(
     if (f.hitFlashFrames > 0 && f.state !== FighterState.HITSTUN && f.state !== FighterState.KNOCKDOWN) {
       ctx.save();
       ctx.globalCompositeOperation = 'screen';
-      ctx.globalAlpha = 0.08;
-      ctx.fillStyle = '#ffffff';
+      const hitGlowColor = maxModeActive ? '#44ff88' : '#ffffff';
+      ctx.globalAlpha = maxModeActive ? 0.12 : 0.08;
+      ctx.fillStyle = hitGlowColor;
       ctx.fillRect(sx + leanOffsetX - hw - 3, sy - f.displayHeight - 3, (hw + 3) * 2, f.displayHeight + 6);
       ctx.restore();
     }
