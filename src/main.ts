@@ -896,6 +896,12 @@ function update(): void {
       combatSystem.resetCombo(i);
     }
     if (f.prevState === FighterState.BLOCK && f.state === FighterState.IDLE) vfx.spawnDust(f.x, STAGE_GROUND_Y);
+    // Heavy knockdown impact: entering KNOCKDOWN from air/hitstun = ground slam
+    if (f.state === FighterState.KNOCKDOWN && f.prevState !== FighterState.KNOCKDOWN && f.prevState !== FighterState.GETUP) {
+      vfx.spawnGroundSlam(f.x, STAGE_GROUND_Y);
+      vfx.spawnImpactRing(f.x, STAGE_GROUND_Y, 1.2);
+      vfx.spawnHeavyDust(f.x, STAGE_GROUND_Y, 16);
+    }
     // Wakeup detection: KNOCKDOWN->GETUP (start of getup) or GETUP->IDLE (getup complete)
     if (f.prevState === FighterState.KNOCKDOWN && f.state === FighterState.GETUP) {
       vfx.spawnDust(f.x, STAGE_GROUND_Y);
