@@ -5,7 +5,7 @@
 import { Fighter } from '../entities/fighter.js';
 import { FighterState } from '../core/types.js';
 import type { MaxModeState } from '../core/types.js';
-import { FIGHTER_WIDTH, STAGE_GROUND_Y } from '../core/constants.js';
+import { FIGHTER_WIDTH, STAGE_GROUND_Y, STAGE_LEFT, STAGE_RIGHT } from '../core/constants.js';
 import { shiftColor } from './utils.js';
 import { drawSkeletalFighter } from './skeletalFighter.js';
 import { drawAttackLimb } from './attackLimb.js';
@@ -351,6 +351,27 @@ export function drawFighters(
       ctx.arc(sx, sy - f.displayHeight / 2, hw + 10, 0, Math.PI * 2);
       ctx.stroke();
       ctx.restore();
+    }
+    // KOF2002: 角落撞击火花 — 被打向角落时额外飞溅
+    if (f.state === FighterState.HITSTUN && f.stateAge < 3) {
+      const nearLeft = f.x - STAGE_LEFT < 30;
+      const nearRight = STAGE_RIGHT - f.x < 30;
+      if (nearLeft || nearRight) {
+        ctx.save();
+        const wallX = nearLeft ? STAGE_LEFT - cameraX : STAGE_RIGHT - cameraX;
+        ctx.globalAlpha = (3 - f.stateAge) / 3 * 0.5;
+        for (let sp = 0; sp < 4; sp++) {
+          const sparkAngle = (sp / 4) * Math.PI + (nearLeft ? 0 : Math.PI);
+          const sparkDist = 5 + f.stateAge * 8;
+          const sparkX = wallX + Math.cos(sparkAngle) * sparkDist;
+          const sparkY = sy - f.displayHeight / 2 + Math.sin(sparkAngle) * sparkDist * 0.5;
+          ctx.fillStyle = '#ffee66';
+          ctx.beginPath();
+          ctx.arc(sparkX, sparkY, 2 - f.stateAge * 0.5, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.restore();
+      }
     }
     // KOF2002: 命中停顿攻击者发光 — hitstop时攻击者微白轮廓
     if (f.hitFlashFrames > 0 && f.state !== FighterState.HITSTUN && f.state !== FighterState.KNOCKDOWN) {
