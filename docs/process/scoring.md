@@ -2,7 +2,7 @@
 
 ## 1. 当前分数
 
-当前总分：`153/2000`
+当前总分：`154/2000`
 
 完整历史见 [SCORE.history.md](../archive/SCORE.history.md)。
 
@@ -16,7 +16,7 @@
 | 舞台美术 | 100 | 8 | 5场景视差+动态元素+CRT扫描线后处理+暗角+场景飘浮微粒+5舞台专属色彩分级+光柱+氛围雾气+场景专属尘土色 |
 | 音频品质 | 150 | 16 | 合成SFX+BGM+Kyo 7种火焰SFX+Iori 8种暗紫SFX+Kyo/Iori专属attackSFX接入+连段递增音效+里程碑音效+菜单光标/确认SFX+DoubleKO/DrawGame播报+倒计时10秒警告铃声+角色专属攻击发声(kiai)+受击发声(hurt voice) |
 | 角色内容 | 150 | 19 | Ryo全闭环+Kyo 14文件+Iori 14文件+三角色contentLoader集成 |
-| 战斗手感 | 150 | 29 | 全反馈矩阵(6档)+MAX金色反馈+HSDM专属+SDM修正+绝境红闪+MAX移动残影+GC Roll/CD激活火花+重攻击swoosh+连击里程碑音效(5/10/15+)+DM发动名称横幅(SDM/HSDM分色) |
+| 战斗手感 | 150 | 30 | 全反馈矩阵(6档)+MAX金色反馈+HSDM专属+SDM修正+绝境红闪+MAX移动残影+GC Roll/CD激活火花+重攻击swoosh+连击里程碑音效(5/10/15+)+DM发动名称横幅(SDM/HSDM分色)+跑步速度线 |
 | 帧数据精度 | 100 | 25 | 全部42种动画状态变量帧节奏完成(idle/walk/attack/crouch/jump/air/special/DM/SDM/HSDM/movement/sub-state/win) |
 | 游戏流程 | 100 | 27 | 完整街机流程+3v3+训练模式+MATCH POINT+暂停菜单+OPTIONS+回合开始持续提示+KO结果HP对比+街机模式对手递进+舞台轮换+街机得分系统 |
 | UI/HUD品质 | 50 | 15 | SNK风格能量槽+计时器+连段计数器+播报+像素帧缓存+暂停菜单(招式/按键)+训练模式SNK风格招式表 |
