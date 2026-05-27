@@ -18,6 +18,24 @@ import { getFighterBlender } from './animationBlender.js';
 
 const fighterDebugOverlayEnabled = isFighterDebugOverlayEnabled();
 
+// ===== Per-character MAX aura color =====
+// KOF2002: each character has a distinct energy color in MAX mode
+interface MaxAuraColor {
+  fill: string;     // rgba for aura glow
+  stroke: string;   // rgba for outline pulse
+  css: string;      // hex for spark/trail tinting
+}
+
+const MAX_AURA_COLORS: Record<string, MaxAuraColor> = {
+  ryo:  { fill: 'rgba(68, 140, 255,',  stroke: 'rgba(68, 140, 255,', css: '#4488ff' },
+  kyo:  { fill: 'rgba(255, 140, 30,',   stroke: 'rgba(255, 120, 20,', css: '#ff8c1e' },
+  iori: { fill: 'rgba(170, 0, 255,',    stroke: 'rgba(150, 0, 255,',  css: '#aa00ff' },
+};
+
+function getMaxAuraColor(charId: string): MaxAuraColor {
+  return MAX_AURA_COLORS[charId] || { fill: 'rgba(68, 255, 136,', stroke: 'rgba(68, 255, 136,', css: '#44ff88' };
+}
+
 // Track previous state per fighter for blend trigger
 const prevStateMap = new Map<number, string>();
 // Track knockdown landing squash per fighter (frames remaining)
@@ -40,6 +58,8 @@ export function drawFighters(
     const isP1 = f === fighters[0];
     const playerIdx = isP1 ? 0 : 1;
     const maxModeActive = maxModes ? maxModes[playerIdx].active : false;
+    const charId = f.charId ?? '';
+    const maxAura = getMaxAuraColor(charId);
     const guardLow = f.guardGauge < 30;
 
     // Enhanced ground shadow
@@ -109,14 +129,14 @@ export function drawFighters(
       const auraPulse = debugOverlayEnabled
         ? 0.08 + Math.sin(globalTick * 0.1) * 0.04
         : 0.03 + Math.sin(globalTick * 0.1) * 0.015;
-      ctx.fillStyle = `rgba(68, 255, 136, ${Math.max(0, auraPulse)})`;
+      ctx.fillStyle = `${maxAura.fill}${Math.max(0, auraPulse)})`;
       ctx.beginPath();
       ctx.ellipse(sx, sy - f.displayHeight / 2, hw + 25, f.displayHeight / 2 + 20, 0, 0, Math.PI * 2);
       ctx.fill();
       const outlinePulse = debugOverlayEnabled
         ? Math.sin(globalTick * 0.15) * 0.3 + 0.4
         : Math.sin(globalTick * 0.15) * 0.12 + 0.18;
-      ctx.strokeStyle = `rgba(68, 255, 136, ${outlinePulse})`;
+      ctx.strokeStyle = `${maxAura.stroke}${outlinePulse})`;
       ctx.lineWidth = debugOverlayEnabled ? 3 : 1.5;
       ctx.beginPath();
       ctx.ellipse(sx, sy - f.displayHeight / 2, hw + 8, f.displayHeight / 2 + 8, 0, 0, Math.PI * 2);
@@ -351,7 +371,7 @@ export function drawFighters(
     if (f.state === FighterState.IDLE && f.landingRecovery > 0 && f.landingRecovery > 5) {
       ctx.save();
       ctx.globalAlpha = 0.15;
-      ctx.fillStyle = maxModeActive ? '#44ff88' : '#bbbbbb';
+      ctx.fillStyle = maxModeActive ? maxAura.css : '#bbbbbb';
       ctx.beginPath();
       ctx.ellipse(sx, sy, 10, 3, 0, 0, Math.PI * 2);
       ctx.fill();
@@ -418,11 +438,11 @@ export function drawFighters(
       ctx.fill();
       ctx.restore();
     }
-    // KOF2002: MAX模式跑步火花 — MAX+RUN时绿色火花
+    // KOF2002: MAX模式跑步火花 — MAX+RUN时角色专属能量火花
     if (maxModeActive && f.state === FighterState.RUN && f.stateAge % 3 === 0) {
       ctx.save();
       ctx.globalAlpha = 0.3;
-      ctx.fillStyle = '#44ff88';
+      ctx.fillStyle = maxAura.css;
       const sparkX = sx - f.facing * (5 + Math.random() * 15);
       const sparkY = sy - f.displayHeight * (0.3 + Math.random() * 0.4);
       ctx.beginPath();
@@ -592,7 +612,7 @@ export function drawFighters(
       if (f.hitFlashFrames > 0) {
         ctx.save();
         ctx.globalAlpha = 0.15;
-        ctx.strokeStyle = maxModeActive ? '#44ff88' : '#ffdd66';
+        ctx.strokeStyle = maxModeActive ? maxAura.css : '#ffdd66';
         ctx.lineWidth = 1.5;
         ctx.beginPath();
         ctx.arc(sx + f.facing * hw, sy - f.displayHeight * 0.5, 15, 0, Math.PI * 2);
@@ -687,7 +707,7 @@ export function drawFighters(
     if (f.hitFlashFrames > 0 && f.state !== FighterState.HITSTUN && f.state !== FighterState.KNOCKDOWN) {
       ctx.save();
       ctx.globalCompositeOperation = 'screen';
-      const hitGlowColor = maxModeActive ? '#44ff88' : '#ffffff';
+      const hitGlowColor = maxModeActive ? maxAura.css : '#ffffff';
       ctx.globalAlpha = maxModeActive ? 0.12 : 0.08;
       ctx.fillStyle = hitGlowColor;
       ctx.fillRect(sx + leanOffsetX - hw - 3, sy - f.displayHeight - 3, (hw + 3) * 2, f.displayHeight + 6);
@@ -867,11 +887,11 @@ export function drawFighters(
       ctx.restore();
     }
 
-    // KOF2002: MAX模式跑步火花 — MAX+RUN时脚下绿色光点
+    // KOF2002: MAX模式跑步火花 — MAX+RUN时角色专属能量光点
     if (maxModeActive && f.state === FighterState.RUN && f.stateAge % 4 === 0) {
       ctx.save();
       ctx.globalAlpha = 0.4;
-      ctx.fillStyle = '#44ff88';
+      ctx.fillStyle = maxAura.css;
       const sparkX = sx + (Math.random() - 0.5) * 20;
       ctx.beginPath();
       ctx.arc(sparkX, sy, 3, 0, Math.PI * 2);
@@ -881,7 +901,7 @@ export function drawFighters(
       if (f.hitFlashFrames > 0) {
         ctx.save();
         ctx.globalAlpha = 0.15;
-        ctx.strokeStyle = maxModeActive ? '#44ff88' : '#ffdd66';
+        ctx.strokeStyle = maxModeActive ? maxAura.css : '#ffdd66';
         ctx.lineWidth = 1.5;
         ctx.beginPath();
         ctx.arc(sx + f.facing * hw, sy - f.displayHeight * 0.5, 15, 0, Math.PI * 2);
@@ -947,9 +967,8 @@ export function drawFighters(
       ctx.fill();
       ctx.restore();
     }
-    // Try Kyo high-res first if character is Kyo, then Ryo, then fallback chain
+    // Try Kyo/Iori high-res first, then Ryo, then fallback chain
     let highResDrawn = false;
-    const charId = f.charId ?? '';
     if (charId === 'kyo') {
       highResDrawn = drawKyoHighResFrame(ctx, f.state, f.stateAge, sx + leanOffsetX, sy, f.facing, f.currentAttack, f.vx);
     } else if (charId === 'iori') {
@@ -1079,23 +1098,23 @@ export function drawFighters(
       ctx.fillRect(sx - glowR, sy - f.displayHeight / 2 - glowR, glowR * 2, glowR * 2);
       ctx.restore();
     }
-    // KOF2002: MAX模式边框脉冲 — MAX模式时角色周围脉冲金色边框
+    // KOF2002: MAX模式边框脉冲 — MAX模式时角色周围脉冲角色专属能量边框
     if (maxModeActive) {
       ctx.save();
       ctx.globalCompositeOperation = 'screen';
       ctx.globalAlpha = 0.15 + Math.sin(globalTick * 0.15) * 0.1;
-      ctx.strokeStyle = '#44ff88';
+      ctx.strokeStyle = maxAura.css;
       ctx.lineWidth = 2;
       ctx.beginPath();
       ctx.ellipse(sx, sy - f.displayHeight / 2, hw + 6, f.displayHeight / 2 + 6, 0, 0, Math.PI * 2);
       ctx.stroke();
       ctx.restore();
     }
-    // KOF2002: MAX模式激活爆发 — MAX_MODE stateAge<3时明亮扩散环
+    // KOF2002: MAX模式激活爆发 — MAX_MODE stateAge<3时角色专属能量扩散环
     if (f.state === FighterState.MAX_MODE && f.stateAge < 3) {
       ctx.save();
       ctx.globalAlpha = (3 - f.stateAge) / 3 * 0.4;
-      ctx.strokeStyle = '#44ff88';
+      ctx.strokeStyle = maxAura.css;
       ctx.lineWidth = 3;
       const maxBurstR = 15 + f.stateAge * 20;
       ctx.beginPath();
@@ -1260,7 +1279,7 @@ export function drawFighters(
       if (f.hitFlashFrames > 0) {
         ctx.save();
         ctx.globalAlpha = 0.15;
-        ctx.strokeStyle = maxModeActive ? '#44ff88' : '#ffdd66';
+        ctx.strokeStyle = maxModeActive ? maxAura.css : '#ffdd66';
         ctx.lineWidth = 1.5;
         ctx.beginPath();
         ctx.arc(sx + f.facing * hw, sy - f.displayHeight * 0.5, 15, 0, Math.PI * 2);
@@ -1364,7 +1383,7 @@ export function drawFighters(
       if (f.hitFlashFrames > 0) {
         ctx.save();
         ctx.globalAlpha = 0.15;
-        ctx.strokeStyle = maxModeActive ? '#44ff88' : '#ffdd66';
+        ctx.strokeStyle = maxModeActive ? maxAura.css : '#ffdd66';
         ctx.lineWidth = 1.5;
         ctx.beginPath();
         ctx.arc(sx + f.facing * hw, sy - f.displayHeight * 0.5, 15, 0, Math.PI * 2);
@@ -1417,7 +1436,7 @@ export function drawFighters(
       if (f.hitFlashFrames > 0) {
         ctx.save();
         ctx.globalAlpha = 0.15;
-        ctx.strokeStyle = maxModeActive ? '#44ff88' : '#ffdd66';
+        ctx.strokeStyle = maxModeActive ? maxAura.css : '#ffdd66';
         ctx.lineWidth = 1.5;
         ctx.beginPath();
         ctx.arc(sx + f.facing * hw, sy - f.displayHeight * 0.5, 15, 0, Math.PI * 2);
@@ -1451,7 +1470,7 @@ export function drawFighters(
       if (f.hitFlashFrames > 0) {
         ctx.save();
         ctx.globalAlpha = 0.15;
-        ctx.strokeStyle = maxModeActive ? '#44ff88' : '#ffdd66';
+        ctx.strokeStyle = maxModeActive ? maxAura.css : '#ffdd66';
         ctx.lineWidth = 1.5;
         ctx.beginPath();
         ctx.arc(sx + f.facing * hw, sy - f.displayHeight * 0.5, 15, 0, Math.PI * 2);
@@ -1474,7 +1493,7 @@ export function drawFighters(
       if (f.hitFlashFrames > 0) {
         ctx.save();
         ctx.globalAlpha = 0.15;
-        ctx.strokeStyle = maxModeActive ? '#44ff88' : '#ffdd66';
+        ctx.strokeStyle = maxModeActive ? maxAura.css : '#ffdd66';
         ctx.lineWidth = 1.5;
         ctx.beginPath();
         ctx.arc(sx + f.facing * hw, sy - f.displayHeight * 0.5, 15, 0, Math.PI * 2);
@@ -1715,7 +1734,7 @@ function drawAfterimageTrail(
     ? '#ff8844'
     : f.state === FighterState.BACKDASH
     ? '#6699ff'
-    : '#44ff88';
+    : '#88ddaa';
 
   const ghostCount = 3;
   for (let i = 1; i <= ghostCount; i++) {

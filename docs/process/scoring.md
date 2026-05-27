@@ -2,7 +2,7 @@
 
 ## 1. 当前分数
 
-当前总分：`219/2000`
+当前总分：`220/2000`
 
 完整历史见 [SCORE.history.md](../archive/SCORE.history.md)。
 
@@ -18,7 +18,7 @@ Phase 1 的 Ryo 基线已经闭合，当前评分更关心 Phase 2 的多角色�
 | 舞台美术 | 100 | 9 | 5场景视差+动态元素+CRT扫描线后处理+暗角+场景飘浮微粒+5舞台专属色彩分级+光柱+氛围雾气+场景专属尘土色+地面冲击波使用场景专属尘土色(木屑/水泥/紫能量) |
 | 音频品质 | 150 | 18 | 合成SFX+BGM+Kyo 7种火焰SFX+Iori 8种暗紫SFX+Kyo/Iori专属attackSFX接入+连段递增音效+里程碑音效+菜单光标/确认SFX+DoubleKO/DrawGame播报+倒计时10秒警告铃声+角色专属攻击发声(kiai)+受击发声(hurt voice)+胜利专属发声(victory voice)+晕眩专属发声(dizzy groan) |
 | 角色内容 | 150 | 19 | Ryo全闭环+Kyo 14文件+Iori 14文件+三角色contentLoader集成 |
-| 战斗手感 | 150 | 32 | 全反馈矩阵(6档)+MAX金色反馈+HSDM专属+SDM修正+绝境红闪+MAX移动残影+GC Roll/CD激活火花+重攻击swoosh+连击里程碑音效(5/10/15+)+DM发动名称横幅(SDM/HSDM分色)+跑步速度线+击倒落地冲击波+首次命中闪光+镜头脉冲缩放 |
+| 战斗手感 | 150 | 33 | 全反馈矩阵(6档)+MAX角色专属能量色(Ryo蓝/Kyo炎橙/Iori紫)+HSDM专属+SDM修正+绝境红闪+MAX移动残影(角色色)+GC Roll/CD激活火花+重攻击swoosh+连击里程碑音效(5/10/15+)+DM发动名称横幅(SDM/HSDM分色)+跑步速度线(角色色)+击倒落地冲击波+首次命中闪光+镜头脉冲缩放 |
 | 帧数据精度 | 100 | 25 | 全部42种动画状态变量帧节奏完成(idle/walk/attack/crouch/jump/air/special/DM/SDM/HSDM/movement/sub-state/win) |
 | 游戏流程 | 100 | 33 | 完整街机流程+3v3+训练模式+MATCH POINT+暂停菜单+OPTIONS+回合开始持续提示+KO结果HP对比+街机模式对手递进(难度渐进)+舞台轮换+街机得分系统+MATCH POINT回合开始提示+NEXT STAGE对手肖像预览+宿敌对决特殊对话(Kyo↔Iori等13组)+FINAL ROUND决胜局播报+街机完成成绩总结(得分/连段/完美/伤害+段位评级)+回合间KOF风格wipe过渡(金色边缘光) |
 | UI/HUD品质 | 50 | 17 | SNK风格能量槽+计时器+连段计数器+播报+像素帧缓存+暂停菜单(招式/按键)+训练模式SNK风格招式表+选人画面招式预览面板 |

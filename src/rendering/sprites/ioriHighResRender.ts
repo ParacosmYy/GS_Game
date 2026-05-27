@@ -4,14 +4,16 @@
  * Integration layer: connects Iori's high-resolution pixel frame data
  * with the pixelFrameRenderer drawing API.
  *
- * Currently supports: IDLE, WALK (forward/backward)
- * Fallback states (attack, crouch, etc.) will be added as frames are created.
+ * Currently supports: IDLE, WALK (forward/backward), CROUCH, STAND_ATTACK (A/C)
+ * Fallback states (jump, damage, etc.) will be added as frames are created.
  */
 
 import { FighterState, AttackType } from '../../core/types.js';
 import { drawPixelFrame, prerenderFrame, drawPrerenderedFrame, type PixelFrame, type PixelPalette } from './pixelFrameRenderer.js';
 import { IORI_IDLE_FRAMES } from './ioriIdleFrames.js';
 import { IORI_WALK_FORWARD_FRAMES, IORI_WALK_BACKWARD_FRAMES } from './ioriWalkFrames.js';
+import { IORI_CROUCH_FRAMES } from './ioriCrouchFrames.js';
+import { IORI_STAND_A_FRAMES, IORI_STAND_C_FRAMES } from './ioriAttackFrames.js';
 
 // ===== Internal Frame Registry =====
 
@@ -99,6 +101,13 @@ function initAllFrames(): void {
   // WALK — 4-frame forward/backward cycles
   registerFrames('WALK_FORWARD', IORI_WALK_FORWARD_FRAMES, 6);
   registerFrames('WALK_BACKWARD', IORI_WALK_BACKWARD_FRAMES, 7);
+
+  // CROUCH — 4-frame crouch cycle
+  registerFrames('CROUCH', IORI_CROUCH_FRAMES, 8);
+
+  // ATTACKS — STAND_A (4 frames) + STAND_C (5 frames)
+  registerVariableFrames('STAND_A', IORI_STAND_A_FRAMES, [4, 3, 4, 8]);
+  registerVariableFrames('STAND_C', IORI_STAND_C_FRAMES, [6, 4, 5, 5, 10]);
 }
 
 // ===== State Resolution =====
@@ -114,6 +123,14 @@ function resolveFrameKey(
       return 'IDLE';
     case FighterState.WALK:
       return (_vx * _facing > 0) ? 'WALK_FORWARD' : 'WALK_BACKWARD';
+    case FighterState.CROUCH:
+    case FighterState.CROUCH_ATTACK:
+      return 'CROUCH';
+    case FighterState.STAND_ATTACK:
+      if (_currentAttack === AttackType.STAND_C) {
+        return 'STAND_C';
+      }
+      return 'STAND_A';
     default:
       return null;
   }
