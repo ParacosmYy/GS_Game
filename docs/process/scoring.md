@@ -2,7 +2,11 @@
 
 ## 1. 当前分数
 
+<<<<<<< HEAD
 当前总分：`146/2000`
+=======
+当前总分：`146/2000`
+>>>>>>> b5b42fb (docs(scoring): 144->145/2000 special move variable frames)
 
 完整历史见 [SCORE.history.md](../archive/SCORE.history.md)。
 
@@ -17,8 +21,17 @@
 | 音频品质 | 150 | 15 | 合成SFX+BGM+Kyo 7种火焰SFX+Iori 8种暗紫SFX+Kyo/Iori专属attackSFX接入+连段递增音效+里程碑音效+菜单光标/确认SFX+DoubleKO/DrawGame播报+倒计时10秒警告铃声 |
 | 角色内容 | 150 | 19 | Ryo全闭环+Kyo 14文件+Iori 14文件+三角色contentLoader集成 |
 | 战斗手感 | 150 | 28 | 全反馈矩阵(6档)+MAX金色反馈+HSDM专属+SDM修正+绝境红闪+MAX移动残影+GC Roll/CD激活火花+重攻击swoosh+连击里程碑音效(5/10/15+) |
+<<<<<<< HEAD
 | 帧数据精度 | 100 | 21 | 全动作变量帧节奏(idle/walk/hurt/knockdown/全部通常攻击/近距离攻击/蹲伏/跳跃/空中攻击)对齐战斗相 |
 | 游戏流程 | 100 | 27 | 完整街机流程+3v3+训练模式+MATCH POINT+暂停菜单+OPTIONS+回合开始持续提示+KO结果HP对比+街机模式对手递进+舞台轮换+街机得分系统 |
+=======
+| 帧数据精度 | 100 | 22 | 全动作变量帧节奏(idle/walk/hurt/knockdown/全部通常攻击/近距离攻击/蹲伏/跳跃/空中攻击/6种必杀技)对齐战斗相 |
+<<<<<<< HEAD
+| 游戏流程 | 100 | 26 | 完整街机流程+3v3+训练模式+MATCH POINT+暂停菜单+OPTIONS+回合开始持续提示+KO结果HP对比+街机模式对手递进+舞台轮换 |
+=======
+| 游戏流程 | 100 | 26 | 完整街机流程+3v3+训练模式+MATCH POINT+暂停菜单+OPTIONS+回合开始持续提示+KO结果HP对比+回合切换黑幕淡入 |
+>>>>>>> d0f7746 (docs(scoring): 142->143/2000 round transition fade-in)
+>>>>>>> b5b42fb (docs(scoring): 144->145/2000 special move variable frames)
 | UI/HUD品质 | 50 | 14 | SNK风格能量槽+计时器+连段计数器+播报+像素帧缓存+暂停菜单(招式/按键)+训练模式SNK风格招式表 |
 
 ## 2.1 Phase 2 千分制维度（1001-2000）
