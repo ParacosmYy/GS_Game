@@ -49,6 +49,7 @@ vi.mock('../src/audio/sampler.js', () => ({
   playHaou: vi.fn(),
   playHioHacker: vi.fn(),
   playZanretsuKen: vi.fn(),
+  playComboMilestone: vi.fn(),
 }));
 
 vi.mock('../src/audio/bgm.js', () => ({

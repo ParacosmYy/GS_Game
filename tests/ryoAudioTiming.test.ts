@@ -44,6 +44,7 @@ vi.mock('../src/audio/sampler.js', () => ({
   playKoHou: () => { sfxLog.push('playKoHou'); },
   playHien: () => { sfxLog.push('playHien'); },
   playHaou: () => { sfxLog.push('playHaou'); },
+  playComboMilestone: (c: number) => { sfxLog.push(`playComboMilestone:${c}`); },
 }));
 
 vi.mock('../src/audio/bgm.js', () => ({
