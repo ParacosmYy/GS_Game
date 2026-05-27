@@ -119,7 +119,7 @@ function initAllFrames(): void {
 
   // WALK — forward and backward stored as separate entries
   registerFrames('WALK_FORWARD', RYO_WALK_FORWARD_FRAMES, 6);
-  registerFrames('WALK_BACKWARD', RYO_WALK_BACKWARD_FRAMES, 6);
+  registerFrames('WALK_BACKWARD', RYO_WALK_BACKWARD_FRAMES, 7);
 
   // ATTACK — stand_a (light punch) and stand_c (heavy punch)
   // STAND_A: startup=6, active=3, recovery=5 = 14 total; 4 frames × 4 tpf = 16
