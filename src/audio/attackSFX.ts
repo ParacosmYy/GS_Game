@@ -77,52 +77,54 @@ export const ATTACK_SFX_TABLE: AttackSFXEntry[] = [
   { attackType: 'DM_TEN_HA_OU', phase: 'startup', frame: 6, sfx: 'playSpecialHeavy', priority: 3 },
   { attackType: 'DM_TEN_HA_OU', phase: 'active', frame: 0, sfx: 'playDM', priority: 4 },
 
-  // ── Kyo normals — startup whoosh ──
+  // ── Kyo normals — startup whoosh + flame accent ──
   { attackType: 'KYO_STAND_A', phase: 'startup', frame: 0, sfx: 'playWhoosh', priority: 2 },
+  { attackType: 'KYO_STAND_A', phase: 'active', frame: 0, sfx: 'playHitAccentFire', priority: 2 },
   { attackType: 'KYO_STAND_C', phase: 'startup', frame: 0, sfx: 'playHeavyWhoosh', priority: 2 },
+  { attackType: 'KYO_STAND_C', phase: 'active', frame: 0, sfx: 'playHitAccentFire', priority: 2 },
 
-  // ── Kyo specials ──
-  { attackType: 'KYO_ONIYAKI', phase: 'startup', frame: 0, sfx: 'playSpecialLight', priority: 2 },
-  { attackType: 'KYO_ONIYAKI', phase: 'active', frame: 0, sfx: 'playSpecialHeavy', priority: 2 },
-  { attackType: 'KYO_ONIYAKI_C', phase: 'startup', frame: 0, sfx: 'playSpecialLight', priority: 2 },
-  { attackType: 'KYO_ONIYAKI_C', phase: 'active', frame: 0, sfx: 'playSpecialHeavy', priority: 3 },
-  { attackType: 'KYO_YAMIBARAI', phase: 'startup', frame: 0, sfx: 'playSpecialLight', priority: 2 },
-  { attackType: 'KYO_YAMIBARAI', phase: 'active', frame: 0, sfx: 'playSpecialHeavy', priority: 2 },
-  { attackType: 'KYO_YAMIBARAI_C', phase: 'startup', frame: 0, sfx: 'playSpecialLight', priority: 2 },
-  { attackType: 'KYO_YAMIBARAI_C', phase: 'active', frame: 0, sfx: 'playSpecialHeavy', priority: 2 },
-  { attackType: 'KYO_RED_KICK', phase: 'startup', frame: 0, sfx: 'playSpecialLight', priority: 2 },
-  { attackType: 'KYO_RED_KICK', phase: 'active', frame: 0, sfx: 'playSpecialHeavy', priority: 2 },
-  { attackType: 'KYO_75KAI', phase: 'startup', frame: 0, sfx: 'playSpecialLight', priority: 2 },
-  { attackType: 'KYO_75KAI', phase: 'active', frame: 0, sfx: 'playSpecialHeavy', priority: 2 },
-  { attackType: 'KYO_ARAGAMI', phase: 'startup', frame: 0, sfx: 'playSpecialLight', priority: 2 },
-  { attackType: 'KYO_ARAGAMI', phase: 'active', frame: 0, sfx: 'playSpecialHeavy', priority: 2 },
-  { attackType: 'KYO_DOKUGAMI', phase: 'startup', frame: 0, sfx: 'playSpecialLight', priority: 2 },
-  { attackType: 'KYO_DOKUGAMI', phase: 'active', frame: 0, sfx: 'playSpecialHeavy', priority: 2 },
+  // ── Kyo specials — character-specific flame SFX ──
+  { attackType: 'KYO_ONIYAKI', phase: 'startup', frame: 0, sfx: 'playKyoOniyaki', priority: 2 },
+  { attackType: 'KYO_ONIYAKI', phase: 'active', frame: 0, sfx: 'playKyoOniyaki', priority: 3 },
+  { attackType: 'KYO_ONIYAKI_C', phase: 'startup', frame: 0, sfx: 'playKyoOniyaki', priority: 2 },
+  { attackType: 'KYO_ONIYAKI_C', phase: 'active', frame: 0, sfx: 'playKyoOniyaki', priority: 3 },
+  { attackType: 'KYO_YAMIBARAI', phase: 'startup', frame: 0, sfx: 'playKyoYamibarai', priority: 2 },
+  { attackType: 'KYO_YAMIBARAI', phase: 'active', frame: 0, sfx: 'playKyoYamibarai', priority: 2 },
+  { attackType: 'KYO_YAMIBARAI_C', phase: 'startup', frame: 0, sfx: 'playKyoYamibarai', priority: 2 },
+  { attackType: 'KYO_YAMIBARAI_C', phase: 'active', frame: 0, sfx: 'playKyoYamibarai', priority: 2 },
+  { attackType: 'KYO_RED_KICK', phase: 'startup', frame: 0, sfx: 'playKyoRedKick', priority: 2 },
+  { attackType: 'KYO_RED_KICK', phase: 'active', frame: 0, sfx: 'playKyoRedKick', priority: 2 },
+  { attackType: 'KYO_75KAI', phase: 'startup', frame: 0, sfx: 'playKyo75Kai', priority: 2 },
+  { attackType: 'KYO_75KAI', phase: 'active', frame: 0, sfx: 'playKyo75Kai', priority: 2 },
+  { attackType: 'KYO_ARAGAMI', phase: 'startup', frame: 0, sfx: 'playKyoAragami', priority: 2 },
+  { attackType: 'KYO_ARAGAMI', phase: 'active', frame: 0, sfx: 'playKyoAragami', priority: 2 },
+  { attackType: 'KYO_DOKUGAMI', phase: 'startup', frame: 0, sfx: 'playKyoDokugami', priority: 2 },
+  { attackType: 'KYO_DOKUGAMI', phase: 'active', frame: 0, sfx: 'playKyoDokugami', priority: 2 },
 
-  // ── Kyo DM ──
-  { attackType: 'DM_OROCHINAGI', phase: 'startup', frame: 0, sfx: 'playSpecialLight', priority: 2 },
-  { attackType: 'DM_OROCHINAGI', phase: 'startup', frame: 8, sfx: 'playSpecialHeavy', priority: 3 },
+  // ── Kyo DM — fire climax SFX ──
+  { attackType: 'DM_OROCHINAGI', phase: 'startup', frame: 0, sfx: 'playKyoOrochinagi', priority: 2 },
+  { attackType: 'DM_OROCHINAGI', phase: 'startup', frame: 8, sfx: 'playKyoOrochinagi', priority: 3 },
   { attackType: 'DM_OROCHINAGI', phase: 'active', frame: 0, sfx: 'playDM', priority: 4 },
 
-  // ── Iori specials ──
-  { attackType: 'IORI_AOIHANA', phase: 'startup', frame: 0, sfx: 'playSpecialLight', priority: 2 },
-  { attackType: 'IORI_AOIHANA', phase: 'active', frame: 0, sfx: 'playSpecialHeavy', priority: 2 },
-  { attackType: 'IORI_ONIYAKI', phase: 'startup', frame: 0, sfx: 'playSpecialLight', priority: 2 },
-  { attackType: 'IORI_ONIYAKI', phase: 'active', frame: 0, sfx: 'playSpecialHeavy', priority: 2 },
-  { attackType: 'IORI_ONIYAKI_C', phase: 'startup', frame: 0, sfx: 'playSpecialLight', priority: 2 },
-  { attackType: 'IORI_ONIYAKI_C', phase: 'active', frame: 0, sfx: 'playSpecialHeavy', priority: 3 },
-  { attackType: 'IORI_YAMIBARAI', phase: 'startup', frame: 0, sfx: 'playSpecialLight', priority: 2 },
-  { attackType: 'IORI_YAMIBARAI', phase: 'active', frame: 0, sfx: 'playSpecialHeavy', priority: 2 },
-  { attackType: 'IORI_YAMIBARAI_C', phase: 'startup', frame: 0, sfx: 'playSpecialLight', priority: 2 },
-  { attackType: 'IORI_YAMIBARAI_C', phase: 'active', frame: 0, sfx: 'playSpecialHeavy', priority: 2 },
-  { attackType: 'IORI_KOTOTSUKI', phase: 'startup', frame: 0, sfx: 'playSpecialLight', priority: 2 },
-  { attackType: 'IORI_KOTOTSUKI', phase: 'active', frame: 0, sfx: 'playSpecialHeavy', priority: 2 },
-  { attackType: 'IORI_KUZUKAZE', phase: 'startup', frame: 0, sfx: 'playSpecialLight', priority: 2 },
+  // ── Iori specials — character-specific dark purple SFX ──
+  { attackType: 'IORI_AOIHANA', phase: 'startup', frame: 0, sfx: 'playIoriAoihana', priority: 2 },
+  { attackType: 'IORI_AOIHANA', phase: 'active', frame: 0, sfx: 'playIoriAoihana', priority: 2 },
+  { attackType: 'IORI_ONIYAKI', phase: 'startup', frame: 0, sfx: 'playIoriOniyaki', priority: 2 },
+  { attackType: 'IORI_ONIYAKI', phase: 'active', frame: 0, sfx: 'playIoriOniyaki', priority: 2 },
+  { attackType: 'IORI_ONIYAKI_C', phase: 'startup', frame: 0, sfx: 'playIoriOniyaki', priority: 2 },
+  { attackType: 'IORI_ONIYAKI_C', phase: 'active', frame: 0, sfx: 'playIoriOniyaki', priority: 3 },
+  { attackType: 'IORI_YAMIBARAI', phase: 'startup', frame: 0, sfx: 'playIoriYamibarai', priority: 2 },
+  { attackType: 'IORI_YAMIBARAI', phase: 'active', frame: 0, sfx: 'playIoriYamibarai', priority: 2 },
+  { attackType: 'IORI_YAMIBARAI_C', phase: 'startup', frame: 0, sfx: 'playIoriYamibarai', priority: 2 },
+  { attackType: 'IORI_YAMIBARAI_C', phase: 'active', frame: 0, sfx: 'playIoriYamibarai', priority: 2 },
+  { attackType: 'IORI_KOTOTSUKI', phase: 'startup', frame: 0, sfx: 'playIoriKototsuki', priority: 2 },
+  { attackType: 'IORI_KOTOTSUKI', phase: 'active', frame: 0, sfx: 'playIoriKototsuki', priority: 2 },
+  { attackType: 'IORI_KUZUKAZE', phase: 'startup', frame: 0, sfx: 'playIoriKuzukaze', priority: 2 },
   { attackType: 'IORI_KUZUKAZE', phase: 'active', frame: 0, sfx: 'playThrow', priority: 3 },
 
-  // ── Iori DM ──
-  { attackType: 'DM_YATAGARASU', phase: 'startup', frame: 0, sfx: 'playSpecialLight', priority: 2 },
-  { attackType: 'DM_YATAGARASU', phase: 'startup', frame: 8, sfx: 'playSpecialHeavy', priority: 3 },
+  // ── Iori DM — dark energy climax SFX ──
+  { attackType: 'DM_YATAGARASU', phase: 'startup', frame: 0, sfx: 'playIoriYaotome', priority: 2 },
+  { attackType: 'DM_YATAGARASU', phase: 'startup', frame: 8, sfx: 'playIoriYaotome', priority: 3 },
   { attackType: 'DM_YATAGARASU', phase: 'active', frame: 0, sfx: 'playDM', priority: 4 },
 
   // ── Terry specials ──

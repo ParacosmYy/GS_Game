@@ -3,37 +3,36 @@
 ## 目标
 
 - Phase 2 (1004→2000) 持续迭代
-- 优先: Kyo 内容包创建，验证多角色复制管线
+- 当前分数：112/2000
+- 本轮：Kyo/Iori 专属 attackSFX 接入（闭合差距矩阵 1.3 打击反馈差距）
 
 ## 当前状态
 
 - 当前主线：Phase 2 质量提升 + 多角色闭环
 - Phase 1：Ryo Vertical Slice 100% 完成，退出条件全部满足
 - 战斗系统：8/8 KOF2002 深层机制已实现
-- 当前分数：102/2000（诚实重置基数+Kyo内容包+SFX）
-- Phase 2 已完成：Kyo内容包14文件, Kyo SFX 7种, 舞台名intro, DM暗幕, 像素帧缓存
-- 当前最高优先级仍然是按 [KOF 差距矩阵](../product/kof-gap-matrix.md) 逐项闭合差距，优先肖像、动作节奏、打击反馈、输入可见性。
+- 当前最高优先级仍然是按 [KOF 差距矩阵](../product/kof-gap-matrix.md) 逐项闭合差距
 
 ## Phase 2 维度与进度
 
 | 维度 | 满分 | 当前进度 | 下一目标 |
 | --- | ---: | --- | --- |
 | 角色美术（进阶） | 150 | 4/150 | Ryo帧进阶已完成,下一步:SNK风格纹理深化 |
-| 多角色闭环 | 200 | 30/200 | Kyo内容包+SFX完成→Iori内容包→Kyo集成到游戏 |
+| 多角色闭环 | 200 | 30/200 | Kyo+Iori SFX接入完成→继续Kyo/Iori游戏内集成 |
 | 舞台美术（进阶） | 100 | 0/100 | 需要位图品质提升 |
 | 深层机制 | 200 | ~80/200 | 系统已实现,需多角色cancel paths+验证 |
-| 音频品质（进阶） | 100 | 15/100 | Kyo SFX完成(7种)→Iori SFX |
+| 音频品质（进阶） | 100 | 16/100 | Kyo/Iori专属SFX已接入→连段音/BGM编曲 |
 | 游戏流程（进阶） | 150 | 0/150 | Options菜单/暂停/Title完善 |
 | UI/HUD品质（进阶） | 100 | 0/100 | SNK风格菜单/VS画面 |
 
 ## 本轮任务
 
-- Iori 内容包：复制 Kyo 管线创建 Iori 数据文件
-- Kyo 集成：将 Kyo 内容包接入游戏角色加载系统
-- 继续迭代直到 2000 分
-- 所有后续任务都必须标注自己对应的 gap matrix 项。
+- 本轮已完成：Kyo/Iori 专属 attackSFX 接入，替换通用 playSpecialLight/Heavy
+  - Kyo: 7个必杀技→playKyo*专属函数 + 普通攻击 fire accent
+  - Iori: 6个必杀技→playIori*专属函数
+  - 新增 playHitAccentFire / playHitAccentPurple 函数
 
 ## 回退方案
 
-- 所有新增都是纯数据文件，不改现有逻辑
+- 所有改动只涉及 SFX 调度映射，不改合成逻辑
 - 回退 git revert 即可

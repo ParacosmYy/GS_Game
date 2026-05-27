@@ -2570,3 +2570,11 @@ export function playIoriKatanugi(): void { initSampler(); play('iori_katanugi', 
 
 /** 播放八稚女音效 — DM暗色连突：多层暗能量叠加 */
 export function playIoriYaotome(): void { initSampler(); play('iori_yaotome'); }
+
+// === Character-themed normal attack accents ===
+
+/** Kyo normal attack hit — fire-crackle accent */
+export function playHitAccentFire(): void { initSampler(); play('accent_fire', 0.6); }
+
+/** Iori normal attack hit — dark-purple accent */
+export function playHitAccentPurple(): void { initSampler(); play('accent_purple', 0.6); }
