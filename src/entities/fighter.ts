@@ -509,14 +509,26 @@ export class Fighter {
     }
 
     // KOF2002: Invincibility on startup for DP-type moves
-    // RYO_KO_HOU (A version): frames 1-5 upper body invincible (full invincible for simplicity)
-    // RYO_KO_HOU_C (C version): frames 1-8 full body invincible
+    // Base invincibility + MAX mode extension (+3 frames during MAX mode)
+    const maxBonus = this.maxModeActive ? 3 : 0;
     if (attackType === AttackType.RYO_KO_HOU) {
       this.invincible = true;
-      this.wakeupInvulnFrames = 5; // repurpose as general invincibility countdown
+      this.wakeupInvulnFrames = 5 + maxBonus;
     } else if (attackType === AttackType.RYO_KO_HOU_C) {
       this.invincible = true;
-      this.wakeupInvulnFrames = 8;
+      this.wakeupInvulnFrames = 8 + maxBonus;
+    } else if (attackType === AttackType.KYO_ONIYAKI) {
+      this.invincible = true;
+      this.wakeupInvulnFrames = 4 + maxBonus;
+    } else if (attackType === AttackType.KYO_ONIYAKI_C) {
+      this.invincible = true;
+      this.wakeupInvulnFrames = 7 + maxBonus;
+    } else if (attackType === AttackType.IORI_ONIYAKI) {
+      this.invincible = true;
+      this.wakeupInvulnFrames = 4 + maxBonus;
+    } else if (attackType === AttackType.IORI_ONIYAKI_C) {
+      this.invincible = true;
+      this.wakeupInvulnFrames = 7 + maxBonus;
     }
 
     // Multi-hit moves: each active frame can connect independently

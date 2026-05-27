@@ -300,12 +300,22 @@ export const KyoDef: CharacterDefinition = {
   },
 
   onAttackActive(fighter, attackType, projectiles, playerIndex) {
-    // 闇払い: spawn projectile (weak/strong share same logic)
+    // 闇払い: spawn projectile — EX version during MAX mode
     if ((attackType === AttackType.KYO_YAMIBARAI || attackType === AttackType.KYO_YAMIBARAI_C) && fighter.attackFrame === 0) {
+      const isStrong = attackType === AttackType.KYO_YAMIBARAI_C;
+      const isEX = fighter.maxModeActive;
       const data = FRAME_DATA[attackType as keyof typeof FRAME_DATA];
+      const hitW = isEX ? 25 : isStrong ? 18 : 15;
+      const hitH = isEX ? 18 : isStrong ? 13 : 10;
+      const speed = isEX ? 9 : isStrong ? 7 : 5;
+      const frames = isEX ? 65 : data.active;
+      const level = isEX ? 'strong' : 'weak';
+      const damage = isEX ? 120 : isStrong ? 90 : 60;
       projectiles.push(new Projectile(
         fighter.x + 50 * fighter.facing, fighter.y - 50, fighter.facing,
-        data.active, playerIndex, fighter.charId,
+        frames, playerIndex, fighter.charId,
+        hitW, hitH, speed, isStrong ? 'C' : 'A',
+        level, damage, isEX,
       ));
       return true;
     }
