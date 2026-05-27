@@ -54,6 +54,8 @@ interface FrameEntry {
   frames: PixelFrame[];
   palette: PixelPalette;
   ticksPerFrame: number;
+  /** Optional per-frame duration overrides. When present, frame cycling uses these instead of uniform ticksPerFrame. */
+  frameDurations?: number[];
 }
 
 const RYO_FRAMES = new Map<string, FrameEntry>();
@@ -105,6 +107,31 @@ function registerFrames(key: string, rawFrames: SourcePixelFrame[], ticksPerFram
   });
 }
 
+/** Register a set of frames with per-frame variable durations */
+function registerVariableFrames(key: string, rawFrames: SourcePixelFrame[], frameDurations: number[]): void {
+  if (RYO_FRAMES.has(key)) return;
+  const converted = rawFrames.map(convertFrame);
+  if (converted.length === 0) return;
+  RYO_FRAMES.set(key, {
+    frames: converted.map(c => c.frame),
+    palette: converted[0].palette,
+    ticksPerFrame: frameDurations[0] || 8, // fallback
+    frameDurations,
+  });
+}
+
+/** Compute frame index from non-uniform durations */
+function getVariableFrameIndex(stateAge: number, frameDurations: number[]): number {
+  let tickAccum = 0;
+  const totalCycle = frameDurations.reduce((a, b) => a + b, 0);
+  const cycleAge = stateAge % totalCycle;
+  for (let i = 0; i < frameDurations.length; i++) {
+    tickAccum += frameDurations[i];
+    if (cycleAge < tickAccum) return i;
+  }
+  return frameDurations.length - 1;
+}
+
 // ===== Initialization =====
 
 let initialized = false;
@@ -114,8 +141,10 @@ function initAllFrames(): void {
   if (initialized) return;
   initialized = true;
 
-  // IDLE — 8-frame breathing loop, slow cycle
-  registerFrames('IDLE', RYO_IDLE_FRAMES, 9);
+  // IDLE — 8-frame breathing loop with variable frame hold
+  // KOF-authentic rhythm: hold at peak inhale (frame 3), faster through neutral
+  // Frame order: neutral → rise → rising → peak → descend → descending → valley → return
+  registerVariableFrames('IDLE', RYO_IDLE_FRAMES, [7, 8, 9, 12, 9, 8, 10, 7]);
 
   // WALK — forward and backward stored as separate entries
   registerFrames('WALK_FORWARD', RYO_WALK_FORWARD_FRAMES, 6);
@@ -463,8 +492,10 @@ export function drawHighResFrame(
   const { frames, palette, ticksPerFrame } = entry;
   if (frames.length === 0) return false;
 
-  // Cyclic frame selection matching the skeletal renderer pattern
-  const frameIdx = Math.floor(stateAge / ticksPerFrame) % frames.length;
+  // Cyclic frame selection — use variable durations when available
+  const frameIdx = entry.frameDurations
+    ? getVariableFrameIndex(stateAge, entry.frameDurations)
+    : Math.floor(stateAge / entry.ticksPerFrame) % frames.length;
   const frame = frames[frameIdx];
 
   // Compute scale dynamically so all frame sizes display at the same target height.
