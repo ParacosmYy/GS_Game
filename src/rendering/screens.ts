@@ -1110,11 +1110,43 @@ export function drawIntro(ctx: CanvasRenderingContext2D, phaseTimer: number, cur
       ctx.shadowBlur = 0;
     }
 
-    // KOF2002: 舞台名显示 — 底部淡入淡出
+    // KOF2002: 舞台名显示 — SNK风格地点卡片，金色分割线+舞台名
     if (stageId && STAGE_NAMES[stageId]) {
-      const stageAlpha = Math.min(1, Math.max(0, (phaseTimer - 30) / 20)) * fadeOut;
-      ctx.globalAlpha = stageAlpha * alpha * 0.7;
-      drawSNKText(ctx, STAGE_NAMES[stageId], CANVAS_WIDTH / 2, CANVAS_HEIGHT - 130, 12, 'rgba(180,180,200,0.8)', '#000000');
+      const stageAlpha = Math.min(1, Math.max(0, (phaseTimer - 25) / 15)) * fadeOut;
+      ctx.globalAlpha = stageAlpha * alpha;
+      const locY = CANVAS_HEIGHT - 120;
+      const locW = 280;
+      const locX = CANVAS_WIDTH / 2 - locW / 2;
+
+      // Horizontal divider line — gold gradient
+      const divGrad = ctx.createLinearGradient(locX, 0, locX + locW, 0);
+      divGrad.addColorStop(0, 'rgba(200,160,50,0)');
+      divGrad.addColorStop(0.15, 'rgba(200,160,50,0.6)');
+      divGrad.addColorStop(0.5, 'rgba(255,200,80,0.9)');
+      divGrad.addColorStop(0.85, 'rgba(200,160,50,0.6)');
+      divGrad.addColorStop(1, 'rgba(200,160,50,0)');
+      ctx.strokeStyle = divGrad;
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(locX, locY);
+      ctx.lineTo(locX + locW, locY);
+      ctx.stroke();
+
+      // Small diamond at center
+      ctx.fillStyle = 'rgba(255,200,80,0.7)';
+      ctx.beginPath();
+      ctx.moveTo(CANVAS_WIDTH / 2, locY - 3);
+      ctx.lineTo(CANVAS_WIDTH / 2 + 3, locY);
+      ctx.lineTo(CANVAS_WIDTH / 2, locY + 3);
+      ctx.lineTo(CANVAS_WIDTH / 2 - 3, locY);
+      ctx.closePath();
+      ctx.fill();
+
+      // Stage name — gold with glow
+      ctx.shadowColor = '#cc8800';
+      ctx.shadowBlur = 8;
+      drawSNKText(ctx, STAGE_NAMES[stageId], CANVAS_WIDTH / 2, locY + 16, 14, '#ddb844');
+      ctx.shadowBlur = 0;
     }
   }
   // Phase 2: "FIGHT!" (INTRO_ROUND_FRAMES ~ total)
