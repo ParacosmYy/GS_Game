@@ -280,6 +280,15 @@ export function drawFighters(
     if (f.isBeingThrown) {
       ctx.translate(Math.sin(globalTick * 2) * 2, 0);
     }
+    // KOF2002: 命中停顿冻结指示 — hitstop首帧微弱白色边框
+    if (f.hitFlashFrames > 0 && f.hitFlashFrames === Math.ceil(f.hitFlashFrames) && f.state !== FighterState.HITSTUN) {
+      ctx.save();
+      ctx.globalAlpha = 0.06;
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(sx + leanOffsetX - hw - 2, sy - f.displayHeight - 2, (hw + 2) * 2, f.displayHeight + 4);
+      ctx.restore();
+    }
     // KOF2002: 跑步起步烟尘 — RUN前2帧脚下灰色烟尘
     if (f.state === FighterState.RUN && f.stateAge < 2) {
       ctx.save();
