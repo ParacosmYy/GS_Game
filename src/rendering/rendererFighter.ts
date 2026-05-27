@@ -241,6 +241,17 @@ export function drawFighters(
     if (f.isBeingThrown) {
       ctx.translate(Math.sin(globalTick * 2) * 2, 0);
     }
+    // KOF2002: 跑步起步烟尘 — RUN前2帧脚下灰色烟尘
+    if (f.state === FighterState.RUN && f.stateAge < 2) {
+      ctx.save();
+      ctx.globalAlpha = (2 - f.stateAge) / 2 * 0.3;
+      ctx.fillStyle = '#999999';
+      const puffR = 6 + f.stateAge * 4;
+      ctx.beginPath();
+      ctx.ellipse(sx - f.facing * 8, sy, puffR, puffR * 0.3, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
     // KOF2002: 后撤步渐隐 — 后dash期间身体更透明(幻影感)
     if (f.state === FighterState.BACKDASH) {
       ctx.globalAlpha = Math.min(ctx.globalAlpha || 1, 0.75);
