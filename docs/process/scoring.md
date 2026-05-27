@@ -2,11 +2,7 @@
 
 ## 1. 当前分数
 
-
-
 当前总分：`168/2000`
-b5b42fb (docs(scoring): 144->145/2000 special move variable frames)
-6b7b47c (docs(scoring): 149->150/2000 pulsing win diamonds)
 
 完整历史见 [SCORE.history.md](../archive/SCORE.history.md)。
 
@@ -16,19 +12,14 @@ b5b42fb (docs(scoring): 144->145/2000 special move variable frames)
 
 | 维度 | 满分 | 当前 | 现状 |
 | --- | ---: | ---: | --- |
-| 角色美术 | 200 | 14 | Ryo像素帧42/42状态覆盖+Kyo/Iori 64x80 win+48x48 HUD肖像(sizedPortraits),仍是程序化非SNK精灵图 |
+| 角色美术 | 200 | 15 | Ryo像素帧42/42状态覆盖+Kyo/Iori 64x80 win+48x48 HUD肖像(sizedPortraits)+Ryo四尺寸肖像完整闭环(select/vs/hud/win),仍是程序化非SNK精灵图 |
 | 舞台美术 | 100 | 8 | 5场景视差+动态元素+CRT扫描线后处理+暗角+场景飘浮微粒+5舞台专属色彩分级+光柱+氛围雾气+场景专属尘土色 |
 | 音频品质 | 150 | 16 | 合成SFX+BGM+Kyo 7种火焰SFX+Iori 8种暗紫SFX+Kyo/Iori专属attackSFX接入+连段递增音效+里程碑音效+菜单光标/确认SFX+DoubleKO/DrawGame播报+倒计时10秒警告铃声+角色专属攻击发声(kiai)+受击发声(hurt voice) |
 | 角色内容 | 150 | 19 | Ryo全闭环+Kyo 14文件+Iori 14文件+三角色contentLoader集成 |
-| 战斗手感 | 150 | 30 | 全反馈矩阵(6档)+MAX金色反馈+HSDM专属+SDM修正+绝境红闪+MAX移动残影+GC Roll/CD激活火花+重攻击swoosh+连击里程碑音效(5/10/15+)+DM发动名称横幅(SDM/HSDM分色)+跑步速度线 |
+| 战斗手感 | 150 | 31 | 全反馈矩阵(6档)+MAX金色反馈+HSDM专属+SDM修正+绝境红闪+MAX移动残影+GC Roll/CD激活火花+重攻击swoosh+连击里程碑音效(5/10/15+)+DM发动名称横幅(SDM/HSDM分色)+跑步速度线+击倒落地冲击波 |
 | 帧数据精度 | 100 | 25 | 全部42种动画状态变量帧节奏完成(idle/walk/attack/crouch/jump/air/special/DM/SDM/HSDM/movement/sub-state/win) |
-
-
-| 游戏流程 | 100 | 26 | 完整街机流程+3v3+训练模式+MATCH POINT+暂停菜单+OPTIONS+回合开始持续提示+KO结果HP对比+回合切换黑幕淡入 |
-d0f7746 (docs(scoring): 142->143/2000 round transition fade-in)
-b5b42fb (docs(scoring): 144->145/2000 special move variable frames)
+| 游戏流程 | 100 | 28 | 完整街机流程+3v3+训练模式+MATCH POINT+暂停菜单+OPTIONS+回合开始持续提示+KO结果HP对比+街机模式对手递进+舞台轮换+街机得分系统+MATCH POINT回合开始提示 |
 | UI/HUD品质 | 50 | 16 | SNK风格能量槽+计时器+连段计数器+播报+像素帧缓存+暂停菜单(招式/按键)+训练模式SNK风格招式表 |
-6b7b47c (docs(scoring): 149->150/2000 pulsing win diamonds)
 
 ## 2.1 Phase 2 千分制维度（1001-2000）
 
