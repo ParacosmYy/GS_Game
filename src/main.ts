@@ -141,6 +141,15 @@ let p1DelayedHealth = p1.maxHealth;
 let p2DelayedHealth = p2.maxHealth;
 let prevTimeSeconds = 99; // Track time for countdown warning bell
 
+/** KOF2002-style arcade difficulty ramp: difficulty increases per stage.
+ *  Base difficulty from options (0=easy, 1=normal, 2=hard) → scalar 0..1.
+ *  Each stage adds ramp up to a max of 0.95. */
+function arcadeDifficulty(base: number, stageIndex: number, totalStages: number): number {
+  const baseScalar = base === 0 ? 0.3 : base === 2 ? 0.7 : 0.5;
+  const ramp = totalStages > 1 ? (stageIndex / (totalStages - 1)) * 0.3 : 0;
+  return Math.min(0.95, baseScalar + ramp);
+}
+
 function pickWinQuote(w: number | null): string {
   if (w === null) return '';
   const fighter = w === 0 ? p1 : p2;
@@ -529,7 +538,10 @@ function update(): void {
           loser.setStats(newChar.stats);
           loserCtrl.setCharacter(newChar);
           if (p2AI && losingIdx === 1) {
-            p2AI = new AdvancedAI(p2, p1, newChar, 'medium');
+            const aiDiff = gs.arcadeOpponents.length > 0
+              ? arcadeDifficulty(gs.options.difficulty, gs.arcadeOpponentIndex, gs.arcadeOpponents.length)
+              : 0.6;
+            p2AI = new AdvancedAI(p2, p1, newChar, aiDiff);
           }
           // Cinematic transition for team mode round change
           rounds.startCinematicTransition(
@@ -669,7 +681,10 @@ function update(): void {
             gs.arcadeOpponents[(gs.arcadeOpponentIndex + 2) % gs.arcadeOpponents.length],
           ]);
         }
-        p2AI = new AdvancedAI(p2, p1, nextChar, 'medium');
+        const nextDiff = gs.arcadeOpponents.length > 0
+          ? arcadeDifficulty(gs.options.difficulty, gs.arcadeOpponentIndex + 1, gs.arcadeOpponents.length)
+          : 0.6;
+        p2AI = new AdvancedAI(p2, p1, nextChar, nextDiff);
         // Reset for new match
         rounds.currentRound = 1;
         rounds.fullReset();
