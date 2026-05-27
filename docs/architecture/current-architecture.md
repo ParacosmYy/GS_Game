@@ -40,6 +40,7 @@ src/
 - `src/content/characters/index.ts` 已经汇总 Ryo / Kyo / Iori 内容包导出，说明角色内容层正在从分散入口向统一入口收口。
 - `src/content/characters/{ryo,kyo,iori}/` 已开始建立内容包骨架，当前既有兼容入口，也有按职责拆分的迁移入口；还需要继续把 commands / moves / attacks / animations / hitboxes / feedback / portraits / reports 落到真实数据里。
 - `src/rendering/sprites/` 已开始拆出高分辨率帧分组，`src/tools/validateManifest.ts` 也已经承担内容校验职责。
+- `docs/architecture/file-pool-and-state-machine.md` 作为文件池和状态机拆分的硬约束，专门约束大文件拆分与状态机粒度。
 
 ## 4. 下一阶段架构方向
 
@@ -53,6 +54,7 @@ src/
 - 把各角色内容包继续拆成子目录，确保 commands / moves / attacks / animations / hitboxes / feedback / portraits / reports 有固定归属。
 - 让 `src/content/index.ts` 和 `src/content/characters/index.ts` 成为统一导出入口，减少上层对分散文件的直接依赖。
 - 用 Frame Contract 连接 rendering/combat/audio/vfx，并在多角色之间保持一致。
+- 把状态机类文件拆成更小的文件池，不再把状态、转移、副作用和表现层混在一个大文件里。
 - 逐步迁移到 `content/` 和 `simulation/`，但每轮只迁一个领域。
 
 ## 5. 保持边界

@@ -160,6 +160,7 @@ npx vite build
 - [当前架构](docs/architecture/current-architecture.md)：真实结构。
 - [模块边界](docs/architecture/module-boundaries.md)：依赖和职责。
 - [工作区目标架构](docs/architecture/workspace-architecture-target.md)：大型项目目录目标和迁移阶段。
+- [文件池与状态机拆分约束](docs/architecture/file-pool-and-state-machine.md)：单文件职责、状态机拆分和文件池边界。
 - [资产管线架构](docs/architecture/asset-pipeline.md)：sprite/portrait/frame/hitbox 管线。
 - [未来引擎架构](docs/architecture/future-engine-architecture.md)：换栈决策。
 - [角色内容包架构](docs/architecture/character-content-package.md)：每个人物、每个技能、每个攻击的目录归类方式。

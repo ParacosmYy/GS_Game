@@ -14,6 +14,7 @@ Phase 1 基线由 [Ryo Vertical Slice](../product/ryo-vertical-slice-plan.md) �
 - 先把内容包、流程和 UI 做成可复制模板，再做更多角色或更多模式。
 - 任何不服务当前 Phase 2 闭环的收口动作，都必须先说明为什么现在做。
 - 任何新功能都必须先说明它对应 [KOF 差距矩阵](../product/kof-gap-matrix.md) 的哪一项差距。
+- 任何“文件池”整理都必须说明它是在把职责拆开，而不是单纯增加文件数。
 
 每轮必须先判断是否服务以下目标之一：
 
@@ -136,6 +137,7 @@ Phase 1 基线由 [Ryo Vertical Slice](../product/ryo-vertical-slice-plan.md) �
 - 涉及战斗界面或训练界面时，必须同步当前角色的真实 `moveList`、爆气说明和标准/快捷键位显示，禁止继续使用示例文本。
 - 每次涉及文件收口或目录整理时，必须明确本轮是否在推进 Phase 2 的闭环；如果不能明确，就先停。
 - 当前多角色内容包已经进入“兼容入口 + 分层迁移”的状态，目录整理必须优先让子域落地真实数据，而不是只改文档措辞。
+- 当前任何状态机类文件的重构，都应优先拆成 state / transitions / effects / selectors / tests，而不是把所有逻辑继续塞在一个文件里。
 
 ### 2.8 验证
 

@@ -42,6 +42,25 @@ tools -> assets/core schema
 - 各角色的单一真源应逐步向 `src/content/characters/<id>/` 收口。
 - 如果某个角色专属数据还留在旧目录，必须说明它是过渡层而不是新来源。
 - 通用模块只负责消费数据，不负责替任何角色生成新的数据来源。
+- 角色内容池内部也要继续拆分：不要把 commands / moves / attacks / animations / hitboxes / feedback / portraits / reports 再塞进同一个大文件。
+
+## 2.1 文件池约束
+
+文件池是“可组合的小文件集合”，不是“很多文件的聚合目录”。
+
+允许：
+
+- 一个职责一个文件。
+- 一个状态机拆成 state / transitions / effects / selectors。
+- 通过 `index.ts` 统一出口。
+
+禁止：
+
+- 一个文件承担多个不相邻职责。
+- 状态机、渲染、输入、音频混写。
+- 让大文件继续吸纳新逻辑。
+
+如果某个文件开始同时解释“数据是什么”和“数据怎么流转”，就应该拆。
 
 ## 3. Frame Contract 边界
 
