@@ -122,6 +122,8 @@ export function drawFighters(
     if (f.state === FighterState.RUN) {
       leanOffsetX = 8 * f.facing + blendOffsetX;
       leanAngle = 0.12 * f.facing;
+      // KOF2002: 跑步弹跳 — 更高频3px上下弹跳
+      leanOffsetY = Math.abs(Math.sin(f.stateAge * 0.8)) * 3;
     } else if (f.state === FighterState.BACKDASH) {
       leanOffsetX = -6 * f.facing + blendOffsetX;
       leanAngle = -0.08 * f.facing;
