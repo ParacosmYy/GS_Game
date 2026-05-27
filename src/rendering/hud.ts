@@ -1565,6 +1565,26 @@ export function drawComboCounters(
       ctx.restore();
     }
 
+    // --- KOF2002: Combo tier badge (5/10/15 threshold) ---
+    if (isActive && displayCombo >= 5) {
+      const tier = displayCombo >= 15 ? 'EXCELLENT' : displayCombo >= 10 ? 'GREAT' : 'NICE';
+      const tierColor = displayCombo >= 15 ? '#ff44ff' : displayCombo >= 10 ? '#ffaa00' : '#44ddff';
+      const tierFontSize = 10;
+      const tierY = sy - fontSize * 0.55 - 6;
+      ctx.save();
+      ctx.globalAlpha = alpha * 0.9;
+      ctx.font = `bold ${tierFontSize}px "Courier New", monospace`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.strokeStyle = '#000000';
+      ctx.lineWidth = 2;
+      ctx.lineJoin = 'round';
+      ctx.strokeText(tier, sx, tierY);
+      ctx.fillStyle = tierColor;
+      ctx.fillText(tier, sx, tierY);
+      ctx.restore();
+    }
+
     // --- Reset fade state when animation completes ---
     if (fade.fadeTimer <= 0 && !isActive) {
       fade.lastCombo = 0;
@@ -1572,6 +1592,41 @@ export function drawComboCounters(
       fade.scale = 1;
       fade.prevCount = 0;
     }
+  }
+
+  // KOF2002: 高连击屏幕边缘发光 — combo>=5时边缘发光强度递增
+  const maxCombo = Math.max(comboCount[0], comboCount[1]);
+  if (maxCombo >= 5) {
+    const edgeAlpha = Math.min(0.18, (maxCombo - 4) * 0.025);
+    const edgeColor = maxCombo >= 15 ? '#ff44ff' : maxCombo >= 10 ? '#ffaa00' : '#4488ff';
+    const pulse = Math.sin(Date.now() * 0.005) * 0.3 + 0.7;
+    ctx.save();
+    ctx.globalAlpha = edgeAlpha * pulse;
+    // Top edge
+    const topGrad = ctx.createLinearGradient(0, 0, 0, 40);
+    topGrad.addColorStop(0, edgeColor);
+    topGrad.addColorStop(1, edgeColor + '00');
+    ctx.fillStyle = topGrad;
+    ctx.fillRect(0, 0, CANVAS_WIDTH, 40);
+    // Bottom edge
+    const botGrad = ctx.createLinearGradient(0, CANVAS_HEIGHT, 0, CANVAS_HEIGHT - 40);
+    botGrad.addColorStop(0, edgeColor);
+    botGrad.addColorStop(1, edgeColor + '00');
+    ctx.fillStyle = botGrad;
+    ctx.fillRect(0, CANVAS_HEIGHT - 40, CANVAS_WIDTH, 40);
+    // Left edge
+    const leftGrad = ctx.createLinearGradient(0, 0, 30, 0);
+    leftGrad.addColorStop(0, edgeColor);
+    leftGrad.addColorStop(1, edgeColor + '00');
+    ctx.fillStyle = leftGrad;
+    ctx.fillRect(0, 0, 30, CANVAS_HEIGHT);
+    // Right edge
+    const rightGrad = ctx.createLinearGradient(CANVAS_WIDTH, 0, CANVAS_WIDTH - 30, 0);
+    rightGrad.addColorStop(0, edgeColor);
+    rightGrad.addColorStop(1, edgeColor + '00');
+    ctx.fillStyle = rightGrad;
+    ctx.fillRect(CANVAS_WIDTH - 30, 0, 30, CANVAS_HEIGHT);
+    ctx.restore();
   }
 
   ctx.restore();
