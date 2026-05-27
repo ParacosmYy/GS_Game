@@ -239,6 +239,10 @@ export function drawFighters(
       ctx.stroke();
       ctx.restore();
     }
+    // KOF2002: 被投技摇晃 — isBeingThrown时身体微抖
+    if (f.isBeingThrown) {
+      ctx.translate(Math.sin(globalTick * 2) * 2, 0);
+    }
     // KOF2002: 后撤步渐隐 — 后dash期间身体更透明(幻影感)
     if (f.state === FighterState.BACKDASH) {
       ctx.globalAlpha = Math.min(ctx.globalAlpha || 1, 0.75);
@@ -327,6 +331,17 @@ export function drawFighters(
       ctx.translate(0, -sy);
       ctx.scale(1 - hitSquash * 0.08, 1 + hitSquash * 0.05);
       ctx.translate(0, sy);
+    }
+    // KOF2002: 受击火花环 — HITSTUN首帧小环形火花
+    if (f.state === FighterState.HITSTUN && f.stateAge === 0) {
+      ctx.save();
+      ctx.globalAlpha = 0.3;
+      ctx.strokeStyle = '#ffcc44';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.arc(sx, sy - f.displayHeight / 2, hw + 10, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.restore();
     }
     // KOF2002: 命中停顿攻击者发光 — hitstop时攻击者微白轮廓
     if (f.hitFlashFrames > 0 && f.state !== FighterState.HITSTUN && f.state !== FighterState.KNOCKDOWN) {
