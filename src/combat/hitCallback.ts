@@ -89,14 +89,20 @@ export const MOVE_NAME_MAP: Partial<Record<AttackType, string>> = {
 /** 根据攻击类型获取招式名样式 */
 function getMoveNameStyle(at: AttackType, charSpecialColor: string): { color: string; fontSize: number } | null {
   const atStr = at as string;
-  const isSDM = atStr.startsWith('SDM_') || atStr.startsWith('HSDM_');
+  const isHSDM = atStr.startsWith('HSDM_');
+  const isSDM = atStr.startsWith('SDM_') || isHSDM;
   const _isDM = atStr.startsWith('DM_') || isSDM;
 
+  if (isHSDM) {
+    return { color: '#ff44ff', fontSize: 30 };
+  }
+  if (isSDM) {
+    return { color: '#ffd700', fontSize: 28 };
+  }
   if (_isDM) {
-    // DM/SDM: 金色, 26px
     return { color: '#ffd700', fontSize: 26 };
   }
-  // 必杀技: 角色色, 20px
+  // 必殺技: 角色色, 20px
   return { color: charSpecialColor, fontSize: 20 };
 }
 
