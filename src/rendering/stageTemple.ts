@@ -117,7 +117,7 @@ export function drawTempleStage(
   drawClouds(ctx, globalTick, CLOUDS);
   drawDistantMountains(ctx, cameraX);
   drawTempleBuildings(ctx, cameraX, globalTick, LANTERNS, CLOUDS);
-  drawGround(ctx, cameraX);
+  drawGround(ctx, cameraX, globalTick, LANTERNS);
   renderParticles(ctx, globalTick);
   renderStageBoundaries(ctx, cameraX);
 }

@@ -879,7 +879,7 @@ function drawLantern(ctx: CanvasRenderingContext2D, x: number, y: number, size: 
 
 // ===== Layer 3: Ground =====
 
-export function drawGround(ctx: CanvasRenderingContext2D, cameraX: number): void {
+export function drawGround(ctx: CanvasRenderingContext2D, cameraX: number, tick: number = 0, lanterns: Lantern[] = []): void {
   // 木地板 — 更丰富的渐变
   const groundGrad = ctx.createLinearGradient(0, STAGE_GROUND_Y, 0, CANVAS_HEIGHT);
   groundGrad.addColorStop(0, '#3a3025');
@@ -945,6 +945,36 @@ export function drawGround(ctx: CanvasRenderingContext2D, cameraX: number): void
   reflGrad.addColorStop(1, 'rgba(80, 120, 255, 0)');
   ctx.fillStyle = reflGrad;
   ctx.fillRect(0, STAGE_GROUND_Y, CANVAS_WIDTH, 35);
+
+  // KOF2002: 灯笼水面倒影 — 灯笼暖光沿地面反射，配合脉动和涟漪
+  for (const lantern of lanterns) {
+    const lx = lantern.baseX - cameraX * 0.5;
+    if (lx < -60 || lx > CANVAS_WIDTH + 60) continue;
+    const flicker = 0.7 + Math.sin(tick * 0.06 + lantern.swayPhase) * 0.15 + Math.sin(tick * 0.13 + lantern.swayPhase * 2) * 0.1;
+    const reflY = STAGE_GROUND_Y + 5;
+    const reflH = 20 + Math.sin(tick * 0.04 + lantern.swayPhase) * 4;
+    // Lantern glow reflection on ground
+    const reflGlow = ctx.createRadialGradient(lx, reflY, 2, lx, reflY + reflH / 2, 25 + lantern.size);
+    reflGlow.addColorStop(0, lantern.color + Math.round(flicker * 40).toString(16).padStart(2, '0'));
+    reflGlow.addColorStop(0.4, lantern.color + Math.round(flicker * 18).toString(16).padStart(2, '0'));
+    reflGlow.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = reflGlow;
+    ctx.fillRect(lx - 30, reflY, 60, reflH);
+    // Ripple lines
+    ctx.save();
+    ctx.globalAlpha = flicker * 0.15;
+    ctx.strokeStyle = lantern.color;
+    ctx.lineWidth = 0.5;
+    for (let r = 0; r < 3; r++) {
+      const ry = reflY + 4 + r * 6 + Math.sin(tick * 0.03 + r * 1.5) * 2;
+      const rw = 12 + r * 6 + Math.sin(tick * 0.05 + lantern.swayPhase + r) * 4;
+      ctx.beginPath();
+      ctx.moveTo(lx - rw, ry);
+      ctx.quadraticCurveTo(lx, ry + Math.sin(tick * 0.04 + r) * 1.5, lx + rw, ry);
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
 }
 
 function drawRailing(ctx: CanvasRenderingContext2D, cameraX: number): void {
