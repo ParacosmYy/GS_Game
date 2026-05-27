@@ -67,7 +67,12 @@
   - Iori屑風暗能量漩涡专属VFX (暗紫螺旋+爪痕斩击+暗影wisp)
   - Ryo霸王翔吼拳属性色VFX (蓝雷替代通用金色)
   - Ryo強虎煌拳D版增强 (impactRing+screenFlash+shake升级)
-  - 4372 回归测试保护反馈矩阵完整性和层级递进
+  - Kyo荒咬み連撃鏈遞進火焰VFX (opener→followup→finisher遞增)
+  - Ryo卸しimpactRing+Iori雪割暗能量爆裂
+  - 3角色57必殺技VFX+SFX全覆蓋回歸測試 (118 tests)
+  - MAX爆氣激活角色屬性色閃光 (取代通用綠色)
+  - DM終結KO屬性色閃光 (DM/SDM/HSDM擊殺按殺手元素色)
+  - 4512 回归测试保护反馈矩阵完整性和层级递进
 - 当前差距：hitstop、spark、shake、pushback、SFX 还没有按轻重/特殊/爆气状态形成稳定矩阵。
 - 新功能添加点：
   - feedback manifest
@@ -122,7 +127,7 @@
   - Kyo 完整度校验工具 (8维报告: animationMeta/frameData/attackFrames/feedback/portrait/moveList/cancelPaths/hitEffects)
   - Iori 完整度校验工具 (8维报告: 同Kyo结构)
   - Kyo/Iori完整度回归测试 (33 tests: 维度有效性+覆盖率+最低阈值)
-  - 测试总数 4504
+  - 测试总数 4512
 - 当前差距：角色内容已开始分层，但真实数据、兼容入口、校验工具之间还需继续收口。
 - 新功能添加点：
   - `src/content/characters/index.ts` barrel export
@@ -136,7 +141,7 @@
 
 - 当前差距：部分输入、镜头、特效、命中边界虽然已改善，但仍需要更强回归保护。
 - 已闭合项：
-  - 4504 tests 全部通过 (vitest)
+  - 4512 tests 全部通过 (vitest)
   - 6档反馈矩阵回归测试 (23 tests, 层级递进+参数完整性+3角色映射)
   - DM→SDM→HSDM升级链回归测试 (8 tests, Kyo/Iori/HSDM一致性)
   - 3角色必杀技像素帧覆盖 (134 tests, 基本+通常+必杀+DM/SDM/HSDM+命令技)
