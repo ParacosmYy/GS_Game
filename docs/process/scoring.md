@@ -3,9 +3,9 @@
 ## 1. 当前分数
 
 <<<<<<< HEAD
-当前总分：`147/2000`
+当前总分：`148/2000`
 =======
-当前总分：`147/2000`
+当前总分：`148/2000`
 >>>>>>> b5b42fb (docs(scoring): 144->145/2000 special move variable frames)
 
 完整历史见 [SCORE.history.md](../archive/SCORE.history.md)。
@@ -32,7 +32,7 @@
 | 游戏流程 | 100 | 26 | 完整街机流程+3v3+训练模式+MATCH POINT+暂停菜单+OPTIONS+回合开始持续提示+KO结果HP对比+回合切换黑幕淡入 |
 >>>>>>> d0f7746 (docs(scoring): 142->143/2000 round transition fade-in)
 >>>>>>> b5b42fb (docs(scoring): 144->145/2000 special move variable frames)
-| UI/HUD品质 | 50 | 14 | SNK风格能量槽+计时器+连段计数器+播报+像素帧缓存+暂停菜单(招式/按键)+训练模式SNK风格招式表 |
+| UI/HUD品质 | 50 | 15 | SNK风格能量槽+计时器+连段计数器+播报+像素帧缓存+暂停菜单(招式/按键)+训练模式SNK风格招式表 |
 
 ## 2.1 Phase 2 千分制维度（1001-2000）
 
