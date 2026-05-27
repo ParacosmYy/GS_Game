@@ -108,6 +108,12 @@ export {
 } from './iori/animations.js';
 
 export {
+  IORI_PORTRAIT_META,
+  getIoriPortraitMeta,
+  getIoriAvailablePortraitSizes,
+} from './iori/portraits/ioriPortraits.js';
+
+export {
   IORI_CANCEL_PATHS,
   findCancelRoute as findIoriCancelRoute,
   getCancelTargets as getIoriCancelTargets,
