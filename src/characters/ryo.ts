@@ -834,10 +834,8 @@ export const RyoDef: CharacterDefinition = {
       || state === FighterState.HOP
       || state === FighterState.HYPER_JUMP;
     if (isAir) return null;
-    // →+A: 近距离→猛速突進拳 / 远距离→冰柱割り(overhead)
-    if (input.buttonAPressed && input.forward && !input.down) {
-      return _isCloseRange ? AttackType.RYO_HIO_HACKER : AttackType.RYO_TSURIZAO;
-    }
+    // →+A 冰柱割り (overhead)
+    if (input.buttonAPressed && input.forward && !input.down) return AttackType.RYO_TSURIZAO;
     // ↘+B 落蹴 (low)
     if (input.buttonBPressed && input.forward && input.down) return AttackType.RYO_ORISHI;
     return null;
