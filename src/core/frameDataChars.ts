@@ -336,6 +336,18 @@ export const FRAME_DATA_CHARS = {
     knockdown: true,
     chipDamage: 30,
   },
+  HSDM_OROCHINAGI: {
+    startup: 5,
+    active: 30,
+    recovery: 32,
+    damage: 400,
+    hitstun: 0,
+    blockstun: 24,
+    pushback: 16,
+    hitLevel: "MID" as const,
+    knockdown: true,
+    chipDamage: 40,
+  },
   // 百八拾二式·SDM — SDM版伤害高于DM_A/C
   SDM_182SHIKI: {
     startup: 4,

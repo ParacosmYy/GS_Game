@@ -159,9 +159,13 @@ export const HITBOX_OFFSETS = {
   DM_HAKA_OTOSHI: { offsetX: 50, offsetY: -120, width: 95, height: 75 },
   // ── SDM hitboxes (larger than DM) ──
   SDM_OROCHINAGI: { offsetX: 50, offsetY: -120, width: 100, height: 80 },
+  HSDM_OROCHINAGI: { offsetX: 55, offsetY: -120, width: 110, height: 85 },
   SDM_YATAGARASU: { offsetX: 45, offsetY: -140, width: 95, height: 85 },
+  HSDM_YAOTOME: { offsetX: 50, offsetY: -140, width: 100, height: 90 },
   SDM_POWER_GEYSER: { offsetX: 50, offsetY: -120, width: 100, height: 80 },
+  SDM_HIGH_ANGLE_GEYSER: { offsetX: 45, offsetY: -140, width: 100, height: 80 },
   SDM_PHOENIX_KICK: { offsetX: 50, offsetY: -130, width: 95, height: 80 },
+  SDM_PHOENIX_HITEN: { offsetX: 55, offsetY: -140, width: 95, height: 80 },
   SDM_TEN_HA_OU: { offsetX: 50, offsetY: -120, width: 100, height: 80 },
   SDM_V_SLASHER: { offsetX: 45, offsetY: -140, width: 95, height: 85 },
   SDM_CHAIN_SHOT: { offsetX: 50, offsetY: -130, width: 95, height: 80 },

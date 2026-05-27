@@ -34,13 +34,17 @@ describe('simplifiedInput', () => {
       const r = resolveSimplified(false, true, false, ryo, makeGauge(0), makeMaxMode(true));
       expect(r.attack).toBe(AttackType.RYO_KO_HOU_C);
     });
-    it('O activates MAX when stocks >= 1', () => {
-      const r = resolveSimplified(false, false, true, ryo, makeGauge(1), makeMaxMode(false));
+    it('O activates MAX when stocks >= 3', () => {
+      const r = resolveSimplified(false, false, true, ryo, makeGauge(3), makeMaxMode(false));
       expect(r.activateMax).toBe(true);
       expect(r.attack).toBeNull();
     });
+    it('O does not activate MAX with < 3 stocks', () => {
+      const r = resolveSimplified(false, false, true, ryo, makeGauge(1), makeMaxMode(false));
+      expect(r.activateMax).toBe(false);
+    });
     it('O does not activate MAX when already active', () => {
-      const r = resolveSimplified(false, false, true, ryo, makeGauge(1), makeMaxMode(true));
+      const r = resolveSimplified(false, false, true, ryo, makeGauge(3), makeMaxMode(true));
       expect(r.activateMax).toBe(false);
     });
     it('O does not activate MAX when no stocks', () => {

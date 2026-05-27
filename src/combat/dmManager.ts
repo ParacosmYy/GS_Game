@@ -26,6 +26,8 @@ function formatMoveName(atk: string): string {
 // DM -> HSDM upgrade mapping (MAX + desperation)
 const DM_TO_HSDM: Partial<Record<AttackType, AttackType>> = {
   [AttackType.DM_RYUKO_RANBU]: AttackType.HSDM_RYUKO_RANBU,
+  [AttackType.DM_OROCHINAGI]: AttackType.HSDM_OROCHINAGI,
+  [AttackType.DM_YATAGARASU]: AttackType.HSDM_YAOTOME,
 };
 
 const DM_TO_SDM: Partial<Record<AttackType, AttackType>> = {
@@ -35,8 +37,10 @@ const DM_TO_SDM: Partial<Record<AttackType, AttackType>> = {
   [AttackType.DM_YATAGARASU]: AttackType.SDM_YATAGARASU,
   // Terry
   [AttackType.DM_POWER_GEYSER]: AttackType.SDM_POWER_GEYSER,
+  [AttackType.DM_HIGH_ANGLE_GEYSER]: AttackType.SDM_HIGH_ANGLE_GEYSER,
   // Kim
   [AttackType.DM_PHOENIX_KICK]: AttackType.SDM_PHOENIX_KICK,
+  [AttackType.DM_PHOENIX_HITEN]: AttackType.SDM_PHOENIX_HITEN,
   // Ryo
   [AttackType.DM_TEN_HA_OU]: AttackType.SDM_TEN_HA_OU,
   [AttackType.DM_RYUKO_RANBU]: AttackType.SDM_RYUKO_RANBU,

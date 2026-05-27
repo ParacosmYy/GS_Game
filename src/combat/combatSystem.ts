@@ -576,8 +576,8 @@ export class CombatSystem {
       damage = Math.round(damage * MAX_MODE_DEFENSE_BONUS);
     }
 
-    // Desperation mode: defender at low health (<25%), DM damage +30% for attacker
-    if (isDM(attackName) && defender.health > 0 && defender.health / defender.maxHealth < DESPERATION_HEALTH_THRESHOLD) {
+    // Desperation mode: attacker at low health (<25%), DM damage +30% (KOF2002 style)
+    if (isDM(attackName) && attacker.health > 0 && attacker.health / attacker.maxHealth < DESPERATION_HEALTH_THRESHOLD) {
       damage = Math.round(damage * DESPERATION_DM_DAMAGE_BONUS);
     }
 

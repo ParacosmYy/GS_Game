@@ -8,6 +8,7 @@
 import { AttackType } from '../core/types.js';
 import type { CharacterDefinition } from '../characters/types.js';
 import type { PowerGauge, MaxModeState } from '../core/types.js';
+import { MAX_MODE_STOCK_COST } from '../core/constants.js';
 
 export interface SimplifiedResult {
   attack: AttackType | null;
@@ -146,7 +147,7 @@ export function resolveSimplified(
   maxModes: MaxModeState,
 ): SimplifiedResult {
   // O: Activate MAX mode
-  if (oPressed && !maxModes.active && gauges.stocks >= 1) {
+  if (oPressed && !maxModes.active && gauges.stocks >= MAX_MODE_STOCK_COST) {
     return { attack: null, activateMax: true };
   }
 
