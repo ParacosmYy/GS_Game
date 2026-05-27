@@ -71,3 +71,6 @@ export const ROSTER: CharacterDefinition[] = [
 // Register each character's ActionContracts into the global lookup.
 // Runtime systems (combat, rendering, audio) query contracts via getCharacterActionContract().
 registerCharacterContracts('ryo', RYO_ACTION_CONTRACTS);
+
+import { KYO_ACTION_CONTRACTS } from '../core/kyoFrameContract.js';
+registerCharacterContracts('kyo', KYO_ACTION_CONTRACTS);
