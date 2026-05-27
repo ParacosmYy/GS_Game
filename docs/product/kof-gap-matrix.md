@@ -14,6 +14,11 @@
 
 ### 1.1 肖像气质差距
 
+- 已闭合项：
+  - portrait manifest 四尺寸规范 (select 120x120 / vs 160x160 / hud 48x48 / win 200x200)
+  - Ryo/Kyo/Iori 全4尺寸像素肖像数据
+  - 27角色 CHARACTER_PORTRAIT_COLORS fallback 色板
+  - 肖像渲染三级链 (sizedPortraits → pixelPortrait → 渐变+字母)
 - 当前差距：选人、HUD、胜利肖像还没有形成统一的正式角色气质。
 - 新功能添加点：
   - `portrait manifest`
@@ -30,6 +35,9 @@
   - Ryo/Kyo/Iori 所有指令通常技(命令通常技)已有专用高分辨率像素帧(v2.14)
   - 不再 fallback 到程序化渲染
   - 8个校验点 + 11个回归测试保护
+  - Iori动画元数据补全 (crouch/block/dizzy)
+  - 3角色动画节奏一致性回归测试 (63 tests: 轻重攻击递增/hitstun<knockdown/loop属性)
+  - 3角色必杀技像素帧覆盖 (134 tests: 基本+通常+必杀+DM/SDM/HSDM+命令技)
 - 新功能添加点：
   - animation manifest
   - pose bank
