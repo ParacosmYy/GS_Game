@@ -1144,4 +1144,27 @@
 **仍不像KOF在哪里:**
 - 音效仍是Web Audio合成,缺乏重量感
 - 角色仍是骨骼棍人+高分辨率像素帧混合
+
+---
+
+## H228: 10种攻击独立recovery帧+TSURIZAO/ORISHI反馈+gi抖色+像素残影 — 200→204
+
+**commits:** ead26f9 + d8cb1d5 + d135773 + e1b3cf6 + e054ef2 + 65ab260 + b8de7f2
+
+**变更:**
+- H228a: 10种攻击(STAND_A/C/B/D, CLOSE_A/B/C/D, CROUCH_B/D)独立recovery帧替代clone(BASE)
+- H228b: TSURIZAO(overhead)专属VFX: groundSlam+impactRing, ORISHI(low)专属VFX: heavyDust
+- H228c: gi褶皱SNK抖色纹理: idle帧+attack帧 gg→gege checkerboard渐变
+- H228d: 像素帧残影系统: RUN/BACKDASH/ROLL使用drawHighResAfterimage()替代skeletal
+- H228e: 14项recovery帧唯一性验证测试
+
+**更像KOF在哪里:**
+- 攻击收招有可见武器回收轨迹,不再瞬移回guard
+- gi道服褶皱从硬边缘变为SNK checkerboard渐变
+- RUN/BACKDASH残影保持角色精确轮廓,不是火柴人
+- 釣瓶打overhead有地面冲击反馈,卸しlow有低位扬尘
+
+**仍不像KOF在哪里:**
+- 仍是程序化像素帧,非真实SNK精灵图
+- 音效仍是Web Audio合成
 - 舞台仍是程序化背景,缺乏位图质感
