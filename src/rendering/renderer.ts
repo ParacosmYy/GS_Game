@@ -320,8 +320,8 @@ export class Renderer {
     drawKO(this.ctx, winner, perfectPlayer);
   }
 
-  drawSuperFlash(ctx: CanvasRenderingContext2D, timer: number, flashScreenX: number, flashScreenY: number, flashType: 'DM' | 'SDM' | 'HSDM' = 'DM'): void {
-    drawSuperFlash(ctx, timer, flashScreenX, flashScreenY, flashType);
+  drawSuperFlash(ctx: CanvasRenderingContext2D, timer: number, flashScreenX: number, flashScreenY: number, flashType: 'DM' | 'SDM' | 'HSDM' = 'DM', moveName?: string | null): void {
+    drawSuperFlash(ctx, timer, flashScreenX, flashScreenY, flashType, moveName);
   }
 
   /** Get current super flash zoom factor (1.0 = no zoom, ~1.08 during flash) */

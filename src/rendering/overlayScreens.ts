@@ -35,6 +35,7 @@ export function drawSuperFlash(
   ctx: CanvasRenderingContext2D, timer: number,
   flashScreenX: number, flashScreenY: number,
   flashType: 'DM' | 'SDM' | 'HSDM' = 'DM',
+  moveName?: string | null,
 ): void {
   ctx.save();
   // KOF2002 Super Flash 4阶段: FLASH(24-19) → DARKEN(18-13) → HOLD(12-5) → RELEASE(4-0)
@@ -253,6 +254,55 @@ export function drawSuperFlash(
       ctx.arc(px, py, pSize, 0, Math.PI * 2);
       ctx.fill();
     }
+  }
+
+  // KOF2002: DM name banner — large centered move name during DARKEN/HOLD phase
+  if (moveName && timer <= 19 && timer > 4) {
+    const bannerAlpha = timer > 14 ? Math.min(1, (19 - timer) / 5) : Math.min(1, (timer - 4) / 8);
+    const bannerScale = timer > 16 ? 1.8 - (19 - timer) * 0.27 : 1.0;
+    const bannerY = CANVAS_HEIGHT * 0.38;
+
+    ctx.save();
+    ctx.globalAlpha = bannerAlpha;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+
+    // Banner background bar
+    const barW = Math.max(200, moveName.length * 28 + 60);
+    const barH = 40;
+    const barGrad = ctx.createLinearGradient(CANVAS_WIDTH / 2 - barW / 2, bannerY - barH / 2, CANVAS_WIDTH / 2 + barW / 2, bannerY + barH / 2);
+    if (isHSDM) {
+      barGrad.addColorStop(0, 'rgba(80, 0, 120, 0.85)');
+      barGrad.addColorStop(0.5, 'rgba(120, 20, 160, 0.9)');
+      barGrad.addColorStop(1, 'rgba(80, 0, 120, 0.85)');
+    } else if (isSDM) {
+      barGrad.addColorStop(0, 'rgba(100, 40, 0, 0.85)');
+      barGrad.addColorStop(0.5, 'rgba(160, 60, 0, 0.9)');
+      barGrad.addColorStop(1, 'rgba(100, 40, 0, 0.85)');
+    } else {
+      barGrad.addColorStop(0, 'rgba(40, 30, 0, 0.85)');
+      barGrad.addColorStop(0.5, 'rgba(80, 60, 0, 0.9)');
+      barGrad.addColorStop(1, 'rgba(40, 30, 0, 0.85)');
+    }
+    ctx.fillStyle = barGrad;
+    roundRect(ctx, CANVAS_WIDTH / 2 - barW / 2 * bannerScale, bannerY - barH / 2 * bannerScale, barW * bannerScale, barH * bannerScale, 6);
+    ctx.fill();
+
+    // Gold border
+    ctx.strokeStyle = '#ffd700';
+    ctx.lineWidth = 2;
+    roundRect(ctx, CANVAS_WIDTH / 2 - barW / 2 * bannerScale, bannerY - barH / 2 * bannerScale, barW * bannerScale, barH * bannerScale, 6);
+    ctx.stroke();
+
+    // Move name text
+    const nameColor = isHSDM ? '#ff88ff' : isSDM ? '#ffaa44' : '#ffd700';
+    ctx.shadowColor = nameColor;
+    ctx.shadowBlur = 15;
+    const fontSize = Math.round(22 * bannerScale);
+    drawSNKText(ctx, moveName, CANVAS_WIDTH / 2, bannerY, fontSize, nameColor);
+    ctx.shadowBlur = 0;
+
+    ctx.restore();
   }
 
   ctx.restore();

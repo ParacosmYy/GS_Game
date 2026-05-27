@@ -56,6 +56,8 @@ export class CinematicState {
   superFlashAttacker = 0; // 0=p1, 1=p2
   /** Flash type for current super flash */
   superFlashType: 'DM' | 'SDM' | 'HSDM' = 'DM';
+  /** Move name to display during super flash (null = no banner) */
+  superFlashMoveName: string | null = null;
   /** Defender index during hit-stop (for jitter rendering). -1 = none */
   hitStopDefender = -1;
   /** Directional bias for defender jitter (attacker's facing direction) */
@@ -150,13 +152,14 @@ export class CinematicState {
   }
 
   /** Trigger Super Flash (dark screen freeze) on DM startup */
-  triggerSuperFlash(x: number, y: number, attacker: number, duration?: number, flashType?: 'DM' | 'SDM' | 'HSDM'): void {
+  triggerSuperFlash(x: number, y: number, attacker: number, duration?: number, flashType?: 'DM' | 'SDM' | 'HSDM', moveName?: string): void {
     const dur = duration ?? 28;
     this.superFlashTimer = dur;
     this.superFlashX = x;
     this.superFlashY = y;
     this.superFlashAttacker = attacker;
     this.superFlashType = flashType ?? 'DM';
+    this.superFlashMoveName = moveName ?? null;
     this.hitStop = dur;
   }
 

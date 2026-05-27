@@ -1167,7 +1167,7 @@ function render(): void {
       ctx.scale(zoom, zoom);
       ctx.translate(-CANVAS_WIDTH / 2, -CANVAS_HEIGHT / 2);
     }
-    renderer.drawSuperFlash(ctx, cinematic.superFlashTimer, cinematic.superFlashX - camera.x, cinematic.superFlashY, cinematic.superFlashType);
+    renderer.drawSuperFlash(ctx, cinematic.superFlashTimer, cinematic.superFlashX - camera.x, cinematic.superFlashY, cinematic.superFlashType, cinematic.superFlashMoveName);
     if (zoom > 1.001) {
       ctx.restore();
     }
