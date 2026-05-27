@@ -2,7 +2,11 @@
 
 ## 1. 当前分数
 
-当前总分：`154/2000`
+
+
+当前总分：`155/2000`
+b5b42fb (docs(scoring): 144->145/2000 special move variable frames)
+cbd3d1b (docs(scoring): 148->149/2000 variable frame regression test)
 
 完整历史见 [SCORE.history.md](../archive/SCORE.history.md)。
 
