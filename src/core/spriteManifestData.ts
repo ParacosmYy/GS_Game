@@ -638,18 +638,24 @@ function makeAnim(name: string, frameCount: number, loop: boolean, durationMs: n
  */
 function createMinimalAnimations(): Record<string, SpriteAnimation> {
   return {
-    idle:         makeAnim('idle',         4, true,  150),
-    walk_forward: makeAnim('walk_forward', 6, true,  100),
-    crouch:       makeAnim('crouch',       1, false, 200),
-    jump:         makeAnim('jump',         6, false,  80),
-    stand_a:      makeAnim('stand_a',      3, false, 100),
-    stand_c:      makeAnim('stand_c',      4, false, 120),
-    hurt:         makeAnim('hurt',         3, false, 100),
-    knockdown:    makeAnim('knockdown',    4, false, 150),
-    win:          makeAnim('win',          3, false, 200),
-    dizzy:        makeAnim('dizzy',        4, true,  200),
-    guard_crush:  makeAnim('guard_crush',  3, false, 150),
-    taunt:        makeAnim('taunt',        6, false, 100),
+    idle:           makeAnim('idle',           4, true,  150),
+    walk_forward:   makeAnim('walk_forward',   6, true,  100),
+    walk_backward:  makeAnim('walk_backward',  6, true,  110),
+    crouch:         makeAnim('crouch',         1, false, 200),
+    jump:           makeAnim('jump',           6, false,  80),
+    jump_up:        makeAnim('jump_up',        6, false,  80),
+    jump_forward:   makeAnim('jump_forward',   6, false,  80),
+    jump_backward:  makeAnim('jump_backward',  6, false,  80),
+    stand_a:        makeAnim('stand_a',        3, false, 100),
+    stand_c:        makeAnim('stand_c',        4, false, 120),
+    hurt:           makeAnim('hurt',           3, false, 100),
+    hurt_standing:  makeAnim('hurt_standing',  3, false, 100),
+    hurt_crouching: makeAnim('hurt_crouching', 3, false, 120),
+    knockdown:      makeAnim('knockdown',      4, false, 150),
+    win:            makeAnim('win',            3, false, 200),
+    dizzy:          makeAnim('dizzy',          4, true,  200),
+    guard_crush:    makeAnim('guard_crush',    3, false, 150),
+    taunt:          makeAnim('taunt',          6, false, 100),
   };
 }
 
