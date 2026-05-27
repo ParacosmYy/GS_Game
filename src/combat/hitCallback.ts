@@ -304,10 +304,16 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
     const combo = deps.combatSystem.getComboCount(defIdx);
     const comboDmg = deps.combatSystem.getComboDamage(defIdx);
     const baseStop = calcHitStop(attackType, counterHit);
-    // 连击和低血只做轻微补强，避免把命中时间线拖成堆栈
-    const comboStop = combo >= 10 ? 1 : 0;
+    // KOF2002: 连击hitstop递减 — 高连击时每hit的hitstop逐步缩短
+    // hits 1-4: full, hits 5-8: 70%, hits 9+: 50%
+    // DM不受递减影响
+    const comboDecayMultiplier = isDM ? 1.0
+      : combo < 4 ? 1.0
+      : combo < 8 ? 0.7
+      : 0.5;
+    // 低血补强: 不受连击递减
     const criticalStop = defender.health < defender.maxHealth * 0.15 ? 1 : 0;
-    deps.cinematic.triggerHitStop(baseStop + comboStop + criticalStop, defIdx, attacker.facing);
+    deps.cinematic.triggerHitStop(Math.round(baseStop * comboDecayMultiplier) + criticalStop, defIdx, attacker.facing);
     gainMeterOnHitstun(deps.gauges[defIdx], attackType, defender.health, defender.maxHealth);
     // 风云再起特色: 第一次命中奖励 — 每回合首次命中额外+30气槽
     if (!deps.combatSystem.wasFirstHitAwarded(defIdx)) {
