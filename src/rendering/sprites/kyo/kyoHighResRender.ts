@@ -103,6 +103,8 @@ function initKyoFrames(): void {
   registerVariableFrames('DOKUGAMI', KYO_DOKUGAMI_FRAMES, [7, 5, 10, 12]);
   registerVariableFrames('OROCHINAGI_DM', KYO_OROCHINAGI_DM_FRAMES, [8, 4, 14, 8, 12]);
   registerVariableFrames('OROCHINAGI_SDM', KYO_OROCHINAGI_SDM_FRAMES, [10, 6, 20, 12, 8, 10]);
+  // HSDM reuses SDM frames with extended durations
+  registerVariableFrames('OROCHINAGI_HSDM', KYO_OROCHINAGI_SDM_FRAMES, [12, 8, 24, 16, 10, 12]);
 
   // Movement
   registerVariableFrames('RUN', KYO_RUN_FRAMES, [3, 3, 2, 2, 3, 2]);
@@ -159,6 +161,7 @@ function resolveKyoFrameKey(
           currentAttack === AttackType.KYO_BATSUYOMI) return 'DOKUGAMI';
       if (currentAttack === AttackType.DM_OROCHINAGI) return 'OROCHINAGI_DM';
       if (currentAttack === AttackType.SDM_OROCHINAGI) return 'OROCHINAGI_SDM';
+      if (currentAttack === AttackType.HSDM_OROCHINAGI) return 'OROCHINAGI_HSDM';
       if (currentAttack === AttackType.STAND_C) return 'STAND_C';
       if (currentAttack === AttackType.CLOSE_C) return 'CLOSE_C';
       if (currentAttack === AttackType.STAND_D) return 'STAND_D';
