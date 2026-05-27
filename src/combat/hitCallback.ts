@@ -716,6 +716,12 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       deps.vfx.spawnGroundSlam(hitX, hitY);
       deps.screenShake.trigger(10, 8, attacker.facing * 5);
     }
+    // Crack Shot — sweep kick with heavy dust
+    if (atkName === 'TERRY_CRACK_SHOT') {
+      deps.cinematic.addHitStop(1, defIdx);
+      deps.screenShake.trigger(6, 5, attacker.facing * 3);
+      deps.vfx.spawnHeavyDust(hitX, hitY, 6);
+    }
     // Rising Tackle — upward hit
     if (atkName === 'TERRY_RISING_TACKLE') {
       deps.cinematic.addHitStop(1, defIdx);
