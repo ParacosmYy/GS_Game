@@ -744,6 +744,31 @@ export function drawVSSplash(
   ctx.fillStyle = 'rgba(0, 0, 0, 0.92)';
   ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
+  // KOF2002 diagonal slash wipe effect
+  if (timer > 0 && timer < 20) {
+    const slashProgress = timer / 20;
+    const slashX = CANVAS_WIDTH * slashProgress;
+    const slashY = CANVAS_HEIGHT * slashProgress;
+    ctx.save();
+    ctx.strokeStyle = '#ffcc00';
+    ctx.lineWidth = 3;
+    ctx.shadowColor = '#ffcc00';
+    ctx.shadowBlur = 12;
+    ctx.beginPath();
+    ctx.moveTo(slashX, 0);
+    ctx.lineTo(0, slashY);
+    ctx.stroke();
+    // Trail glow
+    ctx.globalAlpha = Math.max(0, 1 - slashProgress * 1.5);
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(slashX + 5, 0);
+    ctx.lineTo(0, slashY + 5);
+    ctx.stroke();
+    ctx.restore();
+  }
+
   // 淡入动画
   const fadeIn = Math.min(1, timer / 15);
   ctx.globalAlpha = fadeIn;
