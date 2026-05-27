@@ -549,12 +549,12 @@ export function drawFighters(
       ctx.stroke();
       ctx.restore();
     }
-    // MAX glow
+    // MAX glow — P1 green, P2 blue for differentiation
     if (maxModeActive) {
       ctx.save();
       ctx.globalCompositeOperation = 'screen';
       ctx.globalAlpha = 0.15 + Math.sin(globalTick * 0.15) * 0.1;
-      ctx.fillStyle = '#44ff88';
+      ctx.fillStyle = playerIdx === 0 ? '#44ff88' : '#4488ff';
       ctx.fillRect(sx + leanOffsetX - 60, sy - 200, 120, 200);
       ctx.restore();
     }
@@ -611,6 +611,14 @@ export function drawFighters(
       const dangerPulse = Math.sin(globalTick * 0.6) * 0.5 + 0.5;
       ctx.fillStyle = 'rgba(255, 50, 0, ' + (dangerPulse * 0.18) + ')';
       ctx.fillRect(sx + leanOffsetX - hw - 8, sy - f.displayHeight - 8, (hw + 8) * 2, f.displayHeight + 16);
+    }
+
+    // KOF2002: 防御槽低下警告 — guardGauge<30%时身体微黄
+    if (f.guardGauge < 30 && f.state !== FighterState.KNOCKDOWN && f.state !== FighterState.DIZZY) {
+      const gaugeRatio = f.guardGauge / 30;
+      const yellowPulse = Math.sin(globalTick * 0.4) * 0.5 + 0.5;
+      ctx.fillStyle = 'rgba(255, 200, 0, ' + ((1 - gaugeRatio) * 0.08 * yellowPulse) + ')';
+      ctx.fillRect(sx + leanOffsetX - hw - 3, sy - f.displayHeight - 3, (hw + 3) * 2, f.displayHeight + 6);
     }
 
     // KOF2002: 待机战斗姿态光 — IDLE时对手近距离时身体微亮(紧张感)
