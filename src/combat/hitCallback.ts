@@ -409,6 +409,11 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
     // KOF2002: DM/SDM命中时屏幕短暂暗化突出超必杀效果
     if (isDM) { attacker.superBgFlashFrames = isSDM ? 12 : 8; }
 
+    // KOF2002: 命中灰尘 — 地面命中时击中点产生微小灰尘
+    if (defender.isGrounded() && !isDM) {
+      deps.vfx.spawnDust(hitX, hitY + 20);
+    }
+
     // 重攻击保留一层短促微闪，不再额外叠更多环
     if (isHeavyAttack(attackType) && !isSpecial && !isDM) {
       deps.vfx.spawnImpactRing(hitX, hitY, 0.75);
