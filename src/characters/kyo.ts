@@ -29,6 +29,7 @@ import {
   AttackType,
 } from '../core/types.js';
 import { FRAME_DATA } from '../core/constants.js';
+import { KYO_MOVE_LIST } from '../content/characters/kyo/commands/kyoCommands.js';
 
 const REKKA_WINDOW = 20;
 
@@ -43,14 +44,7 @@ export const KyoDef: CharacterDefinition = {
   portrait: '🔥',
   pixelPortrait: kyoPortrait,
   winQuotes: ['まだまだだな', '俺の炎に焼かれる覚悟はできたか?', '草薙の拳、見せてやるよ'],
-  moveList: [
-    { name: '荒咬（アラガミ）', input: '↓↘→ + 轻拳(A)' },
-    { name: '毒咬（ドクガミ）', input: '↓↘→ + 重拳(C)' },
-    { name: '75式·改', input: '↓↘→ + 踢(K)' },
-    { name: 'R.E.D. KICK', input: '↓↙← + 踢(K)' },
-    { name: '鬼烧（オニヤキ）', input: '→↓↘ + 拳 （或快捷：→↓）' },
-    { name: '大蛇薙（ダイジャナギ）[大招]', input: '↓↙←↙↓↘→ + 拳 （或 ↓↘→↓↘→）' },
-  ],
+  moveList: KYO_MOVE_LIST.map(e => ({ name: e.name, input: e.input, type: e.type })),
 
   stats: {
     walkSpeed: 4,

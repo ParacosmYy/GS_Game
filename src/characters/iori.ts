@@ -18,6 +18,7 @@ import {
 import { Projectile } from '../entities/projectile.js';
 import { FRAME_DATA } from '../core/constants.js';
 import { ioriPortrait } from '../rendering/portraits/ioriPortrait.js';
+import { IORI_MOVE_LIST } from '../content/characters/iori/commands/ioriCommands.js';
 
 export const IoriDef: CharacterDefinition = {
   id: 'iori',
@@ -30,14 +31,7 @@ export const IoriDef: CharacterDefinition = {
   portrait: '🌙',
   pixelPortrait: ioriPortrait,
   winQuotes: ['くだらん...', '血の叫びが聞こえるか?', '俺の痛みを味わえ'],
-  moveList: [
-    { name: '踏み荒らし（ふみあらし）', input: '↓↘→ + 轻拳(A)' },
-    { name: '嘸未（ぶみ）', input: '↓↘→ + 重拳(C)' },
-    { name: '葵花（あおいはな）', input: '↓↙← + 拳(P)' },
-    { name: '葵花 追撃', input: '葵花后 重拳(C)连续按' },
-    { name: '鬼焼（オニヤキ）', input: '→↓↘ + 拳' },
-    { name: '八稚女（ヤタガラス）[大招]', input: '↓↙←↙↓↘→ + 拳 （或 ↓↘→↓↘→）' },
-  ],
+  moveList: IORI_MOVE_LIST.map(e => ({ name: e.name, input: e.input, type: e.type })),
 
   stats: {
     walkSpeed: 4.5,
