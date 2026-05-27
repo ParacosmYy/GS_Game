@@ -622,6 +622,29 @@ export function drawHUD(
     ctx.restore();
   }
 
+  // ===== KOF2002: Match point screen edge glow =====
+  // Subtle edge glow when match point is active for either player
+  const isMatchPoint = (p1Wins === winsNeeded - 1 && p2Wins < winsNeeded)
+    || (p2Wins === winsNeeded - 1 && p1Wins < winsNeeded);
+  if (isMatchPoint) {
+    const edgeAlpha = 0.06 + Math.sin(tick * 0.08) * 0.04;
+    const edgeColor = p1Wins === winsNeeded - 1 ? '#ff4400' : '#4488ff';
+    // Left edge glow
+    const leftGrad = ctx.createLinearGradient(0, 0, 30, 0);
+    leftGrad.addColorStop(0, edgeColor);
+    leftGrad.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.globalAlpha = edgeAlpha;
+    ctx.fillStyle = leftGrad;
+    ctx.fillRect(0, 0, 30, CANVAS_HEIGHT);
+    // Right edge glow
+    const rightGrad = ctx.createLinearGradient(CANVAS_WIDTH, 0, CANVAS_WIDTH - 30, 0);
+    rightGrad.addColorStop(0, edgeColor);
+    rightGrad.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = rightGrad;
+    ctx.fillRect(CANVAS_WIDTH - 30, 0, 30, CANVAS_HEIGHT);
+    ctx.globalAlpha = 1;
+  }
+
   // ===== KOF2002: Round start lingering indicator =====
   // Shows "ROUND X" fading text below timer for first 90 ticks of each round
   const ROUND_DISPLAY_DURATION = 90;
