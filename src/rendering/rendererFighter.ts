@@ -299,6 +299,13 @@ export function drawFighters(
       ctx.fillRect(-25, -f.displayHeight - 10, 50, f.displayHeight + 20);
       ctx.globalAlpha = 1.0;
     }
+    // KOF2002: 受击初始压扁 — HITSTUN前2帧身体横向压缩
+    if (f.state === FighterState.HITSTUN && f.stateAge < 2) {
+      const hitSquash = (2 - f.stateAge) / 2;
+      ctx.translate(0, -sy);
+      ctx.scale(1 - hitSquash * 0.08, 1 + hitSquash * 0.05);
+      ctx.translate(0, sy);
+    }
     // KOF2002: 命中停顿攻击者发光 — hitstop时攻击者微白轮廓
     if (f.hitFlashFrames > 0 && f.state !== FighterState.HITSTUN && f.state !== FighterState.KNOCKDOWN) {
       ctx.save();
