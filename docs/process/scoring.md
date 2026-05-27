@@ -4,9 +4,9 @@
 
 
 
-当前总分：`155/2000`
+当前总分：`150/2000`
 b5b42fb (docs(scoring): 144->145/2000 special move variable frames)
-cbd3d1b (docs(scoring): 148->149/2000 variable frame regression test)
+6b7b47c (docs(scoring): 149->150/2000 pulsing win diamonds)
 
 完整历史见 [SCORE.history.md](../archive/SCORE.history.md)。
 
@@ -22,8 +22,13 @@ cbd3d1b (docs(scoring): 148->149/2000 variable frame regression test)
 | 角色内容 | 150 | 19 | Ryo全闭环+Kyo 14文件+Iori 14文件+三角色contentLoader集成 |
 | 战斗手感 | 150 | 30 | 全反馈矩阵(6档)+MAX金色反馈+HSDM专属+SDM修正+绝境红闪+MAX移动残影+GC Roll/CD激活火花+重攻击swoosh+连击里程碑音效(5/10/15+)+DM发动名称横幅(SDM/HSDM分色)+跑步速度线 |
 | 帧数据精度 | 100 | 25 | 全部42种动画状态变量帧节奏完成(idle/walk/attack/crouch/jump/air/special/DM/SDM/HSDM/movement/sub-state/win) |
-| 游戏流程 | 100 | 27 | 完整街机流程+3v3+训练模式+MATCH POINT+暂停菜单+OPTIONS+回合开始持续提示+KO结果HP对比+街机模式对手递进+舞台轮换+街机得分系统 |
-| UI/HUD品质 | 50 | 15 | SNK风格能量槽+计时器+连段计数器+播报+像素帧缓存+暂停菜单(招式/按键)+训练模式SNK风格招式表 |
+
+
+| 游戏流程 | 100 | 26 | 完整街机流程+3v3+训练模式+MATCH POINT+暂停菜单+OPTIONS+回合开始持续提示+KO结果HP对比+回合切换黑幕淡入 |
+d0f7746 (docs(scoring): 142->143/2000 round transition fade-in)
+b5b42fb (docs(scoring): 144->145/2000 special move variable frames)
+| UI/HUD品质 | 50 | 16 | SNK风格能量槽+计时器+连段计数器+播报+像素帧缓存+暂停菜单(招式/按键)+训练模式SNK风格招式表 |
+6b7b47c (docs(scoring): 149->150/2000 pulsing win diamonds)
 
 ## 2.1 Phase 2 千分制维度（1001-2000）
 
