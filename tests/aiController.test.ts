@@ -453,3 +453,132 @@ describe('difficulty scaling', () => {
     expect(mid.reactionDelay).toBeGreaterThan(hard.reactionDelay);
   });
 });
+
+// ═══ Multi-Character AI ═══
+
+describe('AIController multi-character movesets', () => {
+  const characters = ['ryo', 'kyo', 'iori'] as const;
+  const expectedDPs: Record<string, AttackType[]> = {
+    ryo: [AttackType.RYO_KO_HOU, AttackType.RYO_KO_HOU_C],
+    kyo: [AttackType.KYO_ONIYAKI, AttackType.KYO_ONIYAKI_C],
+    iori: [AttackType.IORI_ONIYAKI, AttackType.IORI_ONIYAKI_C],
+  };
+  const expectedProjectiles: Record<string, AttackType[]> = {
+    ryo: [AttackType.RYO_KOOU, AttackType.RYO_KOOU_C],
+    kyo: [AttackType.KYO_YAMIBARAI, AttackType.KYO_YAMIBARAI_C],
+    iori: [AttackType.IORI_YAMIBARAI, AttackType.IORI_YAMIBARAI_C],
+  };
+
+  for (const char of characters) {
+    describe(`${char} AI`, () => {
+      it('uses character-specific DP for anti-air', () => {
+        const ai = new AIController(0.95, char);
+        const self = makeSnapshot({ x: 400, canAct: true, state: FighterState.IDLE });
+        const opp = makeSnapshot({ x: 350, state: FighterState.AIR_ATTACK, y: 200 });
+
+        const decisions = collectDecisions(ai, self, opp, 100, 50);
+        const dpDecisions = decisions.filter(
+          (d) => d.attackType && expectedDPs[char].includes(d.attackType),
+        );
+        expect(dpDecisions.length).toBeGreaterThan(0);
+      });
+
+      it('uses character-specific projectile at far range', () => {
+        const ai = new AIController(0.95, char);
+        const self = makeSnapshot({ x: 200, canAct: true, state: FighterState.IDLE });
+        const opp = makeSnapshot({ x: 600, state: FighterState.IDLE });
+
+        const decisions = collectDecisions(ai, self, opp, 400, 50);
+        const projDecisions = decisions.filter(
+          (d) => d.attackType && expectedProjectiles[char].includes(d.attackType),
+        );
+        expect(projDecisions.length).toBeGreaterThan(0);
+      });
+
+      it('uses character-specific DP for wake-up reversal', () => {
+        const ai = new AIController(0.95, char);
+        const self = makeSnapshot({
+          x: 400, canAct: false, state: FighterState.KNOCKDOWN, knockdownTimer: 3,
+        });
+        const opp = makeSnapshot({ x: 350, state: FighterState.IDLE });
+
+        const decisions = collectDecisions(ai, self, opp, 50, 20);
+        const reversalDecisions = decisions.filter(
+          (d) => d.attackType && expectedDPs[char].includes(d.attackType),
+        );
+        expect(reversalDecisions.length).toBeGreaterThan(0);
+      });
+    });
+  }
+
+  it('unknown character falls back to ryo moveset', () => {
+    const ai = new AIController(0.95, 'unknown');
+    const self = makeSnapshot({ x: 200, canAct: true, state: FighterState.IDLE });
+    const opp = makeSnapshot({ x: 600, state: FighterState.IDLE });
+
+    const decisions = collectDecisions(ai, self, opp, 400, 50);
+    const ryoProjDecisions = decisions.filter(
+      (d) => d.attackType === AttackType.RYO_KOOU_C,
+    );
+    expect(ryoProjDecisions.length).toBeGreaterThan(0);
+  });
+});
+
+describe('AI input routing for all characters', () => {
+  it('Kyo special input generates correct button presses', () => {
+    const input = aiDecisionToInput(
+      { action: 'special', attackType: AttackType.KYO_ONIYAKI_C, urgency: 0.8 },
+      1 as Direction,
+      100,
+    );
+    expect(input.forward).toBe(true);
+    expect(input.down).toBe(true);
+    expect(input.buttonC).toBe(true);
+    expect(input.punchPressed).toBe(true);
+  });
+
+  it('Iori special input generates correct button presses', () => {
+    const input = aiDecisionToInput(
+      { action: 'special', attackType: AttackType.IORI_AOIHANA, urgency: 0.7 },
+      1 as Direction,
+      100,
+    );
+    expect(input.back).toBe(true);
+    expect(input.down).toBe(true);
+    expect(input.buttonA).toBe(true);
+    expect(input.punchPressed).toBe(true);
+  });
+
+  it('Iori KUZUKAZE grab generates correct input', () => {
+    const input = aiDecisionToInput(
+      { action: 'special', attackType: AttackType.IORI_KUZUKAZE, urgency: 0.8 },
+      1 as Direction,
+      50,
+    );
+    expect(input.down).toBe(true);
+    expect(input.buttonC).toBe(true);
+    expect(input.punchPressed).toBe(true);
+  });
+
+  it('Kyo super input generates correct button presses', () => {
+    const input = aiDecisionToInput(
+      { action: 'super', attackType: AttackType.SDM_OROCHINAGI, urgency: 0.9 },
+      1 as Direction,
+      150,
+    );
+    expect(input.down).toBe(true);
+    expect(input.buttonC).toBe(true);
+    expect(input.punchPressed).toBe(true);
+  });
+
+  it('Iori HSDM input generates correct button presses', () => {
+    const input = aiDecisionToInput(
+      { action: 'super', attackType: AttackType.HSDM_YAOTOME, urgency: 1.0 },
+      1 as Direction,
+      80,
+    );
+    expect(input.down).toBe(true);
+    expect(input.buttonC).toBe(true);
+    expect(input.punchPressed).toBe(true);
+  });
+});

@@ -1,21 +1,14 @@
 /**
  * AIController — situation-aware AI controller for CPU opponents and training dummies.
  *
- * This is a standalone decision system that analyses Fighter state and produces
- * AIDecisions. The caller converts AIDecisions into ResolvedInput via
- * `aiDecisionToInput()`, feeding it through the normal input pipeline so the AI
- * uses the same state machine as a human player (no cheating).
+ * Supports Ryo, Kyo, and Iori with character-specific movesets and combos.
+ * Constructed with a characterId that selects the appropriate moveset:
+ *   - ryo:  KO_HOU DP, KOOU projectile, HIEN pressure, HAOU counter
+ *   - kyo:  ONIYAKI DP, YAMIBARAI projectile, ARAGAMI rekka pressure
+ *   - iori: ONIYAKI DP, YAMIBARAI projectile, AOIHANA rekka, KUZUKAZE grab
  *
- * Difficulty scaling uses reaction delay ticks and probability gates rather than
- * hidden input injection, keeping the system honest at every level.
- *
- * Ryo-specific move references:
- *   - RYO_KOOU / RYO_KOOU_C  (虎煌 projectile)
- *   - RYO_KO_HOU / RYO_KO_HOU_C (虎咆 DP / anti-air)
- *   - RYO_HIEN                (飛燕疾風脚 overhead kick)
- *   - RYO_HAOU                (霸王翔吼拳 counter)
- *   - DM_TEN_HA_OU / SDM_TEN_HA_OU (天地霸煌拳 DM)
- *   - DM_RYUKO_RANBU / SDM_RYUKO_RANBU / HSDM_RYUKO_RANBU (龍虎乱舞 DM)
+ * The decision engine uses the same input pipeline as a human player (no cheating).
+ * Difficulty scaling uses reaction delay ticks and probability gates.
  */
 import { FighterState, AttackType } from './types.js';
 import type { Direction } from './types.js';
@@ -141,33 +134,131 @@ function scalarToDifficulty(d: number): AIDifficultyPreset {
   };
 }
 
-// ─── Combo definitions for Ryo ───
+// ─── Character-specific AI configuration ───
 
 interface ComboRoute {
   steps: { attack: AttackType; delay: number }[];
 }
 
-const RYO_SIMPLE_COMBO: ComboRoute = {
-  steps: [
-    { attack: AttackType.STAND_A, delay: 0 },
-    { attack: AttackType.RYO_KOOU, delay: 3 },
-  ],
+interface CharacterAIMoveset {
+  dpWeak: AttackType;
+  dpStrong: AttackType;
+  projectileWeak: AttackType;
+  projectileStrong: AttackType;
+  /** Mid-range pressure special (overhead / rush) */
+  pressure: AttackType;
+  /** Command throw or close mixup special */
+  closeMixup?: AttackType;
+  dmProjectile?: AttackType;
+  dmRanbu?: AttackType;
+  sdmProjectile?: AttackType;
+  sdmRanbu?: AttackType;
+  hsdm?: AttackType;
+  simpleCombo: ComboRoute;
+  mediumCombo: ComboRoute;
+  hardCombo: ComboRoute;
+}
+
+const RYO_MOVESET: CharacterAIMoveset = {
+  dpWeak: AttackType.RYO_KO_HOU,
+  dpStrong: AttackType.RYO_KO_HOU_C,
+  projectileWeak: AttackType.RYO_KOOU,
+  projectileStrong: AttackType.RYO_KOOU_C,
+  pressure: AttackType.RYO_HIEN,
+  dmProjectile: AttackType.DM_TEN_HA_OU,
+  sdmProjectile: AttackType.SDM_TEN_HA_OU,
+  dmRanbu: AttackType.DM_RYUKO_RANBU,
+  sdmRanbu: AttackType.SDM_RYUKO_RANBU,
+  hsdm: AttackType.HSDM_RYUKO_RANBU,
+  simpleCombo: {
+    steps: [
+      { attack: AttackType.STAND_A, delay: 0 },
+      { attack: AttackType.RYO_KOOU, delay: 3 },
+    ],
+  },
+  mediumCombo: {
+    steps: [
+      { attack: AttackType.CLOSE_C, delay: 0 },
+      { attack: AttackType.RYO_KO_HOU, delay: 3 },
+    ],
+  },
+  hardCombo: {
+    steps: [
+      { attack: AttackType.JUMP_C, delay: 0 },
+      { attack: AttackType.STAND_C, delay: 4 },
+      { attack: AttackType.RYO_KOOU, delay: 3 },
+      { attack: AttackType.DM_TEN_HA_OU, delay: 4 },
+    ],
+  },
 };
 
-const RYO_MEDIUM_COMBO: ComboRoute = {
-  steps: [
-    { attack: AttackType.CLOSE_C, delay: 0 },
-    { attack: AttackType.RYO_KO_HOU, delay: 3 },
-  ],
+const KYO_MOVESET: CharacterAIMoveset = {
+  dpWeak: AttackType.KYO_ONIYAKI,
+  dpStrong: AttackType.KYO_ONIYAKI_C,
+  projectileWeak: AttackType.KYO_YAMIBARAI,
+  projectileStrong: AttackType.KYO_YAMIBARAI_C,
+  pressure: AttackType.KYO_ARAGAMI,
+  closeMixup: AttackType.KYO_DOKUGAMI,
+  dmRanbu: AttackType.SDM_OROCHINAGI,
+  hsdm: AttackType.HSDM_OROCHINAGI,
+  simpleCombo: {
+    steps: [
+      { attack: AttackType.STAND_A, delay: 0 },
+      { attack: AttackType.KYO_ARAGAMI, delay: 3 },
+    ],
+  },
+  mediumCombo: {
+    steps: [
+      { attack: AttackType.CLOSE_C, delay: 0 },
+      { attack: AttackType.KYO_ONIYAKI, delay: 3 },
+    ],
+  },
+  hardCombo: {
+    steps: [
+      { attack: AttackType.JUMP_C, delay: 0 },
+      { attack: AttackType.STAND_C, delay: 4 },
+      { attack: AttackType.KYO_ARAGAMI, delay: 3 },
+      { attack: AttackType.SDM_OROCHINAGI, delay: 4 },
+    ],
+  },
 };
 
-const RYO_HARD_COMBO: ComboRoute = {
-  steps: [
-    { attack: AttackType.JUMP_C, delay: 0 },
-    { attack: AttackType.STAND_C, delay: 4 },
-    { attack: AttackType.RYO_KOOU, delay: 3 },
-    { attack: AttackType.DM_TEN_HA_OU, delay: 4 },
-  ],
+const IORI_MOVESET: CharacterAIMoveset = {
+  dpWeak: AttackType.IORI_ONIYAKI,
+  dpStrong: AttackType.IORI_ONIYAKI_C,
+  projectileWeak: AttackType.IORI_YAMIBARAI,
+  projectileStrong: AttackType.IORI_YAMIBARAI_C,
+  pressure: AttackType.IORI_AOIHANA,
+  closeMixup: AttackType.IORI_KUZUKAZE,
+  dmRanbu: AttackType.DM_YATAGARASU,
+  sdmRanbu: AttackType.SDM_YATAGARASU,
+  hsdm: AttackType.HSDM_YAOTOME,
+  simpleCombo: {
+    steps: [
+      { attack: AttackType.STAND_A, delay: 0 },
+      { attack: AttackType.IORI_AOIHANA, delay: 3 },
+    ],
+  },
+  mediumCombo: {
+    steps: [
+      { attack: AttackType.CLOSE_C, delay: 0 },
+      { attack: AttackType.IORI_ONIYAKI, delay: 3 },
+    ],
+  },
+  hardCombo: {
+    steps: [
+      { attack: AttackType.JUMP_C, delay: 0 },
+      { attack: AttackType.STAND_C, delay: 4 },
+      { attack: AttackType.IORI_AOIHANA, delay: 3 },
+      { attack: AttackType.DM_YATAGARASU, delay: 4 },
+    ],
+  },
+};
+
+const CHARACTER_MOVESETS: Record<string, CharacterAIMoveset> = {
+  ryo: RYO_MOVESET,
+  kyo: KYO_MOVESET,
+  iori: IORI_MOVESET,
 };
 
 // ─── Main class ───
@@ -180,6 +271,7 @@ export class AIController {
   private reactionTimer: number = 0;
   private currentDecision: AIDecision | null = null;
   private rng: SeededRNG;
+  private moveset: CharacterAIMoveset;
 
   // Combo execution state
   private comboStep: number = 0;
@@ -191,11 +283,12 @@ export class AIController {
   private prevOppState: FighterState = FighterState.IDLE;
   private frameCount: number = 0;
 
-  constructor(difficulty: number = 0.5) {
+  constructor(difficulty: number = 0.5, characterId: string = 'ryo') {
     this.difficulty = scalarToDifficulty(difficulty);
     this.reactionDelay = this.difficulty.reactionDelay;
     this.reactionTimer = 0;
     this.rng = new SeededRNG(AI_SEED_OFFSET);
+    this.moveset = CHARACTER_MOVESETS[characterId] ?? CHARACTER_MOVESETS.ryo;
   }
 
   /** Main entry: produces an AIDecision each tick. */
@@ -219,7 +312,7 @@ export class AIController {
       if (this.chance(this.difficulty.reversalRate)) {
         return {
           action: 'special',
-          attackType: AttackType.RYO_KO_HOU_C,
+          attackType: this.moveset.dpStrong,
           urgency: 1.0,
         };
       }
@@ -230,7 +323,7 @@ export class AIController {
       if (this.chance(this.difficulty.antiAirRate)) {
         return {
           action: 'special',
-          attackType: AttackType.RYO_KO_HOU_C,
+          attackType: this.moveset.dpStrong,
           urgency: 0.9,
         };
       }
@@ -254,8 +347,9 @@ export class AIController {
           return { action: 'idle', urgency: 0 };
         }
         const isSuper = step.attack.startsWith('DM_') || step.attack.startsWith('SDM_') || step.attack.startsWith('HSDM_');
+        const isCharSpecial = step.attack.startsWith('RYO_') || step.attack.startsWith('KYO_') || step.attack.startsWith('IORI_');
         return {
-          action: isSuper ? 'super' : step.attack.startsWith('RYO_') ? 'special' : 'attack',
+          action: isSuper ? 'super' : isCharSpecial ? 'special' : 'attack',
           attackType: step.attack,
           urgency: 0.8,
         };
@@ -306,7 +400,7 @@ export class AIController {
       const punishWindow = this.remainingRecoveryFrames(opp);
       if (punishWindow >= 8 && dist < 120) {
         if (dist < RANGE_CLOSE) {
-          this.startCombo(RYO_MEDIUM_COMBO);
+          this.startCombo(this.moveset.mediumCombo);
           return { action: 'attack', attackType: AttackType.CLOSE_C, urgency: 0.9 };
         }
         return { action: 'attack', attackType: AttackType.STAND_C, urgency: 0.85 };
@@ -327,8 +421,7 @@ export class AIController {
     // ── Self in corner: escape attempts ──
     if (selfInCorner && dist < RANGE_MID) {
       if (this.chance(this.difficulty.aggressionScale * 0.4)) {
-        // Try DP to create space
-        return { action: 'special', attackType: AttackType.RYO_KO_HOU, urgency: 0.7 };
+        return { action: 'special', attackType: this.moveset.dpWeak, urgency: 0.7 };
       }
       if (this.chance(0.3)) {
         return { action: 'jump', urgency: 0.6 };
@@ -369,23 +462,26 @@ export class AIController {
     // Opponent in corner: pressure with stand_C -> special cancel
     if (oppInCorner) {
       if (r < 0.4 + aggro * 0.2) {
-        this.startCombo(RYO_MEDIUM_COMBO);
+        this.startCombo(this.moveset.mediumCombo);
         return { action: 'attack', attackType: AttackType.CLOSE_C, urgency: 0.85 };
       }
       if (r < 0.6 + aggro * 0.1) {
         return { action: 'attack', attackType: AttackType.THROW_FORWARD, urgency: 0.7 };
       }
-      return { action: 'special', attackType: AttackType.RYO_HIEN, urgency: 0.65 };
+      return { action: 'special', attackType: this.moveset.pressure, urgency: 0.65 };
     }
 
     // Opponent low HP: go for kill
     if (oppLowHp) {
       if (r < 0.5) {
-        this.startCombo(RYO_MEDIUM_COMBO);
+        this.startCombo(this.moveset.mediumCombo);
         return { action: 'attack', attackType: AttackType.CLOSE_C, urgency: 0.9 };
       }
       if (r < 0.7) {
-        return { action: 'special', attackType: AttackType.RYO_KO_HOU_C, urgency: 0.85 };
+        return { action: 'special', attackType: this.moveset.dpStrong, urgency: 0.85 };
+      }
+      if (r < 0.85 && this.moveset.closeMixup) {
+        return { action: 'special', attackType: this.moveset.closeMixup, urgency: 0.8 };
       }
       return { action: 'attack', attackType: AttackType.THROW_FORWARD, urgency: 0.75 };
     }
@@ -397,14 +493,14 @@ export class AIController {
     const retreatP = specialP + Math.max(0.05, 0.2 - aggro * 0.15);
 
     if (r < attackP) {
-      this.startCombo(RYO_SIMPLE_COMBO);
+      this.startCombo(this.moveset.simpleCombo);
       return { action: 'attack', attackType: AttackType.CLOSE_A, urgency: 0.7 };
     }
     if (r < throwP) {
       return { action: 'attack', attackType: AttackType.THROW_FORWARD, urgency: 0.65 };
     }
     if (r < specialP) {
-      return { action: 'special', attackType: AttackType.RYO_HIEN, urgency: 0.6 };
+      return { action: 'special', attackType: this.moveset.pressure, urgency: 0.6 };
     }
     if (r < retreatP) {
       return { action: 'retreat', urgency: 0.5 };
@@ -433,9 +529,9 @@ export class AIController {
       }
     }
 
-    // Ko'ou Ken projectile at mid range occasionally
+    // Projectile at mid range occasionally
     if (this.chance(this.difficulty.projectileRate * 0.5)) {
-      return { action: 'special', attackType: AttackType.RYO_KOOU, urgency: 0.5 };
+      return { action: 'special', attackType: this.moveset.projectileWeak, urgency: 0.5 };
     }
 
     // Approach
@@ -461,7 +557,7 @@ export class AIController {
 
     // Projectile at far range
     if (this.chance(this.difficulty.projectileRate)) {
-      return { action: 'special', attackType: AttackType.RYO_KOOU_C, urgency: 0.5 };
+      return { action: 'special', attackType: this.moveset.projectileStrong, urgency: 0.5 };
     }
 
     // Jump-in attempt
@@ -752,6 +848,85 @@ function applySpecialInput(
       base.back = true; base.down = true;
       base.buttonA = true; base.buttonAPressed = true; base.punchPressed = true;
       break;
+
+    // ── Kyo specials ──
+    case AttackType.KYO_ONIYAKI:
+      // DP + A (鬼焼き weak)
+      base.forward = true; base.down = true;
+      base.buttonA = true; base.buttonAPressed = true; base.punchPressed = true;
+      break;
+    case AttackType.KYO_ONIYAKI_C:
+      // DP + C (鬼焼き strong)
+      base.forward = true; base.down = true;
+      base.buttonC = true; base.buttonCPressed = true; base.punchPressed = true;
+      break;
+    case AttackType.KYO_YAMIBARAI:
+      // QCF + A (暗払い weak)
+      base.down = true;
+      base.buttonA = true; base.buttonAPressed = true; base.punchPressed = true;
+      break;
+    case AttackType.KYO_YAMIBARAI_C:
+      // QCF + C (暗払い strong)
+      base.down = true;
+      base.buttonC = true; base.buttonCPressed = true; base.punchPressed = true;
+      break;
+    case AttackType.KYO_ARAGAMI:
+      // QCF + A (荒咬み rekka)
+      base.down = true;
+      base.buttonA = true; base.buttonAPressed = true; base.punchPressed = true;
+      break;
+    case AttackType.KYO_DOKUGAMI:
+      // QCF + C (毒咬み C rekka)
+      base.down = true;
+      base.buttonC = true; base.buttonCPressed = true; base.punchPressed = true;
+      break;
+
+    // ── Iori specials ──
+    case AttackType.IORI_ONIYAKI:
+      // DP + A (鬼焼き weak)
+      base.forward = true; base.down = true;
+      base.buttonA = true; base.buttonAPressed = true; base.punchPressed = true;
+      break;
+    case AttackType.IORI_ONIYAKI_C:
+      // DP + C (鬼焼き strong)
+      base.forward = true; base.down = true;
+      base.buttonC = true; base.buttonCPressed = true; base.punchPressed = true;
+      break;
+    case AttackType.IORI_YAMIBARAI:
+      // QCF + A (闇払い weak)
+      base.down = true;
+      base.buttonA = true; base.buttonAPressed = true; base.punchPressed = true;
+      break;
+    case AttackType.IORI_YAMIBARAI_C:
+      // QCF + C (闇払い strong)
+      base.down = true;
+      base.buttonC = true; base.buttonCPressed = true; base.punchPressed = true;
+      break;
+    case AttackType.IORI_AOIHANA:
+      // QCB + A (葵花 A rekka)
+      base.back = true; base.down = true;
+      base.buttonA = true; base.buttonAPressed = true; base.punchPressed = true;
+      break;
+    case AttackType.IORI_AOIHANA_C:
+      // QCB + C (葵花 C rekka)
+      base.back = true; base.down = true;
+      base.buttonC = true; base.buttonCPressed = true; base.punchPressed = true;
+      break;
+    case AttackType.IORI_KOTOTSUKI:
+      // HCF + B (琴月陰 weak)
+      base.down = true;
+      base.buttonB = true; base.buttonBPressed = true; base.kickPressed = true;
+      break;
+    case AttackType.IORI_KOTOTSUKI_D:
+      // HCF + D (琴月陰 strong)
+      base.down = true;
+      base.buttonD = true; base.buttonDPressed = true; base.kickPressed = true;
+      break;
+    case AttackType.IORI_KUZUKAZE:
+      // HCF + P (屑風 command grab)
+      base.down = true;
+      base.buttonC = true; base.buttonCPressed = true; base.punchPressed = true;
+      break;
     default:
       base.down = true;
       base.buttonC = true; base.buttonCPressed = true; base.punchPressed = true;
@@ -771,6 +946,7 @@ function applySuperInput(
   }
 
   switch (attackType) {
+    // ── Ryo DM/SDM/HSDM ──
     case AttackType.DM_TEN_HA_OU:
     case AttackType.SDM_TEN_HA_OU:
       // Double QCF + C (天地霸煌拳)
@@ -784,6 +960,28 @@ function applySuperInput(
       base.down = true;
       base.buttonC = true; base.buttonCPressed = true; base.punchPressed = true;
       break;
+
+    // ── Kyo DM/SDM/HSDM ──
+    case AttackType.SDM_OROCHINAGI:
+    case AttackType.HSDM_OROCHINAGI:
+      // QCF x2 + C (大蛇薙)
+      base.down = true;
+      base.buttonC = true; base.buttonCPressed = true; base.punchPressed = true;
+      break;
+
+    // ── Iori DM/SDM/HSDM ──
+    case AttackType.DM_YATAGARASU:
+    case AttackType.SDM_YATAGARASU:
+      // QCF x2 + C (八咫烏)
+      base.down = true;
+      base.buttonC = true; base.buttonCPressed = true; base.punchPressed = true;
+      break;
+    case AttackType.HSDM_YAOTOME:
+      // QCF x2 + C (八稚女 HSDM)
+      base.down = true;
+      base.buttonC = true; base.buttonCPressed = true; base.punchPressed = true;
+      break;
+
     default:
       base.down = true;
       base.buttonC = true; base.buttonCPressed = true; base.punchPressed = true;
