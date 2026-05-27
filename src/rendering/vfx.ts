@@ -176,9 +176,9 @@ export class VFXSystem {
     spawnSuperBurst(this.particles, worldX, worldY, color, glow, isSDM);
   }
 
-  /** KO落地时的震撼效果 */
+  /** KO落地时的震撼效果 — uses stage-specific dust colors */
   spawnGroundSlam(worldX: number, worldY: number): void {
-    spawnGroundSlam(this.particles, worldX, worldY);
+    spawnGroundSlam(this.particles, worldX, worldY, getStageDustColors(getStage()));
   }
 
   spawnDamageText(worldX: number, worldY: number, value: number, overrideColor?: string): void {

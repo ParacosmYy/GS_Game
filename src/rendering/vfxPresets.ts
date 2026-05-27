@@ -744,7 +744,8 @@ export function spawnSuperBurst(particles: Particle[], worldX: number, worldY: n
 }
 
 /** KO落地时的震撼效果 */
-export function spawnGroundSlam(particles: Particle[], worldX: number, worldY: number): void {
+export function spawnGroundSlam(particles: Particle[], worldX: number, worldY: number, dustColors?: [string, string]): void {
+  const dc = dustColors || ['#9a7b5d', '#bb9a73'];
   particles.push({
     x: worldX, y: worldY, vx: 0, vy: 0,
     life: 24, maxLife: 24, size: 104,
@@ -761,7 +762,7 @@ export function spawnGroundSlam(particles: Particle[], worldX: number, worldY: n
       life: 18 + Math.floor(Math.random() * 10),
       maxLife: 30,
       size: 4 + Math.random() * 6,
-      color: i % 2 === 0 ? '#9a7b5d' : '#bb9a73', type: 'spark', gravity: 0.12, friction: 0.96,
+      color: i % 2 === 0 ? dc[0] : dc[1], type: 'spark', gravity: 0.12, friction: 0.96,
     });
   }
   for (let i = 0; i < 12; i++) {
