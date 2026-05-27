@@ -977,7 +977,7 @@ function render(): void {
     if (gs.announceSequence.isRunning()) {
       drawAnnounceSequence(ctx, gs.announceSequence, canvas.width, canvas.height);
     } else {
-      renderer.drawIntro(gs.phaseTimer, rounds.currentRound, p1Char.nameCn, p2Char.nameCn);
+      renderer.drawIntro(gs.phaseTimer, rounds.currentRound, p1Char.nameCn, p2Char.nameCn, getStage());
     }
   }
   if (gs.phase === GamePhase.KO && gs.announceSequence.isRunning()) {

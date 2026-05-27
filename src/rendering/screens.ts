@@ -668,7 +668,7 @@ function drawVSPaletteDots(
 const INTRO_ROUND_FRAMES = 90;
 const INTRO_FIGHT_FRAMES = 60;
 
-export function drawIntro(ctx: CanvasRenderingContext2D, phaseTimer: number, currentRound: number = 1, p1Name: string = '', p2Name: string = ''): void {
+export function drawIntro(ctx: CanvasRenderingContext2D, phaseTimer: number, currentRound: number = 1, p1Name: string = '', p2Name: string = '', stageId?: StageId): void {
   ctx.save();
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
@@ -729,6 +729,13 @@ export function drawIntro(ctx: CanvasRenderingContext2D, phaseTimer: number, cur
       drawSNKText(ctx, p1Name, CANVAS_WIDTH / 2 - 30, CANVAS_HEIGHT / 2 + 35, 16, '#ff6644', '#000000', 'right');
       drawSNKText(ctx, p2Name, CANVAS_WIDTH / 2 + 30, CANVAS_HEIGHT / 2 + 35, 16, '#4488ff', '#000000', 'left');
       drawSNKText(ctx, 'VS', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 35, 14, '#ffcc00');
+    }
+
+    // KOF2002: 舞台名显示 — 底部淡入淡出
+    if (stageId && STAGE_NAMES[stageId]) {
+      const stageAlpha = Math.min(1, Math.max(0, (phaseTimer - 30) / 20)) * fadeOut;
+      ctx.globalAlpha = stageAlpha * alpha * 0.7;
+      drawSNKText(ctx, STAGE_NAMES[stageId], CANVAS_WIDTH / 2, CANVAS_HEIGHT - 130, 12, 'rgba(180,180,200,0.8)', '#000000');
     }
   }
   // Phase 2: "FIGHT!" (INTRO_ROUND_FRAMES ~ total)
