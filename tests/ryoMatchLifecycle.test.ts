@@ -36,6 +36,7 @@ import { resetGameRng } from '../src/core/prng.js';
 vi.mock('../src/audio/sampler.js', () => ({
   initAudio: vi.fn(),
   playSelect: vi.fn(),
+  playCursorMove: vi.fn(),
 }));
 
 // ---------------------------------------------------------------------------

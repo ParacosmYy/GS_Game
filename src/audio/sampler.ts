@@ -29,7 +29,8 @@ type SampleId =
   | 'kyo_yamibarai' | 'kyo_oniyaki' | 'kyo_aragami' | 'kyo_dokugami'
   | 'kyo_75kai' | 'kyo_red_kick' | 'kyo_orochinagi'
   | 'iori_aoihana' | 'iori_yamibarai' | 'iori_oniyaki' | 'iori_kototsuki'
-  | 'iori_kuzukaze' | 'iori_yumeyumi' | 'iori_katanugi' | 'iori_yaotome';
+  | 'iori_kuzukaze' | 'iori_yumeyumi' | 'iori_katanugi' | 'iori_yaotome'
+  | 'cursor_move' | 'cursor_confirm';
 
 const samples = new Map<SampleId, AudioBuffer>();
 let initialized = false;
@@ -627,6 +628,21 @@ function renderSelect(sr: number): Float32Array {
     t => expDecay(t, 0.2, 12));
   const harm = renderOsc(sr, dur, 'sine', _t => 1760, t => expDecay(t, 0.05, 18));
   return normalize(mixLayers([osc, harm], [1, 0.25]));
+}
+
+function renderCursorMove(sr: number): Float32Array {
+  const dur = 0.06;
+  const osc = renderOsc(sr, dur, 'sine', _t => 1200, t => expDecay(t, 0.06, 30));
+  return normalize(osc);
+}
+
+function renderCursorConfirm(sr: number): Float32Array {
+  const dur = 0.15;
+  const osc = renderOsc(sr, dur, 'sine',
+    t => t < 0.04 ? 660 : 990,
+    t => expDecay(t, 0.15, 18));
+  const harm = renderOsc(sr, dur * 0.6, 'triangle', _t => 1320, t => expDecay(t, 0.04, 22));
+  return normalize(mixLayers([osc, harm], [1, 0.35]));
 }
 
 function renderVictory(sr: number): Float32Array {
@@ -2208,6 +2224,8 @@ export function initSampler(): void {
     ['throw', renderThrow],
     ['throw_escape', renderThrowEscape],
     ['select', renderSelect],
+    ['cursor_move', renderCursorMove],
+    ['cursor_confirm', renderCursorConfirm],
     ['victory', renderVictory],
     ['roll', renderRoll],
     ['landing', renderLanding],
@@ -2595,3 +2613,8 @@ export function playHitAccentFire(): void { initSampler(); play('accent_fire', 0
 
 /** Iori normal attack hit — dark-purple accent */
 export function playHitAccentPurple(): void { initSampler(); play('accent_purple', 0.6); }
+
+// === Menu navigation SFX ===
+
+export function playCursorMove(): void { initSampler(); play('cursor_move', 0.5); }
+export function playCursorConfirm(): void { initSampler(); play('cursor_confirm', 0.7); }

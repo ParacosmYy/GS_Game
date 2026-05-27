@@ -23,6 +23,7 @@ import { RyoDef } from '../src/characters/ryo.js';
 vi.mock('../src/audio/sampler.js', () => ({
   initAudio: vi.fn(),
   playSelect: vi.fn(),
+  playCursorMove: vi.fn(),
 }));
 
 // --- Helpers ---

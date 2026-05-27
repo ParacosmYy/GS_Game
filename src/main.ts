@@ -28,7 +28,7 @@ import { SelectState } from './state/selectState.js';
 import { RoundState } from './state/roundState.js';
 import { DMManager } from './combat/dmManager.js';
 import { createHitCallback, triggerKOGroundEffect } from './combat/hitCallback.js';
-import { initAudio, initSampler, playKO, playVictoryFanfare, playMAXActivation, playPerfect, playThrowEscape, playFight, playRoll, playCancel, playQuickStand, playGuardCrush, playHit, playSpecialLight, playSpecialHeavy, playDM, playWhoosh, playHeavyWhoosh, playKoouken, playKoHou, playHien, playHaou } from './audio/sampler.js';
+import { initAudio, initSampler, playKO, playVictoryFanfare, playMAXActivation, playPerfect, playThrowEscape, playFight, playRoll, playCancel, playQuickStand, playGuardCrush, playHit, playSpecialLight, playSpecialHeavy, playDM, playWhoosh, playHeavyWhoosh, playKoouken, playKoHou, playHien, playHaou, playCursorMove, playCursorConfirm } from './audio/sampler.js';
 import { tickAttackSFX, dispatchContractSFX } from './audio/attackSFX.js';
 import { getContractEventTags } from './entities/fighter.js';
 import { tickMotionSFX } from './audio/motionSFX.js';
@@ -92,6 +92,10 @@ p1Ctrl.setOpponent(p2);
 p2Ctrl.setOpponent(p1);
 combatSystem.defenderControllers = [p1Ctrl, p2Ctrl];
 const gauges: [PowerGauge, PowerGauge] = [createPowerGauge(), createPowerGauge()];
+// Menu cursor prev-frame tracking for edge-triggered SFX
+let prevModeCursor = -1;
+let prevOptionsCursor = -1;
+let prevStageCursor = -1;
 const maxModes: [MaxModeState, MaxModeState] = [createMaxMode(), createMaxMode()];
 p1Ctrl.setGauge(gauges[0]);
 p2Ctrl.setGauge(gauges[1]);
@@ -177,7 +181,9 @@ function update(): void {
     tickRef.value++;
     if (inputManager.isKeyDown('ArrowLeft') || inputManager.isKeyDown('KeyA')) gs.modeSelectCursor = Math.max(0, gs.modeSelectCursor - 1);
     if (inputManager.isKeyDown('ArrowRight') || inputManager.isKeyDown('KeyD')) gs.modeSelectCursor = Math.min(3, gs.modeSelectCursor + 1);
+    if (gs.modeSelectCursor !== prevModeCursor) { if (prevModeCursor >= 0) playCursorMove(); prevModeCursor = gs.modeSelectCursor; }
     if (inputManager.isKeyDown('Enter') || inputManager.isKeyDown('KeyJ')) {
+      playCursorConfirm();
       if (gs.modeSelectCursor === 3) {
         gs.setPhase(GamePhase.OPTIONS);
         gs.optionsCursor = 0;
@@ -195,8 +201,10 @@ function update(): void {
     const opts = gs.options;
     if (inputManager.isKeyDown('ArrowUp') || inputManager.isKeyDown('KeyW')) gs.optionsCursor = Math.max(0, gs.optionsCursor - 1);
     if (inputManager.isKeyDown('ArrowDown') || inputManager.isKeyDown('KeyS')) gs.optionsCursor = Math.min(5, gs.optionsCursor + 1); // 5 settings + BACK
+    if (gs.optionsCursor !== prevOptionsCursor) { if (prevOptionsCursor >= 0) playCursorMove(); prevOptionsCursor = gs.optionsCursor; }
     if (inputManager.isKeyDown('ArrowLeft') || inputManager.isKeyDown('KeyA') || inputManager.isKeyDown('ArrowRight') || inputManager.isKeyDown('KeyD')) {
       if (gs.optionsCursor < 5) {
+        playCursorMove();
         const dir = (inputManager.isKeyDown('ArrowRight') || inputManager.isKeyDown('KeyD')) ? 1 : -1;
         switch (gs.optionsCursor) {
           case 0: opts.difficulty = ((opts.difficulty + dir + 3) % 3) as 0|1|2; break;
@@ -208,6 +216,7 @@ function update(): void {
       }
     }
     if (inputManager.isKeyDown('Enter') || inputManager.isKeyDown('KeyJ') || inputManager.isKeyDown('Escape')) {
+      playCursorConfirm();
       gs.setPhase(GamePhase.MODE_SELECT);
       gs.modeSelectCursor = 3;
     }
@@ -287,8 +296,8 @@ function update(): void {
 
     if (!gs.teamOrderReady[0]) {
       if (!gs.teamOrderSwapMode) {
-        if (p1Input.left && canRepeat) { gs.teamOrderCursor = Math.max(0, gs.teamOrderCursor - 1); gs.inputRepeatCooldown = 10; }
-        if (p1Input.right && canRepeat) { gs.teamOrderCursor = Math.min(2, gs.teamOrderCursor + 1); gs.inputRepeatCooldown = 10; }
+        if (p1Input.left && canRepeat) { gs.teamOrderCursor = Math.max(0, gs.teamOrderCursor - 1); gs.inputRepeatCooldown = 10; playCursorMove(); }
+        if (p1Input.right && canRepeat) { gs.teamOrderCursor = Math.min(2, gs.teamOrderCursor + 1); gs.inputRepeatCooldown = 10; playCursorMove(); }
         // Press A (buttonA) to enter swap mode
         if (p1Input.buttonA) {
           gs.teamOrderSwapMode = true;
@@ -296,14 +305,15 @@ function update(): void {
         }
       } else {
         // In swap mode: left/right to pick target
-        if (p1Input.left && canRepeat) { gs.teamOrderSwapCursor = Math.max(0, gs.teamOrderSwapCursor - 1); gs.inputRepeatCooldown = 10; }
-        if (p1Input.right && canRepeat) { gs.teamOrderSwapCursor = Math.min(2, gs.teamOrderSwapCursor + 1); gs.inputRepeatCooldown = 10; }
+        if (p1Input.left && canRepeat) { gs.teamOrderSwapCursor = Math.max(0, gs.teamOrderSwapCursor - 1); gs.inputRepeatCooldown = 10; playCursorMove(); }
+        if (p1Input.right && canRepeat) { gs.teamOrderSwapCursor = Math.min(2, gs.teamOrderSwapCursor + 1); gs.inputRepeatCooldown = 10; playCursorMove(); }
         // Press A to confirm swap
         if (p1Input.buttonA && gs.teamOrderSwapCursor !== gs.teamOrderCursor) {
           const temp = gs.teamOrderSlots[0][gs.teamOrderCursor];
           gs.teamOrderSlots[0][gs.teamOrderCursor] = gs.teamOrderSlots[0][gs.teamOrderSwapCursor];
           gs.teamOrderSlots[0][gs.teamOrderSwapCursor] = temp;
           gs.teamOrderSwapMode = false;
+          playCursorConfirm();
         }
         // Press C or D to cancel swap
         if (p1Input.buttonC || p1Input.buttonD) {
@@ -313,6 +323,7 @@ function update(): void {
 
       // Press Enter/KeyJ to confirm order
       if (inputManager.isKeyDown('KeyJ') || inputManager.isKeyDown('Enter')) {
+        playCursorConfirm();
         gs.teamOrderReady[0] = true;
         gs.teamOrderReady[1] = true; // AI confirms instantly
       }
@@ -347,7 +358,9 @@ function update(): void {
     if (!gs.stageSelectReady) {
       if (p1Input.left && canRepeat) { gs.stageSelectCursor = Math.max(0, gs.stageSelectCursor - 1); gs.inputRepeatCooldown = 10; }
       if (p1Input.right && canRepeat) { gs.stageSelectCursor = Math.min(totalSlots - 1, gs.stageSelectCursor + 1); gs.inputRepeatCooldown = 10; }
+      if (gs.stageSelectCursor !== prevStageCursor) { if (prevStageCursor >= 0) playCursorMove(); prevStageCursor = gs.stageSelectCursor; }
       if (inputManager.isKeyDown('KeyJ') || inputManager.isKeyDown('Enter') || p1Input.buttonA) {
+        playCursorConfirm();
         gs.stageSelectReady = true;
         // Resolve stage
         if (gs.stageSelectCursor >= allStages.length) {

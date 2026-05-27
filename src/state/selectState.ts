@@ -10,7 +10,7 @@ import { FighterController } from '../entities/fighterController.js';
 import { Fighter } from '../entities/fighter.js';
 import { gameRandomInt } from '../core/prng.js';
 import { CommandBuffer } from '../input/commandBuffer.js';
-import { initAudio, playSelect } from '../audio/sampler.js';
+import { initAudio, playSelect, playCursorMove } from '../audio/sampler.js';
 
 // 随机选择格子放在ROSTER末尾的虚拟索引
 export const RANDOM_SLOT_INDEX = ROSTER.length;
@@ -120,13 +120,13 @@ export class SelectState {
     // P1未确认: 移动光标 + 选色 + 确认
     if (!this.p1Ready) {
       if (rawP1.left && !this.prevP1Left)
-        this.p1Cursor = (this.p1Cursor - 1 + TOTAL_SELECT_SLOTS) % TOTAL_SELECT_SLOTS;
+        { this.p1Cursor = (this.p1Cursor - 1 + TOTAL_SELECT_SLOTS) % TOTAL_SELECT_SLOTS; playCursorMove(); }
       if (rawP1.right && !this.prevP1Right)
-        this.p1Cursor = (this.p1Cursor + 1) % TOTAL_SELECT_SLOTS;
+        { this.p1Cursor = (this.p1Cursor + 1) % TOTAL_SELECT_SLOTS; playCursorMove(); }
       if (rawP1.up && !this.prevP1Up)
-        this.p1Cursor = (this.p1Cursor - 8 + TOTAL_SELECT_SLOTS) % TOTAL_SELECT_SLOTS;
+        { this.p1Cursor = (this.p1Cursor - 8 + TOTAL_SELECT_SLOTS) % TOTAL_SELECT_SLOTS; playCursorMove(); }
       if (rawP1.down && !this.prevP1Down)
-        this.p1Cursor = (this.p1Cursor + 8) % TOTAL_SELECT_SLOTS;
+        { this.p1Cursor = (this.p1Cursor + 8) % TOTAL_SELECT_SLOTS; playCursorMove(); }
       // 按键选择颜色并确认
       if (rawP1.buttonA && !this.prevP1A) { this.p1ColorIndex = 0; this.p1Ready = true; initAudio(); playSelect(); }
       if (rawP1.buttonB && !this.prevP1B) { this.p1ColorIndex = 1; this.p1Ready = true; initAudio(); playSelect(); }
@@ -145,13 +145,13 @@ export class SelectState {
       }
     } else if (!this.p2Ready) {
       if (rawP2.left && !this.prevP2Left)
-        this.p2Cursor = (this.p2Cursor - 1 + TOTAL_SELECT_SLOTS) % TOTAL_SELECT_SLOTS;
+        { this.p2Cursor = (this.p2Cursor - 1 + TOTAL_SELECT_SLOTS) % TOTAL_SELECT_SLOTS; playCursorMove(); }
       if (rawP2.right && !this.prevP2Right)
-        this.p2Cursor = (this.p2Cursor + 1) % TOTAL_SELECT_SLOTS;
+        { this.p2Cursor = (this.p2Cursor + 1) % TOTAL_SELECT_SLOTS; playCursorMove(); }
       if (rawP2.up && !this.prevP2Up)
-        this.p2Cursor = (this.p2Cursor - 8 + TOTAL_SELECT_SLOTS) % TOTAL_SELECT_SLOTS;
+        { this.p2Cursor = (this.p2Cursor - 8 + TOTAL_SELECT_SLOTS) % TOTAL_SELECT_SLOTS; playCursorMove(); }
       if (rawP2.down && !this.prevP2Down)
-        this.p2Cursor = (this.p2Cursor + 8) % TOTAL_SELECT_SLOTS;
+        { this.p2Cursor = (this.p2Cursor + 8) % TOTAL_SELECT_SLOTS; playCursorMove(); }
       if (rawP2.buttonA && !this.prevP2A) { this.p2ColorIndex = 0; this.p2Ready = true; }
       if (rawP2.buttonB && !this.prevP2B) { this.p2ColorIndex = 1; this.p2Ready = true; }
       if (rawP2.buttonC && !this.prevP2C) { this.p2ColorIndex = 2; this.p2Ready = true; }
