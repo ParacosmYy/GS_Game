@@ -12,7 +12,7 @@ export interface IoriMoveEntry {
   /** Input notation string */
   input: string;
   /** Move category */
-  type: 'command' | 'special' | 'dm' | 'sdm' | 'system';
+  type: 'command' | 'special' | 'dm' | 'sdm' | 'hsdm' | 'system';
   /** Corresponding AttackType key (if applicable) */
   attackTypeKey?: string;
 }
@@ -36,6 +36,8 @@ export const IORI_MOVE_LIST: IoriMoveEntry[] = [
   { name: '八稚女 (Yaotome)', input: '↓↙←↙↓↘→ + A / C', type: 'dm', attackTypeKey: 'DM_YATAGARASU' },
   // SDMs — MAX超必杀技
   { name: '八稚女 (MAX)', input: '↓↙←↙↓↘→ + AC', type: 'sdm', attackTypeKey: 'SDM_YATAGARASU' },
+  // HSDM — 隐藏超必杀技 (MAX + 红血)
+  { name: '八稚女 (HSDM)', input: 'MAX+红血 ↓↙←↙↓↘→ + AC', type: 'hsdm', attackTypeKey: 'HSDM_YAOTOME' },
   // System — 系统动作
   { name: '爆气 (MAX Mode)', input: 'K+U / O (shortcut)', type: 'system' },
 ];
@@ -52,5 +54,5 @@ export const IORI_AVAILABLE_ACTIONS: string[] = [
   'win',
   'aoihana', 'oniyaki', 'yamibarai', 'kototsuki', 'kuzukaze',
   'iori_yumeyumi', 'iori_katanugi', 'iori_yukiwarui',
-  'dm_yaotome',
+  'dm_yatagarasu',
 ];

@@ -12,7 +12,7 @@ export interface KyoMoveEntry {
   /** Input notation string */
   input: string;
   /** Move category */
-  type: 'command' | 'special' | 'dm' | 'sdm' | 'system';
+  type: 'command' | 'special' | 'dm' | 'sdm' | 'hsdm' | 'system';
   /** Corresponding AttackType key (if applicable) */
   attackTypeKey?: string;
 }
@@ -43,6 +43,8 @@ export const KYO_MOVE_LIST: KyoMoveEntry[] = [
   { name: '大蛇薙 (Orochinagi)', input: '↓↙←↙↓↘→ + A / C', type: 'dm', attackTypeKey: 'DM_OROCHINAGI' },
   // SDMs — MAX超必杀技
   { name: '大蛇薙 (MAX)', input: '↓↙←↙↓↘→ + AC', type: 'sdm', attackTypeKey: 'SDM_OROCHINAGI' },
+  // HSDM — 隐藏超必杀技 (MAX + 红血)
+  { name: '大蛇薙 (HSDM)', input: 'MAX+红血 ↓↙←↙↓↘→ + AC', type: 'hsdm', attackTypeKey: 'HSDM_OROCHINAGI' },
   // System — 系统动作
   { name: '爆气 (MAX Mode)', input: 'K+U / O (shortcut)', type: 'system' },
 ];
