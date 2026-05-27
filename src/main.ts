@@ -625,11 +625,19 @@ function update(): void {
   // Arcade: transition to next opponent
   if (gs.phase === GamePhase.NEXT_MATCH) {
     gs.arcadeNextMatchTimer++;
-    // 90-frame transition: show "NEXT STAGE" text, then start next fight
+    // Play "new challenger" announcement once at start
+    if (gs.arcadeNextMatchTimer === 1) {
+      announcer.newChallenger();
+    }
+    // 120-frame transition: show "NEXT STAGE" text, then start next fight
     if (gs.arcadeNextMatchTimer >= 120 || (gs.arcadeNextMatchTimer > 30 && (inputManager.isKeyDown('KeyJ') || inputManager.isKeyDown('Enter')))) {
       gs.arcadeOpponentIndex++;
       const nextChar = gs.arcadeOpponents[gs.arcadeOpponentIndex];
       if (nextChar) {
+        // Cycle to a different stage for variety (KOF2002: each fight on different stage)
+        const allStages = getAllStages();
+        const nextStage = allStages[gs.arcadeOpponentIndex % allStages.length];
+        setStage(nextStage);
         // Set up P2 as next opponent
         p2.charId = nextChar.id;
         p2.color = nextChar.color;

@@ -1217,18 +1217,57 @@ export function drawNextMatch(
   ctx.fillStyle = `rgba(80, 20, 0, ${pulseAlpha})`;
   ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
+  // Diagonal scan lines for arcade feel
+  ctx.strokeStyle = `rgba(255, 120, 40, ${0.02 + Math.sin(timer * 0.03) * 0.01})`;
+  ctx.lineWidth = 0.5;
+  for (let i = -10; i < 30; i++) {
+    const xOff = (timer * 0.2) % 60;
+    ctx.beginPath();
+    ctx.moveTo(i * 60 + xOff, 0);
+    ctx.lineTo(i * 60 + xOff - CANVAS_HEIGHT, CANVAS_HEIGHT);
+    ctx.stroke();
+  }
+
   const fadeIn = Math.min(1, timer / 20);
   ctx.globalAlpha = fadeIn;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
 
-  // "NEXT STAGE" header
+  // "NEXT STAGE" header — KOF-style scaling entrance
   const headerProgress = Math.min(1, timer / 15);
   const headerScale = 1 + (1 - headerProgress) * 0.8;
+
+  // Energy ring burst
+  if (timer < 30) {
+    const ringP = timer / 30;
+    const ringR = 30 + ringP * 200;
+    const ringA = (1 - ringP) * 0.4;
+    ctx.strokeStyle = `rgba(255, 140, 40, ${ringA})`;
+    ctx.lineWidth = (3 - ringP * 2);
+    ctx.beginPath();
+    ctx.arc(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 80, ringR, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+
   ctx.shadowColor = '#ff8800';
   ctx.shadowBlur = 25;
   drawSNKText(ctx, `STAGE ${stageNumber}`, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 80, Math.round(36 * headerScale), '#ff8800');
   ctx.shadowBlur = 0;
+
+  // Stage name subtitle
+  const allStages: string[] = ['temple', 'china', 'factory', 'orochi', 'street'];
+  const stageNames: Record<string, string> = {
+    temple: '日本寺庙 · Japan',
+    china: '唐人街 · China',
+    factory: '工場 · Factory',
+    orochi: '大蛇神社 · Orochi',
+    street: '街市夜市 · Street',
+  };
+  const currentStageName = stageNames[allStages[(stageNumber - 1) % allStages.length]] ?? '';
+  const stageAlpha = Math.min(1, Math.max(0, (timer - 5) / 15));
+  ctx.globalAlpha = stageAlpha * fadeIn;
+  drawSNKText(ctx, currentStageName, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 50, 12, 'rgba(200,180,160,0.7)');
+  ctx.globalAlpha = fadeIn;
 
   // Stage progress bar
   const barW = 200;
