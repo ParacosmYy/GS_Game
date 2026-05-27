@@ -1193,7 +1193,7 @@ function render(): void {
     if (gs.announceSequence.isRunning()) {
       drawAnnounceSequence(ctx, gs.announceSequence, canvas.width, canvas.height);
     } else {
-      renderer.drawIntro(gs.phaseTimer, rounds.currentRound, p1Char.nameCn, p2Char.nameCn, getStage());
+      renderer.drawIntro(gs.phaseTimer, rounds.currentRound, p1Char.nameCn, p2Char.nameCn, getStage(), rounds.p1Wins, rounds.p2Wins, rounds.winsNeeded);
     }
     // KOF2002: Round transition fade-in from black (30 frames = 0.5s)
     if (gs.phaseTimer < 30) {
