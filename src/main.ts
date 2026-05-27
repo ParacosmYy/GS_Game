@@ -54,6 +54,7 @@ import { createRoundStartSequence, createKOSequence, createTimeOverSequence, cre
 import { TrainingModeState } from './state/trainingMode.js';
 import { drawPauseMenu } from './rendering/pauseMenu.js';
 import { drawCharacterKOOverlay } from './rendering/overlayScreens.js';
+import { triggerMoveName, tickMoveNameDisplay, drawMoveNameDisplay, resetMoveNameDisplay } from './rendering/moveNameDisplay.js';
 import type { CharacterDefinition } from './characters/types.js';
 import { initCharacterHitEffects } from './content/registerHitEffects.js';
 
@@ -604,6 +605,7 @@ function update(): void {
               gs.announceSequence.setSteps(createRoundStartSequence(rounds.currentRound, rounds.p1Wins >= rounds.winsNeeded - 1 && rounds.p2Wins >= rounds.winsNeeded - 1));
               announcer.roundStart(rounds.currentRound);
               announcer.fight();
+              resetMoveNameDisplay();
             },
           );
           return;
@@ -646,6 +648,7 @@ function update(): void {
             gs.setPhase(GamePhase.INTRO);
             gs.phaseTimer = 0;
             gs.resetForNextRound();
+            resetMoveNameDisplay();
             gs.announceSequence.setSteps(createRoundStartSequence(rounds.currentRound, rounds.p1Wins >= rounds.winsNeeded - 1 && rounds.p2Wins >= rounds.winsNeeded - 1));
             announcer.roundStart(rounds.currentRound);
             announcer.fight();
@@ -1039,10 +1042,23 @@ function update(): void {
     f.savePrevState();
   });
 
+  // KOF2002: Move name flash — show move name when special/DM starts
+  for (const f of [p1, p2]) {
+    if (f.currentAttack && f.attackPhase === 'startup' && f.attackFrame <= 1) {
+      const atk = f.currentAttack as string;
+      const isSpecialOrDM = atk.startsWith('RYO_') || atk.startsWith('KYO_') || atk.startsWith('IORI_')
+        || atk.startsWith('DM_') || atk.startsWith('SDM_') || atk.startsWith('HSDM_');
+      if (isSpecialOrDM) {
+        triggerMoveName(f.charId, f.currentAttack, f.x);
+      }
+    }
+  }
+
   updateMovementVfx([p1, p2], vfx, tickRef.value);
 
   // Tick announcer overlay animations
   announcerOverlay.tick();
+  tickMoveNameDisplay();
 
   // Motion SFX: footstep, jump, landing sounds based on state transitions
   tickMotionSFX([p1, p2], tickRef.value);
@@ -1092,7 +1108,7 @@ function update(): void {
     if (p1.health <= 0 || p2.health <= 0) {
       p1.health = p1.maxHealth; p2.health = p2.maxHealth;
       p1DelayedHealth = p1.maxHealth; p2DelayedHealth = p2.maxHealth;
-      cinematic.reset(); gameSpeed.reset(); gs.koGroundSlamDone = false;
+      cinematic.reset(); gameSpeed.reset(); gs.koGroundSlamDone = false; resetMoveNameDisplay();
     }
   }
 
@@ -1278,6 +1294,7 @@ function render(): void {
     // Decay zoom back to 1.0
     renderer.updateSuperFlashZoom(0, 24);
   }
+  drawMoveNameDisplay(ctx);
   renderer.drawPowerGauges(gauges, maxModes);
   if (gs.phase === GamePhase.INTRO) {
     if (gs.announceSequence.isRunning()) {
@@ -1486,6 +1503,9 @@ function render(): void {
 
   // Announcer overlay (counter hit, MAX activation, etc.)
   announcerOverlay.draw(ctx, canvas.width, canvas.height);
+
+  // KOF2002: Move name flash overlay
+  drawMoveNameDisplay(ctx);
 
   // KOF2002: Time critical screen edge glow — red vignette when ≤5 seconds
   if (!gs.isTrainingMode && gs.phase === GamePhase.FIGHTING && tickRef.value >= 3300 && tickRef.value < 3600) {
