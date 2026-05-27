@@ -539,6 +539,54 @@ export const HSDM_RYUKO_RANBU_FRAMES: AttackFrame[] = [
   F([{ ox: 75, oy: -28, w: 130, h: 95 }]),
 ];
 
+// Ryo: Ko'ou Ken D version (heavy projectile) — 22 active frames
+export const RYO_KOOUKEN_D_FRAMES: AttackFrame[] = [
+  // Projectile launch: large, powerful energy ball
+  F([{ ox: 52, oy: -56, w: 42, h: 32 }]),
+  F([{ ox: 58, oy: -54, w: 48, h: 36 }]),
+  F([{ ox: 64, oy: -52, w: 54, h: 40 }]),
+  F([{ ox: 70, oy: -50, w: 58, h: 42 }]),
+  // Sustained travel
+  F([{ ox: 76, oy: -48, w: 62, h: 44 }]),
+  F([{ ox: 82, oy: -46, w: 66, h: 46 }]),
+  F([{ ox: 88, oy: -44, w: 68, h: 48 }]),
+  F([{ ox: 94, oy: -42, w: 70, h: 48 }]),
+  // Full power sustained
+  ...Array.from({ length: 10 }, (_, i) =>
+    F([{ ox: 100 + i * 6, oy: -40, w: 72, h: 50 }])
+  ),
+  // Dissipation
+  F([{ ox: 160, oy: -38, w: 60, h: 44 }]),
+  F([{ ox: 170, oy: -36, w: 48, h: 38 }]),
+  F([{ ox: 178, oy: -34, w: 36, h: 30 }]),
+  F([{ ox: 184, oy: -32, w: 24, h: 22 }]),
+];
+
+// Ryo: Hio Hacker (dash strike) — 6 active frames
+export const RYO_HIO_HACKER_FRAMES: AttackFrame[] = [
+  // Forward dash strike: elbow/shoulder tackle
+  F([{ ox: 40, oy: -62, w: 40, h: 32 }]),
+  // Impact extension
+  F([{ ox: 48, oy: -58, w: 48, h: 38 }]),
+  // Full extension
+  F([{ ox: 54, oy: -55, w: 52, h: 42 }]),
+  // Sustained hit
+  F([{ ox: 52, oy: -56, w: 50, h: 40 }]),
+  // Pullback
+  F([{ ox: 46, oy: -60, w: 44, h: 36 }]),
+  // Recovery
+  F([{ ox: 40, oy: -64, w: 38, h: 30 }]),
+];
+
+// Ryo: Zanretsu Ken (multi-punch) — 4 active frames per cycle, repeated
+export const RYO_ZANRETSU_KEN_FRAMES: AttackFrame[] = [
+  // Punch cycle 1: alternating left/right
+  F([{ ox: 42, oy: -60, w: 40, h: 32 }]),
+  F([{ ox: 48, oy: -58, w: 44, h: 34 }]),
+  F([{ ox: 42, oy: -60, w: 40, h: 32 }]),
+  F([{ ox: 48, oy: -58, w: 44, h: 34 }]),
+];
+
 export const DM_V_SLASHER_FRAMES: AttackFrame[] = [
   F([{ ox: 30, oy: -68, w: 58, h: 48 }]),
   F([{ ox: 36, oy: -65, w: 68, h: 52 }]),
