@@ -13,13 +13,14 @@
  * - Air attack type resolution (AIR_A vs AIR_C vs AIR_D from currentAttack)
  * - Cycle timing for animation frames
  *
- * Currently supports: IDLE
- * Fallback states (walk, attack, etc.) will be added in subsequent iterations.
+ * Currently supports: IDLE, WALK (forward/backward)
+ * Fallback states (attack, crouch, jump, etc.) will be added in subsequent iterations.
  */
 
 import { FighterState, AttackType } from '../../core/types.js';
 import { drawPixelFrame, prerenderFrame, drawPrerenderedFrame, type PixelFrame, type PixelPalette } from './pixelFrameRenderer.js';
 import { KYO_IDLE_FRAMES } from './kyoIdleFrames.js';
+import { KYO_WALK_FORWARD_FRAMES, KYO_WALK_BACKWARD_FRAMES } from './kyoWalkFrames.js';
 
 // ===== Internal Frame Registry =====
 
@@ -118,8 +119,11 @@ function initAllFrames(): void {
   // KOF-authentic rhythm: hold at peak inhale (frame 2), faster through neutral
   registerVariableFrames('IDLE', KYO_IDLE_FRAMES, [8, 9, 12, 9, 10, 8]);
 
-  // NOTE: Additional frame sets (walk, attack, crouch, jump, etc.) will be
-  // registered here as they are created in subsequent iterations.
+  // WALK FORWARD — 4-frame stride loop, 6 ticks per frame
+  registerFrames('WALK_FORWARD', KYO_WALK_FORWARD_FRAMES, 6);
+
+  // WALK BACKWARD — 4-frame cautious step loop, 7 ticks per frame (slower than forward)
+  registerFrames('WALK_BACKWARD', KYO_WALK_BACKWARD_FRAMES, 7);
 }
 
 // ===== State Resolution =====
@@ -140,8 +144,9 @@ function resolveFrameKey(
     case FighterState.IDLE:
       return 'IDLE';
 
-    // NOTE: Additional state resolutions will be added as frames are created.
-    // For now, all other states return null, causing fallback to skeleton renderer.
+    case FighterState.WALK:
+      // Forward vs backward determined by velocity direction relative to facing
+      return (vx * _facing > 0) ? 'WALK_FORWARD' : 'WALK_BACKWARD';
 
     default:
       return null;
