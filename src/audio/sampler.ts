@@ -25,7 +25,9 @@ type SampleId =
   | 'whoosh' | 'whoosh_heavy' | 'footstep' | 'jump' | 'landing_normal'
   | 'ryo_koouken' | 'ryo_ko_hou' | 'ryo_hien' | 'ryo_haou'
   | 'ryo_tsurizao' | 'ryo_orishi'
-  | 'ryo_hio_hacker' | 'ryo_zanretsu_ken';
+  | 'ryo_hio_hacker' | 'ryo_zanretsu_ken'
+  | 'kyo_yamibarai' | 'kyo_oniyaki' | 'kyo_aragami' | 'kyo_dokugami'
+  | 'kyo_75kai' | 'kyo_red_kick' | 'kyo_orochinagi';
 
 const samples = new Map<SampleId, AudioBuffer>();
 let initialized = false;
@@ -1617,6 +1619,204 @@ function renderZanretsuKen(sr: number): Float32Array {
   return normalize(mixLayers([...hits, padTo(body, total)], [1, 1, 1, 1, 0.5]));
 }
 
+// === Kyo 必杀技专属音效预渲染 ===
+
+// 闇払い (YAMIBARAI): 火焰弹 — whoosh + 火焰噼啪
+// 特征：低频火焰推进 + 高频燃烧噼啪，模拟草薙火焰弹的炽热飞行动感
+function renderKyoYamibarai(sr: number): Float32Array {
+  const dur = 0.4;
+  // 低频火焰推进 — 锯齿波从200Hz扫到80Hz，模拟火焰弹飞行
+  const rumble = renderOsc(sr, dur, 'sawtooth',
+    t => 200 - 300 * t,
+    t => t < 0.05 ? t * 8 : expDecay(t - 0.05, 0.25, 5));
+  // 高频火焰噼啪 — 噪声快速衰减
+  const crackle = highPass(renderNoise(sr, dur * 0.7, t => expDecay(t, 0.18, 10)), sr, 5000);
+  // 中频火焰核心 — 带通噪声模拟火焰中心能量
+  const core = bandPass(renderNoise(sr, dur * 0.6, t => expDecay(t, 0.2, 8)), sr, 1500, 4500);
+  // 发射瞬态 — 火焰弹弹出瞬间的"呼"
+  const launch = renderOsc(sr, 0.06, 'square', t => 1800 - 30000 * t, t => expDecay(t, 0.15, 35));
+  // 低频弹体共振
+  const hum = renderOsc(sr, dur * 0.85, 'sine',
+    t => 160 - 300 * t,
+    t => t < 0.04 ? t * 6 : expDecay(t - 0.04, 0.2, 6));
+
+  const total = Math.ceil(sr * dur);
+  const crackleP = padTo(crackle, total);
+  const coreP = padTo(core, total);
+  const launchP = padTo(launch, total);
+  const humP = padTo(hum, total);
+
+  return normalize(mixLayers(
+    [rumble, crackleP, coreP, launchP, humP],
+    [1, 0.65, 0.75, 0.55, 0.6]
+  ));
+}
+
+// 鬼焼き (ONIYAKI): 升龙火焰拳 — 上升频率sweep + 打击感
+// 特征：快速上升的正弦波 + 短促噪声爆发，模拟燃烧拳头向上挥击
+function renderKyoOniyaki(sr: number): Float32Array {
+  const dur = 0.3;
+  // 上升火焰sweep — 正弦波从150Hz升到600Hz
+  const sweep = renderOsc(sr, 0.15, 'sine',
+    t => 150 + 3000 * t,
+    t => expDecay(t, 0.22, 12));
+  // 火焰打击噪声 — 短促爆发
+  const burst = highPass(renderNoise(sr, 0.1, t => expDecay(t, 0.25, 25)), sr, 3000);
+  // 低频体感 — 上勾拳力量感
+  const body = renderOsc(sr, 0.12, 'sine', t => 100 - 1000 * t, t => expDecay(t, 0.3, 10));
+  // 火焰裂响瞬态 — 高频三角波模拟火焰炸裂
+  const snap = renderOsc(sr, 0.04, 'triangle', t => 3500 - 80000 * t, t => expDecay(t, 0.15, 50));
+  // 子低音 — 升龙击的深层体感
+  const sub = renderOsc(sr, 0.18, 'sine', t => 50 - 25 * t, t => expDecay(t, 0.35, 6));
+
+  const total = Math.ceil(sr * dur);
+  const burstP = padTo(burst, total);
+  const snapP = padTo(snap, total, Math.floor(sr * 0.03));
+  const subP = padTo(sub, total, Math.floor(sr * 0.03));
+
+  return normalize(mixLayers(
+    [sweep, burstP, body, snapP, subP],
+    [1, 0.6, 0.85, 0.5, 0.9]
+  ));
+}
+
+// 荒咬み (ARAGAMI): rekka起手式火焰拳 — 锐利火拳冲击
+// 特征：方波300Hz + 短促噪声，非常锐利的火焰拳击感
+function renderKyoAragami(sr: number): Float32Array {
+  const dur = 0.25;
+  // 火焰拳击核心 — 方波短促
+  const punch = renderOsc(sr, 0.1, 'square', t => 300 - 2000 * t, t => expDecay(t, 0.2, 30));
+  // 火焰噪声 — 高频噼啪
+  const fire = highPass(renderNoise(sr, 0.08, t => expDecay(t, 0.18, 30)), sr, 4000);
+  // 低频冲击 — 拳击重量感
+  const body = renderOsc(sr, 0.08, 'sine', t => 150 - 2000 * t, t => expDecay(t, 0.25, 20));
+  // 火焰裂响瞬态
+  const snap = renderOsc(sr, 0.025, 'triangle', t => 4000 - 80000 * t, t => expDecay(t, 0.12, 60));
+
+  const total = Math.ceil(sr * dur);
+  const fireP = padTo(fire, total);
+  const snapP = padTo(snap, total, Math.floor(sr * 0.02));
+
+  return normalize(mixLayers(
+    [punch, fireP, body, snapP],
+    [1, 0.7, 0.8, 0.55]
+  ));
+}
+
+// 毒咬み (DOKUGAMI): 强rekka火焰拳 — 沉重火焰爆炸
+// 特征：锯齿波250Hz + 噪声 + 更长持续，模拟更强的火焰拳击
+function renderKyoDokugami(sr: number): Float32Array {
+  const dur = 0.3;
+  // 沉重火焰拳 — 锯齿波更长持续
+  const blast = renderOsc(sr, 0.15, 'sawtooth', t => 250 - 1500 * t, t => expDecay(t, 0.22, 15));
+  // 火焰噪声 — 中频噼啪更久
+  const fire = bandPass(renderNoise(sr, 0.12, t => expDecay(t, 0.2, 15)), sr, 2000, 7000);
+  // 低频冲击 — 重击体感
+  const body = renderOsc(sr, 0.12, 'sine', t => 120 - 1500 * t, t => expDecay(t, 0.3, 12));
+  // 高频瞬态 — 火焰炸裂尖响
+  const crack = renderOsc(sr, 0.035, 'triangle', t => 3000 - 60000 * t, t => expDecay(t, 0.15, 45));
+  // 子低音 — 重火焰拳深层冲击
+  const sub = renderOsc(sr, 0.15, 'sine', t => 50 - 30 * t, t => expDecay(t, 0.35, 8));
+
+  const total = Math.ceil(sr * dur);
+  const fireP = padTo(fire, total);
+  const crackP = padTo(crack, total, Math.floor(sr * 0.03));
+  const subP = padTo(sub, total);
+
+  return normalize(mixLayers(
+    [blast, fireP, body, crackP, subP],
+    [1, 0.75, 0.9, 0.5, 0.85]
+  ));
+}
+
+// 75式改 (75_KAI): 双段踢 — 两次短促冲击
+// 特征：两段短促噪声爆发，间隔约0.08s，模拟连续两脚踢击
+function renderKyo75Kai(sr: number): Float32Array {
+  const dur = 0.2;
+  // 第一踢 — 噪声爆发
+  const kick1 = bandPass(renderNoise(sr, 0.04, t => expDecay(t, 0.25, 40)), sr, 1500, 6000);
+  // 第二踢 — 噪声爆发，偏移0.08s
+  const kick2 = bandPass(renderNoise(sr, 0.04, t => expDecay(t, 0.25, 40)), sr, 1500, 6000);
+  // 低频踢击体感
+  const body = renderOsc(sr, 0.1, 'sine', t => 130 - 1500 * t, t => expDecay(t, 0.28, 18));
+  // 风切声 — 踢腿划空气
+  const wind = highPass(renderNoise(sr, 0.08, t => expDecay(t, 0.12, 25)), sr, 4000);
+
+  const total = Math.ceil(sr * dur);
+  const kick1P = padTo(kick1, total);
+  const kick2P = padTo(kick2, total, Math.floor(sr * 0.08));
+  const bodyP = padTo(body, total, Math.floor(sr * 0.02));
+  const windP = padTo(wind, total);
+
+  return normalize(mixLayers(
+    [kick1P, kick2P, bodyP, windP],
+    [1, 0.9, 0.75, 0.55]
+  ));
+}
+
+// R.E.D. Kick: 弧形飞踢 — 频率下扫 + 噪声
+// 特征：正弦波从400Hz扫到200Hz模拟弧线下落 + 噪声风切
+function renderKyoRedKick(sr: number): Float32Array {
+  const dur = 0.3;
+  // 弧线下扫 — 正弦波从高频到低频
+  const swoop = renderOsc(sr, 0.18, 'sine',
+    t => 400 - 1100 * t,
+    t => expDecay(t, 0.2, 10));
+  // 踢击风切 — 噪声
+  const wind = highPass(renderNoise(sr, 0.1, t => expDecay(t, 0.18, 20)), sr, 3000);
+  // 打击瞬态 — 踢击命中
+  const impact = bandPass(renderNoise(sr, 0.05, t => expDecay(t, 0.25, 35)), sr, 2000, 7000);
+  // 低频body — 飞踢重量感
+  const body = renderOsc(sr, 0.1, 'sine', t => 110 - 1200 * t, t => expDecay(t, 0.25, 18));
+
+  const total = Math.ceil(sr * dur);
+  const windP = padTo(wind, total);
+  const impactP = padTo(impact, total, Math.floor(sr * 0.06));
+  const bodyP = padTo(body, total, Math.floor(sr * 0.04));
+
+  return normalize(mixLayers(
+    [swoop, windP, impactP, bodyP],
+    [0.9, 0.6, 1, 0.8]
+  ));
+}
+
+// 大蛇薙 (OROCHINAGI): DM大蛇薙 — 巨大火焰波
+// 特征：低频隆隆 + 中频火焰 + 高频噼啪，持续0.5s以上，更响更大
+function renderKyoOrochinagi(sr: number): Float32Array {
+  const dur = 0.6;
+  // 厚重低频隆隆 — 锯齿波从80Hz扫到60Hz
+  const bass = renderOsc(sr, dur, 'sawtooth',
+    t => t < 0.08 ? 80 + 200 * t : 96 - 60 * (t - 0.08),
+    t => t < 0.06 ? t * 6 : expDecay(t - 0.06, 0.35, 3));
+  // 中频火焰 — 方波从300Hz扫到150Hz
+  const mid = renderOsc(sr, dur * 0.8, 'square',
+    t => 300 - 250 * t,
+    t => t < 0.05 ? t * 5 : expDecay(t - 0.05, 0.25, 4));
+  // 高频噼啪 — 噪声
+  const crackle = highPass(renderNoise(sr, dur * 0.6, t => expDecay(t, 0.2, 6)), sr, 5000);
+  // 子低音冲击 — 发射深沉"轰"
+  const sub = renderOsc(sr, 0.3, 'sine', t => 45 - 30 * t, t => expDecay(t, 0.45, 3));
+  // 中频能量爆发
+  const burst = bandPass(renderNoise(sr, dur * 0.5, t => expDecay(t, 0.25, 5)), sr, 400, 3000);
+  // 发射瞬态
+  const launch = renderOsc(sr, 0.06, 'square', t => 2000 - 35000 * t, t => expDecay(t, 0.18, 30));
+  // 金属泛音 — 火焰高频质感
+  const metal = renderOsc(sr, 0.08, 'triangle', t => 2500 - 30000 * t, t => expDecay(t, 0.1, 20));
+
+  const total = Math.ceil(sr * dur);
+  const midP = padTo(mid, total);
+  const crackleP = padTo(crackle, total);
+  const subP = padTo(sub, total);
+  const burstP = padTo(burst, total);
+  const launchP = padTo(launch, total);
+  const metalP = padTo(metal, total, Math.floor(sr * 0.05));
+
+  return normalize(mixLayers(
+    [bass, midP, crackleP, subP, burstP, launchP, metalP],
+    [1.1, 0.8, 0.55, 1.15, 0.7, 0.6, 0.35]
+  ));
+}
+
 // === 基础 BGM 框架 ===
 
 // 生成简单循环战斗BGM
@@ -1838,6 +2038,14 @@ export function initSampler(): void {
     ['ryo_orishi', renderOrishi],
     ['ryo_hio_hacker', renderHioHacker],
     ['ryo_zanretsu_ken', renderZanretsuKen],
+    // Kyo 必杀技专属音效
+    ['kyo_yamibarai', renderKyoYamibarai],
+    ['kyo_oniyaki', renderKyoOniyaki],
+    ['kyo_aragami', renderKyoAragami],
+    ['kyo_dokugami', renderKyoDokugami],
+    ['kyo_75kai', renderKyo75Kai],
+    ['kyo_red_kick', renderKyoRedKick],
+    ['kyo_orochinagi', renderKyoOrochinagi],
   ];
 
   for (const [id, renderer] of renderers) {
@@ -2079,3 +2287,26 @@ export function playHioHacker(): void { initSampler(); play('ryo_hio_hacker', 0.
 
 /** 播放斩裂拳音效 — qcb+P 连打技：快速连击声 */
 export function playZanretsuKen(): void { initSampler(); play('ryo_zanretsu_ken', 0.6); }
+
+// === Kyo 必杀技专属音效 API ===
+
+/** 播放闇払い音效 — 火焰弹：低频火焰推进 + 高频噼啪 */
+export function playKyoYamibarai(): void { initSampler(); play('kyo_yamibarai'); }
+
+/** 播放鬼焼き音效 — 升龙火焰拳：上升sweep + 火焰打击 */
+export function playKyoOniyaki(): void { initSampler(); play('kyo_oniyaki'); }
+
+/** 播放荒咬み音效 — rekka起手火焰拳：锐利火拳冲击 */
+export function playKyoAragami(): void { initSampler(); play('kyo_aragami', 0.65); }
+
+/** 播放毒咬み音效 — 强rekka火焰拳：沉重火焰爆炸 */
+export function playKyoDokugami(): void { initSampler(); play('kyo_dokugami', 0.65); }
+
+/** 播放75式改音效 — 双段踢：两次短促冲击 */
+export function playKyo75Kai(): void { initSampler(); play('kyo_75kai', 0.6); }
+
+/** 播放R.E.D. Kick音效 — 弧形飞踢：频率下扫 + 风切 */
+export function playKyoRedKick(): void { initSampler(); play('kyo_red_kick', 0.65); }
+
+/** 播放大蛇薙音效 — DM巨大火焰波：低频隆隆 + 中频火焰 + 高频噼啪 */
+export function playKyoOrochinagi(): void { initSampler(); play('kyo_orochinagi'); }
