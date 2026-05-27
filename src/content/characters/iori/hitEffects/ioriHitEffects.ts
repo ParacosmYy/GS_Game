@@ -64,12 +64,14 @@ function ioriVFX(ctx: HitEffectContext): boolean {
   if (atkName === 'IORI_AOIHANA' || atkName === 'IORI_AOIHANA_C') {
     cinematic.addHitStop(1, ctx.defIdx);
     vfx.spawnImpactRing(hitX, hitY, 0.7);
+    vfx.spawnIoriAoihanaTrail(hitX, hitY, attacker.facing, 0);
     handled = true;
   }
   if (atkName === 'IORI_AOIHANA_2' || atkName === 'IORI_AOIHANA_C_2') {
     cinematic.addHitStop(1, ctx.defIdx);
     screenShake.trigger(5, 5, attacker.facing * 3);
     vfx.spawnImpactRing(hitX, hitY, 0.9);
+    vfx.spawnIoriAoihanaTrail(hitX, hitY, attacker.facing, 1);
     handled = true;
   }
   // Aoihana finisher
@@ -78,6 +80,7 @@ function ioriVFX(ctx: HitEffectContext): boolean {
     cinematic.addHitStop(2, ctx.defIdx);
     screenShake.trigger(9, 8, attacker.facing * 5);
     screenFlash.trigger('#8822cc', 0.1, 4);
+    vfx.spawnIoriAoihanaTrail(hitX, hitY, attacker.facing, 2);
     handled = true;
   }
   // Kototsuki (琴月) — dark rush

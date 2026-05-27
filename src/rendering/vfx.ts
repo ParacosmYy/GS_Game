@@ -53,6 +53,8 @@ import {
   spawnIoriYamibaraiVFX,
   spawnKyoOniyakiVFX,
   spawnIoriOniyakiVFX,
+  spawnIoriAoihanaTrail,
+  spawnKyoDokugamiTrail,
   spawnRunSpeedLines,
   spawnScorchMark,
   spawnKOSuperBurst,
@@ -331,6 +333,16 @@ export class VFXSystem {
   /** Iori: Oniyaki (鬼焼き) rising dark energy uppercut column */
   spawnIoriOniyakiVFX(worldX: number, worldY: number, facing: number, isHeavy: boolean): void {
     spawnIoriOniyakiVFX(this.particles, worldX, worldY, facing, isHeavy);
+  }
+
+  /** Iori: Aoihana (葵花) rekka chain trail — escalating per hit */
+  spawnIoriAoihanaTrail(worldX: number, worldY: number, facing: number, hitIndex: number): void {
+    spawnIoriAoihanaTrail(this.particles, worldX, worldY, facing, hitIndex);
+  }
+
+  /** Kyo: Dokugami (毒咬み) rekka chain trail — escalating per hit */
+  spawnKyoDokugamiTrail(worldX: number, worldY: number, facing: number, hitIndex: number): void {
+    spawnKyoDokugamiTrail(this.particles, worldX, worldY, facing, hitIndex);
   }
 
   /** Ryo: Ko Hou (虎咲) uppercut flame column VFX */

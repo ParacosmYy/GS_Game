@@ -89,18 +89,21 @@ function kyoVFX(ctx: HitEffectContext): boolean {
     cinematic.addHitStop(1, ctx.defIdx);
     screenShake.trigger(7, 6, attacker.facing * 4);
     vfx.spawnProjectileExplosion(hitX, hitY, '#ff6622', '#ffaa44');
+    vfx.spawnKyoDokugamiTrail(hitX, hitY, attacker.facing, 0);
     handled = true;
   }
   // Dokugami followups — Tsumiyomi, Batsuyomi
   if (atkName === 'KYO_TSUMIYOMI') {
     cinematic.addHitStop(1, ctx.defIdx);
     vfx.spawnProjectileExplosion(hitX, hitY, '#ff5500', '#ff9933');
+    vfx.spawnKyoDokugamiTrail(hitX, hitY, attacker.facing, 1);
     handled = true;
   }
   if (atkName === 'KYO_BATSUYOMI') {
     cinematic.addHitStop(1, ctx.defIdx);
     screenShake.trigger(7, 6, attacker.facing * 4);
     vfx.spawnSuperBurst(hitX, hitY, '#ff4400', '#ffaa22', false);
+    vfx.spawnKyoDokugamiTrail(hitX, hitY, attacker.facing, 2);
     handled = true;
   }
   // Red Kick

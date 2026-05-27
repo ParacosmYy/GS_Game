@@ -2074,3 +2074,53 @@ export function spawnIoriOniyakiVFX(particles: Particle[], x: number, y: number,
     type: 'flash',
   });
 }
+
+/** Iori Aoihana rekka hit trail — dark energy slash wisps trailing the claw strike */
+export function spawnIoriAoihanaTrail(particles: Particle[], x: number, y: number, facing: number, hitIndex: number): void {
+  // hitIndex 0=starter, 1=second, 2=finisher — intensity scales up
+  const count = 4 + hitIndex * 3;
+  for (let i = 0; i < count; i++) {
+    const angle = facing > 0
+      ? (-Math.PI * 0.3 + Math.random() * Math.PI * 0.6)
+      : (Math.PI - Math.PI * 0.3 + Math.random() * Math.PI * 0.6);
+    const speed = 1.5 + Math.random() * 2 + hitIndex * 0.5;
+    particles.push({
+      x: x + (Math.random() - 0.5) * 12,
+      y: y + (Math.random() - 0.5) * 16,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed - 1,
+      life: 10 + Math.floor(Math.random() * 8) + hitIndex * 3,
+      maxLife: 18 + hitIndex * 4,
+      size: 2 + Math.random() * 3 + hitIndex,
+      color: i < count / 3 ? '#cc88ff' : i < count * 2 / 3 ? '#8833cc' : '#440066',
+      type: 'spark',
+      gravity: -0.2,
+      friction: 0.96,
+    });
+  }
+}
+
+/** Kyo Dokugami rekka hit trail — fire slash wisps trailing the flame punch */
+export function spawnKyoDokugamiTrail(particles: Particle[], x: number, y: number, facing: number, hitIndex: number): void {
+  // hitIndex 0=Dokugami, 1=Tsumiyomi, 2=Batsuyomi — intensity scales up
+  const count = 5 + hitIndex * 3;
+  for (let i = 0; i < count; i++) {
+    const angle = facing > 0
+      ? (-Math.PI * 0.4 + Math.random() * Math.PI * 0.8)
+      : (Math.PI - Math.PI * 0.4 + Math.random() * Math.PI * 0.8);
+    const speed = 2 + Math.random() * 2.5 + hitIndex * 0.5;
+    particles.push({
+      x: x + (Math.random() - 0.5) * 14,
+      y: y + (Math.random() - 0.5) * 14,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed - 0.5,
+      life: 10 + Math.floor(Math.random() * 8) + hitIndex * 3,
+      maxLife: 18 + hitIndex * 4,
+      size: 2 + Math.random() * 3 + hitIndex,
+      color: i < count / 3 ? '#ffee88' : i < count * 2 / 3 ? '#ff8822' : '#cc4400',
+      type: 'spark',
+      gravity: -0.15,
+      friction: 0.95,
+    });
+  }
+}
