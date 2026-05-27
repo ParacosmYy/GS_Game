@@ -598,6 +598,13 @@ export function drawFighters(
       ctx.fillRect(sx + leanOffsetX - hw - 5, sy - f.displayHeight - 5, (hw + 5) * 2, f.displayHeight + 10);
     }
 
+    // KOF2002: 重击累积暗化 — hitstunTimer越大身体越暗(重击效果)
+    if (f.state === FighterState.HITSTUN && f.hitstunTimer > 10) {
+      const darkAlpha = Math.min((f.hitstunTimer - 10) * 0.005, 0.08);
+      ctx.fillStyle = 'rgba(80, 0, 0, ' + darkAlpha + ')';
+      ctx.fillRect(sx + leanOffsetX - hw - 3, sy - f.displayHeight - 3, (hw + 3) * 2, f.displayHeight + 6);
+    }
+
     // KOF2002: 削血致死警告 — HP<10%且防御中时脉冲红光
     if (f.health > 0 && f.health < f.maxHealth * 0.1
       && (f.state === FighterState.BLOCK || f.state === FighterState.BLOCKSTUN)) {
