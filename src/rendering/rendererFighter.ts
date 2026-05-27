@@ -335,6 +335,18 @@ export function drawFighters(
       }
       ctx.restore();
     }
+    // KOF2002: 投技命中金色爆发 — THROW stateAge<2时金色扩散环
+    if (f.state === FighterState.THROW && f.stateAge < 2) {
+      ctx.save();
+      ctx.globalAlpha = (2 - f.stateAge) / 2 * 0.25;
+      ctx.strokeStyle = '#ffdd44';
+      ctx.lineWidth = 2;
+      const throwRingR = 10 + f.stateAge * 15;
+      ctx.beginPath();
+      ctx.ellipse(sx, sy - f.displayHeight / 2, throwRingR, throwRingR * 0.6, 0, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.restore();
+    }
     // KOF2002: 滚动摩擦光 — ROLL时身体周围微弱旋转光点
     if ((f.state === FighterState.ROLL || f.state === FighterState.BACK_ROLL) && f.stateAge % 3 === 0) {
       ctx.save();
@@ -346,6 +358,20 @@ export function drawFighters(
       ctx.beginPath();
       ctx.arc(dotX, dotY, 2, 0, Math.PI * 2);
       ctx.fill();
+      ctx.restore();
+    }
+    // KOF2002: 翻滚扬尘 — ROLL/BACK_ROLL时脚下扬尘
+    if ((f.state === FighterState.ROLL || f.state === FighterState.BACK_ROLL) && f.stateAge < 6) {
+      ctx.save();
+      ctx.globalAlpha = (6 - f.stateAge) / 6 * 0.2;
+      ctx.fillStyle = '#ccbb99';
+      const dustDir = f.state === FighterState.ROLL ? -f.facing : f.facing;
+      for (let d = 0; d < 2; d++) {
+        const dx = sx + dustDir * (5 + f.stateAge * 3 + d * 8);
+        ctx.beginPath();
+        ctx.ellipse(dx, sy + 2, 4 + f.stateAge, 2, 0, 0, Math.PI * 2);
+        ctx.fill();
+      }
       ctx.restore();
     }
 
@@ -481,6 +507,20 @@ export function drawFighters(
         }
         ctx.restore();
       }
+    }
+    // KOF2002: 浮空受击下落粒子 — HITSTUN空中时蓝色粒子下落
+    if (f.state === FighterState.HITSTUN && !f.isGrounded() && f.stateAge < 8) {
+      ctx.save();
+      ctx.globalAlpha = (8 - f.stateAge) / 8 * 0.3;
+      ctx.fillStyle = '#6699ff';
+      for (let p = 0; p < 3; p++) {
+        const px = sx + Math.sin(globalTick * 0.3 + p * 2.1) * 12;
+        const py = sy - f.displayHeight * 0.5 + f.stateAge * 4 + p * 8;
+        ctx.beginPath();
+        ctx.arc(px, py, 1.5 - f.stateAge * 0.15, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.restore();
     }
     // KOF2002: 命中停顿攻击者发光 — hitstop时攻击者微白轮廓
     if (f.hitFlashFrames > 0 && f.state !== FighterState.HITSTUN && f.state !== FighterState.KNOCKDOWN) {
