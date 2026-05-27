@@ -325,6 +325,22 @@ export function drawFighters(
       ctx.translate(0, crouchOffset);
     }
 
+    // KOF2002: 受击恢复闪烁 — hitstun最后5帧身体闪烁
+    if (f.state === FighterState.HITSTUN && f.hitstunTimer > 0 && f.hitstunTimer <= 5) {
+      const flickerOn = f.hitstunTimer % 2 === 0;
+      if (flickerOn) {
+        ctx.globalAlpha = 0.7;
+      }
+    }
+
+    // KOF2002: 防御恢复闪烁 — blockstun最后4帧身体闪烁
+    if (f.state === FighterState.BLOCK && f.blockstunTimer > 0 && f.blockstunTimer <= 4) {
+      const flickerOn = f.blockstunTimer % 2 === 0;
+      if (flickerOn) {
+        ctx.globalAlpha = 0.75;
+      }
+    }
+
     // Compute animation frame index: attacks use attackFrame, cyclic states use stateAge
     const isAttackState = f.state === FighterState.STAND_ATTACK
       || f.state === FighterState.CROUCH_ATTACK
