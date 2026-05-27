@@ -5,6 +5,11 @@
  * ONIYAKI_C (鬼焼き C): 6 frames — stronger uppercut with bigger flame
  * YAMIBARAI (闇払い): 4 frames — fireball casting stance
  * RED_KICK (R.E.D. Kick): 5 frames — diving overhead kick
+ * 75KAI (75式改): 4 frames — dual kick
+ * ARAGAMI (荒咬み): 4 frames — punching flame thrust
+ * DOKUGAMI (毒咬み): 4 frames — heavy flame punch
+ * OROCHINAGI DM (大蛇薙): 5 frames — DM flame sweep
+ * OROCHINAGI SDM (大蛇薙 SDM): 6 frames — SDM bigger flame sweep
  * 48x72 px each, extended palette with flame colors.
  */
 
