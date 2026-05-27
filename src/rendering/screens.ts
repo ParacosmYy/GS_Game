@@ -380,6 +380,41 @@ export function drawCharacterSelect(
     drawSNKText(ctx, '???', CANVAS_WIDTH / 2, hoverY, 28, '#ffcc00');
   }
 
+  // ===== Move command preview — hovered character's special move inputs =====
+  if (hoveredChar && hoveredChar.moveList && hoveredChar.moveList.length > 0) {
+    const mlX = CANVAS_WIDTH / 2 + 130;
+    const mlY = hoverY - 40;
+    ctx.save();
+    ctx.globalAlpha = Math.min(1, Math.max(0, (tick % 120) / 20)) * 0.85;
+    // Background
+    ctx.fillStyle = 'rgba(0,0,0,0.55)';
+    roundRect(ctx, mlX - 8, mlY - 8, 170, hoveredChar.moveList.length * 16 + 26, 6);
+    ctx.fill();
+    ctx.strokeStyle = hoveredChar.color + '44';
+    ctx.lineWidth = 1;
+    roundRect(ctx, mlX - 8, mlY - 8, 170, hoveredChar.moveList.length * 16 + 26, 6);
+    ctx.stroke();
+    // "MOVES" header
+    drawSNKText(ctx, 'MOVES', mlX + 75, mlY + 2, 10, hoveredChar.color);
+    // Move entries
+    ctx.textAlign = 'left';
+    for (let mi = 0; mi < Math.min(hoveredChar.moveList.length, 8); mi++) {
+      const mv = hoveredChar.moveList[mi];
+      const entryY = mlY + 16 + mi * 16;
+      // Move name
+      ctx.fillStyle = '#ddd';
+      ctx.font = '10px "Courier New", monospace';
+      ctx.fillText(mv.name.substring(0, 10), mlX, entryY);
+      // Input notation
+      ctx.fillStyle = hoveredChar.color;
+      ctx.font = '9px "Courier New", monospace';
+      ctx.textAlign = 'right';
+      ctx.fillText(mv.input.substring(0, 14), mlX + 158, entryY);
+      ctx.textAlign = 'left';
+    }
+    ctx.restore();
+  }
+
   // ===== 底部面板 — P1/P2信息 =====
   const panelY = 340;
   ctx.fillStyle = 'rgba(0,0,0,0.5)';
