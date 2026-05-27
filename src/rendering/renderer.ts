@@ -176,10 +176,18 @@ export class Renderer {
     if (ko) {
       drawKO(ctx, winner, perfectPlayer, isTimeOver, fighters[0].health, fighters[1].health, fighters[0].maxHealth, koTimer, koDustParticles, cameraX, koPhase, koPhaseTimer);
       // KOF2002: KO瞬间白色闪光 — KO前3帧全屏白闪
-      if (koTimer < 3) {
+      if (koTimer < 3 && !isTimeOver) {
         ctx.save();
         ctx.globalAlpha = (3 - koTimer) / 3 * 0.4;
         ctx.fillStyle = '#ffffff';
+        ctx.fillRect(-10, -10, CANVAS_WIDTH + 20, CANVAS_HEIGHT + 20);
+        ctx.restore();
+      }
+      // KOF2002: 时间到紫色闪光 — TIME OVER时紫色闪烁
+      if (isTimeOver && koTimer < 5) {
+        ctx.save();
+        ctx.globalAlpha = (5 - koTimer) / 5 * 0.25;
+        ctx.fillStyle = '#8833cc';
         ctx.fillRect(-10, -10, CANVAS_WIDTH + 20, CANVAS_HEIGHT + 20);
         ctx.restore();
       }

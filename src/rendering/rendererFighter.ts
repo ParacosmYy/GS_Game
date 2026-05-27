@@ -307,6 +307,20 @@ export function drawFighters(
       ctx.fill();
       ctx.restore();
     }
+    // KOF2002: 蹲攻击横扫扬尘 — CROUCH_ATTACK前2帧地面横向扬尘
+    if (f.state === FighterState.CROUCH_ATTACK && f.stateAge < 2) {
+      ctx.save();
+      ctx.globalAlpha = (2 - f.stateAge) / 2 * 0.2;
+      ctx.fillStyle = '#ccbb99';
+      const sweepDir = f.facing;
+      for (let sd = 0; sd < 3; sd++) {
+        const sdx = sx + sweepDir * (10 + sd * 8);
+        ctx.beginPath();
+        ctx.ellipse(sdx, sy + 2, 5 + sd * 2, 2, 0, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.restore();
+    }
     // KOF2002: 重击地面弹坑 — hitFlashFrames>8(重击)且着地时地面圆环
     if (f.hitFlashFrames > 8 && f.isGrounded() && f.state === FighterState.HITSTUN) {
       ctx.save();
@@ -736,6 +750,18 @@ export function drawFighters(
         ctx.scale(1 + squashT * 0.05, 1 - squashT * 0.08);
         ctx.translate(0, sy);
       }
+    }
+    // KOF2002: 着地冲击环 — landingRecovery>7时地面扩散环
+    if (f.landingRecovery > 7 && f.state === FighterState.IDLE) {
+      ctx.save();
+      ctx.globalAlpha = (f.landingRecovery - 7) / 5 * 0.2;
+      ctx.strokeStyle = '#aaaaaa';
+      ctx.lineWidth = 1;
+      const landR = 10 + (10 - f.landingRecovery) * 3;
+      ctx.beginPath();
+      ctx.ellipse(sx, sy + 2, landR, landR * 0.25, 0, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.restore();
     }
     // KOF2002: 蹲下状态额外Y偏移+身体微宽 — 确保蹲姿视觉更低更稳
     if (f.state === FighterState.CROUCH) {
