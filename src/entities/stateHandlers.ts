@@ -27,6 +27,7 @@ import {
 import { FighterState, AttackType, CLOSE_RANGE } from '../core/types.js';
 import { spendStocks, gainMeterOnWhiff } from '../combat/meter.js';
 import { isDM as isDMClassified } from '../core/attackClassifier.js';
+import { checkCancelValid } from '../combat/cancelValidator.js';
 
 export { handleBlock, handleAirBlock, handleGuardCrush, handleCounterStance, handleHitstun, handleKnockdown, handleGetup, handleDizzy } from './stunStateHandlers.js';
 
@@ -395,7 +396,7 @@ export function handleAttack(ctx: FighterCtx, input: ResolvedInput): void {
     return;
   }
 
-  // Super Cancel
+  // Super Cancel (validated against cancel paths)
   if (f.superCancelReady && ctx.gauge && f.currentAttack
       && (f.attackPhase === 'active' || f.attackPhase === 'recovery')
       && f.hitConfirmDelay === 0) {
@@ -403,15 +404,25 @@ export function handleAttack(ctx: FighterCtx, input: ResolvedInput): void {
     const dmAttack = ctx.character.routeSpecial(input, ctx.cmdBuf, tick, ctx.wasChargingDown);
     if (dmAttack && isDM(dmAttack as string)
         && ctx.gauge.stocks >= DM_STOCK_COST + SUPER_CANCEL_STOCK_COST) {
-      spendStocks(ctx.gauge, DM_STOCK_COST + SUPER_CANCEL_STOCK_COST);
-      f.cancelEvent = 'super_cancel';
-      ctx.vfx.spawnSuperCancelText(f.x, f.y - f.displayHeight - 30);
-      f.startAttack(dmAttack);
-      return;
+      const cancelCheck = checkCancelValid(ctx.character.id, f.currentAttack, dmAttack, {
+        hitConfirmed: f.hasHit,
+        stocks: ctx.gauge.stocks,
+        maxModeActive: ctx.maxMode?.active ?? false,
+        maxModeTimer: ctx.maxMode?.timer ?? 0,
+        maxModeDuration: ctx.maxMode?.maxDuration ?? 0,
+        framesSinceHit: 0,
+      });
+      if (cancelCheck.valid) {
+        spendStocks(ctx.gauge, DM_STOCK_COST + SUPER_CANCEL_STOCK_COST);
+        f.cancelEvent = 'super_cancel';
+        ctx.vfx.spawnSuperCancelText(f.x, f.y - f.displayHeight - 30);
+        f.startAttack(dmAttack);
+        return;
+      }
     }
   }
 
-  // Free Cancel (MAX mode only)
+  // Free Cancel (MAX mode only, validated against cancel paths)
   if (ctx.maxMode && ctx.maxMode.active && f.currentAttack
       && (f.attackPhase === 'active' || f.attackPhase === 'recovery')
       && f.hitConfirmDelay === 0) {
@@ -422,12 +433,22 @@ export function handleAttack(ctx: FighterCtx, input: ResolvedInput): void {
       const tick = ctx.tickRef.value;
       const specialAttack = ctx.character.routeSpecial(input, ctx.cmdBuf, tick, ctx.wasChargingDown);
       if (specialAttack && !isDM(specialAttack as string)) {
-        ctx.maxMode.timer -= Math.round(ctx.maxMode.maxDuration * FREE_CANCEL_TIMER_COST);
-        if (ctx.maxMode.timer <= 0) ctx.maxMode.timer = 0;
-        f.cancelEvent = 'free_cancel';
-        ctx.vfx.spawnFreeCancelText(f.x, f.y - f.displayHeight - 30);
-        f.startAttack(specialAttack);
-        return;
+        const cancelCheck = checkCancelValid(ctx.character.id, f.currentAttack, specialAttack, {
+          hitConfirmed: f.hasHit,
+          stocks: ctx.gauge?.stocks ?? 0,
+          maxModeActive: true,
+          maxModeTimer: ctx.maxMode.timer,
+          maxModeDuration: ctx.maxMode.maxDuration,
+          framesSinceHit: 0,
+        });
+        if (cancelCheck.valid) {
+          ctx.maxMode.timer -= Math.round(ctx.maxMode.maxDuration * FREE_CANCEL_TIMER_COST);
+          if (ctx.maxMode.timer <= 0) ctx.maxMode.timer = 0;
+          f.cancelEvent = 'free_cancel';
+          ctx.vfx.spawnFreeCancelText(f.x, f.y - f.displayHeight - 30);
+          f.startAttack(specialAttack);
+          return;
+        }
       }
     }
   }
