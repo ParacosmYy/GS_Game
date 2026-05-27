@@ -97,13 +97,13 @@ const PROJECTILE_PATTERNS = [
   'KA_CHO_SEN', 'PSYCHO_BALL', 'HISHOU_KEN', 'SANSETSU', 'HURRICANE',
 ];
 
-interface SectionResult {
+export interface SectionResult {
   total: number;
   pass: number;
   issues: string[];
 }
 
-interface CharacterReport {
+export interface CharacterReport {
   charId: string;
   sections: Array<{ name: string; result: SectionResult }>;
 }
@@ -224,7 +224,7 @@ function validateHitEffectsRegistration(charId: string): SectionResult {
 // Register hit effects so we can validate them
 initCharacterHitEffects();
 
-function validateCharacter(charId: string): CharacterReport {
+export function validateCharacter(charId: string): CharacterReport {
   const sections: Array<{ name: string; result: SectionResult }> = [
     { name: 'frameData <-> attackFrames', result: validateFrameDataAlignment(charId) },
     { name: 'feedback tier mapping', result: validateFeedbackTiers(charId) },
@@ -276,4 +276,8 @@ function main(): void {
   process.exit(totalIssues > 0 ? 1 : 0);
 }
 
-main();
+// Only run main when executed directly as a script (not imported by tests)
+const entryFile = process.argv[1];
+if (entryFile && entryFile.includes('validateManifest')) {
+  main();
+}
