@@ -566,6 +566,23 @@ export function drawFighters(
       }
     }
 
+    // KOF2002: 倒地冲击线 — KNOCKDOWN前3帧地面扩散细线
+    if (f.state === FighterState.KNOCKDOWN && f.stateAge < 3 && f.isGrounded()) {
+      ctx.save();
+      ctx.globalAlpha = (3 - f.stateAge) / 3 * 0.4;
+      ctx.strokeStyle = '#ffcc44';
+      ctx.lineWidth = 1.5;
+      for (let i = 0; i < 4; i++) {
+        const angle = (i / 4) * Math.PI - Math.PI / 2;
+        const len = 15 + f.stateAge * 10;
+        ctx.beginPath();
+        ctx.moveTo(sx, sy);
+        ctx.lineTo(sx + Math.cos(angle) * len, sy + Math.sin(angle) * len * 0.3);
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+
     // KOF2002: KO状态红色覆盖 — 倒地后身体发红
     if (f.health <= 0) {
       ctx.fillStyle = 'rgba(180, 20, 20, 0.15)';
