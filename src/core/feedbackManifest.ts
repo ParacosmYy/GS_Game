@@ -242,6 +242,10 @@ function isHeavy(at: string): boolean {
     || at === 'JUMP_C' || at === 'JUMP_D';
 }
 
+function isThrow(at: string): boolean {
+  return at === 'THROW' || at === 'THROW_FORWARD' || at === 'THROW_BACK';
+}
+
 /**
  * 根据攻击类型推断反馈档位
  */
@@ -251,6 +255,7 @@ export function inferTier(attackType: AttackType): FeedbackTier {
   if (at.startsWith('SDM_')) return 'sdm';
   if (at.startsWith('DM_')) return 'dm';
   if (isSpecial(at) && !isDm(at)) return 'special';
+  if (isThrow(at)) return 'special';
   if (isHeavy(at)) return 'heavy';
   return 'light';
 }
