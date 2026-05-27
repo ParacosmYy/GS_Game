@@ -165,6 +165,10 @@ export function drawFighters(
       // KOF2002: 站立攻击前倾 — 出拳/踢时重心前移
       leanOffsetX = 2 * f.facing + blendOffsetX;
       leanAngle = 0.03 * f.facing;
+    } else if (f.state === FighterState.THROW) {
+      // KOF2002: 投技突进前倾 — 投技发动时重心大幅前移
+      leanOffsetX = 6 * f.facing + blendOffsetX;
+      leanAngle = 0.1 * f.facing;
     }
 
     // Afterimage trail
