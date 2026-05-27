@@ -184,14 +184,14 @@ describe('5. Haou Counter Flash', () => {
     expect(particles.length).toBe(13);
   });
 
-  it('includes white and golden flash core particles', () => {
+  it('includes white and element-coded flash core particles', () => {
     const particles: Particle[] = [];
     spawnHaouFlash(particles, 400, 300, 'ryo');
     const flashes = particles.filter(p => p.type === 'flash');
     expect(flashes.length).toBe(2);
     const colors = flashes.map(p => p.color);
     expect(colors).toContain('#ffffff');
-    expect(colors).toContain('#ffcc44');
+    expect(colors).toContain('#4488ff'); // Ryo element blue
   });
 
   it('sparks scatter outward in a shield pattern', () => {

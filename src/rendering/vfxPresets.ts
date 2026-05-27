@@ -1622,20 +1622,28 @@ export function spawnDMTenHaOuVFX(particles: Particle[], x: number, y: number, c
  * Haou Shou Kou Ken (霸王翔吼拳) counter flash — bright shield-like burst on counter activation.
  * Duration: 15 frames.
  */
-export function spawnHaouFlash(particles: Particle[], x: number, y: number, _charId: string): void {
+export function spawnHaouFlash(particles: Particle[], x: number, y: number, charId: string): void {
+  // Element-coded burst colors
+  const elColors: Record<string, { burst: string; sparks: string[]; ring: string }> = {
+    ryo: { burst: '#4488ff', sparks: ['#ffffff', '#88ccff', '#4488ff'], ring: '#4488ff' },
+    kyo: { burst: '#ff8c1e', sparks: ['#ffffff', '#ffaa44', '#ff6622'], ring: '#ff8c1e' },
+    iori: { burst: '#8822cc', sparks: ['#ffffff', '#bb66ff', '#6600aa'], ring: '#8822cc' },
+  };
+  const el = elColors[charId] ?? { burst: '#ffcc44', sparks: ['#ffffff', '#ffcc44', '#ffaa22'], ring: '#ffcc44' };
+
   // Bright shield-shaped flash
   particles.push({
     x, y: y - 20, vx: 0, vy: 0,
     life: 10, maxLife: 10, size: 50,
     color: '#ffffff', type: 'flash',
   });
-  // Golden outer burst
+  // Element-coded outer burst
   particles.push({
     x, y: y - 20, vx: 0, vy: 0,
     life: 12, maxLife: 12, size: 65,
-    color: '#ffcc44', type: 'flash',
+    color: el.burst, type: 'flash',
   });
-  // Scattered golden sparks for shield effect
+  // Scattered element sparks for shield effect
   for (let i = 0; i < 10; i++) {
     const angle = (i / 10) * Math.PI * 2;
     const speed = 2 + Math.random() * 3;
@@ -1646,17 +1654,17 @@ export function spawnHaouFlash(particles: Particle[], x: number, y: number, _cha
       life: 10 + Math.floor(Math.random() * 5),
       maxLife: 15,
       size: 3 + Math.random() * 3,
-      color: i % 3 === 0 ? '#ffffff' : '#ffcc44',
+      color: el.sparks[i % el.sparks.length],
       type: 'spark',
       gravity: 0,
       friction: 0.92,
     });
   }
-  // Counter activation ring
+  // Element-coded activation ring
   particles.push({
     x, y: y - 20, vx: 0, vy: 0,
     life: 12, maxLife: 12, size: 10,
-    color: '#ffcc44', type: 'ring',
+    color: el.ring, type: 'ring',
   });
 }
 
