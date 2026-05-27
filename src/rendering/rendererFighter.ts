@@ -163,6 +163,10 @@ export function drawFighters(
     if (f.state === FighterState.HITSTUN) {
       leanOffsetX = -4 * f.facing + blendOffsetX;
       leanAngle = -0.06 * f.facing;
+    } else if (f.state === FighterState.KNOCKDOWN && !f.isGrounded()) {
+      // KOF2002: 空中击飞旋转 — 浮空KNOCKDOWN时身体翻转
+      leanAngle = f.stateAge * 0.08 * f.facing;
+      leanOffsetX = -2 * f.facing + blendOffsetX;
     } else if (f.state === FighterState.BLOCK) {
       leanOffsetX = -2 * f.facing + blendOffsetX;
       leanAngle = -0.03 * f.facing;
