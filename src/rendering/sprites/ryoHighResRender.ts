@@ -174,9 +174,11 @@ function initAllFrames(): void {
   // CLOSE_D: startup=6, active=4, recovery=12 → [6, 4, 6, 8]
   registerVariableFrames('CLOSE_D', RYO_CLOSE_D_FRAMES, [6, 4, 6, 8]);
 
-  // DAMAGE — hurt (5f) and knockdown (6f)
-  registerFrames('HURT', RYO_HURT_FRAMES, 4);
-  registerFrames('KNOCKDOWN', RYO_KNOCKDOWN_FRAMES, 5);
+  // DAMAGE — hurt and knockdown with KOF weight rhythm
+  // HURT: flinch reaction — quick recoil then settle [3, 5, 6, 4]
+  registerVariableFrames('HURT', RYO_HURT_FRAMES, [3, 5, 6, 4]);
+  // KNOCKDOWN: fly up slow, slam fast, ground settle
+  registerVariableFrames('KNOCKDOWN', RYO_KNOCKDOWN_FRAMES, [4, 5, 6, 8, 10, 12]);
 
   // JUMP — 6-frame jump arc
   registerFrames('JUMP', RYO_JUMP_FRAMES, 5);
