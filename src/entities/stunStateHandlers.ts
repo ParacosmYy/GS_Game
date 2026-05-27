@@ -40,12 +40,16 @@ export function handleBlock(ctx: FighterCtx, input: ResolvedInput): void {
     f.displayHeight = 60;
     f.blockstunTimer = 0;
     ctx.vfx.spawnDust(f.x, STAGE_GROUND_Y);
+    // KOF2002: Guard Cancel Roll distinctive green sparks
+    ctx.vfx.spawnCharacterHitSparks(f.x, f.y - f.displayHeight / 2, 6, '#44ff88', 0.8, 1.0, 0.2, false, f.facing);
     return;
   }
   // Guard Cancel CD (costs GC_CD_STOCK_COST stocks)
   if (f.blockstunTimer > 0 && input.blowbackPressed && ctx.gauge && spendStocks(ctx.gauge, GC_CD_STOCK_COST)) {
     f.blockstunTimer = 0;
     f.startAttack(AttackType.STAND_CD);
+    // KOF2002: Guard Cancel CD distinctive orange sparks
+    ctx.vfx.spawnCharacterHitSparks(f.x, f.y - f.displayHeight / 2, 8, '#ff8844', 1.0, 1.2, 0.25, false, f.facing);
     return;
   }
   if (f.blockstunTimer <= 0) { f.state = FighterState.IDLE; f.vx = 0; f.throwInvincibilityTimer = THROW_INVINCIBILITY_POST_STUN; }
