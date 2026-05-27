@@ -86,6 +86,14 @@
 
 ### 2.1 技能与资源规则差距
 
+- 已闭合项：
+  - 6层反馈矩阵+MAX mode damage/defense bonus (1.2x/0.75x)
+  - DM→SDM免费升级(MAX mode内)、DM→HSDM升级(MAX+desperation)
+  - 3 Stock MAX mode activation, 1 Stock DM, Super Cancel extra stock
+  - Free Cancel drains 20% MAX timer, Desperation DM damage bonus (1.3x)
+  - 命中时气槽闪光反馈 (meterFlash + stockFlash)
+  - DM→SDM→HSDM升级链回归测试 (8 tests, 3角色HSDM映射)
+  - Kyo/Iori取消路径回归测试 (22 tests)
 - 当前差距：普通气、MAX 气、强化版技能、DM/HSDM 的消耗与强化关系还需要更稳定。
 - 新功能添加点：
   - MAX mode resource split
