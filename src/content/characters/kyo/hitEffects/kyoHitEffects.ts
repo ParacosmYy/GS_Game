@@ -119,7 +119,7 @@ function kyoVFX(ctx: HitEffectContext): boolean {
   // DM Orochinagi (大蛇薙)
   if (atkName === 'DM_OROCHINAGI') {
     vfx.spawnSuperBurst(hitX, hitY, '#ff4400', '#ffdd44', true);
-    vfx.spawnDMTenHaOuVFX(hitX, hitY, attacker.charId);
+    vfx.spawnKyoOrochinagiVFX(hitX, hitY, attacker.facing);
     screenFlash.triggerDarken(6);
     screenFlash.trigger('#ff6600', 0.35, 10);
     screenShake.trigger(14, 14, attackDirectionBias);
@@ -128,7 +128,7 @@ function kyoVFX(ctx: HitEffectContext): boolean {
   // SDM Orochinagi
   if (atkName === 'SDM_OROCHINAGI') {
     vfx.spawnSuperBurst(hitX, hitY, '#ff2200', '#ffee44', true);
-    vfx.spawnDMTenHaOuVFX(hitX, hitY, attacker.charId);
+    vfx.spawnKyoOrochinagiVFX(hitX, hitY, attacker.facing);
     vfx.spawnGroundSlam(hitX, hitY);
     screenFlash.triggerDarken(8);
     screenFlash.trigger('#ff4400', 0.45, 14);
@@ -138,7 +138,7 @@ function kyoVFX(ctx: HitEffectContext): boolean {
   // HSDM Orochinagi — hidden ultimate, maximum fire drama
   if (atkName === 'HSDM_OROCHINAGI') {
     vfx.spawnSuperBurst(hitX, hitY, '#ff1100', '#ffff66', true);
-    vfx.spawnDMTenHaOuVFX(hitX, hitY, attacker.charId);
+    vfx.spawnKyoOrochinagiVFX(hitX, hitY, attacker.facing);
     vfx.spawnGroundSlam(hitX, hitY);
     vfx.spawnScreenCracks(hitX, hitY);
     screenFlash.triggerDarken(10);

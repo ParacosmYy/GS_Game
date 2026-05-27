@@ -45,12 +45,14 @@ function ioriVFX(ctx: HitEffectContext): boolean {
   // Yamibarai (闇払い) dark projectile
   if (atkName === 'IORI_YAMIBARAI') {
     vfx.spawnProjectileExplosion(hitX, hitY, '#7722aa', '#bb55ff');
+    vfx.spawnIoriYamibaraiVFX(hitX, hitY, attacker.facing);
     screenFlash.trigger('#7722aa', 0.08, 3);
     handled = true;
   }
   // Yamibarai C (strong)
   if (atkName === 'IORI_YAMIBARAI_C') {
     vfx.spawnProjectileExplosion(hitX, hitY, '#6611aa', '#cc66ff');
+    vfx.spawnIoriYamibaraiVFX(hitX, hitY, attacker.facing);
     vfx.spawnImpactRing(hitX, hitY, 0.8);
     cinematic.addHitStop(1, ctx.defIdx);
     screenFlash.trigger('#6611aa', 0.12, 4);

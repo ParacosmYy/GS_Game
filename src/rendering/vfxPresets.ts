@@ -1942,3 +1942,77 @@ export function spawnScorchMark(particles: Particle[], x: number, groundY: numbe
     friction: 1,
   });
 }
+
+/** Kyo Orochinagi (大蛇薙) startup — flame pillar burst */
+export function spawnKyoOrochinagiVFX(particles: Particle[], x: number, y: number, facing: number): void {
+  // Rising flame column — 14 particles, orange to white gradient
+  for (let i = 0; i < 14; i++) {
+    const spread = (Math.random() - 0.5) * 20;
+    const heightOffset = i * 8;
+    particles.push({
+      x: x + spread,
+      y: y - heightOffset,
+      vx: facing * (1 + Math.random() * 2),
+      vy: -(3 + Math.random() * 4),
+      life: 18 + Math.random() * 8,
+      maxLife: 26,
+      size: 6 + Math.random() * 6 + i * 0.3,
+      color: i < 4 ? '#ffffff' : i < 8 ? '#ffcc00' : i < 11 ? '#ff6600' : '#ff2200',
+      type: 'spark',
+      gravity: -0.3,
+      friction: 0.94,
+    });
+  }
+  // Core flash
+  particles.push({
+    x, y: y - 30,
+    vx: 0, vy: 0,
+    life: 8, maxLife: 8, size: 50,
+    color: '#ffaa44',
+    type: 'flash',
+  });
+  // Fire ring
+  particles.push({
+    x, y: y - 30,
+    vx: 0, vy: 0,
+    life: 15, maxLife: 15, size: 40,
+    color: '#ff4400',
+    type: 'ring',
+  });
+}
+
+/** Iori Yamibarai (闇払い) launch — dark energy burst */
+export function spawnIoriYamibaraiVFX(particles: Particle[], x: number, y: number, facing: number): void {
+  // Dark energy orb — purple core
+  particles.push({
+    x, y: y - 10,
+    vx: facing * 7, vy: 0,
+    life: 35, maxLife: 35, size: 28,
+    color: '#7722cc',
+    type: 'flash',
+  });
+  // Inner glow
+  particles.push({
+    x, y: y - 10,
+    vx: facing * 7, vy: 0,
+    life: 30, maxLife: 30, size: 14,
+    color: '#bb66ff',
+    type: 'flash',
+  });
+  // Trailing dark wisps
+  for (let i = 0; i < 6; i++) {
+    particles.push({
+      x: x - facing * (6 + i * 5),
+      y: y - 10 + (Math.random() - 0.5) * 12,
+      vx: facing * (3 + Math.random() * 2),
+      vy: (Math.random() - 0.5) * 2,
+      life: 12 + Math.random() * 6,
+      maxLife: 18,
+      size: 4 + Math.random() * 4,
+      color: i % 2 === 0 ? '#5500aa' : '#8833dd',
+      type: 'spark',
+      gravity: 0,
+      friction: 0.92,
+    });
+  }
+}

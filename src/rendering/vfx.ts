@@ -49,6 +49,8 @@ import {
   spawnMoveNameText,
   spawnTierSparks,
   spawnScreenCracks,
+  spawnKyoOrochinagiVFX,
+  spawnIoriYamibaraiVFX,
   spawnRunSpeedLines,
   spawnScorchMark,
   spawnKOSuperBurst,
@@ -307,6 +309,16 @@ export class VFXSystem {
   /** Ryo: Ko'ou Ken (虎煌拳) projectile ki blast VFX */
   spawnKooukenVFX(worldX: number, worldY: number, facing: number, charId: string): void {
     spawnKooukenVFX(this.particles, worldX, worldY, facing, charId);
+  }
+
+  /** Kyo: Orochinagi (大蛇薙) flame pillar startup VFX */
+  spawnKyoOrochinagiVFX(worldX: number, worldY: number, facing: number): void {
+    spawnKyoOrochinagiVFX(this.particles, worldX, worldY, facing);
+  }
+
+  /** Iori: Yamibarai (闇払い) dark energy projectile launch VFX */
+  spawnIoriYamibaraiVFX(worldX: number, worldY: number, facing: number): void {
+    spawnIoriYamibaraiVFX(this.particles, worldX, worldY, facing);
   }
 
   /** Ryo: Ko Hou (虎咲) uppercut flame column VFX */
