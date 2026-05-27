@@ -475,6 +475,15 @@ export function drawFighters(
         ctx.globalAlpha = 0.75;
       }
     }
+    // KOF2002: 防御恢复机会指示 — blockstun最后2帧微绿闪
+    if (f.state === FighterState.BLOCKSTUN && f.blockstunTimer > 0 && f.blockstunTimer <= 2) {
+      ctx.save();
+      ctx.globalCompositeOperation = 'screen';
+      ctx.globalAlpha = 0.08;
+      ctx.fillStyle = '#44ff44';
+      ctx.fillRect(sx + leanOffsetX - hw - 3, sy - f.displayHeight - 3, (hw + 3) * 2, f.displayHeight + 6);
+      ctx.restore();
+    }
 
     // Compute animation frame index: attacks use attackFrame, cyclic states use stateAge
     const isAttackState = f.state === FighterState.STAND_ATTACK
