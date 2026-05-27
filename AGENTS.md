@@ -40,6 +40,7 @@ Phase 2 的执行要求：
 - `src/content/characters/ryo/`、`src/content/characters/kyo/`、`src/content/characters/iori/` 已形成内容包雏形，兼容入口和真实数据迁移需要同时存在。
 - `src/rendering/sprites/`、`src/state/`、`src/tools/validateManifest.ts` 已经开始承担更明确的分工。
 - 后续新增内容应优先落到对应子域，不要重新把数据塞回单一巨型文件。
+- 默认任何单文件都不应超过 2000 行；`main.ts` 和入口壳文件必须更小，只能做启动、组装和转发，不能长期承载状态机。
 
 在 Phase 2 收口达标前，禁止把主要精力投入：
 
@@ -119,6 +120,7 @@ Phase 2 的执行要求：
 - 视觉帧、判定帧、命中反馈必须通过同一个 `Frame Contract` 对齐。
 - 骨骼/像素块/placeholder 只能作为 fallback，不得继续冒充正式美术方向。
 - 新状态必须声明归属、生命周期、reset、snapshot/replay 影响。
+- 任何状态机如果开始接近单文件 2000 行上限，必须优先拆成 state / transitions / effects / selectors / tests。
 
 模块细则见 [模块边界](docs/architecture/module-boundaries.md)，资产细则见 [资产管线架构](docs/architecture/asset-pipeline.md)。
 

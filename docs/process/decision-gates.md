@@ -181,6 +181,8 @@ Phase 1 基线条件见 [Ryo Vertical Slice](../product/ryo-vertical-slice-plan.
 - 统一入口是谁。
 - 哪些文件只是过渡层。
 - 如何验证拆分没有改坏行为。
+- 是否存在任何文件接近或超过 2000 行。
+- `main.ts` 是否被约束为最小启动壳。
 
 ## 11. 提交前决策复盘
 
