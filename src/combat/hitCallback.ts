@@ -131,6 +131,36 @@ function isHeavyAttack(at: AttackType): boolean {
     || at === AttackType.STAND_CD || at === AttackType.JUMP_CD;
 }
 
+/**
+ * 斩击线角度按攻击部位差异化 — KOF2002风格
+ * - punch (拳): steep ~60°
+ * - kick (脚): shallow ~30°
+ * - uppercut/升龙: near-vertical ~80°
+ * - sweep/扫腿: near-horizontal ~10°
+ */
+function getSlashAngle(attackType: AttackType): number {
+  const at = attackType as string;
+  // Uppercut / 升龙系 — 近乎垂直
+  if (at.includes('KO_HOU') || at.includes('ONIYAKI') || at.includes('HIENZAN')
+    || at.includes('RISING_TACKLE') || at.includes('POWER_DUNK'))
+    return 80;
+  // Sweep / 下段 — 近乎水平
+  if (at === 'CROUCH_D' || at.includes('HAKI') || at.includes('CRACK_SHOT'))
+    return 10;
+  // Kick attacks — 浅斜
+  if (at.endsWith('_D') || at === 'STAND_CD' || at === 'JUMP_CD'
+    || at.includes('HIEN') || at.includes('HISHOU') || at.includes('HANGETSU')
+    || at.includes('RED_KICK') || at.includes('PHOENIX_KICK'))
+    return 30;
+  // Punch attacks — 陡斜
+  if (at.endsWith('_C') || at.endsWith('_A') || at.endsWith('_B')
+    || at.includes('KOOU') || at.includes('HAOU') || at.includes('ARAGAMI')
+    || at.includes('DOKUGAMI') || at.includes('BURN_KNUCKLE'))
+    return 60;
+  // Default: 45° diagonal
+  return 45;
+}
+
 function isThrowAttack(at: AttackType): boolean {
   return at === AttackType.THROW || at === AttackType.THROW_FORWARD || at === AttackType.THROW_BACK;
 }
@@ -337,10 +367,11 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
     const ringScale = fb.impactRingScale + (combo >= 5 ? 0.2 : 0);
     deps.vfx.spawnImpactRing(hitX, hitY, ringScale, fb.impactRingCount);
 
-    // 重攻击斩击线
+    // 重攻击斩击线 — 角度按攻击部位差异化
     if (isHeavyAttack(attackType) || isSpecial) {
       const slashScale = isDM ? 1.6 : isSpecial ? 1.2 : 1.0;
-      deps.vfx.spawnSlashLine(hitX, hitY, attacker.facing, sparkColor, slashScale);
+      const slashAngle = getSlashAngle(attackType);
+      deps.vfx.spawnSlashLine(hitX, hitY, attacker.facing, sparkColor, slashScale, slashAngle);
     }
 
     // 伤害数字 — KOF2002: DM用角色色, CH用橙色, 通常用默认分级色

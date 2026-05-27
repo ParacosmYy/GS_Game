@@ -135,8 +135,8 @@ export class VFXSystem {
   }
 
   /** 打击斩击线 — 重攻击命中时的横向闪光 */
-  spawnSlashLine(worldX: number, worldY: number, facing: number, color: string, scale?: number): void {
-    spawnSlashLine(this.particles, worldX, worldY, facing, color, scale);
+  spawnSlashLine(worldX: number, worldY: number, facing: number, color: string, scale?: number, angleDeg?: number): void {
+    spawnSlashLine(this.particles, worldX, worldY, facing, color, scale, angleDeg);
   }
 
   /** DM/超必杀激活时的华丽爆发 */

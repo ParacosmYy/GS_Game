@@ -421,9 +421,18 @@ export function spawnImpactRing(particles: Particle[], worldX: number, worldY: n
   }
 }
 
-/** 打击斩击线 — 重攻击命中时的横向闪光. scale: 重1.0, 必杀1.4, DM2.0 */
-export function spawnSlashLine(particles: Particle[], worldX: number, worldY: number, _facing: number, color: string, scale: number = 1.0): void {
-  const baseRotation = _facing !== 0 ? _facing * 0.55 : 0;
+/** 打击斩击线 — 重攻击命中时的横向闪光.
+ *  KOF2002: 角度按攻击部位差异化:
+ *  - punch (拳): steep diagonal ~60°
+ *  - kick (脚): shallow diagonal ~30°
+ *  - uppercut: near-vertical ~80°
+ *  - sweep: near-horizontal ~10°
+ *  scale: 重1.0, 必杀1.4, DM2.0
+ */
+export function spawnSlashLine(particles: Particle[], worldX: number, worldY: number, _facing: number, color: string, scale: number = 1.0, angleDeg: number = 45): void {
+  const angleRad = (angleDeg * Math.PI) / 180;
+  const facingSign = _facing !== 0 ? _facing : 1;
+  const baseRotation = facingSign > 0 ? -angleRad : Math.PI + angleRad;
   particles.push({
     x: worldX, y: worldY, vx: 0, vy: 0,
     life: 7, maxLife: 7, size: (30 + Math.random() * 16) * scale,
