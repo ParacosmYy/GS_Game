@@ -15,7 +15,7 @@
  */
 
 import { FighterState, AttackType } from '../../core/types.js';
-import { drawPixelFrame, type PixelFrame, type PixelPalette } from './pixelFrameRenderer.js';
+import { drawPixelFrame, prerenderFrame, drawPrerenderedFrame, type PixelFrame, type PixelPalette } from './pixelFrameRenderer.js';
 import { RYO_IDLE_FRAMES } from './ryoIdleFrames.js';
 import { RYO_WALK_FORWARD_FRAMES, RYO_WALK_BACKWARD_FRAMES } from './ryoWalkFrames.js';
 import { RYO_STAND_A_FRAMES, RYO_STAND_C_FRAMES, RYO_CLOSE_A_FRAMES, RYO_CLOSE_C_FRAMES } from './ryoAttackFrames.js';
@@ -57,6 +57,9 @@ interface FrameEntry {
 }
 
 const RYO_FRAMES = new Map<string, FrameEntry>();
+
+// Pre-rendered frame cache: key = "registryKey:scale:facing", value = offscreen canvas
+const FRAME_CACHE = new Map<string, HTMLCanvasElement>();
 
 /** Source frame type shared by all ryo*Frames.ts modules */
 interface SourcePixelFrame {
@@ -467,7 +470,15 @@ export function drawHighResFrame(
   // Compute scale dynamically so all frame sizes display at the same target height.
   // 48x72 frames -> scale 2 (72*2=144), 96x144 frames -> scale 1 (144*1=144).
   const scale = RYO_TARGET_DISPLAY_HEIGHT / frame.height;
-  drawPixelFrame(ctx, frame, x, y, scale, facing, palette);
+
+  // Use pre-rendered frame cache for performance
+  const cacheKey = `${key}:${frameIdx}:${scale}`;
+  let cached = FRAME_CACHE.get(cacheKey);
+  if (!cached) {
+    cached = prerenderFrame(frame, scale, palette);
+    FRAME_CACHE.set(cacheKey, cached);
+  }
+  drawPrerenderedFrame(ctx, cached, frame, x, y, scale, facing);
   return true;
 }
 

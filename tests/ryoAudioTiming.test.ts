@@ -150,6 +150,7 @@ function createMockScreenShake(): ScreenShake & { trigger: ReturnType<typeof vi.
 function createMockScreenFlash(): ScreenFlash & { trigger: ReturnType<typeof vi.fn> } {
   return {
     trigger: vi.fn(),
+    triggerDarken: vi.fn(),
     update: vi.fn(),
     render: vi.fn(),
     active: false,
