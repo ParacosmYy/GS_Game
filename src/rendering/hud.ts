@@ -297,7 +297,7 @@ const MOVE_TYPE_COLORS: Record<string, string> = {
 };
 
 /** Category display priority for in-game move list */
-const CATEGORY_ORDER: MoveCategory[] = ['special', 'dm', 'sdm', 'command', 'system'];
+const CATEGORY_ORDER: MoveCategory[] = ['special', 'dm', 'sdm', 'hsdm', 'command', 'system'];
 const CATEGORY_LABELS: Record<string, string> = {
   command: 'CMD',
   special: 'SP',
