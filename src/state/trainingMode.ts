@@ -83,6 +83,8 @@ export interface FrameDataDisplay {
   advantageBlock: number;  // = blockstun - totalFrames
   currentFrame: number;    // current frame in the attack animation
   phase: string;           // 'startup' | 'active' | 'recovery'
+  guardType?: string;      // 'MID' | 'LOW' | 'HIGH' | 'UNBLOCKABLE'
+  cancelInto?: string[];   // possible cancel targets
 }
 
 // ===== Training Mode Controller =====
@@ -364,16 +366,21 @@ export class TrainingModeController {
 
   /** Determine cancel options for an attack type */
   private _getCancelOptions(attackId: string): string[] {
-    const options: string[] = [];
-    if (attackId.startsWith('CLOSE_') || attackId.startsWith('STAND_') || attackId.startsWith('CROUCH_')) {
-      if (attackId.endsWith('_A') || attackId.endsWith('_B')) {
-        options.push('rapid');
-      }
-      options.push('special');
-      options.push('super');
-    }
-    return options;
+    return getCancelOptions(attackId);
   }
+}
+
+/** Get cancel option labels for an attack type */
+function getCancelOptions(attackId: string): string[] {
+  const options: string[] = [];
+  if (attackId.startsWith('CLOSE_') || attackId.startsWith('STAND_') || attackId.startsWith('CROUCH_')) {
+    if (attackId.endsWith('_A') || attackId.endsWith('_B')) {
+      options.push('rapid');
+    }
+    options.push('special');
+    options.push('super');
+  }
+  return options;
 }
 
 /** Create an empty ResolvedInput with all fields false */
@@ -489,6 +496,8 @@ export class TrainingModeState {
           advantageBlock: advBlock,
           currentFrame: p1.attackFrame,
           phase: p1.attackPhase,
+          guardType: fd.hitLevel ?? undefined,
+          cancelInto: getCancelOptions(attackId),
         };
       }
     }

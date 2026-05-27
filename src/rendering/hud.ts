@@ -730,8 +730,8 @@ export function drawHUD(
   drawNamePlate(ctx, HUD_MARGIN, HUD_BAR_Y + HUD_BAR_HEIGHT + 26, p1Name, '#ff6644', 'left');
   drawNamePlate(ctx, CANVAS_WIDTH - HUD_MARGIN, HUD_BAR_Y + HUD_BAR_HEIGHT + 26, p2Name, '#4488ff', 'right');
 
-  // ===== P1 move list panel =====
-  if (p1MoveList.length > 0) {
+  // ===== P1 move list panel (only in simplified mode for non-training gameplay) =====
+  if (p1MoveList.length > 0 && simplifiedMode) {
     drawMoveListPanel(ctx, p1MoveList, simplifiedMode);
   }
 

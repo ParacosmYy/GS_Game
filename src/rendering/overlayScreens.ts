@@ -2074,6 +2074,30 @@ function drawFrameDataPanel(
   ctx.fillStyle = advBlockColor;
   ctx.font = 'bold 12px "Courier New", monospace';
   ctx.fillText(frameData.advantageBlock >= 0 ? `+${frameData.advantageBlock}` : `${frameData.advantageBlock}`, advX + 80, row2Y + 12);
+
+  // Guard type badge
+  if (frameData.guardType) {
+    const guardColors: Record<string, string> = { MID: '#44aaff', LOW: '#44ff44', HIGH: '#ff8844', UNBLOCKABLE: '#ff4444' };
+    const guardX = panelX + panelW - 300;
+    ctx.font = '9px "Courier New", monospace';
+    ctx.fillStyle = '#666';
+    ctx.fillText('GUARD', guardX, row2Y);
+    ctx.fillStyle = guardColors[frameData.guardType] ?? '#aaa';
+    ctx.font = 'bold 11px "Courier New", monospace';
+    ctx.fillText(frameData.guardType, guardX, row2Y + 12);
+  }
+
+  // Cancel options (truncated)
+  if (frameData.cancelInto && frameData.cancelInto.length > 0) {
+    const cancelX = panelX + panelW - 230;
+    ctx.font = '9px "Courier New", monospace';
+    ctx.fillStyle = '#666';
+    ctx.fillText('CANCEL', cancelX, row2Y);
+    ctx.fillStyle = '#ddaaff';
+    ctx.font = '9px "Courier New", monospace';
+    const cancelText = frameData.cancelInto.slice(0, 3).join(', ');
+    ctx.fillText(cancelText, cancelX, row2Y + 12);
+  }
 }
 
 /** Controls help panel on the right side */
