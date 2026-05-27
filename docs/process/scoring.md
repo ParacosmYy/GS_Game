@@ -2,7 +2,15 @@
 
 ## 1. 当前分数
 
-当前总分：`181/2000`
+
+
+
+
+当前总分：`186/2000`
+b5b42fb (docs(scoring): 144->145/2000 special move variable frames)
+6b7b47c (docs(scoring): 149->150/2000 pulsing win diamonds)
+b9287c0 (docs(scoring): 168->172/2000 格挡火花+运动灰尘+赛点氛围)
+6e15dfd (docs(scoring): 180->186/2000 全角色必杀技+DM专属VFX闭环)
 
 完整历史见 [SCORE.history.md](../archive/SCORE.history.md)。
 
