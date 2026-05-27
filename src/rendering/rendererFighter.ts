@@ -250,6 +250,14 @@ export function drawFighters(
     ctx.rotate(leanAngle);
     ctx.translate(-(sx + leanOffsetX), -(sy - leanOffsetY));
 
+    // KOF2002: 待机呼吸 — idle时轻微纵向缩放模拟呼吸
+    if (f.state === FighterState.IDLE) {
+      const breathe = Math.sin(globalTick * 0.08) * 0.008;
+      ctx.translate(0, -sy);
+      ctx.scale(1 + breathe, 1 - breathe);
+      ctx.translate(0, sy);
+    }
+
     // KOF2002: Hit-stop defender jitter — 确定性正弦抖动产生稳定震动感
     if (hitStopDefender >= 0 && playerIdx === hitStopDefender) {
       const phase = performance.now() * 0.05;
@@ -617,6 +625,28 @@ export function resolveFighterColors(f: Fighter, globalTick: number): { bodyColo
     case FighterState.KNOCKDOWN:
       bodyColor = shiftColor(manifestColors.outfit, -50);
       outlineColor = '#88000040';
+      break;
+    case FighterState.GETUP:
+      // KOF2002: 起身微白 — 起身动作时身体短暂泛白
+      bodyColor = shiftColor(manifestColors.outfit, 15);
+      outlineColor = '#ffffff30';
+      break;
+    case FighterState.CROUCH:
+      // KOF2002: 蹲下稍暗 — 蹲姿时身体略微变暗
+      bodyColor = shiftColor(manifestColors.outfit, -10);
+      outlineColor = '#ffffff20';
+      break;
+    case FighterState.THROW:
+      // KOF2002: 投技发动发红 — 技发动时身体发红
+      bodyColor = shiftColor(manifestColors.outfit, 30);
+      outlineColor = '#ff440050';
+      glowColor = '#ff220020';
+      break;
+    case FighterState.MAX_MODE:
+      // KOF2002: MAX模式金色光环 — 激活MAX时身体金色闪烁
+      bodyColor = globalTick % 8 < 4 ? '#ffdd44' : manifestColors.outfit;
+      outlineColor = '#ffaa0080';
+      glowColor = '#ffaa0040';
       break;
   }
 
