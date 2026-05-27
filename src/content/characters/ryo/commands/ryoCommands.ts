@@ -15,7 +15,7 @@ export interface RyoMoveEntry {
   /** Input notation string */
   input: string;
   /** Move category */
-  type: 'command' | 'special' | 'dm' | 'sdm' | 'system';
+  type: 'command' | 'special' | 'dm' | 'sdm' | 'hsdm' | 'system';
   /** Corresponding AttackType key (if applicable) */
   attackTypeKey?: string;
 }
@@ -38,6 +38,8 @@ export const RYO_MOVE_LIST: RyoMoveEntry[] = [
   // SDMs — MAX超必杀技
   { name: '天地霸煌拳 (MAX)', input: '↓↘→↓↘→ + AC', type: 'sdm', attackTypeKey: 'SDM_TEN_HA_OU' },
   { name: '龍虎乱舞 (MAX)', input: '↓↘→↘↓↙← + AC', type: 'sdm', attackTypeKey: 'SDM_RYUKO_RANBU' },
+  // HSDM — 隐藏超必杀技 (MAX + 红血)
+  { name: '龍虎乱舞 (HSDM)', input: 'MAX+红血 ↓↘→↘↓↙← + AC', type: 'hsdm', attackTypeKey: 'HSDM_RYUKO_RANBU' },
   // System — 系统动作
   { name: '爆气 (MAX Mode)', input: 'K+U / O (shortcut)', type: 'system' },
 ];
