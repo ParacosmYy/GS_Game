@@ -543,7 +543,7 @@ function update(): void {
               gs.setPhase(GamePhase.INTRO);
               gs.phaseTimer = 0;
               gs.resetForNextRound();
-              gs.announceSequence.setSteps(createRoundStartSequence(rounds.currentRound));
+              gs.announceSequence.setSteps(createRoundStartSequence(rounds.currentRound, rounds.p1Wins >= rounds.winsNeeded - 1 && rounds.p2Wins >= rounds.winsNeeded - 1));
               announcer.roundStart(rounds.currentRound);
               announcer.fight();
             },
@@ -588,7 +588,7 @@ function update(): void {
             gs.setPhase(GamePhase.INTRO);
             gs.phaseTimer = 0;
             gs.resetForNextRound();
-            gs.announceSequence.setSteps(createRoundStartSequence(rounds.currentRound));
+            gs.announceSequence.setSteps(createRoundStartSequence(rounds.currentRound, rounds.p1Wins >= rounds.winsNeeded - 1 && rounds.p2Wins >= rounds.winsNeeded - 1));
             announcer.roundStart(rounds.currentRound);
             announcer.fight();
           },

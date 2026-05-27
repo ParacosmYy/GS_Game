@@ -82,21 +82,21 @@ function fadeInLateOut(progress: number): number {
 // ---------------------------------------------------------------------------
 
 /** 创建回合开始播报序列：ROUND X → FIGHT! */
-export function createRoundStartSequence(roundNumber: number): AnnounceStep[] {
+export function createRoundStartSequence(roundNumber: number, isFinalRound: boolean = false): AnnounceStep[] {
   return [
     {
       id: 'round_display',
-      text: `ROUND ${roundNumber}`,
+      text: isFinalRound ? 'FINAL ROUND' : `ROUND ${roundNumber}`,
       duration: 80,
-      fillColor: '#ffcc00',
-      glowColor: '#ff8800',
-      fontSize: 52,
+      fillColor: isFinalRound ? '#ff4400' : '#ffcc00',
+      glowColor: isFinalRound ? '#ff2200' : '#ff8800',
+      fontSize: isFinalRound ? 60 : 52,
       scaleCurve: popIn,
       alphaCurve: fadeInHoldOut,
       sfxTriggerFrame: 5,
       sfxId: 'round_call',
-      flash: null,
-      shockwaveRings: 0,
+      flash: isFinalRound ? { color: '#ff4400', alpha: 0.15, frames: 8 } : null,
+      shockwaveRings: isFinalRound ? 3 : 1,
     },
     {
       id: 'fight_display',
