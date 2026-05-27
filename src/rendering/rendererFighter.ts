@@ -227,13 +227,12 @@ export function drawFighters(
       // KOF2002: 超跳大幅前倾 + 起跳前蹲
       leanOffsetX = 4 * f.facing + blendOffsetX;
       leanAngle = 0.06 * f.facing;
-      if (f.stateAge < 2) { leanOffsetY += 6; } // 起跳前蹲
+      if (f.stateAge < 2) { leanOffsetY += 6; }
     } else if (f.state === FighterState.TAUNT) {
       // KOF2002: 挑衅后仰
       leanOffsetX = -4 * f.facing + blendOffsetX;
       leanAngle = -0.08 * f.facing;
       leanOffsetY = Math.sin(f.stateAge * 0.3) * 2;
-      // KOF2002: 挑衅闪光 — 每15帧身体微闪
     }
 
     // Afterimage trail
