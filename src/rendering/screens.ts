@@ -42,6 +42,93 @@ function getBestPortrait(
   return sized ?? char.pixelPortrait;
 }
 
+function drawPortraitContainedInBox(
+  ctx: CanvasRenderingContext2D,
+  portrait: PixelPortraitData,
+  boxX: number,
+  boxY: number,
+  boxWidth: number,
+  boxHeight: number,
+  options: Parameters<typeof drawPixelPortrait>[5] = {},
+): void {
+  const scale = Math.min(boxWidth / portrait.width, boxHeight / portrait.height);
+  const drawWidth = portrait.width * scale;
+  const drawHeight = portrait.height * scale;
+  const drawX = boxX + (boxWidth - drawWidth) / 2;
+  const drawY = boxY + (boxHeight - drawHeight) / 2;
+
+  drawPixelPortrait(ctx, portrait, drawX, drawY, scale, options);
+}
+
+function getVisiblePortraitBounds(
+  portrait: PixelPortraitData,
+): { minX: number; minY: number; width: number; height: number } | null {
+  let minX = portrait.width;
+  let minY = portrait.height;
+  let maxX = -1;
+  let maxY = -1;
+
+  for (let row = 0; row < portrait.height; row++) {
+    const rowData = portrait.pixels[row];
+    if (!rowData) continue;
+    for (let col = 0; col < portrait.width; col++) {
+      if ((rowData[col] ?? 0) === 0) continue;
+      if (col < minX) minX = col;
+      if (row < minY) minY = row;
+      if (col > maxX) maxX = col;
+      if (row > maxY) maxY = row;
+    }
+  }
+
+  if (maxX < 0 || maxY < 0) return null;
+  return {
+    minX,
+    minY,
+    width: maxX - minX + 1,
+    height: maxY - minY + 1,
+  };
+}
+
+function cropPortraitToVisibleBounds(portrait: PixelPortraitData): PixelPortraitData | null {
+  const bounds = getVisiblePortraitBounds(portrait);
+  if (!bounds) return null;
+
+  const pixels: number[][] = [];
+  for (let row = 0; row < bounds.height; row++) {
+    const sourceRow = portrait.pixels[bounds.minY + row] ?? [];
+    pixels.push(sourceRow.slice(bounds.minX, bounds.minX + bounds.width));
+  }
+
+  return {
+    width: bounds.width,
+    height: bounds.height,
+    palette: portrait.palette,
+    pixels,
+  };
+}
+
+function drawPortraitFitVisibleBoundsInBox(
+  ctx: CanvasRenderingContext2D,
+  portrait: PixelPortraitData,
+  boxX: number,
+  boxY: number,
+  boxWidth: number,
+  boxHeight: number,
+  options: Parameters<typeof drawPixelPortrait>[5] = {},
+): boolean {
+  const cropped = cropPortraitToVisibleBounds(portrait);
+  if (!cropped) return false;
+
+  const scale = Math.min(boxWidth / cropped.width, boxHeight / cropped.height);
+  const drawWidth = cropped.width * scale;
+  const drawHeight = cropped.height * scale;
+  const drawX = boxX + (boxWidth - drawWidth) / 2;
+  const drawY = boxY + (boxHeight - drawHeight) / 2;
+
+  drawPixelPortrait(ctx, cropped, drawX, drawY, scale, options);
+  return true;
+}
+
 // 格子布局参数
 const CARD_W = 68;
 const CARD_H = 80;
@@ -172,16 +259,26 @@ export function drawCharacterSelect(
 
       const selectPortrait = getBestPortrait(char, 'select');
       if (selectPortrait) {
-        const portraitScale = 1.2;
-        const pw = selectPortrait.width * portraitScale;
-        const ph = selectPortrait.height * portraitScale;
-        const px = cx + 8 + ((CARD_W - 16) - pw) / 2;
-        const py = portraitY + (48 - ph) / 2;
-        drawPixelPortrait(ctx, selectPortrait, px, py, portraitScale, {
+        const portraitBoxX = cx + 12;
+        const portraitBoxY = portraitY + 4;
+        const portraitBoxW = CARD_W - 24;
+        const portraitBoxH = 40;
+        if (!drawPortraitFitVisibleBoundsInBox(ctx, selectPortrait, portraitBoxX, portraitBoxY, portraitBoxW, portraitBoxH, {
           frameColor: char.color,
           backdropColor: 'rgba(8, 8, 18, 0.85)',
           scanlines: true,
-        });
+        })) {
+          const charGrad = ctx.createLinearGradient(cx + 10, portraitY + 3, cx + CARD_W - 10, portraitY + 45);
+          charGrad.addColorStop(0, char.color);
+          charGrad.addColorStop(1, char.accentColor);
+          ctx.fillStyle = charGrad;
+          roundRect(ctx, cx + 10, portraitY + 3, CARD_W - 20, 42, 3);
+          ctx.fill();
+          ctx.font = '22px serif';
+          ctx.textAlign = 'center';
+          ctx.fillStyle = '#fff';
+          ctx.fillText(char.portrait, cx + CARD_W / 2, portraitY + 30);
+        }
       } else {
         const charGrad = ctx.createLinearGradient(cx + 10, portraitY + 3, cx + CARD_W - 10, portraitY + 45);
         charGrad.addColorStop(0, char.color);
@@ -241,24 +338,29 @@ export function drawCharacterSelect(
     // 放大肖像预览 — 网格左侧
     const hoverPortrait = getBestPortrait(hoveredChar, 'select');
     if (hoverPortrait) {
-      const previewScale = hoverPortrait.width > 100 ? 1.5 : 4;
-      const pw = hoverPortrait.width * previewScale;
-      const ph = hoverPortrait.height * previewScale;
-      const ppx = CANVAS_WIDTH / 2 - pw / 2 - 100;
-      const ppy = hoverY - ph / 2 - 5;
+      const previewBoxW = 120;
+      const previewBoxH = 120;
+      const ppx = CANVAS_WIDTH / 2 - previewBoxW / 2 - 100;
+      const ppy = hoverY - previewBoxH / 2 - 5;
       // 肖像背景
       ctx.fillStyle = 'rgba(0,0,0,0.5)';
-      roundRect(ctx, ppx - 4, ppy - 4, pw + 8, ph + 8, 4);
+      roundRect(ctx, ppx - 4, ppy - 4, previewBoxW + 8, previewBoxH + 8, 4);
       ctx.fill();
       ctx.strokeStyle = hoveredChar.color + '88';
       ctx.lineWidth = 1;
-      roundRect(ctx, ppx - 4, ppy - 4, pw + 8, ph + 8, 4);
+      roundRect(ctx, ppx - 4, ppy - 4, previewBoxW + 8, previewBoxH + 8, 4);
       ctx.stroke();
-      drawPixelPortrait(ctx, hoverPortrait, ppx, ppy, previewScale, {
+      if (!drawPortraitFitVisibleBoundsInBox(ctx, hoverPortrait, ppx, ppy, previewBoxW, previewBoxH, {
         frameColor: hoveredChar.color,
         backdropColor: 'rgba(8, 8, 18, 0.9)',
         scanlines: true,
-      });
+      })) {
+        ctx.font = 'bold 44px "Courier New", monospace';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillStyle = hoveredChar.color;
+        ctx.fillText(hoveredChar.portrait, ppx + previewBoxW / 2, ppy + previewBoxH / 2);
+      }
     }
     // 角色名大字 — 网格中央偏右
     ctx.save();
@@ -364,18 +466,23 @@ function drawPlayerInfo(
   // 头像预览
   const infoPortrait = char ? getBestPortrait(char, 'select') : undefined;
   if (infoPortrait) {
-    const pScale = infoPortrait.width > 80 ? 0.8 : 2;
-    const pw = infoPortrait.width * pScale;
-    const ph = infoPortrait.height * pScale;
-    const ppx = isLeft ? 10 : CANVAS_WIDTH - pw - 18;
+    const portraitBoxW = 72;
+    const portraitBoxH = 72;
+    const ppx = isLeft ? 10 : CANVAS_WIDTH - 18 - portraitBoxW;
     const ppy = panelY + 2;
     ctx.fillStyle = 'rgba(10, 10, 20, 0.7)';
-    roundRect(ctx, ppx, ppy, pw + 8, ph + 8, 4); ctx.fill();
-    drawPixelPortrait(ctx, infoPortrait, ppx + 4, ppy + 4, pScale, {
+    roundRect(ctx, ppx, ppy, portraitBoxW, portraitBoxH, 4); ctx.fill();
+    if (!drawPortraitFitVisibleBoundsInBox(ctx, infoPortrait, ppx + 4, ppy + 4, portraitBoxW - 8, portraitBoxH - 8, {
       frameColor: char?.color ?? '#888',
       backdropColor: 'rgba(8, 8, 18, 0.85)',
       scanlines: true,
-    });
+    })) {
+      ctx.font = 'bold 30px "Courier New", monospace';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillStyle = char?.color ?? '#888';
+      ctx.fillText(char?.portrait ?? '?', ppx + portraitBoxW / 2, ppy + portraitBoxH / 2);
+    }
   } else if (isRandom) {
     // 随机格 — 问号图标
     const ppx = isLeft ? 15 : CANVAS_WIDTH - 70;
@@ -684,7 +791,7 @@ function drawVSPaletteDots(
 const INTRO_ROUND_FRAMES = 90;
 const INTRO_FIGHT_FRAMES = 60;
 
-export function drawIntro(ctx: CanvasRenderingContext2D, phaseTimer: number, currentRound: number = 1, p1Name: string = '', p2Name: string = '', stageId?: StageId): void {
+export function drawIntro(ctx: CanvasRenderingContext2D, phaseTimer: number, currentRound: number = 1, p1Name: string = '', p2Name: string = '', stageId?: StageId, p1Wins: number = 0, p2Wins: number = 0, winsNeeded: number = 2): void {
   ctx.save();
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
@@ -745,6 +852,23 @@ export function drawIntro(ctx: CanvasRenderingContext2D, phaseTimer: number, cur
       drawSNKText(ctx, p1Name, CANVAS_WIDTH / 2 - 30, CANVAS_HEIGHT / 2 + 35, 16, '#ff6644', '#000000', 'right');
       drawSNKText(ctx, p2Name, CANVAS_WIDTH / 2 + 30, CANVAS_HEIGHT / 2 + 35, 16, '#4488ff', '#000000', 'left');
       drawSNKText(ctx, 'VS', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 35, 14, '#ffcc00');
+    }
+
+    // KOF2002: MATCH POINT — 任一方只差一胜时显示
+    const p1MatchPoint = p1Wins >= winsNeeded - 1 && p2Wins < winsNeeded;
+    const p2MatchPoint = p2Wins >= winsNeeded - 1 && p1Wins < winsNeeded;
+    if (p1MatchPoint || p2MatchPoint) {
+      const mpAlpha = Math.min(1, Math.max(0, (phaseTimer - 40) / 15)) * fadeOut;
+      ctx.globalAlpha = mpAlpha * alpha * 0.9;
+      const mpColor = p1MatchPoint ? '#ff6644' : '#4488ff';
+      const mpName = p1MatchPoint ? p1Name : p2Name;
+      ctx.shadowColor = mpColor;
+      ctx.shadowBlur = 10;
+      drawSNKText(ctx, 'MATCH POINT', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 55, 16, mpColor);
+      if (mpName) {
+        drawSNKText(ctx, mpName, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 72, 11, 'rgba(200,200,200,0.7)');
+      }
+      ctx.shadowBlur = 0;
     }
 
     // KOF2002: 舞台名显示 — 底部淡入淡出
@@ -1598,16 +1722,26 @@ export function drawTeamOrderSelect(
       if (char) {
         const orderPortrait = getBestPortrait(char, 'select');
         if (orderPortrait) {
-          const pScale = orderPortrait.width > 80 ? 0.8 : 2.5;
-          const pw = orderPortrait.width * pScale;
-          const ph = orderPortrait.height * pScale;
-          const ppx = sx + (slotW - pw) / 2;
-          const ppy = sy + 10;
-          drawPixelPortrait(ctx, orderPortrait, ppx, ppy, pScale, {
+          const portraitBoxX = sx + 8;
+          const portraitBoxY = sy + 10;
+          const portraitBoxW = slotW - 16;
+          const portraitBoxH = 92;
+          if (!drawPortraitFitVisibleBoundsInBox(ctx, orderPortrait, portraitBoxX, portraitBoxY, portraitBoxW, portraitBoxH, {
             frameColor: char.color,
             backdropColor: 'rgba(8, 8, 18, 0.85)',
             scanlines: true,
-          });
+          })) {
+            const charGrad = ctx.createLinearGradient(sx + 10, sy + 10, sx + slotW - 10, sy + 90);
+            charGrad.addColorStop(0, char.color);
+            charGrad.addColorStop(1, char.accentColor);
+            ctx.fillStyle = charGrad;
+            roundRect(ctx, sx + 10, sy + 10, slotW - 20, 80, 4);
+            ctx.fill();
+            ctx.font = '28px serif';
+            ctx.textAlign = 'center';
+            ctx.fillStyle = '#fff';
+            ctx.fillText(char.portrait, sx + slotW / 2, sy + 55);
+          }
         } else {
           const charGrad = ctx.createLinearGradient(sx + 10, sy + 10, sx + slotW - 10, sy + 90);
           charGrad.addColorStop(0, char.color);
