@@ -252,6 +252,16 @@ export function drawFighters(
       ctx.fill();
       ctx.restore();
     }
+    // KOF2002: 跳跃起飞烟尘 — JUMP/HYPER_JUMP首帧脚下烟尘
+    if ((f.state === FighterState.JUMP || f.state === FighterState.HYPER_JUMP || f.state === FighterState.RUN_JUMP) && f.stateAge < 2) {
+      ctx.save();
+      ctx.globalAlpha = (2 - f.stateAge) / 2 * 0.25;
+      ctx.fillStyle = '#aaaaaa';
+      ctx.beginPath();
+      ctx.ellipse(sx, sy, 8 + f.stateAge * 3, 3, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
     // KOF2002: 后撤步渐隐 — 后dash期间身体更透明(幻影感)
     if (f.state === FighterState.BACKDASH) {
       ctx.globalAlpha = Math.min(ctx.globalAlpha || 1, 0.75);
