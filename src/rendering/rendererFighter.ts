@@ -275,7 +275,17 @@ export function drawFighters(
       ctx.fillStyle = '#ff4444';
       ctx.fillRect(-25, -f.displayHeight - 10, 50, f.displayHeight + 20);
       ctx.globalAlpha = 1.0;
-    }    // Hitstun body shake — KOF2002 tiered body wobble
+    }
+    // KOF2002: 命中停顿攻击者发光 — hitstop时攻击者微白轮廓
+    if (f.hitFlashFrames > 0 && f.state !== FighterState.HITSTUN && f.state !== FighterState.KNOCKDOWN) {
+      ctx.save();
+      ctx.globalCompositeOperation = 'screen';
+      ctx.globalAlpha = 0.08;
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(sx + leanOffsetX - hw - 3, sy - f.displayHeight - 3, (hw + 3) * 2, f.displayHeight + 6);
+      ctx.restore();
+    }
+    // Hitstun body shake — KOF2002 tiered body wobble
     // Light hit: subtle jitter (1-2px), Heavy: strong wobble (3-4px), Special/DM: violent shake (5+px)
     // hitstunTimer carries tier info: light=11, heavy=19, special=22+, DM=0(knockdown)
     if (f.state === FighterState.HITSTUN && f.hitstunTimer > 0) {
@@ -325,15 +335,16 @@ export function drawFighters(
       const swayX = Math.sin(f.stateAge * 0.15) * 3;
       const swayY = Math.sin(f.stateAge * 0.22) * 1.5;
       ctx.translate(swayX, swayY);
-      // KOF2002: 眩晕星星 — 头顶3颗旋转星星
+      // KOF2002: 眩晕星星 — 头顶3颗旋转星星(随时间增大)
       const starBaseY = sy - f.displayHeight - 12;
+      const starSize = 3 + Math.min(f.stateAge * 0.01, 2); // 3->5px over time
       for (let s = 0; s < 3; s++) {
         const angle = (s / 3) * Math.PI * 2 + globalTick * 0.08;
         const starX = sx + Math.cos(angle) * 18;
         const starY = starBaseY + Math.sin(angle) * 6;
         ctx.fillStyle = '#ffee44';
         ctx.beginPath();
-        ctx.arc(starX, starY, 3, 0, Math.PI * 2);
+        ctx.arc(starX, starY, starSize, 0, Math.PI * 2);
         ctx.fill();
       }
     }    // Getup Y offset — interpolate from lying (ground) to standing position
@@ -358,7 +369,8 @@ export function drawFighters(
     }
     // KOF2002: 蹲下状态额外Y偏移 — 确保蹲姿视觉更低
     if (f.state === FighterState.CROUCH) {
-      ctx.translate(0, 8);
+      const crouchBreathe = Math.sin(globalTick * 0.06) * 1;
+      ctx.translate(0, 8 + crouchBreathe);
     }
 
     // KOF2002: 受击恢复闪烁 — hitstun最后5帧身体闪烁
