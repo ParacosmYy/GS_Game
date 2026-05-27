@@ -2,27 +2,35 @@
 
 这里是 `Ryo` 的单一内容包入口。
 
-## 目标
+## 当前状态
 
-- 让 Ryo 的角色数据、技能、攻击、动画、判定、反馈、肖像和报告都有明确归属。
-- 让以后所有 Ryo 内容只认这一个目录，不再散落到别的地方。
+- 这个目录已经不再是纯概念占位，而是实际内容迁移的主入口。
+- 根部兼容层仍保留，用来接住旧代码和逐步迁移期间的调用。
+- 新数据优先进入职责子域，不再回流到单文件堆叠。
 
 ## 当前结构
 
 ```text
 src/content/characters/ryo/
-├── definition.ts      # 角色定义入口，当前兼容层
-├── stats.ts           # 角色数值入口，当前兼容层
-├── completeness.ts    # 完整度/报告入口，当前兼容层
-├── commands/          # 指令、出招、路由说明
-├── moves/             # 必杀技、超必杀、EX/强化版本
-├── attacks/           # 普通技、命中性质、攻击分组
-├── animations/        # 动作帧、pose、manifest
-├── hitboxes/          # 判定框与受击框数据
-├── feedback/          # 命中火花、音效、屏闪、停顿反馈
-├── portraits/         # 头像、胜利图、HUD 肖像
-└── reports/           # 完整度、验收、对齐报告
+├── index.ts            # 对外统一导出入口
+├── definition.ts       # 角色定义兼容层
+├── stats.ts            # 数值兼容层
+├── completeness.ts     # 完整度/报告兼容层
+├── commands/           # 指令、出招、路由说明
+├── moves/              # 必杀技、超必杀、强化版关系
+├── attacks/            # 普通技、攻击分类、攻击分组
+├── animations/         # 动作帧、pose、manifest
+├── hitboxes/           # 判定框与受击框
+├── feedback/           # 命中反馈、音效、屏闪、停顿
+├── portraits/          # 头像、胜利图、HUD 肖像
+└── reports/            # 完整度、验收、对齐报告
 ```
+
+## 兼容层与迁移层
+
+- `definition.ts`、`stats.ts`、`completeness.ts` 继续承担兼容入口职责。
+- `index.ts` 是对外单一入口，运行时应优先依赖它，而不是直接穿透到多个内部文件。
+- 子目录目前以目录骨架和迁移说明为主，后续会逐步放入真实数据文件。
 
 ## 归类规则
 
@@ -37,6 +45,7 @@ src/content/characters/ryo/
 
 ## 过渡原则
 
-- 现有根目录 `definition.ts`、`stats.ts`、`completeness.ts` 暂时保留为兼容层。
-- 新增内容优先进入对应子目录。
-- 以后如果要继续拆分，优先从 `moves/`、`animations/`、`hitboxes/`、`feedback/` 开始。
+- 新增 Ryo 内容优先进入对应子目录。
+- 旧入口先保留，不要为了“整理干净”直接删适配层。
+- 每次迁移都要保留回退路径。
+- 后续如果继续拆分，优先从 `moves/`、`animations/`、`hitboxes/`、`feedback/`、`portraits/` 的真实数据开始。

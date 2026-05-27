@@ -24,6 +24,7 @@
 
 - 把 Ryo 内容包拆成 `commands/`、`moves/`、`attacks/`、`animations/`、`hitboxes/`、`feedback/`、`portraits/`、`reports/`。
 - 把 definition / stats / completeness 保留为兼容入口。
+- 把当前已经出现的分层实现继续向真实数据迁移，而不是停留在 README 和目录骨架。
 - 让新增内容优先进入对应子目录，不再回流到单个大文件。
 
 ## P2 Ryo 最小动作闭环

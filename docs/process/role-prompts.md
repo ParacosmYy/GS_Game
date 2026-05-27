@@ -4,6 +4,7 @@
 
 - 自侦测是每轮必做的前置门。
 - 深审编队只用于高风险任务、黄/红自侦测结果，或用户明确要求。
+- 当前若任务与 Ryo 内容包相关，所有角色都必须区分“兼容入口”与“真实数据迁移层”，不要把 README 或目录骨架误判成已完成数据。
 
 如果工具环境无法创建子 agent，主 agent 必须明确说明原因，并在同一轮中按本文模板逐项模拟这些角色的结论。不得写成“已调用子 agent”。
 
@@ -83,6 +84,7 @@
 
 - Ryo content package。
 - stats、commands、frameData、animations、hitboxes、feedback。
+- 哪些仍是兼容入口，哪些已经进入真实数据层。
 - 角色数据是否泄露到通用系统。
 
 ### 2.5 研发 C：rendering / animation

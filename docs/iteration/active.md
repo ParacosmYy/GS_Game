@@ -8,12 +8,12 @@
 ## 当前状态
 
 - 当前主线：Ryo 内容包细分收口。
-- 当前要做：把 `src/content/characters/ryo/` 下的内容按职责拆到 `commands/`、`moves/`、`attacks/`、`animations/`、`hitboxes/`、`feedback/`、`portraits/`、`reports/`。
-- 当前重点：先把定义、数值、完整度报告保留为兼容入口，再逐步迁移真实数据。
+- 当前要做：把 `src/content/characters/ryo/` 下的内容按职责继续向真实数据迁移，避免子目录长期只停留在 README。
+- 当前重点：兼容入口 `definition.ts`、`stats.ts`、`completeness.ts` 继续保留，真实数据优先进入 `commands/`、`moves/`、`attacks/`、`animations/`、`hitboxes/`、`feedback/`、`portraits/`、`reports/`。
 
 ## 本轮验收
 
-- 至少让一个 Ryo 子域拥有真实目录归属，而不是继续散落在单文件里。
+- 至少让一个 Ryo 子域拥有真实数据归属，而不是继续散落在单文件或只有 README 的目录里。
 - 约束文档、路线图和迭代工作区同步更新。
 - 不引入新的角色扩张。
 

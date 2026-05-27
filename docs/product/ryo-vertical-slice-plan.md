@@ -69,7 +69,7 @@ Ryo 相关新增数据文件优先落到 [工作区目标架构](../architecture
 
 ### 4.1 当前下一步
 
-当前不是继续扩角色，而是把 Ryo 内容包从“有入口”推进到“有分层”：
+当前不是继续扩角色，而是把 Ryo 内容包从“有入口”推进到“真实分层已开始、数据仍待填充”的状态：
 
 - `commands/`：把出招、快捷键、标准键位和路由说明固定下来。
 - `moves/`：把普通技、必杀技、DM/MAX/强化版的关系拆清楚。
@@ -86,7 +86,7 @@ Ryo 相关新增数据文件优先落到 [工作区目标架构](../architecture
 
 1. 定义或修正数据格式。
 2. 写校验测试或校验工具。
-3. 接入 Ryo 内容包的一个明确子域（commands/moves/attacks/animations/hitboxes/feedback/portraits/reports 之一）。
+3. 接入 Ryo 内容包的一个明确子域（commands/moves/attacks/animations/hitboxes/feedback/portraits/reports 之一），并优先让该子域不再只剩 README。
 4. 保留 fallback。
 5. 验证构建。
 6. 复盘是否更像 KOF。

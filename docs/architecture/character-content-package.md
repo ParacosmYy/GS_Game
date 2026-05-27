@@ -12,6 +12,7 @@
 
 ```text
 src/content/characters/<id>/
+├── index.ts
 ├── definition.ts
 ├── stats.ts
 ├── completeness.ts
@@ -24,6 +25,13 @@ src/content/characters/<id>/
 ├── portraits/
 └── reports/
 ```
+
+## 当前状态
+
+- Ryo 已经有兼容入口和职责分层的过渡形态。
+- 根部的 `definition.ts` / `stats.ts` / `completeness.ts` 仍作为兼容层保留。
+- 新的真实数据应优先进入对应子目录，而不是继续往单文件里堆。
+- `index.ts` 应成为运行时面向角色内容包的单一导出入口。
 
 ## 归类原则
 
@@ -39,6 +47,6 @@ src/content/characters/<id>/
 ## 迁移顺序
 
 1. 先建立目录和 README。
-2. 再把 Ryo 的数据逐步迁进去。
-3. 迁移时保持旧入口兼容。
-4. 通过后再复制到其他角色。
+2. 再把 Ryo 的真实数据逐步迁进去。
+3. 迁移时保持旧入口兼容，不一次性删掉适配层。
+4. 通过 manifest / frame contract / 视觉回归验证后，再复制到其他角色。

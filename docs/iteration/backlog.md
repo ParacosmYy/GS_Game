@@ -8,7 +8,7 @@
 
 ## 待办列表
 
-- 把 `commands/` 里的输入/路由说明迁成正式数据文件。
+- 把 `commands/` 里的输入/路由说明迁成正式数据文件，替换 README 占位。
 - 把 `moves/` 里的普通技、必杀技、强化版关系写成可读数据。
 - 把 `attacks/` 拆成普通技分组和命令通常技分组。
 - 把 `animations/` 对接真实 pose / manifest。
@@ -16,4 +16,5 @@
 - 把 `feedback/` 对接 light/heavy/special/DM 反馈矩阵。
 - 把 `portraits/` 变成 select/HUD/win 的统一规范入口。
 - 把 `reports/` 变成完整度、迁移状态、校验结果的固定输出。
+- 把当前已存在的平面兼容文件逐步改成更清晰的导出层，而不是继续新增新的平面入口。
 - 等 Ryo 内容包细分稳定后，再评估 Kyo / Iori 的复制模板。
