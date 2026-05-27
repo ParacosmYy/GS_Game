@@ -2,7 +2,7 @@
 
 ## 1. 当前分数
 
-当前总分：`104/2000`
+当前总分：`108/2000`
 
 完整历史见 [SCORE.history.md](../archive/SCORE.history.md)。
 
@@ -14,10 +14,10 @@
 | --- | ---: | ---: | --- |
 | 角色美术 | 200 | 12 | Ryo像素帧42/42状态覆盖，仍是程序化非SNK精灵图 |
 | 舞台美术 | 100 | 5 | 5场景视差+动态元素，程序化非位图 |
-| 音频品质 | 150 | 9 | 合成SFX+BGM+Kyo 7种火焰SFX，非采样音效 |
-| 角色内容 | 150 | 18 | Ryo全闭环+Kyo内容包14文件+Kyo内容集成(barrel+contentLoader) |
+| 音频品质 | 150 | 10 | 合成SFX+BGM+Kyo 7种火焰SFX+Iori 8种暗紫SFX |
+| 角色内容 | 150 | 19 | Ryo全闭环+Kyo 14文件+Iori 14文件+三角色contentLoader集成 |
 | 战斗手感 | 150 | 18 | hitstop衰减+方向震屏+冲击环+斩击线+连段hitstop递减 |
-| 帧数据精度 | 100 | 12 | Frame Contract全攻击对齐，逐帧判定可测试 |
+| 帧数据精度 | 100 | 13 | Frame Contract: Ryo全攻击+Kyo 47个ActionContract对齐 |
 | 游戏流程 | 100 | 20 | 选人→对战→KO→结算+3v3+训练模式+舞台名intro+DM暗幕 |
 | UI/HUD品质 | 50 | 12 | SNK风格能量槽+计时器+连段计数器+播报+像素帧缓存 |
 
@@ -26,7 +26,7 @@
 | 维度 | 满分 | Phase 2 主线 |
 | --- | ---: | --- |
 | 角色美术（进阶） | 150 | 像素帧SNK抖色/残影/纹理进阶/每帧唯一性 |
-| 多角色闭环 | 200 | Kyo+Iori 样板角色完成，复制管线验证 |
+| 多角色闭环 | 200 | Kyo+Iori内容包+SFX+Kyo Frame Contract完成,管线三角色验证通过 |
 | 舞台美术（进阶） | 100 | 位图品质舞台/视差层次/动态元素/氛围粒子 |
 | 深层机制 | 200 | MAX模式/FreeCancel/GuardCancel/Juggle/CounterWire/Blowback |
 | 音频品质（进阶） | 100 | 逐角色SFX差异化/连段音/BGM编曲方向 |
