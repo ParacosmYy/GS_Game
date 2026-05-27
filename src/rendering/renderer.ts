@@ -19,6 +19,7 @@ export interface DebugInputHistory {
 
 import { drawStage, generateStars, getStage } from './stage.js';
 import type { Star } from './stage.js';
+import { drawColorGrade, drawLightRays, drawStageVignette, drawStageFog, drawStageParticles } from './stageAtmosphere.js';
 import { drawFighters as drawFightersImpl } from './rendererFighter.js';
 import { drawHUD, drawPowerGauges, drawComboCounters, drawTeamOrder, type TeamDisplayInfo } from './hud.js';
 import { subscribeMeterFlash, tickMeterFlash } from './meterFlash.js';
@@ -240,43 +241,13 @@ export class Renderer {
       ctx.restore();
     }
 
-    // KOF2002: 暗角效果 — 聚焦中心, 边缘渐暗 (场景色温)
+    // KOF2002: 场景氛围 — 每个舞台独特的色温/光柱/暗角/雾气/粒子
     const stageId = getStage();
-    const vigTint = stageId === 'temple' ? '30, 15, 5'
-      : stageId === 'china' ? '40, 10, 10'
-      : '5, 15, 30';
-    const vigGrad = ctx.createRadialGradient(
-      CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, CANVAS_WIDTH * 0.28,
-      CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, CANVAS_WIDTH * 0.65,
-    );
-    vigGrad.addColorStop(0, 'rgba(0, 0, 0, 0)');
-    vigGrad.addColorStop(0.6, `rgba(${vigTint}, 0.08)`);
-    vigGrad.addColorStop(1, `rgba(${vigTint}, 0.38)`);
-    ctx.fillStyle = vigGrad;
-    ctx.fillRect(-10, -10, CANVAS_WIDTH + 20, CANVAS_HEIGHT + 20);
-
-    // KOF2002: 底部地面雾气 — 地面附近半透明白色薄雾
-    const fogGrad = ctx.createLinearGradient(0, STAGE_GROUND_Y + 10, 0, STAGE_GROUND_Y + 60);
-    fogGrad.addColorStop(0, 'rgba(180, 170, 160, 0)');
-    fogGrad.addColorStop(0.3, 'rgba(160, 155, 150, 0.06)');
-    fogGrad.addColorStop(0.7, 'rgba(140, 135, 130, 0.08)');
-    fogGrad.addColorStop(1, 'rgba(120, 115, 110, 0.12)');
-    ctx.fillStyle = fogGrad;
-    ctx.fillRect(-10, STAGE_GROUND_Y + 10, CANVAS_WIDTH + 20, 60);
-
-    // KOF2002: 场景飘浮微粒 — 缓慢飘浮的环境粒子
-    ctx.save();
-    const particleColor = stageId === 'temple' ? '#ffddaa' : stageId === 'china' ? '#ffaaaa' : '#aaddff';
-    for (let pi = 0; pi < 8; pi++) {
-      const px = ((tick * 0.3 + pi * 120) % (CANVAS_WIDTH + 40)) - 20;
-      const py = CANVAS_HEIGHT * 0.3 + Math.sin(tick * 0.02 + pi * 1.7) * 60 + pi * 20;
-      ctx.globalAlpha = 0.08 + Math.sin(tick * 0.03 + pi) * 0.04;
-      ctx.fillStyle = particleColor;
-      ctx.beginPath();
-      ctx.arc(px, py, 1.5, 0, Math.PI * 2);
-      ctx.fill();
-    }
-    ctx.restore();
+    drawColorGrade(ctx, stageId);
+    drawLightRays(ctx, stageId, tick);
+    drawStageVignette(ctx, stageId);
+    drawStageFog(ctx, stageId, tick);
+    drawStageParticles(ctx, stageId, tick);
 
     ctx.restore();
 

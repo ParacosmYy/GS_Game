@@ -12,3 +12,4 @@ export { drawSuperFlash, drawMatchEnd, drawModeIndicator, drawStageIndicator, dr
 export { drawMAXModeAura, drawMAXActivationFlash, resetMAXWisps } from './maxModeVfx.js';
 export { roundRect, shiftColor, parseColor } from './utils.js';
 export { getCharacterRenderData, getCharacterColors, getCharacterAnimFrameInfo, getOutfitColor, getHeadColor, getHairColor } from './manifestRenderData.js';
+export { drawColorGrade, drawLightRays, drawStageVignette, drawStageFog, drawStageParticles } from './stageAtmosphere.js';
