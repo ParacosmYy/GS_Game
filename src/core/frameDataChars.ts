@@ -1089,6 +1089,33 @@ export const FRAME_DATA_CHARS = {
     knockdown: true,
     chipDamage: 28,
   },
+  // ── 坂崎亮命令通常技 (Ryo Sakazaki Command Normals) ── KOF2002UM calibrated
+  // 冰柱割り →+A (Tsurizarao, overhead)
+  RYO_TSURIZAO: {
+    startup: 14,
+    active: 4,
+    recovery: 18,
+    damage: 44,
+    hitstun: 19,
+    blockstun: 16,
+    pushback: 3,
+    hitLevel: "HIGH" as const,
+    knockdown: false,
+    chipDamage: 0,
+  },
+  // 落蹴 ↘+B (Orishi, low kick)
+  RYO_ORISHI: {
+    startup: 8,
+    active: 4,
+    recovery: 20,
+    damage: 38,
+    hitstun: 18,
+    blockstun: 15,
+    pushback: 2,
+    hitLevel: "LOW" as const,
+    knockdown: false,
+    chipDamage: 0,
+  },
   // ── 坂崎亮必杀技 (Ryo Sakazaki) ── KOF2002UM calibrated
   // 虎煌拳 qcf+A (Ko'ou Ken, projectile)
   RYO_KOOU: {
