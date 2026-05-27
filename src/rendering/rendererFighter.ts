@@ -541,6 +541,18 @@ export function drawFighters(
       ctx.fillStyle = 'rgba(255, 255, 255, ' + flashAlpha + ')';
       ctx.fillRect(-30, -f.displayHeight - 5, 60, f.displayHeight + 10);
     }
+    // KOF2002: 起身能量环 — GETUP最后5帧向上扩散环
+    if (f.state === FighterState.GETUP && f.getupTimer > 0 && f.getupTimer <= 5) {
+      ctx.save();
+      const ringT = (5 - f.getupTimer) / 5;
+      ctx.globalAlpha = (1 - ringT) * 0.2;
+      ctx.strokeStyle = '#88ccff';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.ellipse(sx, sy - ringT * 15, hw + 5 + ringT * 10, 4 + ringT * 8, 0, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.restore();
+    }
     // Dizzy state wobble — KOF2002 unsteady sway when stunned (intensity grows over time)
     if (f.state === FighterState.DIZZY) {
       const intensityMult = 1 + Math.min(f.stateAge * 0.005, 1.5);
