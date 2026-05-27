@@ -14,7 +14,7 @@
  * - Cycle timing for animation frames
  *
  * Currently supports: IDLE, WALK (fwd/back), STAND_ATTACK (A/C),
- *   CROUCH, JUMP (all jump types), HITSTUN, KNOCKDOWN
+ *   CROUCH, BLOCK, JUMP (all jump types), HITSTUN, KNOCKDOWN
  * Fallback states (crouch_attack, air_attack, block, etc.) will follow.
  */
 
@@ -142,6 +142,9 @@ function initAllFrames(): void {
   // CROUCH — 4-frame crouch idle breathing loop
   registerVariableFrames('CROUCH', KYO_CROUCH_FRAMES, [8, 10, 8, 10]);
 
+  // BLOCK — 2-frame guard stance, slightly shorter hold than idle
+  registerVariableFrames('BLOCK', KYO_BLOCK_FRAMES, [3, 8]);
+
   // JUMP — 6-frame jump arc with variable timing
   // pre-jump, rise, peak_up, peak_fwd, descend, land
   registerVariableFrames('JUMP', KYO_JUMP_FRAMES, [4, 3, 5, 6, 5, 4]);
@@ -188,6 +191,9 @@ function resolveFrameKey(
 
     case FighterState.CROUCH:
       return 'CROUCH';
+
+    case FighterState.BLOCK:
+      return 'BLOCK';
 
     case FighterState.JUMP:
     case FighterState.RUN_JUMP:
@@ -332,3 +338,4 @@ export function drawKyoHighResAfterimage(
   ctx.restore();
   return true;
 }
+

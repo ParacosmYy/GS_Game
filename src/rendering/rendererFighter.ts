@@ -13,6 +13,7 @@ import type { SpriteRenderer } from './spriteRenderer.js';
 import { getCharacterColors } from './manifestRenderData.js';
 import { drawHighResFrame, drawHighResAfterimage } from './sprites/ryoHighResRender.js';
 import { drawKyoHighResFrame, drawKyoHighResAfterimage } from './sprites/kyoHighResRender.js';
+import { drawIoriHighResFrame, drawIoriHighResAfterimage } from './sprites/ioriHighResRender.js';
 import { getFighterBlender } from './animationBlender.js';
 
 const fighterDebugOverlayEnabled = isFighterDebugOverlayEnabled();
@@ -951,6 +952,8 @@ export function drawFighters(
     const charId = f.charId ?? '';
     if (charId === 'kyo') {
       highResDrawn = drawKyoHighResFrame(ctx, f.state, f.stateAge, sx + leanOffsetX, sy, f.facing, f.currentAttack, f.vx);
+    } else if (charId === 'iori') {
+      highResDrawn = drawIoriHighResFrame(ctx, f.state, f.stateAge, sx + leanOffsetX, sy, f.facing, f.currentAttack, f.vx);
     } else {
       highResDrawn = drawHighResFrame(ctx, charId, f.state, f.stateAge, sx + leanOffsetX, sy, f.facing, f.currentAttack, f.vx);
     }
@@ -1723,6 +1726,12 @@ function drawAfterimageTrail(
     const ghostCharId = f.charId ?? '';
     if (ghostCharId === 'kyo') {
       pixelDrawn = drawKyoHighResAfterimage(
+        ctx, f.state, f.stateAge,
+        trailX, f.y, f.facing, f.currentAttack, f.vx,
+        trailTint, ghostAlpha,
+      );
+    } else if (ghostCharId === 'iori') {
+      pixelDrawn = drawIoriHighResAfterimage(
         ctx, f.state, f.stateAge,
         trailX, f.y, f.facing, f.currentAttack, f.vx,
         trailTint, ghostAlpha,
