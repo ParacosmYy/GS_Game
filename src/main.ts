@@ -56,6 +56,7 @@ import { drawPauseMenu } from './rendering/pauseMenu.js';
 import { drawCharacterKOOverlay } from './rendering/overlayScreens.js';
 import { triggerMoveName, tickMoveNameDisplay, drawMoveNameDisplay, resetMoveNameDisplay } from './rendering/moveNameDisplay.js';
 import { startCharIntro, tickCharIntro, drawCharIntro, resetCharIntro, isIntroActive } from './rendering/charIntro.js';
+import { triggerIntroQuotes, tickIntroQuotes, drawIntroQuotes, resetIntroQuotes } from './rendering/charIntroQuotes.js';
 import { drawHitboxOverlay } from './rendering/hitboxDebug.js';
 import type { CharacterDefinition } from './characters/types.js';
 import { initCharacterHitEffects } from './content/registerHitEffects.js';
@@ -540,10 +541,13 @@ function update(): void {
       playCharVoice(p1.charId, 'intro', 0.4);
       // KOF2002: Character-specific intro animations
       startCharIntro(p1.charId, p2.charId);
+      // KOF2002: Character intro quotes
+      triggerIntroQuotes(p1.charId, p2.charId);
     }
 
     // Tick character intro animations
     tickCharIntro();
+    tickIntroQuotes();
 
     // Tick announce sequence, play SFX on trigger frames
     if (gs.announceSequence.isRunning()) {
@@ -675,7 +679,7 @@ function update(): void {
               gs.announceSequence.setSteps(createRoundStartSequence(rounds.currentRound, rounds.p1Wins >= rounds.winsNeeded - 1 && rounds.p2Wins >= rounds.winsNeeded - 1));
               announcer.roundStart(rounds.currentRound);
               announcer.fight();
-              resetMoveNameDisplay(); resetCharIntro();
+              resetMoveNameDisplay(); resetCharIntro(); resetIntroQuotes();
             },
           );
           return;
@@ -718,7 +722,7 @@ function update(): void {
             gs.setPhase(GamePhase.INTRO);
             gs.phaseTimer = 0;
             gs.resetForNextRound();
-            resetMoveNameDisplay(); resetCharIntro();
+            resetMoveNameDisplay(); resetCharIntro(); resetIntroQuotes();
             gs.announceSequence.setSteps(createRoundStartSequence(rounds.currentRound, rounds.p1Wins >= rounds.winsNeeded - 1 && rounds.p2Wins >= rounds.winsNeeded - 1));
             announcer.roundStart(rounds.currentRound);
             announcer.fight();
@@ -1178,7 +1182,7 @@ function update(): void {
     if (p1.health <= 0 || p2.health <= 0) {
       p1.health = p1.maxHealth; p2.health = p2.maxHealth;
       p1DelayedHealth = p1.maxHealth; p2DelayedHealth = p2.maxHealth;
-      cinematic.reset(); gameSpeed.reset(); gs.koGroundSlamDone = false; resetMoveNameDisplay(); resetCharIntro();
+      cinematic.reset(); gameSpeed.reset(); gs.koGroundSlamDone = false; resetMoveNameDisplay(); resetCharIntro(); resetIntroQuotes();
     }
   }
 
@@ -1351,6 +1355,8 @@ function render(): void {
   if (gs.phase === GamePhase.INTRO) {
     drawCharIntro(ctx, p1.charId, p1.x - camera.x, p1.y, p1.facing,
       p2.charId, p2.x - camera.x, p2.y, p2.facing);
+    drawIntroQuotes(ctx, p1.charId, p1.x, p1.y,
+      p2.charId, p2.x, p2.y, camera.x);
   }
 
   if (cinematic.superFlashTimer > 0) {
@@ -1621,6 +1627,7 @@ function restartGame(): void {
   rounds.fullReset();
   resetMoveNameDisplay();
   resetCharIntro();
+  resetIntroQuotes();
   p1DelayedHealth = p1.maxHealth;
   p2DelayedHealth = p2.maxHealth;
 }
