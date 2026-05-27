@@ -540,6 +540,8 @@ function update(): void {
       vfx.spawnDust(p2.x, p2.y);
       // KOF2002: P1 intro voice — brief ready stance grunt
       playCharVoice(p1.charId, 'intro', 0.4);
+      // KOF2002: P2 intro voice — opponent also speaks
+      playCharVoice(p2.charId, 'intro', 0.35);
       // KOF2002: Character-specific intro animations
       startCharIntro(p1.charId, p2.charId);
       // KOF2002: Character intro quotes
@@ -1244,6 +1246,20 @@ function update(): void {
         addArcadeScore(3000 + hpBonus);
       }
       const isPerfect = gs.winner !== null && cinematic.getPerfectPlayer(gs.winner) !== null;
+      // Store breakdown for score popup display
+      if (gs.winner === 0 && !gs.isTrainingMode) {
+        const hpB = Math.round(p1.health / p1.maxHealth * 1000);
+        const perfectB = isPerfect ? 5000 : 0;
+        gs.lastRoundScoreBreakdown = {
+          baseScore: 3000,
+          hpBonus: hpB,
+          perfectBonus: perfectB,
+          totalScore: 3000 + hpB + perfectB,
+          isPerfect,
+        };
+      } else {
+        gs.lastRoundScoreBreakdown = null;
+      }
       gs.announceSequence.setSteps(createKOSequence(isPerfect));
       if (isPerfect) {
         const pw = gs.winner === 0 ? p1 : p2;
@@ -1323,6 +1339,10 @@ function render(): void {
     renderer.drawCharacterSelect(select, tickRef.value, gs.simplifiedMode, getStage());
     if (select.vsSplashTimer >= 0) {
       renderer.drawVSSplash(select, tickRef.value, getStage());
+      // KOF2002: VS画面冲击音效 — 双方确认后首次显示VS闪屏时播放
+      if (select.vsSplashTimer === 0) {
+        playDM();
+      }
     }
     return;
   }
