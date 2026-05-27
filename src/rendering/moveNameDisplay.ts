@@ -33,9 +33,7 @@ function buildMap(
     if (!entry.attackTypeKey) continue;
     const tier = entry.type as FeedbackTier;
     if (tier !== 'special' && tier !== 'dm' && tier !== 'sdm' && tier !== 'hsdm') continue;
-    const atkType = entry.attackTypeKey as AttackType;
-    const cnName = MOVE_NAME_MAP[atkType];
-    map[entry.attackTypeKey] = { displayName: cnName ?? entry.name, tier };
+    map[entry.attackTypeKey] = { displayName: entry.name, tier };
   }
   return map;
 }
