@@ -223,36 +223,48 @@ function initAllFrames(): void {
   // EX Ko'Hou: fast startup, moderate recovery
   registerVariableFrames('KO_HOU_C', RYO_KO_HOU_C_FRAMES, [3, 3, 8]);
 
-  // SUPERS — DM/SDM/HSDM
-  // DM_TEN_HA_OU: 4 frames × 12 = 48
-  registerFrames('DM_TEN_HA_OU', RYO_DM_TEN_HA_OU_FRAMES, 12);
-  // DM_RYUKO_RANBU: 5 frames × 8 = 40
-  registerFrames('DM_RYUKO_RANBU', RYO_DM_RYUKO_RANBU_FRAMES, 8);
-  // SDM_TEN_HA_OU: 3 frames × 16 = 48
-  registerFrames('SDM_TEN_HA_OU', RYO_SDM_TEN_HA_OU_FRAMES, 16);
-  // HSDM_RYUKO_RANBU: 4 frames × 10 = 40
-  registerFrames('HSDM_RYUKO_RANBU', RYO_HSDM_RYUKO_RANBU_FRAMES, 10);
+  // SUPERS — DM/SDM/HSDM with variable timing
+  // DM Ten Ha Ou: dramatic startup → explosive active → long recovery
+  registerVariableFrames('DM_TEN_HA_OU', RYO_DM_TEN_HA_OU_FRAMES, [8, 4, 14, 18]);
+  // DM Ryuko Ranbu: fast startup → multi-hit rush → finisher → recovery
+  registerVariableFrames('DM_RYUKO_RANBU', RYO_DM_RYUKO_RANBU_FRAMES, [4, 3, 4, 6, 12]);
+  // SDM Ten Ha Ou: heavier startup → more explosive → longer recovery
+  registerVariableFrames('SDM_TEN_HA_OU', RYO_SDM_TEN_HA_OU_FRAMES, [10, 6, 20]);
+  // HSDM Ryuko Ranbu: fastest startup → maximum intensity
+  registerVariableFrames('HSDM_RYUKO_RANBU', RYO_HSDM_RYUKO_RANBU_FRAMES, [3, 4, 6, 14]);
 
-  // MOVEMENT — run, backdash, rolls
-  registerFrames('RUN', RYO_RUN_FRAMES, 3);
-  registerFrames('BACKDASH', RYO_BACKDASH_FRAMES, 3);
-  registerFrames('ROLL', RYO_ROLL_FRAMES, 4);
-  registerFrames('BACK_ROLL', RYO_BACK_ROLL_FRAMES, 4);
+  // MOVEMENT — variable timing
+  // Run: accelerating rhythm
+  registerVariableFrames('RUN', RYO_RUN_FRAMES, [3, 3, 2, 2, 3, 2]);
+  // Backdash: fast escape
+  registerVariableFrames('BACKDASH', RYO_BACKDASH_FRAMES, [2, 2, 3, 4]);
+  // Roll: smooth forward roll
+  registerVariableFrames('ROLL', RYO_ROLL_FRAMES, [3, 3, 4, 5]);
+  // Back roll: quick retreat
+  registerVariableFrames('BACK_ROLL', RYO_BACK_ROLL_FRAMES, [3, 3, 4, 5]);
 
-  // SUB-STATES — guard crush, MAX mode, taunt, counter, block, dizzy, throw
-  registerFrames('BLOCK', RYO_BLOCK_FRAMES, 8);
-  registerFrames('DIZZY', RYO_DIZZY_FRAMES, 10);
-  registerFrames('THROW', RYO_THROW_FRAMES, 6);
-  registerFrames('GUARD_CRUSH', RYO_GUARD_CRUSH_FRAMES, 8);
-  registerFrames('MAX_MODE', RYO_MAX_MODE_FRAMES, 6);
-  registerFrames('TAUNT', RYO_TAUNT_FRAMES, 12);
-  registerFrames('COUNTER_STANCE', RYO_COUNTER_STANCE_FRAMES, 8);
+  // SUB-STATES — variable timing
+  // Block: quick stance → held
+  registerVariableFrames('BLOCK', RYO_BLOCK_FRAMES, [3, 8]);
+  // Dizzy: wobble rhythm
+  registerVariableFrames('DIZZY', RYO_DIZZY_FRAMES, [8, 10, 8, 12, 8, 10, 8, 14]);
+  // Throw: grab → slam → recover
+  registerVariableFrames('THROW', RYO_THROW_FRAMES, [3, 4, 5, 6, 8, 10]);
+  // Guard Crush: impact stagger
+  registerVariableFrames('GUARD_CRUSH', RYO_GUARD_CRUSH_FRAMES, [4, 10]);
+  // MAX Mode activation: power-up burst
+  registerVariableFrames('MAX_MODE', RYO_MAX_MODE_FRAMES, [3, 4, 8]);
+  // Taunt: deliberate slow motion
+  registerVariableFrames('TAUNT', RYO_TAUNT_FRAMES, [10, 14, 12, 16]);
+  // Counter Stance: ready position
+  registerVariableFrames('COUNTER_STANCE', RYO_COUNTER_STANCE_FRAMES, [4, 6, 10]);
 
   // SUPERS — Ryuko Ranbu (SDM/HSDM)
-  registerFrames('RYUKO_RANBU', RYO_RYUKO_RANBU_FRAMES, 5);
+  registerVariableFrames('RYUKO_RANBU', RYO_RYUKO_RANBU_FRAMES, [3, 3, 4, 5]);
 
   // WIN POSE — arms crossed victory
-  registerFrames('WIN', RYO_WIN_FRAMES, 12);
+  // WIN POSE — arms crossed victory (slow deliberate motion)
+  registerVariableFrames('WIN', RYO_WIN_FRAMES, [6, 30]);
 }
 
 // ===== State Resolution =====
