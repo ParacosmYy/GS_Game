@@ -584,6 +584,8 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
     // SDM Ten Ha Ou — enhanced energy burst + longer flash
     if (atkName === 'SDM_TEN_HA_OU') {
       deps.vfx.spawnDMTenHaOuVFX(hitX, hitY, attacker.charId);
+      deps.vfx.spawnGroundSlam(hitX, hitY);
+      deps.vfx.spawnSuperBurst(hitX, hitY, '#4488ff', '#88ccff', true);
       deps.screenFlash.triggerDarken(8);
       deps.screenFlash.trigger('#ffdd44', 0.45, 14);
       deps.screenShake.trigger(16, 16, getAttackDirectionBias(attacker, defender, attackType, counterHit));
