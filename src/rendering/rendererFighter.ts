@@ -185,6 +185,10 @@ export function drawFighters(
       || f.state === FighterState.ROLL || f.state === FighterState.BACK_ROLL) {
       drawAfterimageTrail(ctx, f, sx, leanOffsetX, globalTick, maxModeActive);
     }
+    // KOF2002: 无敌帧半透明 — 后dash/起身无敌期间角色闪烁
+    if (f.invincible || f.throwInvulnFrames > 0) {
+      ctx.globalAlpha = 0.6 + Math.sin(globalTick * 0.5) * 0.15;
+    }
 
     // GC Roll green aura
     if (f.isRolling() && f.isGCRoll) {
