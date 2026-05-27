@@ -594,6 +594,16 @@ export function drawFighters(
       ctx.fillRect(sx + leanOffsetX - hw - 8, sy - f.displayHeight - 8, (hw + 8) * 2, f.displayHeight + 16);
     }
 
+    // KOF2002: 待机战斗姿态光 — IDLE时对手近距离时身体微亮(紧张感)
+    if (f.state === FighterState.IDLE && f.health < f.maxHealth * 0.5) {
+      ctx.save();
+      ctx.globalCompositeOperation = 'screen';
+      ctx.globalAlpha = 0.05;
+      ctx.fillStyle = '#ff4444';
+      ctx.fillRect(sx + leanOffsetX - hw - 3, sy - f.displayHeight - 3, (hw + 3) * 2, f.displayHeight + 6);
+      ctx.restore();
+    }
+
     ctx.restore();
 
     drawAttackLimb(ctx, f, sx, sy);
