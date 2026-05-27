@@ -361,6 +361,14 @@ export function drawFighters(
       ctx.fillRect(sx + leanOffsetX - hw - 3, sy - f.displayHeight - 3, (hw + 3) * 2, f.displayHeight + 6);
       ctx.restore();
     }
+    // KOF2002: 攻击命中残影 — hitstop时攻击者后方微弱残影
+    if (f.hitFlashFrames > 0 && f.state !== FighterState.HITSTUN && f.state !== FighterState.KNOCKDOWN) {
+      ctx.save();
+      ctx.globalAlpha = 0.12;
+      ctx.fillStyle = 'rgba(255, 255, 200, 0.15)';
+      ctx.fillRect(sx + leanOffsetX - hw - 3 - f.facing * 12, sy - f.displayHeight - 3, (hw + 3) * 2, f.displayHeight + 6);
+      ctx.restore();
+    }
     // Hitstun body shake — KOF2002 tiered body wobble
     // Light hit: subtle jitter (1-2px), Heavy: strong wobble (3-4px), Special/DM: violent shake (5+px)
     // hitstunTimer carries tier info: light=11, heavy=19, special=22+, DM=0(knockdown)
