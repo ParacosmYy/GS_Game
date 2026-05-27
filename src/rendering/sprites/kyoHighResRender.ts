@@ -13,14 +13,15 @@
  * - Air attack type resolution (AIR_A vs AIR_C vs AIR_D from currentAttack)
  * - Cycle timing for animation frames
  *
- * Currently supports: IDLE, WALK (forward/backward)
- * Fallback states (attack, crouch, jump, etc.) will be added in subsequent iterations.
+ * Currently supports: IDLE, WALK (forward/backward), STAND_ATTACK (A/C)
+ * Fallback states (crouch, jump, kick, etc.) will be added in subsequent iterations.
  */
 
 import { FighterState, AttackType } from '../../core/types.js';
 import { drawPixelFrame, prerenderFrame, drawPrerenderedFrame, type PixelFrame, type PixelPalette } from './pixelFrameRenderer.js';
 import { KYO_IDLE_FRAMES } from './kyoIdleFrames.js';
 import { KYO_WALK_FORWARD_FRAMES, KYO_WALK_BACKWARD_FRAMES } from './kyoWalkFrames.js';
+import { KYO_STAND_A_FRAMES, KYO_STAND_C_FRAMES } from './kyoAttackFrames.js';
 
 // ===== Internal Frame Registry =====
 
@@ -124,6 +125,14 @@ function initAllFrames(): void {
 
   // WALK BACKWARD — 4-frame cautious step loop, 7 ticks per frame (slower than forward)
   registerFrames('WALK_BACKWARD', KYO_WALK_BACKWARD_FRAMES, 7);
+
+  // STAND_A (light punch) — 4 frames: windup-snap-hold-retract
+  // startup=6, active=3, recovery=5
+  registerVariableFrames('STAND_A', KYO_STAND_A_FRAMES, [6, 3, 2, 5]);
+
+  // STAND_C (heavy punch) — 5 frames: windup-snap-hold-retract1-retract2
+  // startup=7, active=3, recovery=20
+  registerVariableFrames('STAND_C', KYO_STAND_C_FRAMES, [7, 3, 2, 8, 12]);
 }
 
 // ===== State Resolution =====
@@ -147,6 +156,13 @@ function resolveFrameKey(
     case FighterState.WALK:
       // Forward vs backward determined by velocity direction relative to facing
       return (vx * _facing > 0) ? 'WALK_FORWARD' : 'WALK_BACKWARD';
+
+    case FighterState.STAND_ATTACK:
+      // Distinguish light (A) vs heavy (C) punch
+      if (currentAttack === AttackType.STAND_C) {
+        return 'STAND_C';
+      }
+      return 'STAND_A';
 
     default:
       return null;
