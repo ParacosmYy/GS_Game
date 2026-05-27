@@ -46,11 +46,13 @@ function ryoVFX(ctx: HitEffectContext): boolean {
     vfx.spawnImpactRing(hitX, hitY, 1.1);
     handled = true;
   }
-  // RYO_KOOUKEN_D (强虎煌拳D版) — knockdown version
+  // RYO_KOOUKEN_D (强虎煌拳D版) — knockdown version, stronger than C
   if (atkName === 'RYO_KOOUKEN_D') {
-    cinematic.addHitStop(2, ctx.defIdx);
-    screenShake.trigger(9, 9, attacker.facing * 5);
-    vfx.spawnProjectileExplosion(hitX, hitY, '#4488ff', '#88ccff');
+    cinematic.addHitStop(3, ctx.defIdx);
+    screenShake.trigger(10, 10, attacker.facing * 6);
+    vfx.spawnProjectileExplosion(hitX, hitY, '#2266dd', '#aaddff');
+    vfx.spawnImpactRing(hitX, hitY, 1.2);
+    screenFlash.trigger('#4488ff', 0.12, 4);
     handled = true;
   }
   // RYO_KOOU_C (虎煌拳C版) — strong projectile burst
