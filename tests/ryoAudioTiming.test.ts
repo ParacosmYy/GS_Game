@@ -135,6 +135,7 @@ function createMockVFX(): VFXSystem & Record<string, ReturnType<typeof vi.fn>> {
     // Ryo-specific VFX functions used in hitCallback
     spawnKooukenVFX: vi.fn(),
     spawnKoHouVFX: vi.fn(),
+    spawnKoHouCVFX: vi.fn(),
     spawnHienTrail: vi.fn(),
     spawnDMTenHaOuVFX: vi.fn(),
     spawnHaouFlash: vi.fn(),

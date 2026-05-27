@@ -20,15 +20,21 @@ function ryoVFX(ctx: HitEffectContext): boolean {
     vfx.spawnKooukenVFX(attacker.x, attacker.y, attacker.facing, attacker.charId);
     handled = true;
   }
-  // Ko Hou (虎咲) uppercut — flame column
-  if (atkName.startsWith('RYO_KO_HOU')) {
+  // Ko Hou (虎咲) uppercut — flame column (A version)
+  if (atkName === 'RYO_KO_HOU') {
     vfx.spawnKoHouVFX(attacker.x, attacker.y, attacker.charId);
-    if (atkName === 'RYO_KO_HOU_C') {
-      cinematic.addHitStop(3, ctx.defIdx);
-      screenShake.trigger(10, 10, attacker.facing * 6);
-      vfx.spawnImpactRing(hitX, hitY, 1.3);
-      screenFlash.trigger('#ffaa33', 0.12, 4);
-    }
+    cinematic.addHitStop(2, ctx.defIdx);
+    screenShake.trigger(7, 8, attacker.facing * 5);
+    vfx.spawnImpactRing(hitX, hitY, 1.0);
+    handled = true;
+  }
+  // Ko Hou C (虎咲C) — doubled intensity flame column
+  if (atkName === 'RYO_KO_HOU_C') {
+    vfx.spawnKoHouCVFX(attacker.x, attacker.y, attacker.charId);
+    cinematic.addHitStop(3, ctx.defIdx);
+    screenShake.trigger(10, 10, attacker.facing * 6);
+    vfx.spawnImpactRing(hitX, hitY, 1.3);
+    screenFlash.trigger('#ffaa33', 0.12, 4);
     handled = true;
   }
   // Hien (飛燕) flying kick — speed line trail
