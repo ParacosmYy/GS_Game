@@ -2,7 +2,7 @@
 
 ## 1. 当前分数
 
-当前总分：`131/2000`
+当前总分：`132/2000`
 
 完整历史见 [SCORE.history.md](../archive/SCORE.history.md)。
 
@@ -14,7 +14,7 @@
 | --- | ---: | ---: | --- |
 | 角色美术 | 200 | 14 | Ryo像素帧42/42状态覆盖+Kyo/Iori 64x80 win+48x48 HUD肖像(sizedPortraits),仍是程序化非SNK精灵图 |
 | 舞台美术 | 100 | 7 | 5场景视差+动态元素+CRT扫描线后处理+暗角+场景飘浮微粒+5舞台专属色彩分级+光柱+氛围雾气 |
-| 音频品质 | 150 | 12 | 合成SFX+BGM+Kyo 7种火焰SFX+Iori 8种暗紫SFX+Kyo/Iori专属attackSFX接入+连段递增音效+里程碑音效 |
+| 音频品质 | 150 | 13 | 合成SFX+BGM+Kyo 7种火焰SFX+Iori 8种暗紫SFX+Kyo/Iori专属attackSFX接入+连段递增音效+里程碑音效+菜单光标/确认SFX |
 | 角色内容 | 150 | 19 | Ryo全闭环+Kyo 14文件+Iori 14文件+三角色contentLoader集成 |
 | 战斗手感 | 150 | 24 | hitstop衰减+方向震屏+冲击环+斩击线+连段hitstop递减+Kyo火焰VFX+Iori暗紫VFX+气槽命中闪光+命中冲击分层光效+MAX模式金色反馈+HSDM专属档位+SDM震屏修正+绝境反击红闪 |
 | 帧数据精度 | 100 | 16 | Frame Contract: Ryo+Kyo 47+Iori 47 ActionContract, 三角色逐帧碰撞对齐, 后退步行7tpf对齐元数据, idle变量帧呼吸节奏 |
