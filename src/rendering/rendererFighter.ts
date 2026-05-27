@@ -461,6 +461,12 @@ export function drawFighters(
         ctx.globalAlpha = 0.7;
       }
     }
+    // KOF2002: 受击红色脉冲 — hitstunTimer越高身体越红
+    if (f.state === FighterState.HITSTUN && f.hitstunTimer > 5) {
+      const redIntensity = Math.min((f.hitstunTimer - 5) * 0.01, 0.1);
+      ctx.fillStyle = 'rgba(255, 50, 30, ' + redIntensity + ')';
+      ctx.fillRect(sx + leanOffsetX - hw, sy - f.displayHeight, hw * 2, f.displayHeight);
+    }
 
     // KOF2002: 防御恢复闪烁 — blockstun最后4帧身体闪烁
     if (f.state === FighterState.BLOCK && f.blockstunTimer > 0 && f.blockstunTimer <= 4) {
