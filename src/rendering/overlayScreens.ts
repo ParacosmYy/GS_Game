@@ -1304,6 +1304,12 @@ export function drawNextMatch(
   drawSNKText(ctx, `STAGE ${stageNumber}`, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 80, Math.round(36 * headerScale), '#ff8800');
   ctx.shadowBlur = 0;
 
+  // "NEXT CHALLENGER" subtitle
+  const ncAlpha = Math.min(1, Math.max(0, (timer - 8) / 15));
+  ctx.globalAlpha = ncAlpha * fadeIn;
+  drawSNKText(ctx, 'NEXT CHALLENGER', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 60, 13, 'rgba(255,180,100,0.8)');
+  ctx.globalAlpha = fadeIn;
+
   // Stage name subtitle
   const allStages: string[] = ['temple', 'china', 'factory', 'orochi', 'street'];
   const stageNames: Record<string, string> = {
@@ -1334,29 +1340,69 @@ export function drawNextMatch(
     ctx.fill();
   }
 
-  // Next opponent info
+  // Next opponent info with portrait preview
   if (nextChar) {
     const infoAlpha = Math.min(1, Math.max(0, (timer - 10) / 20));
     ctx.globalAlpha = infoAlpha;
 
-    // Opponent name
+    // Opponent portrait — KOF2002: next challenger portrait reveal
+    const nextPortrait = getPortraitForSize(nextChar.id, 'select' as PortraitSize) ?? nextChar.pixelPortrait;
+    const portraitAlpha = Math.min(1, Math.max(0, (timer - 15) / 15));
+    ctx.globalAlpha = portraitAlpha * infoAlpha;
+    if (nextPortrait) {
+      const pScale = nextPortrait.width >= 120 ? 2.2 : 3.5;
+      const pw = nextPortrait.width * pScale;
+      const ph = nextPortrait.height * pScale;
+      const ppx = CANVAS_WIDTH / 2 - pw / 2;
+      const ppy = CANVAS_HEIGHT / 2 - 115;
+      // Portrait backdrop
+      ctx.fillStyle = 'rgba(8, 8, 18, 0.85)';
+      roundRect(ctx, ppx - 6, ppy - 6, pw + 12, ph + 12, 6);
+      ctx.fill();
+      // Animated border glow
+      const borderPulse = 0.5 + Math.sin(timer * 0.08) * 0.3;
+      ctx.strokeStyle = nextChar.color;
+      ctx.lineWidth = 2;
+      ctx.globalAlpha = portraitAlpha * infoAlpha * borderPulse;
+      roundRect(ctx, ppx - 6, ppy - 6, pw + 12, ph + 12, 6);
+      ctx.stroke();
+      ctx.globalAlpha = portraitAlpha * infoAlpha;
+      drawPixelPortrait(ctx, nextPortrait, ppx, ppy, pScale, {
+        frameColor: nextChar.color,
+        backdropColor: 'rgba(8, 8, 18, 0.9)',
+        scanlines: true,
+      });
+    }
+    ctx.globalAlpha = infoAlpha;
+
+    // "VS" label
     ctx.shadowColor = nextChar.color;
     ctx.shadowBlur = 20;
-    drawSNKText(ctx, 'VS', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, 28, '#ffcc00');
+    drawSNKText(ctx, 'VS', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + (nextPortrait ? -15 : 0), 28, '#ffcc00');
     ctx.shadowBlur = 0;
 
+    // Opponent name
     const nameProgress = Math.min(1, Math.max(0, (timer - 20) / 15));
     ctx.globalAlpha = nameProgress * infoAlpha;
     ctx.shadowColor = nextChar.color;
     ctx.shadowBlur = 15;
-    drawSNKText(ctx, nextChar.nameCn, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 45, 36, nextChar.color);
+    const nameY = CANVAS_HEIGHT / 2 + (nextPortrait ? 25 : 45);
+    drawSNKText(ctx, nextChar.nameCn, CANVAS_WIDTH / 2, nameY, 36, nextChar.color);
     ctx.shadowBlur = 0;
+    // English subtitle
+    if (nextChar.name) {
+      ctx.globalAlpha = nameProgress * infoAlpha * 0.6;
+      ctx.fillStyle = '#aaa';
+      ctx.font = '10px "Courier New", monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText(nextChar.name, CANVAS_WIDTH / 2, nameY + 18);
+    }
 
     // Character color accent bar
     const accentW = 120;
     const accentH = 3;
     const accentX = CANVAS_WIDTH / 2 - accentW / 2;
-    const accentY = CANVAS_HEIGHT / 2 + 70;
+    const accentY = CANVAS_HEIGHT / 2 + (nextPortrait ? 50 : 70);
     const accentGrad = ctx.createLinearGradient(accentX, 0, accentX + accentW, 0);
     accentGrad.addColorStop(0, nextChar.color + '00');
     accentGrad.addColorStop(0.5, nextChar.color + 'cc');
