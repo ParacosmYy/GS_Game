@@ -1343,10 +1343,12 @@ export function drawFighters(
 
     ctx.restore();
 
-    drawAttackLimb(ctx, f, sx, sy);
+    // Attack limb overlay and startup glow only for non-high-res fighters
+    if (!highResDrawn) {
+      drawAttackLimb(ctx, f, sx, sy);
 
-    // KOF2002: 攻击发动闪光 — 出手前3帧拳头/脚尖位置白色小光点
-    if (f.state === FighterState.STAND_ATTACK || f.state === FighterState.CROUCH_ATTACK || f.state === FighterState.AIR_ATTACK) {
+      // KOF2002: 攻击发动闪光 — 出手前3帧拳头/脚尖位置白色小光点
+      if (f.state === FighterState.STAND_ATTACK || f.state === FighterState.CROUCH_ATTACK || f.state === FighterState.AIR_ATTACK) {
       if (f.stateAge < 3) {
         ctx.save();
         const glowAlpha = (3 - f.stateAge) / 3 * 0.6;
@@ -1373,9 +1375,10 @@ export function drawFighters(
         ctx.restore();
       }
     }
+    } // end if (!highResDrawn)
 
     // KOF2002: 空中攻击速度线 — AIR_ATTACK时身后速度线
-    if (f.state === FighterState.AIR_ATTACK && !f.isGrounded()) {
+    if (!highResDrawn && f.state === FighterState.AIR_ATTACK && !f.isGrounded()) {
       ctx.save();
       ctx.globalAlpha = 0.2;
       ctx.strokeStyle = '#ffffff';
