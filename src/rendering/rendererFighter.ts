@@ -1148,6 +1148,17 @@ export function resolveFighterColors(f: Fighter, globalTick: number): { bodyColo
         outlineColor = '#ffaa0060';
       }
       break;
+    case FighterState.BLOCKSTUN:
+      // KOF2002: 防御硬直体色 — 深蓝表示正在承受压力
+      bodyColor = '#556688';
+      outlineColor = '#6688cc70';
+      glowColor = '#3355ff18';
+      if (f.blockstunTimer > 12) {
+        // 重击防御色更深
+        bodyColor = '#445577';
+        outlineColor = '#5577bb80';
+      }
+      break;
     case FighterState.GUARD_CRUSH:
       bodyColor = globalTick % 6 < 3 ? '#ff4444' : '#ffffff';
       outlineColor = '#ff000080';
