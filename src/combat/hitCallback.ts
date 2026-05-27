@@ -543,9 +543,11 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       deps.screenShake.trigger(5, 6, attacker.facing * 2);
       deps.vfx.spawnHeavyDust(hitX, hitY + 30, 8);
     }
-    // RYO_ZANRETSU_KEN (斩裂拳) — 连打命中反馈
-    if (atkName === 'RYO_ZANRETSU_KEN' && combo > 0) {
+    // RYO_ZANRETSU_KEN (斩裂拳) — 连打命中递增反馈: each hit escalates
+    if (atkName === 'RYO_ZANRETSU_KEN') {
       deps.cinematic.addHitStop(1, defIdx);
+      const comboScale = 0.6 + Math.min(combo, 5) * 0.15;
+      deps.vfx.spawnImpactRing(hitX, hitY, comboScale);
     }
     // DM Ten Ha Ou (天地霸煌拳) — massive energy burst + screen flash
     if (atkName === 'DM_TEN_HA_OU') {
@@ -575,6 +577,7 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       // 霸王翔吼拳命中 — 额外冲击反馈
       deps.cinematic.addHitStop(2, defIdx);
       deps.vfx.spawnImpactRing(hitX, hitY, 1.0);
+      deps.screenShake.trigger(8, 10, attacker.facing * 4);
     }
 
     // === Kyo 角色专属必杀技VFX — 火焰主题 ===
@@ -601,6 +604,12 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       deps.cinematic.addHitStop(1, defIdx);
       deps.screenShake.trigger(7, 7, attacker.facing * 4);
       deps.vfx.spawnHeavyDust(hitX, hitY + 20, 6);
+    }
+    // 75-Shiki Kai (百式·鬼焼き) — rapid rekka chain hit: escalating fire burst
+    if (atkName === 'KYO_75KAI' || atkName === 'KYO_75KAI_2') {
+      deps.cinematic.addHitStop(1, defIdx);
+      deps.screenShake.trigger(5, 6, attacker.facing * 3);
+      deps.vfx.spawnProjectileExplosion(hitX, hitY, '#ff6622', '#ffaa44');
     }
     // DM Orochinagi (大蛇薙) — massive fire explosion
     if (atkName === 'DM_OROCHINAGI') {

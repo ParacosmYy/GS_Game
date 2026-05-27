@@ -469,6 +469,9 @@ function update(): void {
       } else if (sfxId === 'perfect') {
         playPerfect();
         announcer.perfect();
+        // Perfect KO golden screen flash
+        screenFlash.trigger('#ffdd00', 0.15, 8);
+        screenShake.trigger(6, 10);
         // Phase 52: PERFECT KO bonus meter award
         if (!cinematic.perfectMeterAwarded && gs.winner !== null) {
           cinematic.perfectMeterAwarded = true;
