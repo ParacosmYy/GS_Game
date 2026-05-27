@@ -57,6 +57,10 @@ export interface FeedbackParams {
   impactRingCount: number;
   /** 冲击环基础尺寸缩放 */
   impactRingScale: number;
+  /** 受击方身体晃动幅度 (hitstun body shake, px) */
+  hitstunBodyShake: number;
+  /** 受击方身体晃动衰减速度 (higher = faster decay) */
+  hitstunBodyShakeDecay: number;
 }
 
 /** 反馈 manifest */
@@ -90,6 +94,8 @@ export const FEEDBACK_TIERS: Record<FeedbackTier, FeedbackParams> = {
     blockPushbackScale: 0.8,
     impactRingCount: 1,
     impactRingScale: 0.6,
+    hitstunBodyShake: 1.5,
+    hitstunBodyShakeDecay: 0.3,
   },
   heavy: {
     tier: 'heavy',
@@ -112,6 +118,8 @@ export const FEEDBACK_TIERS: Record<FeedbackTier, FeedbackParams> = {
     blockPushbackScale: 1.2,
     impactRingCount: 1,
     impactRingScale: 1.0,
+    hitstunBodyShake: 3.0,
+    hitstunBodyShakeDecay: 0.2,
   },
   special: {
     tier: 'special',
@@ -134,6 +142,8 @@ export const FEEDBACK_TIERS: Record<FeedbackTier, FeedbackParams> = {
     blockPushbackScale: 1.5,
     impactRingCount: 2,
     impactRingScale: 1.2,
+    hitstunBodyShake: 4.5,
+    hitstunBodyShakeDecay: 0.15,
   },
   dm: {
     tier: 'dm',
@@ -156,6 +166,8 @@ export const FEEDBACK_TIERS: Record<FeedbackTier, FeedbackParams> = {
     blockPushbackScale: 2.0,
     impactRingCount: 3,
     impactRingScale: 1.6,
+    hitstunBodyShake: 5.0,
+    hitstunBodyShakeDecay: 0.12,
   },
   sdm: {
     tier: 'sdm',
@@ -178,6 +190,8 @@ export const FEEDBACK_TIERS: Record<FeedbackTier, FeedbackParams> = {
     blockPushbackScale: 2.5,
     impactRingCount: 4,
     impactRingScale: 2.0,
+    hitstunBodyShake: 6.5,
+    hitstunBodyShakeDecay: 0.1,
   },
 };
 

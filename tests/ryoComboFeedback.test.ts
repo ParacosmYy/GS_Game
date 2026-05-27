@@ -540,9 +540,8 @@ describe('Ryo combo scaling feedback', () => {
     expect(COMBO_MIN_SCALE).toBe(0.60);
   });
 
-  it('Hitstop per hit remains constant regardless of combo count', () => {
-    // hitstop is determined by attack type + counter hit, NOT combo count
-    // (combo >= 10 adds +1 frame, but the base remains the same)
+  it('Hitstop decays with combo count (KOF2002 combo decay)', () => {
+    // KOF2002: combo 1-4 = 100%, 5-8 = 70%, 9+ = 50%
     const ctx1 = createRyoDeps();
     const cb1 = createHitCallback(ctx1.deps);
     cb1(ctx1.deps.fighters[0], ctx1.deps.fighters[1], AttackType.STAND_A, false, false);
@@ -554,9 +553,9 @@ describe('Ryo combo scaling feedback', () => {
     cb2(ctx2.deps.fighters[0], ctx2.deps.fighters[1], AttackType.STAND_A, false, false);
     const hitstopCombo5 = ctx2.cinematic.hitStop;
 
-    // combo=0 -> base = HITSTOP_LIGHT, combo=5 -> base = HITSTOP_LIGHT (no bonus until combo>=10)
-    expect(hitstopCombo0).toBe(hitstopCombo5);
+    // combo=0 -> full HITSTOP_LIGHT, combo=5 -> 70% decay
     expect(hitstopCombo0).toBe(HITSTOP_LIGHT);
+    expect(hitstopCombo5).toBe(Math.round(HITSTOP_LIGHT * 0.7));
   });
 
   it('Shake per hit stays constant for the same attack type', () => {

@@ -576,16 +576,17 @@ describe('HitCallbackDeps — required fields', () => {
 // ===== 11. Combo feedback scaling =====
 
 describe('Combo feedback scaling', () => {
-  it('high combo (>=10) triggers additional hitstop bonus', () => {
+  it('high combo (>=10) applies hitstop decay to 50%', () => {
     const deps = createDeps();
     (deps.combatSystem.getComboCount as ReturnType<typeof vi.fn>).mockReturnValue(10);
     const onHit = createHitCallback(deps);
 
     onHit(deps.fighters[0], deps.fighters[1], AttackType.STAND_C, false, false);
 
-    // The hitstop should include comboStop bonus of 1
+    // KOF2002 combo decay: combo >= 9 → 50% hitstop
     const hitStopCall = (deps.cinematic.triggerHitStop as ReturnType<typeof vi.fn>).mock.calls[0];
-    expect(hitStopCall[0]).toBeGreaterThanOrEqual(getFeedback(AttackType.STAND_C).hitstop + 1);
+    const baseStop = getFeedback(AttackType.STAND_C).hitstop;
+    expect(hitStopCall[0]).toBe(Math.round(baseStop * 0.5));
   });
 
   it('low combo (<10) does not add combo hitstop bonus', () => {

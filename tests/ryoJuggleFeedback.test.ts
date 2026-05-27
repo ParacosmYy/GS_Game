@@ -374,48 +374,49 @@ describe('Juggle hitstop cap: combo >= 10 adds only +1 frame', () => {
     expect(cinematic.hitStop).toBe(4);
   });
 
-  it('combo = 5: hitstop is base value (no bonus yet)', () => {
+  it('combo = 5: hitstop decays to 70% (combo 4-7 tier)', () => {
     const { deps, cinematic, p1, p2 } = createJuggleDeps(5);
     const cb = createHitCallback(deps);
     cb(p1, p2, AttackType.STAND_A, false, false);
 
-    // comboStop = 5 >= 10 ? 1 : 0 = 0
-    expect(cinematic.hitStop).toBe(4);
+    // KOF2002 decay: combo 4-7 → 70%
+    expect(cinematic.hitStop).toBe(Math.round(4 * 0.7));
   });
 
-  it('combo = 9: hitstop is still base value', () => {
+  it('combo = 9: hitstop decays to 50% (combo >= 8 tier)', () => {
     const { deps, cinematic, p1, p2 } = createJuggleDeps(9);
     const cb = createHitCallback(deps);
     cb(p1, p2, AttackType.STAND_A, false, false);
 
-    expect(cinematic.hitStop).toBe(4);
+    // KOF2002 decay: combo >= 8 → 50%
+    expect(cinematic.hitStop).toBe(Math.round(4 * 0.5));
   });
 
-  it('combo = 10: hitstop is base + 1 (capped bonus)', () => {
+  it('combo = 10: hitstop stays at 50% decay', () => {
     const { deps, cinematic, p1, p2 } = createJuggleDeps(10);
     const cb = createHitCallback(deps);
     cb(p1, p2, AttackType.STAND_A, false, false);
 
-    // comboStop = 10 >= 10 ? 1 : 0 = 1
-    expect(cinematic.hitStop).toBe(4 + 1);
+    // KOF2002 decay: combo >= 8 → 50%
+    expect(cinematic.hitStop).toBe(Math.round(4 * 0.5));
   });
 
-  it('combo = 20: hitstop is still only base + 1 (does not scale further)', () => {
+  it('combo = 20: hitstop stays at 50% decay (floor)', () => {
     const { deps, cinematic, p1, p2 } = createJuggleDeps(20);
     const cb = createHitCallback(deps);
     cb(p1, p2, AttackType.STAND_A, false, false);
 
-    // comboStop = 20 >= 10 ? 1 : 0 = 1 (same cap)
-    expect(cinematic.hitStop).toBe(4 + 1);
+    // KOF2002 decay: combo >= 8 → 50% (no further decay)
+    expect(cinematic.hitStop).toBe(Math.round(4 * 0.5));
   });
 
-  it('combo = 10 with STAND_C: hitstop is HITSTOP_MEDIUM + 1', () => {
+  it('combo = 10 with STAND_C: hitstop decays to 50%', () => {
     const { deps, cinematic, p1, p2 } = createJuggleDeps(10);
     const cb = createHitCallback(deps);
     cb(p1, p2, AttackType.STAND_C, false, false);
 
-    // STAND_C base = 8 (HITSTOP_MEDIUM), comboStop = 1
-    expect(cinematic.hitStop).toBe(8 + 1);
+    // STAND_C base = 8 (HITSTOP_MEDIUM), KOF2002 decay: combo >= 8 → 50%
+    expect(cinematic.hitStop).toBe(Math.round(8 * 0.5));
   });
 });
 
