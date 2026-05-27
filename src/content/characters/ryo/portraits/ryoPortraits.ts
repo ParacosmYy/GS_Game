@@ -65,7 +65,7 @@ export const RYO_PORTRAIT_META: Record<PortraitSize, PortraitMeta> = {
     primaryColor: '#DD6600',
     accentColor: '#FFD700',
     style: '胜利画面大肖像,金色边框',
-    hasPixelData: false,
+    hasPixelData: true,
   },
 };
 
