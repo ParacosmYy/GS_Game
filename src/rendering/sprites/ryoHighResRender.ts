@@ -180,25 +180,32 @@ function initAllFrames(): void {
   // KNOCKDOWN: fly up slow, slam fast, ground settle
   registerVariableFrames('KNOCKDOWN', RYO_KNOCKDOWN_FRAMES, [4, 5, 6, 8, 10, 12]);
 
-  // JUMP — 6-frame jump arc
-  registerFrames('JUMP', RYO_JUMP_FRAMES, 5);
+  // JUMP — 6-frame jump arc with variable timing
+  // KOF2002: crouch_prep(4) → launch(3) → rising(5) → peak(6) → falling(5) → landing(4)
+  registerVariableFrames('JUMP', RYO_JUMP_FRAMES, [4, 3, 5, 6, 5, 4]);
 
-  // CROUCH — crouch idle (4f loop)
-  registerFrames('CROUCH', RYO_CROUCH_FRAMES, 9);
+  // CROUCH — crouch idle (4f breathing loop)
+  // KOF2002: slow breathing rhythm with hold on inhale
+  registerVariableFrames('CROUCH', RYO_CROUCH_FRAMES, [8, 10, 8, 10]);
 
-  // CROUCH ATTACK — crouch_a (3f low jab) and crouch_c (4f low uppercut)
-  registerFrames('CROUCH_A', RYO_CROUCH_A_FRAMES, 4);
-  registerFrames('CROUCH_C', RYO_CROUCH_C_FRAMES, 5);
-  // CROUCH KICKS — crouch_b (low kick), crouch_d (sweep)
-  // CROUCH_B: startup=5, active=5, recovery=5 = 15 total; 3 frames × 5 tpf = 15
-  registerFrames('CROUCH_B', RYO_CROUCH_B_FRAMES, 5);
-  // CROUCH_D: startup=5, active=6, recovery=31 = 42 total; 5 frames × 8 tpf = 40
-  registerFrames('CROUCH_D', RYO_CROUCH_D_FRAMES, 8);
+  // CROUCH ATTACK — variable timing per KOF2002 frame data
+  // crouch_A: fast low jab — quick startup, 2f active, moderate recovery
+  registerVariableFrames('CROUCH_A', RYO_CROUCH_A_FRAMES, [3, 2, 5]);
+  // crouch_C: heavy low uppercut — windup, active, two-stage recovery
+  registerVariableFrames('CROUCH_C', RYO_CROUCH_C_FRAMES, [5, 3, 5, 10]);
+  // CROUCH KICKS
+  // crouch_B: quick low kick — moderate startup, 2f active, moderate recovery
+  registerVariableFrames('CROUCH_B', RYO_CROUCH_B_FRAMES, [4, 2, 7]);
+  // crouch_D: sweep — windup, multi-frame active sweep arc, long recovery
+  registerVariableFrames('CROUCH_D', RYO_CROUCH_D_FRAMES, [6, 3, 3, 3, 12]);
 
-  // AIR ATTACK — air_a (3f air jab), air_c (4f air heavy), air_d (4f air kick)
-  registerFrames('AIR_A', RYO_AIR_A_FRAMES, 4);
-  registerFrames('AIR_C', RYO_AIR_C_FRAMES, 4);
-  registerFrames('AIR_D', RYO_AIR_D_FRAMES, 4);
+  // AIR ATTACK — variable timing for air attacks
+  // air_A: quick air jab — fast startup, brief active, moderate recovery
+  registerVariableFrames('AIR_A', RYO_AIR_A_FRAMES, [3, 3, 5]);
+  // air_C: heavy air punch — startup, two active frames, recovery
+  registerVariableFrames('AIR_C', RYO_AIR_C_FRAMES, [5, 3, 3, 5]);
+  // air_D: air kick — startup, two active frames, recovery
+  registerVariableFrames('AIR_D', RYO_AIR_D_FRAMES, [4, 3, 3, 5]);
 
   // SPECIALS — ticksPerFrame calibrated to frameData totals
   // KO_HOU: startup=5, active=5, recovery=25 = 35; 5 frames × 7 = 35
