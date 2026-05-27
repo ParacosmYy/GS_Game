@@ -248,6 +248,7 @@ function update(): void {
         rounds.currentRound = 1;
         rounds.fullReset();
         cinematic.reset();
+        camera.reset();
         p1DelayedHealth = p1.maxHealth;
         p2DelayedHealth = p2.maxHealth;
         p1.savePrevState();
@@ -535,6 +536,7 @@ function update(): void {
               p1DelayedHealth = p1.maxHealth;
               p2DelayedHealth = p2.maxHealth;
               cinematic.reset();
+              camera.reset();
             },
             () => {
               gs.setPhase(GamePhase.INTRO);
@@ -661,6 +663,7 @@ function update(): void {
         rounds.currentRound = 1;
         rounds.fullReset();
         cinematic.reset();
+        camera.reset();
         p1.health = p1.maxHealth;
         p2.health = p2.maxHealth;
         p1DelayedHealth = p1.maxHealth;
