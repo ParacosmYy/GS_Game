@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getSuperFlashZoom, updateSuperFlashZoom, GAME_OVER_DURATION } from '../src/rendering/overlayScreens.js';
+import { getSuperFlashZoom, updateSuperFlashZoom, GAME_OVER_DURATION, drawTrainingHUD } from '../src/rendering/overlayScreens.js';
 import type { RoundScoreBreakdown } from '../src/rendering/overlayScreens.js';
 
 describe('overlayScreens', () => {
@@ -59,5 +59,80 @@ describe('RoundScoreBreakdown type', () => {
       isPerfect: true,
     };
     expect(breakdown.baseScore + breakdown.hpBonus + breakdown.perfectBonus).toBe(breakdown.totalScore);
+  });
+});
+
+describe('drawTrainingHUD with MAX/burst info', () => {
+  function makeCtx() {
+    const calls: string[] = [];
+    const ctx = {
+      save: () => { calls.push('save'); },
+      restore: () => { calls.push('restore'); },
+      fillRect: () => {},
+      strokeRect: () => {},
+      fillText: () => {},
+      strokeText: () => {},
+      beginPath: () => {},
+      moveTo: () => {},
+      lineTo: () => {},
+      closePath: () => {},
+      stroke: () => {},
+      fill: () => {},
+      createLinearGradient: () => ({
+        addColorStop: () => {},
+      }),
+      arc: () => {},
+      rect: () => {},
+      quadraticCurveTo: () => {},
+      bezierCurveTo: () => {},
+      set font(_f: string) {},
+      get font() { return ''; },
+      set textAlign(_a: string) {},
+      get textAlign() { return 'left'; },
+      set textBaseline(_b: string) {},
+      get textBaseline() { return 'top'; },
+      set fillStyle(_s: string | CanvasGradient) {},
+      get fillStyle() { return '#000'; },
+      set strokeStyle(_s: string | CanvasGradient) {},
+      get strokeStyle() { return '#000'; },
+      set lineWidth(_w: number) {},
+      get lineWidth() { return 1; },
+      set globalAlpha(_a: number) {},
+      get globalAlpha() { return 1; },
+      set shadowColor(_c: string) {},
+      get shadowColor() { return ''; },
+      set shadowBlur(_b: number) {},
+      get shadowBlur() { return 0; },
+      set shadowOffsetX(_x: number) {},
+      get shadowOffsetX() { return 0; },
+      set shadowOffsetY(_y: number) {},
+      get shadowOffsetY() { return 0; },
+      roundRect: () => {},
+      measureText: () => ({ width: 40 }),
+    } as unknown as CanvasRenderingContext2D;
+    return { ctx, calls };
+  }
+
+  const training = {
+    enabled: true,
+    showMoveList: false,
+    showInputHistory: false,
+    showFrameData: false,
+    inputHistory: [],
+    lastFrameData: null,
+    dummyBehavior: 'stand' as const,
+    getDummyBehaviorLabel: () => 'STAND',
+  };
+
+  it('drawTrainingHUD renders without error', () => {
+    const { ctx } = makeCtx();
+    expect(() => drawTrainingHUD(ctx, training, 0, 0, 0)).not.toThrow();
+  });
+
+  it('drawTrainingHUD calls save/restore for each panel group', () => {
+    const { ctx, calls } = makeCtx();
+    drawTrainingHUD(ctx, training, 0, 0, 0);
+    expect(calls.filter(c => c === 'save').length).toBeGreaterThanOrEqual(2);
+    expect(calls.filter(c => c === 'restore').length).toBeGreaterThanOrEqual(2);
   });
 });

@@ -1958,6 +1958,9 @@ export function drawTrainingHUD(
   // ===== Right panel: Controls help =====
   drawControlsPanel(ctx);
 
+  // ===== MAX/Burst system explanation (below controls) =====
+  drawMaxBurstInfoPanel(ctx);
+
   // ===== Motion progress indicator (bottom-right) =====
   if (motionProgress) {
     drawMotionProgress(ctx, motionProgress, tick);
@@ -2408,4 +2411,62 @@ function drawControlsPanel(ctx: CanvasRenderingContext2D): void {
     ctx.fillStyle = '#888';
     ctx.fillText(lines[i].desc, panelX + 36, y);
   }
+}
+
+/** MAX/Burst system explanation panel — KOF2002 mechanic reference */
+function drawMaxBurstInfoPanel(ctx: CanvasRenderingContext2D): void {
+  const panelW = 155;
+  const panelX = CANVAS_WIDTH - panelW - 4;
+  const panelY = 178; // below controls panel (36 + 136 + 6)
+
+  const sections = [
+    { title: '— MAX MODE —', color: '#4488ff', lines: [
+      { cmd: 'O / 9', desc: 'Activate MAX' },
+      { cmd: 'Cost', desc: '3 power stocks' },
+      { cmd: 'Buff', desc: 'DM → SDM upgrade' },
+      { cmd: 'Timer', desc: '~10 sec duration' },
+    ]},
+    { title: '— BURST —', color: '#ff8844', lines: [
+      { cmd: 'Low HP', desc: 'DM available <25%' },
+      { cmd: 'MAX+DM', desc: 'SDM free upgrade' },
+      { cmd: 'MAX+Low', desc: 'HSDM unlock' },
+    ]},
+  ];
+
+  let totalLines = 0;
+  for (const s of sections) totalLines += s.lines.length;
+  const sectionHeaderH = 14;
+  const lineH = 12;
+  const panelH = 6 + sections.length * sectionHeaderH + totalLines * lineH + 4;
+
+  ctx.save();
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+  roundRect(ctx, panelX, panelY, panelW, panelH, 6);
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(68, 255, 68, 0.15)';
+  ctx.lineWidth = 1;
+  roundRect(ctx, panelX, panelY, panelW, panelH, 6);
+  ctx.stroke();
+
+  let y = panelY + 4;
+  for (const section of sections) {
+    ctx.font = 'bold 9px "Courier New", monospace';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    ctx.fillStyle = section.color;
+    ctx.fillText(section.title, panelX + panelW / 2, y);
+    y += sectionHeaderH;
+
+    ctx.font = '8px "Courier New", monospace';
+    ctx.textAlign = 'left';
+    for (const line of section.lines) {
+      ctx.fillStyle = '#ffcc00';
+      ctx.fillText(line.cmd, panelX + 6, y);
+      ctx.fillStyle = '#999';
+      ctx.fillText(line.desc, panelX + 50, y);
+      y += lineH;
+    }
+  }
+
+  ctx.restore();
 }
