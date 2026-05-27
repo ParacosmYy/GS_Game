@@ -2045,3 +2045,32 @@ export function spawnKyoOniyakiVFX(particles: Particle[], x: number, y: number, 
     type: 'flash',
   });
 }
+
+/** Iori Oniyaki (鬼焼き) — rising dark energy uppercut column */
+export function spawnIoriOniyakiVFX(particles: Particle[], x: number, y: number, facing: number, isHeavy: boolean): void {
+  const count = isHeavy ? 12 : 8;
+  for (let i = 0; i < count; i++) {
+    const spread = (Math.random() - 0.5) * 16;
+    particles.push({
+      x: x + spread,
+      y: y + i * 6,
+      vx: facing * (0.5 + Math.random()) + (Math.random() - 0.5),
+      vy: -(4 + Math.random() * 3),
+      life: 14 + Math.random() * 6,
+      maxLife: 20,
+      size: 4 + Math.random() * 4 + (isHeavy ? 2 : 0),
+      color: i < 3 ? '#ddccff' : i < 6 ? '#9944dd' : '#550088',
+      type: 'spark',
+      gravity: -0.4,
+      friction: 0.94,
+    });
+  }
+  particles.push({
+    x, y: y - 20,
+    vx: 0, vy: 0,
+    life: 6, maxLife: 6,
+    size: isHeavy ? 35 : 25,
+    color: '#8822cc',
+    type: 'flash',
+  });
+}

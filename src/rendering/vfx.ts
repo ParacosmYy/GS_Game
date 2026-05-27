@@ -52,6 +52,7 @@ import {
   spawnKyoOrochinagiVFX,
   spawnIoriYamibaraiVFX,
   spawnKyoOniyakiVFX,
+  spawnIoriOniyakiVFX,
   spawnRunSpeedLines,
   spawnScorchMark,
   spawnKOSuperBurst,
@@ -325,6 +326,11 @@ export class VFXSystem {
   /** Kyo: Oniyaki (鬼焼き) rising flame uppercut column */
   spawnKyoOniyakiVFX(worldX: number, worldY: number, facing: number, isHeavy: boolean): void {
     spawnKyoOniyakiVFX(this.particles, worldX, worldY, facing, isHeavy);
+  }
+
+  /** Iori: Oniyaki (鬼焼き) rising dark energy uppercut column */
+  spawnIoriOniyakiVFX(worldX: number, worldY: number, facing: number, isHeavy: boolean): void {
+    spawnIoriOniyakiVFX(this.particles, worldX, worldY, facing, isHeavy);
   }
 
   /** Ryo: Ko Hou (虎咲) uppercut flame column VFX */

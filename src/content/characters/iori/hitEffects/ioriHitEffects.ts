@@ -36,10 +36,12 @@ function ioriVFX(ctx: HitEffectContext): boolean {
   }
   // Oniyaki (鬼焼き) dark uppercut — purple burst
   if (atkName === 'IORI_ONIYAKI' || atkName === 'IORI_ONIYAKI_C') {
-    vfx.spawnSuperBurst(hitX, hitY, '#8800aa', '#cc44ff', atkName === 'IORI_ONIYAKI_C');
-    cinematic.addHitStop(atkName === 'IORI_ONIYAKI_C' ? 3 : 2, ctx.defIdx);
-    screenShake.trigger(atkName === 'IORI_ONIYAKI_C' ? 10 : 7, 8, attacker.facing * 5);
-    vfx.spawnImpactRing(hitX, hitY, atkName === 'IORI_ONIYAKI_C' ? 1.4 : 1.1);
+    const isHeavy = atkName === 'IORI_ONIYAKI_C';
+    vfx.spawnSuperBurst(hitX, hitY, '#8800aa', '#cc44ff', isHeavy);
+    vfx.spawnIoriOniyakiVFX(hitX, hitY, attacker.facing, isHeavy);
+    cinematic.addHitStop(isHeavy ? 3 : 2, ctx.defIdx);
+    screenShake.trigger(isHeavy ? 10 : 7, 8, attacker.facing * 5);
+    vfx.spawnImpactRing(hitX, hitY, isHeavy ? 1.4 : 1.1);
     handled = true;
   }
   // Yamibarai (闇払い) dark projectile
