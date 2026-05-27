@@ -121,8 +121,10 @@ export function drawFighters(
     let leanOffsetY = 0;
     let leanAngle = 0;
     if (f.state === FighterState.RUN) {
-      leanOffsetX = 8 * f.facing + blendOffsetX;
-      leanAngle = 0.12 * f.facing;
+      // KOF2002: 跑步起步加速 — 前3帧额外前倾
+      const startBoost = f.stateAge < 3 ? (3 - f.stateAge) * 1.5 : 0;
+      leanOffsetX = (8 + startBoost) * f.facing + blendOffsetX;
+      leanAngle = (0.12 + (f.stateAge < 3 ? 0.03 : 0)) * f.facing;
       // KOF2002: 跑步弹跳 — 更高频3px上下弹跳
       leanOffsetY = Math.abs(Math.sin(f.stateAge * 0.8)) * 3;
     } else if (f.state === FighterState.ROLL || f.state === FighterState.BACK_ROLL) {
@@ -489,6 +491,18 @@ export function drawFighters(
       ctx.fill();
       ctx.restore();
     }
+    // KOF2002: MAX模式边框脉冲 — MAX模式时角色周围脉冲金色边框
+    if (maxModeActive) {
+      ctx.save();
+      ctx.globalCompositeOperation = 'screen';
+      ctx.globalAlpha = 0.15 + Math.sin(globalTick * 0.15) * 0.1;
+      ctx.strokeStyle = '#44ff88';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.ellipse(sx, sy - f.displayHeight / 2, hw + 6, f.displayHeight / 2 + 6, 0, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.restore();
+    }
     // MAX glow
     if (maxModeActive) {
       ctx.save();
@@ -566,6 +580,24 @@ export function drawFighters(
       }
     }
 
+    // KOF2002: 空中攻击速度线 — AIR_ATTACK时身后速度线
+    if (f.state === FighterState.AIR_ATTACK && !f.isGrounded()) {
+      ctx.save();
+      ctx.globalAlpha = 0.2;
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 1;
+      for (let i = 0; i < 3; i++) {
+        const lineY = sy - f.displayHeight * (0.3 + i * 0.25);
+        const lineStart = sx - f.facing * 10;
+        const lineEnd = sx - f.facing * (25 + i * 8);
+        ctx.beginPath();
+        ctx.moveTo(lineStart, lineY);
+        ctx.lineTo(lineEnd, lineY);
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+
     // KOF2002: 倒地冲击线 — KNOCKDOWN前3帧地面扩散细线
     if (f.state === FighterState.KNOCKDOWN && f.stateAge < 3 && f.isGrounded()) {
       ctx.save();
@@ -593,6 +625,18 @@ export function drawFighters(
       ctx.beginPath();
       ctx.ellipse(sx, sy - f.displayHeight / 2, hw + 8, f.displayHeight / 2 + 5, 0, 0, Math.PI * 2);
       ctx.fill();
+      ctx.restore();
+    }
+
+    // KOF2002: 防御硬直冲击波 — BLOCKSTUN时正面冲击波纹
+    if (f.state === FighterState.BLOCKSTUN && f.blockstunTimer > 0 && f.stateAge < 2) {
+      ctx.save();
+      ctx.globalAlpha = 0.25;
+      ctx.strokeStyle = '#88aaff';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(sx + leanOffsetX, sy - f.displayHeight / 2, hw + 15 + f.stateAge * 10, 0, Math.PI * 2);
+      ctx.stroke();
       ctx.restore();
     }
 
