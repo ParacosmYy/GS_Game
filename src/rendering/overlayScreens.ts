@@ -1245,6 +1245,104 @@ export function drawGameOver(ctx: CanvasRenderingContext2D, timer: number): void
 
 export { GAME_OVER_DURATION };
 
+// ===== Round Score Breakdown Popup =====
+
+export interface RoundScoreBreakdown {
+  baseScore: number;
+  hpBonus: number;
+  perfectBonus: number;
+  totalScore: number;
+  isPerfect: boolean;
+}
+
+export function drawRoundScoreBreakdown(
+  ctx: CanvasRenderingContext2D,
+  timer: number,
+  breakdown: RoundScoreBreakdown,
+): void {
+  ctx.save();
+
+  const fadeIn = Math.min(1, timer / 20);
+  ctx.globalAlpha = fadeIn;
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'top';
+
+  const panelW = 200;
+  const panelH = breakdown.isPerfect ? 120 : 100;
+  const panelX = CANVAS_WIDTH - panelW - 12;
+  const panelY = 100;
+
+  // Background
+  ctx.fillStyle = 'rgba(5, 5, 15, 0.85)';
+  roundRect(ctx, panelX, panelY, panelW, panelH, 6);
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(255, 200, 60, 0.4)';
+  ctx.lineWidth = 1;
+  roundRect(ctx, panelX, panelY, panelW, panelH, 6);
+  ctx.stroke();
+
+  // Header
+  ctx.fillStyle = 'rgba(255, 200, 60, 0.12)';
+  ctx.fillRect(panelX + 1, panelY + 1, panelW - 2, 16);
+  ctx.font = 'bold 9px "Courier New", monospace';
+  ctx.fillStyle = '#ddb840';
+  ctx.fillText('ROUND BONUS', panelX + 8, panelY + 4);
+
+  // Staggered row reveal
+  const rows: Array<{ label: string; value: string; color: string; delay: number }> = [
+    { label: 'WIN', value: `+${breakdown.baseScore}`, color: '#aaccff', delay: 20 },
+    { label: 'HP BONUS', value: `+${breakdown.hpBonus}`, color: '#88ff88', delay: 30 },
+  ];
+  if (breakdown.isPerfect) {
+    rows.push({ label: 'PERFECT!', value: `+${breakdown.perfectBonus}`, color: '#ff44ff', delay: 40 });
+  }
+
+  let rowY = panelY + 22;
+  for (const row of rows) {
+    const rowAlpha = Math.min(1, Math.max(0, (timer - row.delay) / 12));
+    if (rowAlpha <= 0) { rowY += 18; continue; }
+    ctx.globalAlpha = fadeIn * rowAlpha;
+    ctx.font = '9px "Courier New", monospace';
+    ctx.fillStyle = '#888';
+    ctx.fillText(row.label, panelX + 10, rowY);
+    ctx.textAlign = 'right';
+    ctx.fillStyle = row.color;
+    ctx.fillText(row.value, panelX + panelW - 10, rowY);
+    ctx.textAlign = 'left';
+    rowY += 18;
+  }
+
+  // Separator
+  const sepAlpha = Math.min(1, Math.max(0, (timer - 50) / 10));
+  if (sepAlpha > 0) {
+    ctx.globalAlpha = fadeIn * sepAlpha;
+    ctx.strokeStyle = 'rgba(255, 200, 60, 0.3)';
+    ctx.beginPath();
+    ctx.moveTo(panelX + 8, rowY);
+    ctx.lineTo(panelX + panelW - 8, rowY);
+    ctx.stroke();
+    rowY += 6;
+
+    // Total — animated counter
+    const totalAlpha = Math.min(1, Math.max(0, (timer - 55) / 10));
+    ctx.globalAlpha = fadeIn * totalAlpha;
+    ctx.font = 'bold 14px "Courier New", monospace';
+    ctx.fillStyle = '#ffcc00';
+    ctx.fillText('TOTAL', panelX + 10, rowY);
+    ctx.textAlign = 'right';
+    // Animate the counter from 0 to total
+    const countProgress = Math.min(1, Math.max(0, (timer - 55) / 25));
+    const displayTotal = Math.round(breakdown.totalScore * countProgress);
+    ctx.shadowColor = '#ffcc00';
+    ctx.shadowBlur = 8;
+    ctx.fillText(displayTotal.toString(), panelX + panelW - 10, rowY);
+    ctx.shadowBlur = 0;
+  }
+
+  ctx.globalAlpha = 1;
+  ctx.restore();
+}
+
 // ===== Arcade Complete Screen =====
 
 export interface ArcadeStats {

@@ -1495,6 +1495,10 @@ function render(): void {
     if (gs.announceSequence.isRunning()) {
       drawAnnounceSequence(ctx, gs.announceSequence, canvas.width, canvas.height);
     }
+    // Round score breakdown popup
+    if (gs.lastRoundScoreBreakdown) {
+      renderer.drawRoundScoreBreakdown(gs.phaseTimer, gs.lastRoundScoreBreakdown);
+    }
   }
   if (rounds.fadeAlpha > 0) {
     if (rounds.transitionType === 'wipe' && rounds.isTransitioning()) {

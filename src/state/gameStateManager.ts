@@ -80,6 +80,9 @@ export class GameStateManager {
   arcadeNextMatchTimer = 0;
   arcadeComplete = false;
 
+  // Round score breakdown for display
+  lastRoundScoreBreakdown: { baseScore: number; hpBonus: number; perfectBonus: number; totalScore: number; isPerfect: boolean } | null = null;
+
   /** Record damage dealt by a player this match */
   recordDamage(playerIndex: number, damage: number): void {
     if (playerIndex === 0) this.matchStats.p1TotalDamage += damage;
@@ -165,5 +168,6 @@ export class GameStateManager {
     this.isTimeOver = false;
     this.firstHitTracked = false;
     this.firstAttacker = null;
+    this.lastRoundScoreBreakdown = null;
   }
 }
