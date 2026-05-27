@@ -327,3 +327,38 @@ describe('Cancel Route Queries', () => {
     expect(findCancelRoute('STAND_A', 'DM_TEN_HA_OU')).toBeNull();
   });
 });
+
+// ── New special moves cancel routes ─────────────────────────────
+describe('Ryo new specials cancel routes (KOOUKEN_D/HIO_HACKER/ZANRETSU_KEN)', () => {
+  const newSpecials = ['RYO_KOOUKEN_D', 'RYO_HIO_HACKER', 'RYO_ZANRETSU_KEN'];
+
+  for (const special of newSpecials) {
+    describe(`${special}`, () => {
+      it('is a cancel target from STAND_C (heavy normal)', () => {
+        const targets = getCancelTargets('STAND_C');
+        expect(targets).toContain(special);
+      });
+
+      it('is a cancel target from CLOSE_C (heavy close normal)', () => {
+        const targets = getCancelTargets('CLOSE_C');
+        expect(targets).toContain(special);
+      });
+
+      it('has super cancel route to DM_TEN_HA_OU', () => {
+        const route = findCancelRoute(special, 'DM_TEN_HA_OU');
+        expect(route, `No super cancel from ${special} to DM_TEN_HA_OU`).toBeDefined();
+        expect(route!.cancelType).toBe('super');
+      });
+
+      it('has super cancel route to DM_RYUKO_RANBU', () => {
+        const route = findCancelRoute(special, 'DM_RYUKO_RANBU');
+        expect(route, `No super cancel from ${special} to DM_RYUKO_RANBU`).toBeDefined();
+        expect(route!.cancelType).toBe('super');
+      });
+
+      it('is a cancel source (super cancel)', () => {
+        expect(isCancelSource(special)).toBe(true);
+      });
+    });
+  }
+});
