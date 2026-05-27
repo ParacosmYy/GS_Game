@@ -70,7 +70,7 @@ const IORI_SPECIAL_ANIMATIONS = [
   'iori_aoihana', 'iori_aoihana_2', 'iori_aoihana_3',
   'iori_aoihana_c', 'iori_aoihana_c_2', 'iori_aoihana_c_3',
   'iori_yumeyumi', 'iori_katanugi', 'iori_yukiwarui',
-  'dm_yatagarasu', 'sdm_yatagarasu', 'hsdm_yaotome',
+  'dm_yaotome', 'sdm_yaotome', 'hsdm_yaotome',
 ];
 
 const ALL_IORI_ANIMATIONS = [...IORI_BASIC_ANIMATIONS, ...IORI_NORMAL_ANIMATIONS, ...IORI_SPECIAL_ANIMATIONS];

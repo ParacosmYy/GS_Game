@@ -77,8 +77,8 @@ const KYO_SPECIAL_ANIMATIONS = [
 const ALL_KYO_ANIMATIONS = [...KYO_BASIC_ANIMATIONS, ...KYO_NORMAL_ANIMATIONS, ...KYO_SPECIAL_ANIMATIONS];
 
 const EXPECTED_KYO_MOVES: { name: string; type: string }[] = [
-  { name: '皇斧', type: 'command' },
-  { name: '88式', type: 'command' },
+  { name: '轟斧陽', type: 'command' },
+  { name: '八拾八式', type: 'command' },
   { name: '奈落', type: 'command' },
   { name: '闇払い', type: 'special' },
   { name: '鬼焼き', type: 'special' },
