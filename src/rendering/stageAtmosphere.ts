@@ -238,8 +238,52 @@ export function drawStageParticles(
     return;
   }
 
+  // Temple stage: falling sakura petals instead of generic dots
+  if (stageId === 'temple') {
+    for (let pi = 0; pi < 14; pi++) {
+      const px = ((pi * 67 + tick * 0.6 + Math.sin(tick * 0.01 + pi * 2) * 30) % (CANVAS_WIDTH + 40)) - 20;
+      const py = ((tick * 0.4 + pi * 80) % (STAGE_GROUND_Y + 40)) - 20;
+      const sway = Math.sin(tick * 0.025 + pi * 1.3) * 8;
+      const alpha = 0.12 + Math.sin(tick * 0.02 + pi) * 0.06;
+      ctx.globalAlpha = alpha;
+      ctx.fillStyle = '#ffb7c5';
+      ctx.save();
+      ctx.translate(px + sway, py);
+      ctx.rotate(Math.sin(tick * 0.03 + pi * 0.7) * 0.5);
+      // Petal shape: small ellipse
+      ctx.beginPath();
+      ctx.ellipse(0, 0, 3, 1.5, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+    ctx.restore();
+    return;
+  }
+
+  // Factory stage: falling sparks (orange dots that drop and fade)
+  if (stageId === 'china') {
+    for (let pi = 0; pi < 10; pi++) {
+      const px = ((pi * 93 + tick * 0.2) % (CANVAS_WIDTH + 20)) - 10;
+      const py = ((tick * 0.8 + pi * 55) % (STAGE_GROUND_Y + 30)) - 15;
+      const lifeT = ((tick * 0.8 + pi * 55) % 200) / 200;
+      const alpha = (1 - lifeT) * 0.15;
+      ctx.globalAlpha = alpha;
+      ctx.fillStyle = lifeT < 0.3 ? '#ffcc44' : '#ff8822';
+      ctx.beginPath();
+      ctx.arc(px, py, 1 + (1 - lifeT) * 1.5, 0, Math.PI * 2);
+      ctx.fill();
+      // Tiny glow
+      ctx.globalAlpha = alpha * 0.3;
+      ctx.beginPath();
+      ctx.arc(px, py, 4, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.restore();
+    return;
+  }
+
   // Standard floating particles with per-stage count and behavior
-  const count = stageId === 'temple' ? 10 : stageId === 'street' ? 6 : 8;
+  const count = stageId === 'street' ? 6 : 8;
   for (let pi = 0; pi < count; pi++) {
     const speed = stageId === 'street' ? 0.5 : 0.3;
     const px = ((tick * speed + pi * 120) % (CANVAS_WIDTH + 40)) - 20;
