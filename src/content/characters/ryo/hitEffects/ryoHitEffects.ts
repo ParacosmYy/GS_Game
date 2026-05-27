@@ -82,11 +82,25 @@ function ryoVFX(ctx: HitEffectContext): boolean {
     vfx.spawnHeavyDust(hitX, hitY + 30, 8);
     handled = true;
   }
-  // RYO_ZANRETSU_KEN (斩裂拳) — multi-hit scaling
+  // RYO_ZANRETSU_KEN (斩裂拳) — multi-hit progressive escalation
   if (atkName === 'RYO_ZANRETSU_KEN') {
-    cinematic.addHitStop(1, ctx.defIdx);
     const comboScale = 0.6 + Math.min(combo, 5) * 0.15;
     vfx.spawnImpactRing(hitX, hitY, comboScale);
+    if (combo < 2) {
+      // Early hits: quick sparks only
+      cinematic.addHitStop(1, ctx.defIdx);
+    } else if (combo < 4) {
+      // Mid chain: add blue energy burst
+      cinematic.addHitStop(1, ctx.defIdx);
+      screenShake.trigger(4 + combo, 5, attacker.facing * 2);
+      vfx.spawnProjectileExplosion(hitX, hitY, '#4488ff', '#88ccff');
+    } else {
+      // Late chain: flash + strong burst + shake escalation
+      cinematic.addHitStop(2, ctx.defIdx);
+      screenShake.trigger(6 + combo, 7, attacker.facing * 3);
+      vfx.spawnProjectileExplosion(hitX, hitY, '#2266dd', '#aaddff');
+      screenFlash.trigger('#4488ff', 0.08 + Math.min(combo, 6) * 0.02, 3);
+    }
     handled = true;
   }
   // DM Ten Ha Ou (天地霸煌拳)

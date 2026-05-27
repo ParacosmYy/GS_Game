@@ -95,14 +95,18 @@ function kyoVFX(ctx: HitEffectContext): boolean {
   // Dokugami followups — Tsumiyomi, Batsuyomi
   if (atkName === 'KYO_TSUMIYOMI') {
     cinematic.addHitStop(1, ctx.defIdx);
+    screenShake.trigger(5, 5, attacker.facing * 3);
     vfx.spawnProjectileExplosion(hitX, hitY, '#ff5500', '#ff9933');
+    vfx.spawnImpactRing(hitX, hitY, 0.8);
     vfx.spawnKyoDokugamiTrail(hitX, hitY, attacker.facing, 1);
     handled = true;
   }
   if (atkName === 'KYO_BATSUYOMI') {
-    cinematic.addHitStop(1, ctx.defIdx);
-    screenShake.trigger(7, 6, attacker.facing * 4);
+    cinematic.addHitStop(2, ctx.defIdx);
+    screenShake.trigger(9, 7, attacker.facing * 5);
     vfx.spawnSuperBurst(hitX, hitY, '#ff4400', '#ffaa22', false);
+    vfx.spawnImpactRing(hitX, hitY, 1.2);
+    screenFlash.trigger('#ff6600', 0.1, 4);
     vfx.spawnKyoDokugamiTrail(hitX, hitY, attacker.facing, 2);
     handled = true;
   }
