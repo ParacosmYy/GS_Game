@@ -159,6 +159,16 @@ export function drawFighters(
       // KOF2002: 步行节奏微弹 — 走路时轻微上下弹动
       leanOffsetY += Math.sin(f.stateAge * 0.4) * 2;
     }
+    // KOF2002: 步行脚底灰尘 — WALK步底时脚底微尘
+    if (f.state === FighterState.WALK_FORWARD && Math.sin(f.stateAge * 0.4) > 0.9) {
+      ctx.save();
+      ctx.globalAlpha = 0.1;
+      ctx.fillStyle = '#aaaaaa';
+      ctx.beginPath();
+      ctx.ellipse(sx, sy, 6, 2, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
     // KOF2002: 受击/防御后仰 — 被打时身体向后方微倾
     if (f.state === FighterState.HITSTUN) {
       leanOffsetX = -4 * f.facing + blendOffsetX;
