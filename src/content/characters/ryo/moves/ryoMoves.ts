@@ -178,7 +178,42 @@ export const RYO_MOVES: MoveDefinition[] = [
     ],
   },
 
-  // ── DM (超必杀技) ──
+  {
+    key: 'RYO_HIO_HACKER',
+    nameJa: '猛速突進拳',
+    nameEn: 'Hio Hacker (Dash Strike)',
+    category: 'special',
+    input: 'f + A (dash strike)',
+    versions: [
+      {
+        version: 'A',
+        attackTypeKey: 'RYO_HIO_HACKER',
+        differences: '突进技,快速前冲打击',
+        damageMultiplier: 1.0,
+        knockdown: false,
+        invincibleStartup: 0,
+        isProjectile: false,
+      },
+    ],
+  },
+  {
+    key: 'RYO_ZANRETSU_KEN',
+    nameJa: '暢連拳',
+    nameEn: 'Zanretsu Ken (Multi Punch)',
+    category: 'special',
+    input: 'qcb + P (rapid punch)',
+    versions: [
+      {
+        version: 'A',
+        attackTypeKey: 'RYO_ZANRETSU_KEN',
+        differences: '连打技,多段拳击(约6hit),单hit低伤害但总计高',
+        damageMultiplier: 1.0,
+        knockdown: false,
+        invincibleStartup: 0,
+        isProjectile: false,
+      },
+    ],
+  },  // ── DM (超必杀技) ──
 
   {
     key: 'DM_TEN_HA_OU',

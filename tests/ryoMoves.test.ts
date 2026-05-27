@@ -25,7 +25,7 @@ describe('Ryo Moves Definitions', () => {
 
   it('should have Ryo 4 core specials', () => {
     const specials = getMovesByCategory('special');
-    expect(specials.length).toBe(4);
+    expect(specials.length).toBe(6);
     const keys = specials.map(s => s.key);
     expect(keys).toContain('RYO_KOOU');
     expect(keys).toContain('RYO_KO_HOU');
@@ -86,7 +86,7 @@ describe('Ryo Moves Definitions', () => {
     const stats = getMoveStats();
     expect(stats.total).toBe(RYO_MOVES.length);
     expect(stats.versions).toBeGreaterThanOrEqual(stats.total);
-    expect(stats.byCategory['special']).toBe(4);
+    expect(stats.byCategory['special']).toBe(6);
     expect(stats.byCategory['dm']).toBe(2);
   });
 
