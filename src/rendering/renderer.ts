@@ -19,7 +19,7 @@ export interface DebugInputHistory {
 
 import { drawStage, generateStars, getStage } from './stage.js';
 import type { Star } from './stage.js';
-import { drawColorGrade, drawLightRays, drawStageVignette, drawStageFog, drawStageParticles } from './stageAtmosphere.js';
+import { drawColorGrade, drawLightRays, drawStageVignette, drawStageFog, drawStageParticles, drawSuperStageReaction } from './stageAtmosphere.js';
 import { drawFighters as drawFightersImpl } from './rendererFighter.js';
 import { drawHUD, drawPowerGauges, drawComboCounters, drawTeamOrder, type TeamDisplayInfo } from './hud.js';
 import { subscribeMeterFlash, tickMeterFlash } from './meterFlash.js';
@@ -254,6 +254,7 @@ export class Renderer {
     drawStageVignette(ctx, stageId);
     drawStageFog(ctx, stageId, tick);
     drawStageParticles(ctx, stageId, tick);
+    drawSuperStageReaction(ctx, stageId, tick);
 
     ctx.restore();
 

@@ -11,6 +11,8 @@ import type { CinematicState } from '../state/cinematicState.js';
 import type { VFXSystem, ScreenShake } from '../rendering/vfx.js';
 import type { ResolvedInput } from '../input/inputResolver.js';
 import { MOVE_NAME_MAP } from './hitCallback.js';
+import { triggerSuperStageFlash } from '../rendering/stageAtmosphere.js';
+import { getCharacterColors } from '../rendering/manifestRenderData.js';
 
 /** Format attack ID to display-friendly move name (Chinese from MOVE_NAME_MAP) */
 function formatMoveName(atk: string): string {
@@ -20,6 +22,11 @@ function formatMoveName(atk: string): string {
     .replace(/^(DM_|SDM_|HSDM_)/, '')
     .replace(/_/g, ' ')
     .replace(/\b\w/g, c => c.toUpperCase());
+}
+
+function fireSuperStageReaction(f: Fighter, type: 'DM' | 'SDM' | 'HSDM'): void {
+  const colors = getCharacterColors(f.charId);
+  triggerSuperStageFlash(f.x, f.y - f.displayHeight / 2, colors.outfit, type !== 'DM');
 }
 
 // DM -> SDM upgrade mapping (all 29 characters)
@@ -128,11 +135,13 @@ export class DMManager {
         // HSDM: longest flash, most dramatic
         drainMaxModeTimer(maxModes[i], FREE_CANCEL_TIMER_COST);
         cinematic.triggerSuperFlash(f.x, f.y - f.displayHeight / 2, i, 32, 'HSDM', formatMoveName(atk));
+        fireSuperStageReaction(f, 'HSDM');
       } else if (this.isSDMAttack(atk)) {
         const inDesperation = isDesperation(f.health, f.maxHealth);
         if (maxModes[i].active) {
           drainMaxModeTimer(maxModes[i], FREE_CANCEL_TIMER_COST);
           cinematic.triggerSuperFlash(f.x, f.y - f.displayHeight / 2, i, 28, 'SDM', formatMoveName(atk));
+          fireSuperStageReaction(f, 'SDM');
           continue;
         }
         if (!inDesperation || gauges[i].stocks < 2) {
@@ -141,6 +150,7 @@ export class DMManager {
         }
         spendStocks(gauges[i], 2);
         cinematic.triggerSuperFlash(f.x, f.y - f.displayHeight / 2, i, 28, 'SDM', formatMoveName(atk));
+        fireSuperStageReaction(f, 'SDM');
       } else if (maxModes[i].active) {
         const inDesperation = isDesperation(f.health, f.maxHealth);
         // MAX + desperation: upgrade DM to HSDM (hidden super)
@@ -148,11 +158,13 @@ export class DMManager {
           f.currentAttack = DM_TO_HSDM[atk]!;
           drainMaxModeTimer(maxModes[i], FREE_CANCEL_TIMER_COST);
           cinematic.triggerSuperFlash(f.x, f.y - f.displayHeight / 2, i, 32, 'HSDM', formatMoveName(atk));
+          fireSuperStageReaction(f, 'HSDM');
         } else if (DM_TO_SDM[atk]) {
           // MAX mode: upgrade DM to SDM and consume MAX timer, not stocks
           f.currentAttack = DM_TO_SDM[atk]!;
           drainMaxModeTimer(maxModes[i], FREE_CANCEL_TIMER_COST);
           cinematic.triggerSuperFlash(f.x, f.y - f.displayHeight / 2, i, 28, 'SDM', formatMoveName(atk));
+          fireSuperStageReaction(f, 'SDM');
         }
       } else {
         // Desperation mode: upgrade DM to SDM (costs 2 stocks instead of 1)
@@ -161,10 +173,12 @@ export class DMManager {
           f.currentAttack = DM_TO_SDM[atk]!;
           spendStocks(gauges[i], 2);
           cinematic.triggerSuperFlash(f.x, f.y - f.displayHeight / 2, i, 28, 'SDM', formatMoveName(atk));
+          fireSuperStageReaction(f, 'SDM');
         } else if (gauges[i].stocks >= DM_STOCK_COST) {
           // Non-MAX, non-desperation: consume 1 stock for DM
           this.useDM(i);
           cinematic.triggerSuperFlash(f.x, f.y - f.displayHeight / 2, i, 24, 'DM', formatMoveName(atk));
+          fireSuperStageReaction(f, 'DM');
         } else {
           f.endAttack(); // Not enough meter -> cancel
         }

@@ -375,3 +375,74 @@ export function drawStageParticles(
   }
   ctx.restore();
 }
+
+// ===== Super Move Stage Reaction — KOF2002 stage flash during supers =====
+let superStageTimer = 0;
+let superStageX = CANVAS_WIDTH / 2;
+let superStageY = CANVAS_HEIGHT / 2;
+let superStageColor = '#ffffff';
+
+export function triggerSuperStageFlash(x: number, y: number, color: string, isSDM: boolean): void {
+  superStageTimer = isSDM ? 30 : 20;
+  superStageX = x;
+  superStageY = y;
+  superStageColor = color;
+}
+
+export function drawSuperStageReaction(
+  ctx: CanvasRenderingContext2D,
+  stageId: StageId,
+  tick: number,
+): void {
+  if (superStageTimer <= 0) return;
+  superStageTimer--;
+
+  const progress = superStageTimer / 30;
+  const atm = STAGE_ATMOSPHERE[stageId];
+  const [r, g, b] = atm.vigTint;
+
+  // Desaturation flash — stage goes near-monochrome for a few frames
+  const desatAlpha = progress > 0.6 ? (progress - 0.6) / 0.4 * 0.3 : 0;
+  if (desatAlpha > 0) {
+    ctx.save();
+    ctx.globalCompositeOperation = 'saturation';
+    ctx.globalAlpha = desatAlpha;
+    ctx.fillStyle = '#808080';
+    ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+    ctx.restore();
+  }
+
+  // Expanding vignette — tighter during super
+  const vigScale = 0.18 + progress * 0.15;
+  const vigGrad = ctx.createRadialGradient(
+    CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, CANVAS_WIDTH * vigScale,
+    CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, CANVAS_WIDTH * 0.55,
+  );
+  vigGrad.addColorStop(0, 'rgba(0, 0, 0, 0)');
+  vigGrad.addColorStop(0.5, `rgba(${r}, ${g}, ${b}, ${progress * 0.15})`);
+  vigGrad.addColorStop(1, `rgba(0, 0, 0, ${progress * 0.25})`);
+  ctx.fillStyle = vigGrad;
+  ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+  // Energy shockwave ring expanding from super activation point
+  if (progress > 0.3) {
+    const ringProgress = 1 - progress;
+    const ringR = 20 + ringProgress * 300;
+    const ringAlpha = (progress - 0.3) * 0.5;
+    ctx.save();
+    ctx.strokeStyle = superStageColor;
+    ctx.lineWidth = 3 * progress;
+    ctx.globalAlpha = ringAlpha;
+    ctx.beginPath();
+    ctx.arc(superStageX, superStageY, ringR, 0, Math.PI * 2);
+    ctx.stroke();
+    // Inner colored ring
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 1.5 * progress;
+    ctx.globalAlpha = ringAlpha * 0.6;
+    ctx.beginPath();
+    ctx.arc(superStageX, superStageY, ringR * 0.6, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.restore();
+  }
+}
