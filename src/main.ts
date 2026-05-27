@@ -1361,6 +1361,21 @@ function render(): void {
   // Announcer overlay (counter hit, MAX activation, etc.)
   announcerOverlay.draw(ctx, canvas.width, canvas.height);
 
+  // KOF2002: Time critical screen edge glow — red vignette when ≤5 seconds
+  if (!gs.isTrainingMode && gs.phase === GamePhase.FIGHTING && tickRef.value >= 3300 && tickRef.value < 3600) {
+    const urgency = (tickRef.value - 3300) / 300; // 0→1 over last 5 seconds
+    const pulse = 0.15 + 0.12 * Math.sin(tickRef.value * 0.3);
+    const alpha = urgency * pulse;
+    const grad = ctx.createRadialGradient(
+      canvas.width / 2, canvas.height / 2, canvas.height * 0.3,
+      canvas.width / 2, canvas.height / 2, canvas.height * 0.8,
+    );
+    grad.addColorStop(0, 'rgba(255, 0, 0, 0)');
+    grad.addColorStop(1, `rgba(255, 0, 0, ${alpha})`);
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  }
+
   // Pause menu overlay (drawn last, on top of everything)
   if (gs.isPaused && (gs.phase === GamePhase.FIGHTING || gs.phase === GamePhase.KO)) {
     drawPauseMenu(ctx, canvas.width, canvas.height, gs.pauseMenuCursor, gs.pauseMenuTab, p1Char, p2Char);
