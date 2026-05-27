@@ -697,6 +697,32 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       deps.screenShake.trigger(14, 14, getAttackDirectionBias(attacker, defender, attackType, counterHit));
     }
 
+    // === Terry 角色专属必杀技VFX — 旋风主题 ===
+    // Burn Knuckle — energy fist burst
+    if (atkName === 'TERRY_BURN_KNUCKLE') {
+      deps.cinematic.addHitStop(1, defIdx);
+      deps.screenShake.trigger(7, 6, attacker.facing * 4);
+      deps.vfx.spawnProjectileExplosion(hitX, hitY, '#44aaff', '#88ddff');
+    }
+    // Power Wave — ground energy burst
+    if (atkName === 'TERRY_POWER_WAVE') {
+      deps.vfx.spawnGroundSlam(hitX, hitY);
+      deps.vfx.spawnProjectileExplosion(hitX, hitY, '#ffcc22', '#ffee66');
+      deps.screenShake.trigger(8, 8, attacker.facing * 4);
+    }
+    // Power Dunk — slam impact
+    if (atkName === 'TERRY_POWER_DUNK') {
+      deps.cinematic.addHitStop(2, defIdx);
+      deps.vfx.spawnGroundSlam(hitX, hitY);
+      deps.screenShake.trigger(10, 8, attacker.facing * 5);
+    }
+    // Rising Tackle — upward hit
+    if (atkName === 'TERRY_RISING_TACKLE') {
+      deps.cinematic.addHitStop(1, defIdx);
+      deps.screenShake.trigger(6, 6, attacker.facing * 3);
+      deps.vfx.spawnImpactRing(hitX, hitY, 1.0);
+    }
+
     // SFX
     if (isDM) {
       const isHSDM = (attackType as string).startsWith('HSDM_');
