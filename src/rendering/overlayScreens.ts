@@ -1399,13 +1399,14 @@ export function drawNextMatch(
   ctx.globalAlpha = fadeIn;
 
   // Stage name subtitle
-  const allStages: string[] = ['temple', 'china', 'factory', 'orochi', 'street'];
+  const allStages: string[] = ['temple', 'china', 'factory', 'orochi', 'street', 'rooftop'];
   const stageNames: Record<string, string> = {
     temple: '日本寺庙 · Japan',
     china: '唐人街 · China',
     factory: '工場 · Factory',
     orochi: '大蛇神社 · Orochi',
     street: '街市夜市 · Street',
+    rooftop: '日本屋上 · Rooftop',
   };
   const currentStageName = stageNames[allStages[(stageNumber - 1) % allStages.length]] ?? '';
   const stageAlpha = Math.min(1, Math.max(0, (timer - 5) / 15));

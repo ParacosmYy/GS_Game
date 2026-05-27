@@ -9,6 +9,7 @@ import { drawChinaStage } from './stageChina.js';
 import { drawFactoryStage } from './stageFactory.js';
 import { drawOrochiStage } from './stageOrochi.js';
 import { drawStreetStage } from './stageStreet.js';
+import { drawRooftopStage } from './stageRooftop.js';
 
 export interface Star {
   x: number;
@@ -30,9 +31,9 @@ export function generateStars(count: number): Star[] {
   return stars;
 }
 
-export type StageId = 'temple' | 'china' | 'factory' | 'orochi' | 'street';
+export type StageId = 'temple' | 'china' | 'factory' | 'orochi' | 'street' | 'rooftop';
 
-const ALL_STAGES: StageId[] = ['temple', 'china', 'factory', 'orochi', 'street'];
+const ALL_STAGES: StageId[] = ['temple', 'china', 'factory', 'orochi', 'street', 'rooftop'];
 let currentStage: StageId = 'temple';
 
 export function setStage(id: StageId): void {
@@ -74,6 +75,9 @@ export function drawStage(
       break;
     case 'street':
       drawStreetStage(ctx, cameraX, stars, globalTick);
+      break;
+    case 'rooftop':
+      drawRooftopStage(ctx, cameraX, stars, globalTick);
       break;
   }
   // KOF2002: 环境浮尘 — 地面附近缓慢漂浮的微粒

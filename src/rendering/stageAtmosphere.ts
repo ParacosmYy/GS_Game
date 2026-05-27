@@ -89,6 +89,17 @@ const STAGE_ATMOSPHERE: Record<StageId, StageAtmosphere> = {
     fogTint: [170, 150, 130],
     dustColors: ['#aa9070', '#887060'],
   },
+  rooftop: {
+    gradeColor: [80, 60, 140, 0.04],
+    rayColor: '180, 160, 220',
+    rayAngle: -0.25,
+    rayCount: 2,
+    rayAlpha: 0.04,
+    vigTint: [15, 10, 30],
+    particleColor: '#bbb8dd',
+    fogTint: [140, 130, 160],
+    dustColors: ['#9088aa', '#706888'],
+  },
 };
 
 export function getStageAtmosphere(stageId: StageId): StageAtmosphere {
@@ -314,6 +325,36 @@ export function drawStageParticles(
       ctx.moveTo(px, py);
       ctx.lineTo(px - 1, py + 6);
       ctx.stroke();
+    }
+    ctx.restore();
+    return;
+  }
+
+  // Rooftop stage: wind-blown dust motes + moonlit sparkles
+  if (stageId === 'rooftop') {
+    // Dust motes
+    for (let pi = 0; pi < 10; pi++) {
+      const px = ((pi * 83 + tick * 0.8) % (CANVAS_WIDTH + 20)) - 10;
+      const py = STAGE_GROUND_Y - 30 - ((tick * 0.15 + pi * 55) % 100);
+      const alpha = 0.06 + Math.sin(tick * 0.025 + pi * 0.7) * 0.03;
+      ctx.globalAlpha = alpha;
+      ctx.fillStyle = '#bbb8dd';
+      ctx.beginPath();
+      ctx.arc(px, py, 1 + Math.sin(tick * 0.03 + pi) * 0.5, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    // Moonlit sparkles on ground
+    for (let pi = 0; pi < 6; pi++) {
+      const sx = 200 + pi * 100 + Math.sin(tick * 0.01 + pi) * 20;
+      const sy = STAGE_GROUND_Y + 2;
+      const sparkle = Math.sin(tick * 0.05 + pi * 2.3);
+      if (sparkle > 0.7) {
+        ctx.globalAlpha = (sparkle - 0.7) * 0.8;
+        ctx.fillStyle = '#dde0f0';
+        ctx.beginPath();
+        ctx.arc(sx, sy, 1, 0, Math.PI * 2);
+        ctx.fill();
+      }
     }
     ctx.restore();
     return;

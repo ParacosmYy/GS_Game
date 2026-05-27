@@ -14,7 +14,7 @@
 
 import { getCtx } from './audioCtx.js';
 
-type StageId = 'temple' | 'china' | 'factory' | 'orochi' | 'street';
+type StageId = 'temple' | 'china' | 'factory' | 'orochi' | 'street' | 'rooftop';
 
 export class AmbientSoundPlayer {
   private ctx: AudioContext;
@@ -33,7 +33,7 @@ export class AmbientSoundPlayer {
   }
 
   private prerenderAll(): void {
-    const stages: StageId[] = ['temple', 'china', 'factory', 'orochi', 'street'];
+    const stages: StageId[] = ['temple', 'china', 'factory', 'orochi', 'street', 'rooftop'];
     for (const s of stages) {
       this.buffers.set(s, this.renderStage(s));
     }
@@ -52,6 +52,7 @@ export class AmbientSoundPlayer {
       case 'factory': this.renderFactory(data, rate); break;
       case 'orochi': this.renderOrochi(data, rate); break;
       case 'street': this.renderStreet(data, rate); break;
+      case 'rooftop': this.renderRooftop(data, rate); break;
     }
 
     // Crossfade loop endpoints (100ms smooth splice)
@@ -157,6 +158,28 @@ export class AmbientSoundPlayer {
     // Layer 3: occasional horn (t=2.0s, 5.3s)
     this.addTone(data, rate, 2.0, 0.015, 350, 0.15);
     this.addTone(data, rate, 5.3, 0.015, 400, 0.15);
+  }
+
+  private renderRooftop(data: Float32Array, rate: number): void {
+    const len = data.length;
+    // Layer 1: high-altitude wind (bandpass noise 200-1500Hz)
+    for (let i = 0; i < len; i++) {
+      data[i] = (Math.random() * 2 - 1) * 0.03;
+    }
+    let lp = 0;
+    for (let i = 0; i < len; i++) {
+      lp = lp * 0.994 + data[i] * 0.006;
+      data[i] = lp * 0.6 + (data[i] - lp) * 0.4;
+    }
+    // Layer 2: distant city hum (80Hz, very low)
+    for (let i = 0; i < len; i++) {
+      const t = i / rate;
+      data[i] += Math.sin(2 * Math.PI * 80 * t) * 0.006;
+    }
+    // Layer 3: wind gusts (noise bursts at t=0.8s, 2.5s, 4.5s)
+    this.addNoiseBurst(data, rate, 0.8, 0.025, 0.6);
+    this.addNoiseBurst(data, rate, 2.5, 0.02, 0.5);
+    this.addNoiseBurst(data, rate, 4.5, 0.025, 0.7);
   }
 
   // ─── Synthesis Helpers ───

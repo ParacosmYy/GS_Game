@@ -25,6 +25,7 @@ const STAGE_NAMES: Record<StageId, string> = {
   factory: '工場 · Factory',
   orochi: '大蛇神社 · Orochi',
   street: '街市夜市 · Street',
+  rooftop: '日本屋上 · Rooftop',
 };
 
 // ===== Character Select =====
@@ -1671,7 +1672,7 @@ export function drawAnnounceSequence(
 const STAGE_PREVIEW_W = 120;
 const STAGE_PREVIEW_H = 80;
 const STAGE_PREVIEW_GAP = 16;
-const ALL_STAGES: StageId[] = ['temple', 'china', 'factory', 'orochi', 'street'];
+const ALL_STAGES: StageId[] = ['temple', 'china', 'factory', 'orochi', 'street', 'rooftop'];
 
 const STAGE_THEMES: Record<string, { bg1: string; bg2: string; accent: string; pattern: string }> = {
   temple: { bg1: '#2a1a0a', bg2: '#1a0e05', accent: '#cc6633', pattern: '#cc6633' },
@@ -1679,6 +1680,7 @@ const STAGE_THEMES: Record<string, { bg1: string; bg2: string; accent: string; p
   factory: { bg1: '#1a2a1a', bg2: '#0a150a', accent: '#66aa66', pattern: '#88cc88' },
   orochi: { bg1: '#1a1a2a', bg2: '#0a0a15', accent: '#8866cc', pattern: '#aa88ff' },
   street: { bg1: '#2a2a1a', bg2: '#15150a', accent: '#ccaa33', pattern: '#ffdd66' },
+  rooftop: { bg1: '#1a1530', bg2: '#0a0a1e', accent: '#8877bb', pattern: '#bbaadd' },
 };
 
 export function drawStageSelect(
