@@ -34,6 +34,13 @@ import {
   IORI_KOTOTSUKI_FRAMES, IORI_KOTOTSUKI_D_FRAMES,
   IORI_KUZUKAZE_FRAMES,
 } from './ioriSpecialFrames.js';
+import {
+  IORI_RUN_FRAMES, IORI_BACKDASH_FRAMES,
+  IORI_ROLL_FRAMES, IORI_BACK_ROLL_FRAMES,
+  IORI_GUARD_CRUSH_FRAMES, IORI_MAX_MODE_FRAMES, IORI_TAUNT_FRAMES,
+} from './ioriMovementFrames.js';
+import { IORI_DIZZY_FRAMES } from './ioriDizzyFrames.js';
+import { IORI_THROW_FRAMES } from './ioriThrowFrames.js';
 
 const IORI_FRAMES = new Map<string, FrameEntry>();
 const FRAME_CACHE = new Map<string, HTMLCanvasElement>();
@@ -88,6 +95,19 @@ function initIoriFrames(): void {
   registerVariableFrames('KOTOTSUKI', IORI_KOTOTSUKI_FRAMES, [5, 6, 4, 6, 8]);
   registerVariableFrames('KOTOTSUKI_D', IORI_KOTOTSUKI_D_FRAMES, [5, 8, 4, 6, 8]);
   registerVariableFrames('KUZUKAZE', IORI_KUZUKAZE_FRAMES, [4, 5, 4, 8]);
+
+  // MOVEMENT STATES
+  registerVariableFrames('RUN', IORI_RUN_FRAMES, [3, 3, 2, 2, 3, 2]);
+  registerVariableFrames('BACKDASH', IORI_BACKDASH_FRAMES, [2, 2, 3, 4]);
+  registerVariableFrames('ROLL', IORI_ROLL_FRAMES, [3, 3, 4, 5]);
+  registerVariableFrames('BACK_ROLL', IORI_BACK_ROLL_FRAMES, [3, 3, 4, 5]);
+
+  // DIZZY + THROW + GUARD_CRUSH + MAX_MODE + TAUNT
+  registerVariableFrames('DIZZY', IORI_DIZZY_FRAMES, [8, 10, 8, 12, 8, 10, 8, 14]);
+  registerVariableFrames('THROW', IORI_THROW_FRAMES, [3, 4, 5, 6, 8, 10]);
+  registerVariableFrames('GUARD_CRUSH', IORI_GUARD_CRUSH_FRAMES, [4, 10]);
+  registerVariableFrames('MAX_MODE', IORI_MAX_MODE_FRAMES, [3, 4, 8]);
+  registerVariableFrames('TAUNT', IORI_TAUNT_FRAMES, [10, 14, 12, 16]);
 }
 
 function resolveIoriFrameKey(
@@ -145,6 +165,24 @@ function resolveIoriFrameKey(
       return 'KNOCKDOWN';
     case FighterState.BLOCK:
       return 'BLOCK';
+    case FighterState.RUN:
+      return 'RUN';
+    case FighterState.BACKDASH:
+      return 'BACKDASH';
+    case FighterState.ROLL:
+      return 'ROLL';
+    case FighterState.BACK_ROLL:
+      return 'BACK_ROLL';
+    case FighterState.THROW:
+      return 'THROW';
+    case FighterState.DIZZY:
+      return 'DIZZY';
+    case FighterState.GUARD_CRUSH:
+      return 'GUARD_CRUSH';
+    case FighterState.MAX_MODE:
+      return 'MAX_MODE';
+    case FighterState.TAUNT:
+      return 'TAUNT';
     default:
       return null;
   }
