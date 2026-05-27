@@ -49,6 +49,7 @@ import { ReplaySession } from './core/replaySession.js';
 import { createRoundStartSequence, createKOSequence, createTimeOverSequence, createWinnerSequence } from './state/announcePresets.js';
 import { TrainingModeState } from './state/trainingMode.js';
 import { drawPauseMenu } from './rendering/pauseMenu.js';
+import { drawCharacterKOOverlay } from './rendering/overlayScreens.js';
 
 const canvas = document.getElementById('gameCanvas') as HTMLCanvasElement;
 const ctx = canvas.getContext('2d')!;
@@ -1013,6 +1014,18 @@ function render(): void {
   }
   if (gs.phase === GamePhase.KO && gs.announceSequence.isRunning()) {
     drawAnnounceSequence(ctx, gs.announceSequence, canvas.width, canvas.height);
+  }
+  // Character KO overlay — show winning character name in their color
+  if (gs.phase === GamePhase.KO && gs.winner !== null) {
+    const winnerChar = gs.winner === 0 ? p1Char : p2Char;
+    drawCharacterKOOverlay(
+      ctx,
+      winnerChar.name,
+      winnerChar.nameCn,
+      winnerChar.color,
+      null,
+      gs.koTimer,
+    );
   }
   renderer.drawComboCounters([p1, p2], [combatSystem.getComboCount(0), combatSystem.getComboCount(1)], [0, 0], camera, [combatSystem.getComboDamage(0), combatSystem.getComboDamage(1)]);
   if (gs.teamMode && p1Team && p2Team) {

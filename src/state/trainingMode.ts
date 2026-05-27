@@ -418,6 +418,7 @@ export class TrainingModeState {
   showInputHistory = true;
   showFrameData = true;
   showHitboxes = false;
+  showMoveList = true;
 
   // Input history (last 20 entries)
   inputHistory: InputHistoryEntry[] = [];
@@ -628,6 +629,11 @@ export class TrainingModeState {
         this.showFrameData = !this.showFrameData;
         return true;
 
+      case 'F5':
+        this.fKeyDebounce[code] = true;
+        this.showMoveList = !this.showMoveList;
+        return true;
+
       default:
         return false;
     }
@@ -681,6 +687,7 @@ export class TrainingModeState {
     this.showInputHistory = true;
     this.showFrameData = true;
     this.showHitboxes = false;
+    this.showMoveList = true;
     this.inputHistory = [];
     this.lastFrameData = null;
     this.fKeyDebounce = {};

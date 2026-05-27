@@ -997,6 +997,127 @@ export function drawGameOver(ctx: CanvasRenderingContext2D, timer: number): void
 
 export { GAME_OVER_DURATION };
 
+// ===== Character KO Overlay =====
+
+/**
+ * KOF2002-style character name overlay during KO phase.
+ * Shows the winning character's name in their signature color with glow,
+ * and optionally the finishing move name below.
+ *
+ * Animation: fade in over 20 frames, hold, then fade out.
+ */
+export function drawCharacterKOOverlay(
+  ctx: CanvasRenderingContext2D,
+  charName: string,
+  charNameCn: string,
+  charColor: string,
+  moveName: string | null,
+  tick: number,
+): void {
+  ctx.save();
+
+  const FADE_IN_FRAMES = 20;
+  const HOLD_FRAMES = 100;
+  const FADE_OUT_FRAMES = 30;
+  const totalDuration = FADE_IN_FRAMES + HOLD_FRAMES + FADE_OUT_FRAMES;
+
+  // Calculate alpha based on phase
+  let alpha = 0;
+  if (tick < FADE_IN_FRAMES) {
+    // Fade in
+    alpha = tick / FADE_IN_FRAMES;
+  } else if (tick < FADE_IN_FRAMES + HOLD_FRAMES) {
+    // Hold with subtle pulse
+    alpha = 1.0;
+  } else if (tick < totalDuration) {
+    // Fade out
+    alpha = 1.0 - (tick - FADE_IN_FRAMES - HOLD_FRAMES) / FADE_OUT_FRAMES;
+  } else {
+    alpha = 0;
+  }
+
+  if (alpha <= 0) { ctx.restore(); return; }
+
+  ctx.globalAlpha = alpha;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+
+  const baseY = CANVAS_HEIGHT / 2 + 140;
+
+  // Subtle glow behind name
+  const glowGrad = ctx.createRadialGradient(
+    CANVAS_WIDTH / 2, baseY, 10,
+    CANVAS_WIDTH / 2, baseY, 120,
+  );
+  glowGrad.addColorStop(0, charColor + Math.round(0.3 * alpha * 255).toString(16).padStart(2, '0'));
+  glowGrad.addColorStop(0.5, charColor + Math.round(0.1 * alpha * 255).toString(16).padStart(2, '0'));
+  glowGrad.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = glowGrad;
+  ctx.fillRect(CANVAS_WIDTH / 2 - 140, baseY - 50, 280, 100);
+
+  // Character name — white text with colored glow, KOF2002 style
+  const namePulse = 1.0 + Math.sin(tick * 0.08) * 0.02;
+  const nameFontSize = Math.round(32 * namePulse);
+
+  // Shadow/glow layer
+  ctx.shadowColor = charColor;
+  ctx.shadowBlur = 20 * alpha;
+  ctx.font = `bold ${nameFontSize}px "Courier New", monospace`;
+
+  // Colored outline for depth
+  ctx.strokeStyle = charColor;
+  ctx.lineWidth = 2;
+  ctx.lineJoin = 'round';
+  ctx.strokeText(charNameCn, CANVAS_WIDTH / 2, baseY);
+
+  // White fill
+  ctx.fillStyle = '#ffffff';
+  ctx.fillText(charNameCn, CANVAS_WIDTH / 2, baseY);
+
+  ctx.shadowBlur = 0;
+
+  // Move name — smaller font below character name
+  if (moveName) {
+    const moveAlpha = Math.min(1, Math.max(0, (tick - FADE_IN_FRAMES) / 15));
+    ctx.globalAlpha = alpha * moveAlpha;
+
+    const moveFontSize = 18;
+    ctx.font = `bold ${moveFontSize}px "Courier New", monospace`;
+    ctx.shadowColor = charColor;
+    ctx.shadowBlur = 10 * moveAlpha;
+
+    // Move name in character color, slightly transparent
+    ctx.strokeStyle = charColor;
+    ctx.lineWidth = 1;
+    ctx.strokeText(moveName, CANVAS_WIDTH / 2, baseY + 35);
+
+    ctx.fillStyle = '#ffffffdd';
+    ctx.fillText(moveName, CANVAS_WIDTH / 2, baseY + 35);
+
+    ctx.shadowBlur = 0;
+  }
+
+  // Decorative side lines flanking the name
+  const lineLen = 50 + Math.sin(tick * 0.05) * 5;
+  const lineY = baseY;
+  const lineGap = ctx.measureText(charNameCn).width / 2 + 20;
+  ctx.strokeStyle = charColor + Math.round(0.5 * alpha * 255).toString(16).padStart(2, '0');
+  ctx.lineWidth = 1.5;
+  // Left line
+  ctx.beginPath();
+  ctx.moveTo(CANVAS_WIDTH / 2 - lineGap - lineLen, lineY);
+  ctx.lineTo(CANVAS_WIDTH / 2 - lineGap, lineY);
+  ctx.stroke();
+  // Right line
+  ctx.beginPath();
+  ctx.moveTo(CANVAS_WIDTH / 2 + lineGap, lineY);
+  ctx.lineTo(CANVAS_WIDTH / 2 + lineGap + lineLen, lineY);
+  ctx.stroke();
+
+  ctx.globalAlpha = 1;
+  ctx.restore();
+}
+
 // ===== Screen Transition Helpers =====
 
 /**
@@ -1120,11 +1241,13 @@ export function drawTrainingHUD(
   ctx.fillText(`${comboDamage}`, CANVAS_WIDTH - 45, 23);
 
   // ===== Left top panel: Move list =====
-  drawMoveListPanel(ctx, moveList);
+  if (training.showMoveList) {
+    drawMoveListPanel(ctx, moveList);
+  }
 
   // ===== Left bottom panel: Input history =====
   if (training.showInputHistory) {
-    drawInputHistoryPanelAdjusted(ctx, training.inputHistory, tick);
+    drawInputHistoryPanelAdjusted(ctx, training.inputHistory, tick, training.showMoveList, moveList);
   }
 
   // ===== Bottom panel: Frame data =====
@@ -1138,55 +1261,124 @@ export function drawTrainingHUD(
   ctx.restore();
 }
 
-/** Color for each move category (shared with hud.ts) */
-const MOVE_TYPE_COLORS: Record<string, string> = {
-  command: '#88ccff',   // blue — command normals
-  special: '#ffcc44',   // gold — specials
-  dm: '#ff8844',        // orange — desperation moves
-  sdm: '#ff4466',       // red — super DM
-  hsdm: '#ff2244',      // bright red — hidden SDM
-  system: '#88ff88',    // green — system (burst etc.)
-  normal: '#cccccc',    // white — normal attacks
-};
-
-/** Quick reference move list panel for current character */
+/** SNK-style categorized move list panel with section headers */
 function drawMoveListPanel(ctx: CanvasRenderingContext2D, moveList: MoveListEntry[]): void {
   const panelX = 4;
   const panelY = 36;
-  const panelW = 240;
-  const lineH = 12;
-  const visibleMoves = moveList.slice(0, 8);
-  const panelH = 18 + Math.max(visibleMoves.length, 6) * lineH;
+  const panelW = 270;
+  const lineH = 13;
+  const sectionH = 16;
 
-  // Background
-  ctx.fillStyle = 'rgba(0, 0, 0, 0.65)';
+  // Group moves by category in KOF order
+  const categoryOrder: { key: string; label: string }[] = [
+    { key: 'command', label: 'COMMAND NORMALS' },
+    { key: 'special', label: 'SPECIAL MOVES' },
+    { key: 'dm', label: 'DESPERATION MOVES' },
+    { key: 'sdm', label: 'MAX DM' },
+    { key: 'system', label: 'SYSTEM' },
+  ];
+
+  const groups = new Map<string, MoveListEntry[]>();
+  for (const cat of categoryOrder) {
+    groups.set(cat.key, []);
+  }
+  for (const move of moveList) {
+    const type = move.type ?? 'normal';
+    if (groups.has(type)) {
+      groups.get(type)!.push(move);
+    }
+  }
+
+  // Calculate panel height
+  let totalLines = 0;
+  let hasContent = false;
+  for (const cat of categoryOrder) {
+    const entries = groups.get(cat.key)!;
+    if (entries.length > 0) {
+      totalLines += sectionH + entries.length * lineH;
+      hasContent = true;
+    }
+  }
+  if (!hasContent) totalLines = 40;
+  const panelH = 20 + totalLines + 4;
+
+  // Background with SNK-style dark gradient
+  const bg = ctx.createLinearGradient(panelX, panelY, panelX, panelY + panelH);
+  bg.addColorStop(0, 'rgba(10, 10, 20, 0.85)');
+  bg.addColorStop(1, 'rgba(5, 5, 15, 0.75)');
+  ctx.fillStyle = bg;
   roundRect(ctx, panelX, panelY, panelW, panelH, 6);
   ctx.fill();
-  ctx.strokeStyle = 'rgba(100, 200, 100, 0.3)';
+
+  // Gold border — SNK style
+  ctx.strokeStyle = 'rgba(200, 160, 60, 0.5)';
   ctx.lineWidth = 1;
   roundRect(ctx, panelX, panelY, panelW, panelH, 6);
   ctx.stroke();
 
-  // Header
+  // Header bar
+  ctx.fillStyle = 'rgba(200, 160, 60, 0.15)';
+  ctx.fillRect(panelX + 1, panelY + 1, panelW - 2, 16);
   ctx.font = 'bold 10px "Courier New", monospace';
   ctx.textAlign = 'left';
   ctx.textBaseline = 'top';
-  ctx.fillStyle = '#88ff88';
-  ctx.fillText('MOVE LIST', panelX + 8, panelY + 3);
+  ctx.fillStyle = '#ddb840';
+  ctx.fillText('MOVE LIST', panelX + 8, panelY + 4);
+  ctx.fillStyle = '#886';
+  ctx.font = '8px "Courier New", monospace';
+  ctx.fillText('[F5]', panelX + panelW - 30, panelY + 5);
 
-  ctx.font = '9px "Courier New", monospace';
-  if (!visibleMoves.length) {
-    ctx.fillStyle = '#ccc';
-    ctx.fillText('暂无招式表数据', panelX + 12, panelY + 18);
-    ctx.fillText('请先补充角色 moveList', panelX + 12, panelY + 30);
+  if (!moveList.length) {
+    ctx.fillStyle = '#666';
+    ctx.font = '9px "Courier New", monospace';
+    ctx.fillText('暂无招式表数据', panelX + 12, panelY + 22);
     return;
   }
 
-  for (let i = 0; i < visibleMoves.length; i++) {
-    const y = panelY + 16 + i * lineH;
-    const move = visibleMoves[i];
-    ctx.fillStyle = MOVE_TYPE_COLORS[move.type ?? 'normal'] ?? '#cccccc';
-    ctx.fillText(`${move.name}: ${move.input}`, panelX + 12, y);
+  // Section header styling
+  const sectionStyle: Record<string, { color: string; bg: string }> = {
+    command: { color: '#88ccff', bg: 'rgba(80, 140, 220, 0.1)' },
+    special: { color: '#ffcc44', bg: 'rgba(220, 180, 40, 0.1)' },
+    dm: { color: '#ff8844', bg: 'rgba(220, 120, 40, 0.12)' },
+    sdm: { color: '#ff4466', bg: 'rgba(220, 50, 80, 0.12)' },
+    system: { color: '#88ff88', bg: 'rgba(80, 200, 80, 0.1)' },
+  };
+
+  let curY = panelY + 20;
+
+  for (const cat of categoryOrder) {
+    const entries = groups.get(cat.key)!;
+    if (entries.length === 0) continue;
+
+    const style = sectionStyle[cat.key] ?? { color: '#ccc', bg: 'rgba(128,128,128,0.1)' };
+
+    // Section header with colored left accent bar
+    ctx.fillStyle = style.bg;
+    ctx.fillRect(panelX + 2, curY, panelW - 4, sectionH - 2);
+    ctx.fillStyle = style.color;
+    ctx.fillRect(panelX + 2, curY, 3, sectionH - 2);
+
+    ctx.font = 'bold 9px "Courier New", monospace';
+    ctx.fillStyle = style.color;
+    ctx.fillText(cat.label, panelX + 10, curY + 2);
+    curY += sectionH;
+
+    // Move entries
+    ctx.font = '9px "Courier New", monospace';
+    for (const move of entries) {
+      // Move name
+      ctx.fillStyle = '#ddd';
+      const nameX = panelX + 10;
+      ctx.fillText(move.name, nameX, curY + 1);
+
+      // Input notation — right-aligned
+      ctx.textAlign = 'right';
+      ctx.fillStyle = style.color;
+      ctx.fillText(move.input, panelX + panelW - 8, curY + 1);
+      ctx.textAlign = 'left';
+      curY += lineH;
+    }
+    curY += 2;
   }
 }
 
@@ -1195,8 +1387,26 @@ function drawInputHistoryPanelAdjusted(
   ctx: CanvasRenderingContext2D,
   history: InputHistoryEntry[],
   tick: number,
+  showMoveList: boolean,
+  moveList: MoveListEntry[],
 ): void {
-  const moveListBottom = 36 + 18 + 8 * 12;
+  // Calculate move list panel height to position input history below it
+  let moveListBottom = 36;
+  if (showMoveList && moveList.length > 0) {
+    const lineH = 13;
+    const sectionH = 16;
+    let totalLines = 0;
+    const seen = new Set<string>();
+    for (const move of moveList) {
+      const t = move.type ?? 'normal';
+      if (!seen.has(t)) { seen.add(t); totalLines += sectionH; }
+      totalLines += lineH;
+    }
+    moveListBottom = 36 + 20 + totalLines + 6;
+  } else if (showMoveList) {
+    moveListBottom = 36 + 44;
+  }
+
   const panelX = 4;
   const panelY = moveListBottom + 4;
   const panelW = 220;
@@ -1357,7 +1567,7 @@ function drawFrameDataPanel(
 /** Controls help panel on the right side */
 function drawControlsPanel(ctx: CanvasRenderingContext2D): void {
   const panelW = 155;
-  const panelH = 100;
+  const panelH = 118;
   const panelX = CANVAS_WIDTH - panelW - 4;
   const panelY = 36;
 
@@ -1378,6 +1588,7 @@ function drawControlsPanel(ctx: CanvasRenderingContext2D): void {
     { key: 'F2', desc: 'Reset positions' },
     { key: 'F3', desc: 'Input display' },
     { key: 'F4', desc: 'Frame data' },
+    { key: 'F5', desc: 'Move list' },
     { key: 'ESC', desc: 'Back to select' },
   ];
 
