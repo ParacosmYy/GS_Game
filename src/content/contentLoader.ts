@@ -32,6 +32,17 @@ import {
   getKyoAttackFrames,
   getKyoFeedbackTiers,
 } from './characters/kyo/index.js';
+import {
+  getIoriFrameData,
+  IORI_ATTACK_KEYS,
+  IORI_MOVE_LIST,
+  IORI_AVAILABLE_ACTIONS,
+  IORI_ANIMATION_META,
+  getIoriAnimationNames,
+  getIoriHitboxOffsets,
+  getIoriAttackFrames,
+  getIoriFeedbackTiers,
+} from './characters/iori/index.js';
 
 /** Unified character content interface */
 export interface CharacterContent {
@@ -66,6 +77,8 @@ export function loadCharacterContent(charId: string): CharacterContent {
       return loadRyoContent();
     case 'kyo':
       return loadKyoContent();
+    case 'iori':
+      return loadIoriContent();
     default:
       throw new Error(`Unknown character: ${charId}`);
   }
@@ -73,12 +86,12 @@ export function loadCharacterContent(charId: string): CharacterContent {
 
 /** Check if a character has a content package */
 export function hasCharacterContent(charId: string): boolean {
-  return charId === 'ryo' || charId === 'kyo';
+  return charId === 'ryo' || charId === 'kyo' || charId === 'iori';
 }
 
 /** List all characters with content packages */
 export function getAvailableCharacterIds(): string[] {
-  return ['ryo', 'kyo'];
+  return ['ryo', 'kyo', 'iori'];
 }
 
 function loadRyoContent(): CharacterContent {
@@ -109,6 +122,22 @@ function loadKyoContent(): CharacterContent {
     hitboxes: getKyoHitboxOffsets(),
     attackFrames: getKyoAttackFrames(),
     feedback: getKyoFeedbackTiers(),
+    report: { total: 0, completed: 0, score: 0, subdomains: {} } as any,
+  };
+}
+
+function loadIoriContent(): CharacterContent {
+  return {
+    data: { id: 'iori', name: 'Iori Yagami', nameCn: '八神庵', color: '#8800CC' },
+    attacks: getIoriFrameData(),
+    attackKeys: IORI_ATTACK_KEYS,
+    commands: IORI_MOVE_LIST,
+    availableActions: IORI_AVAILABLE_ACTIONS,
+    animations: IORI_ANIMATION_META,
+    animSequenceNames: getIoriAnimationNames(),
+    hitboxes: getIoriHitboxOffsets(),
+    attackFrames: getIoriAttackFrames(),
+    feedback: getIoriFeedbackTiers(),
     report: { total: 0, completed: 0, score: 0, subdomains: {} } as any,
   };
 }
