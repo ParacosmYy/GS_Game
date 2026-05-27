@@ -387,6 +387,15 @@ export function drawFighters(
       ctx.translate(wobbleX, 0);
     }
 
+    // KOF2002: 跳跃顶端拉伸 — 到达跳跃最高点时身体微拉伸
+    const isAirborne = f.state === FighterState.JUMP || f.state === FighterState.HOP
+      || f.state === FighterState.RUN_JUMP || f.state === FighterState.HYPER_JUMP;
+    if (isAirborne && Math.abs(f.vy) < 1.5) {
+      const apexStretch = 1 - Math.abs(f.vy) / 1.5;
+      ctx.translate(0, -sy);
+      ctx.scale(1 - apexStretch * 0.05, 1 + apexStretch * 0.08);
+      ctx.translate(0, sy);
+    }
 
     // Knockdown ground squash — KOF2002: body compresses on landing
     if (f.state === FighterState.KNOCKDOWN && f.stateAge < 5) {
