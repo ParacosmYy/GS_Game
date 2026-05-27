@@ -486,6 +486,19 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       deps.screenShake.trigger(6, 6, attacker.facing * 3);
       deps.vfx.spawnImpactRing(hitX, hitY, 0.8);
     }
+    // RYO_TSURIZAO (釣瓶打) — overhead slam impact: downward dust + ring
+    if (atkName === 'RYO_TSURIZAO') {
+      deps.cinematic.addHitStop(2, defIdx);
+      deps.screenShake.trigger(8, 8, attacker.facing * 4);
+      deps.vfx.spawnGroundSlam(hitX, hitY);
+      deps.vfx.spawnImpactRing(hitX, hitY, 1.0);
+    }
+    // RYO_ORISHI (卸し) — low sweep impact: low dust + slash
+    if (atkName === 'RYO_ORISHI') {
+      deps.cinematic.addHitStop(1, defIdx);
+      deps.screenShake.trigger(5, 6, attacker.facing * 2);
+      deps.vfx.spawnHeavyDust(hitX, hitY + 30, 8);
+    }
     // RYO_ZANRETSU_KEN (斩裂拳) — 连打命中反馈
     if (atkName === 'RYO_ZANRETSU_KEN' && combo > 0) {
       deps.cinematic.addHitStop(1, defIdx);
@@ -542,6 +555,12 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
     }
     else if (atkName === 'RYO_ZANRETSU_KEN') {
       playZanretsuKen(); if (combo > 0) playHit(0.4, combo);
+    }
+    else if (atkName === 'RYO_TSURIZAO') {
+      playHeavyHit(); if (combo > 0) playHit(0.5, combo);
+    }
+    else if (atkName === 'RYO_ORISHI') {
+      playSpecialLight(); if (combo > 0) playHit(0.5, combo);
     }
     else if (isThrowAttack(attackType)) {
       playThrow();
