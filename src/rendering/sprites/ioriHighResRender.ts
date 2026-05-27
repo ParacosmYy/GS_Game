@@ -4,8 +4,8 @@
  * Integration layer: connects Iori's high-resolution pixel frame data
  * with the pixelFrameRenderer drawing API.
  *
- * Currently supports: IDLE, WALK (forward/backward), CROUCH, STAND_ATTACK (A/C), JUMP
- * Fallback states (damage, etc.) will be added as frames are created.
+ * Currently supports: IDLE, WALK (forward/backward), CROUCH, STAND_ATTACK (A/B/C/D),
+ *   JUMP (all jump types), HITSTUN, KNOCKDOWN, BLOCK
  */
 
 import { FighterState, AttackType } from '../../core/types.js';
@@ -15,6 +15,8 @@ import { IORI_WALK_FORWARD_FRAMES, IORI_WALK_BACKWARD_FRAMES } from './ioriWalkF
 import { IORI_CROUCH_FRAMES } from './ioriCrouchFrames.js';
 import { IORI_STAND_A_FRAMES, IORI_STAND_C_FRAMES } from './ioriAttackFrames.js';
 import { IORI_JUMP_FRAMES } from './ioriJumpFrames.js';
+import { IORI_HURT_FRAMES, IORI_KNOCKDOWN_FRAMES, IORI_BLOCK_FRAMES } from './ioriDamageFrames.js';
+import { IORI_STAND_B_FRAMES, IORI_STAND_D_FRAMES } from './ioriKickFrames.js';
 
 // ===== Internal Frame Registry =====
 
@@ -112,6 +114,15 @@ function initAllFrames(): void {
 
   // JUMP — 6-frame jump arc
   registerVariableFrames('JUMP', IORI_JUMP_FRAMES, [4, 3, 5, 6, 5, 4]);
+
+  // KICK ATTACKS — STAND_B (4 frames) + STAND_D (5 frames)
+  registerVariableFrames('STAND_B', IORI_STAND_B_FRAMES, [5, 3, 3, 9]);
+  registerVariableFrames('STAND_D', IORI_STAND_D_FRAMES, [8, 4, 4, 6, 10]);
+
+  // DAMAGE — HURT (4 frames) + KNOCKDOWN (6 frames) + BLOCK (4 frames)
+  registerVariableFrames('HURT', IORI_HURT_FRAMES, [3, 5, 6, 4]);
+  registerVariableFrames('KNOCKDOWN', IORI_KNOCKDOWN_FRAMES, [4, 5, 6, 8, 10, 12]);
+  registerVariableFrames('BLOCK', IORI_BLOCK_FRAMES, [3, 8, 5, 4]);
 }
 
 // ===== State Resolution =====
@@ -141,8 +152,20 @@ function resolveFrameKey(
       if (_currentAttack === AttackType.STAND_C || _currentAttack === AttackType.CLOSE_C) {
         return 'STAND_C';
       }
-      // Kick types fall back to STAND_A frames (no dedicated kick frames yet)
+      if (_currentAttack === AttackType.STAND_D || _currentAttack === AttackType.CLOSE_D) {
+        return 'STAND_D';
+      }
+      if (_currentAttack === AttackType.STAND_B || _currentAttack === AttackType.CLOSE_B) {
+        return 'STAND_B';
+      }
       return 'STAND_A';
+    case FighterState.HITSTUN:
+      return 'HURT';
+    case FighterState.KNOCKDOWN:
+    case FighterState.GETUP:
+      return 'KNOCKDOWN';
+    case FighterState.BLOCK:
+      return 'BLOCK';
     default:
       return null;
   }
