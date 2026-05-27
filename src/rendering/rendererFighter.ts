@@ -454,6 +454,13 @@ export function drawFighters(
       ctx.globalAlpha = maxModeActive ? 0.12 : 0.08;
       ctx.fillStyle = hitGlowColor;
       ctx.fillRect(sx + leanOffsetX - hw - 3, sy - f.displayHeight - 3, (hw + 3) * 2, f.displayHeight + 6);
+      // KOF2002: 命中闪光肢体亮点 — hitstop时拳脚末端发光点
+      const limbGlowX = sx + f.facing * (hw + 10);
+      const limbGlowY = sy - f.displayHeight * 0.5;
+      ctx.globalAlpha = 0.3;
+      ctx.beginPath();
+      ctx.arc(limbGlowX, limbGlowY, 4, 0, Math.PI * 2);
+      ctx.fill();
       ctx.restore();
     }
     // KOF2002: 攻击命中残影 — hitstop时攻击者后方微弱残影
