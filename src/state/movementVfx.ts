@@ -53,5 +53,12 @@ export function updateMovementVfx(fighters: Fighter[], vfx: VFXSystem, tick: num
     if (f.prevState === FighterState.RUN && f.state === FighterState.IDLE) {
       vfx.spawnHeavyDust(f.x, STAGE_GROUND_Y, 8);
     }
+    // KOF2002: 倒地冲击 — 空中受击转入KNOCKDOWN时产生地面冲击
+    const wasAirKD = (f.prevState === FighterState.HITSTUN || f.prevState === FighterState.AIR_ATTACK)
+      && f.state === FighterState.KNOCKDOWN && f.isGrounded();
+    if (wasAirKD) {
+      vfx.spawnImpactRing(f.x, STAGE_GROUND_Y, 1.5);
+      vfx.spawnHeavyDust(f.x, STAGE_GROUND_Y, 10);
+    }
   }
 }
