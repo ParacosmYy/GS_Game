@@ -21,6 +21,7 @@ import { drawVictoryPose } from './rendering/skeletalFighter.js';
 import { drawRyoWinPose } from './rendering/sprites/ryo/ryoHighResRender.js';
 import { drawKyoWinPose } from './rendering/sprites/kyo/kyoHighResRender.js';
 import { drawIoriWinPose } from './rendering/sprites/iori/ioriHighResRender.js';
+import { getMaxAuraColor } from './rendering/rendererFighter.js';
 import type { TeamDisplayInfo } from './rendering/hud.js';
 import { addArcadeScore, resetArcadeScore, addArcadePerfect, addArcadeMatchWin, getArcadeStats, addArcadeCumulativeStats } from './rendering/hud.js';
 import { ROSTER } from './characters/index.js';
@@ -904,7 +905,8 @@ function update(): void {
   dmMgr.checkMaxActivation(p1Input, 0);
   dmMgr.checkMaxActivation(p2Input, 1);
   if (maxModes[0].active && maxModes[0].timer === maxModes[0].maxDuration - 1) {
-    playMAXActivation(); screenFlash.trigger('#44ff88', 0.3, 8);
+    const p1El = getMaxAuraColor(p1.charId);
+    playMAXActivation(); screenFlash.trigger(p1El.css, 0.3, 8);
     vfx.spawnMAXActivationFlash(p1.x, p1.y - p1.displayHeight / 2); vfx.spawnHeavyDust(p1.x, p1.y, 8);
     vfx.spawnImpactRing(p1.x, p1.y - p1.displayHeight / 2, 1.3);
     try { announcer.maxActivation(); } catch { /* audio unavailable in test env */ }
@@ -912,7 +914,8 @@ function update(): void {
     p1.invincible = true; p1.throwInvulnFrames = 5;
   }
   if (maxModes[1].active && maxModes[1].timer === maxModes[1].maxDuration - 1) {
-    playMAXActivation(); screenFlash.trigger('#44ff88', 0.3, 8);
+    const p2El = getMaxAuraColor(p2.charId);
+    playMAXActivation(); screenFlash.trigger(p2El.css, 0.3, 8);
     vfx.spawnMAXActivationFlash(p2.x, p2.y - p2.displayHeight / 2); vfx.spawnHeavyDust(p2.x, p2.y, 8);
     vfx.spawnImpactRing(p2.x, p2.y - p2.displayHeight / 2, 1.3);
     try { announcer.maxActivation(); } catch { /* audio unavailable in test env */ }

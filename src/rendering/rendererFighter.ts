@@ -33,7 +33,7 @@ const MAX_AURA_COLORS: Record<string, MaxAuraColor> = {
   iori: { fill: 'rgba(170, 0, 255,',    stroke: 'rgba(150, 0, 255,',  css: '#aa00ff' },
 };
 
-function getMaxAuraColor(charId: string): MaxAuraColor {
+export function getMaxAuraColor(charId: string): MaxAuraColor {
   return MAX_AURA_COLORS[charId] || { fill: 'rgba(68, 255, 136,', stroke: 'rgba(68, 255, 136,', css: '#44ff88' };
 }
 
