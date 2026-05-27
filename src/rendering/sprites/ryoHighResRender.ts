@@ -150,11 +150,11 @@ function initAllFrames(): void {
   registerVariableFrames('WALK_FORWARD', RYO_WALK_FORWARD_FRAMES, [7, 5, 7, 7, 5, 7]);
   registerVariableFrames('WALK_BACKWARD', RYO_WALK_BACKWARD_FRAMES, [8, 6, 8, 8, 6, 8]);
 
-  // ATTACK — stand_a (light punch) and stand_c (heavy punch)
-  // STAND_A: startup=6, active=3, recovery=5 = 14 total; 4 frames × 4 tpf = 16
-  registerFrames('STAND_A', RYO_STAND_A_FRAMES, 4);
-  // STAND_C: startup=7, active=3, recovery=20 = 30 total; 5 frames × 6 tpf = 30
-  registerFrames('STAND_C', RYO_STAND_C_FRAMES, 6);
+  // ATTACK — variable frame durations matching combat startup/active/recovery phases
+  // STAND_A: startup=6, active=3, recovery=5 → 4 frames: [6, 3, 2, 5] (windup-snap-hold-retract)
+  registerVariableFrames('STAND_A', RYO_STAND_A_FRAMES, [6, 3, 2, 5]);
+  // STAND_C: startup=7, active=3, recovery=20 → 5 frames: [7, 3, 2, 8, 12] (windup-snap-hold-retract1-retract2)
+  registerVariableFrames('STAND_C', RYO_STAND_C_FRAMES, [7, 3, 2, 8, 12]);
 
   // CLOSE PUNCHES — close_a (elbow), close_c (uppercut)
   registerFrames('CLOSE_A', RYO_CLOSE_A_FRAMES, 4);
