@@ -16,6 +16,8 @@ import { FEEDBACK_MANIFEST, inferTier } from '../core/feedbackManifest.js';
 import { SPRITE_MANIFEST } from '../core/spriteManifestData.js';
 import { HURTBOX_TABLE } from '../core/hurtboxManifest.js';
 import { AttackType, FighterState } from '../core/types.js';
+import { getRegisteredEffectIds } from '../content/characterHitEffects.js';
+import { initCharacterHitEffects } from '../content/registerHitEffects.js';
 
 // ===== Required actions per character =====
 const REQUIRED_ACTIONS: Record<string, string[]> = {
@@ -208,11 +210,26 @@ function formatSection(name: string, r: SectionResult): string {
   return lines.join('\n');
 }
 
+function validateHitEffectsRegistration(charId: string): SectionResult {
+  const registered = getRegisteredEffectIds();
+  const result: SectionResult = { total: 1, pass: 0, issues: [] };
+  if (registered.includes(charId)) {
+    result.pass++;
+  } else {
+    result.issues.push(`${charId} has no CharacterHitEffects plugin registered`);
+  }
+  return result;
+}
+
+// Register hit effects so we can validate them
+initCharacterHitEffects();
+
 function validateCharacter(charId: string): CharacterReport {
   const sections: Array<{ name: string; result: SectionResult }> = [
     { name: 'frameData <-> attackFrames', result: validateFrameDataAlignment(charId) },
     { name: 'feedback tier mapping', result: validateFeedbackTiers(charId) },
     { name: 'sprite manifest', result: validateSpriteManifest(charId) },
+    { name: 'hit effects registration', result: validateHitEffectsRegistration(charId) },
   ];
 
   // Hurtbox coverage is global, only include once
