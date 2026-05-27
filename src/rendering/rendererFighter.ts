@@ -117,6 +117,7 @@ export function drawFighters(
 
     // Lean offset (includes blend transition offset)
     let leanOffsetX = blendOffsetX;
+    let leanOffsetY = 0;
     let leanAngle = 0;
     if (f.state === FighterState.RUN) {
       leanOffsetX = 8 * f.facing + blendOffsetX;
@@ -138,6 +139,8 @@ export function drawFighters(
         leanOffsetX = -2 * f.facing + blendOffsetX;
         leanAngle = -0.03 * f.facing;
       }
+      // KOF2002: 步行微弹 — 每6帧上下2px弹跳模拟步伐
+      leanOffsetY = Math.abs(Math.sin(f.stateAge * 0.5)) * 2;
     }
 
     // Afterimage trail
@@ -180,9 +183,9 @@ export function drawFighters(
     }
 
     ctx.save();
-    ctx.translate(sx + leanOffsetX, sy);
+    ctx.translate(sx + leanOffsetX, sy - leanOffsetY);
     ctx.rotate(leanAngle);
-    ctx.translate(-(sx + leanOffsetX), -sy);
+    ctx.translate(-(sx + leanOffsetX), -(sy - leanOffsetY));
 
     // KOF2002: Hit-stop defender jitter — 确定性正弦抖动产生稳定震动感
     if (hitStopDefender >= 0 && playerIdx === hitStopDefender) {
