@@ -543,6 +543,12 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       deps.screenShake.trigger(9, 9, attacker.facing * 5);
       deps.vfx.spawnProjectileExplosion(hitX, hitY, '#4488ff', '#88ccff');
     }
+    // RYO_KOOU_C (虎煌拳C版) — 强版 projectile burst + ring
+    if (atkName === 'RYO_KOOU_C') {
+      deps.vfx.spawnProjectileExplosion(hitX, hitY, '#4488ff', '#66aaff');
+      deps.vfx.spawnImpactRing(hitX, hitY, 0.7);
+      deps.cinematic.addHitStop(1, defIdx);
+    }
     // RYO_HIO_HACKER (氷果斬) — 突进打击强化反馈
     if (atkName === 'RYO_HIO_HACKER') {
       deps.cinematic.addHitStop(1, defIdx);
