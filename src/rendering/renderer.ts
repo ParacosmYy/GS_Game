@@ -183,6 +183,14 @@ export class Renderer {
         ctx.fillRect(-10, -10, CANVAS_WIDTH + 20, CANVAS_HEIGHT + 20);
         ctx.restore();
       }
+      // KOF2002: Perfect KO金色闪光 — 完美KO时金色全屏闪烁
+      if (perfectPlayer !== undefined && koTimer < 5) {
+        ctx.save();
+        ctx.globalAlpha = (5 - koTimer) / 5 * 0.2;
+        ctx.fillStyle = '#ffcc00';
+        ctx.fillRect(-10, -10, CANVAS_WIDTH + 20, CANVAS_HEIGHT + 20);
+        ctx.restore();
+      }
       // KOF2002: KO持续红色叠加 — KO后持续微红叠加(紧迫感)
       if (koTimer > 3 && koTimer < 30) {
         ctx.save();
