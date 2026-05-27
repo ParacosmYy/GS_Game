@@ -108,9 +108,10 @@ function kyoVFX(ctx: HitEffectContext): boolean {
   }
   // Red Kick
   if (atkName === 'KYO_RED_KICK') {
-    cinematic.addHitStop(1, ctx.defIdx);
-    screenShake.trigger(7, 7, attacker.facing * 4);
+    cinematic.addHitStop(2, ctx.defIdx);
+    screenShake.trigger(8, 7, attacker.facing * 4);
     vfx.spawnHeavyDust(hitX, hitY + 20, 6);
+    vfx.spawnKyoFireKickTrail(hitX, hitY, attacker.facing);
     vfx.spawnProjectileExplosion(hitX, hitY, '#ff4400', '#ff8822');
     handled = true;
   }

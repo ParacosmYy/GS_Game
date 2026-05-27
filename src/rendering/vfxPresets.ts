@@ -1501,6 +1501,67 @@ export function spawnHienLandingDust(particles: Particle[], x: number, y: number
 }
 
 /**
+ * Kyo Red Kick (R.E.D. Kick / 紅丸脚) fire trail — arc-shaped flame burst on impact.
+ * Kyo's signature kick leaves a fire arc from the kick point.
+ * 12 particles: flame core + arc trails + orange embers.
+ */
+export function spawnKyoFireKickTrail(particles: Particle[], x: number, y: number, facing: number): void {
+  const flameColors = ['#ff4400', '#ff6622', '#ff8833', '#ffaa44', '#ffdd66'];
+  // Fire arc — curved trail backward from kick point
+  for (let i = 0; i < 5; i++) {
+    const t = i / 4;
+    const arcX = x - facing * (10 + i * 14);
+    const arcY = y - 25 + Math.sin(t * Math.PI) * 30;
+    particles.push({
+      x: arcX + (Math.random() - 0.5) * 6,
+      y: arcY + (Math.random() - 0.5) * 6,
+      vx: -facing * (1.5 + Math.random() * 2),
+      vy: -1.5 - Math.random() * 2,
+      life: 12 + Math.floor(Math.random() * 6),
+      maxLife: 18,
+      size: 8 + Math.random() * 8,
+      color: flameColors[i],
+      type: 'spark',
+      gravity: 0.04,
+      friction: 0.96,
+    });
+  }
+  // Fire core burst at impact point
+  for (let i = 0; i < 4; i++) {
+    const angle = (i / 4) * Math.PI * 2 + Math.random() * 0.3;
+    particles.push({
+      x: x + Math.cos(angle) * 6,
+      y: y + Math.sin(angle) * 4,
+      vx: Math.cos(angle) * 3 + facing * 1.5,
+      vy: Math.sin(angle) * 3 - 2,
+      life: 8 + Math.floor(Math.random() * 5),
+      maxLife: 13,
+      size: 5 + Math.random() * 4,
+      color: flameColors[i % flameColors.length],
+      type: 'spark',
+      gravity: 0.06,
+      friction: 0.94,
+    });
+  }
+  // Rising orange embers
+  for (let i = 0; i < 3; i++) {
+    particles.push({
+      x: x + (Math.random() - 0.5) * 20,
+      y: y + (Math.random() - 0.5) * 10,
+      vx: (Math.random() - 0.5) * 2,
+      vy: -2.5 - Math.random() * 2,
+      life: 16 + Math.floor(Math.random() * 8),
+      maxLife: 24,
+      size: 2 + Math.random() * 2,
+      color: '#ffcc44',
+      type: 'spark',
+      gravity: -0.03,
+      friction: 0.98,
+    });
+  }
+}
+
+/**
  * DM Ten Ha Ou (天地霸煌拳) energy burst — massive energy explosion.
  * Expanding ring + flash + screen shake trigger. Golden yellow with white core.
  * 30+ particles in expanding circle pattern. Screen flash for 10 frames.

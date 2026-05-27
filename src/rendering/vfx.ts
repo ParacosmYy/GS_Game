@@ -57,6 +57,7 @@ import {
   spawnKyoDokugamiTrail,
   spawnIoriYatagarasuVFX,
   spawnVictoryAuraSpark,
+  spawnKyoFireKickTrail,
   spawnRunSpeedLines,
   spawnScorchMark,
   spawnKOSuperBurst,
@@ -355,6 +356,11 @@ export class VFXSystem {
   /** Victory aura sparkle — element-coded rising energy around winner */
   spawnVictoryAuraSpark(worldX: number, worldY: number, charColor: string): void {
     spawnVictoryAuraSpark(this.particles, worldX, worldY, charColor);
+  }
+
+  /** Kyo: Red Kick (紅丸脚) fire arc trail on impact */
+  spawnKyoFireKickTrail(worldX: number, worldY: number, facing: number): void {
+    spawnKyoFireKickTrail(this.particles, worldX, worldY, facing);
   }
 
   /** Ryo: Ko Hou (虎咲) uppercut flame column VFX */
