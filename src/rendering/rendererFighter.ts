@@ -295,6 +295,12 @@ export function drawFighters(
       const squashX = 1 - (1 - squashProgress) * 0.1;
       ctx.scale(squashX, squashY);
     }
+    // KOF2002: 起身恢复闪光 — GETUP最后3帧微闪白光
+    if (f.state === FighterState.GETUP && f.getupTimer > 0 && f.getupTimer <= 3) {
+      const flashAlpha = f.getupTimer / 3 * 0.15;
+      ctx.fillStyle = 'rgba(255, 255, 255, ' + flashAlpha + ')';
+      ctx.fillRect(-30, -f.displayHeight - 5, 60, f.displayHeight + 10);
+    }
     // Dizzy state wobble — KOF2002 unsteady sway when stunned
     if (f.state === FighterState.DIZZY) {
       const swayX = Math.sin(f.stateAge * 0.15) * 3;
@@ -323,6 +329,10 @@ export function drawFighters(
       const recoveryT = f.landingRecovery / 10; // normalize (max ~10 frames)
       const crouchOffset = 12 * Math.min(1, recoveryT);
       ctx.translate(0, crouchOffset);
+    }
+    // KOF2002: 蹲下状态额外Y偏移 — 确保蹲姿视觉更低
+    if (f.state === FighterState.CROUCH) {
+      ctx.translate(0, 8);
     }
 
     // KOF2002: 受击恢复闪烁 — hitstun最后5帧身体闪烁
@@ -463,6 +473,13 @@ export function drawFighters(
         ctx.fillRect(px - 2, py - 2, 4, 4);
       }
       ctx.restore();
+    }
+    // KOF2002: 低血量红色警告 — HP<25%时身体微红
+    if (f.health > 0 && f.health < f.maxHealth * 0.25) {
+      const hpRatio = f.health / (f.maxHealth * 0.25);
+      const redAlpha = (1 - hpRatio) * 0.12;
+      ctx.fillStyle = 'rgba(200, 30, 30, ' + redAlpha + ')';
+      ctx.fillRect(sx + leanOffsetX - hw - 5, sy - f.displayHeight - 5, (hw + 5) * 2, f.displayHeight + 10);
     }
 
     ctx.restore();
