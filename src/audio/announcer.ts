@@ -120,6 +120,13 @@ const DOUBLE_KO_SYLLABLES: Syllable[] = [
   { vowels: VOWEL_OH, freq: 120, duration: 450, gap: 0,   pitchEnd: 80 },
 ];
 
+// "Draw Game" — flat-to-falling tone
+const DRAW_GAME_SYLLABLES: Syllable[] = [
+  { vowels: VOWEL_AH, freq: 280, duration: 150, gap: 80, pitchEnd: 240 },
+  { vowels: VOWEL_ER, freq: 220, duration: 200, gap: 60, pitchEnd: 160 },
+  { vowels: VOWEL_AH, freq: 160, duration: 300, gap: 0,  pitchEnd: 120 },
+];
+
 // "Super Cancel" -- bright ascending flourish
 const SUPER_CANCEL_SYLLABLES: Syllable[] = [
   { vowels: VOWEL_IH, freq: 350, duration: 70, gap: 55, pitchEnd: 400 },
@@ -583,6 +590,11 @@ export class Announcer {
     this.playPhrase(DOUBLE_KO_SYLLABLES, 0.20);
   }
 
+  drawGame(): void {
+    if (this.playSample('drawGame', 0.5)) return;
+    this.playPhrase(DRAW_GAME_SYLLABLES, 0.20);
+  }
+
   newChallenger(): void {
     if (this.playSample('newChallenger', 0.5)) return;
     this.playPhrase(NEW_CHALLENGER_SYLLABLES, 0.17);
@@ -613,7 +625,10 @@ export type AnnouncerEventType =
   | 'time_up'
   | 'you_win'
   | 'counter_hit'
-  | 'max_activation';
+  | 'max_activation'
+  | 'double_ko'
+  | 'draw_game'
+  | 'first_attack';
 
 /** Event-to-text mapping with display parameters */
 export interface AnnouncerEventConfig {
@@ -635,6 +650,9 @@ export const ANNOUNCER_EVENTS: Record<AnnouncerEventType, AnnouncerEventConfig> 
   you_win:        { text: 'YOU WIN!',     duration: 120, fillColor: '#ffcc00', glowColor: '#ffaa00', fontSize: 52, soundId: 'victory' },
   counter_hit:    { text: 'COUNTER HIT!', duration: 50,  fillColor: '#ff8800', glowColor: '#ff6600', fontSize: 36, soundId: 'counter' },
   max_activation: { text: 'MAX!',         duration: 40,  fillColor: '#44ff88', glowColor: '#22cc66', fontSize: 42, soundId: 'maxActivation' },
+  double_ko:      { text: 'DOUBLE K.O.!', duration: 100, fillColor: '#ff4400', glowColor: '#ff2200', fontSize: 72, soundId: 'ko' },
+  draw_game:      { text: 'DRAW GAME',   duration: 100, fillColor: '#ffaa00', glowColor: '#ff8800', fontSize: 52, soundId: 'time_over' },
+  first_attack:   { text: 'FIRST ATTACK', duration: 60,  fillColor: '#ffffff', glowColor: '#ffcc00', fontSize: 32, soundId: 'fight' },
 };
 
 export const announcer = new Announcer();

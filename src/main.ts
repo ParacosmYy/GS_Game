@@ -926,7 +926,13 @@ function update(): void {
       playKO();
       bgm.stop();
       ambient.stop();
-      announcer.knockOut();
+      // KOF2002: Double KO announcer when both die simultaneously
+      const bothKO = p1.health <= 0 && p2.health <= 0;
+      if (bothKO) {
+        announcer.doubleKO();
+      } else {
+        announcer.knockOut();
+      }
       // Phase 52: Initialize KO state machine
       const koPlayerIdx = p1.health <= 0 ? 0 : (p2.health <= 0 ? 1 : -1);
       cinematic.triggerKOSequence(koPlayerIdx, false);
@@ -964,7 +970,12 @@ function update(): void {
     screenFlash.trigger('#ffaa00', 0.2, 8);
     bgm.stop();
     ambient.stop();
-    announcer.timeOver();
+    // KOF2002: Draw game announcer when time over with equal health
+    if (gs.winner === null) {
+      announcer.drawGame();
+    } else {
+      announcer.timeOver();
+    }
   }
 }
 
