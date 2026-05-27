@@ -172,8 +172,15 @@ let arcadeMatchCount = 0;
 let arcadeCumulativeCombo = 0;
 let arcadeCumulativeDamage = 0;
 
+// Score popup state
+let scorePopupAmount = 0;
+let scorePopupTimer = 0;
+
 export function addArcadeScore(points: number): void {
   arcadeScore += points;
+  // Trigger score popup
+  scorePopupAmount = points;
+  scorePopupTimer = 60;
 }
 
 export function getArcadeScore(): number { return arcadeScore; }
@@ -196,6 +203,8 @@ export function resetArcadeScore(): void {
   arcadeMatchCount = 0;
   arcadeCumulativeCombo = 0;
   arcadeCumulativeDamage = 0;
+  scorePopupAmount = 0;
+  scorePopupTimer = 0;
 }
 
 function tickArcadeScore(): void {
@@ -507,6 +516,23 @@ export function drawHUD(
     ctx.globalAlpha = 0.7;
     drawSNKText(ctx, scoreStr, scoreX, scoreY, 8, '#ffcc44', '#000000', 'center');
     ctx.globalAlpha = 1;
+  }
+
+  // ===== Score popup animation =====
+  if (scorePopupTimer > 0) {
+    scorePopupTimer--;
+    const popProgress = 1 - scorePopupTimer / 60;
+    const popAlpha = popProgress < 0.3 ? popProgress / 0.3 : popProgress > 0.7 ? (1 - popProgress) / 0.3 : 1;
+    const popY = HUD_BAR_Y + HUD_BAR_HEIGHT + 36 - popProgress * 12;
+    const popScale = popProgress < 0.15 ? 1 + (0.15 - popProgress) / 0.15 * 0.5 : 1;
+    ctx.save();
+    ctx.globalAlpha = Math.max(0, popAlpha * 0.9);
+    const fontSize = Math.round(10 * popScale);
+    ctx.shadowColor = '#ffcc00';
+    ctx.shadowBlur = 6;
+    drawSNKText(ctx, `+${scorePopupAmount}`, CANVAS_WIDTH / 2, popY, fontSize, '#ffcc00', '#000000', 'center');
+    ctx.shadowBlur = 0;
+    ctx.restore();
   }
 
   // ===== Timer display — KOF2002 arcade-authentic =====
