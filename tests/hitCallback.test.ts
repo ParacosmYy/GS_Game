@@ -47,6 +47,8 @@ vi.mock('../src/audio/sampler.js', () => ({
   playKoHou: vi.fn(),
   playHien: vi.fn(),
   playHaou: vi.fn(),
+  playHioHacker: vi.fn(),
+  playZanretsuKen: vi.fn(),
 }));
 
 vi.mock('../src/audio/bgm.js', () => ({
@@ -613,5 +615,39 @@ describe('Combo feedback scaling', () => {
       expect.any(Number), expect.any(Number),
       3, 120,
     );
+  });
+});
+
+// ===== 12. New Ryo Specials VFX =====
+
+describe('New Ryo Specials VFX (KOOUKEN_D / HIO_HACKER / ZANRETSU_KEN)', () => {
+  it('RYO_KOOUKEN_D triggers hitstop + shake', () => {
+    const deps = createDeps();
+    (deps.combatSystem.getComboCount as ReturnType<typeof vi.fn>).mockReturnValue(0);
+    const onHit = createHitCallback(deps);
+    onHit(deps.fighters[0], deps.fighters[1], AttackType.RYO_KOOUKEN_D, false, false);
+
+    expect(deps.cinematic.triggerHitStop).toHaveBeenCalled();
+    expect(deps.screenShake.trigger).toHaveBeenCalled();
+  });
+
+  it('RYO_HIO_HACKER triggers hitstop + shake + impactRing', () => {
+    const deps = createDeps();
+    (deps.combatSystem.getComboCount as ReturnType<typeof vi.fn>).mockReturnValue(0);
+    const onHit = createHitCallback(deps);
+    onHit(deps.fighters[0], deps.fighters[1], AttackType.RYO_HIO_HACKER, false, false);
+
+    expect(deps.cinematic.triggerHitStop).toHaveBeenCalled();
+    expect(deps.screenShake.trigger).toHaveBeenCalled();
+    expect(deps.vfx.spawnImpactRing).toHaveBeenCalled();
+  });
+
+  it('RYO_ZANRETSU_KEN triggers hitstop on combo > 0', () => {
+    const deps = createDeps();
+    (deps.combatSystem.getComboCount as ReturnType<typeof vi.fn>).mockReturnValue(2);
+    const onHit = createHitCallback(deps);
+    onHit(deps.fighters[0], deps.fighters[1], AttackType.RYO_ZANRETSU_KEN, false, false);
+
+    expect(deps.cinematic.triggerHitStop).toHaveBeenCalled();
   });
 });
