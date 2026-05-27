@@ -96,6 +96,8 @@ export const ATTACK_SFX_TABLE: AttackSFXEntry[] = [
   { attackType: 'KYO_RED_KICK', phase: 'active', frame: 0, sfx: 'playKyoRedKick', priority: 2 },
   { attackType: 'KYO_75KAI', phase: 'startup', frame: 0, sfx: 'playKyo75Kai', priority: 2 },
   { attackType: 'KYO_75KAI', phase: 'active', frame: 0, sfx: 'playKyo75Kai', priority: 2 },
+  { attackType: 'KYO_75KAI_2', phase: 'startup', frame: 0, sfx: 'playKyo75Kai', priority: 2 },
+  { attackType: 'KYO_75KAI_2', phase: 'active', frame: 0, sfx: 'playKyo75Kai', priority: 2 },
   { attackType: 'KYO_ARAGAMI', phase: 'startup', frame: 0, sfx: 'playKyoAragami', priority: 2 },
   { attackType: 'KYO_ARAGAMI', phase: 'active', frame: 0, sfx: 'playKyoAragami', priority: 2 },
   { attackType: 'KYO_DOKUGAMI', phase: 'startup', frame: 0, sfx: 'playKyoDokugami', priority: 2 },
@@ -105,10 +107,17 @@ export const ATTACK_SFX_TABLE: AttackSFXEntry[] = [
   { attackType: 'DM_OROCHINAGI', phase: 'startup', frame: 0, sfx: 'playKyoOrochinagi', priority: 2 },
   { attackType: 'DM_OROCHINAGI', phase: 'startup', frame: 8, sfx: 'playKyoOrochinagi', priority: 3 },
   { attackType: 'DM_OROCHINAGI', phase: 'active', frame: 0, sfx: 'playDM', priority: 4 },
+  { attackType: 'SDM_OROCHINAGI', phase: 'startup', frame: 0, sfx: 'playKyoOrochinagi', priority: 2 },
+  { attackType: 'SDM_OROCHINAGI', phase: 'startup', frame: 6, sfx: 'playKyoOrochinagi', priority: 3 },
+  { attackType: 'SDM_OROCHINAGI', phase: 'active', frame: 0, sfx: 'playDM', priority: 4 },
 
   // ── Iori specials — character-specific dark purple SFX ──
   { attackType: 'IORI_AOIHANA', phase: 'startup', frame: 0, sfx: 'playIoriAoihana', priority: 2 },
   { attackType: 'IORI_AOIHANA', phase: 'active', frame: 0, sfx: 'playIoriAoihana', priority: 2 },
+  { attackType: 'IORI_AOIHANA_2', phase: 'startup', frame: 0, sfx: 'playIoriAoihana', priority: 2 },
+  { attackType: 'IORI_AOIHANA_2', phase: 'active', frame: 0, sfx: 'playIoriAoihana', priority: 2 },
+  { attackType: 'IORI_AOIHANA_3', phase: 'startup', frame: 0, sfx: 'playIoriAoihana', priority: 2 },
+  { attackType: 'IORI_AOIHANA_3', phase: 'active', frame: 0, sfx: 'playIoriAoihana', priority: 3 },
   { attackType: 'IORI_ONIYAKI', phase: 'startup', frame: 0, sfx: 'playIoriOniyaki', priority: 2 },
   { attackType: 'IORI_ONIYAKI', phase: 'active', frame: 0, sfx: 'playIoriOniyaki', priority: 2 },
   { attackType: 'IORI_ONIYAKI_C', phase: 'startup', frame: 0, sfx: 'playIoriOniyaki', priority: 2 },
@@ -121,11 +130,21 @@ export const ATTACK_SFX_TABLE: AttackSFXEntry[] = [
   { attackType: 'IORI_KOTOTSUKI', phase: 'active', frame: 0, sfx: 'playIoriKototsuki', priority: 2 },
   { attackType: 'IORI_KUZUKAZE', phase: 'startup', frame: 0, sfx: 'playIoriKuzukaze', priority: 2 },
   { attackType: 'IORI_KUZUKAZE', phase: 'active', frame: 0, sfx: 'playThrow', priority: 3 },
+  // ── Iori command normals ──
+  { attackType: 'IORI_YUMEYUMI', phase: 'startup', frame: 0, sfx: 'playIoriYumeyumi', priority: 2 },
+  { attackType: 'IORI_YUMEYUMI', phase: 'active', frame: 0, sfx: 'playIoriYumeyumi', priority: 2 },
+  { attackType: 'IORI_KATANUGI', phase: 'startup', frame: 0, sfx: 'playIoriKatanugi', priority: 2 },
+  { attackType: 'IORI_KATANUGI', phase: 'active', frame: 0, sfx: 'playIoriKatanugi', priority: 2 },
+  { attackType: 'IORI_YUKIWARUI', phase: 'startup', frame: 0, sfx: 'playWhoosh', priority: 2 },
+  { attackType: 'IORI_YUKIWARUI', phase: 'active', frame: 0, sfx: 'playHitAccentFire', priority: 2 },
 
   // ── Iori DM — dark energy climax SFX ──
   { attackType: 'DM_YATAGARASU', phase: 'startup', frame: 0, sfx: 'playIoriYaotome', priority: 2 },
   { attackType: 'DM_YATAGARASU', phase: 'startup', frame: 8, sfx: 'playIoriYaotome', priority: 3 },
   { attackType: 'DM_YATAGARASU', phase: 'active', frame: 0, sfx: 'playDM', priority: 4 },
+  { attackType: 'SDM_YATAGARASU', phase: 'startup', frame: 0, sfx: 'playIoriYaotome', priority: 2 },
+  { attackType: 'SDM_YATAGARASU', phase: 'startup', frame: 6, sfx: 'playIoriYaotome', priority: 3 },
+  { attackType: 'SDM_YATAGARASU', phase: 'active', frame: 0, sfx: 'playDM', priority: 4 },
 
   // ── Terry specials ──
   { attackType: 'TERRY_POWER_WAVE', phase: 'startup', frame: 0, sfx: 'playSpecialLight', priority: 2 },
