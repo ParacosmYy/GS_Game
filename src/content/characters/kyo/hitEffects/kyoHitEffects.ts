@@ -58,30 +58,37 @@ function kyoVFX(ctx: HitEffectContext): boolean {
     screenFlash.trigger('#ff4400', 0.12, 4);
     handled = true;
   }
-  // Aragami (荒咬み) — fire punch impact
+  // Aragami (荒咬み) — fire punch impact, opens the rekka chain
   if (atkName === 'KYO_ARAGAMI') {
     cinematic.addHitStop(1, ctx.defIdx);
     screenShake.trigger(6, 6, attacker.facing * 3);
     vfx.spawnImpactRing(hitX, hitY, 0.9);
+    vfx.spawnProjectileExplosion(hitX, hitY, '#ff8833', '#ffcc44');
     handled = true;
   }
-  // Aragami followups — Konokizu, Yanosabi, Nanase, Koto Tsuki, Yakisogi
+  // Aragami followups — Konokizu, Yanosabi — escalating fire
   if (atkName === 'KYO_ARAGAMI_KONOKIZU' || atkName === 'KYO_ARAGAMI_YANOSABI') {
     cinematic.addHitStop(1, ctx.defIdx);
-    vfx.spawnImpactRing(hitX, hitY, 0.8);
+    screenShake.trigger(6, 6, attacker.facing * 3);
+    vfx.spawnImpactRing(hitX, hitY, 0.9);
     vfx.spawnProjectileExplosion(hitX, hitY, '#ff6622', '#ffaa44');
     handled = true;
   }
+  // Nanase (七瀬) — sweeping followup, fire wave
   if (atkName === 'KYO_NANASE') {
     cinematic.addHitStop(1, ctx.defIdx);
     screenShake.trigger(5, 5, attacker.facing * 3);
     vfx.spawnProjectileExplosion(hitX, hitY, '#ff6622', '#ff8822');
+    vfx.spawnImpactRing(hitX, hitY, 0.9);
     handled = true;
   }
+  // Koto Tsuki / Yakisogi — chain finishers
   if (atkName === 'KYO_KOTO_TSUKI' || atkName === 'KYO_YAKISOGI') {
-    cinematic.addHitStop(1, ctx.defIdx);
-    screenShake.trigger(6, 6, attacker.facing * 3);
-    vfx.spawnImpactRing(hitX, hitY, 0.9);
+    cinematic.addHitStop(2, ctx.defIdx);
+    screenShake.trigger(7, 7, attacker.facing * 4);
+    vfx.spawnImpactRing(hitX, hitY, 1.1);
+    vfx.spawnProjectileExplosion(hitX, hitY, '#ff4400', '#ffaa22');
+    screenFlash.trigger('#ff6600', 0.08, 3);
     handled = true;
   }
   // Dokugami (毒咬み) — flame followup
