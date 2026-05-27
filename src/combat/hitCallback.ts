@@ -569,6 +569,10 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
     const isKOHit = defender.health <= 0;
     if (isKOHit) {
       playKOHit();
+      // KOF2002: KO冲击 — 击倒时屏幕裂纹+地面冲击波
+      deps.vfx.spawnScreenCracks(defender.x, defender.y - defender.displayHeight / 2);
+      deps.vfx.spawnGroundSlam(defender.x, defender.y);
+      deps.screenFlash.trigger('#ffffff', 0.3, 4);
     }
 
     // Sidechain duck: manifest驱动基础值

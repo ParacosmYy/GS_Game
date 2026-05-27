@@ -46,6 +46,7 @@ import {
   spawnHaouFlash,
   spawnMoveNameText,
   spawnTierSparks,
+  spawnScreenCracks,
 } from './vfxPresets.js';
 import type { Particle } from './vfxPresets.js';
 
@@ -256,6 +257,11 @@ export class VFXSystem {
   /** KOF2002: Combo speed lines for high-hit combos */
   spawnComboSpeedLines(centerX: number, centerY: number, comboCount: number): void {
     spawnComboSpeedLines(this.particles, centerX, centerY, comboCount);
+  }
+
+  /** KOF2002: Screen cracks at KO */
+  spawnScreenCracks(worldX: number, worldY: number): void {
+    spawnScreenCracks(this.particles, worldX, worldY);
   }
 
   /** Ryo: Ko'ou Ken (虎煌拳) projectile ki blast VFX */
