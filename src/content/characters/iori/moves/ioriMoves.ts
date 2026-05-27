@@ -20,7 +20,7 @@ export interface MoveDefinition {
   /** 英文名 */
   nameEn: string;
   /** 招式分类 */
-  category: 'command_normal' | 'special' | 'dm' | 'sdm';
+  category: 'command_normal' | 'special' | 'dm' | 'sdm' | 'hsdm';
   /** 输入指令 */
   input: string;
   /** 版本列表（有的招式只有单一版本） */
@@ -175,6 +175,15 @@ export const IORI_MOVES: MoveDefinition[] = [
         invincibleStartup: 0,
         isProjectile: false,
       },
+      {
+        version: 'A',
+        attackTypeKey: 'IORI_KOTOTSUKI_D',
+        differences: '突进攻击，长距离冲刺HKD',
+        damageMultiplier: 1.2,
+        knockdown: true,
+        invincibleStartup: 0,
+        isProjectile: false,
+      },
     ],
   },
   {
@@ -253,6 +262,63 @@ export const IORI_MOVES: MoveDefinition[] = [
     ],
   },
 
+  // ── 葵花 C版 Rekka Chain ──
+
+  {
+    key: 'IORI_AOIHANA_C',
+    nameJa: '葵花 (C版)',
+    nameEn: 'Aoihana C Version',
+    category: 'special',
+    input: '↓↙← + C',
+    versions: [
+      {
+        version: 'C',
+        attackTypeKey: 'IORI_AOIHANA_C',
+        differences: 'C版葵花起手，硬直更短，可接C版第二段',
+        damageMultiplier: 1.1,
+        knockdown: false,
+        invincibleStartup: 0,
+        isProjectile: false,
+      },
+    ],
+  },
+  {
+    key: 'IORI_AOIHANA_C_2',
+    nameJa: '葵花 C版 追撃 弐',
+    nameEn: 'Aoihana C 2nd',
+    category: 'special',
+    input: 'C版葵花中 ↓↙← + P',
+    versions: [
+      {
+        version: 'C',
+        attackTypeKey: 'IORI_AOIHANA_C_2',
+        differences: 'C版葵花第二段',
+        damageMultiplier: 0.9,
+        knockdown: false,
+        invincibleStartup: 0,
+        isProjectile: false,
+      },
+    ],
+  },
+  {
+    key: 'IORI_AOIHANA_C_3',
+    nameJa: '葵花 C版 追撃 参',
+    nameEn: 'Aoihana C 3rd',
+    category: 'special',
+    input: 'C版葵花弐中 ↓↙← + P',
+    versions: [
+      {
+        version: 'C',
+        attackTypeKey: 'IORI_AOIHANA_C_3',
+        differences: 'C版葵花最终段，更大紫焰爆发',
+        damageMultiplier: 1.0,
+        knockdown: true,
+        invincibleStartup: 0,
+        isProjectile: false,
+      },
+    ],
+  },
+
   // ── DM (超必杀技) ──
 
   {
@@ -290,6 +356,27 @@ export const IORI_MOVES: MoveDefinition[] = [
         damageMultiplier: 1.6,
         knockdown: true,
         invincibleStartup: 8,
+        isProjectile: false,
+      },
+    ],
+  },
+
+  // ── HSDM (隐藏超必杀技) ──
+
+  {
+    key: 'HSDM_YAOTOME',
+    nameJa: '八稚女',
+    nameEn: 'Yaotome (Eight Maidens)',
+    category: 'hsdm',
+    input: '↓↙←↙↓↘→ + AC (MAX+低血量)',
+    versions: [
+      {
+        version: 'MAX',
+        attackTypeKey: 'HSDM_YAOTOME',
+        differences: '隐藏超必，血量1/4以下时可用，狂暴连斩+紫焰终结',
+        damageMultiplier: 2.2,
+        knockdown: true,
+        invincibleStartup: 12,
         isProjectile: false,
       },
     ],

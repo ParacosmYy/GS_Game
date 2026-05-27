@@ -27,6 +27,13 @@ import { IORI_STAND_B_FRAMES, IORI_STAND_D_FRAMES } from './ioriKickFrames.js';
 import { IORI_CROUCH_A_FRAMES, IORI_CROUCH_C_FRAMES, IORI_CROUCH_B_FRAMES, IORI_CROUCH_D_FRAMES } from './ioriCrouchAttackFrames.js';
 import { IORI_AIR_A_FRAMES, IORI_AIR_C_FRAMES, IORI_AIR_D_FRAMES } from './ioriAirAttackFrames.js';
 import { IORI_WIN_POSE, IORI_WIN_LAUGH } from './ioriWinFrames.js';
+import {
+  IORI_ONIYAKI_FRAMES, IORI_ONIYAKI_C_FRAMES,
+  IORI_YAMIBARAI_FRAMES, IORI_YAMIBARAI_C_FRAMES,
+  IORI_AOIHANA_FRAMES, IORI_AOIHANA_2_FRAMES, IORI_AOIHANA_3_FRAMES,
+  IORI_KOTOTSUKI_FRAMES, IORI_KOTOTSUKI_D_FRAMES,
+  IORI_KUZUKAZE_FRAMES,
+} from './ioriSpecialFrames.js';
 
 const IORI_FRAMES = new Map<string, FrameEntry>();
 const FRAME_CACHE = new Map<string, HTMLCanvasElement>();
@@ -70,6 +77,17 @@ function initIoriFrames(): void {
 
   // WIN pose
   registerVariableFrames('WIN', [IORI_WIN_POSE, IORI_WIN_LAUGH], [6, 30]);
+
+  // SPECIAL MOVES
+  registerVariableFrames('ONIYAKI', IORI_ONIYAKI_FRAMES, [3, 4, 5, 8, 10]);
+  registerVariableFrames('ONIYAKI_C', IORI_ONIYAKI_C_FRAMES, [4, 4, 6, 6, 8, 10]);
+  registerVariableFrames('YAMIBARAI', IORI_YAMIBARAI_FRAMES, [5, 4, 6, 12]);
+  registerVariableFrames('AOIHANA', IORI_AOIHANA_FRAMES, [4, 3, 5, 8]);
+  registerVariableFrames('AOIHANA_2', IORI_AOIHANA_2_FRAMES, [4, 3, 5, 8]);
+  registerVariableFrames('AOIHANA_3', IORI_AOIHANA_3_FRAMES, [4, 3, 5, 10]);
+  registerVariableFrames('KOTOTSUKI', IORI_KOTOTSUKI_FRAMES, [5, 6, 4, 6, 8]);
+  registerVariableFrames('KOTOTSUKI_D', IORI_KOTOTSUKI_D_FRAMES, [5, 8, 4, 6, 8]);
+  registerVariableFrames('KUZUKAZE', IORI_KUZUKAZE_FRAMES, [4, 5, 4, 8]);
 }
 
 function resolveIoriFrameKey(
@@ -101,6 +119,21 @@ function resolveIoriFrameKey(
       if (currentAttack === AttackType.JUMP_D) return 'AIR_D';
       return 'AIR_A';
     case FighterState.STAND_ATTACK:
+      // Special moves
+      if (currentAttack === AttackType.IORI_ONIYAKI) return 'ONIYAKI';
+      if (currentAttack === AttackType.IORI_ONIYAKI_C) return 'ONIYAKI_C';
+      if (currentAttack === AttackType.IORI_YAMIBARAI) return 'YAMIBARAI';
+      if (currentAttack === AttackType.IORI_YAMIBARAI_C) return 'YAMIBARAI';
+      if (currentAttack === AttackType.IORI_AOIHANA) return 'AOIHANA';
+      if (currentAttack === AttackType.IORI_AOIHANA_2) return 'AOIHANA_2';
+      if (currentAttack === AttackType.IORI_AOIHANA_3) return 'AOIHANA_3';
+      if (currentAttack === AttackType.IORI_AOIHANA_C) return 'AOIHANA';
+      if (currentAttack === AttackType.IORI_AOIHANA_C_2) return 'AOIHANA_2';
+      if (currentAttack === AttackType.IORI_AOIHANA_C_3) return 'AOIHANA_3';
+      if (currentAttack === AttackType.IORI_KOTOTSUKI) return 'KOTOTSUKI';
+      if (currentAttack === AttackType.IORI_KOTOTSUKI_D) return 'KOTOTSUKI_D';
+      if (currentAttack === AttackType.IORI_KUZUKAZE) return 'KUZUKAZE';
+      // Normals
       if (currentAttack === AttackType.STAND_C || currentAttack === AttackType.CLOSE_C) return 'STAND_C';
       if (currentAttack === AttackType.STAND_D || currentAttack === AttackType.CLOSE_D) return 'STAND_D';
       if (currentAttack === AttackType.STAND_B || currentAttack === AttackType.CLOSE_B) return 'STAND_B';

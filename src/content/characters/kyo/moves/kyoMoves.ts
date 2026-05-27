@@ -20,7 +20,7 @@ export interface MoveDefinition {
   /** 英文名 */
   nameEn: string;
   /** 招式分类 */
-  category: 'command_normal' | 'special' | 'dm' | 'sdm';
+  category: 'command_normal' | 'special' | 'dm' | 'sdm' | 'hsdm';
   /** 输入指令 */
   input: string;
   /** 版本列表（有的招式只有单一版本） */
@@ -401,6 +401,27 @@ export const KYO_MOVES: MoveDefinition[] = [
         damageMultiplier: 1.6,
         knockdown: true,
         invincibleStartup: 8,
+        isProjectile: false,
+      },
+    ],
+  },
+
+  // ── HSDM (隐藏超必杀技) ──
+
+  {
+    key: 'HSDM_OROCHINAGI',
+    nameJa: '大蛇薙 (HSDM)',
+    nameEn: 'Orochinagi HSDM',
+    category: 'hsdm',
+    input: '↓↙←↙↓↘→ + AC (MAX+低血量)',
+    versions: [
+      {
+        version: 'MAX',
+        attackTypeKey: 'HSDM_OROCHINAGI',
+        differences: '隐藏超必，血量1/4以下时可用，超大范围火焰爆发',
+        damageMultiplier: 2.2,
+        knockdown: true,
+        invincibleStartup: 12,
         isProjectile: false,
       },
     ],
