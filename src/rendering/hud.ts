@@ -493,6 +493,22 @@ export function drawHUD(
     ctx.globalAlpha = 1;
   }
 
+  // ===== Arcade Score — KOF2002 live score display =====
+  if (arcadeScore > 0) {
+    // Smooth score counter animation
+    if (displayScore < arcadeScore) {
+      const diff = arcadeScore - displayScore;
+      displayScore += Math.ceil(diff * 0.15);
+      if (displayScore > arcadeScore) displayScore = arcadeScore;
+    }
+    const scoreStr = displayScore.toLocaleString().padStart(8, ' ');
+    const scoreX = CANVAS_WIDTH / 2;
+    const scoreY = HUD_BAR_Y + HUD_BAR_HEIGHT + 26;
+    ctx.globalAlpha = 0.7;
+    drawSNKText(ctx, scoreStr, scoreX, scoreY, 8, '#ffcc44', '#000000', 'center');
+    ctx.globalAlpha = 1;
+  }
+
   // ===== Timer display — KOF2002 arcade-authentic =====
   const timeSeconds = Math.max(0, ROUND_TIME - Math.floor(tick / 60));
   const timeStr = timeSeconds.toString().padStart(2, '0');
