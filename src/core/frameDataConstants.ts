@@ -81,7 +81,7 @@ const FRAME_DATA_GENERIC = {
     hitLevel: 'LOW' as const, knockdown: false,
   },
   IORI_YUKIWARUI: {
-    startup: 7, active: 6, recovery: 3,
+    startup: 7, active: 7, recovery: 3,
     damage: 45, hitstun: 19, blockstun: 17, pushback: 4,
     hitLevel: 'HIGH' as const, knockdown: false,
   },
@@ -325,7 +325,7 @@ const FRAME_DATA_GENERIC = {
   },
   // ── DM_OROCHINAGI (shared) ──
   DM_OROCHINAGI: {
-    startup: 20, active: 17, recovery: 27,
+    startup: 20, active: 30, recovery: 27,
     damage: 200, hitstun: 0, blockstun: 21, pushback: 10,
     hitLevel: 'MID' as const, knockdown: true, chipDamage: 20,
   },

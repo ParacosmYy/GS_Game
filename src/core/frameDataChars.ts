@@ -11,7 +11,7 @@ export const FRAME_DATA_CHARS = {
   // 75式·改 qcf+B (第1段)
   KYO_75KAI: {
     startup: 14,
-    active: 3,
+    active: 4,
     recovery: 14,
     damage: 40,
     hitstun: 19,
@@ -23,7 +23,7 @@ export const FRAME_DATA_CHARS = {
   // 75式·改 第2段 (qcf+K 追加)
   KYO_75KAI_2: {
     startup: 7,
-    active: 7,
+    active: 4,
     recovery: 14,
     damage: 40,
     hitstun: 19,
@@ -35,7 +35,7 @@ export const FRAME_DATA_CHARS = {
   // R.E.D. Kicks rdp+B/D
   KYO_RED_KICK: {
     startup: 19,
-    active: 6,
+    active: 5,
     recovery: 33,
     damage: 108,
     hitstun: 19,
@@ -58,7 +58,7 @@ export const FRAME_DATA_CHARS = {
   // 鬼焼き dp+A (2段上升拳, SKD)
   KYO_ONIYAKI: {
     startup: 6,
-    active: 8,
+    active: 5,
     recovery: 38,
     damage: 58,
     hitstun: 22,
@@ -71,7 +71,7 @@ export const FRAME_DATA_CHARS = {
   // 鬼焼き dp+C (长版, 多段)
   KYO_ONIYAKI_C: {
     startup: 6,
-    active: 14,
+    active: 10,
     recovery: 48,
     damage: 108,
     hitstun: 28,
@@ -109,7 +109,7 @@ export const FRAME_DATA_CHARS = {
   // 荒咬み qcf+A (rekka 1段目)
   KYO_ARAGAMI: {
     startup: 12,
-    active: 6,
+    active: 4,
     recovery: 18,
     damage: 58,
     hitstun: 19,
@@ -121,7 +121,7 @@ export const FRAME_DATA_CHARS = {
   // 九傷 qcf+A→qcf+P (rekka 2段目, SKD)
   KYO_ARAGAMI_KONOKIZU: {
     startup: 8,
-    active: 8,
+    active: 4,
     recovery: 31,
     damage: 42,
     hitstun: 19,
@@ -133,7 +133,7 @@ export const FRAME_DATA_CHARS = {
   // 八錆 qcf+A→qcf+P→P (rekka 3段P, HKD overhead)
   KYO_ARAGAMI_YANOSABI: {
     startup: 14,
-    active: 3,
+    active: 5,
     recovery: 31,
     damage: 25,
     hitstun: 19,
@@ -145,7 +145,7 @@ export const FRAME_DATA_CHARS = {
   // 七瀬 qcf+A→qcf+P→K (rekka 3段K, SKD)
   KYO_NANASE: {
     startup: 17,
-    active: 3,
+    active: 5,
     recovery: 24,
     damage: 67,
     hitstun: 19,
@@ -169,7 +169,7 @@ export const FRAME_DATA_CHARS = {
   // 轢鉄 qcf+A→hcb+P→hcb+K (HKD)
   KYO_KOTO_TSUKI: {
     startup: 10,
-    active: 5,
+    active: 6,
     recovery: 38,
     damage: 83,
     hitstun: 19,
@@ -181,7 +181,7 @@ export const FRAME_DATA_CHARS = {
   // 毒咬み qcf+C (rekka C系1段目)
   KYO_DOKUGAMI: {
     startup: 18,
-    active: 6,
+    active: 4,
     recovery: 21,
     damage: 25,
     hitstun: 19,
@@ -193,7 +193,7 @@ export const FRAME_DATA_CHARS = {
   // 罪詠み qcf+C→hcb+P
   KYO_TSUMIYOMI: {
     startup: 11,
-    active: 3,
+    active: 4,
     recovery: 34,
     damage: 33,
     hitstun: 19,
@@ -205,7 +205,7 @@ export const FRAME_DATA_CHARS = {
   // 罰詠み qcf+C→hcb+P→f+P (SKD)
   KYO_BATSUYOMI: {
     startup: 14,
-    active: 4,
+    active: 5,
     recovery: 42,
     damage: 33,
     hitstun: 19,
@@ -217,7 +217,7 @@ export const FRAME_DATA_CHARS = {
   // 焼きそぎ (空中DOWN+P, KD)
   KYO_YAKISOGI: {
     startup: 11,
-    active: 3,
+    active: 4,
     recovery: 30,
     damage: 60,
     hitstun: 19,
@@ -278,7 +278,7 @@ export const FRAME_DATA_CHARS = {
   // ── 京DM/SDM ── Dream Cancel Wiki KOF2002UM
   DM_OROCHINAGI_A: {
     startup: 21,
-    active: 17,
+    active: 30,
     recovery: 27,
     damage: 233,
     hitstun: 0,
@@ -290,7 +290,7 @@ export const FRAME_DATA_CHARS = {
   },
   DM_OROCHINAGI_C: {
     startup: 20,
-    active: 17,
+    active: 30,
     recovery: 27,
     damage: 233,
     hitstun: 0,
@@ -326,7 +326,7 @@ export const FRAME_DATA_CHARS = {
   },
   SDM_OROCHINAGI: {
     startup: 20,
-    active: 25,
+    active: 38,
     recovery: 29,
     damage: 342,
     hitstun: 0,
@@ -415,7 +415,7 @@ export const FRAME_DATA_CHARS = {
   // 葵花 A版 3段 (overhead HKD)
   IORI_AOIHANA_3: {
     startup: 5,
-    active: 4,
+    active: 5,
     recovery: 18,
     damage: 60,
     hitstun: 22,
@@ -489,7 +489,7 @@ export const FRAME_DATA_CHARS = {
   // 鬼焼き dp+A (弱版 升龙)
   IORI_ONIYAKI: {
     startup: 5,
-    active: 4,
+    active: 5,
     recovery: 18,
     damage: 60,
     hitstun: 22,
@@ -502,7 +502,7 @@ export const FRAME_DATA_CHARS = {
   // 鬼焼き dp+C (强版 升龙, 全身无敌)
   IORI_ONIYAKI_C: {
     startup: 4,
-    active: 6,
+    active: 10,
     recovery: 22,
     damage: 90,
     hitstun: 26,
@@ -515,7 +515,7 @@ export const FRAME_DATA_CHARS = {
   // 琴月陰 hcb+B (弱版 冲刺HKD)
   IORI_KOTOTSUKI: {
     startup: 10,
-    active: 5,
+    active: 4,
     recovery: 15,
     damage: 60,
     hitstun: 20,
@@ -588,7 +588,7 @@ export const FRAME_DATA_CHARS = {
   // 八壺·DM — Iori经典DM (Yaotome)
   DM_YATAGARASU: {
     startup: 5,
-    active: 14,
+    active: 20,
     recovery: 30,
     damage: 230,
     hitstun: 0,
@@ -601,7 +601,7 @@ export const FRAME_DATA_CHARS = {
   // 八壺·SDM
   SDM_YATAGARASU: {
     startup: 4,
-    active: 18,
+    active: 28,
     recovery: 32,
     damage: 320,
     hitstun: 0,
