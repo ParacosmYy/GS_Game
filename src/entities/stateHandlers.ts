@@ -295,6 +295,10 @@ export function handleBackdash(ctx: FighterCtx): void {
 export function handleRoll(ctx: FighterCtx, input: ResolvedInput): void {
   const f = ctx.fighter;
   f.rollTimer--; f.displayHeight = 60;
+  // Roll dust every 6 frames
+  if (f.rollTimer % 6 === 0 && f.rollTimer > 0) {
+    ctx.vfx.spawnDust(f.x, STAGE_GROUND_Y);
+  }
   if (f.isGCRoll && input.rollPressed && f.rollTimer > 0) {
     f.rollTimer = ROLL_DURATION;
     f.vx = (f.state === FighterState.ROLL ? ROLL_SPEED : -ROLL_SPEED) * f.facing;
