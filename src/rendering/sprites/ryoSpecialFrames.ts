@@ -365,21 +365,30 @@ KFC_F0[26] = r('...........1289b1.................1db1mn.mm222mm................
 KFC_F0[27] = r('..........128b1...................1d1.mn.m2222m.................................................');
 KFC_F0[28] = r('.........128b1....................11..mn.mm22mm.................................................');
 
-// F1: release — bigger energy ball with orange glow (extending from KOOU thrust)
-const KFC_F1 = clone(KF_F1); // Start from KOOU thrust frame
+// F1: mid-thrust — arms beginning to extend, energy gathering
+const KFC_F1 = clone(KF_F1); // Start from KOOU mid-thrust
+// Widen the energy gathering at the palms
+KFC_F1[22] = r('...............12899a1.............1891.1d1.mn22nmmn22mm.1eeee1d91....');
+KFC_F1[23] = r('..............12899a1..............18d1d1.m222222222222mn1eei1d91.....');
+KFC_F1[24] = r('.............12899b21..............1dbd1.m2222222222222mn1ee1d91......');
+KFC_F1[25] = r('............1289b1................1d8d1.mn222222222222nmm1d91.........');
+KFC_F1[26] = r('...........1289b1.................1db1mn.mm222222222mmn1d91...........');
+
+// F2: release — bigger energy ball with orange glow (extending from KOOU thrust)
+const KFC_F2 = clone(KF_F1); // Start from KOOU thrust frame
 // Replace the thrust arm area with wider orange-glowing energy ball
 // The existing arms extend to x~90 area; we add a larger energy ball
-KFC_F1[18] = r('...................12mn21..........12mn2.111..1eeeeeeeggieeeeeegg18bd81.');
-KFC_F1[19] = r('..................128921...........128b1.111.1eeeeeeeeggieeeeeegg188bd81.');
-KFC_F1[20] = r('.................1289la1...........189a1.111eeeeeeeeggieeeeeeegg188bd81.');
-KFC_F1[21] = r('................1289ka1............18ka111eeeeeeeeeggieeeeeeeegg18d81..');
-KFC_F1[22] = r('...............12899a1.............1891.1eeeeegieeeggmn22meeee1d91....');
-KFC_F1[23] = r('..............12899a1..............18d1eeeegieeggm2222222nei1d91.....');
-KFC_F1[24] = r('.............12899b21..............1d8eeeegieggm222222222221d91.......');
-KFC_F1[25] = r('............1289b1................1d8eeeegieggm2222222222n1d91.........');
-KFC_F1[26] = r('...........1289b1.................1d8eeegeegm2222222222n1d91...........');
-KFC_F1[27] = r('..........128b1...................1deeegegm222222222n1d91..............');
-KFC_F1[28] = r('.........128b1....................11eeegegm2222222n1d91................');
+KFC_F2[18] = r('...................12mn21..........12mn2.111..1eeeeeeeggieeeeeegg18bd81.');
+KFC_F2[19] = r('..................128921...........128b1.111.1eeeeeeeeggieeeeeegg188bd81.');
+KFC_F2[20] = r('.................1289la1...........189a1.111eeeeeeeeggieeeeeeegg188bd81.');
+KFC_F2[21] = r('................1289ka1............18ka111eeeeeeeeeggieeeeeeeegg18d81..');
+KFC_F2[22] = r('...............12899a1.............1891.1eeeeegieeeggmn22meeee1d91....');
+KFC_F2[23] = r('..............12899a1..............18d1eeeegieeggm2222222nei1d91.....');
+KFC_F2[24] = r('.............12899b21..............1d8eeeegieggm222222222221d91.......');
+KFC_F2[25] = r('............1289b1................1d8eeeegieggm2222222222n1d91.........');
+KFC_F2[26] = r('...........1289b1.................1d8eeegeegm2222222222n1d91...........');
+KFC_F2[27] = r('..........128b1...................1deeegegm222222222n1d91..............');
+KFC_F2[28] = r('.........128b1....................11eeegegm2222222n1d91................');
 
 // ═══════════════════════════════════════════════════════════════════
 // RYO_KO_HOU_C — Strong Kohou Uppercut (2 frames)
@@ -404,19 +413,25 @@ KHC_F0[67] = r('...........................k1111111141111111k..1d91.............
 KHC_F0[68] = r('..........................kkkkkkkkkkkkkkkkkk..1d1..........................');
 KHC_F0[69] = r('...............................................11...........................');
 
-// F1: higher peak — use KH_F2 as base but shift even higher
-const KHC_F1 = clone(KH_F2);
+// F1: rising transition — body starting to rise, fist beginning uppercut
+const KHC_F1 = clone(KH_F1);
+// Slightly higher than KH_F1, with more energy glow
+KHC_F1[20] = r('................1289ka1............18ka111eeeeeeeeeggieeeeeeeegg18d81..');
+KHC_F1[21] = r('...............12899a1.............1891.1eeeeegieeeggmn22meeee1d91....');
+
+// F2: higher peak — use KH_F2 as base but shift even higher
+const KHC_F2 = clone(KH_F2);
 // Shift body even higher (4 more rows up from F2)
 // Afterimage trail left behind (faded version at original position)
 for (let y = 35; y <= 76; y++) {
-  KHC_F1[y] = IDLE_BASE[y + 8] ? IDLE_BASE[y + 8].slice() : IDLE_BASE[80].slice();
+  KHC_F2[y] = IDLE_BASE[y + 8] ? IDLE_BASE[y + 8].slice() : IDLE_BASE[80].slice();
 }
 // Afterimage — faded copy using lighter palette values
 // Place afterimage at y=80-90 area (where body was before rising)
 for (let y = 80; y <= 90; y++) {
   const src = IDLE_BASE[y - 60];
   if (src) {
-    KHC_F1[y] = src.map(v => {
+    KHC_F2[y] = src.map(v => {
       // Fade afterimage: darken skin to outline, lighten gi
       if (v >= 1 && v <= 7) return v;       // outline stays
       if (v >= 8 && v <= 13) return 13;     // skin -> darkest skin
@@ -462,9 +477,11 @@ export const RYO_HAOU_FRAMES: PixelFrame[] = [
 export const RYO_KOOU_C_FRAMES: PixelFrame[] = [
   { width: 96, height: 144, palette: PALETTE, pixels: KFC_F0 },
   { width: 96, height: 144, palette: PALETTE, pixels: KFC_F1 },
+  { width: 96, height: 144, palette: PALETTE, pixels: KFC_F2 },
 ];
 
 export const RYO_KO_HOU_C_FRAMES: PixelFrame[] = [
   { width: 96, height: 144, palette: PALETTE, pixels: KHC_F0 },
   { width: 96, height: 144, palette: PALETTE, pixels: KHC_F1 },
+  { width: 96, height: 144, palette: PALETTE, pixels: KHC_F2 },
 ];
