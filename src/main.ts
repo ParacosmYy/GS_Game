@@ -1033,7 +1033,8 @@ function update(): void {
       // KO impact dust particles at hit location
       const hitX = (killer.x + loser.x) / 2;
       const hitY = loser.y - loser.displayHeight / 2;
-      cinematic.spawnKODust(hitX, hitY, isDMKill ? 30 : 20);
+      const killerCharDef = ROSTER.find(c => c.id === killer.charId);
+      cinematic.spawnKODust(hitX, hitY, isDMKill ? 30 : 20, killerCharDef?.specialColor);
       camera.triggerKOZoom(hitX, hitY);
       playKO();
       bgm.stop();

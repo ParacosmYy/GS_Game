@@ -242,7 +242,11 @@ export class CinematicState {
   }
 
   /** Spawn KO impact dust particles at the hit location */
-  spawnKODust(hitX: number, hitY: number, count: number = 20): void {
+  spawnKODust(hitX: number, hitY: number, count: number = 20, charColor?: string): void {
+    // Character-specific KO dust colors
+    const dustColors = charColor
+      ? [charColor, '#c8a060', '#a08050']
+      : ['#c8a060', '#a08050'];
     for (let i = 0; i < count; i++) {
       const angle = (i / count) * Math.PI * 2 + Math.random() * 0.5;
       const speed = 1.5 + Math.random() * 4;
@@ -255,7 +259,7 @@ export class CinematicState {
         life,
         maxLife: life,
         size: 2 + Math.random() * 4,
-        color: Math.random() > 0.5 ? '#c8a060' : '#a08050',
+        color: dustColors[Math.floor(Math.random() * dustColors.length)],
       });
     }
   }
