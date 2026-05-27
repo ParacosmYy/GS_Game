@@ -575,6 +575,32 @@ export function drawHUD(
     drawWinDiamond(ctx, CANVAS_WIDTH - HUD_MARGIN - HUD_BAR_WIDTH - 10 - i * winSpacing, winMarkerY, HUD_WIN_MARKER_SIZE, '#4488ff', tick);
   }
 
+  // ===== KOF2002: MATCH POINT indicator =====
+  // When one player has (winsNeeded - 1) wins, show "MATCH POINT" near their side
+  const winsNeeded = 2; // BO3 by default
+  const mpPulse = 0.6 + Math.sin(tick * 0.1) * 0.4;
+  if (p1Wins === winsNeeded - 1 && p2Wins < winsNeeded) {
+    ctx.save();
+    ctx.globalAlpha = mpPulse;
+    ctx.shadowColor = '#ff4400';
+    ctx.shadowBlur = 8;
+    drawSNKText(ctx, 'MATCH', HUD_MARGIN + HUD_BAR_WIDTH + 10, winMarkerY + 18, 8, '#ff4400');
+    drawSNKText(ctx, 'POINT', HUD_MARGIN + HUD_BAR_WIDTH + 10, winMarkerY + 28, 8, '#ff4400');
+    ctx.shadowBlur = 0;
+    ctx.restore();
+  }
+  if (p2Wins === winsNeeded - 1 && p1Wins < winsNeeded) {
+    ctx.save();
+    ctx.globalAlpha = mpPulse;
+    ctx.shadowColor = '#4488ff';
+    ctx.shadowBlur = 8;
+    const mpX = CANVAS_WIDTH - HUD_MARGIN - HUD_BAR_WIDTH - 10;
+    drawSNKText(ctx, 'MATCH', mpX, winMarkerY + 18, 8, '#4488ff', '#000000', 'right');
+    drawSNKText(ctx, 'POINT', mpX, winMarkerY + 28, 8, '#4488ff', '#000000', 'right');
+    ctx.shadowBlur = 0;
+    ctx.restore();
+  }
+
   ctx.textBaseline = 'alphabetic';
   ctx.textAlign = 'left';
 
