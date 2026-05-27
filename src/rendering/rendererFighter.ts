@@ -343,6 +343,13 @@ export function drawFighters(
       const recoveryT = f.landingRecovery / 10; // normalize (max ~10 frames)
       const crouchOffset = 12 * Math.min(1, recoveryT);
       ctx.translate(0, crouchOffset);
+      // KOF2002: 着地压扁 — 着地前3帧短暂横向拉伸
+      if (f.landingRecovery > 7) {
+        const squashT = (f.landingRecovery - 7) / 3;
+        ctx.translate(0, -sy);
+        ctx.scale(1 + squashT * 0.05, 1 - squashT * 0.08);
+        ctx.translate(0, sy);
+      }
     }
     // KOF2002: 蹲下状态额外Y偏移 — 确保蹲姿视觉更低
     if (f.state === FighterState.CROUCH) {
@@ -522,6 +529,12 @@ export function drawFighters(
         ctx.fill();
         ctx.restore();
       }
+    }
+
+    // KOF2002: KO状态红色覆盖 — 倒地后身体发红
+    if (f.health <= 0) {
+      ctx.fillStyle = 'rgba(180, 20, 20, 0.15)';
+      ctx.fillRect(sx + leanOffsetX - hw - 5, sy - f.displayHeight - 5, (hw + 5) * 2, f.displayHeight + 10);
     }
 
     // KOF2002: 防御护盾效果 — 站防/蹲防时可见的半透明护盾
