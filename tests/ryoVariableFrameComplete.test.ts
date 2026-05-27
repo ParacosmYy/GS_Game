@@ -15,16 +15,23 @@ describe('Ryo Variable Frame Completeness', () => {
   const source = fs.readFileSync(RENDER_FILE, 'utf8');
 
   it('has no remaining uniform registerFrames calls for animations', () => {
-    // Find all registerFrames( calls that are NOT the function definition
+    // Find all direct registerFrames(' calls (not via baseHighResRenderer alias)
     const registerFramesCalls = source.match(/registerFrames\(['"]/g);
     const registerFramesDef = source.match(/function registerFrames\(/g);
+    const baseImport = source.match(/registerFrames as reg/g);
 
     const callCount = registerFramesCalls ? registerFramesCalls.length : 0;
     const defCount = registerFramesDef ? registerFramesDef.length : 0;
+    const usesBase = baseImport ? baseImport.length : 0;
 
-    // Should be 0 calls (only the function definition line is allowed)
-    expect(callCount, 'No uniform registerFrames calls should remain').toBe(0);
-    expect(defCount, 'Function definition should exist').toBe(1);
+    // With shared base: no local definition, no direct calls, uses base import
+    if (usesBase > 0) {
+      expect(callCount, 'No uniform registerFrames calls should remain').toBe(0);
+    } else {
+      // Legacy: function definition should exist, no direct calls
+      expect(callCount, 'No uniform registerFrames calls should remain').toBe(0);
+      expect(defCount, 'Function definition should exist').toBe(1);
+    }
   });
 
   it('has all required animation states registered with variable frames', () => {
