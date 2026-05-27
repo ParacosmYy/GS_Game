@@ -83,12 +83,13 @@ function ioriVFX(ctx: HitEffectContext): boolean {
     vfx.spawnIoriAoihanaTrail(hitX, hitY, attacker.facing, 2);
     handled = true;
   }
-  // Kototsuki (琴月) — dark rush
+  // Kototsuki (琴月) — dark rush with trailing claw wisps
   if (atkName === 'IORI_KOTOTSUKI' || atkName === 'IORI_KOTOTSUKI_D') {
     cinematic.addHitStop(2, ctx.defIdx);
     screenShake.trigger(8, 8, attacker.facing * 4);
     vfx.spawnImpactRing(hitX, hitY, 1.2);
     vfx.spawnProjectileExplosion(hitX, hitY, '#6600aa', '#aa44ff');
+    vfx.spawnIoriAoihanaTrail(hitX, hitY, attacker.facing, 2);
     handled = true;
   }
   // Kuzukaze (屑風) — command grab

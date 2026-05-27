@@ -114,11 +114,20 @@ function kyoVFX(ctx: HitEffectContext): boolean {
     vfx.spawnProjectileExplosion(hitX, hitY, '#ff4400', '#ff8822');
     handled = true;
   }
-  // 75-Shiki Kai — rapid rekka
-  if (atkName === 'KYO_75KAI' || atkName === 'KYO_75KAI_2') {
+  // 75-Shiki Kai — rapid rekka, escalating per hit
+  if (atkName === 'KYO_75KAI') {
     cinematic.addHitStop(1, ctx.defIdx);
     screenShake.trigger(5, 6, attacker.facing * 3);
     vfx.spawnProjectileExplosion(hitX, hitY, '#ff6622', '#ffaa44');
+    vfx.spawnImpactRing(hitX, hitY, 0.7);
+    handled = true;
+  }
+  if (atkName === 'KYO_75KAI_2') {
+    cinematic.addHitStop(2, ctx.defIdx);
+    screenShake.trigger(8, 8, attacker.facing * 4);
+    vfx.spawnProjectileExplosion(hitX, hitY, '#ff4400', '#ffcc44');
+    vfx.spawnImpactRing(hitX, hitY, 1.0);
+    screenFlash.trigger('#ff6600', 0.08, 3);
     handled = true;
   }
   // DM Orochinagi (大蛇薙)
