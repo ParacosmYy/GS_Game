@@ -210,6 +210,14 @@ export function drawFighters(
       ctx.translate(wobbleX, jitterY);
     }
 
+
+    // Blockstun body impact — KOF2002 guard stance pushback wobble
+    // Defenders shake briefly on heavy/special block, light is almost still
+    if (f.state === FighterState.BLOCKSTUN && f.blockstunTimer > 0) {
+      const blockShake = f.blockstunTimer > 12 ? 2.5 : f.blockstunTimer > 6 ? 1.5 : 0.8;
+      const wobbleX = Math.sin(f.stateAge * 1.2) * blockShake;
+      ctx.translate(wobbleX, 0);
+    }
     // Getup Y offset — interpolate from lying (ground) to standing position
     if (f.state === FighterState.GETUP && f.getupTimer > 0) {
       const getupProgress = 1 - (f.getupTimer / (f.getupDuration || 15));
