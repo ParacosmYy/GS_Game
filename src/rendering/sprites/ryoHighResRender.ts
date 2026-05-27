@@ -146,9 +146,9 @@ function initAllFrames(): void {
   // Frame order: neutral → rise → rising → peak → descend → descending → valley → return
   registerVariableFrames('IDLE', RYO_IDLE_FRAMES, [7, 8, 9, 12, 9, 8, 10, 7]);
 
-  // WALK — forward and backward stored as separate entries
-  registerFrames('WALK_FORWARD', RYO_WALK_FORWARD_FRAMES, 6);
-  registerFrames('WALK_BACKWARD', RYO_WALK_BACKWARD_FRAMES, 7);
+  // WALK — variable frame rhythm: stride contact holds longer, passing phase faster
+  registerVariableFrames('WALK_FORWARD', RYO_WALK_FORWARD_FRAMES, [7, 5, 7, 7, 5, 7]);
+  registerVariableFrames('WALK_BACKWARD', RYO_WALK_BACKWARD_FRAMES, [8, 6, 8, 8, 6, 8]);
 
   // ATTACK — stand_a (light punch) and stand_c (heavy punch)
   // STAND_A: startup=6, active=3, recovery=5 = 14 total; 4 frames × 4 tpf = 16
