@@ -16,7 +16,6 @@
 
 import { FighterState, AttackType } from '../../../core/types.js';
 import {
-  registerFrames as reg,
   registerVariableFrames as regV,
   drawFromRegistry,
   drawAfterimageFromRegistry,
@@ -47,9 +46,7 @@ const FRAME_CACHE = new Map<string, HTMLCanvasElement>();
 
 let initialized = false;
 
-/** Shorthand helpers bound to Kyo's registry */
-const registerFrames = (key: string, frames: Parameters<typeof reg>[2], tpf: number) =>
-  reg(KYO_FRAMES, key, frames, tpf);
+/** Shorthand helper bound to Kyo's registry */
 const registerVariableFrames = (key: string, frames: Parameters<typeof regV>[2], durations: number[]) =>
   regV(KYO_FRAMES, key, frames, durations);
 
@@ -58,8 +55,8 @@ function initKyoFrames(): void {
   initialized = true;
 
   registerVariableFrames('IDLE', KYO_IDLE_FRAMES, [8, 9, 12, 9, 10, 8]);
-  registerFrames('WALK_FORWARD', KYO_WALK_FORWARD_FRAMES, 6);
-  registerFrames('WALK_BACKWARD', KYO_WALK_BACKWARD_FRAMES, 7);
+  registerVariableFrames('WALK_FORWARD', KYO_WALK_FORWARD_FRAMES, [6, 5, 6, 6, 5, 6]);
+  registerVariableFrames('WALK_BACKWARD', KYO_WALK_BACKWARD_FRAMES, [7, 6, 7, 7, 6, 7]);
 
   // Stand punches
   registerVariableFrames('STAND_A', KYO_STAND_A_FRAMES, [6, 3, 2, 5]);
