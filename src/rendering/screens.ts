@@ -687,6 +687,17 @@ export function drawIntro(ctx: CanvasRenderingContext2D, phaseTimer: number, cur
       ctx.stroke();
       ctx.restore();
     }
+    // KOF2002: 回合开始暗角 — 前20帧边缘渐暗
+    if (phaseTimer < 20) {
+      ctx.save();
+      ctx.globalAlpha = (20 - phaseTimer) / 20 * 0.3;
+      const grad = ctx.createRadialGradient(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, CANVAS_HEIGHT * 0.3, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, CANVAS_HEIGHT * 0.8);
+      grad.addColorStop(0, 'rgba(0,0,0,0)');
+      grad.addColorStop(1, 'rgba(0,0,0,1)');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+      ctx.restore();
+    }
     const progress = phaseTimer / INTRO_ROUND_FRAMES;
     const fadeIn = Math.min(1, phaseTimer / 20);
     const fadeOut = phaseTimer > INTRO_ROUND_FRAMES - 20 ? (INTRO_ROUND_FRAMES - phaseTimer) / 20 : 1;

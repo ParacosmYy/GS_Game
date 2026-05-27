@@ -960,6 +960,16 @@ export function drawFighters(
       ctx.beginPath();
       ctx.ellipse(sx, sy - f.displayHeight / 2, ringRadius * 0.7, ringRadius * 0.4, 0, 0, Math.PI * 2);
       ctx.stroke();
+      // KOF2002: 超必杀启动竖线 — superBgFlashFrames>6时竖直亮线
+      if (f.superBgFlashFrames > 6) {
+        ctx.globalAlpha = (f.superBgFlashFrames - 6) / 6 * 0.3;
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(sx, sy - f.displayHeight - 10);
+        ctx.lineTo(sx, sy + 10);
+        ctx.stroke();
+      }
       ctx.restore();
     }
     // KOF2002: Counter Hit橙色爆发 — counterGlowFrames时额外橙色扩散

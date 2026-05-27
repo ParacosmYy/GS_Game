@@ -159,6 +159,20 @@ export class Renderer {
         if (f.superBgFlashFrames > 8) {
           ctx.fillStyle = 'rgba(255, 30, 0, 0.08)';
           ctx.fillRect(-10, -10, CANVAS_WIDTH + 20, CANVAS_HEIGHT + 20);
+          // KOF2002: SDM雷光 — SDM发动时随机闪电线条
+          if (f.superBgFlashFrames % 2 === 0) {
+            ctx.save();
+            ctx.globalAlpha = 0.3;
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 1.5;
+            const lx = CANVAS_WIDTH / 2 + (Math.random() - 0.5) * 200;
+            ctx.beginPath();
+            ctx.moveTo(lx, 0);
+            ctx.lineTo(lx + (Math.random() - 0.5) * 40, CANVAS_HEIGHT * 0.4);
+            ctx.lineTo(lx + (Math.random() - 0.5) * 60, CANVAS_HEIGHT);
+            ctx.stroke();
+            ctx.restore();
+          }
         }
       }
       // KOF2002: Counter Hit橙色闪屏 — counterGlowFrames时短暂橙色叠加
