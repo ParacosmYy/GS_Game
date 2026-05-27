@@ -164,6 +164,27 @@ export function resetHUDFlash(): void {
   }
 }
 
+// ===== Arcade Score =====
+let arcadeScore = 0;
+let displayScore = 0;
+
+export function addArcadeScore(points: number): void {
+  arcadeScore += points;
+}
+
+export function resetArcadeScore(): void {
+  arcadeScore = 0;
+  displayScore = 0;
+}
+
+function tickArcadeScore(): void {
+  // Smoothly roll up the display number
+  if (displayScore < arcadeScore) {
+    const diff = arcadeScore - displayScore;
+    displayScore += Math.max(1, Math.ceil(diff * 0.15));
+  }
+}
+
 // ===== Combo counter fade state (see ComboFadeState below) =====
 
 /** HUD portrait size constants */
@@ -625,6 +646,23 @@ export function drawHUD(
   // ===== P1 move list panel =====
   if (p1MoveList.length > 0) {
     drawMoveListPanel(ctx, p1MoveList, simplifiedMode);
+  }
+
+  // ===== Arcade Score display (P1 side, bottom-left) =====
+  if (arcadeScore > 0 || displayScore > 0) {
+    tickArcadeScore();
+    const scoreX = HUD_MARGIN;
+    const scoreY = CANVAS_HEIGHT - 20;
+    ctx.save();
+    ctx.globalAlpha = 0.8;
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'bottom';
+    drawSNKText(ctx, 'SCORE', scoreX, scoreY - 14, 9, '#888');
+    ctx.shadowColor = '#ffcc00';
+    ctx.shadowBlur = 6;
+    drawSNKText(ctx, displayScore.toString().padStart(8, '0'), scoreX, scoreY, 14, '#ffcc00');
+    ctx.shadowBlur = 0;
+    ctx.restore();
   }
 
   // ===== Screen edge red pulse when time < 10 (stronger at < 5) =====

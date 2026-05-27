@@ -20,6 +20,7 @@ import { cycleStage, setStage, getStage, getAllStages, type StageId } from './re
 import { drawVictoryPose } from './rendering/skeletalFighter.js';
 import { drawRyoWinPose } from './rendering/sprites/ryoHighResRender.js';
 import type { TeamDisplayInfo } from './rendering/hud.js';
+import { addArcadeScore, resetArcadeScore } from './rendering/hud.js';
 import { ROSTER } from './characters/index.js';
 import { SpriteManager, SpriteRenderer } from './rendering/spriteRenderer.js';
 import { generatePlaceholderSpritesheet } from './rendering/placeholderSprites.js';
@@ -395,6 +396,7 @@ function update(): void {
         gs.arcadeOpponents = generateArcadeOpponents(p1.charId);
         gs.arcadeOpponentIndex = 0;
         gs.arcadeComplete = false;
+        resetArcadeScore();
       }
       initAudio();
       initSampler();
@@ -884,6 +886,8 @@ function update(): void {
         const lastDmg = combatSystem.getComboDamage(i);
         vfx.spawnComboEndText(f.x, f.y - f.displayHeight - 50, lastCombo);
         vfx.spawnComboDamageText(f.x, f.y - f.displayHeight - 50, lastDmg);
+        // Arcade score: combo bonus
+        if (i === 1) { addArcadeScore(lastCombo * 100 + lastDmg * 5); }
       }
       if (lastCombo >= 2) {
         const opp = i === 0 ? p2 : p1;
@@ -1045,6 +1049,11 @@ function update(): void {
       gs.setPhase(GamePhase.KO);
       gs.koTimer = 0;
       gs.winner = rounds.determineWinner();
+      // Arcade score: round win bonus
+      if (gs.winner === 0) {
+        const hpBonus = Math.round(p1.health / p1.maxHealth * 1000);
+        addArcadeScore(3000 + hpBonus);
+      }
       const isPerfect = gs.winner !== null && cinematic.getPerfectPlayer(gs.winner) !== null;
       gs.announceSequence.setSteps(createKOSequence(isPerfect));
       if (isPerfect) {
@@ -1362,6 +1371,7 @@ function restartGame(): void {
   bgm.stop();
   ambient.stop();
   gs.resetForNewGame();
+  resetArcadeScore();
   tickRef.value = 0;
   select.reset();
   p2AI = null;
