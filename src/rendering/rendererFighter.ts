@@ -368,6 +368,18 @@ export function drawFighters(
       ctx.fill();
       ctx.restore();
     }
+    // KOF2002: MAX模式跑步火花 — MAX+RUN时绿色火花
+    if (maxModeActive && f.state === FighterState.RUN && f.stateAge % 3 === 0) {
+      ctx.save();
+      ctx.globalAlpha = 0.3;
+      ctx.fillStyle = '#44ff88';
+      const sparkX = sx - f.facing * (5 + Math.random() * 15);
+      const sparkY = sy - f.displayHeight * (0.3 + Math.random() * 0.4);
+      ctx.beginPath();
+      ctx.arc(sparkX, sparkY, 1.5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
     // KOF2002: 跳跃起飞烟尘 — JUMP/HYPER_JUMP首帧脚下烟尘
     if ((f.state === FighterState.JUMP || f.state === FighterState.HYPER_JUMP || f.state === FighterState.RUN_JUMP) && f.stateAge < 2) {
       ctx.save();
@@ -376,6 +388,18 @@ export function drawFighters(
       ctx.beginPath();
       ctx.ellipse(sx, sy, 8 + f.stateAge * 3, 3, 0, 0, Math.PI * 2);
       ctx.fill();
+      ctx.restore();
+    }
+    // KOF2002: 大跳爆发 — HYPER_JUMP首帧额外能量爆发环
+    if (f.state === FighterState.HYPER_JUMP && f.stateAge < 2) {
+      ctx.save();
+      ctx.globalAlpha = (2 - f.stateAge) / 2 * 0.25;
+      ctx.strokeStyle = '#ffcc44';
+      ctx.lineWidth = 1.5;
+      const hBurstR = 12 + f.stateAge * 8;
+      ctx.beginPath();
+      ctx.ellipse(sx, sy, hBurstR, hBurstR * 0.3, 0, 0, Math.PI * 2);
+      ctx.stroke();
       ctx.restore();
     }
     // KOF2002: 后撤步渐隐 — 后dash期间身体更透明(幻影感)
@@ -993,6 +1017,18 @@ export function drawFighters(
       ctx.globalAlpha = lowHpAlpha;
       ctx.fillStyle = '#ff2200';
       ctx.fillRect(sx + leanOffsetX - 50, sy - f.displayHeight, 100, f.displayHeight);
+      ctx.restore();
+    }
+    // KOF2002: 擦杀危险红色脉冲 — HP<5%且防御中时红色脉冲轮廓
+    if (f.health > 0 && f.health < f.maxHealth * 0.05 && (f.state === FighterState.BLOCK || f.state === FighterState.BLOCKSTUN)) {
+      ctx.save();
+      ctx.globalCompositeOperation = 'screen';
+      ctx.globalAlpha = 0.15 + Math.sin(globalTick * 0.4) * 0.1;
+      ctx.strokeStyle = '#ff0000';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.ellipse(sx, sy - f.displayHeight / 2, hw + 4, f.displayHeight / 2 + 4, 0, 0, Math.PI * 2);
+      ctx.stroke();
       ctx.restore();
     }
     // KOF2002: 防御崩坏破碎扩散 — 碎片从角色向外飞散
