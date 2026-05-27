@@ -1034,27 +1034,91 @@ export function drawKO(
     ctx.globalAlpha = 1;
   }
 
-  // Time Over HP comparison bar
-  if (isTimeOver && winner !== null) {
-    const barY = CANVAS_HEIGHT / 2 + 85;
-    const barW = 200;
-    const barH = 12;
+  // KO Result HP comparison — all KO types, not just time over
+  if (winner !== null && koTimer > 55) {
+    const resultAlpha = Math.min(1, (koTimer - 55) / 20);
+    const barY = CANVAS_HEIGHT / 2 + 80;
+    const barW = 240;
+    const barH = 16;
     const barX = CANVAS_WIDTH / 2 - barW / 2;
     const p1Ratio = Math.max(0, p1Hp / maxHp);
     const p2Ratio = Math.max(0, p2Hp / maxHp);
-    ctx.fillStyle = 'rgba(0,0,0,0.6)';
-    roundRect(ctx, barX - 2, barY - 2, barW + 4, barH + 4, 4);
+
+    ctx.globalAlpha = resultAlpha;
+
+    // Result card background
+    ctx.fillStyle = 'rgba(5, 5, 15, 0.8)';
+    roundRect(ctx, barX - 12, barY - 22, barW + 24, barH + 38, 6);
     ctx.fill();
-    ctx.fillStyle = '#ff6644';
-    roundRect(ctx, barX, barY, barW * p1Ratio, barH, 3);
-    ctx.fill();
-    ctx.fillStyle = '#4488ff';
-    roundRect(ctx, barX + barW * p1Ratio, barY, barW * p2Ratio, barH, 3);
-    ctx.fill();
-    ctx.strokeStyle = 'rgba(200,168,50,0.4)';
-    ctx.lineWidth = 1;
-    roundRect(ctx, barX, barY, barW, barH, 3);
+    // Card border — winner side glows
+    ctx.strokeStyle = winner === 0 ? 'rgba(255, 100, 60, 0.6)' : 'rgba(68, 136, 255, 0.6)';
+    ctx.lineWidth = 1.5;
+    roundRect(ctx, barX - 12, barY - 22, barW + 24, barH + 38, 6);
     ctx.stroke();
+
+    // P1 label + HP percentage
+    const p1Label = `P1 ${Math.round(p1Ratio * 100)}%`;
+    drawSNKText(ctx, p1Label, barX - 5, barY - 10, 9, winner === 0 ? '#ff6644' : '#886655');
+    // P2 label + HP percentage
+    const p2Label = `${Math.round(p2Ratio * 100)}% P2`;
+    drawSNKText(ctx, p2Label, barX + barW + 5, barY - 10, 9, winner === 1 ? '#4488ff' : '#556688');
+
+    // HP bar background
+    ctx.fillStyle = '#0f0f1a';
+    roundRect(ctx, barX, barY, barW, barH, 3);
+    ctx.fill();
+
+    // P1 HP fill (left side)
+    const p1FillW = Math.round(barW / 2 * p1Ratio);
+    if (p1FillW > 0) {
+      const p1Grad = ctx.createLinearGradient(barX, barY, barX, barY + barH);
+      p1Grad.addColorStop(0, winner === 0 ? '#ff8855' : '#886655');
+      p1Grad.addColorStop(1, winner === 0 ? '#cc4422' : '#554433');
+      ctx.fillStyle = p1Grad;
+      roundRect(ctx, barX, barY, p1FillW, barH, 3);
+      ctx.fill();
+    }
+
+    // P2 HP fill (right side)
+    const p2FillW = Math.round(barW / 2 * p2Ratio);
+    if (p2FillW > 0) {
+      const p2Grad = ctx.createLinearGradient(barX + barW - p2FillW, barY, barX + barW - p2FillW, barY + barH);
+      p2Grad.addColorStop(0, winner === 1 ? '#6699ff' : '#556688');
+      p2Grad.addColorStop(1, winner === 1 ? '#2244cc' : '#334455');
+      ctx.fillStyle = p2Grad;
+      roundRect(ctx, barX + barW - p2FillW, barY, p2FillW, barH, 3);
+      ctx.fill();
+    }
+
+    // Center divider line
+    ctx.strokeStyle = 'rgba(200, 168, 50, 0.5)';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(CANVAS_WIDTH / 2, barY + 1);
+    ctx.lineTo(CANVAS_WIDTH / 2, barY + barH - 1);
+    ctx.stroke();
+
+    // Winner side marker
+    const markerX = winner === 0 ? barX - 3 : barX + barW + 3;
+    const markerPulse = 0.6 + Math.sin(koTimer * 0.1) * 0.4;
+    ctx.fillStyle = winner === 0 ? `rgba(255, 100, 60, ${markerPulse})` : `rgba(68, 136, 255, ${markerPulse})`;
+    ctx.beginPath();
+    if (winner === 0) {
+      ctx.moveTo(markerX, barY + barH / 2 - 5);
+      ctx.lineTo(markerX + 6, barY + barH / 2);
+      ctx.lineTo(markerX, barY + barH / 2 + 5);
+    } else {
+      ctx.moveTo(markerX, barY + barH / 2 - 5);
+      ctx.lineTo(markerX - 6, barY + barH / 2);
+      ctx.lineTo(markerX, barY + barH / 2 + 5);
+    }
+    ctx.fill();
+
+    // "WINNER" label under the winning side
+    const winLabelX = winner === 0 ? barX + 20 : barX + barW - 20;
+    drawSNKText(ctx, 'WIN', winLabelX, barY + barH + 6, 8, '#ffcc00');
+
+    ctx.globalAlpha = 1;
   }
 
   ctx.fillStyle = 'rgba(255,255,255,0.4)';
