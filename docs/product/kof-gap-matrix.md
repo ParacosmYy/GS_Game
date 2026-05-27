@@ -55,6 +55,7 @@
   - 受击反馈与攻击重量绑定 (inferTier 自动分类 + 显式映射)
   - 角色专属 DM/SDM/HSDM 火花色板 (Kyo 火/Iori 紫/Ryo 雷)
   - Kyo大蛇薙专属火焰柱VFX、Iori闇払い专属暗能量发射VFX
+  - MAX mode角色属性光效: Kyo火橙/Iori暗紫/Ryo蓝雷
   - 23+ 回归测试保护反馈矩阵完整性和层级递进
 - 当前差距：hitstop、spark、shake、pushback、SFX 还没有按轻重/特殊/爆气状态形成稳定矩阵。
 - 新功能添加点：
@@ -110,7 +111,7 @@
   - Kyo 完整度校验工具 (8维报告: animationMeta/frameData/attackFrames/feedback/portrait/moveList/cancelPaths/hitEffects)
   - Iori 完整度校验工具 (8维报告: 同Kyo结构)
   - Kyo/Iori完整度回归测试 (33 tests: 维度有效性+覆盖率+最低阈值)
-  - 测试总数 4311
+  - 测试总数 4323
 - 当前差距：角色内容已开始分层，但真实数据、兼容入口、校验工具之间还需继续收口。
 - 新功能添加点：
   - `src/content/characters/index.ts` barrel export
@@ -133,6 +134,9 @@
   - 3角色四尺寸肖像一致性回归测试 (28 tests, select/vs/hud/win全尺寸)
   - 3角色动画节奏一致性回归测试 (63 tests, 轻重攻击递增+loop属性+参数正值)
   - 3角色 manifest 校验工具 全绿 (82+89+89 checks)
+  - 3角色8维完整度校验工具 (Ryo/Kyo/Iori各8维度+加权总分，3角色均100%)
+  - 多角色统一校验入口 (multiCharValidation.ts)
+  - Kyo/Iori完整度+命中特效前缀覆盖率回归测试 (45 tests)
   - HSDM招式表分类+CN_MOVE_NAMES覆盖回归测试 (11 tests)
 - 新功能添加点：
   - smoke / ryo / combat / content 分层测试
