@@ -1113,6 +1113,12 @@ export function resolveFighterColors(f: Fighter, globalTick: number): { bodyColo
       bodyColor = accent.body;
       outlineColor = accent.outline;
       glowColor = accent.glow;
+      // KOF2002: 攻击命中暖色增强 — hitstop时攻击色偏暖(力量感)
+      if (f.hitFlashFrames > 0) {
+        bodyColor = '#ffffff';
+        outlineColor = '#ffdd8860';
+        glowColor = '#ffaa0030';
+      }
       break;
     }
     case FighterState.BLOCK:
