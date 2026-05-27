@@ -101,4 +101,43 @@ describe('Multi-character pixel frame coverage', () => {
       });
     });
   }
+
+  // Special move coverage per character
+  describe('Ryo special moves', () => {
+    const check = (s: FighterState, a: AttackType | null) => hasRyoFrame('ryo', s, a, 0, 1);
+    it('KOOU (light)', () => expect(check(FighterState.STAND_ATTACK, AttackType.RYO_KOOU)).toBe(true));
+    it('KOOU (heavy)', () => expect(check(FighterState.STAND_ATTACK, AttackType.RYO_KOOU_C)).toBe(true));
+    it('KO_HOU', () => expect(check(FighterState.STAND_ATTACK, AttackType.RYO_KO_HOU)).toBe(true));
+    it('HIEN', () => expect(check(FighterState.STAND_ATTACK, AttackType.RYO_HIEN)).toBe(true));
+    it('DM_TEN_HA_OU', () => expect(check(FighterState.STAND_ATTACK, AttackType.DM_TEN_HA_OU)).toBe(true));
+    it('SDM_TEN_HA_OU', () => expect(check(FighterState.STAND_ATTACK, AttackType.SDM_TEN_HA_OU)).toBe(true));
+    it('DM_RYUKO_RANBU', () => expect(check(FighterState.STAND_ATTACK, AttackType.DM_RYUKO_RANBU)).toBe(true));
+    it('HSDM_RYUKO_RANBU', () => expect(check(FighterState.STAND_ATTACK, AttackType.HSDM_RYUKO_RANBU)).toBe(true));
+  });
+
+  describe('Kyo special moves', () => {
+    const check = hasKyoHighResFrame;
+    it('ONIYAKI (light)', () => expect(check(FighterState.STAND_ATTACK, AttackType.KYO_ONIYAKI)).toBe(true));
+    it('YAMIBARAI', () => expect(check(FighterState.STAND_ATTACK, AttackType.KYO_YAMIBARAI)).toBe(true));
+    it('RED_KICK', () => expect(check(FighterState.STAND_ATTACK, AttackType.KYO_RED_KICK)).toBe(true));
+    it('75KAI', () => expect(check(FighterState.STAND_ATTACK, AttackType.KYO_75KAI)).toBe(true));
+    it('ARAGAMI', () => expect(check(FighterState.STAND_ATTACK, AttackType.KYO_ARAGAMI)).toBe(true));
+    it('DOKUGAMI', () => expect(check(FighterState.STAND_ATTACK, AttackType.KYO_DOKUGAMI)).toBe(true));
+    it('DM_OROCHINAGI', () => expect(check(FighterState.STAND_ATTACK, AttackType.DM_OROCHINAGI)).toBe(true));
+    it('SDM_OROCHINAGI', () => expect(check(FighterState.STAND_ATTACK, AttackType.SDM_OROCHINAGI)).toBe(true));
+    it('HSDM_OROCHINAGI', () => expect(check(FighterState.STAND_ATTACK, AttackType.HSDM_OROCHINAGI)).toBe(true));
+    it('CMD_GOFU_YOU', () => expect(check(FighterState.STAND_ATTACK, AttackType.CMD_GOFU_YOU)).toBe(true));
+    it('CMD_88SHIKI', () => expect(check(FighterState.STAND_ATTACK, AttackType.CMD_88SHIKI)).toBe(true));
+  });
+
+  describe('Iori special moves', () => {
+    const check = hasIoriHighResFrame;
+    it('ONIYAKI', () => expect(check(FighterState.STAND_ATTACK, AttackType.IORI_ONIYAKI)).toBe(true));
+    it('YAMIBARAI', () => expect(check(FighterState.STAND_ATTACK, AttackType.IORI_YAMIBARAI)).toBe(true));
+    it('KOTOTSUKI', () => expect(check(FighterState.STAND_ATTACK, AttackType.IORI_KOTOTSUKI)).toBe(true));
+    it('AOIHANA', () => expect(check(FighterState.STAND_ATTACK, AttackType.IORI_AOIHANA)).toBe(true));
+    it('DM_YATAGARASU', () => expect(check(FighterState.STAND_ATTACK, AttackType.DM_YATAGARASU)).toBe(true));
+    it('SDM_YATAGARASU', () => expect(check(FighterState.STAND_ATTACK, AttackType.SDM_YATAGARASU)).toBe(true));
+    it('HSDM_YAOTOME', () => expect(check(FighterState.STAND_ATTACK, AttackType.HSDM_YAOTOME)).toBe(true));
+  });
 });
