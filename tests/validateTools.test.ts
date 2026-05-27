@@ -196,3 +196,79 @@ describe('Manifest: hurtbox coverage', () => {
     }
   });
 });
+
+// ========== Kyo & Iori manifest validation ==========
+
+import { hasKyoHighResFrame } from '../src/rendering/sprites/kyo/kyoHighResRender.js';
+import { hasIoriHighResFrame } from '../src/rendering/sprites/iori/ioriHighResRender.js';
+
+const KYO_ATTACK_TYPES: AttackType[] = [
+  AttackType.STAND_A, AttackType.STAND_B, AttackType.STAND_C, AttackType.STAND_D,
+  AttackType.CLOSE_A, AttackType.CLOSE_B, AttackType.CLOSE_C, AttackType.CLOSE_D,
+  AttackType.CROUCH_A, AttackType.CROUCH_B, AttackType.CROUCH_C, AttackType.CROUCH_D,
+  AttackType.JUMP_A, AttackType.JUMP_C, AttackType.JUMP_D,
+  AttackType.KYO_YAMIBARAI, AttackType.KYO_YAMIBARAI_C,
+  AttackType.KYO_ONIYAKI, AttackType.KYO_ONIYAKI_C,
+  AttackType.KYO_RED_KICK, AttackType.KYO_75KAI,
+  AttackType.KYO_ARAGAMI, AttackType.KYO_DOKUGAMI,
+  AttackType.DM_OROCHINAGI, AttackType.SDM_OROCHINAGI, AttackType.HSDM_OROCHINAGI,
+];
+
+const IORI_ATTACK_TYPES: AttackType[] = [
+  AttackType.STAND_A, AttackType.STAND_B, AttackType.STAND_C, AttackType.STAND_D,
+  AttackType.CLOSE_A, AttackType.CLOSE_B, AttackType.CLOSE_C, AttackType.CLOSE_D,
+  AttackType.CROUCH_A, AttackType.CROUCH_B, AttackType.CROUCH_C, AttackType.CROUCH_D,
+  AttackType.JUMP_A, AttackType.JUMP_C, AttackType.JUMP_D,
+  AttackType.IORI_YAMIBARAI, AttackType.IORI_YAMIBARAI_C,
+  AttackType.IORI_ONIYAKI, AttackType.IORI_ONIYAKI_C,
+  AttackType.IORI_KOTOTSUKI, AttackType.IORI_AOIHANA,
+  AttackType.DM_YATAGARASU, AttackType.SDM_YATAGARASU, AttackType.HSDM_YAOTOME,
+];
+
+describe('Kyo manifest: feedback tier coverage', () => {
+  it('all Kyo attacks have explicit feedback tier mapping', () => {
+    let missing: string[] = [];
+    for (const at of KYO_ATTACK_TYPES) {
+      if (!FEEDBACK_MANIFEST.attackTierMap[at]) missing.push(at);
+    }
+    expect(missing.length, `Missing tiers: ${missing.join(', ')}`).toBe(0);
+  });
+});
+
+describe('Iori manifest: feedback tier coverage', () => {
+  it('all Iori attacks have explicit feedback tier mapping', () => {
+    let missing: string[] = [];
+    for (const at of IORI_ATTACK_TYPES) {
+      if (!FEEDBACK_MANIFEST.attackTierMap[at]) missing.push(at);
+    }
+    expect(missing.length, `Missing tiers: ${missing.join(', ')}`).toBe(0);
+  });
+});
+
+describe('Kyo manifest: high-res frame coverage for attacks', () => {
+  it('all Kyo attacks resolve to high-res frames', () => {
+    let missing: string[] = [];
+    for (const at of KYO_ATTACK_TYPES) {
+      const isStand = at.startsWith('STAND_') || at.startsWith('CLOSE_') || at.startsWith('KYO_')
+        || at.startsWith('DM_') || at.startsWith('SDM_') || at.startsWith('HSDM_') || at.startsWith('CMD_');
+      if (isStand && !hasKyoHighResFrame(FighterState.STAND_ATTACK, at, 0, 1)) {
+        missing.push(at);
+      }
+    }
+    expect(missing.length, `Missing frames: ${missing.join(', ')}`).toBe(0);
+  });
+});
+
+describe('Iori manifest: high-res frame coverage for attacks', () => {
+  it('all Iori attacks resolve to high-res frames', () => {
+    let missing: string[] = [];
+    for (const at of IORI_ATTACK_TYPES) {
+      const isStand = at.startsWith('STAND_') || at.startsWith('CLOSE_') || at.startsWith('IORI_')
+        || at.startsWith('DM_') || at.startsWith('SDM_') || at.startsWith('HSDM_');
+      if (isStand && !hasIoriHighResFrame(FighterState.STAND_ATTACK, at, 0, 1)) {
+        missing.push(at);
+      }
+    }
+    expect(missing.length, `Missing frames: ${missing.join(', ')}`).toBe(0);
+  });
+});
