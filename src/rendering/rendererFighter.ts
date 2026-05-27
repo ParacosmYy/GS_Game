@@ -727,6 +727,21 @@ export function drawFighters(
       ctx.stroke();
       ctx.restore();
     }
+    // KOF2002: KO倒地红光 — 倒地状态持续红晕
+    if (f.health <= 0 && (f.state === FighterState.KNOCKDOWN || f.state === FighterState.GETUP)) {
+      ctx.save();
+      ctx.globalCompositeOperation = 'screen';
+      ctx.globalAlpha = 0.12;
+      const koAuraGrad = ctx.createRadialGradient(
+        sx, sy - f.displayHeight / 2, 5,
+        sx, sy - f.displayHeight / 2, hw + 20,
+      );
+      koAuraGrad.addColorStop(0, 'rgba(255, 40, 20, 0.3)');
+      koAuraGrad.addColorStop(1, 'rgba(255, 0, 0, 0)');
+      ctx.fillStyle = koAuraGrad;
+      ctx.fillRect(sx - hw - 20, sy - f.displayHeight - 20, (hw + 20) * 2, f.displayHeight + 40);
+      ctx.restore();
+    }
     // KOF2002: 低血量红色警告 — HP<25%时身体微红
     if (f.health > 0 && f.health < f.maxHealth * 0.25) {
       const hpRatio = f.health / (f.maxHealth * 0.25);
