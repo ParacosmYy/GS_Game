@@ -453,6 +453,11 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
     // KOF2002: Counter hit发光轮廓 — 反击命中时攻击者短暂橙色轮廓
     if (counterHit) { attacker.counterGlowFrames = 6; }
 
+    // KOF2002: 绝境反击视觉 — 攻击者低血量时命中闪现红色边框暗示危机反击
+    if (attacker.health < attacker.maxHealth * 0.25 && !isDM) {
+      deps.screenFlash.trigger('#ff2200', 0.06, 2);
+    }
+
     // KOF2002: 必杀技/超必杀命中斩线 — 特殊技以上命中时产生方向性斩线
     if ((isSpecial || isDM) && !isThrowAttack(attackType)) {
       const slashColor = isDM ? (isSDM ? '#ff44ff' : '#ffaa00') : '#ffffff';
