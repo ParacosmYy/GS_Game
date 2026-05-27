@@ -1209,7 +1209,7 @@ function render(): void {
   if (gs.phase === GamePhase.SELECT) {
     renderer.drawCharacterSelect(select, tickRef.value, gs.simplifiedMode, getStage());
     if (select.vsSplashTimer >= 0) {
-      renderer.drawVSSplash(select, tickRef.value);
+      renderer.drawVSSplash(select, tickRef.value, getStage());
     }
     return;
   }

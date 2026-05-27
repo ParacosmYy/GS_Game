@@ -732,6 +732,7 @@ export function drawVSSplash(
   ctx: CanvasRenderingContext2D,
   selectState: SelectState,
   tick: number,
+  currentStage: StageId,
 ): void {
   const timer = selectState.vsSplashTimer;
   if (timer < 0) return;
@@ -900,6 +901,19 @@ export function drawVSSplash(
         drawSNKText(ctx, p2Line.substring(0, p2CharsVisible), CANVAS_WIDTH * 0.75, dlgY + 62, 14, p2Color, '#000000', 'center');
       }
     }
+  }
+
+  // Stage name (bottom center)
+  const stageAlpha = Math.min(1, Math.max(0, (timer - 15) / 15));
+  if (stageAlpha > 0) {
+    ctx.globalAlpha = stageAlpha * fadeIn;
+    const stageName = STAGE_NAMES[currentStage] || currentStage;
+    ctx.save();
+    ctx.shadowColor = '#ffcc00';
+    ctx.shadowBlur = 6;
+    drawSNKText(ctx, stageName, CANVAS_WIDTH / 2, CANVAS_HEIGHT - 28, 12, '#ccaa44');
+    ctx.shadowBlur = 0;
+    ctx.restore();
   }
 
   ctx.globalAlpha = 1;

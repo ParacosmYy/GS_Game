@@ -359,8 +359,8 @@ export class Renderer {
     drawCharacterSelect(this.ctx, selectState, tick, simplifiedMode, currentStage);
   }
 
-  drawVSSplash(selectState: SelectState, tick: number): void {
-    drawVSSplash(this.ctx, selectState, tick);
+  drawVSSplash(selectState: SelectState, tick: number, currentStage: StageId): void {
+    drawVSSplash(this.ctx, selectState, tick, currentStage);
   }
 
   drawMatchEnd(winner: number | null, p1Wins: number, p2Wins: number, winQuote?: string, winnerColor?: string, tick?: number, winnerCharId?: string): void {
