@@ -1208,7 +1208,8 @@ function update(): void {
       const koDefender = p1.health <= 0 ? 0 : 1;
       const koAttacker = p1.health <= 0 ? p2 : p1;
       cinematic.triggerHitStop(isDMKill ? 20 : 15, koDefender, koAttacker.facing);
-      screenFlash.trigger('#ff2200', 0.35, 15);
+      const koFlashColor = isDMKill ? getMaxAuraColor(killer.charId).css : '#ff2200';
+      screenFlash.trigger(koFlashColor, 0.35, 15);
       screenShake.trigger(isDMKill ? 18 : 14, 15);
       // KO impact dust particles at hit location
       const hitX = (killer.x + loser.x) / 2;
