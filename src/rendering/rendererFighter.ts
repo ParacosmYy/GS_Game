@@ -149,6 +149,14 @@ export function drawFighters(
       // KOF2002: 步行微弹 — 每6帧上下2px弹跳模拟步伐
       leanOffsetY = Math.abs(Math.sin(f.stateAge * 0.5)) * 2;
     }
+    // KOF2002: 受击/防御后仰 — 被打时身体向后方微倾
+    if (f.state === FighterState.HITSTUN) {
+      leanOffsetX = -4 * f.facing + blendOffsetX;
+      leanAngle = -0.06 * f.facing;
+    } else if (f.state === FighterState.BLOCK) {
+      leanOffsetX = -2 * f.facing + blendOffsetX;
+      leanAngle = -0.03 * f.facing;
+    }
 
     // Afterimage trail
     if (f.state === FighterState.RUN || f.state === FighterState.BACKDASH
