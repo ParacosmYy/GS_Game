@@ -658,6 +658,15 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       deps.screenFlash.trigger('#ff6600', 0.35, 10);
       deps.screenShake.trigger(14, 14, getAttackDirectionBias(attacker, defender, attackType, counterHit));
     }
+    // SDM Orochinagi — even more dramatic
+    if (atkName === 'SDM_OROCHINAGI') {
+      deps.vfx.spawnSuperBurst(hitX, hitY, '#ff2200', '#ffee44', true);
+      deps.vfx.spawnDMTenHaOuVFX(hitX, hitY, attacker.charId);
+      deps.vfx.spawnGroundSlam(hitX, hitY);
+      deps.screenFlash.triggerDarken(8);
+      deps.screenFlash.trigger('#ff4400', 0.45, 14);
+      deps.screenShake.trigger(18, 16, getAttackDirectionBias(attacker, defender, attackType, counterHit));
+    }
 
     // === Iori 角色专属必杀技VFX — 暗紫色主题 ===
     // Oniyaki (鬼焼き) dark uppercut — purple burst
