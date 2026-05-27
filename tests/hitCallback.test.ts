@@ -96,6 +96,7 @@ function mockVFX() {
     spawnSuperBurst: vi.fn(),
     spawnTierSparks: vi.fn(),
     spawnMoveNameText: vi.fn(),
+    spawnComboSpeedLines: vi.fn(),
     spawnProjectileExplosion: vi.fn(),
     spawnGroundSlam: vi.fn(),
     spawnKooukenVFX: vi.fn(),

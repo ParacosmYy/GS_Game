@@ -136,6 +136,7 @@ function createMockVFX(): VFXSystem & Record<string, ReturnType<typeof vi.fn>> {
     spawnDMTenHaOuVFX: vi.fn(),
     spawnHaouFlash: vi.fn(),
     spawnMoveNameText: vi.fn(),
+    spawnComboSpeedLines: vi.fn(),
     update: vi.fn(),
     render: vi.fn(),
   } as unknown as VFXSystem & Record<string, ReturnType<typeof vi.fn>>;

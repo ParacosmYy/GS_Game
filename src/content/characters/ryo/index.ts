@@ -81,9 +81,8 @@ export {
 
 // Reports (dimension report + hitbox chain verification)
 export {
-  getRyoCompletenessReport,
-  getRyoHitboxChainReport,
-  getRyoHitboxChainSummary,
-  type HitboxChainStatus,
-  type HitboxChainSummary,
+  getRyoContentCompletion,
+  getCompletedSubdomains,
+  getSubdomainsNeedingTests,
+  type SubdomainStatus,
 } from './reports/ryoReports.js';

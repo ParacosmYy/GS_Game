@@ -24,7 +24,8 @@ type SampleId =
   | 'battle_bgm'
   | 'whoosh' | 'whoosh_heavy' | 'footstep' | 'jump' | 'landing_normal'
   | 'ryo_koouken' | 'ryo_ko_hou' | 'ryo_hien' | 'ryo_haou'
-  | 'ryo_tsurizao' | 'ryo_orishi';
+  | 'ryo_tsurizao' | 'ryo_orishi'
+  | 'ryo_hio_hacker' | 'ryo_zanretsu_ken';
 
 const samples = new Map<SampleId, AudioBuffer>();
 let initialized = false;
@@ -1587,6 +1588,35 @@ function renderOrishi(sr: number): Float32Array {
   ));
 }
 
+// 猛速突進拳 (HIO_HACKER): dash strike
+// 特征：突进冲击+快速挥拳，短促有力的"嗖—啪"
+function renderHioHacker(sr: number): Float32Array {
+  const dur = 0.2;
+  const dash = highPass(renderNoise(sr, 0.08, t => expDecay(t, 0.15, 30)), sr, 3000);
+  const impact = renderOsc(sr, 0.06, 'sawtooth', t => 800 - 2000 * t, t => expDecay(t, 0.25, 35));
+  const body = renderOsc(sr, 0.08, 'sine', t => 180 - 400 * t, t => expDecay(t, 0.2, 20));
+  const total = Math.ceil(sr * dur);
+  const dashP = padTo(dash, total);
+  const impactP = padTo(impact, total, Math.floor(sr * 0.03));
+  return normalize(mixLayers([dashP, impactP, padTo(body, total)], [0.8, 1, 0.7]));
+}
+
+// 斩裂拳 (ZANRETSU_KEN): multi-punch rapid hits
+// 特征：连打拳连击的密集"啪啪啪"，多次短促中频冲击
+function renderZanretsuKen(sr: number): Float32Array {
+  const dur = 0.25;
+  const hits: Float32Array[] = [];
+  for (let i = 0; i < 4; i++) {
+    const offset = Math.floor(sr * i * 0.04);
+    const hit = bandPass(renderNoise(sr, 0.05, t => expDecay(t, 0.2, 40)), sr, 1500, 6000);
+    const padded = padTo(hit, Math.ceil(sr * dur), offset);
+    hits.push(padded);
+  }
+  const body = renderOsc(sr, 0.15, 'sine', t => 120 - 200 * t, t => expDecay(t, 0.3, 12));
+  const total = Math.ceil(sr * dur);
+  return normalize(mixLayers([...hits, padTo(body, total)], [1, 1, 1, 1, 0.5]));
+}
+
 // === 基础 BGM 框架 ===
 
 // 生成简单循环战斗BGM
@@ -1806,6 +1836,8 @@ export function initSampler(): void {
     ['ryo_haou', renderHaou],
     ['ryo_tsurizao', renderTsurizao],
     ['ryo_orishi', renderOrishi],
+    ['ryo_hio_hacker', renderHioHacker],
+    ['ryo_zanretsu_ken', renderZanretsuKen],
   ];
 
   for (const [id, renderer] of renderers) {

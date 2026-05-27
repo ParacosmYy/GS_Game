@@ -10,7 +10,7 @@ import type { AttackType } from '../../../../core/types.js';
 
 // ===== 版本差异系统 =====
 
-export type MoveVersion = 'A' | 'C' | 'MAX';
+export type MoveVersion = 'A' | 'C' | 'D' | 'MAX';
 
 export interface MoveDefinition {
   /** 内部键名 (对应 AttackType) */

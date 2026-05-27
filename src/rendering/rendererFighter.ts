@@ -105,7 +105,8 @@ export function drawFighters(
     }
 
     // KOF2002: 胜利金色光环 — WIN状态角色发光
-    if (f.state === FighterState.WIN) {
+    // (WIN state not yet in FighterState enum; guard with string literal check)
+    if ((FighterState as Record<string, string>)['WIN'] && f.state === (FighterState as Record<string, string>)['WIN']) {
       const winPulse = 0.06 + Math.sin(globalTick * 0.08) * 0.03;
       ctx.fillStyle = 'rgba(255, 215, 0, ' + Math.max(0, winPulse) + ')';
       ctx.beginPath();
@@ -127,7 +128,7 @@ export function drawFighters(
       ctx.scale(1, -0.15);
       ctx.translate(-sx, -STAGE_GROUND_Y);
       const refColors = getCharacterColors(f.charId ?? '');
-      drawSkeletalFighter(ctx, f, sx, f.y, refColors.outfit, refColors.outline || '#000000', globalTick, maxModeActive, playerIdx);
+      drawSkeletalFighter(ctx, f, sx, f.y, refColors.outfit, '#000000', globalTick, maxModeActive, playerIdx);
       ctx.restore();
     }
 
@@ -177,7 +178,7 @@ export function drawFighters(
       leanOffsetY += Math.sin(f.stateAge * 0.4) * 2;
     }
     // KOF2002: 步行脚底灰尘 — WALK步底时脚底微尘
-    if (f.state === FighterState.WALK_FORWARD && Math.sin(f.stateAge * 0.4) > 0.9) {
+    if (f.state === FighterState.WALK && Math.sin(f.stateAge * 0.4) > 0.9) {
       ctx.save();
       ctx.globalAlpha = 0.1;
       ctx.fillStyle = '#aaaaaa';
@@ -628,7 +629,7 @@ export function drawFighters(
 
     // Blockstun body impact — KOF2002 guard stance pushback wobble
     // Defenders shake briefly on heavy/special block, light is almost still
-    if (f.state === FighterState.BLOCKSTUN && f.blockstunTimer > 0) {
+    if (f.state === FighterState.BLOCK && f.blockstunTimer > 0) {
       const blockShake = f.blockstunTimer > 12 ? 2.5 : f.blockstunTimer > 6 ? 1.5 : 0.8;
       const wobbleX = Math.sin(f.stateAge * 1.2) * blockShake;
       ctx.translate(wobbleX, 0);
@@ -652,7 +653,7 @@ export function drawFighters(
       ctx.scale(squashX, squashY);
     }
     // KOF2002: 防御冲击压扁 — 防御硬直前3帧身体微压
-    if (f.state === FighterState.BLOCKSTUN && f.blockstunTimer > 0 && f.stateAge < 3) {
+    if (f.state === FighterState.BLOCK && f.blockstunTimer > 0 && f.stateAge < 3) {
       const blockSquash = (3 - f.stateAge) / 3;
       ctx.scale(1 + blockSquash * 0.04, 1 - blockSquash * 0.06);
     }
@@ -779,7 +780,7 @@ export function drawFighters(
       }
     }
     // KOF2002: 防御恢复机会指示 — blockstun最后2帧微绿闪
-    if (f.state === FighterState.BLOCKSTUN && f.blockstunTimer > 0 && f.blockstunTimer <= 2) {
+    if (f.state === FighterState.BLOCK && f.blockstunTimer > 0 && f.blockstunTimer <= 2) {
       ctx.save();
       ctx.globalCompositeOperation = 'screen';
       ctx.globalAlpha = 0.08;
@@ -1054,7 +1055,7 @@ export function drawFighters(
 
     // KOF2002: 削血致死警告 — HP<10%且防御中时脉冲红光
     if (f.health > 0 && f.health < f.maxHealth * 0.1
-      && (f.state === FighterState.BLOCK || f.state === FighterState.BLOCKSTUN)) {
+      && f.state === FighterState.BLOCK) {
       const dangerPulse = Math.sin(globalTick * 0.6) * 0.5 + 0.5;
       ctx.fillStyle = 'rgba(255, 50, 0, ' + (dangerPulse * 0.18) + ')';
       ctx.fillRect(sx + leanOffsetX - hw - 8, sy - f.displayHeight - 8, (hw + 8) * 2, f.displayHeight + 16);
@@ -1244,7 +1245,7 @@ export function drawFighters(
     }
 
     // KOF2002: 防御硬直冲击波 — BLOCKSTUN时正面冲击波纹
-    if (f.state === FighterState.BLOCKSTUN && f.blockstunTimer > 0 && f.stateAge < 2) {
+    if (f.state === FighterState.BLOCK && f.blockstunTimer > 0 && f.stateAge < 2) {
       ctx.save();
       ctx.globalAlpha = 0.25;
       ctx.strokeStyle = '#88aaff';
@@ -1370,21 +1371,20 @@ export function resolveFighterColors(f: Fighter, globalTick: number): { bodyColo
       bodyColor = '#6688aa';
       outlineColor = '#88aaff60';
       glowColor = '#4466ff20';
+      // KOF2002: 防御硬直体色 — 深蓝表示正在承受压力
+      if (f.blockstunTimer > 0) {
+        bodyColor = '#556688';
+        outlineColor = '#6688cc70';
+        glowColor = '#3355ff18';
+        if (f.blockstunTimer > 12) {
+          bodyColor = '#445577';
+          outlineColor = '#5577bb80';
+        }
+      }
       // KOF2002: 防御槽低下时防御身体偏黄
       if (f.guardGauge < 30) {
         bodyColor = '#aa8844';
         outlineColor = '#ffaa0060';
-      }
-      break;
-    case FighterState.BLOCKSTUN:
-      // KOF2002: 防御硬直体色 — 深蓝表示正在承受压力
-      bodyColor = '#556688';
-      outlineColor = '#6688cc70';
-      glowColor = '#3355ff18';
-      if (f.blockstunTimer > 12) {
-        // 重击防御色更深
-        bodyColor = '#445577';
-        outlineColor = '#5577bb80';
       }
       break;
     case FighterState.GUARD_CRUSH:
