@@ -122,7 +122,7 @@
   - Kyo 完整度校验工具 (8维报告: animationMeta/frameData/attackFrames/feedback/portrait/moveList/cancelPaths/hitEffects)
   - Iori 完整度校验工具 (8维报告: 同Kyo结构)
   - Kyo/Iori完整度回归测试 (33 tests: 维度有效性+覆盖率+最低阈值)
-  - 测试总数 4372
+  - 测试总数 4504
 - 当前差距：角色内容已开始分层，但真实数据、兼容入口、校验工具之间还需继续收口。
 - 新功能添加点：
   - `src/content/characters/index.ts` barrel export
@@ -136,7 +136,7 @@
 
 - 当前差距：部分输入、镜头、特效、命中边界虽然已改善，但仍需要更强回归保护。
 - 已闭合项：
-  - 4372 tests 全部通过 (vitest)
+  - 4504 tests 全部通过 (vitest)
   - 6档反馈矩阵回归测试 (23 tests, 层级递进+参数完整性+3角色映射)
   - DM→SDM→HSDM升级链回归测试 (8 tests, Kyo/Iori/HSDM一致性)
   - 3角色必杀技像素帧覆盖 (134 tests, 基本+通常+必杀+DM/SDM/HSDM+命令技)

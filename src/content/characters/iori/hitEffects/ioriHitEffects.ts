@@ -165,6 +165,10 @@ function ioriSFX(ctx: HitEffectContext): boolean {
   if (atkName === 'IORI_YUMEYUMI' || atkName === 'IORI_KATANUGI' || atkName === 'IORI_YUKIWARUI') {
     playHit(0.6, combo); return true;
   }
+  if (atkName === 'DM_YATAGARASU' || atkName === 'SDM_YATAGARASU' || atkName === 'HSDM_YAOTOME') {
+    playIoriOniyaki(); if (combo > 0) playHit(0.5, combo);
+    return true;
+  }
 
   return false;
 }

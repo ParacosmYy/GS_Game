@@ -183,6 +183,11 @@ function ryoSFX(ctx: HitEffectContext): boolean {
     playSpecialLight(); if (combo > 0) playHit(0.5, combo);
     return true;
   }
+  if (atkName === 'DM_TEN_HA_OU' || atkName === 'SDM_TEN_HA_OU'
+    || atkName === 'DM_RYUKO_RANBU' || atkName === 'SDM_RYUKO_RANBU' || atkName === 'HSDM_RYUKO_RANBU') {
+    playKoouken(); if (combo > 0) playHit(0.5, combo);
+    return true;
+  }
 
   return false;
 }

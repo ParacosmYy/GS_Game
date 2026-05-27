@@ -194,7 +194,7 @@ function kyoSFX(ctx: HitEffectContext): boolean {
     playKyoRedKick(); if (combo > 0) playHit(0.5, combo);
     return true;
   }
-  if (atkName === 'KYO_75KAI') {
+  if (atkName === 'KYO_75KAI' || atkName === 'KYO_75KAI_2') {
     playKyo75Kai(); if (combo > 0) playHit(0.5, combo);
     return true;
   }
@@ -209,6 +209,10 @@ function kyoSFX(ctx: HitEffectContext): boolean {
   }
   if (atkName === 'CMD_GOFU_YOU' || atkName === 'CMD_88SHIKI' || atkName === 'CMD_NARAKU') {
     playHit(0.6, combo); return true;
+  }
+  if (atkName === 'DM_OROCHINAGI' || atkName === 'SDM_OROCHINAGI' || atkName === 'HSDM_OROCHINAGI') {
+    playKyoOniyaki(); if (combo > 0) playHit(0.5, combo);
+    return true;
   }
 
   return false;
