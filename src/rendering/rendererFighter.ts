@@ -847,6 +847,11 @@ export function resolveFighterColors(f: Fighter, globalTick: number): { bodyColo
       bodyColor = '#6688aa';
       outlineColor = '#88aaff60';
       glowColor = '#4466ff20';
+      // KOF2002: 防御槽低下时防御身体偏黄
+      if (f.guardGauge < 30) {
+        bodyColor = '#aa8844';
+        outlineColor = '#ffaa0060';
+      }
       break;
     case FighterState.GUARD_CRUSH:
       bodyColor = globalTick % 6 < 3 ? '#ff4444' : '#ffffff';
