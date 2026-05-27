@@ -139,6 +139,11 @@ export function drawFighters(
       // KOF2002: 待机微弱重心偏移 — 每3秒缓慢左右移重
       leanOffsetX = Math.sin(globalTick * 0.015) * 2 * f.facing + blendOffsetX;
       leanAngle = Math.sin(globalTick * 0.015) * 0.015 * f.facing;
+      // KOF2002: 低血量待机驼背 — HP<30%时身体前倾
+      if (f.health < f.maxHealth * 0.3) {
+        leanOffsetX += 2 * f.facing;
+        leanAngle += 0.02 * f.facing;
+      }
     } else if (f.state === FighterState.WALK) {
       // KOF2002: 前進=前傾, 後退=後傾 (defensive lean)
       const isWalkingForward = (f.vx > 0 && f.facing > 0) || (f.vx < 0 && f.facing < 0);
