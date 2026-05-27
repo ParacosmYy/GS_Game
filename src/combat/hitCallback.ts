@@ -681,6 +681,13 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       deps.screenShake.trigger(8, 8, attacker.facing * 4);
       deps.vfx.spawnImpactRing(hitX, hitY, 1.2);
     }
+    // Kuzukaze (屑鉄) — command grab dark spin: purple burst
+    if (atkName === 'IORI_KUZUKAZE') {
+      deps.cinematic.addHitStop(2, defIdx);
+      deps.screenShake.trigger(8, 10, attacker.facing * 4);
+      deps.vfx.spawnProjectileExplosion(hitX, hitY, '#660088', '#aa44cc');
+      deps.screenFlash.trigger('#6622aa', 0.12, 4);
+    }
     // DM Yatagarasu (八咫烏) — dark energy burst
     if (atkName === 'DM_YATAGARASU') {
       deps.vfx.spawnSuperBurst(hitX, hitY, '#440066', '#8822cc', true);
