@@ -289,6 +289,10 @@ export function drawFighters(
       || f.state === FighterState.ROLL || f.state === FighterState.BACK_ROLL) {
       drawAfterimageTrail(ctx, f, sx, leanOffsetX, globalTick, maxModeActive);
     }
+    // KOF2002: MAX mode walking golden afterimage — shorter trail than run
+    if (maxModeActive && (f.state === FighterState.WALK || f.state === FighterState.CROUCH)) {
+      drawAfterimageTrail(ctx, f, sx, leanOffsetX, globalTick, true);
+    }
     // KOF2002: 无敌帧半透明 — 后dash/起身无敌期间角色闪烁
     if (f.invincible || f.throwInvulnFrames > 0) {
       ctx.globalAlpha = 0.6 + Math.sin(globalTick * 0.5) * 0.15;
@@ -1682,8 +1686,10 @@ function drawAfterimageTrail(
   ctx: CanvasRenderingContext2D, f: Fighter, sx: number, leanOffsetX: number,
   globalTick: number, maxModeActive: boolean,
 ): void {
-  // KOF2002: 残影色调 — RUN=橙, BACKDASH=蓝, ROLL=绿
-  const trailTint = f.state === FighterState.RUN
+  // KOF2002: 残影色调 — RUN=橙, BACKDASH=蓝, ROLL=绿, MAX mode walk=金
+  const trailTint = maxModeActive && (f.state === FighterState.WALK || f.state === FighterState.CROUCH)
+    ? '#ffcc44'
+    : f.state === FighterState.RUN
     ? '#ff8844'
     : f.state === FighterState.BACKDASH
     ? '#6699ff'
