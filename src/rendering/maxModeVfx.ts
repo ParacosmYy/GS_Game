@@ -1,9 +1,12 @@
 /**
- * MAX Mode Visual Effects — blue-white pulsing aura, energy wisps, activation flash
+ * MAX Mode Visual Effects — element-coded pulsing aura, energy wisps, activation flash
  *
  * Renders a per-frame aura around fighters in MAX mode.
- * The aura is a semi-transparent blue-white glow that pulses between alpha 0.15–0.35,
- * slightly larger than the fighter's bounding box, with small upward-drifting energy wisps.
+ * Aura colors are tinted by character element:
+ *   - Ryo: blue-white (lightning)
+ *   - Kyo: orange-gold (fire)
+ *   - Iori: purple-magenta (dark flame)
+ *   - Default: blue-white
  */
 import type { MaxModeState } from '../core/types.js';
 
@@ -22,6 +25,60 @@ interface EnergyWisp {
 const wispPools: [EnergyWisp[], EnergyWisp[]] = [[], []];
 const MAX_WISPS_PER_PLAYER = 12;
 
+// ===== Character Element Colors =====
+
+interface ElementColors {
+  /** Core glow (inner) */
+  core: [number, number, number];
+  /** Mid aura */
+  mid: [number, number, number];
+  /** Outer aura */
+  outer: [number, number, number];
+  /** Wisp bright core */
+  wispCore: [number, number, number];
+  /** Wisp glow */
+  wispGlow: [number, number, number];
+  /** Ring / accent */
+  ring: [number, number, number];
+}
+
+const ELEMENT_DEFAULT: ElementColors = {
+  core: [180, 220, 255],
+  mid: [100, 180, 255],
+  outer: [40, 100, 220],
+  wispCore: [200, 230, 255],
+  wispGlow: [100, 180, 255],
+  ring: [120, 200, 255],
+};
+
+const ELEMENT_KYO: ElementColors = {
+  core: [255, 220, 120],
+  mid: [255, 160, 40],
+  outer: [200, 80, 10],
+  wispCore: [255, 240, 180],
+  wispGlow: [255, 160, 40],
+  ring: [255, 180, 60],
+};
+
+const ELEMENT_IORI: ElementColors = {
+  core: [200, 120, 255],
+  mid: [140, 40, 200],
+  outer: [80, 10, 140],
+  wispCore: [220, 160, 255],
+  wispGlow: [140, 40, 200],
+  ring: [160, 80, 220],
+};
+
+const ELEMENT_MAP: Record<string, ElementColors> = {
+  kyo: ELEMENT_KYO,
+  iori: ELEMENT_IORI,
+  ryo: ELEMENT_DEFAULT,
+};
+
+function getElementColors(charId: string): ElementColors {
+  return ELEMENT_MAP[charId] ?? ELEMENT_DEFAULT;
+}
+
 /** Draw the continuous MAX mode aura around a fighter.
  *  Call every frame while maxMode.active is true.
  */
@@ -33,9 +90,11 @@ export function drawMAXModeAura(
   tick: number,
   maxMode: MaxModeState,
   playerIdx: 0 | 1,
+  charId: string = 'ryo',
 ): void {
   if (!maxMode.active) return;
 
+  const el = getElementColors(charId);
   const centerX = screenX;
   const centerY = groundY - displayHeight / 2;
   const auraRadius = displayHeight * 0.75;
@@ -44,17 +103,17 @@ export function drawMAXModeAura(
   const pulsePhase = Math.sin(tick * 0.08);
   const baseAlpha = 0.325 + pulsePhase * 0.125;
 
-  // === 1. Radial gradient aura (blue-white glow) ===
+  // === 1. Radial gradient aura (element-coded glow) ===
   ctx.save();
   const auraGrad = ctx.createRadialGradient(
     centerX, centerY, auraRadius * 0.15,
     centerX, centerY, auraRadius,
   );
-  auraGrad.addColorStop(0, `rgba(180, 220, 255, ${baseAlpha * 1.4})`);
-  auraGrad.addColorStop(0.3, `rgba(100, 180, 255, ${baseAlpha})`);
-  auraGrad.addColorStop(0.6, `rgba(60, 140, 255, ${baseAlpha * 0.5})`);
-  auraGrad.addColorStop(0.85, `rgba(40, 100, 220, ${baseAlpha * 0.15})`);
-  auraGrad.addColorStop(1, 'rgba(30, 80, 200, 0)');
+  auraGrad.addColorStop(0, `rgba(${el.core[0]}, ${el.core[1]}, ${el.core[2]}, ${baseAlpha * 1.4})`);
+  auraGrad.addColorStop(0.3, `rgba(${el.mid[0]}, ${el.mid[1]}, ${el.mid[2]}, ${baseAlpha})`);
+  auraGrad.addColorStop(0.6, `rgba(${el.mid[0]}, ${el.mid[1]}, ${el.mid[2]}, ${baseAlpha * 0.5})`);
+  auraGrad.addColorStop(0.85, `rgba(${el.outer[0]}, ${el.outer[1]}, ${el.outer[2]}, ${baseAlpha * 0.15})`);
+  auraGrad.addColorStop(1, `rgba(${el.outer[0]}, ${el.outer[1]}, ${el.outer[2]}, 0)`);
   ctx.fillStyle = auraGrad;
   ctx.fillRect(
     Math.round(centerX - auraRadius),
@@ -69,7 +128,7 @@ export function drawMAXModeAura(
   const ringR = 15 + ringPhase * auraRadius * 1.1;
   const ringAlpha = (1 - ringPhase) * 0.3;
   ctx.save();
-  ctx.strokeStyle = `rgba(120, 200, 255, ${ringAlpha})`;
+  ctx.strokeStyle = `rgba(${el.ring[0]}, ${el.ring[1]}, ${el.ring[2]}, ${ringAlpha})`;
   ctx.lineWidth = 2 * (1 - ringPhase) + 0.5;
   ctx.beginPath();
   ctx.arc(centerX, centerY, ringR, 0, Math.PI * 2);
@@ -103,7 +162,7 @@ export function drawMAXModeAura(
 
   // === 3. Energy wisps (small upward-drifting particles) ===
   spawnWisps(playerIdx, centerX, centerY, auraRadius, tick);
-  updateAndDrawWisps(ctx, playerIdx, tick);
+  updateAndDrawWisps(ctx, playerIdx, tick, el);
 
   // === 4. Ground-level energy shimmer ===
   ctx.save();
@@ -112,9 +171,9 @@ export function drawMAXModeAura(
     centerX, groundY, auraRadius * 0.6,
   );
   const shimmerAlpha = 0.08 + pulsePhase * 0.04;
-  groundShimmer.addColorStop(0, `rgba(140, 200, 255, ${shimmerAlpha})`);
-  groundShimmer.addColorStop(0.5, `rgba(80, 150, 255, ${shimmerAlpha * 0.4})`);
-  groundShimmer.addColorStop(1, 'rgba(40, 100, 220, 0)');
+  groundShimmer.addColorStop(0, `rgba(${el.mid[0]}, ${el.mid[1]}, ${el.mid[2]}, ${shimmerAlpha})`);
+  groundShimmer.addColorStop(0.5, `rgba(${el.outer[0]}, ${el.outer[1]}, ${el.outer[2]}, ${shimmerAlpha * 0.4})`);
+  groundShimmer.addColorStop(1, `rgba(${el.outer[0]}, ${el.outer[1]}, ${el.outer[2]}, 0)`);
   ctx.fillStyle = groundShimmer;
   ctx.beginPath();
   ctx.ellipse(centerX, groundY, auraRadius * 0.6, 10, 0, 0, Math.PI * 2);
@@ -154,6 +213,7 @@ function updateAndDrawWisps(
   ctx: CanvasRenderingContext2D,
   playerIdx: 0 | 1,
   _tick: number,
+  el: ElementColors,
 ): void {
   const pool = wispPools[playerIdx];
   for (let i = pool.length - 1; i >= 0; i--) {
@@ -174,13 +234,13 @@ function updateAndDrawWisps(
     ctx.globalAlpha = alpha;
 
     // Bright core
-    ctx.fillStyle = `rgba(200, 230, 255, ${alpha})`;
+    ctx.fillStyle = `rgba(${el.wispCore[0]}, ${el.wispCore[1]}, ${el.wispCore[2]}, ${alpha})`;
     ctx.beginPath();
     ctx.arc(w.x, w.y, w.size * (1 - progress * 0.3), 0, Math.PI * 2);
     ctx.fill();
 
     // Soft outer glow
-    ctx.fillStyle = `rgba(100, 180, 255, ${alpha * 0.4})`;
+    ctx.fillStyle = `rgba(${el.wispGlow[0]}, ${el.wispGlow[1]}, ${el.wispGlow[2]}, ${alpha * 0.4})`;
     ctx.beginPath();
     ctx.arc(w.x, w.y, w.size * 2 * (1 - progress * 0.2), 0, Math.PI * 2);
     ctx.fill();
@@ -201,9 +261,11 @@ export function drawMAXActivationFlash(
   timer: number,
   canvasW: number,
   canvasH: number,
+  charId: string = 'ryo',
 ): void {
   if (timer <= 0) return;
 
+  const el = getElementColors(charId);
   const centerY = groundY - displayHeight / 2;
 
   // Phase 1: White flash centered on fighter (4 ticks) — enhanced with cross-star burst
@@ -217,9 +279,9 @@ export function drawMAXActivationFlash(
       screenX, centerY, flashRadius,
     );
     flashGrad.addColorStop(0, `rgba(255, 255, 255, ${flashAlpha * 0.95})`);
-    flashGrad.addColorStop(0.3, `rgba(200, 230, 255, ${flashAlpha * 0.55})`);
-    flashGrad.addColorStop(0.6, `rgba(150, 200, 255, ${flashAlpha * 0.25})`);
-    flashGrad.addColorStop(1, 'rgba(100, 150, 255, 0)');
+    flashGrad.addColorStop(0.3, `rgba(${el.core[0]}, ${el.core[1]}, ${el.core[2]}, ${flashAlpha * 0.55})`);
+    flashGrad.addColorStop(0.6, `rgba(${el.mid[0]}, ${el.mid[1]}, ${el.mid[2]}, ${flashAlpha * 0.25})`);
+    flashGrad.addColorStop(1, `rgba(${el.outer[0]}, ${el.outer[1]}, ${el.outer[2]}, 0)`);
     ctx.fillStyle = flashGrad;
     ctx.fillRect(
       Math.round(screenX - flashRadius),

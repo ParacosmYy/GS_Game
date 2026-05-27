@@ -1047,10 +1047,10 @@ export function drawSkeletalFighter(
 
   // === MAX mode glow aura — KOF2002 style ===
   if (maxModeActive) {
-    // Blue-white pulsing aura with energy wisps (Phase 50)
+    // Element-coded pulsing aura with energy wisps
     drawMAXModeAura(ctx, sx, sy, f.displayHeight, globalTick,
       { active: true, timer: 1, maxDuration: 1 },
-      playerIdx);
+      playerIdx, f.charId ?? 'ryo');
 
     const glowPulse = 0.3 + Math.sin(globalTick / 4) * 0.12;
 
