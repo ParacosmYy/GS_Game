@@ -23,6 +23,8 @@ import { IORI_STAND_A_FRAMES, IORI_STAND_C_FRAMES } from './ioriAttackFrames.js'
 import { IORI_JUMP_FRAMES } from './ioriJumpFrames.js';
 import { IORI_HURT_FRAMES, IORI_KNOCKDOWN_FRAMES, IORI_BLOCK_FRAMES } from './ioriDamageFrames.js';
 import { IORI_STAND_B_FRAMES, IORI_STAND_D_FRAMES } from './ioriKickFrames.js';
+import { IORI_CROUCH_A_FRAMES, IORI_CROUCH_C_FRAMES, IORI_CROUCH_B_FRAMES, IORI_CROUCH_D_FRAMES } from './ioriCrouchAttackFrames.js';
+import { IORI_AIR_A_FRAMES, IORI_AIR_C_FRAMES, IORI_AIR_D_FRAMES } from './ioriAirAttackFrames.js';
 
 const IORI_FRAMES = new Map<string, FrameEntry>();
 const FRAME_CACHE = new Map<string, HTMLCanvasElement>();
@@ -52,6 +54,17 @@ function initIoriFrames(): void {
   registerVariableFrames('HURT', IORI_HURT_FRAMES, [3, 5, 6, 4]);
   registerVariableFrames('KNOCKDOWN', IORI_KNOCKDOWN_FRAMES, [4, 5, 6, 8, 10, 12]);
   registerVariableFrames('BLOCK', IORI_BLOCK_FRAMES, [3, 8, 5, 4]);
+
+  // CROUCH ATTACKS
+  registerVariableFrames('CROUCH_A', IORI_CROUCH_A_FRAMES, [3, 2, 5]);
+  registerVariableFrames('CROUCH_C', IORI_CROUCH_C_FRAMES, [5, 3, 5, 10]);
+  registerVariableFrames('CROUCH_B', IORI_CROUCH_B_FRAMES, [4, 2, 7]);
+  registerVariableFrames('CROUCH_D', IORI_CROUCH_D_FRAMES, [6, 3, 3, 3, 12]);
+
+  // AIR ATTACKS
+  registerVariableFrames('AIR_A', IORI_AIR_A_FRAMES, [3, 3, 5]);
+  registerVariableFrames('AIR_C', IORI_AIR_C_FRAMES, [5, 3, 3, 5]);
+  registerVariableFrames('AIR_D', IORI_AIR_D_FRAMES, [4, 3, 3, 5]);
 }
 
 function resolveIoriFrameKey(
@@ -66,15 +79,22 @@ function resolveIoriFrameKey(
     case FighterState.WALK:
       return (vx * facing > 0) ? 'WALK_FORWARD' : 'WALK_BACKWARD';
     case FighterState.CROUCH:
-    case FighterState.CROUCH_ATTACK:
       return 'CROUCH';
+    case FighterState.CROUCH_ATTACK:
+      if (currentAttack === AttackType.CROUCH_C) return 'CROUCH_C';
+      if (currentAttack === AttackType.CROUCH_D) return 'CROUCH_D';
+      if (currentAttack === AttackType.CROUCH_B) return 'CROUCH_B';
+      return 'CROUCH_A';
     case FighterState.JUMP:
     case FighterState.RUN_JUMP:
     case FighterState.HOP:
     case FighterState.HYPER_JUMP:
-    case FighterState.AIR_ATTACK:
     case FighterState.AIR_BLOCK:
       return 'JUMP';
+    case FighterState.AIR_ATTACK:
+      if (currentAttack === AttackType.JUMP_C) return 'AIR_C';
+      if (currentAttack === AttackType.JUMP_D) return 'AIR_D';
+      return 'AIR_A';
     case FighterState.STAND_ATTACK:
       if (currentAttack === AttackType.STAND_C || currentAttack === AttackType.CLOSE_C) return 'STAND_C';
       if (currentAttack === AttackType.STAND_D || currentAttack === AttackType.CLOSE_D) return 'STAND_D';
