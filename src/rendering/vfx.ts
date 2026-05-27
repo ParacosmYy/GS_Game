@@ -563,15 +563,18 @@ export class ScreenShake {
   private duration = 0;
   private maxDuration = 1;
   private biasX = 0;
+  /** Vertical bias: positive = shake downward (overhead hits), negative = shake upward (low hits) */
+  private biasY = 0;
   offsetX = 0;
   offsetY = 0;
 
-  trigger(intensity: number, duration: number, biasX: number = 0): void {
+  trigger(intensity: number, duration: number, biasX: number = 0, biasY: number = 0): void {
     if (intensity >= this.intensity) {
       this.intensity = intensity;
       this.duration = duration;
       this.maxDuration = duration;
       this.biasX = biasX;
+      this.biasY = biasY;
     }
   }
 
@@ -582,10 +585,11 @@ export class ScreenShake {
       const elapsed = this.maxDuration - this.duration - 1;
 
       if (elapsed < 3) {
-        // Phase 1 (first 3 frames): deterministic displacement along biasX direction
+        // Phase 1 (first 3 frames): deterministic displacement along bias direction
         const t = elapsed / 3;
         this.offsetX = this.biasX * this.intensity * (1 - t * 0.3);
-        this.offsetY = this.intensity * 0.5 * (1 - t);
+        // KOF2002: vertical bias — overhead pushes down, low pushes up, mid stays neutral
+        this.offsetY = (this.biasY * this.intensity + this.intensity * 0.5) * (1 - t);
       } else {
         // Phase 2 (after frame 3): damped spring rebound — no randomness
         const remaining = this.maxDuration - 3;
@@ -594,7 +598,7 @@ export class ScreenShake {
         const frequency = 8;
         const phase = progress * frequency * Math.PI;
         this.offsetX = this.biasX * this.intensity * 0.5 * Math.sin(phase) * decay;
-        this.offsetY = this.intensity * 0.3 * Math.sin(phase + 0.5) * decay;
+        this.offsetY = (this.biasY * this.intensity * 0.5 + this.intensity * 0.3) * Math.sin(phase + 0.5) * decay;
       }
 
       // Clamp offsets to reasonable pixel range

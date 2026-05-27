@@ -135,6 +135,36 @@ function isThrowAttack(at: AttackType): boolean {
   return at === AttackType.THROW || at === AttackType.THROW_FORWARD || at === AttackType.THROW_BACK;
 }
 
+/**
+ * 基于攻击高度的垂直震屏偏置:
+ * - Overhead/uppercut/air attacks: positive bias (shake downward)
+ * - Low/sweep attacks: negative bias (shake upward) 
+ * - Mid attacks: neutral (0)
+ * KOF2002: 攻击轨迹决定震屏方向，增强打击方向感
+ */
+function getShakeBiasY(attackType: AttackType): number {
+  const at = attackType as string;
+  // Overhead / uppercut — shake downward
+  if (at === 'STAND_CD' || at === 'JUMP_CD' || at === 'JUMP_C' || at === 'JUMP_D'
+    || at === 'JUMP_A' || at === 'JUMP_B'
+    || at.includes('KO_HOU') || at.includes('HIENZAN') || at.includes('ONIYAKI')
+    || at.includes('RISING_TACKLE') || at.includes('POWER_DUNK'))
+    return 0.6;
+  // Low / sweep — shake upward
+  if (at === 'CROUCH_D' || at === 'CROUCH_B' || at === 'STAND_B'
+    || at.includes('HAKI') || at.includes('CRACK_SHOT'))
+    return -0.4;
+  // DM / Special mid — slight downward
+  if (at.startsWith('DM_') || at.startsWith('SDM_') || at.startsWith('HSDM_'))
+    return 0.3;
+  // Special moves — slight upward by default
+  if (at.includes('RYO_') || at.includes('KYO_') || at.includes('IORI_')
+    || at.includes('TERRY_') || at.includes('KIM_'))
+    return 0.2;
+  // Default mid: neutral
+  return 0;
+}
+
 function getAttackDirectionBias(attacker: Fighter, defender: Fighter, attackType: AttackType, counterHit: boolean): number {
   const atkToDef = defender.x - attacker.x;
   const closeBias = atkToDef === 0 ? attacker.facing * 4 : Math.sign(atkToDef) * 4;
@@ -553,7 +583,7 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       deps.screenFlash.trigger('#ffffff', 0.04, 2);
     }
 
-    // 震屏 — manifest驱动
+    // 震屏 — manifest驱动, 垂直方向由攻击高度决定
     const comboShakeBonus = combo >= 10 ? 1 : 0;
     // 连击中震屏递减: 高连击时震屏强度逐步衰减，最低保留60%
     const comboShakeDecay = combo >= 3 ? Math.max(0.6, 1 - combo * 0.05) : 1;
@@ -561,6 +591,7 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       Math.round(calcShake(attackType, counterHit, data.damage) * comboShakeDecay) + comboShakeBonus,
       fb.shakeDuration,
       getAttackDirectionBias(attacker, defender, attackType, counterHit),
+      getShakeBiasY(attackType),
     );
     deps.cinematic.trackDamage(defIdx, data.damage);
 
