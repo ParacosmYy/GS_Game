@@ -502,9 +502,7 @@ export function handleAttack(ctx: FighterCtx, input: ResolvedInput): void {
     }
   }
 
-  // KOF2002: Command Normal → Special Cancel
-  // 取消链中的命令通常技：命中+被防均可取消
-  // 独立命令通常技：仅命中时可取消
+  // KOF2002: Command Normal → Special Cancel (validated against cancel paths)
   if (f.attackPhase === 'recovery' && f.currentAttack
       && COMMAND_NORMALS.has(f.currentAttack as string)) {
     const canCancel = f.cancelledIntoNormal ? true : f.hasHit;
@@ -512,23 +510,43 @@ export function handleAttack(ctx: FighterCtx, input: ResolvedInput): void {
       const tick = ctx.tickRef.value;
       const special = ctx.character.routeSpecial(input, ctx.cmdBuf, tick, ctx.wasChargingDown);
       if (special && !isDM(special as string)) {
-        f.startAttack(special);
-        f.cancelledIntoNormal = false;
-        f.normalCancelReady = false;
-        return;
+        const cancelCheck = checkCancelValid(ctx.character.id, f.currentAttack, special, {
+          hitConfirmed: f.hasHit,
+          stocks: ctx.gauge?.stocks ?? 0,
+          maxModeActive: ctx.maxMode?.active ?? false,
+          maxModeTimer: ctx.maxMode?.timer ?? 0,
+          maxModeDuration: ctx.maxMode?.maxDuration ?? 0,
+          framesSinceHit: 0,
+        });
+        if (cancelCheck.valid) {
+          f.startAttack(special);
+          f.cancelledIntoNormal = false;
+          f.normalCancelReady = false;
+          return;
+        }
       }
     }
   }
 
-  // KOF2002: 通常技被防→必杀技取消 (压力博弈核心机制)
+  // KOF2002: 通常技被防→必杀技取消 (压力博弈核心机制, validated)
   if (f.normalCancelReady && !f.hasHit && f.attackPhase === 'recovery' && f.currentAttack
       && NORMAL_ATTACKS.has(f.currentAttack as string)) {
     const tick = ctx.tickRef.value;
     const special = ctx.character.routeSpecial(input, ctx.cmdBuf, tick, ctx.wasChargingDown);
     if (special && !isDM(special as string)) {
-      f.startAttack(special);
-      f.normalCancelReady = false;
-      return;
+      const cancelCheck = checkCancelValid(ctx.character.id, f.currentAttack, special, {
+        hitConfirmed: false,
+        stocks: ctx.gauge?.stocks ?? 0,
+        maxModeActive: ctx.maxMode?.active ?? false,
+        maxModeTimer: ctx.maxMode?.timer ?? 0,
+        maxModeDuration: ctx.maxMode?.maxDuration ?? 0,
+        framesSinceHit: 0,
+      });
+      if (cancelCheck.valid) {
+        f.startAttack(special);
+        f.normalCancelReady = false;
+        return;
+      }
     }
   }
 
