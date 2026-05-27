@@ -550,6 +550,7 @@ export enum GamePhase {
   KO = 'KO',           // KO state
   WIN_QUOTE = 'WIN_QUOTE', // 胜利台词显示
   MATCH_END = 'MATCH_END', // Match complete (best of 3)
+  NEXT_MATCH = 'NEXT_MATCH', // Arcade: transition to next opponent
   CONTINUE = 'CONTINUE', // Continue? countdown
   GAME_OVER = 'GAME_OVER', // Game over screen (after continue timeout or NO)
   OPTIONS = 'OPTIONS', // Settings screen (difficulty, rounds, time, CRT, etc.)

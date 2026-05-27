@@ -8,6 +8,7 @@ import { GamePhase } from '../core/types.js';
 import type { GameOptions } from '../rendering/overlayScreens.js';
 import { DEFAULT_OPTIONS } from '../rendering/overlayScreens.js';
 import { AnnounceSequence } from './announceSequence.js';
+import type { CharacterDefinition } from '../characters/types.js';
 
 export class GameStateManager {
   phase: GamePhase = GamePhase.TITLE;
@@ -72,6 +73,12 @@ export class GameStateManager {
     p1LongestCombo: 0,
     p2LongestCombo: 0,
   };
+
+  // Arcade ladder state
+  arcadeOpponents: CharacterDefinition[] = [];
+  arcadeOpponentIndex = 0;
+  arcadeNextMatchTimer = 0;
+  arcadeComplete = false;
 
   /** Record damage dealt by a player this match */
   recordDamage(playerIndex: number, damage: number): void {
@@ -143,6 +150,10 @@ export class GameStateManager {
     this.transitionType = 'none';
     this.transitionTimer = 0;
     this.matchStats = { p1TotalDamage: 0, p2TotalDamage: 0, p1LongestCombo: 0, p2LongestCombo: 0 };
+    this.arcadeOpponents = [];
+    this.arcadeOpponentIndex = 0;
+    this.arcadeNextMatchTimer = 0;
+    this.arcadeComplete = false;
     this.resetStageSelect();
     this.resetTeamOrder();
   }

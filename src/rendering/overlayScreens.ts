@@ -1144,6 +1144,147 @@ export function drawGameOver(ctx: CanvasRenderingContext2D, timer: number): void
 
 export { GAME_OVER_DURATION };
 
+// ===== Arcade Complete Screen =====
+
+export function drawArcadeComplete(ctx: CanvasRenderingContext2D, timer: number): void {
+  ctx.save();
+
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.9)';
+  ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+  // Golden sparkle particles
+  const sparkleCount = 20;
+  for (let i = 0; i < sparkleCount; i++) {
+    const sx = (Math.sin(timer * 0.02 + i * 1.3) * 0.5 + 0.5) * CANVAS_WIDTH;
+    const sy = (Math.cos(timer * 0.015 + i * 2.1) * 0.5 + 0.5) * CANVAS_HEIGHT;
+    const sa = (0.3 + Math.sin(timer * 0.08 + i * 0.7) * 0.3) * Math.min(1, timer / 30);
+    const ss = 2 + Math.sin(timer * 0.1 + i) * 1;
+    if (sa > 0) {
+      ctx.fillStyle = `rgba(255, 220, 100, ${sa})`;
+      ctx.beginPath();
+      ctx.moveTo(sx, sy - ss);
+      ctx.lineTo(sx + ss * 0.35, sy);
+      ctx.lineTo(sx, sy + ss);
+      ctx.lineTo(sx - ss * 0.35, sy);
+      ctx.closePath();
+      ctx.fill();
+    }
+  }
+
+  const fadeIn = Math.min(1, timer / 30);
+  ctx.globalAlpha = fadeIn;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+
+  // CONGRATULATIONS — gold glow
+  const textProgress = Math.min(1, timer / 20);
+  const textScale = 1 + (1 - textProgress) * 0.5;
+  ctx.shadowColor = '#ffcc00';
+  ctx.shadowBlur = 40;
+  drawSNKText(ctx, 'CONGRATULATIONS', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 40, Math.round(48 * textScale), '#ffcc00');
+  ctx.shadowBlur = 0;
+
+  // Subtitle
+  const subAlpha = Math.min(1, Math.max(0, (timer - 20) / 20));
+  ctx.globalAlpha = subAlpha;
+  drawSNKText(ctx, 'YOU HAVE DEFEATED ALL OPPONENTS', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 20, 16, '#ff8844');
+
+  // Press any key
+  const pressAlpha = 0.3 + Math.sin(timer * 0.06) * 0.2;
+  ctx.globalAlpha = pressAlpha;
+  drawSNKText(ctx, 'PRESS ANY KEY', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 60, 13, 'rgba(255,255,255,0.7)');
+  ctx.globalAlpha = 1;
+
+  ctx.restore();
+}
+
+// ===== Next Match Transition =====
+
+export function drawNextMatch(
+  ctx: CanvasRenderingContext2D,
+  timer: number,
+  nextChar: import('../characters/types.js').CharacterDefinition | undefined,
+  stageNumber: number,
+  totalStages: number,
+): void {
+  ctx.save();
+
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.92)';
+  ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+  // Red accent pulse
+  const pulseAlpha = 0.05 + Math.sin(timer * 0.04) * 0.03;
+  ctx.fillStyle = `rgba(80, 20, 0, ${pulseAlpha})`;
+  ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+  const fadeIn = Math.min(1, timer / 20);
+  ctx.globalAlpha = fadeIn;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+
+  // "NEXT STAGE" header
+  const headerProgress = Math.min(1, timer / 15);
+  const headerScale = 1 + (1 - headerProgress) * 0.8;
+  ctx.shadowColor = '#ff8800';
+  ctx.shadowBlur = 25;
+  drawSNKText(ctx, `STAGE ${stageNumber}`, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 80, Math.round(36 * headerScale), '#ff8800');
+  ctx.shadowBlur = 0;
+
+  // Stage progress bar
+  const barW = 200;
+  const barH = 6;
+  const barX = CANVAS_WIDTH / 2 - barW / 2;
+  const barY = CANVAS_HEIGHT / 2 - 45;
+  ctx.fillStyle = 'rgba(40, 40, 60, 0.8)';
+  roundRect(ctx, barX, barY, barW, barH, 3);
+  ctx.fill();
+  const ratio = stageNumber / totalStages;
+  ctx.fillStyle = '#ff8800';
+  if (barW * ratio > 0) {
+    roundRect(ctx, barX, barY, barW * ratio, barH, 3);
+    ctx.fill();
+  }
+
+  // Next opponent info
+  if (nextChar) {
+    const infoAlpha = Math.min(1, Math.max(0, (timer - 10) / 20));
+    ctx.globalAlpha = infoAlpha;
+
+    // Opponent name
+    ctx.shadowColor = nextChar.color;
+    ctx.shadowBlur = 20;
+    drawSNKText(ctx, 'VS', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, 28, '#ffcc00');
+    ctx.shadowBlur = 0;
+
+    const nameProgress = Math.min(1, Math.max(0, (timer - 20) / 15));
+    ctx.globalAlpha = nameProgress * infoAlpha;
+    ctx.shadowColor = nextChar.color;
+    ctx.shadowBlur = 15;
+    drawSNKText(ctx, nextChar.nameCn, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 45, 36, nextChar.color);
+    ctx.shadowBlur = 0;
+
+    // Character color accent bar
+    const accentW = 120;
+    const accentH = 3;
+    const accentX = CANVAS_WIDTH / 2 - accentW / 2;
+    const accentY = CANVAS_HEIGHT / 2 + 70;
+    const accentGrad = ctx.createLinearGradient(accentX, 0, accentX + accentW, 0);
+    accentGrad.addColorStop(0, nextChar.color + '00');
+    accentGrad.addColorStop(0.5, nextChar.color + 'cc');
+    accentGrad.addColorStop(1, nextChar.color + '00');
+    ctx.fillStyle = accentGrad;
+    ctx.fillRect(accentX, accentY, accentW, accentH);
+  }
+
+  // "PRESS START" prompt
+  const promptAlpha = timer > 40 ? 0.3 + Math.sin(timer * 0.06) * 0.2 : 0;
+  ctx.globalAlpha = promptAlpha;
+  drawSNKText(ctx, 'PRESS START', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 110, 13, 'rgba(255,255,255,0.7)');
+
+  ctx.globalAlpha = 1;
+  ctx.restore();
+}
+
 // ===== Character KO Overlay =====
 
 /**

@@ -50,6 +50,7 @@ import { createRoundStartSequence, createKOSequence, createTimeOverSequence, cre
 import { TrainingModeState } from './state/trainingMode.js';
 import { drawPauseMenu } from './rendering/pauseMenu.js';
 import { drawCharacterKOOverlay } from './rendering/overlayScreens.js';
+import type { CharacterDefinition } from './characters/types.js';
 
 const canvas = document.getElementById('gameCanvas') as HTMLCanvasElement;
 const ctx = canvas.getContext('2d')!;
@@ -143,6 +144,16 @@ function pickWinQuote(w: number | null): string {
   const charDef = ROSTER.find(c => c.id === fighter.charId);
   if (!charDef || !charDef.winQuotes.length) return '';
   return charDef.winQuotes[gameRandomInt(charDef.winQuotes.length)];
+}
+
+/** Generate a shuffled opponent queue for arcade mode, excluding P1's character */
+function generateArcadeOpponents(p1CharId: string): CharacterDefinition[] {
+  const available = ROSTER.filter(c => c.id !== p1CharId);
+  for (let i = available.length - 1; i > 0; i--) {
+    const j = gameRandomInt(i + 1);
+    [available[i], available[j]] = [available[j], available[i]];
+  }
+  return available;
 }
 
 // ===== Update =====
@@ -378,6 +389,12 @@ function update(): void {
       }
 
       if (gs.isTrainingMode) training.reset();
+      // Generate arcade opponent ladder for non-training modes
+      if (!gs.isTrainingMode) {
+        gs.arcadeOpponents = generateArcadeOpponents(p1.charId);
+        gs.arcadeOpponentIndex = 0;
+        gs.arcadeComplete = false;
+      }
       initAudio();
       initSampler();
       rounds.currentRound = 1;
@@ -585,9 +602,65 @@ function update(): void {
     }
     if (gs.koTimer > 180 || (gs.koTimer > 60 && (inputManager.isKeyDown('KeyR') || inputManager.isKeyDown('KeyJ') || inputManager.isKeyDown('Enter')))) {
       gs.announceSequence.reset();
-      gs.setPhase(GamePhase.CONTINUE);
-      gs.continueCountdown = CONTINUE_DURATION;
-      gs.continueCursorYes = true;
+      // Arcade progression: P1 won and more opponents remain → next match
+      const p1Won = gs.winner === 0;
+      const moreOpponents = !gs.isTrainingMode && gs.arcadeOpponents.length > 0 && gs.arcadeOpponentIndex < gs.arcadeOpponents.length - 1;
+      if (p1Won && moreOpponents) {
+        gs.setPhase(GamePhase.NEXT_MATCH);
+        gs.arcadeNextMatchTimer = 0;
+      } else if (p1Won && gs.arcadeOpponents.length > 0 && gs.arcadeOpponentIndex >= gs.arcadeOpponents.length - 1) {
+        // Beat all opponents — arcade complete
+        gs.arcadeComplete = true;
+        gs.setPhase(GamePhase.GAME_OVER);
+        gs.gameOverTimer = 0;
+      } else {
+        gs.setPhase(GamePhase.CONTINUE);
+        gs.continueCountdown = CONTINUE_DURATION;
+        gs.continueCursorYes = true;
+      }
+    }
+    return;
+  }
+
+  // Arcade: transition to next opponent
+  if (gs.phase === GamePhase.NEXT_MATCH) {
+    gs.arcadeNextMatchTimer++;
+    // 90-frame transition: show "NEXT STAGE" text, then start next fight
+    if (gs.arcadeNextMatchTimer >= 120 || (gs.arcadeNextMatchTimer > 30 && (inputManager.isKeyDown('KeyJ') || inputManager.isKeyDown('Enter')))) {
+      gs.arcadeOpponentIndex++;
+      const nextChar = gs.arcadeOpponents[gs.arcadeOpponentIndex];
+      if (nextChar) {
+        // Set up P2 as next opponent
+        p2.charId = nextChar.id;
+        p2.color = nextChar.color;
+        p2.setStats(nextChar.stats);
+        p2Ctrl.setCharacter(nextChar);
+        if (gs.teamMode && p2Team) {
+          p2Team = createTeam([
+            nextChar,
+            gs.arcadeOpponents[(gs.arcadeOpponentIndex + 1) % gs.arcadeOpponents.length],
+            gs.arcadeOpponents[(gs.arcadeOpponentIndex + 2) % gs.arcadeOpponents.length],
+          ]);
+        }
+        p2AI = new AdvancedAI(p2, p1, nextChar, 'medium');
+        // Reset for new match
+        rounds.currentRound = 1;
+        rounds.fullReset();
+        cinematic.reset();
+        p1.health = p1.maxHealth;
+        p2.health = p2.maxHealth;
+        p1DelayedHealth = p1.maxHealth;
+        p2DelayedHealth = p2.maxHealth;
+        p1.savePrevState();
+        p2.savePrevState();
+        gs.isTimeOver = false;
+        gs.matchStats = { p1TotalDamage: 0, p2TotalDamage: 0, p1LongestCombo: 0, p2LongestCombo: 0 };
+        gs.setPhase(GamePhase.INTRO);
+        gs.phaseTimer = 0;
+        gs.announceSequence.setSteps(createRoundStartSequence(1));
+        announcer.roundStart(1);
+        announcer.fight();
+      }
     }
     return;
   }
@@ -998,7 +1071,17 @@ function render(): void {
     return;
   }
   if (gs.phase === GamePhase.GAME_OVER) {
-    renderer.drawGameOver(gs.gameOverTimer);
+    if (gs.arcadeComplete) {
+      renderer.drawArcadeComplete(gs.gameOverTimer);
+    } else {
+      renderer.drawGameOver(gs.gameOverTimer);
+    }
+    return;
+  }
+  if (gs.phase === GamePhase.NEXT_MATCH) {
+    const nextIdx = gs.arcadeOpponentIndex + 1;
+    const nextChar = gs.arcadeOpponents[nextIdx];
+    renderer.drawNextMatch(gs.arcadeNextMatchTimer, nextChar, gs.arcadeOpponentIndex + 1, gs.arcadeOpponents.length);
     return;
   }
   if (gs.phase === GamePhase.SELECT) {

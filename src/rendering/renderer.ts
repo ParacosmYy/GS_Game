@@ -25,7 +25,7 @@ import { drawHUD, drawPowerGauges, drawComboCounters, drawTeamOrder, type TeamDi
 import { subscribeMeterFlash, tickMeterFlash } from './meterFlash.js';
 import { drawCharacterSelect, drawIntro, drawKO, drawWinQuote, drawVSSplash, drawStageSelect, drawTeamOrderSelect, drawTransition, WIN_QUOTE_DURATION } from './screens.js';
 import type { KODustParticle, KOPhase } from '../state/cinematicState.js';
-import { drawSuperFlash, drawMatchEnd, drawModeIndicator, drawStageIndicator, drawTitle, drawContinue, drawModeSelect, drawTrainingHUD, drawGameOver, drawOptionsScreen, getSuperFlashZoom, updateSuperFlashZoom } from './overlayScreens.js';
+import { drawSuperFlash, drawMatchEnd, drawModeIndicator, drawStageIndicator, drawTitle, drawContinue, drawModeSelect, drawTrainingHUD, drawGameOver, drawOptionsScreen, drawArcadeComplete, drawNextMatch, getSuperFlashZoom, updateSuperFlashZoom } from './overlayScreens.js';
 import type { GameOptions } from './overlayScreens.js';
 import { drawProjectiles as drawProjectilesImpl } from './projectileRenderer.js';
 import type { SpriteRenderer } from './spriteRenderer.js';
@@ -393,6 +393,14 @@ export class Renderer {
 
   drawGameOver(timer: number): void {
     drawGameOver(this.ctx, timer);
+  }
+
+  drawArcadeComplete(timer: number): void {
+    drawArcadeComplete(this.ctx, timer);
+  }
+
+  drawNextMatch(timer: number, nextChar: CharacterDefinition | undefined, stageNumber: number, totalStages: number): void {
+    drawNextMatch(this.ctx, timer, nextChar, stageNumber, totalStages);
   }
 
   drawWinQuote(timer: number, charName: string, winQuote: string, charColor: string, pixelPortrait: import('./pixelPortraits.js').PixelPortraitData | undefined): void {
