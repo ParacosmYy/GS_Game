@@ -272,10 +272,12 @@ const RYO_SPECIAL_TO_DM: CancelRoute[] = [
 // KOF2002: In MAX mode, any special can cancel into any other special
 // Drains MAX mode timer per cancel
 
+const RYO_OTHER_SPECIALS = ['RYO_KOOU', 'RYO_KOOU_C', 'RYO_KO_HOU', 'RYO_KO_HOU_C', 'RYO_HIEN', 'RYO_HAOU', 'RYO_KOOUKEN_D', 'RYO_HIO_HACKER', 'RYO_ZANRETSU_KEN'];
+
 const RYO_FREE_CANCEL: CancelRoute[] = [
   {
     from: 'RYO_KOOU',
-    to: ['RYO_KO_HOU', 'RYO_KO_HOU_C', 'RYO_HIEN', 'RYO_HAOU', 'RYO_KOOU_C'],
+    to: ['RYO_KO_HOU', 'RYO_KO_HOU_C', 'RYO_HIEN', 'RYO_HAOU', 'RYO_KOOU_C', 'RYO_KOOUKEN_D', 'RYO_HIO_HACKER', 'RYO_ZANRETSU_KEN'],
     cancelType: 'free',
     requiresHit: true,
     stockCost: 0,
@@ -284,7 +286,7 @@ const RYO_FREE_CANCEL: CancelRoute[] = [
   },
   {
     from: 'RYO_KOOU_C',
-    to: ['RYO_KO_HOU', 'RYO_KO_HOU_C', 'RYO_HIEN', 'RYO_HAOU', 'RYO_KOOU'],
+    to: ['RYO_KO_HOU', 'RYO_KO_HOU_C', 'RYO_HIEN', 'RYO_HAOU', 'RYO_KOOU', 'RYO_KOOUKEN_D', 'RYO_HIO_HACKER', 'RYO_ZANRETSU_KEN'],
     cancelType: 'free',
     requiresHit: true,
     stockCost: 0,
@@ -293,7 +295,7 @@ const RYO_FREE_CANCEL: CancelRoute[] = [
   },
   {
     from: 'RYO_KO_HOU',
-    to: ['RYO_KOOU', 'RYO_KOOU_C', 'RYO_HIEN', 'RYO_HAOU'],
+    to: ['RYO_KOOU', 'RYO_KOOU_C', 'RYO_HIEN', 'RYO_HAOU', 'RYO_KOOUKEN_D', 'RYO_HIO_HACKER', 'RYO_ZANRETSU_KEN'],
     cancelType: 'free',
     requiresHit: true,
     stockCost: 0,
@@ -302,7 +304,7 @@ const RYO_FREE_CANCEL: CancelRoute[] = [
   },
   {
     from: 'RYO_KO_HOU_C',
-    to: ['RYO_KOOU', 'RYO_KOOU_C', 'RYO_HIEN', 'RYO_HAOU'],
+    to: ['RYO_KOOU', 'RYO_KOOU_C', 'RYO_HIEN', 'RYO_HAOU', 'RYO_KOOUKEN_D', 'RYO_HIO_HACKER', 'RYO_ZANRETSU_KEN'],
     cancelType: 'free',
     requiresHit: true,
     stockCost: 0,
@@ -311,7 +313,7 @@ const RYO_FREE_CANCEL: CancelRoute[] = [
   },
   {
     from: 'RYO_HIEN',
-    to: ['RYO_KOOU', 'RYO_KOOU_C', 'RYO_KO_HOU', 'RYO_KO_HOU_C', 'RYO_HAOU'],
+    to: ['RYO_KOOU', 'RYO_KOOU_C', 'RYO_KO_HOU', 'RYO_KO_HOU_C', 'RYO_HAOU', 'RYO_KOOUKEN_D', 'RYO_HIO_HACKER', 'RYO_ZANRETSU_KEN'],
     cancelType: 'free',
     requiresHit: true,
     stockCost: 0,
@@ -320,7 +322,34 @@ const RYO_FREE_CANCEL: CancelRoute[] = [
   },
   {
     from: 'RYO_HAOU',
-    to: ['RYO_KOOU', 'RYO_KOOU_C', 'RYO_KO_HOU', 'RYO_KO_HOU_C', 'RYO_HIEN'],
+    to: ['RYO_KOOU', 'RYO_KOOU_C', 'RYO_KO_HOU', 'RYO_KO_HOU_C', 'RYO_HIEN', 'RYO_KOOUKEN_D', 'RYO_HIO_HACKER', 'RYO_ZANRETSU_KEN'],
+    cancelType: 'free',
+    requiresHit: true,
+    stockCost: 0,
+    timerCost: FREE_CANCEL_TIMER_COST,
+    windowFrames: CANCEL_WINDOW_FREE,
+  },
+  {
+    from: 'RYO_KOOUKEN_D',
+    to: ['RYO_KOOU', 'RYO_KOOU_C', 'RYO_KO_HOU', 'RYO_KO_HOU_C', 'RYO_HIEN', 'RYO_HAOU', 'RYO_HIO_HACKER', 'RYO_ZANRETSU_KEN'],
+    cancelType: 'free',
+    requiresHit: true,
+    stockCost: 0,
+    timerCost: FREE_CANCEL_TIMER_COST,
+    windowFrames: CANCEL_WINDOW_FREE,
+  },
+  {
+    from: 'RYO_HIO_HACKER',
+    to: ['RYO_KOOU', 'RYO_KOOU_C', 'RYO_KO_HOU', 'RYO_KO_HOU_C', 'RYO_HIEN', 'RYO_HAOU', 'RYO_KOOUKEN_D', 'RYO_ZANRETSU_KEN'],
+    cancelType: 'free',
+    requiresHit: true,
+    stockCost: 0,
+    timerCost: FREE_CANCEL_TIMER_COST,
+    windowFrames: CANCEL_WINDOW_FREE,
+  },
+  {
+    from: 'RYO_ZANRETSU_KEN',
+    to: ['RYO_KOOU', 'RYO_KOOU_C', 'RYO_KO_HOU', 'RYO_KO_HOU_C', 'RYO_HIEN', 'RYO_HAOU', 'RYO_KOOUKEN_D', 'RYO_HIO_HACKER'],
     cancelType: 'free',
     requiresHit: true,
     stockCost: 0,
