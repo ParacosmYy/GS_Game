@@ -268,6 +268,9 @@ export const FEEDBACK_MANIFEST: FeedbackManifest = {
     RYO_HAOU: 'special',
     RYO_TSURIZAO: 'special',
     RYO_ORISHI: 'special',
+    RYO_KOOUKEN_D: 'special',
+    RYO_HIO_HACKER: 'special',
+    RYO_ZANRETSU_KEN: 'special',
 
     // ===== Ryo DM / SDM / HSDM =====
     DM_TEN_HA_OU: 'dm',
