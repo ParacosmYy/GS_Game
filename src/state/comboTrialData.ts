@@ -152,12 +152,12 @@ const IORI_TRIALS: ComboTrial[] = [
   {
     id: 'iori_04',
     charId: 'iori',
-    name: 'DM确认: Jump C → Stand C → 八稚女',
+    name: 'DM确认: Jump C → Stand C → 八咫烏',
     difficulty: 'expert',
     steps: [
       step(AttackType.JUMP_C, 'normal', 5, 'Jump C'),
       step(AttackType.STAND_C, 'normal', 4, '→ Stand C'),
-      step(AttackType.DM_YATAGARASU, 'super', 5, '→ QCFx2+P 八稚女'),
+      step(AttackType.DM_YATAGARASU, 'super', 5, '→ QCFx2+P 八咫烏'),
     ],
     totalDamage: 0,
   },
@@ -165,14 +165,14 @@ const IORI_TRIALS: ComboTrial[] = [
   {
     id: 'iori_05',
     charId: 'iori',
-    name: 'MAX连段: Close C → 葵花×3 → 八稚女',
+    name: 'MAX连段: Close C → 葵花×3 → 八咫烏',
     difficulty: 'expert',
     steps: [
       step(AttackType.CLOSE_C, 'free', 5, 'MAX Close C'),
       step(AttackType.IORI_AOIHANA, 'free', 5, '→ QCB+A 葵花'),
       step(AttackType.IORI_AOIHANA_2, 'free', 5, '→ QCB+P 葵花2段'),
       step(AttackType.IORI_AOIHANA_3, 'free', 5, '→ QCB+P 葵花3段'),
-      step(AttackType.DM_YATAGARASU, 'super', 4, '→ QCFx2+P 八稚女'),
+      step(AttackType.DM_YATAGARASU, 'super', 4, '→ QCFx2+P 八咫烏'),
     ],
     totalDamage: 0,
   },

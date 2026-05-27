@@ -30,7 +30,7 @@ export const IORI_MOVE_LIST: IoriMoveEntry[] = [
   { name: '鬼焼き (Oniyaki C)', input: '→↓↘ + C', type: 'special', attackTypeKey: 'IORI_ONIYAKI_C' },
   { name: '琴月陰 (Kototsuki In)', input: '←↙↓↘→ + B', type: 'special', attackTypeKey: 'IORI_KOTOTSUKI' },
   { name: '琴月陰 (Kototsuki In D)', input: '←↙↓↘→ + D', type: 'special', attackTypeKey: 'IORI_KOTOTSUKI_D' },
-  { name: '屑風 (Kuzukaze)', input: '←↙↓↘→↗↓↙← + P', type: 'special', attackTypeKey: 'IORI_KUZUKAZE' },
+  { name: '屑風 (Kuzukaze)', input: '←↙↓↘→ + P', type: 'special', attackTypeKey: 'IORI_KUZUKAZE' },
   // Rekka — 葵花 A chain
   { name: '葵花 (Aoihana)', input: '↓↙← + A', type: 'special', attackTypeKey: 'IORI_AOIHANA' },
   { name: '葵花 追撃 弐', input: '葵花中 ↓↙← + P', type: 'special', attackTypeKey: 'IORI_AOIHANA_2' },
@@ -40,11 +40,11 @@ export const IORI_MOVE_LIST: IoriMoveEntry[] = [
   { name: '葵花 C 追撃 弐', input: '葵花C中 ↓↙← + P', type: 'special', attackTypeKey: 'IORI_AOIHANA_C_2' },
   { name: '葵花 C 追撃 参', input: '葵花C弐中 ↓↙← + P', type: 'special', attackTypeKey: 'IORI_AOIHANA_C_3' },
   // DMs — 超必杀技
-  { name: '八稚女 (Yaotome)', input: '↓↙←↙↓↘→ + A / C', type: 'dm', attackTypeKey: 'DM_YATAGARASU' },
+  { name: '八咫烏 (Yatagarasu)', input: '↓↙←↙↓↘→ + A / C', type: 'dm', attackTypeKey: 'DM_YATAGARASU' },
   // SDMs — MAX超必杀技
-  { name: '八稚女 (MAX)', input: '↓↙←↙↓↘→ + AC', type: 'sdm', attackTypeKey: 'SDM_YATAGARASU' },
+  { name: '八咫烏 (MAX)', input: '↓↙←↙↓↘→ + AC', type: 'sdm', attackTypeKey: 'SDM_YATAGARASU' },
   // HSDM — 隐藏超必杀技 (MAX + 红血)
-  { name: '八稚女 (HSDM)', input: 'MAX+红血 ↓↙←↙↓↘→ + AC', type: 'hsdm', attackTypeKey: 'HSDM_YAOTOME' },
+  { name: '八稚女 (Ya Otome)', input: 'MAX+红血 ↓↙←↙↓↘→ + AC', type: 'hsdm', attackTypeKey: 'HSDM_YAOTOME' },
   // System — 系统动作
   { name: '爆气 (MAX Mode)', input: 'K+U / O (shortcut)', type: 'system' },
 ];

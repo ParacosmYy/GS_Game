@@ -61,8 +61,8 @@ export const MOVE_NAME_MAP: Partial<Record<AttackType, string>> = {
   // Iori (八神庵)
   [AttackType.IORI_YAMIBARAI]: '闇払い',
   [AttackType.IORI_YAMIBARAI_C]: '闇払い',
-  [AttackType.DM_YATAGARASU]: '八稚女',
-  [AttackType.SDM_YATAGARASU]: '八稚女',
+  [AttackType.DM_YATAGARASU]: '八咫烏',
+  [AttackType.SDM_YATAGARASU]: '八咫烏',
   [AttackType.IORI_AOIHANA]: '葵花',
   [AttackType.IORI_AOIHANA_2]: '葵花',
   [AttackType.IORI_AOIHANA_3]: '葵花',

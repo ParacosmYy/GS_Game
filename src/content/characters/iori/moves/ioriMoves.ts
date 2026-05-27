@@ -257,15 +257,15 @@ export const IORI_MOVES: MoveDefinition[] = [
 
   {
     key: 'DM_YATAGARASU',
-    nameJa: '八稚女',
-    nameEn: 'Yaotome (Eight Maidens)',
+    nameJa: '八咫烏',
+    nameEn: 'Yatagarasu (Eight-Hand Raven)',
     category: 'dm',
     input: '↓↙←↙↓↘→ + A / C',
     versions: [
       {
         version: 'A',
         attackTypeKey: 'DM_YATAGARASU',
-        differences: '八稚女 DM，狂暴连斩，消耗1条stock',
+        differences: '八咫烏 DM，暗黑冲斩，消耗1条stock',
         damageMultiplier: 1.0,
         knockdown: true,
         invincibleStartup: 5,
@@ -278,8 +278,8 @@ export const IORI_MOVES: MoveDefinition[] = [
 
   {
     key: 'SDM_YATAGARASU',
-    nameJa: '八稚女 (MAX)',
-    nameEn: 'Yaotome MAX',
+    nameJa: '八咫烏 (MAX)',
+    nameEn: 'Yatagarasu MAX',
     category: 'sdm',
     input: '↓↙←↙↓↘→ + AC',
     versions: [
