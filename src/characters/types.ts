@@ -12,7 +12,6 @@ import {
   FighterState,
   AttackType,
 } from '../core/types.js';
-import type { MoveListEntry } from '../core/types.js';
 import type { PixelPortraitData } from '../rendering/pixelPortraits.js';
 
 // ===== 骨骼动画系统 (Skeletal Pose System) =====
@@ -130,7 +129,7 @@ export interface CharacterDefinition {
   portrait: string;     // 选人界面图标
   pixelPortrait?: PixelPortraitData; // SNK-style pixel portrait for character select
   winQuotes: string[];  // 胜利台词(随机选一条显示)
-  moveList?: MoveListEntry[]; // 招式表显示给玩家看
+  moveList?: { name: string, input: string }[]; // 招式表，由于显示给玩家看
 
   // ── 数值 ──
   /** 角色差异化数值 (速度/生命/碰撞) */
