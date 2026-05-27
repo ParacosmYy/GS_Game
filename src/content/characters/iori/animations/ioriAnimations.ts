@@ -57,7 +57,8 @@ export const IORI_ANIMATION_META: Record<string, AnimationMeta> = {
   iori_yamibarai_c: { name: 'iori_yamibarai_c', type: 'attack', totalFrames: 40, ticksPerFrame: 2, loop: false, transition: 'snap', description: '闇払い C版,强紫色飞行道具' },
   iori_oniyaki:     { name: 'iori_oniyaki', type: 'attack', totalFrames: 30, ticksPerFrame: 2, loop: false, transition: 'snap', description: '鬼焼き A版,对空升龙' },
   iori_oniyaki_c:   { name: 'iori_oniyaki_c', type: 'attack', totalFrames: 45, ticksPerFrame: 2, loop: false, transition: 'snap', description: '鬼焼き C版,无敌升龙' },
-  iori_kototsuki:   { name: 'iori_kototsuki', type: 'attack', totalFrames: 28, ticksPerFrame: 2, loop: false, transition: 'snap', description: '琴月陰,突进HKD' },
+  iori_kototsuki:   { name: 'iori_kototsuki', type: 'attack', totalFrames: 28, ticksPerFrame: 2, loop: false, transition: 'snap', description: '琴月陰 B版,短距离突进HKD' },
+  iori_kototsuki_d: { name: 'iori_kototsuki_d', type: 'attack', totalFrames: 34, ticksPerFrame: 2, loop: false, transition: 'snap', description: '琴月陰 D版,长距离突进HKD' },
   iori_kuzukaze:    { name: 'iori_kuzukaze', type: 'attack', totalFrames: 20, ticksPerFrame: 2, loop: false, transition: 'snap', description: '屑風,指令投换边' },
 
   // === 命令通常技 ===
@@ -65,14 +66,20 @@ export const IORI_ANIMATION_META: Record<string, AnimationMeta> = {
   iori_katanugi:  { name: 'iori_katanugi', type: 'attack', totalFrames: 18, ticksPerFrame: 2, loop: false, transition: 'snap', description: '邯鄲,下段攻击' },
   iori_yukiwarui: { name: 'iori_yukiwarui', type: 'attack', totalFrames: 16, ticksPerFrame: 2, loop: false, transition: 'snap', description: '百合折り,空中crossup' },
 
-  // === Rekka — 葵花 chain ===
-  iori_aoihana:   { name: 'iori_aoihana', type: 'attack', totalFrames: 16, ticksPerFrame: 2, loop: false, transition: 'snap', description: '葵花壹段,rekka起手爪击' },
-  iori_aoihana_2: { name: 'iori_aoihana_2', type: 'attack', totalFrames: 16, ticksPerFrame: 2, loop: false, transition: 'snap', description: '葵花弐段,下段追击' },
-  iori_aoihana_3: { name: 'iori_aoihana_3', type: 'attack', totalFrames: 18, ticksPerFrame: 2, loop: false, transition: 'snap', description: '葵花参段,overhead击倒' },
+  // === Rekka — 葵花 A chain ===
+  iori_aoihana:   { name: 'iori_aoihana', type: 'attack', totalFrames: 16, ticksPerFrame: 2, loop: false, transition: 'snap', description: '葵花壹段A版,rekka起手爪击' },
+  iori_aoihana_2: { name: 'iori_aoihana_2', type: 'attack', totalFrames: 16, ticksPerFrame: 2, loop: false, transition: 'snap', description: '葵花弐段A版,下段追击' },
+  iori_aoihana_3: { name: 'iori_aoihana_3', type: 'attack', totalFrames: 18, ticksPerFrame: 2, loop: false, transition: 'snap', description: '葵花参段A版,overhead击倒' },
+
+  // === Rekka — 葵花 C chain ===
+  iori_aoihana_c:   { name: 'iori_aoihana_c', type: 'attack', totalFrames: 18, ticksPerFrame: 2, loop: false, transition: 'snap', description: '葵花壹段C版,慢速高伤害爪击' },
+  iori_aoihana_c_2: { name: 'iori_aoihana_c_2', type: 'attack', totalFrames: 18, ticksPerFrame: 2, loop: false, transition: 'snap', description: '葵花弐段C版,下段追击' },
+  iori_aoihana_c_3: { name: 'iori_aoihana_c_3', type: 'attack', totalFrames: 20, ticksPerFrame: 2, loop: false, transition: 'snap', description: '葵花参段C版,overhead击倒' },
 
   // === DM ===
-  dm_yaotome:  { name: 'dm_yaotome', type: 'attack', totalFrames: 36, ticksPerFrame: 2, loop: false, transition: 'snap', description: '八稚女 DM,狂暴连斩' },
-  sdm_yaotome: { name: 'sdm_yaotome', type: 'attack', totalFrames: 40, ticksPerFrame: 2, loop: false, transition: 'snap', description: '八稚女 SDM,强化狂暴连斩' },
+  dm_yaotome:   { name: 'dm_yaotome', type: 'attack', totalFrames: 36, ticksPerFrame: 2, loop: false, transition: 'snap', description: '八稚女 DM,狂暴连斩' },
+  sdm_yaotome:  { name: 'sdm_yaotome', type: 'attack', totalFrames: 40, ticksPerFrame: 2, loop: false, transition: 'snap', description: '八稚女 SDM,强化狂暴连斩' },
+  hsdm_yaotome: { name: 'hsdm_yaotome', type: 'attack', totalFrames: 44, ticksPerFrame: 2, loop: false, transition: 'snap', description: '八稚女 HSDM,隐藏超必杀' },
 };
 
 /** 获取Iori所有动作名称 */

@@ -50,5 +50,5 @@ export const IORI_FEEDBACK_SUMMARY: Record<FeedbackTier, string[]> = {
   ],
   dm: ['DM_YATAGARASU'],
   sdm: ['SDM_YATAGARASU'],
-  hsdm: [],
+  hsdm: ['HSDM_YAOTOME'],
 };

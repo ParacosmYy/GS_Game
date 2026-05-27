@@ -87,8 +87,9 @@ export const KYO_ANIMATION_META: Record<string, AnimationMeta> = {
   kyo_batsuyomi:  { name: 'kyo_batsuyomi', type: 'attack', totalFrames: 30, ticksPerFrame: 2, loop: false, transition: 'snap', description: '402式·罰詠み,最终派生' },
 
   // === DM ===
-  dm_orochinagi:  { name: 'dm_orochinagi', type: 'attack', totalFrames: 68, ticksPerFrame: 2, loop: false, transition: 'snap', description: '大蛇薙 DM,巨大火焰爆发' },
-  sdm_orochinagi: { name: 'sdm_orochinagi', type: 'attack', totalFrames: 67, ticksPerFrame: 2, loop: false, transition: 'snap', description: '大蛇薙 SDM' },
+  dm_orochinagi:   { name: 'dm_orochinagi', type: 'attack', totalFrames: 68, ticksPerFrame: 2, loop: false, transition: 'snap', description: '大蛇薙 DM,巨大火焰爆发' },
+  sdm_orochinagi:  { name: 'sdm_orochinagi', type: 'attack', totalFrames: 67, ticksPerFrame: 2, loop: false, transition: 'snap', description: '大蛇薙 SDM' },
+  hsdm_orochinagi: { name: 'hsdm_orochinagi', type: 'attack', totalFrames: 60, ticksPerFrame: 2, loop: false, transition: 'snap', description: '大蛇薙 HSDM,隐藏超必杀' },
 };
 
 /** 获取Kyo所有动作名称 */
