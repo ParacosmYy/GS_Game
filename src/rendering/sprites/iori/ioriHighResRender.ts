@@ -44,6 +44,7 @@ import {
 } from './ioriMovementFrames.js';
 import { IORI_DIZZY_FRAMES } from './ioriDizzyFrames.js';
 import { IORI_THROW_FRAMES } from './ioriThrowFrames.js';
+import { IORI_YUMEYUMI_FRAMES, IORI_KATANUGI_FRAMES, IORI_YUKIWARUI_FRAMES } from './ioriCommandNormalFrames.js';
 
 const IORI_FRAMES = new Map<string, FrameEntry>();
 const FRAME_CACHE = new Map<string, HTMLCanvasElement>();
@@ -117,6 +118,11 @@ function initIoriFrames(): void {
   registerVariableFrames('MAX_MODE', IORI_MAX_MODE_FRAMES, [3, 4, 8]);
   registerVariableFrames('TAUNT', IORI_TAUNT_FRAMES, [10, 14, 12, 16]);
   registerVariableFrames('COUNTER_STANCE', IORI_COUNTER_STANCE_FRAMES, [4, 6, 10, 8]);
+
+  // Command normals
+  registerVariableFrames('CMD_YUMEYUMI', IORI_YUMEYUMI_FRAMES, [8, 3, 4, 20]);
+  registerVariableFrames('CMD_KATANUGI', IORI_KATANUGI_FRAMES, [10, 3, 4, 22]);
+  registerVariableFrames('CMD_YUKIWARUI', IORI_YUKIWARUI_FRAMES, [6, 4, 18]);
 }
 
 function resolveIoriFrameKey(
@@ -166,6 +172,10 @@ function resolveIoriFrameKey(
       if (currentAttack === AttackType.DM_YATAGARASU) return 'YATAGARASU_DM';
       if (currentAttack === AttackType.SDM_YATAGARASU) return 'YATAGARASU_SDM';
       if (currentAttack === AttackType.HSDM_YAOTOME) return 'YAOTOME_HSDM';
+      // Command normals
+      if (currentAttack === AttackType.IORI_YUMEYUMI) return 'CMD_YUMEYUMI';
+      if (currentAttack === AttackType.IORI_KATANUGI) return 'CMD_KATANUGI';
+      if (currentAttack === AttackType.IORI_YUKIWARUI) return 'CMD_YUKIWARUI';
       // Normals
       if (currentAttack === AttackType.STAND_C || currentAttack === AttackType.CLOSE_C) return 'STAND_C';
       if (currentAttack === AttackType.STAND_D || currentAttack === AttackType.CLOSE_D) return 'STAND_D';
