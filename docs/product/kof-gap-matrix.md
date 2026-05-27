@@ -54,6 +54,7 @@
   - 命中事件统一触发链 (hitCallback → feedbackManifest → cinematicState)
   - 受击反馈与攻击重量绑定 (inferTier 自动分类 + 显式映射)
   - 角色专属 DM/SDM/HSDM 火花色板 (Kyo 火/Iori 紫/Ryo 雷)
+  - Kyo大蛇薙专属火焰柱VFX、Iori闇払い专属暗能量发射VFX
   - 23+ 回归测试保护反馈矩阵完整性和层级递进
 - 当前差距：hitstop、spark、shake、pushback、SFX 还没有按轻重/特殊/爆气状态形成稳定矩阵。
 - 新功能添加点：
@@ -109,10 +110,14 @@
 
 - 当前差距：部分输入、镜头、特效、命中边界虽然已改善，但仍需要更强回归保护。
 - 已闭合项：
-  - 4161 tests 全部通过 (vitest)
+  - 4278 tests 全部通过 (vitest)
   - 6档反馈矩阵回归测试 (23 tests, 层级递进+参数完整性+3角色映射)
   - DM→SDM→HSDM升级链回归测试 (8 tests, Kyo/Iori/HSDM一致性)
   - 3角色必杀技像素帧覆盖 (134 tests, 基本+通常+必杀+DM/SDM/HSDM+命令技)
+  - Kyo/Iori反馈层+帧映射回归测试 (4 tests, 27+25攻击类型全映射)
+  - 3角色取消路径结构回归测试 (22 tests, 通常技→必杀技→DM超必→Free Cancel)
+  - 3角色四尺寸肖像一致性回归测试 (28 tests, select/vs/hud/win全尺寸)
+  - 3角色动画节奏一致性回归测试 (63 tests, 轻重攻击递增+loop属性+参数正值)
   - 3角色 manifest 校验工具 全绿 (82+89+89 checks)
   - HSDM招式表分类+CN_MOVE_NAMES覆盖回归测试 (11 tests)
 - 新功能添加点：
