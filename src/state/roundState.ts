@@ -44,6 +44,10 @@ export class RoundState {
   fadeDirection = 0;  // 0=idle, 1=out(to black), -1=in(from black)
   fadeCallback: (() => void) | null = null;
 
+  // Wipe transition support
+  transitionType: 'fade' | 'wipe' = 'fade';
+  transitionTick = 0;
+
   // Round transition state machine
   transitionPhase: RoundTransitionPhase = RoundTransitionPhase.NONE;
   /** Frames to hold black screen between fade-out and fade-in */
@@ -126,6 +130,8 @@ export class RoundState {
     this.fadeDirection = 1;
     this.fadeAlpha = 0;
     this.holdBlackFrames = 0;
+    this.transitionType = 'wipe';
+    this.transitionTick = 0;
     // Store the peak callback — fires when fade reaches full black
     this.fadeCallback = () => {
       // Reset round state at peak of fade-out
@@ -142,6 +148,11 @@ export class RoundState {
 
   /** Tick fade alpha and transition state machine. Returns true while fade/transition is active. */
   tickFade(): boolean {
+    // Advance wipe tick counter when a transition is active
+    if (this.transitionType === 'wipe' && this.isTransitioning()) {
+      this.transitionTick++;
+    }
+
     // Phase: hold black — count frames, then start fade-in
     if (this.transitionPhase === RoundTransitionPhase.HOLD_BLACK) {
       this.holdBlackFrames++;
@@ -213,6 +224,8 @@ export class RoundState {
     this.transitionPhase = RoundTransitionPhase.NONE;
     this.holdBlackFrames = 0;
     this.transitionCompleteCallback = null;
+    this.transitionType = 'fade';
+    this.transitionTick = 0;
     resetMeterSystem(this.gauges[0], this.maxModes[0]);
     resetMeterSystem(this.gauges[1], this.maxModes[1]);
   }
@@ -234,5 +247,7 @@ export class RoundState {
     this.transitionPhase = RoundTransitionPhase.NONE;
     this.holdBlackFrames = 0;
     this.transitionCompleteCallback = null;
+    this.transitionType = 'fade';
+    this.transitionTick = 0;
   }
 }

@@ -1312,23 +1312,26 @@ function render(): void {
     }
   }
   if (rounds.fadeAlpha > 0) {
-    ctx.save();
-    // Main fade overlay
-    ctx.fillStyle = `rgba(0,0,0,${rounds.fadeAlpha})`;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    // Subtle warm edge glow during fade — gives cinematic round transition feel
-    if (rounds.isTransitioning() && rounds.fadeAlpha >= 0.9) {
-      const glowGrad = ctx.createRadialGradient(
-        canvas.width / 2, canvas.height / 2, 40,
-        canvas.width / 2, canvas.height / 2, canvas.width * 0.5,
-      );
-      glowGrad.addColorStop(0, `rgba(255, 180, 60, ${0.08 * rounds.fadeAlpha})`);
-      glowGrad.addColorStop(0.5, `rgba(255, 120, 30, ${0.04 * rounds.fadeAlpha})`);
-      glowGrad.addColorStop(1, 'rgba(0,0,0,0)');
-      ctx.fillStyle = glowGrad;
+    if (rounds.transitionType === 'wipe' && rounds.isTransitioning()) {
+      // KOF2002-style wipe transition with golden edge
+      renderer.drawTransition(rounds.transitionTick, 'wipe');
+    } else {
+      ctx.save();
+      ctx.fillStyle = `rgba(0,0,0,${rounds.fadeAlpha})`;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
+      if (rounds.isTransitioning() && rounds.fadeAlpha >= 0.9) {
+        const glowGrad = ctx.createRadialGradient(
+          canvas.width / 2, canvas.height / 2, 40,
+          canvas.width / 2, canvas.height / 2, canvas.width * 0.5,
+        );
+        glowGrad.addColorStop(0, `rgba(255, 180, 60, ${0.08 * rounds.fadeAlpha})`);
+        glowGrad.addColorStop(0.5, `rgba(255, 120, 30, ${0.04 * rounds.fadeAlpha})`);
+        glowGrad.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.fillStyle = glowGrad;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+      }
+      ctx.restore();
     }
-    ctx.restore();
   }
   screenFlash.render(ctx, canvas.width, canvas.height);
   // KO去饱和闪光 + 红色暗角 — 由CinematicState控制
