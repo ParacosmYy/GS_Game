@@ -27,7 +27,9 @@ type SampleId =
   | 'ryo_tsurizao' | 'ryo_orishi'
   | 'ryo_hio_hacker' | 'ryo_zanretsu_ken'
   | 'kyo_yamibarai' | 'kyo_oniyaki' | 'kyo_aragami' | 'kyo_dokugami'
-  | 'kyo_75kai' | 'kyo_red_kick' | 'kyo_orochinagi';
+  | 'kyo_75kai' | 'kyo_red_kick' | 'kyo_orochinagi'
+  | 'iori_aoihana' | 'iori_yamibarai' | 'iori_oniyaki' | 'iori_kototsuki'
+  | 'iori_kuzukaze' | 'iori_yumeyumi' | 'iori_katanugi' | 'iori_yaotome';
 
 const samples = new Map<SampleId, AudioBuffer>();
 let initialized = false;
@@ -1817,6 +1819,229 @@ function renderKyoOrochinagi(sr: number): Float32Array {
   ));
 }
 
+// === Iori 必杀技专属音效预渲染 ===
+// Iori音效设计哲学：暗、紫、爪感、侵略性
+// 比Kyo更低频、更多锯齿波+噪声（vs Kyo的火焰音调）、子低音暗能量隆隆声、尖锐瞬态模拟爪击
+
+// 葵花 (AOIHANA): rekka连拳 — 锯齿波暗爪 + 噪声撕裂
+// 特征：180Hz锯齿波 + 高通噪声 + 三角波瞬态，模拟暗色爪击的锐利低沉感
+function renderIoriAoihana(sr: number): Float32Array {
+  const dur = 0.25;
+  // 暗爪锯齿波 — 180Hz快速衰减的暗能量打击
+  const claw = renderOsc(sr, dur, 'sawtooth', t => 180 - 2000 * t, t => expDecay(t, 0.25, 12));
+  // 高通噪声撕裂 — 爪击划破空气的粗糙感
+  const tear = highPass(renderNoise(sr, dur * 0.7, t => expDecay(t, 0.18, 20)), sr, 4000);
+  // 三角波瞬态 — 爪击命中的尖锐"嚓"
+  const slash = renderOsc(sr, 0.04, 'triangle', t => 2500 - 60000 * t, t => expDecay(t, 0.2, 45));
+  // 低频体感 — 暗色打击的深层重量
+  const body = renderOsc(sr, 0.1, 'sine', t => 100 - 1000 * t, t => expDecay(t, 0.3, 15));
+
+  const total = Math.ceil(sr * dur);
+  const tearP = padTo(tear, total);
+  const slashP = padTo(slash, total, Math.floor(sr * 0.02));
+  const bodyP = padTo(body, total, Math.floor(sr * 0.03));
+
+  return normalize(mixLayers(
+    [claw, tearP, slashP, bodyP],
+    [1, 0.65, 0.55, 0.85]
+  ));
+}
+
+// 闇払い (YAMIBARAI): 暗色弹 — 锯齿波下扫 + 带通噪声暗核 + 子低音
+// 特征：120→60Hz锯齿波扫频 + 带通噪声暗能量核心 + 40Hz子低音，模拟紫色暗能量弹
+function renderIoriYamibarai(sr: number): Float32Array {
+  const dur = 0.4;
+  // 暗色弹体下扫 — 锯齿波从120Hz扫到60Hz，模拟暗能量弹飞行
+  const projectile = renderOsc(sr, dur, 'sawtooth',
+    t => 120 - 150 * t,
+    t => t < 0.05 ? t * 8 : expDecay(t - 0.05, 0.22, 5));
+  // 带通噪声暗核 — 暗能量弹的暗色核心嗡鸣
+  const darkCore = bandPass(renderNoise(sr, dur * 0.7, t => expDecay(t, 0.18, 8)), sr, 800, 3000);
+  // 子低音 — 40Hz暗能量深层脉冲
+  const sub = renderOsc(sr, dur * 0.8, 'sine', t => 40 - 15 * t, t => t < 0.04 ? t * 5 : expDecay(t - 0.04, 0.3, 4));
+  // 发射瞬态 — 暗能量弹出瞬间
+  const launch = renderOsc(sr, 0.05, 'square', t => 1600 - 35000 * t, t => expDecay(t, 0.15, 40));
+  // 低频弹体共振 — 持续暗色嗡嗡
+  const hum = renderOsc(sr, dur * 0.85, 'sine',
+    t => 130 - 200 * t,
+    t => t < 0.04 ? t * 5 : expDecay(t - 0.04, 0.18, 5));
+
+  const total = Math.ceil(sr * dur);
+  const darkCoreP = padTo(darkCore, total);
+  const subP = padTo(sub, total);
+  const launchP = padTo(launch, total);
+  const humP = padTo(hum, total);
+
+  return normalize(mixLayers(
+    [projectile, darkCoreP, subP, launchP, humP],
+    [1, 0.7, 0.9, 0.5, 0.6]
+  ));
+}
+
+// 鬼焼き (ONIYAKI): 升龙暗焰 — 正弦上升扫频 + 噪声爆发 + 低频闷响
+// 特征：120→500Hz正弦上升 + 噪声爆发 + 低频闷击，模拟暗焰升龙
+function renderIoriOniyaki(sr: number): Float32Array {
+  const dur = 0.3;
+  // 上升暗焰扫频 — 正弦波从120Hz升到500Hz
+  const sweep = renderOsc(sr, 0.15, 'sine',
+    t => 120 + 2533 * t,
+    t => expDecay(t, 0.22, 10));
+  // 暗焰噪声爆发 — 短促暗色能量爆发
+  const burst = highPass(renderNoise(sr, 0.1, t => expDecay(t, 0.25, 22)), sr, 2500);
+  // 低频闷响 — 升龙击的沉重体感
+  const thud = renderOsc(sr, 0.12, 'sine', t => 90 - 900 * t, t => expDecay(t, 0.32, 10));
+  // 暗色裂响瞬态 — 暗焰炸裂
+  const crack = renderOsc(sr, 0.035, 'triangle', t => 3000 - 70000 * t, t => expDecay(t, 0.15, 50));
+  // 子低音 — 升龙暗击深层冲击
+  const sub = renderOsc(sr, 0.18, 'sine', t => 45 - 20 * t, t => expDecay(t, 0.35, 6));
+
+  const total = Math.ceil(sr * dur);
+  const burstP = padTo(burst, total);
+  const crackP = padTo(crack, total, Math.floor(sr * 0.03));
+  const subP = padTo(sub, total, Math.floor(sr * 0.03));
+
+  return normalize(mixLayers(
+    [sweep, burstP, thud, crackP, subP],
+    [1, 0.6, 0.9, 0.5, 0.85]
+  ));
+}
+
+// 琴月陰 (KOTOTSUKI): 突进暗能量 — 锯齿波冲刺 + 噪声扫频 + 子低音
+// 特征：200→80Hz锯齿波突进 + 噪声扫频 + 30Hz子低音，模拟暗能量突进
+function renderIoriKototsuki(sr: number): Float32Array {
+  const dur = 0.35;
+  // 暗能量突进 — 锯齿波从200Hz扫到80Hz
+  const rush = renderOsc(sr, dur, 'sawtooth',
+    t => t < 0.06 ? 200 + 3000 * t : 380 - 900 * (t - 0.06),
+    t => t < 0.06 ? t * 6 : expDecay(t - 0.06, 0.22, 6));
+  // 噪声扫频 — 突进时的暗色风切
+  const noise = bandPass(renderNoise(sr, dur * 0.6, t => expDecay(t, 0.18, 10)), sr, 600, 3500);
+  // 子低音 — 30Hz暗能量深层推进
+  const sub = renderOsc(sr, dur * 0.8, 'sine', t => 30 - 10 * t, t => t < 0.04 ? t * 4 : expDecay(t - 0.04, 0.3, 3));
+  // 冲击瞬态 — 突进命中
+  const impact = renderOsc(sr, 0.05, 'square', t => 1200 - 25000 * t, t => expDecay(t, 0.2, 35));
+
+  const total = Math.ceil(sr * dur);
+  const noiseP = padTo(noise, total);
+  const subP = padTo(sub, total);
+  const impactP = padTo(impact, total, Math.floor(sr * 0.06));
+
+  return normalize(mixLayers(
+    [rush, noiseP, subP, impactP],
+    [1, 0.7, 1.0, 0.65]
+  ));
+}
+
+// 屑風 (KUZUKAZE): 指令投 — 方波闷击 + 噪声碎裂 + 子低音
+// 特征：100Hz方波闷击 + 噪声暗色碎裂 + 60Hz正弦子低音，模拟暗色抓取
+function renderIoriKuzukaze(sr: number): Float32Array {
+  const dur = 0.2;
+  // 方波闷击 — 100Hz抓取冲击
+  const thud = renderOsc(sr, 0.1, 'square', t => 100 - 1200 * t, t => expDecay(t, 0.25, 18));
+  // 暗色噪声碎裂 — 抓取的撕裂感
+  const crack = highPass(renderNoise(sr, 0.08, t => expDecay(t, 0.2, 25)), sr, 3000);
+  // 子低音 — 60Hz暗色抓取深层感
+  const sub = renderOsc(sr, 0.12, 'sine', t => 60 - 30 * t, t => expDecay(t, 0.35, 8));
+  // 中频共鸣 — 抓取的"咕"声
+  const grab = bandPass(renderNoise(sr, 0.06, t => expDecay(t, 0.2, 30)), sr, 800, 2500);
+
+  const total = Math.ceil(sr * dur);
+  const crackP = padTo(crack, total);
+  const subP = padTo(sub, total);
+  const grabP = padTo(grab, total, Math.floor(sr * 0.02));
+
+  return normalize(mixLayers(
+    [thud, crackP, subP, grabP],
+    [1, 0.6, 0.85, 0.55]
+  ));
+}
+
+// 夢弾 (YUMEYUMI): overhead 2连击 — 两段带通噪声爆发
+// 特征：两段短促带通噪声爆发，间隔0.06s，模拟2hit overhead
+function renderIoriYumeyumi(sr: number): Float32Array {
+  const dur = 0.2;
+  // 第一击 — 带通噪声爆发
+  const hit1 = bandPass(renderNoise(sr, 0.04, t => expDecay(t, 0.25, 40)), sr, 1500, 6000);
+  // 第二击 — 带通噪声爆发，偏移0.06s
+  const hit2 = bandPass(renderNoise(sr, 0.04, t => expDecay(t, 0.25, 40)), sr, 1800, 7000);
+  // 低频体感 — 2连击的重量
+  const body = renderOsc(sr, 0.1, 'sine', t => 110 - 1200 * t, t => expDecay(t, 0.28, 16));
+  // 暗色高频碎响 — overhead的暗色质感
+  const darkSnap = renderOsc(sr, 0.03, 'triangle', t => 2200 - 50000 * t, t => expDecay(t, 0.15, 50));
+
+  const total = Math.ceil(sr * dur);
+  const hit1P = padTo(hit1, total);
+  const hit2P = padTo(hit2, total, Math.floor(sr * 0.06));
+  const bodyP = padTo(body, total, Math.floor(sr * 0.02));
+  const darkSnapP = padTo(darkSnap, total);
+
+  return normalize(mixLayers(
+    [hit1P, hit2P, bodyP, darkSnapP],
+    [1, 0.9, 0.75, 0.5]
+  ));
+}
+
+// 邯鄲 (KATANUGI): 下段扫踢 — 高通噪声扫频 + 正弦下扫
+// 特征：高通噪声swoosh + 200→100Hz正弦下扫，模拟低扫踢的闷响
+function renderIoriKatanugi(sr: number): Float32Array {
+  const dur = 0.2;
+  // 高通噪声扫频 — 低扫踢的swoosh
+  const swoosh = highPass(renderNoise(sr, dur * 0.7, t => expDecay(t, 0.15, 22)), sr, 3000);
+  // 正弦下扫 — 200→100Hz模拟低扫踢的闷响
+  const sweep = renderOsc(sr, dur, 'sine', t => 200 - 500 * t, t => expDecay(t, 0.2, 12));
+  // 低频体感 — 低扫踢的重量
+  const body = renderOsc(sr, 0.08, 'sine', t => 90 - 800 * t, t => expDecay(t, 0.25, 18));
+  // 短促瞬态 — 踢击命中
+  const snap = renderOsc(sr, 0.025, 'triangle', t => 1800 - 40000 * t, t => expDecay(t, 0.12, 55));
+
+  const total = Math.ceil(sr * dur);
+  const swooshP = padTo(swoosh, total);
+  const bodyP = padTo(body, total, Math.floor(sr * 0.03));
+  const snapP = padTo(snap, total, Math.floor(sr * 0.02));
+
+  return normalize(mixLayers(
+    [swooshP, sweep, bodyP, snapP],
+    [0.8, 1, 0.75, 0.5]
+  ));
+}
+
+// 八稚女 (YAOTOME): DM暗色连突 — 多层暗能量叠加
+// 特征：100→50Hz锯齿波 + 200→80Hz方波 + 噪声暗色噼啪 + 30Hz子低音 + 爆发，0.5s
+function renderIoriYaotome(sr: number): Float32Array {
+  const dur = 0.5;
+  // 暗色主锯齿波 — 100→50Hz，暗能量连续打击的主体
+  const bass = renderOsc(sr, dur, 'sawtooth',
+    t => 100 - 100 * t,
+    t => t < 0.06 ? t * 6 : expDecay(t - 0.06, 0.3, 3.5));
+  // 方波暗色打击 — 200→80Hz，更锐利的暗色节奏
+  const mid = renderOsc(sr, dur * 0.8, 'square',
+    t => 200 - 150 * t,
+    t => t < 0.05 ? t * 5 : expDecay(t - 0.05, 0.22, 4));
+  // 噪声暗色噼啪 — 持续的暗能量碎裂
+  const crackle = highPass(renderNoise(sr, dur * 0.6, t => expDecay(t, 0.2, 6)), sr, 4000);
+  // 子低音 — 30Hz暗能量深层冲击
+  const sub = renderOsc(sr, 0.35, 'sine', t => 30 - 15 * t, t => expDecay(t, 0.4, 3));
+  // 爆发瞬态 — DM起手的暗色爆发
+  const burst = renderOsc(sr, 0.06, 'square', t => 1800 - 30000 * t, t => expDecay(t, 0.18, 30));
+  // 中频暗能量涌动 — 带通噪声
+  const darkWave = bandPass(renderNoise(sr, dur * 0.5, t => expDecay(t, 0.2, 5)), sr, 300, 2500);
+  // 暗色金属泛音
+  const metal = renderOsc(sr, 0.08, 'triangle', t => 2000 - 25000 * t, t => expDecay(t, 0.1, 22));
+
+  const total = Math.ceil(sr * dur);
+  const midP = padTo(mid, total);
+  const crackleP = padTo(crackle, total);
+  const subP = padTo(sub, total);
+  const burstP = padTo(burst, total);
+  const darkWaveP = padTo(darkWave, total);
+  const metalP = padTo(metal, total, Math.floor(sr * 0.04));
+
+  return normalize(mixLayers(
+    [bass, midP, crackleP, subP, burstP, darkWaveP, metalP],
+    [1.1, 0.75, 0.55, 1.1, 0.6, 0.7, 0.35]
+  ));
+}
+
 // === 基础 BGM 框架 ===
 
 // 生成简单循环战斗BGM
@@ -2046,6 +2271,15 @@ export function initSampler(): void {
     ['kyo_75kai', renderKyo75Kai],
     ['kyo_red_kick', renderKyoRedKick],
     ['kyo_orochinagi', renderKyoOrochinagi],
+    // Iori 必杀技专属音效
+    ['iori_aoihana', renderIoriAoihana],
+    ['iori_yamibarai', renderIoriYamibarai],
+    ['iori_oniyaki', renderIoriOniyaki],
+    ['iori_kototsuki', renderIoriKototsuki],
+    ['iori_kuzukaze', renderIoriKuzukaze],
+    ['iori_yumeyumi', renderIoriYumeyumi],
+    ['iori_katanugi', renderIoriKatanugi],
+    ['iori_yaotome', renderIoriYaotome],
   ];
 
   for (const [id, renderer] of renderers) {
@@ -2310,3 +2544,29 @@ export function playKyoRedKick(): void { initSampler(); play('kyo_red_kick', 0.6
 
 /** 播放大蛇薙音效 — DM巨大火焰波：低频隆隆 + 中频火焰 + 高频噼啪 */
 export function playKyoOrochinagi(): void { initSampler(); play('kyo_orochinagi'); }
+
+// === Iori 必杀技专属音效 API ===
+
+/** 播放葵花音效 — rekka连拳：暗爪锯齿波 + 噪声撕裂 */
+export function playIoriAoihana(): void { initSampler(); play('iori_aoihana', 0.65); }
+
+/** 播放闇払い音效 — 暗色弹：锯齿波下扫 + 带通噪声暗核 + 子低音 */
+export function playIoriYamibarai(): void { initSampler(); play('iori_yamibarai'); }
+
+/** 播放鬼焼き音效 — 升龙暗焰：正弦上升扫频 + 噪声爆发 + 低频闷响 */
+export function playIoriOniyaki(): void { initSampler(); play('iori_oniyaki'); }
+
+/** 播放琴月陰音效 — 突进暗能量：锯齿波冲刺 + 噪声扫频 + 子低音 */
+export function playIoriKototsuki(): void { initSampler(); play('iori_kototsuki', 0.65); }
+
+/** 播放屑風音效 — 指令投：方波闷击 + 噪声碎裂 + 子低音 */
+export function playIoriKuzukaze(): void { initSampler(); play('iori_kuzukaze', 0.6); }
+
+/** 播放夢弾音效 — overhead 2连击：两段带通噪声爆发 */
+export function playIoriYumeyumi(): void { initSampler(); play('iori_yumeyumi', 0.6); }
+
+/** 播放邯鄲音效 — 下段扫踢：高通噪声swoosh + 正弦下扫 */
+export function playIoriKatanugi(): void { initSampler(); play('iori_katanugi', 0.6); }
+
+/** 播放八稚女音效 — DM暗色连突：多层暗能量叠加 */
+export function playIoriYaotome(): void { initSampler(); play('iori_yaotome'); }
