@@ -600,6 +600,18 @@ export function spawnComboEndText(particles: Particle[], worldX: number, worldY:
   });
 }
 
+
+// KOF2002: 实时连击计数器 — 每次命中(第2hit起)显示当前连击数
+export function spawnComboHitCounter(particles: Particle[], worldX: number, worldY: number, hitCount: number): void {
+  if (hitCount < 2) return; // 第1hit不显示
+  const size = hitCount >= 10 ? 18 : hitCount >= 5 ? 16 : 14;
+  const color = hitCount >= 10 ? '#ff4444' : hitCount >= 5 ? '#ff8844' : '#ffcc44';
+  particles.push({
+    x: worldX, y: worldY - 30, vx: 0, vy: -1.5,
+    life: 30, maxLife: 30, size,
+    color, type: 'text' as const, text: `${hitCount} HIT${hitCount > 1 ? 'S' : ''}`,
+  });
+}
 // KOF2002: 连击结束显示总伤害
 export function spawnComboDamageText(particles: Particle[], worldX: number, worldY: number, totalDmg: number): void {
   particles.push({
