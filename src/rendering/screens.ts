@@ -629,6 +629,22 @@ function drawVSPortrait(
       backdropColor: 'rgba(20, 20, 40, 0.85)',
       scanlines: true,
     });
+    // Shimmer sweep — diagonal light line across portrait
+    const shimmerPhase = ((tick * 0.02 + playerIndex * 0.5) % 1.0);
+    const shimmerX = px - 20 + shimmerPhase * (pw + 40);
+    const shimmerGrad = ctx.createLinearGradient(shimmerX - 15, py, shimmerX + 15, py + ph);
+    shimmerGrad.addColorStop(0, 'rgba(255,255,255,0)');
+    shimmerGrad.addColorStop(0.4, 'rgba(255,255,255,0.08)');
+    shimmerGrad.addColorStop(0.5, 'rgba(255,255,255,0.15)');
+    shimmerGrad.addColorStop(0.6, 'rgba(255,255,255,0.08)');
+    shimmerGrad.addColorStop(1, 'rgba(255,255,255,0)');
+    ctx.save();
+    ctx.beginPath();
+    roundRect(ctx, px, py, pw, ph, 4);
+    ctx.clip();
+    ctx.fillStyle = shimmerGrad;
+    ctx.fillRect(px, py, pw, ph);
+    ctx.restore();
 }
 
 // VS闪屏中的调色板圆点
