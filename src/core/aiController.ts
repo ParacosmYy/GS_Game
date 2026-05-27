@@ -738,9 +738,19 @@ function applySpecialInput(
       base.buttonD = true; base.buttonDPressed = true; base.kickPressed = true;
       break;
     case AttackType.RYO_HAOU:
-      // QCF + K (霸王翔吼拳)
+      // QCF + B (霸王翔吼拳 — D版路由到KOOUKEN_D)
+      base.down = true;
+      base.buttonB = true; base.buttonBPressed = true; base.kickPressed = true;
+      break;
+    case AttackType.RYO_KOOUKEN_D:
+      // QCF + D (虎煌拳D版 — 重飞行道具)
       base.down = true;
       base.buttonD = true; base.buttonDPressed = true; base.kickPressed = true;
+      break;
+    case AttackType.RYO_ZANRETSU_KEN:
+      // QCB + P (斩裂拳 — 多段连打)
+      base.back = true; base.down = true;
+      base.buttonA = true; base.buttonAPressed = true; base.punchPressed = true;
       break;
     default:
       base.down = true;
