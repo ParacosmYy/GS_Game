@@ -187,15 +187,242 @@ export function drawFighters(
       ctx.fill();
       ctx.restore();
     }
-    // KOF2002: 跑步持续扬尘 — RUN每4帧身后扬尘
-    if (f.state === FighterState.RUN && f.stateAge > 3 && f.stateAge % 4 === 0) {
+    // KOF2002: 受击/防御后仰 — 被打时身体向后方微倾
+    if (f.state === FighterState.HITSTUN) {
+      leanOffsetX = -4 * f.facing + blendOffsetX;
+      leanAngle = -0.06 * f.facing;
+    } else if (f.state === FighterState.KNOCKDOWN && !f.isGrounded()) {
+      // KOF2002: 空中击飞旋转 — 浮空KNOCKDOWN时身体翻转
+      leanAngle = f.stateAge * 0.08 * f.facing;
+      leanOffsetX = -2 * f.facing + blendOffsetX;
+    } else if (f.state === FighterState.BLOCK) {
+      leanOffsetX = -2 * f.facing + blendOffsetX;
+      leanAngle = -0.03 * f.facing;
+    } else if (f.state === FighterState.CROUCH_ATTACK) {
+      // KOF2002: 蹲攻击前倾 — 出手时重心前移
+      leanOffsetX = 3 * f.facing + blendOffsetX;
+      leanAngle = 0.04 * f.facing;
+      leanOffsetY = 8; // 保持蹲姿
+      // KOF2002: 蹲攻击下压 — 前2帧身体更低
+      if (f.stateAge < 2) { leanOffsetY += 4; }
+    } else if (f.state === FighterState.STAND_ATTACK) {
+      // KOF2002: 站立攻击前倾 — 出拳/踢时重心前移
+      leanOffsetX = 2 * f.facing + blendOffsetX;
+      leanAngle = 0.03 * f.facing;
+      // KOF2002: 站攻击微蹲 — 前2帧微蹲蓄力
+      if (f.stateAge < 2) { leanOffsetY = 3; }
+    } else if (f.state === FighterState.THROW) {
+      // KOF2002: 投技突进前倾 — 投技发动时重心大幅前移
+      leanOffsetX = 6 * f.facing + blendOffsetX;
+      leanAngle = 0.1 * f.facing;
+      // KOF2002: 投技发动前2帧下沉 — 投技抓人前身体微沉
+      if (f.stateAge < 2) { leanOffsetY += 4; }
+    } else if (f.state === FighterState.AIR_ATTACK) {
+      // KOF2002: 空中攻击俯冲前倾
+      leanOffsetX = 4 * f.facing + blendOffsetX;
+      leanAngle = 0.07 * f.facing;
+    } else if (f.state === FighterState.AIR_BLOCK) {
+      // KOF2002: 空中防御收缩 — 空中防御时蜷缩姿态
+      leanOffsetY = 5;
+      leanAngle = -0.04 * f.facing;
+    } else if (f.state === FighterState.COUNTER_STANCE) {
+      // KOF2002: 反击架势后仰 + 蓄力微弹
+      leanOffsetX = -3 * f.facing + blendOffsetX;
+      leanAngle = -0.05 * f.facing;
+      leanOffsetY += Math.sin(f.stateAge * 0.5) * 1.5;
+    } else if (f.state === FighterState.JUMP || f.state === FighterState.RUN_JUMP) {
+      // KOF2002: 跳跃微前倾 + 起跳前蹲
+      leanOffsetX = 2 * f.facing + blendOffsetX;
+      leanAngle = 0.03 * f.facing;
+      if (f.stateAge < 2) { leanOffsetY += 3; }
+    } else if (f.state === FighterState.HOP) {
+      // KOF2002: 小跳微缩 — 紧凑姿态 + 起跳前蹲
+      leanOffsetY = 3;
+      if (f.stateAge < 2) { leanOffsetY += 4; }
+    } else if (f.state === FighterState.HYPER_JUMP) {
+      // KOF2002: 超跳大幅前倾 + 起跳前蹲
+      leanOffsetX = 4 * f.facing + blendOffsetX;
+      leanAngle = 0.06 * f.facing;
+      if (f.stateAge < 2) { leanOffsetY += 6; }
+    } else if (f.state === FighterState.TAUNT) {
+      // KOF2002: 挑衅后仰
+      leanOffsetX = -4 * f.facing + blendOffsetX;
+      leanAngle = -0.08 * f.facing;
+      leanOffsetY = Math.sin(f.stateAge * 0.3) * 2;
+    }
+
+    // Afterimage trail
+    if (f.state === FighterState.RUN || f.state === FighterState.BACKDASH
+      || f.state === FighterState.ROLL || f.state === FighterState.BACK_ROLL) {
+      drawAfterimageTrail(ctx, f, sx, leanOffsetX, globalTick, maxModeActive);
+    }
+    // KOF2002: 无敌帧半透明 — 后dash/起身无敌期间角色闪烁
+    if (f.invincible || f.throwInvulnFrames > 0) {
+      ctx.globalAlpha = 0.6 + Math.sin(globalTick * 0.5) * 0.15;
+    }
+    // KOF2002: 挑衅微光 — TAUNT时身体微弱金色闪烁
+    if (f.state === FighterState.TAUNT) {
+      ctx.save();
+      ctx.globalCompositeOperation = 'screen';
+      ctx.globalAlpha = 0.06 + Math.sin(globalTick * 0.2) * 0.03;
+      ctx.fillStyle = '#ffcc44';
+      ctx.fillRect(sx + leanOffsetX - hw, sy - f.displayHeight, hw * 2, f.displayHeight);
+      ctx.restore();
+    }
+    // KOF2002: 挑衅起手星芒 — TAUNT stateAge<3时4颗金色星点
+    if (f.state === FighterState.TAUNT && f.stateAge < 3) {
+      ctx.save();
+      ctx.globalAlpha = (3 - f.stateAge) / 3 * 0.5;
+      ctx.fillStyle = '#ffdd44';
+      for (let ts = 0; ts < 4; ts++) {
+        const tAngle = (ts / 4) * Math.PI * 2 + globalTick * 0.5;
+        const tDist = 8 + f.stateAge * 5;
+        const tx = sx + Math.cos(tAngle) * tDist;
+        const ty = sy - f.displayHeight * 0.6 + Math.sin(tAngle) * tDist * 0.5;
+        ctx.beginPath();
+        ctx.arc(tx, ty, 2 - f.stateAge * 0.5, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.restore();
+    }
+    // KOF2002: 投技无敌金色轮廓 — throwInvuln期间金色边框
+    if (f.throwInvulnFrames > 0 && !f.invincible) {
+      ctx.save();
+      ctx.globalCompositeOperation = 'screen';
+      ctx.globalAlpha = 0.1;
+      ctx.strokeStyle = '#ffcc44';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.ellipse(sx, sy - f.displayHeight / 2, hw + 4, f.displayHeight / 2 + 4, 0, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.restore();
+    }
+    // KOF2002: HOP落地烟尘 — HOP着陆时脚边小尘团
+    if (f.state === FighterState.IDLE && f.landingRecovery > 0 && f.landingRecovery > 5) {
       ctx.save();
       ctx.globalAlpha = 0.15;
-      ctx.fillStyle = '#ccbb99';
-      const rdX = sx - f.facing * (8 + (f.stateAge % 8) * 2);
+      ctx.fillStyle = maxModeActive ? '#44ff88' : '#bbbbbb';
       ctx.beginPath();
-      ctx.ellipse(rdX, sy + 2, 4 + (f.stateAge % 6), 2, 0, 0, Math.PI * 2);
+      ctx.ellipse(sx, sy, 10, 3, 0, 0, Math.PI * 2);
       ctx.fill();
+      ctx.restore();
+    }
+    // KOF2002: 重击地面弹坑 — hitFlashFrames>8(重击)且着地时地面圆环
+    if (f.hitFlashFrames > 8 && f.isGrounded() && f.state === FighterState.HITSTUN) {
+      ctx.save();
+      ctx.globalAlpha = Math.min(0.3, f.hitFlashFrames / 15);
+      ctx.strokeStyle = '#ffaa44';
+      ctx.lineWidth = 2;
+      const craterR = 8 + (15 - f.hitFlashFrames) * 2;
+      ctx.beginPath();
+      ctx.ellipse(sx, sy + 2, craterR, craterR * 0.3, 0, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.restore();
+    }
+    // KOF2002: 被投技摇晃 — isBeingThrown时身体微抖
+    if (f.isBeingThrown) {
+      ctx.translate(Math.sin(globalTick * 2) * 2, 0);
+    }
+    // KOF2002: 命中停顿冻结指示 — hitstop首帧微弱白色边框
+    if (f.hitFlashFrames > 0 && f.hitFlashFrames === Math.ceil(f.hitFlashFrames) && f.state !== FighterState.HITSTUN) {
+      ctx.save();
+      ctx.globalAlpha = 0.06;
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(sx + leanOffsetX - hw - 2, sy - f.displayHeight - 2, (hw + 2) * 2, f.displayHeight + 4);
+      ctx.restore();
+    }
+    // KOF2002: 跑步起步烟尘 — RUN前2帧脚下灰色烟尘
+    if (f.state === FighterState.RUN && f.stateAge < 2) {
+      ctx.save();
+      ctx.globalAlpha = (2 - f.stateAge) / 2 * 0.3;
+      ctx.fillStyle = '#999999';
+      const puffR = 6 + f.stateAge * 4;
+      ctx.beginPath();
+      ctx.ellipse(sx - f.facing * 8, sy, puffR, puffR * 0.3, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+    // KOF2002: 跳跃起飞烟尘 — JUMP/HYPER_JUMP首帧脚下烟尘
+    if ((f.state === FighterState.JUMP || f.state === FighterState.HYPER_JUMP || f.state === FighterState.RUN_JUMP) && f.stateAge < 2) {
+      ctx.save();
+      ctx.globalAlpha = (2 - f.stateAge) / 2 * 0.25;
+      ctx.fillStyle = '#aaaaaa';
+      ctx.beginPath();
+      ctx.ellipse(sx, sy, 8 + f.stateAge * 3, 3, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+    // KOF2002: 后撤步渐隐 — 后dash期间身体更透明(幻影感)
+    if (f.state === FighterState.BACKDASH) {
+      ctx.globalAlpha = Math.min(ctx.globalAlpha || 1, 0.75);
+      // KOF2002: 后撤幻影 — BACKDASH前6帧身后半透明幻影
+      if (f.stateAge < 6) {
+        ctx.save();
+        ctx.globalAlpha = (6 - f.stateAge) / 6 * 0.15;
+        ctx.fillStyle = playerIdx === 0 ? '#44ff88' : '#4488ff';
+        ctx.fillRect(sx - f.facing * 15 + leanOffsetX - 30, sy - f.displayHeight, 60, f.displayHeight);
+        ctx.restore();
+      }
+    }
+    // KOF2002: 攻击恢复期变暗 — 攻击动作后半段身体微暗(显示破绽)
+    if ((f.state === FighterState.STAND_ATTACK || f.state === FighterState.CROUCH_ATTACK) && f.stateAge > 15) {
+      const dimAlpha = Math.max(0.85, 1 - (f.stateAge - 15) * 0.01);
+      ctx.globalAlpha = Math.min(ctx.globalAlpha || 1, dimAlpha);
+    }
+    // KOF2002: 投技冲击线 — THROW前3帧水平冲击线
+    if (f.state === FighterState.THROW && f.stateAge < 3) {
+      ctx.save();
+      ctx.globalAlpha = (3 - f.stateAge) / 3 * 0.35;
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 1.5;
+      for (let l = 0; l < 3; l++) {
+        const ly = sy - f.displayHeight * (0.3 + l * 0.2);
+        const lx = sx + f.facing * (10 + l * 8);
+        ctx.beginPath();
+        ctx.moveTo(lx, ly);
+        ctx.lineTo(lx + f.facing * (15 - f.stateAge * 4), ly);
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+    // KOF2002: 投技命中金色爆发 — THROW stateAge<2时金色扩散环
+    if (f.state === FighterState.THROW && f.stateAge < 2) {
+      ctx.save();
+      ctx.globalAlpha = (2 - f.stateAge) / 2 * 0.25;
+      ctx.strokeStyle = '#ffdd44';
+      ctx.lineWidth = 2;
+      const throwRingR = 10 + f.stateAge * 15;
+      ctx.beginPath();
+      ctx.ellipse(sx, sy - f.displayHeight / 2, throwRingR, throwRingR * 0.6, 0, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.restore();
+    }
+    // KOF2002: 滚动摩擦光 — ROLL时身体周围微弱旋转光点
+    if ((f.state === FighterState.ROLL || f.state === FighterState.BACK_ROLL) && f.stateAge % 3 === 0) {
+      ctx.save();
+      ctx.globalAlpha = 0.3;
+      ctx.fillStyle = '#ffffff';
+      const dotAngle = globalTick * 0.8;
+      const dotX = sx + Math.cos(dotAngle) * (hw + 5);
+      const dotY = sy - f.displayHeight / 2 + Math.sin(dotAngle) * 10;
+      ctx.beginPath();
+      ctx.arc(dotX, dotY, 2, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+    // KOF2002: 翻滚扬尘 — ROLL/BACK_ROLL时脚下扬尘
+    if ((f.state === FighterState.ROLL || f.state === FighterState.BACK_ROLL) && f.stateAge < 6) {
+      ctx.save();
+      ctx.globalAlpha = (6 - f.stateAge) / 6 * 0.2;
+      ctx.fillStyle = '#ccbb99';
+      const dustDir = f.state === FighterState.ROLL ? -f.facing : f.facing;
+      for (let d = 0; d < 2; d++) {
+        const dx = sx + dustDir * (5 + f.stateAge * 3 + d * 8);
+        ctx.beginPath();
+        ctx.ellipse(dx, sy + 2, 4 + f.stateAge, 2, 0, 0, Math.PI * 2);
+        ctx.fill();
+      }
       ctx.restore();
     }
 
@@ -743,22 +970,6 @@ export function drawFighters(
         ctx.globalAlpha = Math.max(0, 0.5 - crushT / 60);
         ctx.fillStyle = '#ff4444';
         ctx.fillRect(px - 2, py - 2, 4, 4);
-      }
-      ctx.restore();
-    }
-    // KOF2002: 防御崩坏裂纹 — GUARD_CRUSH时身体裂纹线
-    if (f.state === FighterState.GUARD_CRUSH && f.stateAge < 10) {
-      ctx.save();
-      ctx.globalAlpha = (10 - f.stateAge) / 10 * 0.4;
-      ctx.strokeStyle = '#ff6644';
-      ctx.lineWidth = 1;
-      for (let cl = 0; cl < 3; cl++) {
-        const clStartY = sy - f.displayHeight * (0.3 + cl * 0.25);
-        ctx.beginPath();
-        ctx.moveTo(sx - 8 + cl * 5, clStartY);
-        ctx.lineTo(sx + 3 - cl * 3, clStartY + 12 + cl * 4);
-        ctx.lineTo(sx - 5 + cl * 7, clStartY + 20 + cl * 3);
-        ctx.stroke();
       }
       ctx.restore();
     }
