@@ -15,6 +15,7 @@ const PIXEL_KEYS: Record<string, string> = {
   ryo_tsurizao: 'STAND_A', ryo_orishi: 'CROUCH_B',
   ryo_koou: 'KOOU', ryo_koou_c: 'KOOU_C', ryo_ko_hou: 'KO_HOU', ryo_ko_hou_c: 'KO_HOU_C',
   ryo_hien: 'HIEN', ryo_haou: 'HAOU',
+  ryo_koouken_d: 'KOOU', ryo_hio_hacker: 'STAND_C', ryo_zanretsu_ken: 'STAND_A',
   dm_ten_ha_ou: 'DM_TEN_HA_OU', sdm_ten_ha_ou: 'SDM_TEN_HA_OU',
   dm_ryuko_ranbu: 'DM_RYUKO_RANBU', sdm_ryuko_ranbu: 'DM_RYUKO_RANBU',
   hsdm_ryuko_ranbu: 'HSDM_RYUKO_RANBU',
@@ -564,6 +565,61 @@ const ryo_haou: ActionContract = {
   feedbackTierOverride: 'special',
 };
 
+/** 虎煌拳D版 — heavy projectile (qcf+D) */
+const ryo_koouken_d: ActionContract = {
+  characterId: 'ryo',
+  actionId: 'ryo_koouken_d',
+  state: FighterState.STAND_ATTACK,
+  attackType: AttackType.RYO_KOOUKEN_D,
+  frames: makeAttackFrames('ryo_koouken_d', 15, 22, 30, AttackType.RYO_KOOUKEN_D),
+  hitLevel: 'MID',
+  knockdown: true,
+  startup: 15,
+  active: 22,
+  recovery: 30,
+  totalFrames: 67,
+  cancelWindows: [],
+  feedbackTierOverride: 'special',
+};
+
+/** 氷果斬 — dash strike (f+A) */
+const ryo_hio_hacker: ActionContract = {
+  characterId: 'ryo',
+  actionId: 'ryo_hio_hacker',
+  state: FighterState.STAND_ATTACK,
+  attackType: AttackType.RYO_HIO_HACKER,
+  frames: makeAttackFrames('ryo_hio_hacker', 8, 6, 18, AttackType.RYO_HIO_HACKER),
+  hitLevel: 'MID',
+  knockdown: false,
+  startup: 8,
+  active: 6,
+  recovery: 18,
+  totalFrames: 32,
+  cancelWindows: [
+    { frames: [6, 13], targetTypes: ['special', 'super'], requiresHit: true, maxOnly: false },
+  ],
+  feedbackTierOverride: 'special',
+};
+
+/** 斩裂拳 — multi-punch (qcb+P) */
+const ryo_zanretsu_ken: ActionContract = {
+  characterId: 'ryo',
+  actionId: 'ryo_zanretsu_ken',
+  state: FighterState.STAND_ATTACK,
+  attackType: AttackType.RYO_ZANRETSU_KEN,
+  frames: makeAttackFrames('ryo_zanretsu_ken', 4, 4, 16, AttackType.RYO_ZANRETSU_KEN),
+  hitLevel: 'MID',
+  knockdown: false,
+  startup: 4,
+  active: 4,
+  recovery: 16,
+  totalFrames: 24,
+  cancelWindows: [
+    { frames: [3, 7], targetTypes: ['special'], requiresHit: true, maxOnly: false },
+  ],
+  feedbackTierOverride: 'special',
+};
+
 // ═══════════════════════════════════════════════════════════════════
 // DM — Desperation Moves (超必殺技)
 // ═══════════════════════════════════════════════════════════════════
@@ -704,6 +760,9 @@ export const RYO_ACTION_CONTRACTS: Map<string, ActionContract> = new Map([
   ['ryo_ko_hou_c', ryo_ko_hou_c],
   ['ryo_hien', ryo_hien],
   ['ryo_haou', ryo_haou],
+  ['ryo_koouken_d', ryo_koouken_d],
+  ['ryo_hio_hacker', ryo_hio_hacker],
+  ['ryo_zanretsu_ken', ryo_zanretsu_ken],
   // DM
   ['dm_ten_ha_ou', dm_ten_ha_ou],
   ['dm_ryuko_ranbu', dm_ryuko_ranbu],
