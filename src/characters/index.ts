@@ -73,4 +73,6 @@ export const ROSTER: CharacterDefinition[] = [
 registerCharacterContracts('ryo', RYO_ACTION_CONTRACTS);
 
 import { KYO_ACTION_CONTRACTS } from '../core/kyoFrameContract.js';
+import { IORI_ACTION_CONTRACTS } from '../core/ioriFrameContract.js';
 registerCharacterContracts('kyo', KYO_ACTION_CONTRACTS);
+registerCharacterContracts('iori', IORI_ACTION_CONTRACTS);
