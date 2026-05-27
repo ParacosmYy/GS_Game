@@ -11,6 +11,7 @@
  */
 import type { Fighter } from '../entities/fighter.js';
 import type { AttackPhase } from '../core/types.js';
+import { playCharVoice, inferVoiceType } from './charVoice.js';
 
 // ===== SFX Table Entry =====
 
@@ -224,6 +225,12 @@ export function tickAttackSFX(fighter: Fighter, sampler: Record<string, (...args
   if (attackType !== prev) {
     played.clear();
     lastAttackType.set(fighterId, attackType);
+
+    // Character voice on new attack startup
+    if (fighter.charId && phase === 'startup' && frame === 0) {
+      const voiceType = inferVoiceType(attackType);
+      playCharVoice(fighter.charId, voiceType, voiceType === 'dm' ? 0.55 : 0.35);
+    }
   }
 
   // Find matching entries: exact match > wildcard

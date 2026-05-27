@@ -15,6 +15,7 @@ import { ROSTER } from '../characters/index.js';
 import { isDM as isDMCheck } from '../core/attackClassifier.js';
 import { gainMeterOnHit, gainMeterOnBlock, gainMeterOnHitstun } from './meter.js';
 import { playHit, playBlock, playSpecial, playDM, playThrow, playCounter, playHeavyHit, playSuperFlash, playWire, playJuggleHit, playBlockSpecial, playBlockDM, playSpecialLight, playSpecialHeavy, playKOHit, playHitAccent, playLandingHeavy, playDizzyHit, playGroundBounce, playWallBounce, playGuardCrush, playKoouken, playKoHou, playHien, playHaou, playHioHacker, playZanretsuKen, playKyoOniyaki, playKyoYamibarai, playKyoAragami, playKyoDokugami, playKyo75Kai, playKyoRedKick, playKyoOrochinagi, playIoriAoihana, playIoriYamibarai, playIoriOniyaki, playIoriKototsuki, playIoriKuzukaze, playComboMilestone } from '../audio/sampler.js';
+import { playCharVoice } from '../audio/charVoice.js';
 import { spawnTierSparks } from '../rendering/vfxPresets.js';
 import { bgm } from '../audio/bgm.js';
 import { announcer } from '../audio/announcer.js';
@@ -330,6 +331,11 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
     // 风云再起特色: 第一次命中奖励 — 每回合首次命中额外+30气槽
     if (!deps.combatSystem.wasFirstHitAwarded(defIdx)) {
       deps.gauges[atkIdx].meter = Math.min(deps.gauges[atkIdx].meter + 30, MAX_STOCKS * METER_PER_STOCK);
+    }
+
+    // KOF2002: Defender hurt voice — character-specific pained vocalization
+    if (defender.charId && !isDM) {
+      playCharVoice(defender.charId, 'hurt', 0.25);
     }
 
     const atkChar = atkIdx === 0
