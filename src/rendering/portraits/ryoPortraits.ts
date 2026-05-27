@@ -9,6 +9,7 @@
  * Palette shared across sizes for consistency.
  */
 import type { PixelPortraitData } from '../pixelPortraits.js';
+import { ryoWinPortrait } from './ryoWinPortrait.js';
 
 // ===== Shared palette (extends base ryoPortrait palette) =====
 
@@ -355,5 +356,5 @@ export const RYO_SIZED_PORTRAITS: Record<string, PixelPortraitData> = {
   select: ryoSelectPortrait,
   vs: ryoVsPortrait,
   hud: ryoHudPortrait,
-  // win reuses the existing 64x80 portrait (kept in ryoPortrait.ts)
+  win: ryoWinPortrait,
 };
