@@ -3,9 +3,9 @@
 ## 1. 当前分数
 
 <<<<<<< HEAD
-当前总分：`146/2000`
+当前总分：`147/2000`
 =======
-当前总分：`146/2000`
+当前总分：`147/2000`
 >>>>>>> b5b42fb (docs(scoring): 144->145/2000 special move variable frames)
 
 完整历史见 [SCORE.history.md](../archive/SCORE.history.md)。
@@ -25,7 +25,7 @@
 | 帧数据精度 | 100 | 21 | 全动作变量帧节奏(idle/walk/hurt/knockdown/全部通常攻击/近距离攻击/蹲伏/跳跃/空中攻击)对齐战斗相 |
 | 游戏流程 | 100 | 27 | 完整街机流程+3v3+训练模式+MATCH POINT+暂停菜单+OPTIONS+回合开始持续提示+KO结果HP对比+街机模式对手递进+舞台轮换+街机得分系统 |
 =======
-| 帧数据精度 | 100 | 22 | 全动作变量帧节奏(idle/walk/hurt/knockdown/全部通常攻击/近距离攻击/蹲伏/跳跃/空中攻击/6种必杀技)对齐战斗相 |
+| 帧数据精度 | 100 | 25 | 全部42种动画状态变量帧节奏完成(idle/walk/attack/crouch/jump/air/special/DM/SDM/HSDM/movement/sub-state/win) |
 <<<<<<< HEAD
 | 游戏流程 | 100 | 26 | 完整街机流程+3v3+训练模式+MATCH POINT+暂停菜单+OPTIONS+回合开始持续提示+KO结果HP对比+街机模式对手递进+舞台轮换 |
 =======
