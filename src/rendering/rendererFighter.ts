@@ -104,6 +104,21 @@ export function drawFighters(
       ctx.stroke();
     }
 
+    // KOF2002: 胜利金色光环 — WIN状态角色发光
+    if (f.state === FighterState.WIN) {
+      const winPulse = 0.06 + Math.sin(globalTick * 0.08) * 0.03;
+      ctx.fillStyle = 'rgba(255, 215, 0, ' + Math.max(0, winPulse) + ')';
+      ctx.beginPath();
+      ctx.ellipse(sx, sy - f.displayHeight / 2, hw + 20, f.displayHeight / 2 + 16, 0, 0, Math.PI * 2);
+      ctx.fill();
+      const winOutline = Math.sin(globalTick * 0.12) * 0.15 + 0.2;
+      ctx.strokeStyle = 'rgba(255, 215, 0, ' + Math.max(0, winOutline) + ')';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.ellipse(sx, sy - f.displayHeight / 2, hw + 10, f.displayHeight / 2 + 6, 0, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+
     // Ground reflection — KOF2002: 角色脚下微弱倒影
     if (f.isGrounded()) {
       ctx.save();
