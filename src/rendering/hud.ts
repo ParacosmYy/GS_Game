@@ -164,17 +164,38 @@ export function resetHUDFlash(): void {
   }
 }
 
-// ===== Arcade Score =====
+// ===== Arcade Score & Stats =====
 let arcadeScore = 0;
 let displayScore = 0;
+let arcadePerfectCount = 0;
+let arcadeMatchCount = 0;
+let arcadeCumulativeCombo = 0;
+let arcadeCumulativeDamage = 0;
 
 export function addArcadeScore(points: number): void {
   arcadeScore += points;
 }
 
+export function getArcadeScore(): number { return arcadeScore; }
+
+export function addArcadePerfect(): void { arcadePerfectCount++; }
+export function addArcadeMatchWin(): void { arcadeMatchCount++; }
+export function addArcadeCumulativeStats(combo: number, damage: number): void {
+  arcadeCumulativeCombo = Math.max(arcadeCumulativeCombo, combo);
+  arcadeCumulativeDamage += damage;
+}
+
+export function getArcadeStats(): { score: number; perfects: number; matches: number; maxCombo: number; totalDamage: number } {
+  return { score: arcadeScore, perfects: arcadePerfectCount, matches: arcadeMatchCount, maxCombo: arcadeCumulativeCombo, totalDamage: arcadeCumulativeDamage };
+}
+
 export function resetArcadeScore(): void {
   arcadeScore = 0;
   displayScore = 0;
+  arcadePerfectCount = 0;
+  arcadeMatchCount = 0;
+  arcadeCumulativeCombo = 0;
+  arcadeCumulativeDamage = 0;
 }
 
 function tickArcadeScore(): void {

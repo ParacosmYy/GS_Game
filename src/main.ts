@@ -20,7 +20,7 @@ import { cycleStage, setStage, getStage, getAllStages, type StageId } from './re
 import { drawVictoryPose } from './rendering/skeletalFighter.js';
 import { drawRyoWinPose } from './rendering/sprites/ryoHighResRender.js';
 import type { TeamDisplayInfo } from './rendering/hud.js';
-import { addArcadeScore, resetArcadeScore } from './rendering/hud.js';
+import { addArcadeScore, resetArcadeScore, addArcadePerfect, addArcadeMatchWin, getArcadeStats, addArcadeCumulativeStats } from './rendering/hud.js';
 import { ROSTER } from './characters/index.js';
 import { SpriteManager, SpriteRenderer } from './rendering/spriteRenderer.js';
 import { generatePlaceholderSpritesheet } from './rendering/placeholderSprites.js';
@@ -620,6 +620,10 @@ function update(): void {
       // Arcade progression: P1 won and more opponents remain → next match
       const p1Won = gs.winner === 0;
       const moreOpponents = !gs.isTrainingMode && gs.arcadeOpponents.length > 0 && gs.arcadeOpponentIndex < gs.arcadeOpponents.length - 1;
+      if (p1Won && !gs.isTrainingMode && gs.arcadeOpponents.length > 0) {
+        addArcadeMatchWin();
+        addArcadeCumulativeStats(gs.matchStats.p1LongestCombo, gs.matchStats.p1TotalDamage);
+      }
       if (p1Won && moreOpponents) {
         gs.setPhase(GamePhase.NEXT_MATCH);
         gs.arcadeNextMatchTimer = 0;
@@ -1087,6 +1091,7 @@ function update(): void {
         const pw = gs.winner === 0 ? p1 : p2;
         vfx.spawnPerfectFlash(pw.x, pw.y - pw.displayHeight / 2);
         screenFlash.trigger('#ffcc00', 0.25, 8);
+        if (gs.winner === 0) addArcadePerfect();
       }
     }
   }
@@ -1130,7 +1135,14 @@ function render(): void {
   }
   if (gs.phase === GamePhase.GAME_OVER) {
     if (gs.arcadeComplete) {
-      renderer.drawArcadeComplete(gs.gameOverTimer);
+      const arcStats = getArcadeStats();
+      renderer.drawArcadeComplete(gs.gameOverTimer, {
+        score: arcStats.score,
+        perfects: arcStats.perfects,
+        matches: arcStats.matches,
+        longestCombo: arcStats.maxCombo,
+        totalDamage: arcStats.totalDamage,
+      });
     } else {
       renderer.drawGameOver(gs.gameOverTimer);
     }

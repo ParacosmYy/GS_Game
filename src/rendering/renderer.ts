@@ -26,7 +26,7 @@ import { subscribeMeterFlash, tickMeterFlash } from './meterFlash.js';
 import { drawCharacterSelect, drawIntro, drawKO, drawWinQuote, drawVSSplash, drawStageSelect, drawTeamOrderSelect, drawTransition, WIN_QUOTE_DURATION } from './screens.js';
 import type { KODustParticle, KOPhase } from '../state/cinematicState.js';
 import { drawSuperFlash, drawMatchEnd, drawModeIndicator, drawStageIndicator, drawTitle, drawContinue, drawModeSelect, drawTrainingHUD, drawGameOver, drawOptionsScreen, drawArcadeComplete, drawNextMatch, getSuperFlashZoom, updateSuperFlashZoom } from './overlayScreens.js';
-import type { GameOptions } from './overlayScreens.js';
+import type { GameOptions, ArcadeStats } from './overlayScreens.js';
 import { drawProjectiles as drawProjectilesImpl } from './projectileRenderer.js';
 import type { SpriteRenderer } from './spriteRenderer.js';
 import type { SelectState } from '../state/selectState.js';
@@ -395,8 +395,8 @@ export class Renderer {
     drawGameOver(this.ctx, timer);
   }
 
-  drawArcadeComplete(timer: number): void {
-    drawArcadeComplete(this.ctx, timer);
+  drawArcadeComplete(timer: number, stats?: ArcadeStats): void {
+    drawArcadeComplete(this.ctx, timer, stats);
   }
 
   drawNextMatch(timer: number, nextChar: CharacterDefinition | undefined, stageNumber: number, totalStages: number): void {

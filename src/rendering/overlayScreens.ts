@@ -1196,14 +1196,22 @@ export { GAME_OVER_DURATION };
 
 // ===== Arcade Complete Screen =====
 
-export function drawArcadeComplete(ctx: CanvasRenderingContext2D, timer: number): void {
+export interface ArcadeStats {
+  score: number;
+  perfects: number;
+  matches: number;
+  longestCombo: number;
+  totalDamage: number;
+}
+
+export function drawArcadeComplete(ctx: CanvasRenderingContext2D, timer: number, stats?: ArcadeStats): void {
   ctx.save();
 
-  ctx.fillStyle = 'rgba(0, 0, 0, 0.9)';
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.92)';
   ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
   // Golden sparkle particles
-  const sparkleCount = 20;
+  const sparkleCount = 25;
   for (let i = 0; i < sparkleCount; i++) {
     const sx = (Math.sin(timer * 0.02 + i * 1.3) * 0.5 + 0.5) * CANVAS_WIDTH;
     const sy = (Math.cos(timer * 0.015 + i * 2.1) * 0.5 + 0.5) * CANVAS_HEIGHT;
@@ -1228,21 +1236,101 @@ export function drawArcadeComplete(ctx: CanvasRenderingContext2D, timer: number)
 
   // CONGRATULATIONS — gold glow
   const textProgress = Math.min(1, timer / 20);
-  const textScale = 1 + (1 - textProgress) * 0.5;
+  const textScale = 1 + (1 - textProgress) * 0.3;
   ctx.shadowColor = '#ffcc00';
   ctx.shadowBlur = 40;
-  drawSNKText(ctx, 'CONGRATULATIONS', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 40, Math.round(48 * textScale), '#ffcc00');
+  drawSNKText(ctx, 'CONGRATULATIONS', CANVAS_WIDTH / 2, 70, Math.round(48 * textScale), '#ffcc00');
   ctx.shadowBlur = 0;
 
   // Subtitle
-  const subAlpha = Math.min(1, Math.max(0, (timer - 20) / 20));
+  const subAlpha = Math.min(1, Math.max(0, (timer - 15) / 20));
   ctx.globalAlpha = subAlpha;
-  drawSNKText(ctx, 'YOU HAVE DEFEATED ALL OPPONENTS', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 20, 16, '#ff8844');
+  drawSNKText(ctx, 'YOU HAVE DEFEATED ALL OPPONENTS', CANVAS_WIDTH / 2, 110, 14, '#ff8844');
+
+  // Results panel — staggered reveal
+  if (stats && timer > 30) {
+    const panelAlpha = Math.min(1, (timer - 30) / 20);
+    ctx.globalAlpha = panelAlpha;
+
+    // Panel background
+    const panelX = CANVAS_WIDTH / 2 - 180;
+    const panelY = 140;
+    const panelW = 360;
+    const panelH = 200;
+    ctx.fillStyle = 'rgba(20, 15, 5, 0.85)';
+    ctx.strokeStyle = 'rgba(255, 200, 80, 0.5)';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.roundRect(panelX, panelY, panelW, panelH, 4);
+    ctx.fill();
+    ctx.stroke();
+
+    // Stats rows
+    const rows: Array<{ label: string; value: string; color: string }> = [
+      { label: 'TOTAL SCORE', value: stats.score.toLocaleString(), color: '#ffcc00' },
+      { label: 'MATCHES WON', value: `${stats.matches}`, color: '#66ccff' },
+      { label: 'PERFECT ROUNDS', value: `${stats.perfects}`, color: stats.perfects > 0 ? '#ff44ff' : '#888' },
+      { label: 'MAX COMBO', value: `${stats.longestCombo} HITS`, color: stats.longestCombo >= 10 ? '#ff6644' : '#aaa' },
+      { label: 'TOTAL DAMAGE', value: `${stats.totalDamage.toLocaleString()}`, color: '#88ff88' },
+    ];
+
+    ctx.textAlign = 'left';
+    const rowH = 30;
+    const startY = panelY + 25;
+    for (let i = 0; i < rows.length; i++) {
+      const row = rows[i];
+      const rowAlpha = Math.min(1, Math.max(0, (timer - 40 - i * 8) / 12));
+      if (rowAlpha <= 0) continue;
+      ctx.globalAlpha = panelAlpha * rowAlpha;
+
+      const y = startY + i * rowH;
+      // Label
+      drawSNKText(ctx, row.label, panelX + 20, y, 11, '#999');
+      // Value (right-aligned)
+      ctx.textAlign = 'right';
+      ctx.shadowColor = row.color;
+      ctx.shadowBlur = 8;
+      drawSNKText(ctx, row.value, panelX + panelW - 20, y, 16, row.color);
+      ctx.shadowBlur = 0;
+      ctx.textAlign = 'left';
+
+      // Separator line
+      if (i < rows.length - 1) {
+        ctx.strokeStyle = 'rgba(255, 200, 80, 0.15)';
+        ctx.beginPath();
+        ctx.moveTo(panelX + 15, y + rowH / 2 + 2);
+        ctx.lineTo(panelX + panelW - 15, y + rowH / 2 + 2);
+        ctx.stroke();
+      }
+    }
+
+    // Grade badge
+    if (timer > 80) {
+      const gradeAlpha = Math.min(1, (timer - 80) / 15);
+      ctx.globalAlpha = gradeAlpha;
+      let grade: string;
+      let gradeColor: string;
+      if (stats.perfects >= 3 && stats.longestCombo >= 15) { grade = 'S'; gradeColor = '#ffcc00'; }
+      else if (stats.perfects >= 2 || stats.longestCombo >= 10) { grade = 'A'; gradeColor = '#ff6644'; }
+      else if (stats.perfects >= 1 || stats.longestCombo >= 5) { grade = 'B'; gradeColor = '#66ccff'; }
+      else { grade = 'C'; gradeColor = '#aaa'; }
+
+      const gradeX = CANVAS_WIDTH / 2;
+      const gradeY = panelY + panelH + 50;
+      ctx.shadowColor = gradeColor;
+      ctx.shadowBlur = 30;
+      drawSNKText(ctx, grade, gradeX, gradeY, 72, gradeColor);
+      ctx.shadowBlur = 0;
+      drawSNKText(ctx, 'RANK', gradeX, gradeY - 42, 12, '#888');
+    }
+  }
+
+  ctx.textAlign = 'center';
 
   // Press any key
   const pressAlpha = 0.3 + Math.sin(timer * 0.06) * 0.2;
   ctx.globalAlpha = pressAlpha;
-  drawSNKText(ctx, 'PRESS ANY KEY', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 60, 13, 'rgba(255,255,255,0.7)');
+  drawSNKText(ctx, 'PRESS ANY KEY', CANVAS_WIDTH / 2, CANVAS_HEIGHT - 40, 13, 'rgba(255,255,255,0.7)');
   ctx.globalAlpha = 1;
 
   ctx.restore();
