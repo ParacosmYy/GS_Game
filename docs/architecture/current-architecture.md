@@ -34,25 +34,26 @@ src/
 - `rendering/` 仍有大量骨骼、像素块、placeholder 渲染。
 - `core/*Manifest*` 已有结构，但真实资产接管不足。
 - `combat/` 和 frame data 已有基础，但 hit feedback 还未形成统一矩阵。
-- 文件体积偏大，后续只在服务 Ryo 样板时拆分。
+- 文件体积偏大，后续只在服务 Phase 2 的内容包、流程和稳定性收口时拆分。
 - `src/` 仍按技术层粗分，没有形成大型项目中常见的 `app/engine/simulation/content/tools` 边界。
-- `src/content/characters/index.ts` 已经作为角色内容包的总 barrel 出现，说明角色内容层正在从分散入口向统一入口收口。
-- `src/content/characters/ryo/` 已开始建立内容包骨架，当前既有兼容入口，也有按职责拆分的迁移入口；还需要继续把 commands / moves / attacks / animations / hitboxes / feedback / portraits / reports 落到真实数据里。
-- `src/rendering/sprites/` 已开始拆出 Ryo 的高分辨率帧分组，`src/tools/validateManifest.ts` 也已经承担内容校验职责。
+- `src/content/index.ts` 已经作为内容包总 barrel 出现。
+- `src/content/characters/index.ts` 已经汇总 Ryo / Kyo / Iori 内容包导出，说明角色内容层正在从分散入口向统一入口收口。
+- `src/content/characters/{ryo,kyo,iori}/` 已开始建立内容包骨架，当前既有兼容入口，也有按职责拆分的迁移入口；还需要继续把 commands / moves / attacks / animations / hitboxes / feedback / portraits / reports 落到真实数据里。
+- `src/rendering/sprites/` 已开始拆出高分辨率帧分组，`src/tools/validateManifest.ts` 也已经承担内容校验职责。
 
 ## 4. 下一阶段架构方向
 
-围绕 [Ryo Vertical Slice](../product/ryo-vertical-slice-plan.md) 做：
+围绕 [Ryo Vertical Slice](../product/ryo-vertical-slice-plan.md) 作为基线，并按 [KOF 差距矩阵](../product/kof-gap-matrix.md) 推进 Phase 2 做：
 
-- 把 Ryo 肖像接入 portrait manifest。
-- 把 Ryo sprite 接入 sprite atlas manifest。
-- 把 Ryo 动作接入 animation manifest。
-- 把 Ryo 判定接入 hitbox manifest。
-- 把 Ryo 命中事件接入 feedback manifest。
-- 把 Ryo 内容包从单一入口进一步拆成子目录，确保 commands / moves / attacks / animations / hitboxes / feedback / portraits / reports 有固定归属。
-- 让 `src/content/characters/index.ts` 成为角色内容包的统一导出入口，减少上层对分散文件的直接依赖。
-- 用 Frame Contract 连接 rendering/combat/audio/vfx。
-- 逐步迁移到 `content/characters/ryo` 和 `simulation/`，但每轮只迁一个领域。
+- 把 Ryo / Kyo / Iori 肖像接入 portrait manifest。
+- 把 Ryo / Kyo / Iori sprite 接入 sprite atlas manifest。
+- 把 Ryo / Kyo / Iori 动作接入 animation manifest。
+- 把 Ryo / Kyo / Iori 判定接入 hitbox manifest。
+- 把 Ryo / Kyo / Iori 命中事件接入 feedback manifest。
+- 把各角色内容包继续拆成子目录，确保 commands / moves / attacks / animations / hitboxes / feedback / portraits / reports 有固定归属。
+- 让 `src/content/index.ts` 和 `src/content/characters/index.ts` 成为统一导出入口，减少上层对分散文件的直接依赖。
+- 用 Frame Contract 连接 rendering/combat/audio/vfx，并在多角色之间保持一致。
+- 逐步迁移到 `content/` 和 `simulation/`，但每轮只迁一个领域。
 
 ## 5. 保持边界
 

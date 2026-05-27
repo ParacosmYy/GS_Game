@@ -18,29 +18,30 @@
 
 ## 1. 当前总方向
 
-项目已经停止“横向堆角色、堆系统、堆 placeholder”的路线。
+项目已经从“Ryo 单线收口”进入 Phase 2。
 
-从现在开始，主线只有一条：
+Phase 2 的主线不是继续横向堆功能，而是：
 
-> 以 Ryo 为唯一样板角色，建立角色美术、逐帧动作、帧数据、碰撞盒、命中反馈、肖像与资产管线的完整闭环。
+> 以 Ryo 为基线，完成 Kyo/Iori 内容包接入、街机流程与场景仪式感、UI/HUD 可见性、稳定性与工具链收口。
 
-当前最高优先级不是“继续加功能”，而是按 [KOF 差距矩阵](docs/product/kof-gap-matrix.md) 逐项闭合最显眼的差距。所有新增功能都必须先说明它正在关闭矩阵里的哪一项差距。
+当前最高优先级仍然是按 [KOF 差距矩阵](docs/product/kof-gap-matrix.md) 逐项闭合最显眼的差距。所有新增功能都必须先说明它正在关闭矩阵里的哪一项差距。
 
-如果项目已经进入 Phase 2 或多角色阶段，也必须先服从这份差距矩阵，再决定是继续补 Ryo、补 Kyo/Iori，还是补通用管线。
+Phase 2 的执行要求：
 
-这条主线还要求“先收口，再扩张”：
+- 先把现有内容包、流程、UI 和稳定性做成可复制模板，再扩更多角色。
+- Ryo 仍是 baseline 和质量基准，但不再是唯一迭代对象。
+- Kyo/Iori 已进入内容包与运行时接入阶段，后续新增内容优先落到对应内容包与 manifest。
+- 任何文件重排都必须服务 Phase 2 闭环，不得趁机横向扩目录。
 
-- 先把一个人物做精，再做其他人物。
-- 先把 Ryo 的内容边界收成单一闭环，再考虑 Kyo / Iori。
-- 任何文件重排都必须服务 Ryo 闭环，不得趁机横向扩目录。
+当前真实代码状态已经不是单体堆叠，而是已经形成多角色内容包与统一入口：
 
-当前真实代码状态已经不是单体堆叠，而是开始按职责分层：
-
-- `src/content/characters/ryo/` 已经形成内容包雏形，兼容入口和真实数据迁移需要同时存在。
+- `src/content/index.ts` 是内容包顶层 barrel。
+- `src/content/characters/index.ts` 汇总 Ryo / Kyo / Iori 内容包导出。
+- `src/content/characters/ryo/`、`src/content/characters/kyo/`、`src/content/characters/iori/` 已形成内容包雏形，兼容入口和真实数据迁移需要同时存在。
 - `src/rendering/sprites/`、`src/state/`、`src/tools/validateManifest.ts` 已经开始承担更明确的分工。
 - 后续新增内容应优先落到对应子域，不要重新把数据塞回单一巨型文件。
 
-在 Ryo 样板闭环达标前，禁止把主要精力投入：
+在 Phase 2 收口达标前，禁止把主要精力投入：
 
 - 新增角色。
 - 新增玩法模式。
@@ -123,18 +124,18 @@
 
 大型项目目标结构见 [工作区目标架构](docs/architecture/workspace-architecture-target.md)。新增目录、迁移文件、拆分大文件前必须先对照该文档。
 
-## 6. Ryo 样板线硬规则
+## 6. 内容包与角色硬规则
 
-在 Ryo 样板线达标前：
+在 Phase 2 收口前：
 
-- 所有角色内容收口优先级都低于 Ryo。
-- 任何 Ryo 相关新增文件，必须优先归属到 Ryo 内容包目标结构；如果暂时还在旧目录，必须写清迁移计划与回退点。
-- 默认只允许改 Ryo 相关资产、Ryo 相关动作、Ryo 验收工具、通用资产管线和通用打击反馈矩阵。
-- Kyo/Iori 只能用于接口兼容性校验，不作为主迭代目标。
-- 新增角色必须被拒绝，除非用户明确覆盖本规则。
-- 任何“全角色优化”必须先证明不会稀释 Ryo 样板目标。
+- 所有角色内容必须先进入对应内容包，再考虑运行时接入。
+- Ryo 仍是 baseline，所有新角色都必须以 Ryo 的合同与验收标准为参照。
+- Kyo/Iori 已允许作为主线的一部分推进，但新增角色仍需用户明确覆盖。
+- 任何角色相关新增文件，必须写清楚它属于哪一个内容包、哪一个子域、对应哪项 KOF 差距。
+- 默认只允许改角色内容包、通用资产管线、通用打击反馈矩阵、流程/UI 收口和验证工具。
+- 任何“全角色优化”必须先证明不会稀释 Phase 2 的当前主线。
 
-Ryo 样板的完整定义见 [Ryo Vertical Slice](docs/product/ryo-vertical-slice-plan.md)。
+Ryo 样板的完整定义见 [Ryo Vertical Slice](docs/product/ryo-vertical-slice-plan.md)；当前阶段的差距优先级见 [KOF 差距矩阵](docs/product/kof-gap-matrix.md)。
 
 ## 7. 质量门禁
 

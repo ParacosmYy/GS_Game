@@ -32,12 +32,12 @@
 
 ## 4. 本项目采用方式
 
-本项目以 Ryo 为样板角色，把上述思想落成：
+本项目以 Phase 2 的多角色内容包和流程仪式感为落点，把上述思想落成：
 
-- `content/characters/ryo/`
-- `assets/source/characters/ryo/`
-- `assets/generated/atlases/ryo/`
-- `data/frame-data/ryo/`
+- `content/characters/<id>/`
+- `assets/source/characters/<id>/`
+- `assets/generated/atlases/<id>/`
+- `data/frame-data/<id>/`
 - `tools/asset-pipeline/`
 - `tools/validators/`
 - `reports/completeness/`
@@ -51,4 +51,4 @@
 - 参考来源。
 - 学到的工程思想。
 - 没有复制的内容。
-- 如何落到 Ryo 样板线。
+- 如何落到当前 Phase 2 主线。

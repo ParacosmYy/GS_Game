@@ -35,7 +35,7 @@
 
 允许条件：
 
-- 直接服务 Ryo 样板。
+- 直接服务当前 Phase 2 主线。
 - 能明确对应 [KOF 差距矩阵](../product/kof-gap-matrix.md) 的某一项差距。
 - 有验收标准。
 - 有测试或手测路径。
@@ -82,9 +82,9 @@
 
 ## 5. 角色扩展决策门
 
-在 Ryo 达标前默认拒绝新增角色。
+在 Phase 2 的角色内容包和共享 contract 不稳定前，默认拒绝新增“无契约”的角色。
 
-Ryo 达标条件见 [Ryo Vertical Slice](../product/ryo-vertical-slice-plan.md)。
+Phase 1 基线条件见 [Ryo Vertical Slice](../product/ryo-vertical-slice-plan.md)。
 
 允许 Kyo/Iori 的条件：
 
@@ -92,6 +92,8 @@ Ryo 达标条件见 [Ryo Vertical Slice](../product/ryo-vertical-slice-plan.md)�
 - Ryo select/HUD 肖像完成。
 - Ryo light/heavy feedback 完成。
 - Ryo 完整度报告可运行。
+- Kyo/Iori 角色内容包和 content loader 已接入统一入口。
+- Kyo/Iori 的新增内容不破坏现有 shared contract / Frame Contract。
 - 构建和测试通过。
 
 ## 6. 打击感决策门

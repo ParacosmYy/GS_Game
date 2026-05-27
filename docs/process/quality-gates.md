@@ -32,17 +32,18 @@ npm run test:smoke
 
 任何验证通过都必须能回到 [KOF 差距矩阵](../product/kof-gap-matrix.md) 的某一项差距：如果验证只能说明“没坏”，却不能说明“补了什么差距”，就不算高价值推进。
 
-## 3. Ryo 样板专属门禁
+## 3. Phase 2 内容包门禁
 
-涉及 Ryo 主线时必须回答：
+涉及 Phase 2 主线时必须回答：
 
-- 是否推进 [Ryo Vertical Slice](../product/ryo-vertical-slice-plan.md)？
+- 是否推进 [Ryo Vertical Slice](../product/ryo-vertical-slice-plan.md) 这条基线？
+- 是否推进 [KOF 差距矩阵](../product/kof-gap-matrix.md) 中的一项高优先级差距？
 - 是否使用或完善 [资产管线架构](../architecture/asset-pipeline.md)？
 - 是否符合 [工作区目标架构](../architecture/workspace-architecture-target.md)？
 - 是否通过 [决策门](decision-gates.md)？
 - 是否保持 Frame Contract 语义？
 - 是否保留 fallback？
-- 是否避免扩张到非 Ryo 角色？
+- 是否避免把内容散落到多个没有统一入口的角色目录里？
 
 ## 4. 手测要求
 

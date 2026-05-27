@@ -99,20 +99,20 @@ config/
 
 ### 1.0.1 单角色内容包优先策略
 
-当前阶段的第一收口对象不是“所有角色”，而是“Ryo 单角色内容包”。
+当前阶段的第一收口对象已经是“多角色内容包 + 统一入口 + Phase 2 可复制管线”。
 
 这意味着：
 
-- Ryo 的定义、stats、commands、frameData、animations、hitboxes、feedback、portraits、completeness 应逐步收拢为一个统一内容包。
-- `src/content/characters/index.ts` 这样的 barrel 入口应承担“统一导出”，避免上层继续直连各个分散文件。
+- Ryo、Kyo、Iori 的定义、stats、commands、frameData、animations、hitboxes、feedback、portraits、completeness 应逐步收拢为统一内容包体系。
+- `src/content/index.ts` 和 `src/content/characters/index.ts` 这类 barrel 入口应承担“统一导出”，避免上层继续直连各个分散文件。
 - 当前实现已经进入过渡态：兼容入口还在，子域拆分已经开始，后续任务是把真实数据继续搬进这些子域，而不是重新新增一套平面入口。
-- 运行时只消费该内容包导出的统一数据，不允许同一份 Ryo 内容继续散落在多个互不相干的文件里。
+- 运行时只消费该内容包导出的统一数据，不允许同一份内容继续散落在多个互不相干的文件里。
 - 其他角色先保持只读参考或兼容校验，不作为目录扩张理由。
 
-Ryo 内容包的目标形态应尽量接近：
+角色内容包的目标形态应尽量接近：
 
 ```text
-src/content/characters/ryo/
+src/content/characters/<id>/
   index.ts
   definition.ts
   stats.ts
@@ -125,7 +125,7 @@ src/content/characters/ryo/
   completeness.ts
 ```
 
-如果暂时做不到完全迁移，也必须保持一个明确的“单一真源”方向，不能让 Ryo 内容继续横向生长成多个来源。
+如果暂时做不到完全迁移，也必须保持一个明确的“单一真源”方向，不能让任何角色内容继续横向生长成多个来源。
 
 运行时代码内部结构应接近：
 
@@ -177,7 +177,7 @@ tests/
 
 - 不做一次性大搬家。
 - 新功能优先落到目标架构的新目录。
-- 旧文件只在服务 Ryo 主线时逐步抽离。
+- 旧文件只在服务 Phase 2 收口时逐步抽离。
 - 每次迁移都必须保持构建通过。
 - 每次迁移都必须保留 fallback。
 - 不得把代码搬迁和玩法改动混在同一个提交。
@@ -328,12 +328,12 @@ src/rendering/
 
 - 一个角色一个目录。
 - 角色目录内只放该角色数据、manifest、动作定义和完整度声明。
-- Ryo 达标后，Kyo/Iori 复制目录模板，不复制具体动作。
+- 任一角色达标后，其他角色复制目录模板，不复制具体动作。
 
 目标结构：
 
 ```text
-content/characters/ryo/
+content/characters/<id>/
   character.json
   portraits.manifest.json
   sprites.manifest.json
@@ -346,7 +346,7 @@ content/characters/ryo/
   README.md
 ```
 
-在 `src/content/characters/ryo/` 的过渡结构中，推荐继续细分为：
+在 `src/content/characters/<id>/` 的过渡结构中，推荐继续细分为：
 
 ```text
 src/content/characters/ryo/

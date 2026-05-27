@@ -1,12 +1,14 @@
 # 路线图
 
-当前路线图已重排：先 Ryo 样板，再 Kyo/Iori，再扩展系统和角色。
+当前路线图已重排：先 Ryo baseline，再 Phase 2 的多角色内容包、流程仪式感和系统收口。
+
+当前实际执行已经进入 Phase 2：Ryo 作为 baseline，Kyo/Iori 内容包与街机流程、UI/HUD、稳定性和工具链一起推进。路线图以 [KOF 差距矩阵](kof-gap-matrix.md) 为优先级来源。
 
 ## P0 方向收敛
 
 - 固化 `AGENTS.md` / `CLAUDE.md` / `docs/` 的执行链。
 - 固化 [工作区目标架构](../architecture/workspace-architecture-target.md) 和 [决策门](../process/decision-gates.md)。
-- 停止横向新增角色。
+- 停止无边界横向新增角色。
 - 停止把 placeholder 当作正式美术方向。
 - 明确 Ryo Vertical Slice 是唯一主线。
 
@@ -23,8 +25,8 @@
 ## P1.1 KOF 差距闭合
 
 - 先闭合 [KOF 差距矩阵](kof-gap-matrix.md) 里的最高优先级差距。
-- 先补肖像气质、动作节奏、打击反馈、输入可见性。
-- 再补技能与资源规则、内容包稳定化、回归保护。
+- 当前 Phase 2 先补流程与场景仪式感、多角色内容包、输入可见性、打击反馈和资源规则。
+- 再补肖像气质、动作节奏、内容包稳定化、回归保护。
 - 所有新功能必须明确自己关闭的是哪一项差距。
 
 ## P1.5 Ryo 内容包细分

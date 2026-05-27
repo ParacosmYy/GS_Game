@@ -4,23 +4,25 @@
 
 ## 1. 一句话方向
 
-不要继续横向堆角色和 placeholder。当前项目必须收敛到：
+不要继续横向堆角色和 placeholder。当前项目已经进入 Phase 2，执行口径应收敛到：
 
-> Ryo 一个角色，跑通肖像、sprite atlas、动作帧、判定帧、命中反馈、音画反馈和验收工具的完整闭环。
+> 以 Ryo 为基线，完成 Kyo/Iori 内容包接入、街机流程与场景仪式感、UI/HUD 可见性、稳定性和工具链收口。
 
-只有当 Ryo 闭环成立，Kyo/Iori 和更多角色才有复制意义。
+Ryo 仍是基线和质量参照，但不再是唯一迭代对象。Kyo/Iori 已进入内容包与运行时接入阶段。
 
 补充执行原则：
 
 - 先把一个人物做精，再做其他人物。
-- 所有 Ryo 相关内容优先向单一内容包收口，不允许再在多个目录之间横向散落。
-- 目录整理的目标不是“看起来更整齐”，而是让 Ryo 的动作、肖像、判定、反馈、报告都能在一个闭环里复用。
+- 所有内容优先向各自内容包收口，不允许在多个目录之间横向散落。
+- 目录整理的目标不是“看起来更整齐”，而是让动作、肖像、判定、反馈、报告都能在内容包里复用。
 - 当前最高优先级是按 [KOF 差距矩阵](docs/product/kof-gap-matrix.md) 逐项闭合真实差距，而不是继续堆“看起来更完整”的功能。
-- 如果项目当前处在 Phase 2 或多角色阶段，也必须先对齐差距矩阵，再决定具体补 Ryo、补 Kyo/Iori，还是补通用管线。
+- 如果项目当前处在 Phase 2 或多角色阶段，也必须先对齐差距矩阵，再决定具体补内容包、流程 UI，还是补通用管线。
 
-当前真实代码已经进入“单一内容包 + 兼容入口”的过渡阶段：
+当前真实代码已经进入“多角色内容包 + 统一入口”的过渡阶段：
 
-- `src/content/characters/ryo/` 里已经存在按职责拆分的分层入口。
+- `src/content/index.ts` 是内容包顶层统一入口。
+- `src/content/characters/index.ts` 汇总 Ryo / Kyo / Iori 内容包导出。
+- `src/content/characters/ryo/`、`src/content/characters/kyo/`、`src/content/characters/iori/` 里已经存在按职责拆分的分层入口。
 - 兼容层文件仍可保留，但新增数据优先进入子目录或同名职责文件。
 - `src/tools/validateManifest.ts` 这类校验工具应作为内容包闭环的一部分，而不是临时脚本。
 - 后续新功能优先从差距矩阵里找目标，而不是从“我还想加什么”开始。
@@ -29,28 +31,30 @@
 
 现状问题不是“优化不够”，而是优化分散：
 
-- 角色很多，但没有一个达到街机样板闭环。
-- frame data 有不少，但视觉帧仍大量 placeholder。
-- 肖像 manifest 有结构，但没有正式资产接管。
-- 骨骼/像素块渲染继续存在，导致角色气质不像 SNK/KOF。
+- 角色内容包已经有多角色入口，但多角色之间的体验和完整度仍不一致。
+- frame data 有不少，但视觉帧仍存在 placeholder 和程序化 fallback。
+- 肖像 manifest 有结构，但还需要继续向正式资源闭环推进。
+- 骨骼/像素块渲染继续存在，导致部分角色气质不像 SNK/KOF。
 - 打击感有 hitstop、spark、shake 等组件，但没有按攻击类型形成统一反馈矩阵。
-- 角色内容包已经开始细分，但如果后续文档继续写成“未来要拆”，就会和真实代码状态脱节。
-- 技术栈不是当前第一瓶颈，资产生产线才是。
+- Phase 2 已经从“角色闭环”转入“流程仪式感 + 多角色复制管线”阶段，但文档如果继续写成单角色主线，就会和真实代码状态脱节。
+- 技术栈不是当前第一瓶颈，资产生产线和内容包边界才是。
 
 因此后续 agent 必须从“多点优化”改成“样板线闭环”。
 
-## 3. 当前唯一主线
+## 3. 当前主线
 
-主线名称：`Ryo Vertical Slice`。
+主线名称：`Phase 2 Multi-Role Closure`。
 
 主线目标：
 
-- 让 Ryo 成为第一个可验收的 KOF 风格样板角色。
-- 用 Ryo 验证所有资产格式、动作格式、判定格式和反馈格式。
+- 让 Ryo 继续作为 baseline 和验收参照。
+- 把 Kyo/Iori 内容包、街机流程、菜单/UI、流程仪式感推进到可复制模板。
+- 用统一 content loader / manifest / frame contract 验证多角色资产格式、动作格式、判定格式和反馈格式。
 - 把骨骼/placeholder 降级为 fallback。
-- 形成可以复制给 Kyo/Iori 的角色生产模板。
+- 形成可以复制给后续角色的生产模板。
 
-主线文档：[docs/product/ryo-vertical-slice-plan.md](docs/product/ryo-vertical-slice-plan.md)。
+主线基线文档：[docs/product/ryo-vertical-slice-plan.md](docs/product/ryo-vertical-slice-plan.md)。
+当前优先级文档：[docs/product/kof-gap-matrix.md](docs/product/kof-gap-matrix.md)。
 
 ## 4. 每轮启动脚本
 
@@ -74,6 +78,8 @@
    - 命中反馈
    - 验收工具
    - 文档约束
+   - 流程与场景仪式感
+   - 多角色内容包
 5. 先执行 [自侦测前置](docs/process/self-detection.md) 的 3 个角色：架构、研发、产品。
 6. 只有自侦测通过，才决定是否需要升级到深审编队。
 7. 输出本轮 PM/玩家/研发/测试/架构结论。
@@ -395,6 +401,6 @@ type(scope): 中文标题
 
 每次想新增东西前，先问：
 
-> 这是否让 Ryo 的肖像、动作、判定、打击反馈闭环更完整？
+> 这是否明确闭合了 [KOF 差距矩阵](docs/product/kof-gap-matrix.md) 中的一项差距？
 
 如果答案不是明确的“是”，不要做。
