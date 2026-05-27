@@ -52,11 +52,17 @@
 ### 1.4 输入可见性差距
 
 - 当前差距：招式、快捷键、标准按键、爆气说明在界面上必须更一致、更显眼。
+- 已闭合项：
+  - 训练模式 move list HUD (F5 切换, SNK 分组风格)
+  - 训练模式 frame data 面板 (F4 切换)
+  - 训练模式 input history (F3 切换, 方向+按钮)
+  - 训练模式检测招式名称显示 (输入历史面板实时显示中文招式名)
+  - 训练模式指令进度可视化 (QCF/QCB/DP/HCF/HCB 部分匹配进度条)
+  - HSDM 分类补全 (招式表 + 训练模式面板均显示 HIDDEN SUPER DM)
+  - 街机模式 Tab 招式表面板
 - 新功能添加点：
-  - move list HUD
-  - command notation HUD
   - burst / MAX 说明栏
-  - 训练模式招式卡片
+  - 训练模式招式卡片(视觉图标输入)
 - 期望结果：
   - 用户一眼知道怎么出招，怎么爆气，怎么理解角色。
 
@@ -87,6 +93,10 @@
 ### 2.3 稳定性与回归差距
 
 - 当前差距：部分输入、镜头、特效、命中边界虽然已改善，但仍需要更强回归保护。
+- 已闭合项：
+  - 4105 tests 全部通过 (vitest)
+  - 3角色 manifest 校验工具 全绿 (82+89+89 checks)
+  - HSDM招式表分类+CN_MOVE_NAMES覆盖回归测试 (11 tests)
 - 新功能添加点：
   - smoke / ryo / combat / content 分层测试
   - frame contract 回归测试
@@ -107,6 +117,8 @@
   - KO 视觉序列 + DM/SDM/HSDM 终结画面
   - CONGRATULATIONS 通关统计面板
   - CONTINUE 倒计时画面
+  - 回合结束分数明细弹窗(Win+HP Bonus+Perfect+计数动画)
+  - VS画面冲击音效 + P2开场语音
 - 新功能添加点：
   - 胜利姿态动画细化
   - 角色专属胜利语音
