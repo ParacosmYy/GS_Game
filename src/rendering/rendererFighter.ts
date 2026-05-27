@@ -1020,7 +1020,7 @@ export function drawFighters(
       ctx.restore();
     }
     // KOF2002: 擦杀危险红色脉冲 — HP<5%且防御中时红色脉冲轮廓
-    if (f.health > 0 && f.health < f.maxHealth * 0.05 && (f.state === FighterState.BLOCK || f.state === FighterState.BLOCKSTUN)) {
+    if (f.health > 0 && f.health < f.maxHealth * 0.05 && (f.state === FighterState.BLOCK || f.state === FighterState.BLOCK)) {
       ctx.save();
       ctx.globalCompositeOperation = 'screen';
       ctx.globalAlpha = 0.15 + Math.sin(globalTick * 0.4) * 0.1;
