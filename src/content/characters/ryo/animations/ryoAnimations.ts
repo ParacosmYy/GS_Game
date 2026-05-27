@@ -66,6 +66,9 @@ export const RYO_ANIMATION_META: Record<string, AnimationMeta> = {
   ryo_ko_hou_c: { name: 'ryo_ko_hou_c', type: 'attack', totalFrames: 47, ticksPerFrame: 2, loop: false, transition: 'snap', description: '虎咲 C版,无敌升龙' },
   ryo_hien:     { name: 'ryo_hien', type: 'attack', totalFrames: 40, ticksPerFrame: 2, loop: false, transition: 'snap', description: '飛燕疾風脚,空中飞踢' },
   ryo_haou:     { name: 'ryo_haou', type: 'attack', totalFrames: 44, ticksPerFrame: 2, loop: false, transition: 'snap', description: '霸王翔吼拳,大飞行道具' },
+  ryo_koouken_d:    { name: 'ryo_koouken_d', type: 'attack', totalFrames: 67, ticksPerFrame: 2, loop: false, transition: 'snap', description: '虎煌拳D版,重飞行道具,击倒' },
+  ryo_hio_hacker:   { name: 'ryo_hio_hacker', type: 'attack', totalFrames: 32, ticksPerFrame: 2, loop: false, transition: 'snap', description: '氷果斬,突进打击技' },
+  ryo_zanretsu_ken: { name: 'ryo_zanretsu_ken', type: 'attack', totalFrames: 24, ticksPerFrame: 2, loop: false, transition: 'snap', description: '斩裂拳,快速连打技' },
 
   // === DM ===
   dm_ten_ha_ou:       { name: 'dm_ten_ha_ou', type: 'attack', totalFrames: 68, ticksPerFrame: 2, loop: false, transition: 'snap', description: '天地霸煌拳 DM,巨大能量爆发' },
