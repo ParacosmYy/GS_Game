@@ -26,22 +26,22 @@ tools -> assets/core schema
 - `input` 认识具体角色。
 - 通用模块通过角色名分支实现角色行为。
 
-## 2. Ryo 主线归属
+## 2. 内容包归属
 
 | 任务 | 归属 |
 | --- | --- |
-| Ryo 肖像 manifest | `core/` schema + asset data，`rendering/` 只读 |
-| Ryo sprite atlas | `core/` schema，`tools/` 生成，`rendering/` 绘制 |
-| Ryo animation | `core/` manifest，`characters/` 只引用动作语义 |
-| Ryo hitbox | `core/` 数据，`combat/` 读取 |
-| Ryo feedback | `core/` 数据，`combat` 发事件，`rendering/audio` 响应 |
+| Ryo / Kyo / Iori 肖像 manifest | `core/` schema + asset data，`rendering/` 只读 |
+| Ryo / Kyo / Iori sprite atlas | `core/` schema，`tools/` 生成，`rendering/` 绘制 |
+| Ryo / Kyo / Iori animation | `core/` manifest，`characters/` 只引用动作语义 |
+| Ryo / Kyo / Iori hitbox | `core/` 数据，`combat/` 读取 |
+| Ryo / Kyo / Iori feedback | `core/` 数据，`combat` 发事件，`rendering/audio` 响应 |
 | 完整度报告 | `tools/` 或 `tests/` |
 
 补充约束：
 
-- Ryo 的单一真源应逐步向 `src/content/characters/ryo/` 收口。
-- 如果某个 Ryo 专属数据还留在旧目录，必须说明它是过渡层而不是新来源。
-- 通用模块只负责消费数据，不负责替 Ryo 生成新的数据来源。
+- 各角色的单一真源应逐步向 `src/content/characters/<id>/` 收口。
+- 如果某个角色专属数据还留在旧目录，必须说明它是过渡层而不是新来源。
+- 通用模块只负责消费数据，不负责替任何角色生成新的数据来源。
 
 ## 3. Frame Contract 边界
 
@@ -83,7 +83,7 @@ Frame Contract 是多个模块的共享协议：
 
 现有大文件暂不为了数字拆分。只有当拆分服务以下目标时才做：
 
-- Ryo 样板线。
+- Phase 2 内容包与流程收口。
 - Frame Contract。
 - 资产管线。
 - 测试可读性。
