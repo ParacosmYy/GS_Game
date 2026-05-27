@@ -79,3 +79,9 @@ export {
   type CancelType,
   type CancelRoute,
 } from './cancelPaths.js';
+
+// Frame Contract (per-frame collision data + cancel windows)
+export {
+  IORI_ACTION_CONTRACTS,
+  getIoriFrameContractManifest,
+} from '../../../core/ioriFrameContract.js';

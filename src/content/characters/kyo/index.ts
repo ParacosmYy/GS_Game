@@ -79,3 +79,9 @@ export {
   type CancelType,
   type CancelRoute,
 } from './cancelPaths.js';
+
+// Frame Contract (per-frame collision data + cancel windows)
+export {
+  KYO_ACTION_CONTRACTS,
+  getKyoFrameContractManifest,
+} from '../../../core/kyoFrameContract.js';
