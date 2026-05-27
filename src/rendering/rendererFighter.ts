@@ -156,6 +156,15 @@ export function drawFighters(
     } else if (f.state === FighterState.BLOCK) {
       leanOffsetX = -2 * f.facing + blendOffsetX;
       leanAngle = -0.03 * f.facing;
+    } else if (f.state === FighterState.CROUCH_ATTACK) {
+      // KOF2002: 蹲攻击前倾 — 出手时重心前移
+      leanOffsetX = 3 * f.facing + blendOffsetX;
+      leanAngle = 0.04 * f.facing;
+      leanOffsetY = 8; // 保持蹲姿
+    } else if (f.state === FighterState.STAND_ATTACK) {
+      // KOF2002: 站立攻击前倾 — 出拳/踢时重心前移
+      leanOffsetX = 2 * f.facing + blendOffsetX;
+      leanAngle = 0.03 * f.facing;
     }
 
     // Afterimage trail
