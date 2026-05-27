@@ -416,10 +416,42 @@ const WF1: number[][] = [
 // For the initial 96x144 upgrade, all forward frames share the same base silhouette
 // with subtle arm/leg position offsets encoded in the pixel data below.
 
+// Walk forward phase variations — leg/arm stride differentiation
+// WF2 = WF0 base with legs passing (right leg mid-swing), WF3 = WF1 with left leg forward wider
+// WF4 = WF0 with right leg extended further, WF5 = WF1 with left leg pulled back
 const WF2: number[][] = [...WF0.map(row => [...row])];
 const WF3: number[][] = [...WF1.map(row => [...row])];
 const WF4: number[][] = [...WF0.map(row => [...row])];
 const WF5: number[][] = [...WF1.map(row => [...row])];
+
+// WF2: legs passing through center — narrow stance, both legs under body
+// Shift leg columns inward by 1-2px for narrow passing phase
+for (let y = 100; y < 130; y++) {
+  for (let x = 32; x < 42; x++) {
+    if (WF2[y][x] !== 0 && x > 33) WF2[y][x - 1] = WF2[y][x];
+  }
+  for (let x = 52; x < 62; x++) {
+    if (WF2[y][x] !== 0 && x < 60) WF2[y][x + 1] = WF2[y][x];
+  }
+}
+// WF3: left leg forward wider stride — extend left leg 2px outward
+for (let y = 105; y < 128; y++) {
+  for (let x = 58; x >= 50; x--) {
+    if (WF3[y][x] !== 0 && x + 2 < 96) WF3[y][x + 2] = WF3[y][x];
+  }
+}
+// WF4: right leg fully extended — deepen right leg offset, slight body lean
+for (let y = 102; y < 132; y++) {
+  for (let x = 30; x < 40; x++) {
+    if (WF4[y][x] !== 0 && x - 1 >= 0) WF4[y][x - 1] = WF4[y][x];
+  }
+}
+// WF5: left leg pulling back — compress left side, shift right
+for (let y = 108; y < 130; y++) {
+  for (let x = 55; x < 65; x++) {
+    if (WF5[y][x] !== 0 && x - 2 >= 0) WF5[y][x - 2] = WF5[y][x];
+  }
+}
 
 // ═══════════════════════════════════════════════════════════════
 // WALK BACKWARD — 6-frame cycle
@@ -581,6 +613,47 @@ const WB2: number[][] = [...WB0.map(row => [...row])];
 const WB3: number[][] = [...WB0.map(row => [...row])];
 const WB4: number[][] = [...WB0.map(row => [...row])];
 const WB5: number[][] = [...WB0.map(row => [...row])];
+
+// Walk backward phase variations — cautious defensive steps
+// WB1: right foot stepping back — shift right leg 2px back (leftward)
+for (let y = 105; y < 130; y++) {
+  for (let x = 50; x < 60; x++) {
+    if (WB1[y][x] !== 0 && x - 2 >= 0) WB1[y][x - 2] = WB1[y][x];
+  }
+}
+// WB2: both feet together — narrow stance (passing phase)
+for (let y = 100; y < 130; y++) {
+  for (let x = 55; x < 65; x++) {
+    if (WB2[y][x] !== 0 && x + 1 < 96) WB2[y][x + 1] = WB2[y][x];
+  }
+  for (let x = 35; x < 45; x++) {
+    if (WB2[y][x] !== 0 && x - 1 >= 0) WB2[y][x - 1] = WB2[y][x];
+  }
+}
+// WB3: left foot stepping back — shift left leg 2px back
+for (let y = 105; y < 130; y++) {
+  for (let x = 30; x < 42; x++) {
+    if (WB3[y][x] !== 0 && x + 2 < 96) WB3[y][x + 2] = WB3[y][x];
+  }
+}
+// WB4: wider retreat stance — both legs spread
+for (let y = 100; y < 130; y++) {
+  for (let x = 28; x < 38; x++) {
+    if (WB4[y][x] !== 0 && x - 1 >= 0) WB4[y][x - 1] = WB4[y][x];
+  }
+  for (let x = 56; x < 66; x++) {
+    if (WB4[y][x] !== 0 && x + 1 < 96) WB4[y][x + 1] = WB4[y][x];
+  }
+}
+// WB5: guard up, weight centered — arms slightly higher (modify rows 70-85)
+for (let y = 72; y < 84; y++) {
+  for (let x = 24; x < 32; x++) {
+    if (WB5[y][x] !== 0 && y - 1 >= 0) { WB5[y - 1][x] = WB5[y][x]; WB5[y][x] = 0; }
+  }
+  for (let x = 62; x < 70; x++) {
+    if (WB5[y][x] !== 0 && y - 1 >= 0) { WB5[y - 1][x] = WB5[y][x]; WB5[y][x] = 0; }
+  }
+}
 
 // ─────────────────────────────────────────────────────────────
 // Export
