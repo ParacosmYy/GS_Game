@@ -101,8 +101,10 @@
 
 - 当前差距：部分输入、镜头、特效、命中边界虽然已改善，但仍需要更强回归保护。
 - 已闭合项：
-  - 4117 tests 全部通过 (vitest)
+  - 4161 tests 全部通过 (vitest)
   - 6档反馈矩阵回归测试 (23 tests, 层级递进+参数完整性+3角色映射)
+  - DM→SDM→HSDM升级链回归测试 (8 tests, Kyo/Iori/HSDM一致性)
+  - 3角色必杀技像素帧覆盖 (134 tests, 基本+通常+必杀+DM/SDM/HSDM+命令技)
   - 3角色 manifest 校验工具 全绿 (82+89+89 checks)
   - HSDM招式表分类+CN_MOVE_NAMES覆盖回归测试 (11 tests)
 - 新功能添加点：
