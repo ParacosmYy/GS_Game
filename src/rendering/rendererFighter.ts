@@ -808,6 +808,12 @@ export function resolveFighterColors(f: Fighter, globalTick: number): { bodyColo
     outlineColor = '#ff660088';
   }
 
+  // KOF2002: 空中受击蓝色调 — 浮空受击时身体偏蓝
+  if (f.state === FighterState.HITSTUN && !f.isGrounded()) {
+    outlineColor = '#4488ff50';
+    glowColor = '#4466ff20';
+  }
+
   return { bodyColor, outlineColor, glowColor };
 }
 
