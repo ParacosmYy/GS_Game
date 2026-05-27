@@ -44,11 +44,42 @@ function kyoVFX(ctx: HitEffectContext): boolean {
     vfx.spawnImpactRing(hitX, hitY, 0.9);
     handled = true;
   }
+  // Aragami followups — Konokizu, Yanosabi, Nanase, Koto Tsuki, Yakisogi
+  if (atkName === 'KYO_ARAGAMI_KONOKIZU' || atkName === 'KYO_ARAGAMI_YANOSABI') {
+    cinematic.addHitStop(1, ctx.defIdx);
+    vfx.spawnImpactRing(hitX, hitY, 0.8);
+    vfx.spawnProjectileExplosion(hitX, hitY, '#ff6622', '#ffaa44');
+    handled = true;
+  }
+  if (atkName === 'KYO_NANASE') {
+    cinematic.addHitStop(1, ctx.defIdx);
+    screenShake.trigger(5, 5, attacker.facing * 3);
+    vfx.spawnProjectileExplosion(hitX, hitY, '#ff6622', '#ff8822');
+    handled = true;
+  }
+  if (atkName === 'KYO_KOTO_TSUKI' || atkName === 'KYO_YAKISOGI') {
+    cinematic.addHitStop(1, ctx.defIdx);
+    screenShake.trigger(6, 6, attacker.facing * 3);
+    vfx.spawnImpactRing(hitX, hitY, 0.9);
+    handled = true;
+  }
   // Dokugami (毒咬み) — flame followup
   if (atkName === 'KYO_DOKUGAMI') {
     cinematic.addHitStop(1, ctx.defIdx);
     screenShake.trigger(7, 6, attacker.facing * 4);
     vfx.spawnProjectileExplosion(hitX, hitY, '#ff6622', '#ffaa44');
+    handled = true;
+  }
+  // Dokugami followups — Tsumiyomi, Batsuyomi
+  if (atkName === 'KYO_TSUMIYOMI') {
+    cinematic.addHitStop(1, ctx.defIdx);
+    vfx.spawnProjectileExplosion(hitX, hitY, '#ff5500', '#ff9933');
+    handled = true;
+  }
+  if (atkName === 'KYO_BATSUYOMI') {
+    cinematic.addHitStop(1, ctx.defIdx);
+    screenShake.trigger(7, 6, attacker.facing * 4);
+    vfx.spawnSuperBurst(hitX, hitY, '#ff4400', '#ffaa22', false);
     handled = true;
   }
   // Red Kick
@@ -111,11 +142,12 @@ function kyoSFX(ctx: HitEffectContext): boolean {
     playKyo75Kai(); if (combo > 0) playHit(0.5, combo);
     return true;
   }
-  if (atkName === 'KYO_ARAGAMI' || atkName === 'KYO_ARAGAMI_KONOKIZU' || atkName === 'KYO_ARAGAMI_YANOSABI') {
+  if (atkName === 'KYO_ARAGAMI' || atkName === 'KYO_ARAGAMI_KONOKIZU' || atkName === 'KYO_ARAGAMI_YANOSABI'
+    || atkName === 'KYO_NANASE' || atkName === 'KYO_KOTO_TSUKI' || atkName === 'KYO_YAKISOGI') {
     playKyoAragami(); if (combo > 0) playHit(0.5, combo);
     return true;
   }
-  if (atkName === 'KYO_DOKUGAMI') {
+  if (atkName === 'KYO_DOKUGAMI' || atkName === 'KYO_TSUMIYOMI' || atkName === 'KYO_BATSUYOMI') {
     playKyoDokugami(); if (combo > 0) playHit(0.5, combo);
     return true;
   }

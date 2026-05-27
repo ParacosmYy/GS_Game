@@ -38,19 +38,19 @@ function ioriVFX(ctx: HitEffectContext): boolean {
     handled = true;
   }
   // Aoihana (葵花) rekka chain — escalating per hit
-  if (atkName === 'IORI_AOIHANA') {
+  if (atkName === 'IORI_AOIHANA' || atkName === 'IORI_AOIHANA_C') {
     cinematic.addHitStop(1, ctx.defIdx);
     vfx.spawnImpactRing(hitX, hitY, 0.7);
     handled = true;
   }
-  if (atkName === 'IORI_AOIHANA_2') {
+  if (atkName === 'IORI_AOIHANA_2' || atkName === 'IORI_AOIHANA_C_2') {
     cinematic.addHitStop(1, ctx.defIdx);
     screenShake.trigger(5, 5, attacker.facing * 3);
     vfx.spawnImpactRing(hitX, hitY, 0.9);
     handled = true;
   }
   // Aoihana finisher
-  if (atkName === 'IORI_AOIHANA_3') {
+  if (atkName === 'IORI_AOIHANA_3' || atkName === 'IORI_AOIHANA_C_3') {
     vfx.spawnSuperBurst(hitX, hitY, '#660088', '#aa33dd', false);
     cinematic.addHitStop(2, ctx.defIdx);
     screenShake.trigger(9, 8, attacker.facing * 5);
@@ -58,7 +58,7 @@ function ioriVFX(ctx: HitEffectContext): boolean {
     handled = true;
   }
   // Kototsuki (琴月) — dark rush
-  if (atkName === 'IORI_KOTOTSUKI') {
+  if (atkName === 'IORI_KOTOTSUKI' || atkName === 'IORI_KOTOTSUKI_D') {
     cinematic.addHitStop(2, ctx.defIdx);
     screenShake.trigger(8, 8, attacker.facing * 4);
     vfx.spawnImpactRing(hitX, hitY, 1.2);
@@ -102,7 +102,8 @@ function ioriSFX(ctx: HitEffectContext): boolean {
   const atkName = ctx.attackType as string;
   const combo = ctx.combo;
 
-  if (atkName === 'IORI_AOIHANA' || atkName === 'IORI_AOIHANA_2' || atkName === 'IORI_AOIHANA_3') {
+  if (atkName === 'IORI_AOIHANA' || atkName === 'IORI_AOIHANA_2' || atkName === 'IORI_AOIHANA_3'
+    || atkName === 'IORI_AOIHANA_C' || atkName === 'IORI_AOIHANA_C_2' || atkName === 'IORI_AOIHANA_C_3') {
     playIoriAoihana(); if (combo > 0) playHit(0.5, combo);
     return true;
   }
@@ -114,7 +115,7 @@ function ioriSFX(ctx: HitEffectContext): boolean {
     playIoriYamibarai(); if (combo > 0) playHit(0.5, combo);
     return true;
   }
-  if (atkName === 'IORI_KOTOTSUKI') {
+  if (atkName === 'IORI_KOTOTSUKI' || atkName === 'IORI_KOTOTSUKI_D') {
     playIoriKototsuki(); if (combo > 0) playHit(0.5, combo);
     return true;
   }
