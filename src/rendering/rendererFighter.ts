@@ -127,6 +127,8 @@ export function drawFighters(
       leanAngle = (0.12 + (f.stateAge < 3 ? 0.03 : 0)) * f.facing;
       // KOF2002: 跑步弹跳 — 更高频3px上下弹跳
       leanOffsetY = Math.abs(Math.sin(f.stateAge * 0.8)) * 3;
+      // KOF2002: 跑步左右摆动 — 跑步时微弱左右交替重心
+      leanOffsetX = Math.sin(f.stateAge * 0.8) * 2 * f.facing + blendOffsetX;
     } else if (f.state === FighterState.ROLL || f.state === FighterState.BACK_ROLL) {
       // KOF2002: 受身滚动前倾/后倾
       leanOffsetX = (f.state === FighterState.ROLL ? 5 : -5) * f.facing + blendOffsetX;
