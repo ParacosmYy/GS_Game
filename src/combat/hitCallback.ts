@@ -845,6 +845,8 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
         combo, comboDmg,
       );
     }
+    // KOF2002: Combo milestone sound at 5, 10, 15+ hits
+    playComboMilestone(combo);
     // KOF2002: 高连击速度线 — combo>=6时出现背景速度线
     if (combo >= 6) {
       deps.vfx.spawnComboSpeedLines(hitX, hitY, combo);
