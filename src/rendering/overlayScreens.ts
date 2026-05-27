@@ -1344,6 +1344,7 @@ export function drawNextMatch(
   nextChar: import('../characters/types.js').CharacterDefinition | undefined,
   stageNumber: number,
   totalStages: number,
+  isRivalStage: boolean = false,
 ): void {
   ctx.save();
 
@@ -1397,6 +1398,21 @@ export function drawNextMatch(
   ctx.globalAlpha = ncAlpha * fadeIn;
   drawSNKText(ctx, 'NEXT CHALLENGER', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 60, 13, 'rgba(255,180,100,0.8)');
   ctx.globalAlpha = fadeIn;
+
+  // Rival stage badge — KOF2002: final rival gets dramatic treatment
+  if (isRivalStage) {
+    const rivalAlpha = Math.min(1, Math.max(0, (timer - 5) / 12));
+    ctx.globalAlpha = rivalAlpha * fadeIn;
+    // Red pulse overlay for rival intensity
+    const redPulse = 0.03 + Math.sin(timer * 0.06) * 0.02;
+    ctx.fillStyle = `rgba(180, 0, 0, ${redPulse})`;
+    ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+    ctx.shadowColor = '#ff2200';
+    ctx.shadowBlur = 20;
+    drawSNKText(ctx, '宿敵決戦 · RIVAL MATCH', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 70, 14, '#ff4444');
+    ctx.shadowBlur = 0;
+    ctx.globalAlpha = fadeIn;
+  }
 
   // Stage name subtitle
   const allStages: string[] = ['temple', 'china', 'factory', 'orochi', 'street', 'rooftop'];

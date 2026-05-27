@@ -400,8 +400,8 @@ export class Renderer {
     drawArcadeComplete(this.ctx, timer, stats);
   }
 
-  drawNextMatch(timer: number, nextChar: CharacterDefinition | undefined, stageNumber: number, totalStages: number): void {
-    drawNextMatch(this.ctx, timer, nextChar, stageNumber, totalStages);
+  drawNextMatch(timer: number, nextChar: CharacterDefinition | undefined, stageNumber: number, totalStages: number, isRivalStage: boolean = false): void {
+    drawNextMatch(this.ctx, timer, nextChar, stageNumber, totalStages, isRivalStage);
   }
 
   drawWinQuote(timer: number, charName: string, winQuote: string, charColor: string, pixelPortrait: import('./pixelPortraits.js').PixelPortraitData | undefined): void {

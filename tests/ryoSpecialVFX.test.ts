@@ -149,10 +149,10 @@ describe('4. DM Ten Ha Ou Energy Burst', () => {
     expect(dm.length).toBeGreaterThan(haou.length);
   });
 
-  it('uses golden yellow and white color palette', () => {
+  it('uses golden yellow, white, and lightning blue color palette', () => {
     const particles: Particle[] = [];
     spawnDMTenHaOuVFX(particles, 400, 300, 'ryo');
-    const validColors = new Set(['#ffffff', '#ffee66', '#ffaa00', '#ffcc00']);
+    const validColors = new Set(['#ffffff', '#4488ff', '#88ccff', '#2266dd']);
     // Check superburst cores and expanding stars
     for (const p of particles) {
       expect(validColors.has(p.color)).toBe(true);
@@ -271,12 +271,12 @@ describe('7. Ryo VFX Color Consistency', () => {
     spawnDMTenHaOuVFX(allParticles, 400, 300, 'ryo');
     spawnHaouFlash(allParticles, 400, 300, 'ryo');
 
-    // Valid Ryo colors: orange, yellow, golden, white, red-orange
+    // Valid Ryo colors: orange, yellow, golden, white, red-orange, lightning blue
     const validColors = new Set([
       '#ffaa22', '#ffffff', '#ff8800', '#ffcc44',
       '#ff4400', '#ffaa33', '#ffee66', '#ffcc00', '#ff8833', '#ff6600',
       '#ffaa00', '#ffdd66',
-      '#4488ff', '#66aaff', '#88ccff', // blue energy trails
+      '#4488ff', '#66aaff', '#88ccff', '#2266dd', // blue energy + lightning
       '#9a7b5d', '#bb9a73', '#887766', '#aa9070', '#776655', // ground dust
       '#ffddaa', // air line warm white
     ]);

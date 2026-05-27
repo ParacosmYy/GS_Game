@@ -147,11 +147,13 @@ let prevTimeSeconds = 99; // Track time for countdown warning bell
 
 /** KOF2002-style arcade difficulty ramp: difficulty increases per stage.
  *  Base difficulty from options (0=easy, 1=normal, 2=hard) → scalar 0..1.
- *  Each stage adds ramp up to a max of 0.95. */
+ *  Each stage adds ramp up to a max of 0.95.
+ *  Final rival stage gets an extra 0.1 spike for boss intensity. */
 function arcadeDifficulty(base: number, stageIndex: number, totalStages: number): number {
   const baseScalar = base === 0 ? 0.3 : base === 2 ? 0.7 : 0.5;
   const ramp = totalStages > 1 ? (stageIndex / (totalStages - 1)) * 0.3 : 0;
-  return Math.min(0.95, baseScalar + ramp);
+  const rivalSpike = stageIndex === totalStages - 1 ? 0.1 : 0;
+  return Math.min(0.98, baseScalar + ramp + rivalSpike);
 }
 
 function pickWinQuote(w: number | null): string {
@@ -170,14 +172,62 @@ function pickWinQuote(w: number | null): string {
   return charDef.winQuotes[gameRandomInt(charDef.winQuotes.length)];
 }
 
-/** Generate a shuffled opponent queue for arcade mode, excluding P1's character */
+/**
+ * KOF2002-style rival mapping — each character's fixed final-stage rival
+ *
+ * Based on canonical KOF2002 rivalries and team associations.
+ * If P1 has no registered rival, the last opponent is randomly chosen.
+ */
+const RIVAL_MAP: Record<string, string> = {
+  kyo: 'iori',
+  iori: 'kyo',
+  ryo: 'robert',
+  robert: 'ryo',
+  terry: 'andy',
+  andy: 'terry',
+  joe: 'terry',
+  kim: 'chang',
+  chang: 'kim',
+  choi: 'kim',
+  leona: 'ralf',
+  ralf: 'clark',
+  clark: 'ralf',
+  athena: 'kensou',
+  mai: 'andy',
+  kdash: 'kula',
+  kula: 'kdash',
+  yashiro: 'chris',
+  shermie: 'yashiro',
+  chris: 'yashiro',
+  mature: 'vice',
+  vice: 'mature',
+  billy: 'yamazaki',
+  yamazaki: 'billy',
+  mary: 'terry',
+  xiangfei: 'athena',
+  kasumi: 'mai',
+};
+
+/** Generate opponent queue for arcade mode with rival as final opponent */
 function generateArcadeOpponents(p1CharId: string): CharacterDefinition[] {
   const available = ROSTER.filter(c => c.id !== p1CharId);
-  for (let i = available.length - 1; i > 0; i--) {
+  const rivalId = RIVAL_MAP[p1CharId];
+  const rival = rivalId ? available.find(c => c.id === rivalId) : undefined;
+
+  // Remove rival from pool for shuffling
+  const rest = rival ? available.filter(c => c.id !== rivalId) : available;
+
+  // Fisher-Yates shuffle the non-rival opponents
+  for (let i = rest.length - 1; i > 0; i--) {
     const j = gameRandomInt(i + 1);
-    [available[i], available[j]] = [available[j], available[i]];
+    [rest[i], rest[j]] = [rest[j], rest[i]];
   }
-  return available;
+
+  // Place rival as final opponent (KOF tradition)
+  if (rival) {
+    rest.push(rival);
+  }
+  return rest;
 }
 
 // ===== Update =====
@@ -1244,7 +1294,8 @@ function render(): void {
   if (gs.phase === GamePhase.NEXT_MATCH) {
     const nextIdx = gs.arcadeOpponentIndex + 1;
     const nextChar = gs.arcadeOpponents[nextIdx];
-    renderer.drawNextMatch(gs.arcadeNextMatchTimer, nextChar, gs.arcadeOpponentIndex + 1, gs.arcadeOpponents.length);
+    const isRivalStage = nextIdx === gs.arcadeOpponents.length - 1;
+    renderer.drawNextMatch(gs.arcadeNextMatchTimer, nextChar, gs.arcadeOpponentIndex + 1, gs.arcadeOpponents.length, isRivalStage);
     return;
   }
   if (gs.phase === GamePhase.SELECT) {
