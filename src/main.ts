@@ -176,11 +176,40 @@ function update(): void {
   if (gs.phase === GamePhase.MODE_SELECT) {
     tickRef.value++;
     if (inputManager.isKeyDown('ArrowLeft') || inputManager.isKeyDown('KeyA')) gs.modeSelectCursor = Math.max(0, gs.modeSelectCursor - 1);
-    if (inputManager.isKeyDown('ArrowRight') || inputManager.isKeyDown('KeyD')) gs.modeSelectCursor = Math.min(2, gs.modeSelectCursor + 1);
+    if (inputManager.isKeyDown('ArrowRight') || inputManager.isKeyDown('KeyD')) gs.modeSelectCursor = Math.min(3, gs.modeSelectCursor + 1);
     if (inputManager.isKeyDown('Enter') || inputManager.isKeyDown('KeyJ')) {
-      gs.teamMode = gs.modeSelectCursor === 1;
-      gs.isTrainingMode = gs.modeSelectCursor === 2;
-      gs.setPhase(GamePhase.SELECT);
+      if (gs.modeSelectCursor === 3) {
+        gs.setPhase(GamePhase.OPTIONS);
+        gs.optionsCursor = 0;
+      } else {
+        gs.teamMode = gs.modeSelectCursor === 1;
+        gs.isTrainingMode = gs.modeSelectCursor === 2;
+        gs.setPhase(GamePhase.SELECT);
+      }
+    }
+    return;
+  }
+
+  if (gs.phase === GamePhase.OPTIONS) {
+    tickRef.value++;
+    const opts = gs.options;
+    if (inputManager.isKeyDown('ArrowUp') || inputManager.isKeyDown('KeyW')) gs.optionsCursor = Math.max(0, gs.optionsCursor - 1);
+    if (inputManager.isKeyDown('ArrowDown') || inputManager.isKeyDown('KeyS')) gs.optionsCursor = Math.min(5, gs.optionsCursor + 1); // 5 settings + BACK
+    if (inputManager.isKeyDown('ArrowLeft') || inputManager.isKeyDown('KeyA') || inputManager.isKeyDown('ArrowRight') || inputManager.isKeyDown('KeyD')) {
+      if (gs.optionsCursor < 5) {
+        const dir = (inputManager.isKeyDown('ArrowRight') || inputManager.isKeyDown('KeyD')) ? 1 : -1;
+        switch (gs.optionsCursor) {
+          case 0: opts.difficulty = ((opts.difficulty + dir + 3) % 3) as 0|1|2; break;
+          case 1: opts.roundsToWin = ((opts.roundsToWin + dir + 3) % 3) as 1|2|3; break;
+          case 2: { const vals: (30|60|99|0)[] = [30,60,99,0]; const idx = vals.indexOf(opts.timeLimit); opts.timeLimit = vals[(idx + dir + 4) % 4]; break; }
+          case 3: opts.crtEnabled = !opts.crtEnabled; renderer.crtEnabled = opts.crtEnabled; break;
+          case 4: opts.simplifiedMode = !opts.simplifiedMode; gs.simplifiedMode = opts.simplifiedMode; break;
+        }
+      }
+    }
+    if (inputManager.isKeyDown('Enter') || inputManager.isKeyDown('KeyJ') || inputManager.isKeyDown('Escape')) {
+      gs.setPhase(GamePhase.MODE_SELECT);
+      gs.modeSelectCursor = 3;
     }
     return;
   }
@@ -934,6 +963,10 @@ function render(): void {
   }
   if (gs.phase === GamePhase.MODE_SELECT) {
     renderer.drawModeSelect(tickRef.value, gs.modeSelectCursor);
+    return;
+  }
+  if (gs.phase === GamePhase.OPTIONS) {
+    renderer.drawOptionsScreen(tickRef.value, gs.optionsCursor, gs.options);
     return;
   }
   if (gs.phase === GamePhase.CONTINUE) {

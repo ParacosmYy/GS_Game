@@ -552,6 +552,7 @@ export enum GamePhase {
   MATCH_END = 'MATCH_END', // Match complete (best of 3)
   CONTINUE = 'CONTINUE', // Continue? countdown
   GAME_OVER = 'GAME_OVER', // Game over screen (after continue timeout or NO)
+  OPTIONS = 'OPTIONS', // Settings screen (difficulty, rounds, time, CRT, etc.)
   TRAINING = 'TRAINING', // Training mode (no timer, health regen, input display)
 }
 

@@ -5,6 +5,8 @@ import { CANVAS_WIDTH, CANVAS_HEIGHT } from '../core/constants.js';
 import { ROSTER } from '../characters/index.js';
 import { roundRect, drawSNKText } from './utils.js';
 import { drawPixelPortrait } from './pixelPortraits.js';
+import { getPortraitForSize } from './manifestRenderData.js';
+import type { PortraitSize } from '../core/portraitManifest.js';
 
 // ===== Super Flash camera zoom state =====
 let superFlashZoom = 1.0;
@@ -296,10 +298,12 @@ export function drawMatchEnd(
   // Winner portrait — larger, centered, with sparkle glow
   if (winner !== null && winnerCharId) {
     const charDef = ROSTER.find(c => c.id === winnerCharId);
-    if (charDef?.pixelPortrait) {
-      const portraitScale = 4;
-      const pw = charDef.pixelPortrait.width * portraitScale;
-      const ph = charDef.pixelPortrait.height * portraitScale;
+    // Use sized win portrait if available, fallback to base pixelPortrait
+    const winPortrait = charDef ? (getPortraitForSize(winnerCharId, 'win' as PortraitSize) ?? charDef.pixelPortrait) : undefined;
+    if (winPortrait) {
+      const portraitScale = winPortrait.width >= 120 ? 2.5 : 4;
+      const pw = winPortrait.width * portraitScale;
+      const ph = winPortrait.height * portraitScale;
       const px = CANVAS_WIDTH / 2 - pw / 2;
       const py = 20;
 
@@ -726,11 +730,12 @@ export function drawModeSelect(ctx: CanvasRenderingContext2D, tick: number, curs
     { label: 'SINGLE BATTLE', labelCn: '单人模式', desc: '1P vs CPU/AI — Best of 3 rounds', color: '#ff4444' },
     { label: 'TEAM BATTLE', labelCn: '组队模式 3v3', desc: '3v3 Team KOF — KO switches to next fighter', color: '#4488ff' },
     { label: 'TRAINING', labelCn: '训练模式', desc: 'Free practice — Input display & frame data', color: '#44cc44' },
+    { label: 'OPTIONS', labelCn: '设置', desc: 'Difficulty / Rounds / Time / Display', color: '#aa88ff' },
   ];
 
-  const cardW = 195;
-  const cardH = 180;
-  const gap = 25;
+  const cardW = 160;
+  const cardH = 160;
+  const gap = 18;
   const startX = (CANVAS_WIDTH - (modes.length * cardW + (modes.length - 1) * gap)) / 2;
   const cardY = 180;
 
@@ -811,6 +816,147 @@ export function drawModeSelect(ctx: CanvasRenderingContext2D, tick: number, curs
 
   // Instructions
   drawSNKText(ctx, 'A/D or Arrow Keys: Select  |  Enter/J: Confirm', CANVAS_WIDTH / 2, 420, 12, '#444455');
+
+  ctx.restore();
+}
+
+// ===== Options Screen =====
+
+export interface GameOptions {
+  difficulty: 0 | 1 | 2;     // 0=Easy, 1=Normal, 2=Hard
+  roundsToWin: 1 | 2 | 3;   // best-of: 1/3/5
+  timeLimit: 30 | 60 | 99 | 0; // 0=∞
+  crtEnabled: boolean;
+  simplifiedMode: boolean;
+}
+
+export const DEFAULT_OPTIONS: GameOptions = {
+  difficulty: 1,
+  roundsToWin: 2,
+  timeLimit: 60,
+  crtEnabled: true,
+  simplifiedMode: false,
+};
+
+const DIFFICULTY_LABELS = ['EASY', 'NORMAL', 'HARD'];
+const ROUNDS_LABELS = ['1 ROUND', 'BEST OF 3', 'BEST OF 5'];
+const TIME_LABELS = ['30 SEC', '60 SEC', '99 SEC', 'INFINITE'];
+
+export function drawOptionsScreen(
+  ctx: CanvasRenderingContext2D,
+  tick: number,
+  cursor: number,
+  options: GameOptions,
+): void {
+  ctx.save();
+
+  // Background
+  const bg = ctx.createLinearGradient(0, 0, 0, CANVAS_HEIGHT);
+  bg.addColorStop(0, '#08081a');
+  bg.addColorStop(0.5, '#0c0c28');
+  bg.addColorStop(1, '#060614');
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+  // Animated particles
+  for (let i = 0; i < 20; i++) {
+    const x = ((i * 137 + tick * 0.15) % CANVAS_WIDTH);
+    const y = ((i * 97 + tick * 0.06) % CANVAS_HEIGHT);
+    const a = 0.1 + Math.sin(tick * 0.02 + i) * 0.08;
+    ctx.fillStyle = `rgba(255,255,255,${a})`;
+    ctx.beginPath();
+    ctx.arc(x, y, 0.5, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // Title
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.shadowColor = '#ff6600';
+  ctx.shadowBlur = 20;
+  drawSNKText(ctx, 'OPTIONS', CANVAS_WIDTH / 2, 60, 36, '#ffcc00');
+  ctx.shadowBlur = 0;
+
+  // Decorative line
+  const lineGrad = ctx.createLinearGradient(CANVAS_WIDTH / 2 - 180, 0, CANVAS_WIDTH / 2 + 180, 0);
+  lineGrad.addColorStop(0, '#ff440000');
+  lineGrad.addColorStop(0.3, '#ff440088');
+  lineGrad.addColorStop(0.5, '#ffcc4466');
+  lineGrad.addColorStop(0.7, '#ff440088');
+  lineGrad.addColorStop(1, '#ff440000');
+  ctx.strokeStyle = lineGrad;
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(CANVAS_WIDTH / 2 - 180, 85);
+  ctx.lineTo(CANVAS_WIDTH / 2 + 180, 85);
+  ctx.stroke();
+
+  // Settings entries
+  const settings = [
+    { label: 'DIFFICULTY', value: DIFFICULTY_LABELS[options.difficulty], color: '#ff8844' },
+    { label: 'ROUNDS', value: ROUNDS_LABELS[options.roundsToWin], color: '#4488ff' },
+    { label: 'TIME LIMIT', value: TIME_LABELS[TIME_LABELS.indexOf(TIME_LABELS.find((_, i) => [30,60,99,0][i] === options.timeLimit) ?? '60 SEC')], color: '#44cc44' },
+    { label: 'CRT FILTER', value: options.crtEnabled ? 'ON' : 'OFF', color: '#aa88ff' },
+    { label: 'SIMPLIFIED MODE', value: options.simplifiedMode ? 'ON' : 'OFF', color: '#ffcc44' },
+  ];
+
+  const startY = 120;
+  const lineH = 52;
+
+  for (let i = 0; i < settings.length; i++) {
+    const s = settings[i];
+    const y = startY + i * lineH;
+    const isSelected = cursor === i;
+
+    // Row background
+    if (isSelected) {
+      const rowBg = ctx.createLinearGradient(CANVAS_WIDTH * 0.15, y, CANVAS_WIDTH * 0.85, y);
+      rowBg.addColorStop(0, 'rgba(255, 215, 0, 0)');
+      rowBg.addColorStop(0.2, 'rgba(255, 215, 0, 0.06)');
+      rowBg.addColorStop(0.8, 'rgba(255, 215, 0, 0.06)');
+      rowBg.addColorStop(1, 'rgba(255, 215, 0, 0)');
+      ctx.fillStyle = rowBg;
+      ctx.fillRect(CANVAS_WIDTH * 0.15, y, CANVAS_WIDTH * 0.7, lineH - 4);
+
+      // Left accent bar
+      ctx.fillStyle = s.color;
+      ctx.fillRect(CANVAS_WIDTH * 0.15, y, 3, lineH - 4);
+    }
+
+    // Setting label
+    ctx.font = isSelected ? 'bold 16px "Courier New", monospace' : '15px "Courier New", monospace';
+    ctx.textAlign = 'left';
+    ctx.fillStyle = isSelected ? '#ffffff' : '#777';
+    ctx.fillText(s.label, CANVAS_WIDTH * 0.22, y + lineH / 2 - 2);
+
+    // Value — with ← value → arrows when selected
+    ctx.textAlign = 'center';
+    ctx.font = 'bold 16px "Courier New", monospace';
+    ctx.fillStyle = isSelected ? s.color : '#555';
+    const valX = CANVAS_WIDTH * 0.68;
+    if (isSelected) {
+      ctx.fillStyle = 'rgba(255,255,255,0.3)';
+      ctx.font = '14px "Courier New", monospace';
+      ctx.fillText('◄', valX - 60, y + lineH / 2 - 2);
+      ctx.fillText('►', valX + 60, y + lineH / 2 - 2);
+      ctx.font = 'bold 16px "Courier New", monospace';
+      ctx.fillStyle = s.color;
+    }
+    ctx.fillText(s.value, valX, y + lineH / 2 - 2);
+  }
+
+  // Back button
+  const backY = startY + settings.length * lineH + 20;
+  const isBackSelected = cursor === settings.length;
+  ctx.font = isBackSelected ? 'bold 18px "Courier New", monospace' : '16px "Courier New", monospace';
+  ctx.textAlign = 'center';
+  ctx.fillStyle = isBackSelected ? '#ffcc00' : '#555';
+  ctx.fillText('◄ BACK', CANVAS_WIDTH / 2, backY);
+
+  // Footer instructions
+  ctx.font = '11px "Courier New", monospace';
+  ctx.fillStyle = '#444455';
+  ctx.fillText('↑ ↓ : Select  |  ← → : Change  |  Enter : Back', CANVAS_WIDTH / 2, CANVAS_HEIGHT - 30);
 
   ctx.restore();
 }

@@ -23,7 +23,8 @@ import { drawFighters as drawFightersImpl } from './rendererFighter.js';
 import { drawHUD, drawPowerGauges, drawComboCounters, drawTeamOrder, type TeamDisplayInfo } from './hud.js';
 import { drawCharacterSelect, drawIntro, drawKO, drawWinQuote, drawVSSplash, drawStageSelect, drawTeamOrderSelect, drawTransition, WIN_QUOTE_DURATION } from './screens.js';
 import type { KODustParticle, KOPhase } from '../state/cinematicState.js';
-import { drawSuperFlash, drawMatchEnd, drawModeIndicator, drawStageIndicator, drawTitle, drawContinue, drawModeSelect, drawTrainingHUD, drawGameOver, getSuperFlashZoom, updateSuperFlashZoom } from './overlayScreens.js';
+import { drawSuperFlash, drawMatchEnd, drawModeIndicator, drawStageIndicator, drawTitle, drawContinue, drawModeSelect, drawTrainingHUD, drawGameOver, drawOptionsScreen, getSuperFlashZoom, updateSuperFlashZoom } from './overlayScreens.js';
+import type { GameOptions } from './overlayScreens.js';
 import { drawProjectiles as drawProjectilesImpl } from './projectileRenderer.js';
 import type { SpriteRenderer } from './spriteRenderer.js';
 import type { SelectState } from '../state/selectState.js';
@@ -400,6 +401,10 @@ export class Renderer {
 
   drawModeSelect(tick: number, cursor: number): void {
     drawModeSelect(this.ctx, tick, cursor);
+  }
+
+  drawOptionsScreen(tick: number, cursor: number, options: GameOptions): void {
+    drawOptionsScreen(this.ctx, tick, cursor, options);
   }
 
   drawContinue(secondsLeft: number, cursorYes: boolean): void {

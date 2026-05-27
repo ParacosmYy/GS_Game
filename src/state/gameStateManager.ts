@@ -5,6 +5,8 @@
  * 逐步将阶段逻辑提取到独立 handler 中。
  */
 import { GamePhase } from '../core/types.js';
+import type { GameOptions } from '../rendering/overlayScreens.js';
+import { DEFAULT_OPTIONS } from '../rendering/overlayScreens.js';
 import { AnnounceSequence } from './announceSequence.js';
 
 export class GameStateManager {
@@ -40,6 +42,10 @@ export class GameStateManager {
 
   // Stage select state
   stageSelectCursor = 0;       // 0..5 (5 stages + random)
+
+  // Options screen state
+  optionsCursor = 0;
+  options: GameOptions = { ...DEFAULT_OPTIONS };
   stageSelectReady = false;
   stageSelectConfirmed: string | null = null;
 
