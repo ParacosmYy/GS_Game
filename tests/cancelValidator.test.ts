@@ -77,18 +77,26 @@ describe('cancelValidator', () => {
       expect(cancelPathExists('kyo', AttackType.KYO_ARAGAMI, AttackType.KYO_ARAGAMI_KONOKIZU)).toBe(true);
     });
 
-    it('KYO_ONIYAKI → DM_OROCHINAGI super cancel requires hit', () => {
-      const noHit = checkCancelValid('kyo', AttackType.KYO_ONIYAKI, 'DM_OROCHINAGI' as AttackType, {
+    it('KYO_ONIYAKI → DM/SDM/HSDM super cancel requires hit', () => {
+      // SDM_OROCHINAGI
+      const noHit = checkCancelValid('kyo', AttackType.KYO_ONIYAKI, AttackType.SDM_OROCHINAGI, {
         hitConfirmed: false, stocks: 3,
         maxModeActive: false, maxModeTimer: 0, maxModeDuration: 0, framesSinceHit: 0,
       });
       expect(noHit.valid).toBe(false);
 
-      const withHit = checkCancelValid('kyo', AttackType.KYO_ONIYAKI, 'DM_OROCHINAGI' as AttackType, {
+      const withHit = checkCancelValid('kyo', AttackType.KYO_ONIYAKI, AttackType.SDM_OROCHINAGI, {
         hitConfirmed: true, stocks: 3,
         maxModeActive: false, maxModeTimer: 0, maxModeDuration: 0, framesSinceHit: 0,
       });
       expect(withHit.valid).toBe(true);
+
+      // HSDM_OROCHINAGI also valid
+      const hsdm = checkCancelValid('kyo', AttackType.KYO_ONIYAKI, AttackType.HSDM_OROCHINAGI, {
+        hitConfirmed: true, stocks: 3,
+        maxModeActive: false, maxModeTimer: 0, maxModeDuration: 0, framesSinceHit: 0,
+      });
+      expect(hsdm.valid).toBe(true);
     });
   });
 

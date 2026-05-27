@@ -239,7 +239,7 @@ const IORI_REKKA_CHAINS: CancelRoute[] = [
 const IORI_SPECIAL_TO_DM: CancelRoute[] = [
   {
     from: 'IORI_YAMIBARAI',
-    to: ['DM_YATAGARASU'],
+    to: ['DM_YATAGARASU', 'SDM_YATAGARASU', 'HSDM_YAOTOME'],
     cancelType: 'super',
     requiresHit: true,
     stockCost: SUPER_CANCEL_STOCK_COST,
@@ -248,7 +248,7 @@ const IORI_SPECIAL_TO_DM: CancelRoute[] = [
   },
   {
     from: 'IORI_YAMIBARAI_C',
-    to: ['DM_YATAGARASU'],
+    to: ['DM_YATAGARASU', 'SDM_YATAGARASU', 'HSDM_YAOTOME'],
     cancelType: 'super',
     requiresHit: true,
     stockCost: SUPER_CANCEL_STOCK_COST,
@@ -257,7 +257,7 @@ const IORI_SPECIAL_TO_DM: CancelRoute[] = [
   },
   {
     from: 'IORI_ONIYAKI',
-    to: ['DM_YATAGARASU'],
+    to: ['DM_YATAGARASU', 'SDM_YATAGARASU', 'HSDM_YAOTOME'],
     cancelType: 'super',
     requiresHit: true,
     stockCost: SUPER_CANCEL_STOCK_COST,
@@ -266,7 +266,7 @@ const IORI_SPECIAL_TO_DM: CancelRoute[] = [
   },
   {
     from: 'IORI_ONIYAKI_C',
-    to: ['DM_YATAGARASU'],
+    to: ['DM_YATAGARASU', 'SDM_YATAGARASU', 'HSDM_YAOTOME'],
     cancelType: 'super',
     requiresHit: true,
     stockCost: SUPER_CANCEL_STOCK_COST,
@@ -275,7 +275,7 @@ const IORI_SPECIAL_TO_DM: CancelRoute[] = [
   },
   {
     from: 'IORI_KOTOTSUKI',
-    to: ['DM_YATAGARASU'],
+    to: ['DM_YATAGARASU', 'SDM_YATAGARASU', 'HSDM_YAOTOME'],
     cancelType: 'super',
     requiresHit: true,
     stockCost: SUPER_CANCEL_STOCK_COST,
@@ -284,7 +284,7 @@ const IORI_SPECIAL_TO_DM: CancelRoute[] = [
   },
   {
     from: 'IORI_KOTOTSUKI_D',
-    to: ['DM_YATAGARASU'],
+    to: ['DM_YATAGARASU', 'SDM_YATAGARASU', 'HSDM_YAOTOME'],
     cancelType: 'super',
     requiresHit: true,
     stockCost: SUPER_CANCEL_STOCK_COST,
@@ -293,7 +293,7 @@ const IORI_SPECIAL_TO_DM: CancelRoute[] = [
   },
   {
     from: 'IORI_AOIHANA',
-    to: ['DM_YATAGARASU'],
+    to: ['DM_YATAGARASU', 'SDM_YATAGARASU', 'HSDM_YAOTOME'],
     cancelType: 'super',
     requiresHit: true,
     stockCost: SUPER_CANCEL_STOCK_COST,
@@ -302,7 +302,7 @@ const IORI_SPECIAL_TO_DM: CancelRoute[] = [
   },
   {
     from: 'IORI_AOIHANA_2',
-    to: ['DM_YATAGARASU'],
+    to: ['DM_YATAGARASU', 'SDM_YATAGARASU', 'HSDM_YAOTOME'],
     cancelType: 'super',
     requiresHit: true,
     stockCost: SUPER_CANCEL_STOCK_COST,
@@ -311,7 +311,7 @@ const IORI_SPECIAL_TO_DM: CancelRoute[] = [
   },
   {
     from: 'IORI_AOIHANA_C',
-    to: ['DM_YATAGARASU'],
+    to: ['DM_YATAGARASU', 'SDM_YATAGARASU', 'HSDM_YAOTOME'],
     cancelType: 'super',
     requiresHit: true,
     stockCost: SUPER_CANCEL_STOCK_COST,
@@ -320,7 +320,7 @@ const IORI_SPECIAL_TO_DM: CancelRoute[] = [
   },
   {
     from: 'IORI_AOIHANA_C_2',
-    to: ['DM_YATAGARASU'],
+    to: ['DM_YATAGARASU', 'SDM_YATAGARASU', 'HSDM_YAOTOME'],
     cancelType: 'super',
     requiresHit: true,
     stockCost: SUPER_CANCEL_STOCK_COST,

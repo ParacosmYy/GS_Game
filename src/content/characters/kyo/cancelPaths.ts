@@ -267,7 +267,7 @@ const KYO_REKKA_CHAINS: CancelRoute[] = [
 const KYO_SPECIAL_TO_DM: CancelRoute[] = [
   {
     from: 'KYO_YAMIBARAI',
-    to: ['DM_OROCHINAGI'],
+    to: ['DM_OROCHINAGI', 'SDM_OROCHINAGI', 'HSDM_OROCHINAGI'],
     cancelType: 'super',
     requiresHit: true,
     stockCost: SUPER_CANCEL_STOCK_COST,
@@ -276,7 +276,7 @@ const KYO_SPECIAL_TO_DM: CancelRoute[] = [
   },
   {
     from: 'KYO_YAMIBARAI_C',
-    to: ['DM_OROCHINAGI'],
+    to: ['DM_OROCHINAGI', 'SDM_OROCHINAGI', 'HSDM_OROCHINAGI'],
     cancelType: 'super',
     requiresHit: true,
     stockCost: SUPER_CANCEL_STOCK_COST,
@@ -285,7 +285,7 @@ const KYO_SPECIAL_TO_DM: CancelRoute[] = [
   },
   {
     from: 'KYO_ONIYAKI',
-    to: ['DM_OROCHINAGI'],
+    to: ['DM_OROCHINAGI', 'SDM_OROCHINAGI', 'HSDM_OROCHINAGI'],
     cancelType: 'super',
     requiresHit: true,
     stockCost: SUPER_CANCEL_STOCK_COST,
@@ -294,7 +294,7 @@ const KYO_SPECIAL_TO_DM: CancelRoute[] = [
   },
   {
     from: 'KYO_ONIYAKI_C',
-    to: ['DM_OROCHINAGI'],
+    to: ['DM_OROCHINAGI', 'SDM_OROCHINAGI', 'HSDM_OROCHINAGI'],
     cancelType: 'super',
     requiresHit: true,
     stockCost: SUPER_CANCEL_STOCK_COST,
@@ -303,7 +303,7 @@ const KYO_SPECIAL_TO_DM: CancelRoute[] = [
   },
   {
     from: 'KYO_RED_KICK',
-    to: ['DM_OROCHINAGI'],
+    to: ['DM_OROCHINAGI', 'SDM_OROCHINAGI', 'HSDM_OROCHINAGI'],
     cancelType: 'super',
     requiresHit: true,
     stockCost: SUPER_CANCEL_STOCK_COST,
@@ -312,7 +312,7 @@ const KYO_SPECIAL_TO_DM: CancelRoute[] = [
   },
   {
     from: 'KYO_75KAI',
-    to: ['DM_OROCHINAGI'],
+    to: ['DM_OROCHINAGI', 'SDM_OROCHINAGI', 'HSDM_OROCHINAGI'],
     cancelType: 'super',
     requiresHit: true,
     stockCost: SUPER_CANCEL_STOCK_COST,
@@ -321,7 +321,7 @@ const KYO_SPECIAL_TO_DM: CancelRoute[] = [
   },
   {
     from: 'KYO_75KAI_2',
-    to: ['DM_OROCHINAGI'],
+    to: ['DM_OROCHINAGI', 'SDM_OROCHINAGI', 'HSDM_OROCHINAGI'],
     cancelType: 'super',
     requiresHit: true,
     stockCost: SUPER_CANCEL_STOCK_COST,
@@ -331,7 +331,7 @@ const KYO_SPECIAL_TO_DM: CancelRoute[] = [
   // Aragami rekka chain — all parts can super cancel
   {
     from: 'KYO_ARAGAMI',
-    to: ['DM_OROCHINAGI'],
+    to: ['DM_OROCHINAGI', 'SDM_OROCHINAGI', 'HSDM_OROCHINAGI'],
     cancelType: 'super',
     requiresHit: true,
     stockCost: SUPER_CANCEL_STOCK_COST,
@@ -340,7 +340,7 @@ const KYO_SPECIAL_TO_DM: CancelRoute[] = [
   },
   {
     from: 'KYO_ARAGAMI_KONOKIZU',
-    to: ['DM_OROCHINAGI'],
+    to: ['DM_OROCHINAGI', 'SDM_OROCHINAGI', 'HSDM_OROCHINAGI'],
     cancelType: 'super',
     requiresHit: true,
     stockCost: SUPER_CANCEL_STOCK_COST,
@@ -349,7 +349,7 @@ const KYO_SPECIAL_TO_DM: CancelRoute[] = [
   },
   {
     from: 'KYO_ARAGAMI_YANOSABI',
-    to: ['DM_OROCHINAGI'],
+    to: ['DM_OROCHINAGI', 'SDM_OROCHINAGI', 'HSDM_OROCHINAGI'],
     cancelType: 'super',
     requiresHit: true,
     stockCost: SUPER_CANCEL_STOCK_COST,
@@ -358,7 +358,7 @@ const KYO_SPECIAL_TO_DM: CancelRoute[] = [
   },
   {
     from: 'KYO_NANASE',
-    to: ['DM_OROCHINAGI'],
+    to: ['DM_OROCHINAGI', 'SDM_OROCHINAGI', 'HSDM_OROCHINAGI'],
     cancelType: 'super',
     requiresHit: true,
     stockCost: SUPER_CANCEL_STOCK_COST,
@@ -367,7 +367,7 @@ const KYO_SPECIAL_TO_DM: CancelRoute[] = [
   },
   {
     from: 'KYO_KOTO_TSUKI',
-    to: ['DM_OROCHINAGI'],
+    to: ['DM_OROCHINAGI', 'SDM_OROCHINAGI', 'HSDM_OROCHINAGI'],
     cancelType: 'super',
     requiresHit: true,
     stockCost: SUPER_CANCEL_STOCK_COST,
@@ -376,7 +376,7 @@ const KYO_SPECIAL_TO_DM: CancelRoute[] = [
   },
   {
     from: 'KYO_YAKISOGI',
-    to: ['DM_OROCHINAGI'],
+    to: ['DM_OROCHINAGI', 'SDM_OROCHINAGI', 'HSDM_OROCHINAGI'],
     cancelType: 'super',
     requiresHit: true,
     stockCost: SUPER_CANCEL_STOCK_COST,
@@ -386,7 +386,7 @@ const KYO_SPECIAL_TO_DM: CancelRoute[] = [
   // Dokugami rekka chain — all parts can super cancel
   {
     from: 'KYO_DOKUGAMI',
-    to: ['DM_OROCHINAGI'],
+    to: ['DM_OROCHINAGI', 'SDM_OROCHINAGI', 'HSDM_OROCHINAGI'],
     cancelType: 'super',
     requiresHit: true,
     stockCost: SUPER_CANCEL_STOCK_COST,
@@ -395,7 +395,7 @@ const KYO_SPECIAL_TO_DM: CancelRoute[] = [
   },
   {
     from: 'KYO_TSUMIYOMI',
-    to: ['DM_OROCHINAGI'],
+    to: ['DM_OROCHINAGI', 'SDM_OROCHINAGI', 'HSDM_OROCHINAGI'],
     cancelType: 'super',
     requiresHit: true,
     stockCost: SUPER_CANCEL_STOCK_COST,
@@ -404,7 +404,7 @@ const KYO_SPECIAL_TO_DM: CancelRoute[] = [
   },
   {
     from: 'KYO_BATSUYOMI',
-    to: ['DM_OROCHINAGI'],
+    to: ['DM_OROCHINAGI', 'SDM_OROCHINAGI', 'HSDM_OROCHINAGI'],
     cancelType: 'super',
     requiresHit: true,
     stockCost: SUPER_CANCEL_STOCK_COST,

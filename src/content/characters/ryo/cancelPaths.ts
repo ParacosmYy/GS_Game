@@ -187,7 +187,7 @@ const RYO_NORMAL_TO_SPECIAL: CancelRoute[] = [
 const RYO_SPECIAL_TO_DM: CancelRoute[] = [
   {
     from: 'RYO_KOOU',
-    to: ['DM_TEN_HA_OU', 'DM_RYUKO_RANBU'],
+    to: ['DM_TEN_HA_OU', 'SDM_TEN_HA_OU', 'DM_RYUKO_RANBU', 'SDM_RYUKO_RANBU', 'HSDM_RYUKO_RANBU'],
     cancelType: 'super',
     requiresHit: true,
     stockCost: SUPER_CANCEL_STOCK_COST,
@@ -196,7 +196,7 @@ const RYO_SPECIAL_TO_DM: CancelRoute[] = [
   },
   {
     from: 'RYO_KOOU_C',
-    to: ['DM_TEN_HA_OU', 'DM_RYUKO_RANBU'],
+    to: ['DM_TEN_HA_OU', 'SDM_TEN_HA_OU', 'DM_RYUKO_RANBU', 'SDM_RYUKO_RANBU', 'HSDM_RYUKO_RANBU'],
     cancelType: 'super',
     requiresHit: true,
     stockCost: SUPER_CANCEL_STOCK_COST,
@@ -205,7 +205,7 @@ const RYO_SPECIAL_TO_DM: CancelRoute[] = [
   },
   {
     from: 'RYO_KO_HOU',
-    to: ['DM_TEN_HA_OU', 'DM_RYUKO_RANBU'],
+    to: ['DM_TEN_HA_OU', 'SDM_TEN_HA_OU', 'DM_RYUKO_RANBU', 'SDM_RYUKO_RANBU', 'HSDM_RYUKO_RANBU'],
     cancelType: 'super',
     requiresHit: true,
     stockCost: SUPER_CANCEL_STOCK_COST,
@@ -214,7 +214,7 @@ const RYO_SPECIAL_TO_DM: CancelRoute[] = [
   },
   {
     from: 'RYO_KO_HOU_C',
-    to: ['DM_TEN_HA_OU', 'DM_RYUKO_RANBU'],
+    to: ['DM_TEN_HA_OU', 'SDM_TEN_HA_OU', 'DM_RYUKO_RANBU', 'SDM_RYUKO_RANBU', 'HSDM_RYUKO_RANBU'],
     cancelType: 'super',
     requiresHit: true,
     stockCost: SUPER_CANCEL_STOCK_COST,
@@ -223,7 +223,7 @@ const RYO_SPECIAL_TO_DM: CancelRoute[] = [
   },
   {
     from: 'RYO_HIEN',
-    to: ['DM_TEN_HA_OU', 'DM_RYUKO_RANBU'],
+    to: ['DM_TEN_HA_OU', 'SDM_TEN_HA_OU', 'DM_RYUKO_RANBU', 'SDM_RYUKO_RANBU', 'HSDM_RYUKO_RANBU'],
     cancelType: 'super',
     requiresHit: true,
     stockCost: SUPER_CANCEL_STOCK_COST,
@@ -232,7 +232,7 @@ const RYO_SPECIAL_TO_DM: CancelRoute[] = [
   },
   {
     from: 'RYO_HAOU',
-    to: ['DM_TEN_HA_OU', 'DM_RYUKO_RANBU'],
+    to: ['DM_TEN_HA_OU', 'SDM_TEN_HA_OU', 'DM_RYUKO_RANBU', 'SDM_RYUKO_RANBU', 'HSDM_RYUKO_RANBU'],
     cancelType: 'super',
     requiresHit: true,
     stockCost: SUPER_CANCEL_STOCK_COST,
@@ -241,7 +241,7 @@ const RYO_SPECIAL_TO_DM: CancelRoute[] = [
   },
   {
     from: 'RYO_KOOUKEN_D',
-    to: ['DM_TEN_HA_OU', 'DM_RYUKO_RANBU'],
+    to: ['DM_TEN_HA_OU', 'SDM_TEN_HA_OU', 'DM_RYUKO_RANBU', 'SDM_RYUKO_RANBU', 'HSDM_RYUKO_RANBU'],
     cancelType: 'super',
     requiresHit: true,
     stockCost: SUPER_CANCEL_STOCK_COST,
@@ -250,7 +250,7 @@ const RYO_SPECIAL_TO_DM: CancelRoute[] = [
   },
   {
     from: 'RYO_HIO_HACKER',
-    to: ['DM_TEN_HA_OU', 'DM_RYUKO_RANBU'],
+    to: ['DM_TEN_HA_OU', 'SDM_TEN_HA_OU', 'DM_RYUKO_RANBU', 'SDM_RYUKO_RANBU', 'HSDM_RYUKO_RANBU'],
     cancelType: 'super',
     requiresHit: true,
     stockCost: SUPER_CANCEL_STOCK_COST,
@@ -259,7 +259,7 @@ const RYO_SPECIAL_TO_DM: CancelRoute[] = [
   },
   {
     from: 'RYO_ZANRETSU_KEN',
-    to: ['DM_TEN_HA_OU', 'DM_RYUKO_RANBU'],
+    to: ['DM_TEN_HA_OU', 'SDM_TEN_HA_OU', 'DM_RYUKO_RANBU', 'SDM_RYUKO_RANBU', 'HSDM_RYUKO_RANBU'],
     cancelType: 'super',
     requiresHit: true,
     stockCost: SUPER_CANCEL_STOCK_COST,
