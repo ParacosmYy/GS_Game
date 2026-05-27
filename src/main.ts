@@ -1294,7 +1294,6 @@ function render(): void {
     // Decay zoom back to 1.0
     renderer.updateSuperFlashZoom(0, 24);
   }
-  drawMoveNameDisplay(ctx);
   renderer.drawPowerGauges(gauges, maxModes);
   if (gs.phase === GamePhase.INTRO) {
     if (gs.announceSequence.isRunning()) {
