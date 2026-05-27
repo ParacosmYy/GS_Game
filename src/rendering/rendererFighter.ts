@@ -308,9 +308,11 @@ export function drawFighters(
     ctx.rotate(leanAngle);
     ctx.translate(-(sx + leanOffsetX), -(sy - leanOffsetY));
 
-    // KOF2002: 待机呼吸 — idle时轻微纵向缩放模拟呼吸
+    // KOF2002: 待机呼吸 — idle时轻微纵向缩放模拟呼吸(低血量加速)
     if (f.state === FighterState.IDLE) {
-      const breathe = Math.sin(globalTick * 0.08) * 0.008;
+      const hpRatio = f.health / f.maxHealth;
+      const breathSpeed = hpRatio < 0.3 ? 0.14 : 0.08; // 低血量呼吸加速
+      const breathe = Math.sin(globalTick * breathSpeed) * 0.008;
       ctx.translate(0, -sy);
       ctx.scale(1 + breathe, 1 - breathe);
       ctx.translate(0, sy);
@@ -706,6 +708,18 @@ export function drawFighters(
         ctx.fillStyle = '#ff4444';
         ctx.fillRect(px - 2, py - 2, 4, 4);
       }
+      ctx.restore();
+    }
+    // KOF2002: 防御崩坏冲击环 — GUARD_CRUSH前5帧扩散环
+    if (f.state === FighterState.GUARD_CRUSH && f.stateAge < 5) {
+      ctx.save();
+      const ringT = f.stateAge / 5;
+      ctx.globalAlpha = (1 - ringT) * 0.5;
+      ctx.strokeStyle = '#ff6600';
+      ctx.lineWidth = 3 * (1 - ringT);
+      ctx.beginPath();
+      ctx.ellipse(sx, sy - f.displayHeight / 2, 15 + ringT * 40, 10 + ringT * 25, 0, 0, Math.PI * 2);
+      ctx.stroke();
       ctx.restore();
     }
     // KOF2002: 低血量红色警告 — HP<25%时身体微红
