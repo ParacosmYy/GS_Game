@@ -412,6 +412,17 @@ export function drawFighters(
       ctx.ellipse(sx, sy, 8, 3, 0, 0, Math.PI * 2);
       ctx.fill();
       ctx.restore();
+      // KOF2002: 空中攻击冲击环
+      if (f.hitFlashFrames > 0) {
+        ctx.save();
+        ctx.globalAlpha = 0.15;
+        ctx.strokeStyle = maxModeActive ? '#44ff88' : '#ffdd66';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.arc(sx + f.facing * hw, sy - f.displayHeight * 0.5, 15, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+      }
     }
 
     // KOF2002: Hit-stop defender jitter — 确定性正弦抖动产生稳定震动感
@@ -619,6 +630,17 @@ export function drawFighters(
       ctx.arc(sparkX, sy, 3, 0, Math.PI * 2);
       ctx.fill();
       ctx.restore();
+      // KOF2002: 空中攻击冲击环
+      if (f.hitFlashFrames > 0) {
+        ctx.save();
+        ctx.globalAlpha = 0.15;
+        ctx.strokeStyle = maxModeActive ? '#44ff88' : '#ffdd66';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.arc(sx + f.facing * hw, sy - f.displayHeight * 0.5, 15, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+      }
     }
 
     // KOF2002: 受击恢复闪烁 — hitstun最后5帧身体闪烁
@@ -875,6 +897,17 @@ export function drawFighters(
       ctx.fillStyle = '#ffaa44';
       ctx.fillRect(sx + leanOffsetX - hw, sy - f.displayHeight, hw * 2, f.displayHeight);
       ctx.restore();
+      // KOF2002: 空中攻击冲击环
+      if (f.hitFlashFrames > 0) {
+        ctx.save();
+        ctx.globalAlpha = 0.15;
+        ctx.strokeStyle = maxModeActive ? '#44ff88' : '#ffdd66';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.arc(sx + f.facing * hw, sy - f.displayHeight * 0.5, 15, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+      }
     }
 
     // KOF2002: 削血致死警告 — HP<10%且防御中时脉冲红光
@@ -968,6 +1001,17 @@ export function drawFighters(
         ctx.stroke();
       }
       ctx.restore();
+      // KOF2002: 空中攻击冲击环
+      if (f.hitFlashFrames > 0) {
+        ctx.save();
+        ctx.globalAlpha = 0.15;
+        ctx.strokeStyle = maxModeActive ? '#44ff88' : '#ffdd66';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.arc(sx + f.facing * hw, sy - f.displayHeight * 0.5, 15, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+      }
     }
 
     // KOF2002: 倒地冲击线 — KNOCKDOWN前3帧地面扩散细线
@@ -1010,6 +1054,17 @@ export function drawFighters(
         }
       }
       ctx.restore();
+      // KOF2002: 空中攻击冲击环
+      if (f.hitFlashFrames > 0) {
+        ctx.save();
+        ctx.globalAlpha = 0.15;
+        ctx.strokeStyle = maxModeActive ? '#44ff88' : '#ffdd66';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.arc(sx + f.facing * hw, sy - f.displayHeight * 0.5, 15, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+      }
     }
 
     // KOF2002: 反击架势蓄力发光 — COUNTER_STANCE时身体蓄力蓝色光环
@@ -1033,6 +1088,17 @@ export function drawFighters(
         ctx.fill();
       }
       ctx.restore();
+      // KOF2002: 空中攻击冲击环
+      if (f.hitFlashFrames > 0) {
+        ctx.save();
+        ctx.globalAlpha = 0.15;
+        ctx.strokeStyle = maxModeActive ? '#44ff88' : '#ffdd66';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.arc(sx + f.facing * hw, sy - f.displayHeight * 0.5, 15, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+      }
     }
 
     // KOF2002: 防御硬直冲击波 — BLOCKSTUN时正面冲击波纹
@@ -1045,6 +1111,17 @@ export function drawFighters(
       ctx.arc(sx + leanOffsetX, sy - f.displayHeight / 2, hw + 15 + f.stateAge * 10, 0, Math.PI * 2);
       ctx.stroke();
       ctx.restore();
+      // KOF2002: 空中攻击冲击环
+      if (f.hitFlashFrames > 0) {
+        ctx.save();
+        ctx.globalAlpha = 0.15;
+        ctx.strokeStyle = maxModeActive ? '#44ff88' : '#ffdd66';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.arc(sx + f.facing * hw, sy - f.displayHeight * 0.5, 15, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+      }
     }
 
     // KOF2002: KO状态红色覆盖 — 倒地后身体发红
