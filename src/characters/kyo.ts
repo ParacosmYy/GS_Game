@@ -41,7 +41,7 @@ export const KyoDef: CharacterDefinition = {
   accentColor: '#ffaa00',
   specialColor: '#ff4400',
   specialGlow: '#ff6600',
-  portrait: '🔥',
+  portrait: '京',
   pixelPortrait: kyoPortrait,
   winQuotes: ['まだまだだな', '俺の炎に焼かれる覚悟はできたか?', '草薙の拳、見せてやるよ'],
   moveList: KYO_MOVE_LIST.map(e => ({ name: e.name, input: e.input, type: e.type })),

@@ -28,7 +28,7 @@ export const IoriDef: CharacterDefinition = {
   accentColor: '#cc3355',
   specialColor: '#8800cc',
   specialGlow: '#aa22ff',
-  portrait: '🌙',
+  portrait: '庵',
   pixelPortrait: ioriPortrait,
   winQuotes: ['くだらん...', '血の叫びが聞こえるか?', '俺の痛みを味わえ'],
   moveList: IORI_MOVE_LIST.map(e => ({ name: e.name, input: e.input, type: e.type })),

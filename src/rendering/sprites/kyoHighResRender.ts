@@ -183,13 +183,26 @@ function resolveFrameKey(
       return (vx * _facing > 0) ? 'WALK_FORWARD' : 'WALK_BACKWARD';
 
     case FighterState.STAND_ATTACK:
-      // Distinguish light (A) vs heavy (C) punch
-      if (currentAttack === AttackType.STAND_C) {
+      // Resolve punch vs kick attack types
+      if (currentAttack === AttackType.STAND_C || currentAttack === AttackType.CLOSE_C) {
         return 'STAND_C';
+      }
+      if (currentAttack === AttackType.STAND_D || currentAttack === AttackType.CLOSE_D) {
+        return 'STAND_D';
+      }
+      if (currentAttack === AttackType.STAND_B || currentAttack === AttackType.CLOSE_B) {
+        return 'STAND_B';
       }
       return 'STAND_A';
 
     case FighterState.CROUCH:
+      return 'CROUCH';
+
+    case FighterState.CROUCH_ATTACK:
+      // Crouch attacks reuse crouch frames (no dedicated crouch attack frames yet)
+      if (currentAttack === AttackType.CROUCH_D) {
+        return 'CROUCH';
+      }
       return 'CROUCH';
 
     case FighterState.BLOCK:
@@ -199,6 +212,10 @@ function resolveFrameKey(
     case FighterState.RUN_JUMP:
     case FighterState.HOP:
     case FighterState.HYPER_JUMP:
+      return 'JUMP';
+
+    case FighterState.AIR_ATTACK:
+      // Air attacks reuse jump frames (no dedicated air attack frames yet)
       return 'JUMP';
 
     case FighterState.HITSTUN:

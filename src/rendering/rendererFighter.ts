@@ -985,18 +985,29 @@ export function drawFighters(
       }
     }
 
-    // Hit flash overlay — full-body screen blend + cross-star for DM/SDM tier
+    // Hit flash overlay — localized burst so the body silhouette stays readable
     if (f.hitFlashFrames > 0) {
       ctx.save();
       ctx.globalCompositeOperation = 'screen';
-      // Full-body white overlay with screen blend mode
       const flashIntensity = Math.min(f.hitFlashFrames / 3, 1);
-      ctx.globalAlpha = 0.35 * flashIntensity;
-      ctx.fillStyle = '#ffffff';
-      ctx.fillRect(sx + leanOffsetX - hw - 4, sy - f.displayHeight - 4, (hw + 4) * 2, f.displayHeight + 8);
-      // Outer glow aura
       const flashX = sx + leanOffsetX;
-      const flashY = sy - f.displayHeight * 0.5;
+      const flashY = sy - f.displayHeight * 0.48;
+
+      // Core flash near the torso / striking limb instead of a full-body white block.
+      ctx.globalAlpha = 0.28 * flashIntensity;
+      const coreGrad = ctx.createRadialGradient(
+        flashX, flashY, 4,
+        flashX, flashY, Math.max(hw * 0.9, f.displayHeight * 0.28) * 1.1,
+      );
+      coreGrad.addColorStop(0, 'rgba(255,255,255,0.95)');
+      coreGrad.addColorStop(0.35, 'rgba(255,255,255,0.55)');
+      coreGrad.addColorStop(1, 'rgba(255,255,255,0)');
+      ctx.fillStyle = coreGrad;
+      ctx.beginPath();
+      ctx.ellipse(flashX, flashY, hw * 0.7, f.displayHeight * 0.22, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Outer glow aura
       ctx.globalAlpha = 0.18 * flashIntensity;
       const auraGrad = ctx.createRadialGradient(
         flashX, flashY, 5,
@@ -1007,7 +1018,7 @@ export function drawFighters(
       auraGrad.addColorStop(1, 'rgba(255,255,255,0)');
       ctx.fillStyle = auraGrad;
       ctx.beginPath();
-      ctx.ellipse(flashX, flashY, hw * 1.5, f.displayHeight * 0.65, 0, 0, Math.PI * 2);
+      ctx.ellipse(flashX, flashY, hw * 1.15, f.displayHeight * 0.46, 0, 0, Math.PI * 2);
       ctx.fill();
       // Cross-star burst for DM/SDM tier (hitFlashFrames >= 4)
       if (f.hitFlashFrames >= 4) {
