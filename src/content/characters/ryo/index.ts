@@ -64,6 +64,12 @@ export {
   type CancelRoute,
 } from './cancelPaths.js';
 
+// Frame Contract (populated data with real spriteRefs and hitbox data)
+export {
+  RYO_ACTION_CONTRACTS,
+  getRyoFrameContractManifest,
+} from '../../../core/ryoFrameContract.js';
+
 // Completeness reporting
 export {
   generateRyoReport,

@@ -2,12 +2,46 @@ import type { ActionContract, FrameContract, FrameCollision, FrameEventTag, Char
 import { FighterState, AttackType } from './types.js';
 import { ATTACK_FRAMES } from './attackFrames.js';
 
+// Pixel frame registry key mapping: actionId → registry key in ryoHighResRender.ts
+const PIXEL_KEYS: Record<string, string> = {
+  idle: 'IDLE', walk_forward: 'WALK_FORWARD', walk_backward: 'WALK_BACKWARD',
+  jump: 'JUMP', run: 'RUN', backdash: 'BACKDASH', roll: 'ROLL', back_roll: 'BACK_ROLL',
+  crouch: 'CROUCH', block: 'BLOCK', dizzy: 'DIZZY', guard_crush: 'GUARD_CRUSH',
+  max_mode: 'MAX_MODE', taunt: 'TAUNT', win: 'WIN', throw_action: 'THROW',
+  hurt: 'HURT', knockdown: 'KNOCKDOWN',
+  stand_a: 'STAND_A', stand_b: 'STAND_B', stand_c: 'STAND_C', stand_d: 'STAND_D',
+  close_a: 'STAND_A', close_b: 'CLOSE_B', close_c: 'STAND_C', close_d: 'CLOSE_D',
+  crouch_a: 'CROUCH_A', crouch_b: 'CROUCH_B', crouch_c: 'CROUCH_C', crouch_d: 'CROUCH_D',
+  ryo_tsurizao: 'STAND_A', ryo_orishi: 'CROUCH_B',
+  ryo_koou: 'KOOU', ryo_koou_c: 'KOOU_C', ryo_ko_hou: 'KO_HOU', ryo_ko_hou_c: 'KO_HOU_C',
+  ryo_hien: 'HIEN', ryo_haou: 'HAOU',
+  dm_ten_ha_ou: 'DM_TEN_HA_OU', sdm_ten_ha_ou: 'SDM_TEN_HA_OU',
+  dm_ryuko_ranbu: 'DM_RYUKO_RANBU', sdm_ryuko_ranbu: 'DM_RYUKO_RANBU',
+  hsdm_ryuko_ranbu: 'HSDM_RYUKO_RANBU',
+};
+
+// Ticks per frame from pixel frame registry in ryoHighResRender.ts
+const TPF: Record<string, number> = {
+  IDLE: 9, WALK_FORWARD: 6, WALK_BACKWARD: 6, RUN: 3, BACKDASH: 3,
+  ROLL: 4, BACK_ROLL: 4, CROUCH: 9, BLOCK: 8, JUMP: 5, DIZZY: 10,
+  GUARD_CRUSH: 8, MAX_MODE: 6, TAUNT: 12, WIN: 10, THROW: 6,
+  HURT: 4, KNOCKDOWN: 5,
+  STAND_A: 4, STAND_B: 6, STAND_C: 6, STAND_D: 8,
+  CLOSE_B: 5, CLOSE_D: 6,
+  CROUCH_A: 4, CROUCH_B: 5, CROUCH_C: 5, CROUCH_D: 8,
+  AIR_A: 4, AIR_C: 4, AIR_D: 4,
+  KO_HOU: 7, KOOU: 16, HIEN: 8, HAOU: 12, KOOU_C: 20, KO_HOU_C: 18,
+  DM_TEN_HA_OU: 12, DM_RYUKO_RANBU: 8, SDM_TEN_HA_OU: 16, HSDM_RYUKO_RANBU: 10,
+};
+
 function makeFrames(actionId: string, count: number): FrameContract[] {
+  const pixelKey = PIXEL_KEYS[actionId] ?? 'IDLE';
+  const tpf = TPF[pixelKey] ?? 8;
   return Array.from({ length: count }, (_, i) => ({
     characterId: 'ryo',
     actionId,
     frameIndex: i,
-    sprite: { spriteRef: `ryo_${actionId}_${i}`, anchor: { x: 24, y: 72 }, offset: { x: 0, y: 0 }, duration: 1 },
+    sprite: { spriteRef: `${pixelKey}:${i}`, anchor: { x: 48, y: 144 }, offset: { x: 0, y: 0 }, duration: tpf },
     collision: null,
     eventTags: [] as FrameEventTag[],
   }));
