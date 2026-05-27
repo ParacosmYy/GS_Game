@@ -107,6 +107,17 @@ export class Renderer {
     ctx.translate(shakeX, shakeY);
     ctx.clearRect(-10, -10, CANVAS_WIDTH + 20, CANVAS_HEIGHT + 20);
 
+    // KOF2002: 强震屏幕边缘闪白 — 震动幅度>3时边框闪白
+    const shakeMag = Math.abs(shakeX) + Math.abs(shakeY);
+    if (shakeMag > 3) {
+      ctx.save();
+      ctx.globalAlpha = Math.min(0.15, shakeMag * 0.02);
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 4;
+      ctx.strokeRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+      ctx.restore();
+    }
+
     // Apply camera zoom — scale around center
     if (cameraZoom !== 1.0) {
       ctx.save();
