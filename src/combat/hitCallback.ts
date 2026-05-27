@@ -106,7 +106,8 @@ function classifyAttack(at: AttackType) {
     || s.includes('ARAGAMI') || s.includes('DOKUGAMI') || s.includes('ONIYAKI')
     || s.includes('KOTOTSUKI') || s.includes('KUZUKAZE') || s.includes('BURN_KNUCKLE')
     || s.includes('RISING_TACKLE') || s.includes('POWER_DUNK') || s.includes('SANREN')
-    || s.includes('TSUMIYOMI') || s.includes('BATSUYOMI');
+    || s.includes('TSUMIYOMI') || s.includes('BATSUYOMI')
+    || s.includes('KOOUKEN_D') || s.includes('HIO_HACKER') || s.includes('ZANRETSU_KEN');
   return { isDM: _isDM, isSDM, isSpecial, isPunch };
 }
 
