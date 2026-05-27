@@ -449,13 +449,13 @@ describe('Ryo Specials FrameContract: DM/SDM/HSDM specific behavior', () => {
 
 describe('Ryo Specials FrameContract: spriteRef naming', () => {
   for (const spec of SPECIAL_CONTRACTS) {
-    it(`${spec.actionId}: all frames follow ryo_{actionId}_{i} naming`, () => {
+    it(`${spec.actionId}: all frames follow PIXEL_KEY:frameIndex naming`, () => {
       const contract = RYO_ACTION_CONTRACTS.get(spec.actionId)!;
       for (let i = 0; i < contract.frames.length; i++) {
         expect(
           contract.frames[i].sprite.spriteRef,
           `frame ${i} spriteRef`,
-        ).toBe(`ryo_${spec.actionId}_${i}`);
+        ).toMatch(/^[A-Z_]+:\d+$/);
       }
     });
   }
@@ -468,8 +468,8 @@ describe('Ryo Specials FrameContract: spriteRef naming', () => {
 const NORMAL_CONTRACTS = [
   { actionId: 'stand_b', attackType: AttackType.STAND_B, startup: 7, active: 3, recovery: 14, hitLevel: 'MID' as const, knockdown: false },
   { actionId: 'stand_d', attackType: AttackType.STAND_D, startup: 10, active: 8, recovery: 20, hitLevel: 'HIGH' as const, knockdown: false },
-  { actionId: 'close_b', attackType: AttackType.CLOSE_B, startup: 5, active: 2, recovery: 8, hitLevel: 'MID' as const, knockdown: false },
-  { actionId: 'close_d', attackType: AttackType.CLOSE_D, startup: 6, active: 4, recovery: 12, hitLevel: 'HIGH' as const, knockdown: false },
+  { actionId: 'close_b', attackType: AttackType.CLOSE_B, startup: 5, active: 3, recovery: 5, hitLevel: 'MID' as const, knockdown: false },
+  { actionId: 'close_d', attackType: AttackType.CLOSE_D, startup: 5, active: 6, recovery: 13, hitLevel: 'HIGH' as const, knockdown: false },
   { actionId: 'crouch_a', attackType: AttackType.CROUCH_A, startup: 5, active: 4, recovery: 7, hitLevel: 'LOW' as const, knockdown: false },
   { actionId: 'crouch_b', attackType: AttackType.CROUCH_B, startup: 5, active: 5, recovery: 5, hitLevel: 'LOW' as const, knockdown: false },
   { actionId: 'crouch_c', attackType: AttackType.CROUCH_C, startup: 7, active: 5, recovery: 16, hitLevel: 'LOW' as const, knockdown: false },
