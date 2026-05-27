@@ -256,6 +256,11 @@ export function drawFighters(
     if (f.state === FighterState.BACKDASH) {
       ctx.globalAlpha = Math.min(ctx.globalAlpha || 1, 0.75);
     }
+    // KOF2002: 攻击恢复期变暗 — 攻击动作后半段身体微暗(显示破绽)
+    if ((f.state === FighterState.STAND_ATTACK || f.state === FighterState.CROUCH_ATTACK) && f.stateAge > 15) {
+      const dimAlpha = Math.max(0.85, 1 - (f.stateAge - 15) * 0.01);
+      ctx.globalAlpha = Math.min(ctx.globalAlpha || 1, dimAlpha);
+    }
     // KOF2002: 滚动摩擦光 — ROLL时身体周围微弱旋转光点
     if ((f.state === FighterState.ROLL || f.state === FighterState.BACK_ROLL) && f.stateAge % 3 === 0) {
       ctx.save();
