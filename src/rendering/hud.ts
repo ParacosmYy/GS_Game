@@ -1455,6 +1455,15 @@ const comboFade: [ComboFadeState, ComboFadeState] = [
  * 10+ hits:  red
  */
 function getComboColor(combo: number): { fill: string; glow: string; shadow: string } {
+  if (combo >= 15) {
+    // Shimmer: cycle through colors for ultra-high combos
+    const t = (Date.now() % 1000) / 1000;
+    const r = Math.round(200 + 55 * Math.sin(t * Math.PI * 2));
+    const g = Math.round(200 + 55 * Math.sin(t * Math.PI * 2 + 2.094));
+    const b = Math.round(200 + 55 * Math.sin(t * Math.PI * 2 + 4.189));
+    const hex = `#${r.toString(16).padStart(2,'0')}${g.toString(16).padStart(2,'0')}${b.toString(16).padStart(2,'0')}`;
+    return { fill: hex, glow: '#ff00ff', shadow: '#ff44ff' };
+  }
   if (combo >= 10) {
     return { fill: '#ff2222', glow: '#ff0000', shadow: '#ff4444' };
   } else if (combo >= 5) {
