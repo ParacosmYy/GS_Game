@@ -28,6 +28,10 @@ export const RyoDef: CharacterDefinition = {
   portrait: '👊',
   pixelPortrait: ryoPortrait,
   winQuotes: ['極限流空手、恐るるに足らず', 'まだ修行が足りんな', '虎の拳を見たか!'],
+  rivalWinQuotes: {
+    kyo: ['炎を使おうが拳は拳だ', '草薙の家伝など関係ない'],
+    iori: ['その蒼い炎…正気じゃないな', '八神の血に呑まれるな'],
+  },
   moveList: [
     // 命令通常技
     { name: '冰柱割り', input: '→ + A', type: 'command' },

@@ -31,6 +31,10 @@ export const IoriDef: CharacterDefinition = {
   portrait: '庵',
   pixelPortrait: ioriPortrait,
   winQuotes: ['くだらん...', '血の叫びが聞こえるか?', '俺の痛みを味わえ'],
+  rivalWinQuotes: {
+    kyo: ['京…お前を殺せるのは俺だけだ', '三神器の意味、教えてやろうか', '草薙の炎も所詮は燃えカスだ'],
+    ryo: ['極限流など…所詮は拳法ごっこ', '俺の血騒ぎにはならないな'],
+  },
   moveList: IORI_MOVE_LIST.map(e => ({ name: e.name, input: e.input, type: e.type })),
 
   stats: {

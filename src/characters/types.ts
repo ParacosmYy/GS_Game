@@ -130,6 +130,8 @@ export interface CharacterDefinition {
   portrait: string;     // 选人界面图标
   pixelPortrait?: PixelPortraitData; // SNK-style pixel portrait for character select
   winQuotes: string[];  // 胜利台词(随机选一条显示)
+  /** 胜利台词(对手特定) — key=对手charId, value=台词数组 */
+  rivalWinQuotes?: Record<string, string[]>;
   moveList?: MoveListEntry[]; // 招式表显示给玩家看
 
   // ── 数值 ──

@@ -44,6 +44,10 @@ export const KyoDef: CharacterDefinition = {
   portrait: '京',
   pixelPortrait: kyoPortrait,
   winQuotes: ['まだまだだな', '俺の炎に焼かれる覚悟はできたか?', '草薙の拳、見せてやるよ'],
+  rivalWinQuotes: {
+    iori: ['お前の蒼炎じゃ俺は焼けない', 'まだ俺を殺せないのか、八神!', '三種の神器の宿命、背負いきれないか'],
+    ryo: ['極限流か…悪くない拳だ', '武術は喧嘩じゃねえぞ'],
+  },
   moveList: KYO_MOVE_LIST.map(e => ({ name: e.name, input: e.input, type: e.type })),
 
   stats: {

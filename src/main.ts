@@ -156,8 +156,16 @@ function arcadeDifficulty(base: number, stageIndex: number, totalStages: number)
 function pickWinQuote(w: number | null): string {
   if (w === null) return '';
   const fighter = w === 0 ? p1 : p2;
+  const loser = w === 0 ? p2 : p1;
   const charDef = ROSTER.find(c => c.id === fighter.charId);
   if (!charDef || !charDef.winQuotes.length) return '';
+  // Check rival-specific quotes first
+  if (charDef.rivalWinQuotes && loser.charId in charDef.rivalWinQuotes) {
+    const rivalQuotes = charDef.rivalWinQuotes[loser.charId];
+    if (rivalQuotes.length > 0) {
+      return rivalQuotes[gameRandomInt(rivalQuotes.length)];
+    }
+  }
   return charDef.winQuotes[gameRandomInt(charDef.winQuotes.length)];
 }
 
