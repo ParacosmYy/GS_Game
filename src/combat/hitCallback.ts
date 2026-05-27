@@ -727,6 +727,15 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       deps.screenFlash.trigger('#6622aa', 0.35, 10);
       deps.screenShake.trigger(14, 14, getAttackDirectionBias(attacker, defender, attackType, counterHit));
     }
+    // SDM Yatagarasu — dark rage burst, even more dramatic
+    if (atkName === 'SDM_YATAGARASU') {
+      deps.vfx.spawnSuperBurst(hitX, hitY, '#330055', '#aa33ee', true);
+      deps.vfx.spawnDMTenHaOuVFX(hitX, hitY, attacker.charId);
+      deps.vfx.spawnGroundSlam(hitX, hitY);
+      deps.screenFlash.triggerDarken(8);
+      deps.screenFlash.trigger('#5500aa', 0.45, 14);
+      deps.screenShake.trigger(18, 16, getAttackDirectionBias(attacker, defender, attackType, counterHit));
+    }
 
     // === Terry 角色专属必杀技VFX — 旋风主题 ===
     // Burn Knuckle — energy fist burst
