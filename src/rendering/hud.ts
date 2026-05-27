@@ -601,6 +601,20 @@ export function drawHUD(
     ctx.restore();
   }
 
+  // ===== KOF2002: Round start lingering indicator =====
+  // Shows "ROUND X" fading text below timer for first 90 ticks of each round
+  const ROUND_DISPLAY_DURATION = 90;
+  if (tick < ROUND_DISPLAY_DURATION && currentRound > 1) {
+    const fadeProgress = tick / ROUND_DISPLAY_DURATION;
+    const roundAlpha = Math.max(0, 1 - fadeProgress * fadeProgress); // quadratic fade
+    ctx.save();
+    ctx.globalAlpha = roundAlpha * 0.7;
+    const romanNumerals = ['', 'I', 'II', 'III', 'IV', 'V'];
+    const roman = romanNumerals[currentRound] || `${currentRound}`;
+    drawSNKText(ctx, `ROUND ${roman}`, timerX, CANVAS_HEIGHT / 2 - 10, 16, '#ffcc00', '#000000', 'center');
+    ctx.restore();
+  }
+
   ctx.textBaseline = 'alphabetic';
   ctx.textAlign = 'left';
 
