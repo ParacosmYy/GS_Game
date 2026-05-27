@@ -577,6 +577,7 @@ function update(): void {
   if (maxModes[0].active && maxModes[0].timer === maxModes[0].maxDuration - 1) {
     playMAXActivation(); screenFlash.trigger('#44ff88', 0.3, 8);
     vfx.spawnMAXActivationFlash(p1.x, p1.y - p1.displayHeight / 2); vfx.spawnHeavyDust(p1.x, p1.y, 8);
+    vfx.spawnImpactRing(p1.x, p1.y - p1.displayHeight / 2, 1.3);
     try { announcer.maxActivation(); } catch { /* audio unavailable in test env */ }
     announcerOverlay.trigger('max_activation');
     p1.invincible = true; p1.throwInvulnFrames = 5;
@@ -584,6 +585,7 @@ function update(): void {
   if (maxModes[1].active && maxModes[1].timer === maxModes[1].maxDuration - 1) {
     playMAXActivation(); screenFlash.trigger('#44ff88', 0.3, 8);
     vfx.spawnMAXActivationFlash(p2.x, p2.y - p2.displayHeight / 2); vfx.spawnHeavyDust(p2.x, p2.y, 8);
+    vfx.spawnImpactRing(p2.x, p2.y - p2.displayHeight / 2, 1.3);
     try { announcer.maxActivation(); } catch { /* audio unavailable in test env */ }
     announcerOverlay.trigger('max_activation');
     p2.invincible = true; p2.throwInvulnFrames = 5;
