@@ -33,6 +33,7 @@ import { KYO_CROUCH_A_FRAMES, KYO_CROUCH_C_FRAMES, KYO_CROUCH_B_FRAMES, KYO_CROU
 import { KYO_AIR_A_FRAMES, KYO_AIR_C_FRAMES, KYO_AIR_D_FRAMES } from './kyoAirAttackFrames.js';
 import { KYO_CLOSE_A_FRAMES, KYO_CLOSE_C_FRAMES, KYO_CLOSE_B_FRAMES, KYO_CLOSE_D_FRAMES } from './kyoCloseAttackFrames.js';
 import { KYO_ONIYAKI_FRAMES, KYO_ONIYAKI_C_FRAMES, KYO_YAMIBARAI_FRAMES, KYO_RED_KICK_FRAMES, KYO_75KAI_FRAMES, KYO_ARAGAMI_FRAMES, KYO_DOKUGAMI_FRAMES, KYO_OROCHINAGI_DM_FRAMES, KYO_OROCHINAGI_SDM_FRAMES } from './kyoSpecialFrames.js';
+import { KYO_CMD_GOFU_YOU_FRAMES, KYO_CMD_88SHIKI_FRAMES, KYO_CMD_NARAKU_FRAMES } from './kyoCommandNormalFrames.js';
 import { KYO_RUN_FRAMES, KYO_BACKDASH_FRAMES, KYO_ROLL_FRAMES, KYO_BACK_ROLL_FRAMES, KYO_GUARD_CRUSH_FRAMES, KYO_MAX_MODE_FRAMES, KYO_TAUNT_FRAMES, KYO_COUNTER_STANCE_FRAMES } from './kyoMovementFrames.js';
 import { KYO_DIZZY_FRAMES } from './kyoDizzyFrames.js';
 import { KYO_THROW_FRAMES } from './kyoThrowFrames.js';
@@ -106,6 +107,11 @@ function initKyoFrames(): void {
   // HSDM reuses SDM frames with extended durations
   registerVariableFrames('OROCHINAGI_HSDM', KYO_OROCHINAGI_SDM_FRAMES, [12, 8, 24, 16, 10, 12]);
 
+  // Command normals
+  registerVariableFrames('CMD_GOFU_YOU', KYO_CMD_GOFU_YOU_FRAMES, [10, 3, 5, 18]);
+  registerVariableFrames('CMD_88SHIKI', KYO_CMD_88SHIKI_FRAMES, [8, 3, 3, 3, 20]);
+  registerVariableFrames('CMD_NARAKU', KYO_CMD_NARAKU_FRAMES, [6, 3, 5, 16]);
+
   // Movement
   registerVariableFrames('RUN', KYO_RUN_FRAMES, [3, 3, 2, 2, 3, 2]);
   registerVariableFrames('BACKDASH', KYO_BACKDASH_FRAMES, [2, 2, 3, 4]);
@@ -162,6 +168,8 @@ function resolveKyoFrameKey(
       if (currentAttack === AttackType.DM_OROCHINAGI) return 'OROCHINAGI_DM';
       if (currentAttack === AttackType.SDM_OROCHINAGI) return 'OROCHINAGI_SDM';
       if (currentAttack === AttackType.HSDM_OROCHINAGI) return 'OROCHINAGI_HSDM';
+      if (currentAttack === AttackType.CMD_GOFU_YOU) return 'CMD_GOFU_YOU';
+      if (currentAttack === AttackType.CMD_88SHIKI) return 'CMD_88SHIKI';
       if (currentAttack === AttackType.STAND_C) return 'STAND_C';
       if (currentAttack === AttackType.CLOSE_C) return 'CLOSE_C';
       if (currentAttack === AttackType.STAND_D) return 'STAND_D';
@@ -185,6 +193,7 @@ function resolveKyoFrameKey(
     case FighterState.HYPER_JUMP:
       return 'JUMP';
     case FighterState.AIR_ATTACK:
+      if (currentAttack === AttackType.CMD_NARAKU) return 'CMD_NARAKU';
       if (currentAttack === AttackType.JUMP_C) return 'AIR_C';
       if (currentAttack === AttackType.JUMP_D) return 'AIR_D';
       return 'AIR_A';
