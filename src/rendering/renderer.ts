@@ -218,6 +218,25 @@ export class Renderer {
       }
     }
 
+    // KOF2002: 低血量屏幕边缘红色警告 — HP<25%时脉动红色晕影
+    for (const f of fighters) {
+      if (f.health > 0 && f.health < f.maxHealth * 0.25) {
+        const hpRatio = f.health / (f.maxHealth * 0.25);
+        const urgency = (1 - hpRatio);
+        const pulse = 0.4 + Math.sin(tick * 0.08) * 0.2;
+        const vigAlpha = urgency * pulse * 0.3;
+        ctx.save();
+        const hpVig = ctx.createRadialGradient(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, 100, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, 400);
+        hpVig.addColorStop(0, 'rgba(0,0,0,0)');
+        hpVig.addColorStop(0.5, `rgba(120,0,0,${vigAlpha * 0.2})`);
+        hpVig.addColorStop(1, `rgba(180,0,0,${vigAlpha})`);
+        ctx.fillStyle = hpVig;
+        ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+        ctx.restore();
+        break;
+      }
+    }
+
     drawHUD(ctx, fighters, tick, delayedHealth, p1Wins, p2Wins, p1Name, p2Name, currentRound, firstAttacker, p1MoveList ?? [], simplifiedMode);
 
     if (ko) {
