@@ -205,6 +205,7 @@ export function drawFighters(
       leanOffsetX = -4 * f.facing + blendOffsetX;
       leanAngle = -0.08 * f.facing;
       leanOffsetY = Math.sin(f.stateAge * 0.3) * 2;
+      // KOF2002: 挑衅闪光 — 每15帧身体微闪
     }
 
     // Afterimage trail
