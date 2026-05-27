@@ -36,10 +36,12 @@ function kyoVFX(ctx: HitEffectContext): boolean {
   }
   // Oniyaki (鬼焼き) uppercut — fire column burst
   if (atkName === 'KYO_ONIYAKI' || atkName === 'KYO_ONIYAKI_C') {
-    vfx.spawnSuperBurst(hitX, hitY, '#ff4400', '#ffaa22', atkName === 'KYO_ONIYAKI_C');
-    cinematic.addHitStop(atkName === 'KYO_ONIYAKI_C' ? 3 : 2, ctx.defIdx);
-    screenShake.trigger(atkName === 'KYO_ONIYAKI_C' ? 10 : 7, 8, attacker.facing * 5);
-    vfx.spawnImpactRing(hitX, hitY, atkName === 'KYO_ONIYAKI_C' ? 1.4 : 1.1);
+    const isHeavy = atkName === 'KYO_ONIYAKI_C';
+    vfx.spawnSuperBurst(hitX, hitY, '#ff4400', '#ffaa22', isHeavy);
+    vfx.spawnKyoOniyakiVFX(hitX, hitY, attacker.facing, isHeavy);
+    cinematic.addHitStop(isHeavy ? 3 : 2, ctx.defIdx);
+    screenShake.trigger(isHeavy ? 10 : 7, 8, attacker.facing * 5);
+    vfx.spawnImpactRing(hitX, hitY, isHeavy ? 1.4 : 1.1);
     handled = true;
   }
   // Yamibarai (闇払い) fire projectile — flame burst on hit

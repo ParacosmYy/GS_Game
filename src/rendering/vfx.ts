@@ -51,6 +51,7 @@ import {
   spawnScreenCracks,
   spawnKyoOrochinagiVFX,
   spawnIoriYamibaraiVFX,
+  spawnKyoOniyakiVFX,
   spawnRunSpeedLines,
   spawnScorchMark,
   spawnKOSuperBurst,
@@ -319,6 +320,11 @@ export class VFXSystem {
   /** Iori: Yamibarai (闇払い) dark energy projectile launch VFX */
   spawnIoriYamibaraiVFX(worldX: number, worldY: number, facing: number): void {
     spawnIoriYamibaraiVFX(this.particles, worldX, worldY, facing);
+  }
+
+  /** Kyo: Oniyaki (鬼焼き) rising flame uppercut column */
+  spawnKyoOniyakiVFX(worldX: number, worldY: number, facing: number, isHeavy: boolean): void {
+    spawnKyoOniyakiVFX(this.particles, worldX, worldY, facing, isHeavy);
   }
 
   /** Ryo: Ko Hou (虎咲) uppercut flame column VFX */
