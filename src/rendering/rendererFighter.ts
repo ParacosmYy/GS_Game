@@ -198,6 +198,24 @@ export function drawFighters(
       ctx.fill();
       ctx.restore();
     }
+    // KOF2002: 前进速度线 — WALK forward时身后水平细线
+    if (f.state === FighterState.WALK && f.stateAge % 6 < 2) {
+      const isWalkingForward = (f.vx > 0 && f.facing > 0) || (f.vx < 0 && f.facing < 0);
+      if (isWalkingForward) {
+        ctx.save();
+        ctx.globalAlpha = 0.1;
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 0.5;
+        for (let wl = 0; wl < 2; wl++) {
+          const wlY = sy - f.displayHeight * (0.3 + wl * 0.3);
+          ctx.beginPath();
+          ctx.moveTo(sx - f.facing * 15, wlY);
+          ctx.lineTo(sx - f.facing * 25, wlY);
+          ctx.stroke();
+        }
+        ctx.restore();
+      }
+    }
     // KOF2002: 受击/防御后仰 — 被打时身体向后方微倾
     if (f.state === FighterState.HITSTUN) {
       leanOffsetX = -4 * f.facing + blendOffsetX;
@@ -748,6 +766,17 @@ export function drawFighters(
       ctx.stroke();
       ctx.restore();
     }
+    // KOF2002: 起身无敌蓝色光罩 — GETUP期间蓝色微光保护罩
+    if (f.state === FighterState.GETUP && f.getupTimer > 0 && f.getupTimer <= 8) {
+      ctx.save();
+      ctx.globalCompositeOperation = 'screen';
+      ctx.globalAlpha = f.getupTimer / 8 * 0.1;
+      ctx.fillStyle = '#4488ff';
+      ctx.beginPath();
+      ctx.ellipse(sx, sy - f.displayHeight / 2, hw + 8, f.displayHeight / 2 + 5, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
     // Dizzy state wobble — KOF2002 unsteady sway when stunned (intensity grows over time)
     if (f.state === FighterState.DIZZY) {
       const intensityMult = 1 + Math.min(f.stateAge * 0.005, 1.5);
@@ -805,6 +834,16 @@ export function drawFighters(
       ctx.translate(0, -sy);
       ctx.scale(1.03, 0.97); // 蹲下身体微宽
       ctx.translate(0, sy);
+    }
+    // KOF2002: 蹲下起手扬尘 — CROUCH stateAge<2时脚下微尘
+    if (f.state === FighterState.CROUCH && f.stateAge < 2) {
+      ctx.save();
+      ctx.globalAlpha = (2 - f.stateAge) / 2 * 0.15;
+      ctx.fillStyle = '#ccbb99';
+      ctx.beginPath();
+      ctx.ellipse(sx, sy + 2, 5, 2, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
     }
 
     // KOF2002: MAX模式跑步火花 — MAX+RUN时脚下绿色光点
