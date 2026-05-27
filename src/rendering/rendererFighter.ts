@@ -148,9 +148,11 @@ export function drawFighters(
       } else {
         leanOffsetX = -2 * f.facing + blendOffsetX;
         leanAngle = -0.03 * f.facing;
+        // KOF2002: 后退时微抬 — 后退时身体略微上抬
+        leanOffsetY = -1;
       }
       // KOF2002: 步行节奏微弹 — 走路时轻微上下弹动
-      leanOffsetY = Math.sin(f.stateAge * 0.4) * 2;
+      leanOffsetY += Math.sin(f.stateAge * 0.4) * 2;
       // KOF2002: 步行微弹 — 每6帧上下2px弹跳模拟步伐
       leanOffsetY = Math.abs(Math.sin(f.stateAge * 0.5)) * 2;
     }
@@ -190,16 +192,19 @@ export function drawFighters(
       leanAngle = -0.05 * f.facing;
       leanOffsetY += Math.sin(f.stateAge * 0.5) * 1.5;
     } else if (f.state === FighterState.JUMP || f.state === FighterState.RUN_JUMP) {
-      // KOF2002: 跳跃微前倾
+      // KOF2002: 跳跃微前倾 + 起跳前蹲
       leanOffsetX = 2 * f.facing + blendOffsetX;
       leanAngle = 0.03 * f.facing;
+      if (f.stateAge < 2) { leanOffsetY += 3; }
     } else if (f.state === FighterState.HOP) {
-      // KOF2002: 小跳微缩 — 紧凑姿态
+      // KOF2002: 小跳微缩 — 紧凑姿态 + 起跳前蹲
       leanOffsetY = 3;
+      if (f.stateAge < 2) { leanOffsetY += 4; }
     } else if (f.state === FighterState.HYPER_JUMP) {
-      // KOF2002: 超跳大幅前倾
+      // KOF2002: 超跳大幅前倾 + 起跳前蹲
       leanOffsetX = 4 * f.facing + blendOffsetX;
       leanAngle = 0.06 * f.facing;
+      if (f.stateAge < 2) { leanOffsetY += 6; } // 起跳前蹲
     } else if (f.state === FighterState.TAUNT) {
       // KOF2002: 挑衅后仰
       leanOffsetX = -4 * f.facing + blendOffsetX;
@@ -398,10 +403,13 @@ export function drawFighters(
         ctx.translate(0, sy);
       }
     }
-    // KOF2002: 蹲下状态额外Y偏移 — 确保蹲姿视觉更低
+    // KOF2002: 蹲下状态额外Y偏移+身体微宽 — 确保蹲姿视觉更低更稳
     if (f.state === FighterState.CROUCH) {
       const crouchBreathe = Math.sin(globalTick * 0.06) * 1;
       ctx.translate(0, 8 + crouchBreathe);
+      ctx.translate(0, -sy);
+      ctx.scale(1.03, 0.97); // 蹲下身体微宽
+      ctx.translate(0, sy);
     }
 
     // KOF2002: 受击恢复闪烁 — hitstun最后5帧身体闪烁
