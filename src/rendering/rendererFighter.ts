@@ -425,6 +425,14 @@ export function drawFighters(
       ctx.fillRect(sx + leanOffsetX - 60, sy - 200, 120, 200);
       ctx.restore();
     }
+    // KOF2002: 防御量表低警告 — 正常游戏中脚下红色脉冲
+    if (guardLow && f.isGrounded()) {
+      const guardPulse = Math.sin(globalTick * 0.2) * 0.08 + 0.06;
+      ctx.fillStyle = 'rgba(255, 30, 30, ' + Math.max(0, guardPulse) + ')';
+      ctx.beginPath();
+      ctx.ellipse(sx, sy, hw + 12, 6, 0, 0, Math.PI * 2);
+      ctx.fill();
+    }
     // KOF2002: 防御崩坏破碎扩散 — 碎片从角色向外飞散
     if (f.state === FighterState.GUARD_CRUSH) {
       ctx.save();
