@@ -18,7 +18,7 @@ import { FighterState, AttackType } from '../../core/types.js';
 import { drawPixelFrame, type PixelFrame, type PixelPalette } from './pixelFrameRenderer.js';
 import { RYO_IDLE_FRAMES } from './ryoIdleFrames.js';
 import { RYO_WALK_FORWARD_FRAMES, RYO_WALK_BACKWARD_FRAMES } from './ryoWalkFrames.js';
-import { RYO_STAND_A_FRAMES, RYO_STAND_C_FRAMES } from './ryoAttackFrames.js';
+import { RYO_STAND_A_FRAMES, RYO_STAND_C_FRAMES, RYO_CLOSE_A_FRAMES, RYO_CLOSE_C_FRAMES } from './ryoAttackFrames.js';
 import { RYO_STAND_B_FRAMES, RYO_STAND_D_FRAMES } from './ryoKickFrames.js';
 import { RYO_CROUCH_B_FRAMES, RYO_CROUCH_D_FRAMES } from './ryoCrouchKickFrames.js';
 import { RYO_CLOSE_B_FRAMES, RYO_CLOSE_D_FRAMES } from './ryoCloseKickFrames.js';
@@ -123,6 +123,10 @@ function initAllFrames(): void {
   registerFrames('STAND_A', RYO_STAND_A_FRAMES, 4);
   // STAND_C: startup=7, active=3, recovery=20 = 30 total; 5 frames × 6 tpf = 30
   registerFrames('STAND_C', RYO_STAND_C_FRAMES, 6);
+
+  // CLOSE PUNCHES — close_a (elbow), close_c (uppercut)
+  registerFrames('CLOSE_A', RYO_CLOSE_A_FRAMES, 4);
+  registerFrames('CLOSE_C', RYO_CLOSE_C_FRAMES, 5);
 
   // KICK ATTACKS — stand_b (light kick), stand_d (heavy kick)
   // STAND_B: startup=7, active=3, recovery=14 = 24 total; 4 frames × 6 tpf = 24
@@ -246,8 +250,11 @@ function resolveFrameKey(
 
     case FighterState.STAND_ATTACK:
       // Resolve attack type to the correct frame set
-      if (currentAttack === AttackType.STAND_C || currentAttack === AttackType.CLOSE_C) {
+      if (currentAttack === AttackType.STAND_C) {
         return 'STAND_C';
+      }
+      if (currentAttack === AttackType.CLOSE_C) {
+        return 'CLOSE_C';
       }
       // Special moves: uppercut variants
       if (currentAttack === AttackType.RYO_KO_HOU) {
@@ -271,6 +278,18 @@ function resolveFrameKey(
       if (currentAttack === AttackType.RYO_HAOU) {
         return 'HAOU';
       }
+      // Special moves: heavy projectile (D version of Ko'ou Ken)
+      if (currentAttack === AttackType.RYO_KOOUKEN_D) {
+        return 'KOOU';
+      }
+      // Special moves: dash strike
+      if (currentAttack === AttackType.RYO_HIO_HACKER) {
+        return 'STAND_C';
+      }
+      // Special moves: multi-punch
+      if (currentAttack === AttackType.RYO_ZANRETSU_KEN) {
+        return 'STAND_A';
+      }
       // Super moves: Ten Ha Ou variants
       if (currentAttack === AttackType.DM_TEN_HA_OU) {
         return 'DM_TEN_HA_OU';
@@ -286,7 +305,9 @@ function resolveFrameKey(
       if (currentAttack === AttackType.HSDM_RYUKO_RANBU) {
         return 'HSDM_RYUKO_RANBU';
       }
-      // Default to STAND_A for STAND_A, CLOSE_A, and any other stand attack
+      // Default to STAND_A for STAND_A and any other stand attack
+      if (currentAttack === AttackType.STAND_A) return 'STAND_A';
+      if (currentAttack === AttackType.CLOSE_A) return 'CLOSE_A';
       if (currentAttack === AttackType.STAND_B) return 'STAND_B';
       if (currentAttack === AttackType.STAND_D) return 'STAND_D';
       if (currentAttack === AttackType.CLOSE_B) return 'CLOSE_B';
