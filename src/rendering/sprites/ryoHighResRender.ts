@@ -209,17 +209,19 @@ function initAllFrames(): void {
 
   // SPECIALS — ticksPerFrame calibrated to frameData totals
   // KO_HOU: startup=5, active=5, recovery=25 = 35; 5 frames × 7 = 35
-  registerFrames('KO_HOU', RYO_KO_HOU_FRAMES, 7);
-  // KOOU: startup=12, active=18, recovery=34 = 64; 4 frames × 16 = 64
-  registerFrames('KOOU', RYO_KOOU_FRAMES, 16);
-  // HIEN: startup=10, active=8, recovery=22 = 40; 5 frames × 8 = 40
-  registerFrames('HIEN', RYO_HIEN_FRAMES, 8);
-  // HAOU: counter stance, 3 frames × 12 = 36
-  registerFrames('HAOU', RYO_HAOU_FRAMES, 12);
-  // KOOU_C: strong projectile, 2 frames × 20 = 40
-  registerFrames('KOOU_C', RYO_KOOU_C_FRAMES, 20);
-  // KO_HOU_C: strong uppercut, 2 frames × 18 = 36
-  registerFrames('KO_HOU_C', RYO_KO_HOU_C_FRAMES, 18);
+  // SPECIAL MOVES — variable timing per KOF2002 frame data
+  // Ko'Hou (weak uppercut): fast startup, multi-stage recovery
+  registerVariableFrames('KO_HOU', RYO_KO_HOU_FRAMES, [4, 3, 5, 7, 10]);
+  // Koou Ken (fireball): startup → cast → recovery → settle
+  registerVariableFrames('KOOU', RYO_KOOU_FRAMES, [6, 3, 8, 12]);
+  // Hien Senpuu Kyaku (flying kick): startup → active → peak → recovery → settle
+  registerVariableFrames('HIEN', RYO_HIEN_FRAMES, [5, 3, 3, 6, 10]);
+  // Haou Shou Kou Ken (super fireball): heavy startup → active → long recovery
+  registerVariableFrames('HAOU', RYO_HAOU_FRAMES, [8, 4, 14]);
+  // EX Koou Ken: faster startup, same recovery pattern
+  registerVariableFrames('KOOU_C', RYO_KOOU_C_FRAMES, [4, 3, 10]);
+  // EX Ko'Hou: fast startup, moderate recovery
+  registerVariableFrames('KO_HOU_C', RYO_KO_HOU_C_FRAMES, [3, 3, 8]);
 
   // SUPERS — DM/SDM/HSDM
   // DM_TEN_HA_OU: 4 frames × 12 = 48
