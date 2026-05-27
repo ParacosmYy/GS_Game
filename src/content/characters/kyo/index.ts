@@ -88,3 +88,6 @@ export {
 
 // Hit Effects (VFX/SFX plugin)
 export { KYO_HIT_EFFECTS } from './hitEffects/kyoHitEffects.js';
+
+// Audio sampler registration
+export { registerKyoAudio } from './audio/kyoSampler.js';

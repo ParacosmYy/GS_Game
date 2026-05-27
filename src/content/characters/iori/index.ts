@@ -88,3 +88,6 @@ export {
 
 // Hit Effects (VFX/SFX plugin)
 export { IORI_HIT_EFFECTS } from './hitEffects/ioriHitEffects.js';
+
+// Audio sampler registration
+export { registerIoriAudio } from './audio/ioriSampler.js';
