@@ -518,7 +518,7 @@ export function drawModeIndicator(ctx: CanvasRenderingContext2D, simplifiedMode:
 }
 
 export function drawStageIndicator(ctx: CanvasRenderingContext2D, stageId: string, alpha: number): void {
-  const names: Record<string, string> = { temple: '日本寺廟', china: '唐人街', factory: '工場' };
+  const names: Record<string, string> = { temple: '日本寺廟', china: '唐人街', factory: '工場', orochi: '大蛇神社', street: '街市夜市', rooftop: '日本屋上' };
   ctx.save();
   ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
   ctx.globalAlpha = Math.min(1, alpha);
