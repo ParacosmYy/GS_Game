@@ -10,7 +10,7 @@ import {
   FRAME_DATA, STAGE_WIDTH, MAX_STOCKS, METER_PER_STOCK,
   SHAKE_KO, SHAKE_DURATION_KO,
 } from '../core/constants.js';
-import { getFeedback } from '../core/feedbackManifest.js';
+import { getFeedback, getFeedbackTier } from '../core/feedbackManifest.js';
 import { ROSTER } from '../characters/index.js';
 import { isDM as isDMCheck } from '../core/attackClassifier.js';
 import { gainMeterOnHit, gainMeterOnBlock, gainMeterOnHitstun } from './meter.js';
@@ -338,6 +338,7 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
     // KOF2002: MAX模式命中加成 — 攻击者在MAX模式下命中获得额外hitstop
     const maxModeStop = attacker.maxModeActive && !isDM ? 3 : 0;
     deps.cinematic.triggerHitStop(Math.round(baseStop * comboDecayMultiplier) + criticalStop + maxModeStop, defIdx, attacker.facing);
+    defender.lastHitTier = getFeedbackTier(attackType);
     gainMeterOnHitstun(deps.gauges[defIdx], attackType, defender.health, defender.maxHealth);
     // 风云再起特色: 第一次命中奖励 — 每回合首次命中额外+30气槽
     if (!deps.combatSystem.wasFirstHitAwarded(defIdx)) {

@@ -121,6 +121,8 @@ export class Fighter {
   landingRecovery = 0;
   rollTimer = 0;
   blockType: BlockType = 'HIGH';
+  /** Feedback tier from last hit received — used by renderer for tiered body shake */
+  lastHitTier: string = 'light';
 
   // Rekka chain state (荒咬み/毒咬み)
   rekkaChain: RekkaChain = null;

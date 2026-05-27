@@ -12,6 +12,7 @@ import { drawAttackLimb } from './attackLimb.js';
 import type { SpriteRenderer } from './spriteRenderer.js';
 import { getCharacterColors } from './manifestRenderData.js';
 import { drawHighResFrame, drawHighResAfterimage } from './sprites/ryo/ryoHighResRender.js';
+import { getFeedbackByTier, type FeedbackTier } from '../core/feedbackManifest.js';
 import { drawKyoHighResFrame, drawKyoHighResAfterimage } from './sprites/kyo/kyoHighResRender.js';
 import { drawIoriHighResFrame, drawIoriHighResAfterimage } from './sprites/iori/ioriHighResRender.js';
 import { getFighterBlender } from './animationBlender.js';
@@ -728,18 +729,14 @@ export function drawFighters(
       ctx.fillRect(sx + leanOffsetX - hw - 3 - f.facing * 12, sy - f.displayHeight - 3, (hw + 3) * 2, f.displayHeight + 6);
       ctx.restore();
     }
-    // Hitstun body shake — KOF2002 tiered body wobble
-    // Light hit: subtle jitter (1-2px), Heavy: strong wobble (3-4px), Special/DM: violent shake (5+px)
-    // hitstunTimer carries tier info: light=11, heavy=19, special=22+, DM=0(knockdown)
+    // Hitstun body shake — KOF2002 tiered body wobble (from feedback manifest)
     if (f.state === FighterState.HITSTUN && f.hitstunTimer > 0) {
-      // Determine shake intensity from hitstun duration (proxy for feedback tier)
-      const baseShake = f.hitstunTimer > 20 ? 4.5 : f.hitstunTimer > 14 ? 3.0 : 1.5;
-      const decay = f.hitstunTimer > 20 ? 0.15 : f.hitstunTimer > 14 ? 0.2 : 0.3;
-      // Progress: 0 at hit -> 1 at hitstun end
+      const fb = getFeedbackByTier(f.lastHitTier as FeedbackTier);
+      const baseShake = fb.hitstunBodyShake;
+      const decay = fb.hitstunBodyShakeDecay;
       const maxHitstun = f.hitstunTimer + (f.stateAge || 0);
       const progress = maxHitstun > 0 ? 1 - (f.hitstunTimer / maxHitstun) : 1;
       const shakeAmt = baseShake * Math.max(0, 1 - progress * (1 + decay));
-      // Directional wobble: pushed backward (in facing direction of attacker)
       const wobbleX = Math.sin(f.stateAge * 0.8) * shakeAmt;
       const jitterY = (Math.random() - 0.5) * shakeAmt * 0.4;
       ctx.translate(wobbleX, jitterY);

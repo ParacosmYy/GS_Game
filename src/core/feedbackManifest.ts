@@ -372,6 +372,15 @@ export function getFeedback(attackType: AttackType): FeedbackParams {
 }
 
 /**
+ * Resolve the feedback tier name for an attack type.
+ * Used to store tier info on Fighter for renderer consumption.
+ */
+export function getFeedbackTier(attackType: AttackType): FeedbackTier {
+  const explicitTier = FEEDBACK_MANIFEST.attackTierMap[attackType];
+  return explicitTier ?? inferTier(attackType);
+}
+
+/**
  * 直接获取某个档位的反馈参数
  */
 export function getFeedbackByTier(tier: FeedbackTier): FeedbackParams {
