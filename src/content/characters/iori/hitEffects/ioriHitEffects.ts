@@ -32,6 +32,7 @@ function ioriVFX(ctx: HitEffectContext): boolean {
   if (atkName === 'IORI_YUKIWARUI') {
     cinematic.addHitStop(1, ctx.defIdx);
     vfx.spawnImpactRing(hitX, hitY, 0.7);
+    vfx.spawnProjectileExplosion(hitX, hitY, '#5500aa', '#8833cc');
     handled = true;
   }
   // Oniyaki (鬼焼き) dark uppercut — purple burst

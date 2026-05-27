@@ -77,11 +77,12 @@ function ryoVFX(ctx: HitEffectContext): boolean {
     vfx.spawnImpactRing(hitX, hitY, 1.0);
     handled = true;
   }
-  // RYO_ORISHI (卸し) — low sweep
+  // RYO_ORISHI (卸し) — low sweep with dust + energy trail
   if (atkName === 'RYO_ORISHI') {
     cinematic.addHitStop(1, ctx.defIdx);
     screenShake.trigger(5, 6, attacker.facing * 2);
     vfx.spawnHeavyDust(hitX, hitY + 30, 8);
+    vfx.spawnImpactRing(hitX, hitY, 0.7);
     handled = true;
   }
   // RYO_ZANRETSU_KEN (斩裂拳) — multi-hit progressive escalation
