@@ -108,6 +108,11 @@ const PATTERNS: Record<string, VoiceSyllable[]> = {
     { vowel: VOWEL_AH, durationMs: 120, freqOffset: 30,  attackMs: 4, releaseMs: 20, pitchEnd: 50 },
     { vowel: VOWEL_OH, durationMs: 200, freqOffset: 0,   attackMs: 5, releaseMs: 80, pitchEnd: -20 },
   ],
+  dizzy: [
+    // Dazed groan: low, wavering, disoriented
+    { vowel: VOWEL_UH, durationMs: 200, freqOffset: -30, attackMs: 15, releaseMs: 80, pitchEnd: -20 },
+    { vowel: VOWEL_OH, durationMs: 300, freqOffset: -40, attackMs: 10, releaseMs: 150, pitchEnd: 10 },
+  ],
 };
 
 // ─── Buffer cache ───────────────────────────────────────────────

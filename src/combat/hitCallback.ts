@@ -1014,6 +1014,8 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       deps.vfx.spawnCharacterHitSparks(hitX, hitY, 12, '#ffff44', 1.2, 1.0, 0.3, false, attacker.facing);
       // Dizzy Hit SFX — 带回声的打击声
       playDizzyHit();
+      // KOF2002: 角色专属晕眩呻吟
+      playCharVoice(defender.charId, 'dizzy', 0.4);
     }
 
     // === 浮动连击文本 ===
