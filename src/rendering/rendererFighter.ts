@@ -343,6 +343,17 @@ export function drawFighters(
       ctx.fill();
       ctx.restore();
     }
+    // KOF2002: 跑步持续扬尘 — RUN每4帧身后扬尘
+    if (f.state === FighterState.RUN && f.stateAge > 3 && f.stateAge % 4 === 0) {
+      ctx.save();
+      ctx.globalAlpha = 0.15;
+      ctx.fillStyle = '#ccbb99';
+      const rdX = sx - f.facing * (8 + (f.stateAge % 8) * 2);
+      ctx.beginPath();
+      ctx.ellipse(rdX, sy + 2, 4 + (f.stateAge % 6), 2, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
     // KOF2002: 跳跃起飞烟尘 — JUMP/HYPER_JUMP首帧脚下烟尘
     if ((f.state === FighterState.JUMP || f.state === FighterState.HYPER_JUMP || f.state === FighterState.RUN_JUMP) && f.stateAge < 2) {
       ctx.save();
@@ -970,6 +981,22 @@ export function drawFighters(
         ctx.globalAlpha = Math.max(0, 0.5 - crushT / 60);
         ctx.fillStyle = '#ff4444';
         ctx.fillRect(px - 2, py - 2, 4, 4);
+      }
+      ctx.restore();
+    }
+    // KOF2002: 防御崩坏裂纹 — GUARD_CRUSH时身体裂纹线
+    if (f.state === FighterState.GUARD_CRUSH && f.stateAge < 10) {
+      ctx.save();
+      ctx.globalAlpha = (10 - f.stateAge) / 10 * 0.4;
+      ctx.strokeStyle = '#ff6644';
+      ctx.lineWidth = 1;
+      for (let cl = 0; cl < 3; cl++) {
+        const clStartY = sy - f.displayHeight * (0.3 + cl * 0.25);
+        ctx.beginPath();
+        ctx.moveTo(sx - 8 + cl * 5, clStartY);
+        ctx.lineTo(sx + 3 - cl * 3, clStartY + 12 + cl * 4);
+        ctx.lineTo(sx - 5 + cl * 7, clStartY + 20 + cl * 3);
+        ctx.stroke();
       }
       ctx.restore();
     }
