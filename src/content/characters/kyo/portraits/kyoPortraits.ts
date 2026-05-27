@@ -59,13 +59,13 @@ export const KYO_PORTRAIT_META: Record<PortraitSize, PortraitMeta> = {
   },
   win: {
     size: 'win',
-    width: 200,
-    height: 200,
-    pose: '胜利姿势,单手叉腰,自信表情',
+    width: 64,
+    height: 80,
+    pose: '胜利姿势,自信表情,单手燃焰',
     primaryColor: '#FF6600',
     accentColor: '#FFD700',
-    style: '胜利画面大肖像,金色边框',
-    hasPixelData: false,
+    style: '64x80 SNK像素风格胜利肖像,火焰主题',
+    hasPixelData: true,
   },
 };
 

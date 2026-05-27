@@ -294,3 +294,11 @@ import { RYO_SIZED_PORTRAITS } from '../rendering/portraits/ryoPortraits.js';
 for (const [size, data] of Object.entries(RYO_SIZED_PORTRAITS)) {
   registerSizedPortrait('ryo', size as PortraitSize, data);
 }
+
+// ===== 注册 Iori 的 win 肖像 =====
+import { ioriWinPortrait } from '../rendering/portraits/ioriWinPortrait.js';
+registerSizedPortrait('iori', 'win', ioriWinPortrait);
+
+// ===== 注册 Kyo 的 win 肖像 =====
+import { kyoWinPortrait } from '../rendering/portraits/kyoWinPortrait.js';
+registerSizedPortrait('kyo', 'win', kyoWinPortrait);

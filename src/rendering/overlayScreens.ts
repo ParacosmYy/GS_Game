@@ -300,6 +300,7 @@ export function drawMatchEnd(
     const charDef = ROSTER.find(c => c.id === winnerCharId);
     // Use sized win portrait if available, fallback to base pixelPortrait
     const winPortrait = charDef ? (getPortraitForSize(winnerCharId, 'win' as PortraitSize) ?? charDef.pixelPortrait) : undefined;
+    const charColor = charDef?.color ?? '#ffcc00';
     if (winPortrait) {
       const portraitScale = winPortrait.width >= 120 ? 2.5 : 4;
       const pw = winPortrait.width * portraitScale;
@@ -315,8 +316,8 @@ export function drawMatchEnd(
         px + pw / 2, py + ph / 2, pw * 0.9,
       );
       const auraPulse = 0.3 + Math.sin(tickVal * 0.06) * 0.1;
-      auraGrad.addColorStop(0, (charDef.color ?? '#ffcc00') + Math.round(auraPulse * 255).toString(16).padStart(2, '0'));
-      auraGrad.addColorStop(0.6, (charDef.color ?? '#ffcc00') + Math.round(auraPulse * 0.4 * 255).toString(16).padStart(2, '0'));
+      auraGrad.addColorStop(0, charColor + Math.round(auraPulse * 255).toString(16).padStart(2, '0'));
+      auraGrad.addColorStop(0.6, charColor + Math.round(auraPulse * 0.4 * 255).toString(16).padStart(2, '0'));
       auraGrad.addColorStop(1, 'rgba(0,0,0,0)');
       ctx.fillStyle = auraGrad;
       ctx.fillRect(px - pw * 0.3, py - ph * 0.3, pw * 1.6, ph * 1.6);
@@ -334,8 +335,8 @@ export function drawMatchEnd(
       ctx.stroke();
       ctx.globalAlpha = fadeIn;
 
-      drawPixelPortrait(ctx, charDef.pixelPortrait, px, py, portraitScale, {
-        frameColor: charDef.color,
+      drawPixelPortrait(ctx, winPortrait, px, py, portraitScale, {
+        frameColor: charColor,
         backdropColor: 'rgba(8, 8, 18, 0.9)',
         scanlines: true,
       });
