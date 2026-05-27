@@ -300,6 +300,17 @@ export function drawFighters(
       const swayX = Math.sin(f.stateAge * 0.15) * 3;
       const swayY = Math.sin(f.stateAge * 0.22) * 1.5;
       ctx.translate(swayX, swayY);
+      // KOF2002: 眩晕星星 — 头顶3颗旋转星星
+      const starBaseY = sy - f.displayHeight - 12;
+      for (let s = 0; s < 3; s++) {
+        const angle = (s / 3) * Math.PI * 2 + globalTick * 0.08;
+        const starX = sx + Math.cos(angle) * 18;
+        const starY = starBaseY + Math.sin(angle) * 6;
+        ctx.fillStyle = '#ffee44';
+        ctx.beginPath();
+        ctx.arc(starX, starY, 3, 0, Math.PI * 2);
+        ctx.fill();
+      }
     }    // Getup Y offset — interpolate from lying (ground) to standing position
     if (f.state === FighterState.GETUP && f.getupTimer > 0) {
       const getupProgress = 1 - (f.getupTimer / (f.getupDuration || 15));
