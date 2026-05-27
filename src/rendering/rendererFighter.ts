@@ -227,6 +227,14 @@ export function drawFighters(
       ctx.translate(wobbleX, 0);
     }
 
+
+    // Knockdown ground squash — KOF2002: body compresses on landing
+    if (f.state === FighterState.KNOCKDOWN && f.stateAge < 5) {
+      const squashProgress = f.stateAge / 5;
+      const squashY = 1 + (1 - squashProgress) * 0.2;
+      const squashX = 1 - (1 - squashProgress) * 0.1;
+      ctx.scale(squashX, squashY);
+    }
     // Dizzy state wobble — KOF2002 unsteady sway when stunned
     if (f.state === FighterState.DIZZY) {
       const swayX = Math.sin(f.stateAge * 0.15) * 3;
