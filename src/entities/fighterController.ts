@@ -198,6 +198,8 @@ export class FighterController {
         const remainingBlockstun = f.blockstunTimer;
         if (f.currentAttack) f.endAttack();
         f.y = STAGE_GROUND_Y; f.vy = 0; f.vx = 0;
+        // KOF2002: 着陆烟尘 — 跳跃/空中攻击落地时产生视觉反馈
+        if (!wasHop) { this.vfx.spawnDust(f.x, STAGE_GROUND_Y); }
         // KOF2002: 空中防御着陆后如果有剩余blockstun → 转为地面防御
         if (wasAirBlock && remainingBlockstun > 0) {
           f.state = FighterState.BLOCK;
