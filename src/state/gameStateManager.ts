@@ -33,6 +33,11 @@ export class GameStateManager {
   titleBgmStarted = false;
   gameOverTimer = 0;
 
+  // Pause menu state
+  isPaused = false;
+  pauseMenuCursor = 0;
+  pauseMenuTab: 'moves' | 'controls' | 'settings' = 'moves';
+
   // Stage select state
   stageSelectCursor = 0;       // 0..5 (5 stages + random)
   stageSelectReady = false;
@@ -93,6 +98,18 @@ export class GameStateManager {
     this.stageSelectCursor = 0;
     this.stageSelectReady = false;
     this.stageSelectConfirmed = null;
+  }
+
+  togglePause(): void {
+    this.isPaused = !this.isPaused;
+    if (this.isPaused) {
+      this.pauseMenuCursor = 0;
+      this.pauseMenuTab = 'moves';
+    }
+  }
+
+  unpause(): void {
+    this.isPaused = false;
   }
 
   resetTeamOrder(): void {

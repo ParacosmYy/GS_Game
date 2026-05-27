@@ -66,6 +66,11 @@ export class InputManager {
     return this.keys[code] === true;
   }
 
+  /** Clear a key press (consume it so it doesn't repeat) */
+  clearKey(code: string): void {
+    this.keys[code] = false;
+  }
+
   private mapInput(keyMap: Record<string, string>): PlayerInput {
     return {
       up: this.keys[keyMap.up] === true,

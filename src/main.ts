@@ -48,6 +48,7 @@ import { InputLogger } from './core/inputLog.js';
 import { ReplaySession } from './core/replaySession.js';
 import { createRoundStartSequence, createKOSequence, createTimeOverSequence, createWinnerSequence } from './state/announcePresets.js';
 import { TrainingModeState } from './state/trainingMode.js';
+import { drawPauseMenu } from './rendering/pauseMenu.js';
 
 const canvas = document.getElementById('gameCanvas') as HTMLCanvasElement;
 const ctx = canvas.getContext('2d')!;
@@ -549,6 +550,36 @@ function update(): void {
   }
 
   // === FIGHTING phase ===
+  // Pause menu toggle (Escape key) — works in both normal and training mode
+  if (gs.isPaused) {
+    // Only process pause menu navigation while paused
+    if (inputManager.isKeyDown('Escape') || inputManager.isKeyDown('Enter')) {
+      gs.unpause();
+      inputManager.clearKey('Escape');
+      inputManager.clearKey('Enter');
+    }
+    // Tab switching with left/right
+    if (inputManager.isKeyDown('ArrowLeft') || inputManager.isKeyDown('KeyA')) {
+      gs.pauseMenuCursor = Math.max(0, gs.pauseMenuCursor - 1);
+      const tabs: Array<'moves' | 'controls' | 'settings'> = ['moves', 'controls', 'settings'];
+      gs.pauseMenuTab = tabs[gs.pauseMenuCursor] ?? 'moves';
+      inputManager.clearKey('ArrowLeft');
+      inputManager.clearKey('KeyA');
+    }
+    if (inputManager.isKeyDown('ArrowRight') || inputManager.isKeyDown('KeyD')) {
+      gs.pauseMenuCursor = Math.min(2, gs.pauseMenuCursor + 1);
+      const tabs: Array<'moves' | 'controls' | 'settings'> = ['moves', 'controls', 'settings'];
+      gs.pauseMenuTab = tabs[gs.pauseMenuCursor] ?? 'moves';
+      inputManager.clearKey('ArrowRight');
+      inputManager.clearKey('KeyD');
+    }
+    return; // Skip all game updates while paused
+  }
+  if (inputManager.isKeyDown('Escape') && gs.phase === GamePhase.FIGHTING) {
+    gs.togglePause();
+    inputManager.clearKey('Escape');
+    return;
+  }
   if (gs.isTrainingMode && inputManager.isKeyDown('Escape')) {
     bgm.stop(); ambient.stop(); gs.setPhase(GamePhase.SELECT); select.reset(); p2AI = null; gs.isTrainingMode = true; return;
   }
@@ -1139,6 +1170,11 @@ function render(): void {
 
   // Announcer overlay (counter hit, MAX activation, etc.)
   announcerOverlay.draw(ctx, canvas.width, canvas.height);
+
+  // Pause menu overlay (drawn last, on top of everything)
+  if (gs.isPaused && (gs.phase === GamePhase.FIGHTING || gs.phase === GamePhase.KO)) {
+    drawPauseMenu(ctx, canvas.width, canvas.height, gs.pauseMenuCursor, gs.pauseMenuTab, p1Char, p2Char);
+  }
 }
 
 function restartGame(): void {
