@@ -6,7 +6,7 @@
  */
 import { Fighter } from '../entities/fighter.js';
 import { Camera } from '../core/camera.js';
-import type { PowerGauge, MaxModeState, MoveListEntry } from '../core/types.js';
+import type { PowerGauge, MaxModeState, MoveListEntry, MoveCategory } from '../core/types.js';
 import { meterFlashTimers, meterStockFlashes } from './meterFlash.js';
 import {
   CANVAS_WIDTH, CANVAS_HEIGHT, MAX_HEALTH, MAX_STOCKS, ROUND_TIME,
@@ -296,25 +296,49 @@ const MOVE_TYPE_COLORS: Record<string, string> = {
   normal: '#d8d8d8',    // white — normal attacks
 };
 
+/** Category display priority for in-game move list */
+const CATEGORY_ORDER: MoveCategory[] = ['special', 'dm', 'sdm', 'command', 'system'];
+const CATEGORY_LABELS: Record<string, string> = {
+  command: 'CMD',
+  special: 'SP',
+  dm: 'DM',
+  sdm: 'MAX',
+  hsdm: 'HSDM',
+  system: 'SYS',
+  normal: '',
+};
+
 function drawMoveListPanel(
   ctx: CanvasRenderingContext2D,
   moveList: MoveListEntry[],
   simplifiedMode: boolean,
 ): void {
+  if (moveList.length === 0) return;
+
   const panelX = 12;
-  const panelW = 308;
-  const lineH = 12;
+  const panelW = 310;
+  const lineH = 13;
   const headerH = 18;
   const footerH = 16;
-  const visibleMoves = moveList.slice(0, 8);
-  const panelH = headerH + visibleMoves.length * lineH + footerH + 12;
+  const maxMoves = 10;
+
+  // Prioritize: specials & DMs first, then command normals
+  const prioritized = [...moveList]
+    .sort((a, b) => {
+      const ai = CATEGORY_ORDER.indexOf(a.type ?? 'normal');
+      const bi = CATEGORY_ORDER.indexOf(b.type ?? 'normal');
+      return (ai === -1 ? 99 : ai) - (bi === -1 ? 99 : bi);
+    })
+    .slice(0, maxMoves);
+
+  const panelH = headerH + prioritized.length * lineH + footerH + 10;
   const panelY = CANVAS_HEIGHT - panelH - 22;
 
   ctx.save();
-  ctx.fillStyle = 'rgba(0, 0, 0, 0.68)';
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.72)';
   roundRect(ctx, panelX, panelY, panelW, panelH, 6);
   ctx.fill();
-  ctx.strokeStyle = 'rgba(200, 168, 50, 0.28)';
+  ctx.strokeStyle = 'rgba(200, 168, 50, 0.32)';
   ctx.lineWidth = 1;
   roundRect(ctx, panelX, panelY, panelW, panelH, 6);
   ctx.stroke();
@@ -326,11 +350,30 @@ function drawMoveListPanel(
   ctx.fillText('MOVE LIST', panelX + 8, panelY + 4);
 
   ctx.font = '9px "Courier New", monospace';
-  for (let i = 0; i < visibleMoves.length; i++) {
-    const move = visibleMoves[i];
+  for (let i = 0; i < prioritized.length; i++) {
+    const move = prioritized[i];
     const y = panelY + headerH + i * lineH + 4;
-    ctx.fillStyle = MOVE_TYPE_COLORS[move.type ?? 'normal'] ?? '#d8d8d8';
-    ctx.fillText(`${move.name}: ${move.input}`, panelX + 10, y);
+    const catLabel = CATEGORY_LABELS[move.type ?? ''] ?? '';
+    const color = MOVE_TYPE_COLORS[move.type ?? 'normal'] ?? '#d8d8d8';
+
+    // Category badge
+    if (catLabel) {
+      ctx.fillStyle = color;
+      ctx.globalAlpha = 0.5;
+      ctx.fillText(catLabel, panelX + 8, y);
+      ctx.globalAlpha = 1.0;
+    }
+
+    // Move name + input
+    ctx.fillStyle = color;
+    const nameX = panelX + 36;
+    const name = move.name.length > 22 ? move.name.slice(0, 21) + '…' : move.name;
+    const input = move.input.length > 18 ? move.input.slice(0, 17) + '…' : move.input;
+    ctx.fillText(name, nameX, y);
+    ctx.fillStyle = 'rgba(180, 180, 180, 0.7)';
+    ctx.textAlign = 'right';
+    ctx.fillText(input, panelX + panelW - 8, y);
+    ctx.textAlign = 'left';
   }
 
   const burstHint = simplifiedMode

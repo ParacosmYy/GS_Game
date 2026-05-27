@@ -4,7 +4,6 @@
  * Maps Kyo's move list and input commands to their attack types.
  * 归属: content/characters/kyo/commands/ — 只放"怎么按"的规则
  */
-import { KyoDef } from '../../../../characters/kyo.js';
 
 /** A single move entry with structured data */
 export interface KyoMoveEntry {
@@ -49,7 +48,7 @@ export const KYO_MOVE_LIST: KyoMoveEntry[] = [
 ];
 
 /** Kyo's win quotes */
-export const KYO_WIN_QUOTES: string[] = KyoDef.winQuotes;
+export const KYO_WIN_QUOTES: string[] = ['まだまだだな', '俺の炎に焼かれる覚悟はできたか?', '草薙の拳、見せてやるよ'];
 
 /** All available action names for Kyo's animation sequences */
 export const KYO_AVAILABLE_ACTIONS: string[] = [

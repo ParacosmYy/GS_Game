@@ -4,7 +4,6 @@
  * Maps Iori's move list and input commands to their attack types.
  * 归属: content/characters/iori/commands/ — 只放"怎么按"的规则
  */
-import { IoriDef } from '../../../../characters/iori.js';
 
 /** A single move entry with structured data */
 export interface IoriMoveEntry {
@@ -42,7 +41,7 @@ export const IORI_MOVE_LIST: IoriMoveEntry[] = [
 ];
 
 /** Iori's win quotes */
-export const IORI_WIN_QUOTES: string[] = IoriDef.winQuotes;
+export const IORI_WIN_QUOTES: string[] = ['くだらん...', '血の叫びが聞こえるか?', '俺の痛みを味わえ'];
 
 /** All available action names for Iori's animation sequences */
 export const IORI_AVAILABLE_ACTIONS: string[] = [
