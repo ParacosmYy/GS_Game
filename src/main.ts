@@ -1614,6 +1614,8 @@ function restartGame(): void {
   cinematic.reset();
   gameSpeed.reset();
   rounds.fullReset();
+  resetMoveNameDisplay();
+  resetCharIntro();
   p1DelayedHealth = p1.maxHealth;
   p2DelayedHealth = p2.maxHealth;
 }
