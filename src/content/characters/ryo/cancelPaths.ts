@@ -51,7 +51,7 @@ const RYO_NORMAL_TO_SPECIAL: CancelRoute[] = [
   // Far stand normals -> specials
   {
     from: 'STAND_A',
-    to: ['RYO_KOOU', 'RYO_KO_HOU', 'RYO_HIEN', 'RYO_HAOU', 'RYO_TSURIZAO', 'RYO_ORISHI'],
+    to: ['RYO_KOOU', 'RYO_KO_HOU', 'RYO_HIEN', 'RYO_HAOU', 'RYO_TSURIZAO', 'RYO_ORISHI', 'RYO_KOOUKEN_D', 'RYO_HIO_HACKER', 'RYO_ZANRETSU_KEN'],
     cancelType: 'normal',
     requiresHit: false, // KOF2002: normal cancel works on hit AND block
     stockCost: 0,
@@ -60,7 +60,7 @@ const RYO_NORMAL_TO_SPECIAL: CancelRoute[] = [
   },
   {
     from: 'STAND_B',
-    to: ['RYO_KOOU', 'RYO_KO_HOU', 'RYO_HIEN', 'RYO_HAOU', 'RYO_TSURIZAO', 'RYO_ORISHI'],
+    to: ['RYO_KOOU', 'RYO_KO_HOU', 'RYO_HIEN', 'RYO_HAOU', 'RYO_TSURIZAO', 'RYO_ORISHI', 'RYO_KOOUKEN_D', 'RYO_HIO_HACKER', 'RYO_ZANRETSU_KEN'],
     cancelType: 'normal',
     requiresHit: false,
     stockCost: 0,
@@ -69,7 +69,7 @@ const RYO_NORMAL_TO_SPECIAL: CancelRoute[] = [
   },
   {
     from: 'STAND_C',
-    to: ['RYO_KOOU', 'RYO_KOOU_C', 'RYO_KO_HOU', 'RYO_KO_HOU_C', 'RYO_HIEN', 'RYO_HAOU', 'RYO_TSURIZAO', 'RYO_ORISHI'],
+    to: ['RYO_KOOU', 'RYO_KOOU_C', 'RYO_KO_HOU', 'RYO_KO_HOU_C', 'RYO_HIEN', 'RYO_HAOU', 'RYO_TSURIZAO', 'RYO_ORISHI', 'RYO_KOOUKEN_D', 'RYO_HIO_HACKER', 'RYO_ZANRETSU_KEN'],
     cancelType: 'normal',
     requiresHit: false,
     stockCost: 0,
@@ -78,7 +78,7 @@ const RYO_NORMAL_TO_SPECIAL: CancelRoute[] = [
   },
   {
     from: 'STAND_D',
-    to: ['RYO_KOOU', 'RYO_KOOU_C', 'RYO_KO_HOU', 'RYO_KO_HOU_C', 'RYO_HIEN', 'RYO_HAOU', 'RYO_TSURIZAO', 'RYO_ORISHI'],
+    to: ['RYO_KOOU', 'RYO_KOOU_C', 'RYO_KO_HOU', 'RYO_KO_HOU_C', 'RYO_HIEN', 'RYO_HAOU', 'RYO_TSURIZAO', 'RYO_ORISHI', 'RYO_KOOUKEN_D', 'RYO_HIO_HACKER', 'RYO_ZANRETSU_KEN'],
     cancelType: 'normal',
     requiresHit: false,
     stockCost: 0,
@@ -88,7 +88,7 @@ const RYO_NORMAL_TO_SPECIAL: CancelRoute[] = [
   // Close normals -> specials (better combo starters)
   {
     from: 'CLOSE_A',
-    to: ['RYO_KOOU', 'RYO_KO_HOU', 'RYO_HIEN', 'RYO_HAOU', 'RYO_TSURIZAO', 'RYO_ORISHI'],
+    to: ['RYO_KOOU', 'RYO_KO_HOU', 'RYO_HIEN', 'RYO_HAOU', 'RYO_TSURIZAO', 'RYO_ORISHI', 'RYO_ZANRETSU_KEN'],
     cancelType: 'normal',
     requiresHit: false,
     stockCost: 0,
@@ -97,7 +97,7 @@ const RYO_NORMAL_TO_SPECIAL: CancelRoute[] = [
   },
   {
     from: 'CLOSE_B',
-    to: ['RYO_KOOU', 'RYO_KO_HOU', 'RYO_HIEN', 'RYO_HAOU', 'RYO_TSURIZAO', 'RYO_ORISHI'],
+    to: ['RYO_KOOU', 'RYO_KO_HOU', 'RYO_HIEN', 'RYO_HAOU', 'RYO_TSURIZAO', 'RYO_ORISHI', 'RYO_ZANRETSU_KEN'],
     cancelType: 'normal',
     requiresHit: false,
     stockCost: 0,
@@ -106,7 +106,7 @@ const RYO_NORMAL_TO_SPECIAL: CancelRoute[] = [
   },
   {
     from: 'CLOSE_C',
-    to: ['RYO_KOOU', 'RYO_KOOU_C', 'RYO_KO_HOU', 'RYO_KO_HOU_C', 'RYO_HIEN', 'RYO_HAOU', 'RYO_TSURIZAO', 'RYO_ORISHI'],
+    to: ['RYO_KOOU', 'RYO_KOOU_C', 'RYO_KO_HOU', 'RYO_KO_HOU_C', 'RYO_HIEN', 'RYO_HAOU', 'RYO_TSURIZAO', 'RYO_ORISHI', 'RYO_KOOUKEN_D', 'RYO_HIO_HACKER', 'RYO_ZANRETSU_KEN'],
     cancelType: 'normal',
     requiresHit: false,
     stockCost: 0,
@@ -115,7 +115,7 @@ const RYO_NORMAL_TO_SPECIAL: CancelRoute[] = [
   },
   {
     from: 'CLOSE_D',
-    to: ['RYO_KOOU', 'RYO_KOOU_C', 'RYO_KO_HOU', 'RYO_KO_HOU_C', 'RYO_HIEN', 'RYO_HAOU', 'RYO_TSURIZAO', 'RYO_ORISHI'],
+    to: ['RYO_KOOU', 'RYO_KOOU_C', 'RYO_KO_HOU', 'RYO_KO_HOU_C', 'RYO_HIEN', 'RYO_HAOU', 'RYO_TSURIZAO', 'RYO_ORISHI', 'RYO_KOOUKEN_D', 'RYO_HIO_HACKER', 'RYO_ZANRETSU_KEN'],
     cancelType: 'normal',
     requiresHit: false,
     stockCost: 0,
@@ -125,7 +125,7 @@ const RYO_NORMAL_TO_SPECIAL: CancelRoute[] = [
   // Crouch normals -> specials
   {
     from: 'CROUCH_A',
-    to: ['RYO_KOOU', 'RYO_KO_HOU', 'RYO_HIEN', 'RYO_HAOU'],
+    to: ['RYO_KOOU', 'RYO_KO_HOU', 'RYO_HIEN', 'RYO_HAOU', 'RYO_ZANRETSU_KEN'],
     cancelType: 'normal',
     requiresHit: false,
     stockCost: 0,
@@ -134,7 +134,7 @@ const RYO_NORMAL_TO_SPECIAL: CancelRoute[] = [
   },
   {
     from: 'CROUCH_B',
-    to: ['RYO_KOOU', 'RYO_KO_HOU', 'RYO_HIEN', 'RYO_HAOU'],
+    to: ['RYO_KOOU', 'RYO_KO_HOU', 'RYO_HIEN', 'RYO_HAOU', 'RYO_ZANRETSU_KEN'],
     cancelType: 'normal',
     requiresHit: false,
     stockCost: 0,
@@ -143,7 +143,7 @@ const RYO_NORMAL_TO_SPECIAL: CancelRoute[] = [
   },
   {
     from: 'CROUCH_C',
-    to: ['RYO_KOOU', 'RYO_KOOU_C', 'RYO_KO_HOU', 'RYO_KO_HOU_C', 'RYO_HIEN', 'RYO_HAOU'],
+    to: ['RYO_KOOU', 'RYO_KOOU_C', 'RYO_KO_HOU', 'RYO_KO_HOU_C', 'RYO_HIEN', 'RYO_HAOU', 'RYO_KOOUKEN_D', 'RYO_HIO_HACKER', 'RYO_ZANRETSU_KEN'],
     cancelType: 'normal',
     requiresHit: false,
     stockCost: 0,
@@ -152,7 +152,7 @@ const RYO_NORMAL_TO_SPECIAL: CancelRoute[] = [
   },
   {
     from: 'CROUCH_D',
-    to: ['RYO_KOOU', 'RYO_KOOU_C', 'RYO_KO_HOU', 'RYO_KO_HOU_C', 'RYO_HIEN', 'RYO_HAOU'],
+    to: ['RYO_KOOU', 'RYO_KOOU_C', 'RYO_KO_HOU', 'RYO_KO_HOU_C', 'RYO_HIEN', 'RYO_HAOU', 'RYO_KOOUKEN_D', 'RYO_HIO_HACKER', 'RYO_ZANRETSU_KEN'],
     cancelType: 'normal',
     requiresHit: false,
     stockCost: 0,
@@ -232,6 +232,33 @@ const RYO_SPECIAL_TO_DM: CancelRoute[] = [
   },
   {
     from: 'RYO_HAOU',
+    to: ['DM_TEN_HA_OU', 'DM_RYUKO_RANBU'],
+    cancelType: 'super',
+    requiresHit: true,
+    stockCost: SUPER_CANCEL_STOCK_COST,
+    timerCost: 0,
+    windowFrames: CANCEL_WINDOW_SUPER,
+  },
+  {
+    from: 'RYO_KOOUKEN_D',
+    to: ['DM_TEN_HA_OU', 'DM_RYUKO_RANBU'],
+    cancelType: 'super',
+    requiresHit: true,
+    stockCost: SUPER_CANCEL_STOCK_COST,
+    timerCost: 0,
+    windowFrames: CANCEL_WINDOW_SUPER,
+  },
+  {
+    from: 'RYO_HIO_HACKER',
+    to: ['DM_TEN_HA_OU', 'DM_RYUKO_RANBU'],
+    cancelType: 'super',
+    requiresHit: true,
+    stockCost: SUPER_CANCEL_STOCK_COST,
+    timerCost: 0,
+    windowFrames: CANCEL_WINDOW_SUPER,
+  },
+  {
+    from: 'RYO_ZANRETSU_KEN',
     to: ['DM_TEN_HA_OU', 'DM_RYUKO_RANBU'],
     cancelType: 'super',
     requiresHit: true,
