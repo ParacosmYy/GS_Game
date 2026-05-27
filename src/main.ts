@@ -1306,7 +1306,11 @@ function render(): void {
     const nextIdx = gs.arcadeOpponentIndex + 1;
     const nextChar = gs.arcadeOpponents[nextIdx];
     const isRivalStage = nextIdx === gs.arcadeOpponents.length - 1;
-    renderer.drawNextMatch(gs.arcadeNextMatchTimer, nextChar, gs.arcadeOpponentIndex + 1, gs.arcadeOpponents.length, isRivalStage);
+    const upcoming = [
+      gs.arcadeOpponents[nextIdx + 1],
+      gs.arcadeOpponents[nextIdx + 2],
+    ].filter(Boolean);
+    renderer.drawNextMatch(gs.arcadeNextMatchTimer, nextChar, gs.arcadeOpponentIndex + 1, gs.arcadeOpponents.length, isRivalStage, upcoming);
     return;
   }
   if (gs.phase === GamePhase.SELECT) {

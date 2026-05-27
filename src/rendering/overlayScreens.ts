@@ -1345,6 +1345,7 @@ export function drawNextMatch(
   stageNumber: number,
   totalStages: number,
   isRivalStage: boolean = false,
+  upcomingChars: import('../characters/types.js').CharacterDefinition[] = [],
 ): void {
   ctx.save();
 
@@ -1514,6 +1515,25 @@ export function drawNextMatch(
     accentGrad.addColorStop(1, nextChar.color + '00');
     ctx.fillStyle = accentGrad;
     ctx.fillRect(accentX, accentY, accentW, accentH);
+  }
+
+  // Upcoming opponents preview — show next 2 fighters
+  if (upcomingChars.length > 0) {
+    const upAlpha = Math.min(1, Math.max(0, (timer - 30) / 15));
+    ctx.globalAlpha = upAlpha;
+    ctx.font = '9px "Courier New", monospace';
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#777';
+    ctx.fillText('COMING UP', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 90);
+    for (let i = 0; i < upcomingChars.length; i++) {
+      const uc = upcomingChars[i];
+      if (!uc) continue;
+      const upY = CANVAS_HEIGHT / 2 + 102 + i * 14;
+      ctx.fillStyle = uc.color;
+      ctx.font = '10px "Courier New", monospace';
+      ctx.fillText(`${stageNumber + i + 1}. ${uc.nameCn}`, CANVAS_WIDTH / 2, upY);
+    }
+    ctx.globalAlpha = fadeIn;
   }
 
   // "PRESS START" prompt
