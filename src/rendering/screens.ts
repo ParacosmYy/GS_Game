@@ -1,17 +1,17 @@
 /**
  * Screens — Character Select, VS Splash, Intro, KO, Win Quote
  */
-import { CANVAS_WIDTH, CANVAS_HEIGHT } from '../core/constants.js';
+import {
+  CANVAS_WIDTH, CANVAS_HEIGHT,
+} from '../core/constants.js';
 import { ROSTER } from '../characters/index.js';
 import { roundRect, drawSNKText } from './utils.js';
 import { drawPixelPortrait } from './pixelPortraits.js';
 import type { PixelPortraitData } from './pixelPortraits.js';
 import { getPortraitForSize } from './manifestRenderData.js';
-import {
-  RANDOM_SLOT_INDEX, TOTAL_SELECT_SLOTS, COLOR_PALETTES,
-  VS_SPLASH_DURATION,
-} from '../state/selectState.js';
+import { getRivalDialogue, getRivalThemeColors } from '../core/rivalData.js';
 import type { SelectState } from '../state/selectState.js';
+import { RANDOM_SLOT_INDEX, TOTAL_SELECT_SLOTS, COLOR_PALETTES, VS_SPLASH_DURATION } from '../state/selectState.js';
 import type { CharacterDefinition } from '../characters/types.js';
 import type { StageId } from './stage.js';
 import type { AnnounceSequence } from '../state/announceSequence.js';
@@ -702,6 +702,68 @@ export function drawVSSplash(
     ctx.moveTo(CANVAS_WIDTH / 2, 60);
     ctx.lineTo(CANVAS_WIDTH / 2, CANVAS_HEIGHT - 60);
     ctx.stroke();
+  }
+
+  // KOF2002: Rival dialogue — special matchup intro lines
+  if (p1Char && p2Char) {
+    const rival = getRivalDialogue(p1Char.id, p2Char.id);
+    if (rival) {
+      const colors = getRivalThemeColors(rival.theme);
+      // Determine which character is P1's line vs P2's
+      const p1IsA = rival.pair[0] === p1Char.id;
+      const p1Line = p1IsA ? rival.lineA : rival.lineB;
+      const p2Line = p1IsA ? rival.lineB : rival.lineA;
+      const p1Color = p1IsA ? colors.textA : colors.textB;
+      const p2Color = p1IsA ? colors.textB : colors.textA;
+
+      const rivalAlpha = Math.min(1, Math.max(0, (timer - 25) / 15));
+      ctx.globalAlpha = rivalAlpha * fadeIn;
+
+      // Rival flash at dialogue reveal
+      if (timer >= 25 && timer < 29) {
+        ctx.save();
+        ctx.globalAlpha = (29 - timer) / 4 * 0.2 * fadeIn;
+        ctx.fillStyle = colors.flash;
+        ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+        ctx.restore();
+        ctx.globalAlpha = rivalAlpha * fadeIn;
+      }
+
+      // Dialogue background
+      const dlgY = CANVAS_HEIGHT - 130;
+      const dlgH = 90;
+      ctx.fillStyle = colors.bg;
+      roundRect(ctx, 30, dlgY, CANVAS_WIDTH - 60, dlgH, 8);
+      ctx.fill();
+      // Themed border
+      const borderPulse = 0.5 + Math.sin(tick * 0.08) * 0.3;
+      ctx.strokeStyle = colors.border;
+      ctx.lineWidth = 2;
+      ctx.globalAlpha = rivalAlpha * fadeIn * borderPulse;
+      roundRect(ctx, 30, dlgY, CANVAS_WIDTH - 60, dlgH, 8);
+      ctx.stroke();
+      ctx.globalAlpha = rivalAlpha * fadeIn;
+
+      // "RIVAL BATTLE" indicator
+      ctx.save();
+      ctx.shadowColor = colors.border;
+      ctx.shadowBlur = 8;
+      drawSNKText(ctx, 'RIVAL BATTLE', CANVAS_WIDTH / 2, dlgY + 14, 10, colors.border);
+      ctx.shadowBlur = 0;
+      ctx.restore();
+
+      // P1 dialogue line
+      const p1CharsVisible = Math.min(p1Line.length, Math.floor(Math.max(0, timer - 30) / 1.8));
+      if (p1CharsVisible > 0) {
+        drawSNKText(ctx, p1Line.substring(0, p1CharsVisible), CANVAS_WIDTH * 0.25, dlgY + 38, 14, p1Color, '#000000', 'center');
+      }
+
+      // P2 dialogue line
+      const p2CharsVisible = Math.min(p2Line.length, Math.floor(Math.max(0, timer - 45) / 1.8));
+      if (p2CharsVisible > 0) {
+        drawSNKText(ctx, p2Line.substring(0, p2CharsVisible), CANVAS_WIDTH * 0.75, dlgY + 62, 14, p2Color, '#000000', 'center');
+      }
+    }
   }
 
   ctx.globalAlpha = 1;
