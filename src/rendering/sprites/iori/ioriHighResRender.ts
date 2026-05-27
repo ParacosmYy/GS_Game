@@ -33,6 +33,8 @@ import {
   IORI_AOIHANA_FRAMES, IORI_AOIHANA_2_FRAMES, IORI_AOIHANA_3_FRAMES,
   IORI_KOTOTSUKI_FRAMES, IORI_KOTOTSUKI_D_FRAMES,
   IORI_KUZUKAZE_FRAMES,
+  IORI_YATAGARASU_DM_FRAMES, IORI_YATAGARASU_SDM_FRAMES,
+  IORI_YAOTOME_HSDM_FRAMES,
 } from './ioriSpecialFrames.js';
 import {
   IORI_RUN_FRAMES, IORI_BACKDASH_FRAMES,
@@ -96,6 +98,11 @@ function initIoriFrames(): void {
   registerVariableFrames('KOTOTSUKI_D', IORI_KOTOTSUKI_D_FRAMES, [5, 8, 4, 6, 8]);
   registerVariableFrames('KUZUKAZE', IORI_KUZUKAZE_FRAMES, [4, 5, 4, 8]);
 
+  // DM / SDM / HSDM
+  registerVariableFrames('YATAGARASU_DM', IORI_YATAGARASU_DM_FRAMES, [8, 6, 12, 8, 12]);
+  registerVariableFrames('YATAGARASU_SDM', IORI_YATAGARASU_SDM_FRAMES, [10, 6, 16, 12, 10, 12]);
+  registerVariableFrames('YAOTOME_HSDM', IORI_YAOTOME_HSDM_FRAMES, [8, 4, 6, 16, 10, 12]);
+
   // MOVEMENT STATES
   registerVariableFrames('RUN', IORI_RUN_FRAMES, [3, 3, 2, 2, 3, 2]);
   registerVariableFrames('BACKDASH', IORI_BACKDASH_FRAMES, [2, 2, 3, 4]);
@@ -153,6 +160,10 @@ function resolveIoriFrameKey(
       if (currentAttack === AttackType.IORI_KOTOTSUKI) return 'KOTOTSUKI';
       if (currentAttack === AttackType.IORI_KOTOTSUKI_D) return 'KOTOTSUKI_D';
       if (currentAttack === AttackType.IORI_KUZUKAZE) return 'KUZUKAZE';
+      // DM / SDM / HSDM
+      if (currentAttack === AttackType.DM_YATAGARASU) return 'YATAGARASU_DM';
+      if (currentAttack === AttackType.SDM_YATAGARASU) return 'YATAGARASU_SDM';
+      if (currentAttack === AttackType.HSDM_YAOTOME) return 'YAOTOME_HSDM';
       // Normals
       if (currentAttack === AttackType.STAND_C || currentAttack === AttackType.CLOSE_C) return 'STAND_C';
       if (currentAttack === AttackType.STAND_D || currentAttack === AttackType.CLOSE_D) return 'STAND_D';
