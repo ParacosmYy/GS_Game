@@ -85,3 +85,6 @@ export {
   IORI_ACTION_CONTRACTS,
   getIoriFrameContractManifest,
 } from '../../../core/ioriFrameContract.js';
+
+// Hit Effects (VFX/SFX plugin)
+export { IORI_HIT_EFFECTS } from './hitEffects/ioriHitEffects.js';

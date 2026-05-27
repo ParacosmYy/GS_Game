@@ -11,3 +11,11 @@ export {
   getAvailableCharacterIds,
   type CharacterContent,
 } from './contentLoader.js';
+export {
+  dispatchHitVFX,
+  dispatchHitSFX,
+  registerHitEffects,
+  type HitEffectContext,
+  type CharacterHitEffects,
+} from './characterHitEffects.js';
+export { initCharacterHitEffects } from './registerHitEffects.js';

@@ -14,13 +14,14 @@ import { getFeedback } from '../core/feedbackManifest.js';
 import { ROSTER } from '../characters/index.js';
 import { isDM as isDMCheck } from '../core/attackClassifier.js';
 import { gainMeterOnHit, gainMeterOnBlock, gainMeterOnHitstun } from './meter.js';
-import { playHit, playBlock, playSpecial, playDM, playThrow, playCounter, playHeavyHit, playSuperFlash, playWire, playJuggleHit, playBlockSpecial, playBlockDM, playSpecialLight, playSpecialHeavy, playKOHit, playHitAccent, playLandingHeavy, playDizzyHit, playGroundBounce, playWallBounce, playGuardCrush, playKoouken, playKoHou, playHien, playHaou, playHioHacker, playZanretsuKen, playKyoOniyaki, playKyoYamibarai, playKyoAragami, playKyoDokugami, playKyo75Kai, playKyoRedKick, playKyoOrochinagi, playIoriAoihana, playIoriYamibarai, playIoriOniyaki, playIoriKototsuki, playIoriKuzukaze, playComboMilestone } from '../audio/sampler.js';
+import { playHit, playBlock, playSpecial, playDM, playThrow, playCounter, playHeavyHit, playSuperFlash, playWire, playJuggleHit, playBlockSpecial, playBlockDM, playSpecialLight, playSpecialHeavy, playKOHit, playHitAccent, playLandingHeavy, playDizzyHit, playGroundBounce, playWallBounce, playGuardCrush, playComboMilestone } from '../audio/sampler.js';
 import { playCharVoice } from '../audio/charVoice.js';
 import { spawnTierSparks } from '../rendering/vfxPresets.js';
 import { bgm } from '../audio/bgm.js';
 import { announcer } from '../audio/announcer.js';
 import { announcerOverlay } from '../rendering/announcerOverlay.js';
 import type { CinematicState } from '../state/cinematicState.js';
+import { dispatchHitVFX, dispatchHitSFX, type HitEffectContext } from '../content/characterHitEffects.js';
 
 // ===== KOF2002: 命中招式名映射 =====
 // AttackType → 中文招式名, 按角色分组
@@ -513,231 +514,23 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       deps.screenShake.trigger(6, 8, getAttackDirectionBias(attacker, defender, attackType, counterHit));
     }
 
-    // === Ryo 角色专属必杀技VFX ===
-    // Ko'ou Ken (虎煌拳) projectile — ki blast effect
-    if (atkName.startsWith('RYO_KOOU')) {
-      deps.vfx.spawnKooukenVFX(attacker.x, attacker.y, attacker.facing, attacker.charId);
-    }
-    // Ko Hou (虎咲) uppercut — flame column
-    if (atkName.startsWith('RYO_KO_HOU')) {
-      deps.vfx.spawnKoHouVFX(attacker.x, attacker.y, attacker.charId);
-      // KOF2002: 虎咲C版命中 — 强化反馈: 额外hitstop + 更强shake + 冲击环
-      if (atkName === 'RYO_KO_HOU_C') {
-        deps.cinematic.addHitStop(3, defIdx);
-        deps.screenShake.trigger(10, 10, attacker.facing * 6);
-        deps.vfx.spawnImpactRing(hitX, hitY, 1.3);
-        deps.screenFlash.trigger('#ffaa33', 0.12, 4);
-      }
-    }
-    // Hien (飛燕) flying kick — speed line trail
-    if (atkName === 'RYO_HIEN') {
-      deps.vfx.spawnHienTrail(attacker.x, attacker.y, attacker.facing, attacker.charId);
-      // KOF2002: 飛燕命中 — 强化反馈: 额外hitstop + 踢击方向shake
-      deps.cinematic.addHitStop(2, defIdx);
-      deps.screenShake.trigger(9, 8, attacker.facing * 5);
-      deps.vfx.spawnImpactRing(hitX, hitY, 1.1);
-    }
-    // RYO_KOOUKEN_D (强虎煌拳D版) — 击倒版本强化反馈 + energy burst
-    if (atkName === 'RYO_KOOUKEN_D') {
-      deps.cinematic.addHitStop(2, defIdx);
-      deps.screenShake.trigger(9, 9, attacker.facing * 5);
-      deps.vfx.spawnProjectileExplosion(hitX, hitY, '#4488ff', '#88ccff');
-    }
-    // RYO_KOOU_C (虎煌拳C版) — 强版 projectile burst + ring
-    if (atkName === 'RYO_KOOU_C') {
-      deps.vfx.spawnProjectileExplosion(hitX, hitY, '#4488ff', '#66aaff');
-      deps.vfx.spawnImpactRing(hitX, hitY, 0.7);
-      deps.cinematic.addHitStop(1, defIdx);
-    }
-    // RYO_HIO_HACKER (氷果斬) — 突进打击强化反馈
-    if (atkName === 'RYO_HIO_HACKER') {
-      deps.cinematic.addHitStop(1, defIdx);
-      deps.screenShake.trigger(6, 6, attacker.facing * 3);
-      deps.vfx.spawnImpactRing(hitX, hitY, 0.8);
-    }
-    // RYO_TSURIZAO (釣瓶打) — overhead slam impact: downward dust + ring
-    if (atkName === 'RYO_TSURIZAO') {
-      deps.cinematic.addHitStop(2, defIdx);
-      deps.screenShake.trigger(8, 8, attacker.facing * 4);
-      deps.vfx.spawnGroundSlam(hitX, hitY);
-      deps.vfx.spawnImpactRing(hitX, hitY, 1.0);
-    }
-    // RYO_ORISHI (卸し) — low sweep impact: low dust + slash
-    if (atkName === 'RYO_ORISHI') {
-      deps.cinematic.addHitStop(1, defIdx);
-      deps.screenShake.trigger(5, 6, attacker.facing * 2);
-      deps.vfx.spawnHeavyDust(hitX, hitY + 30, 8);
-    }
-    // RYO_ZANRETSU_KEN (斩裂拳) — 连打命中递增反馈: each hit escalates
-    if (atkName === 'RYO_ZANRETSU_KEN') {
-      deps.cinematic.addHitStop(1, defIdx);
-      const comboScale = 0.6 + Math.min(combo, 5) * 0.15;
-      deps.vfx.spawnImpactRing(hitX, hitY, comboScale);
-    }
-    // DM Ten Ha Ou (天地霸煌拳) — massive energy burst + screen flash
-    if (atkName === 'DM_TEN_HA_OU') {
-      deps.vfx.spawnDMTenHaOuVFX(hitX, hitY, attacker.charId);
-      deps.screenFlash.triggerDarken(6);
-      deps.screenFlash.trigger('#ffcc00', 0.35, 10);
-      deps.screenShake.trigger(14, 14, getAttackDirectionBias(attacker, defender, attackType, counterHit));
-    }
-    // SDM Ten Ha Ou — enhanced energy burst + longer flash
-    if (atkName === 'SDM_TEN_HA_OU') {
-      deps.vfx.spawnDMTenHaOuVFX(hitX, hitY, attacker.charId);
-      deps.vfx.spawnGroundSlam(hitX, hitY);
-      deps.vfx.spawnSuperBurst(hitX, hitY, '#4488ff', '#88ccff', true);
-      deps.screenFlash.triggerDarken(8);
-      deps.screenFlash.trigger('#ffdd44', 0.45, 14);
-      deps.screenShake.trigger(16, 16, getAttackDirectionBias(attacker, defender, attackType, counterHit));
-    }
-    // DM/SDM/HSDM Ryuko Ranbu — rush multi-hit feedback
-    if (atkName === 'DM_RYUKO_RANBU' || atkName === 'SDM_RYUKO_RANBU' || atkName === 'HSDM_RYUKO_RANBU') {
-      const isHSDM = atkName === 'HSDM_RYUKO_RANBU';
-      const isSDM = atkName === 'SDM_RYUKO_RANBU';
-      deps.vfx.spawnImpactRing(hitX, hitY, isHSDM ? 1.8 : isSDM ? 1.5 : 1.2);
-      deps.screenFlash.trigger(isHSDM ? '#ffaa22' : '#ffcc00', isHSDM ? 0.5 : 0.3, isHSDM ? 16 : 10);
-      deps.screenShake.trigger(isHSDM ? 18 : isSDM ? 16 : 14, isHSDM ? 18 : isSDM ? 16 : 14, getAttackDirectionBias(attacker, defender, attackType, counterHit));
-    }
-    // Haou Shou Kou Ken (霸王翔吼拳) counter flash
-    if (atkName === 'RYO_HAOU') {
-      deps.vfx.spawnHaouFlash(attacker.x, attacker.y, attacker.charId);
-      // 霸王翔吼拳命中 — 额外冲击反馈
-      deps.cinematic.addHitStop(2, defIdx);
-      deps.vfx.spawnImpactRing(hitX, hitY, 1.0);
-      deps.screenShake.trigger(8, 10, attacker.facing * 4);
-    }
-
-    // === Kyo 角色专属必杀技VFX — 火焰主题 ===
-    // Oniyaki (鬼焼き) uppercut — fire column burst
-    if (atkName === 'KYO_ONIYAKI' || atkName === 'KYO_ONIYAKI_C') {
-      deps.vfx.spawnSuperBurst(hitX, hitY, '#ff4400', '#ffaa22', atkName === 'KYO_ONIYAKI_C');
-      deps.cinematic.addHitStop(atkName === 'KYO_ONIYAKI_C' ? 3 : 2, defIdx);
-      deps.screenShake.trigger(atkName === 'KYO_ONIYAKI_C' ? 10 : 7, 8, attacker.facing * 5);
-      deps.vfx.spawnImpactRing(hitX, hitY, atkName === 'KYO_ONIYAKI_C' ? 1.4 : 1.1);
-    }
-    // Yamibarai (闇払い) fire projectile — flame burst on hit
-    if (atkName === 'KYO_YAMIBARAI') {
-      deps.vfx.spawnProjectileExplosion(hitX, hitY, '#ff6622', '#ffcc44');
-      deps.screenFlash.trigger('#ff6600', 0.08, 3);
-    }
-    // Yamibarai C (strong) — bigger flame burst + hitStop
-    if (atkName === 'KYO_YAMIBARAI_C') {
-      deps.vfx.spawnProjectileExplosion(hitX, hitY, '#ff4400', '#ffee66');
-      deps.vfx.spawnImpactRing(hitX, hitY, 0.8);
-      deps.cinematic.addHitStop(1, defIdx);
-      deps.screenFlash.trigger('#ff4400', 0.12, 4);
-    }
-    // Aragami (荒咬み) — fire punch impact
-    if (atkName === 'KYO_ARAGAMI') {
-      deps.cinematic.addHitStop(1, defIdx);
-      deps.screenShake.trigger(6, 6, attacker.facing * 3);
-      deps.vfx.spawnImpactRing(hitX, hitY, 0.9);
-    }
-    // Dokugami (毒咬み) — flame followup: burst + shake
-    if (atkName === 'KYO_DOKUGAMI') {
-      deps.cinematic.addHitStop(1, defIdx);
-      deps.screenShake.trigger(7, 6, attacker.facing * 4);
-      deps.vfx.spawnProjectileExplosion(hitX, hitY, '#ff6622', '#ffaa44');
-    }
-    // Red Kick (七十五式·改) — flame kick sweep
-    if (atkName === 'KYO_RED_KICK') {
-      deps.cinematic.addHitStop(1, defIdx);
-      deps.screenShake.trigger(7, 7, attacker.facing * 4);
-      deps.vfx.spawnHeavyDust(hitX, hitY + 20, 6);
-      deps.vfx.spawnProjectileExplosion(hitX, hitY, '#ff4400', '#ff8822');
-    }
-    // 75-Shiki Kai (百式·鬼焼き) — rapid rekka chain hit: escalating fire burst
-    if (atkName === 'KYO_75KAI' || atkName === 'KYO_75KAI_2') {
-      deps.cinematic.addHitStop(1, defIdx);
-      deps.screenShake.trigger(5, 6, attacker.facing * 3);
-      deps.vfx.spawnProjectileExplosion(hitX, hitY, '#ff6622', '#ffaa44');
-    }
-    // DM Orochinagi (大蛇薙) — massive fire explosion
-    if (atkName === 'DM_OROCHINAGI') {
-      deps.vfx.spawnSuperBurst(hitX, hitY, '#ff4400', '#ffdd44', true);
-      deps.vfx.spawnDMTenHaOuVFX(hitX, hitY, attacker.charId);
-      deps.screenFlash.triggerDarken(6);
-      deps.screenFlash.trigger('#ff6600', 0.35, 10);
-      deps.screenShake.trigger(14, 14, getAttackDirectionBias(attacker, defender, attackType, counterHit));
-    }
-    // SDM Orochinagi — even more dramatic
-    if (atkName === 'SDM_OROCHINAGI') {
-      deps.vfx.spawnSuperBurst(hitX, hitY, '#ff2200', '#ffee44', true);
-      deps.vfx.spawnDMTenHaOuVFX(hitX, hitY, attacker.charId);
-      deps.vfx.spawnGroundSlam(hitX, hitY);
-      deps.screenFlash.triggerDarken(8);
-      deps.screenFlash.trigger('#ff4400', 0.45, 14);
-      deps.screenShake.trigger(18, 16, getAttackDirectionBias(attacker, defender, attackType, counterHit));
-    }
-
-    // === Iori 角色专属必杀技VFX — 暗紫色主题 ===
-    // Oniyaki (鬼焼き) dark uppercut — purple burst
-    if (atkName === 'IORI_ONIYAKI' || atkName === 'IORI_ONIYAKI_C') {
-      deps.vfx.spawnSuperBurst(hitX, hitY, '#8800aa', '#cc44ff', atkName === 'IORI_ONIYAKI_C');
-      deps.cinematic.addHitStop(atkName === 'IORI_ONIYAKI_C' ? 3 : 2, defIdx);
-      deps.screenShake.trigger(atkName === 'IORI_ONIYAKI_C' ? 10 : 7, 8, attacker.facing * 5);
-      deps.vfx.spawnImpactRing(hitX, hitY, atkName === 'IORI_ONIYAKI_C' ? 1.4 : 1.1);
-    }
-    // Yamibarai (闇払い) dark projectile — purple explosion on hit
-    if (atkName === 'IORI_YAMIBARAI') {
-      deps.vfx.spawnProjectileExplosion(hitX, hitY, '#7722aa', '#bb55ff');
-      deps.screenFlash.trigger('#7722aa', 0.08, 3);
-    }
-    // Yamibarai C (strong) — larger burst + impact ring
-    if (atkName === 'IORI_YAMIBARAI_C') {
-      deps.vfx.spawnProjectileExplosion(hitX, hitY, '#6611aa', '#cc66ff');
-      deps.vfx.spawnImpactRing(hitX, hitY, 0.8);
-      deps.cinematic.addHitStop(1, defIdx);
-      deps.screenFlash.trigger('#6611aa', 0.12, 4);
-    }
-    // Aoihana (葵花) rekka chain — escalating VFX per hit
-    if (atkName === 'IORI_AOIHANA') {
-      deps.cinematic.addHitStop(1, defIdx);
-      deps.vfx.spawnImpactRing(hitX, hitY, 0.7);
-    }
-    if (atkName === 'IORI_AOIHANA_2') {
-      deps.cinematic.addHitStop(1, defIdx);
-      deps.screenShake.trigger(5, 5, attacker.facing * 3);
-      deps.vfx.spawnImpactRing(hitX, hitY, 0.9);
-    }
-    // Aoihana finisher — dark burst
-    if (atkName === 'IORI_AOIHANA_3') {
-      deps.vfx.spawnSuperBurst(hitX, hitY, '#660088', '#aa33dd', false);
-      deps.cinematic.addHitStop(2, defIdx);
-      deps.screenShake.trigger(9, 8, attacker.facing * 5);
-      deps.screenFlash.trigger('#8822cc', 0.1, 4);
-    }
-    // Kototsuki (琴月) — dark rush impact
-    if (atkName === 'IORI_KOTOTSUKI') {
-      deps.cinematic.addHitStop(2, defIdx);
-      deps.screenShake.trigger(8, 8, attacker.facing * 4);
-      deps.vfx.spawnImpactRing(hitX, hitY, 1.2);
-      deps.vfx.spawnProjectileExplosion(hitX, hitY, '#6600aa', '#aa44ff');
-    }
-    // Kuzukaze (屑鉄) — command grab dark spin: purple burst
-    if (atkName === 'IORI_KUZUKAZE') {
-      deps.cinematic.addHitStop(2, defIdx);
-      deps.screenShake.trigger(8, 10, attacker.facing * 4);
-      deps.vfx.spawnProjectileExplosion(hitX, hitY, '#660088', '#aa44cc');
-      deps.screenFlash.trigger('#6622aa', 0.12, 4);
-    }
-    // DM Yatagarasu (八咫烏) — dark energy burst
-    if (atkName === 'DM_YATAGARASU') {
-      deps.vfx.spawnSuperBurst(hitX, hitY, '#440066', '#8822cc', true);
-      deps.vfx.spawnDMTenHaOuVFX(hitX, hitY, attacker.charId);
-      deps.screenFlash.triggerDarken(6);
-      deps.screenFlash.trigger('#6622aa', 0.35, 10);
-      deps.screenShake.trigger(14, 14, getAttackDirectionBias(attacker, defender, attackType, counterHit));
-    }
-    // SDM Yatagarasu — dark rage burst, even more dramatic
-    if (atkName === 'SDM_YATAGARASU') {
-      deps.vfx.spawnSuperBurst(hitX, hitY, '#330055', '#aa33ee', true);
-      deps.vfx.spawnDMTenHaOuVFX(hitX, hitY, attacker.charId);
-      deps.vfx.spawnGroundSlam(hitX, hitY);
-      deps.screenFlash.triggerDarken(8);
-      deps.screenFlash.trigger('#5500aa', 0.45, 14);
-      deps.screenShake.trigger(18, 16, getAttackDirectionBias(attacker, defender, attackType, counterHit));
-    }
+    // === Character-specific VFX dispatch via plugin registry ===
+    const hitEffectCtx: HitEffectContext = {
+      vfx: deps.vfx,
+      screenShake: deps.screenShake,
+      screenFlash: deps.screenFlash,
+      cinematic: deps.cinematic,
+      attacker,
+      defender,
+      attackType,
+      hitX,
+      hitY,
+      counterHit,
+      combo,
+      attackDirectionBias: getAttackDirectionBias(attacker, defender, attackType, counterHit),
+      defIdx,
+    };
+    dispatchHitVFX(hitEffectCtx);
 
     // === Terry 角色专属必杀技VFX — 旋风主题 ===
     // Burn Knuckle — energy fist burst
@@ -825,67 +618,8 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       playSuperFlash(isHSDM ? 'HSDM' : isSDM ? 'SDM' : 'DM');
       playDM();
     }
-    // Ryo 必杀技差异化音效 — 优先于通用 special 分支
-    else if (atkName === 'RYO_KOOU' || atkName === 'RYO_KOOU_C' || atkName === 'RYO_KOOUKEN_D') {
-      playKoouken(); if (combo > 0) playHit(0.5, combo);
-    }
-    else if (atkName === 'RYO_KO_HOU' || atkName === 'RYO_KO_HOU_C') {
-      playKoHou(); if (combo > 0) playHit(0.5, combo);
-    }
-    else if (atkName === 'RYO_HIEN') {
-      playHien(); if (combo > 0) playHit(0.5, combo);
-    }
-    else if (atkName === 'RYO_HAOU') {
-      playHaou(); if (combo > 0) playHit(0.5, combo);
-    }
-    else if (atkName === 'RYO_HIO_HACKER') {
-      playHioHacker(); if (combo > 0) playHit(0.5, combo);
-    }
-    else if (atkName === 'RYO_ZANRETSU_KEN') {
-      playZanretsuKen(); if (combo > 0) playHit(0.4, combo);
-    }
-    else if (atkName === 'RYO_TSURIZAO') {
-      playHeavyHit(); if (combo > 0) playHit(0.5, combo);
-    }
-    else if (atkName === 'RYO_ORISHI') {
-      playSpecialLight(); if (combo > 0) playHit(0.5, combo);
-    }
-    // Kyo 必杀技差异化音效
-    else if (atkName === 'KYO_ONIYAKI' || atkName === 'KYO_ONIYAKI_C') {
-      playKyoOniyaki(); if (combo > 0) playHit(0.5, combo);
-    }
-    else if (atkName === 'KYO_YAMIBARAI' || atkName === 'KYO_YAMIBARAI_C') {
-      playKyoYamibarai(); if (combo > 0) playHit(0.5, combo);
-    }
-    else if (atkName === 'KYO_RED_KICK') {
-      playKyoRedKick(); if (combo > 0) playHit(0.5, combo);
-    }
-    else if (atkName === 'KYO_75KAI') {
-      playKyo75Kai(); if (combo > 0) playHit(0.5, combo);
-    }
-    else if (atkName === 'KYO_ARAGAMI' || atkName === 'KYO_ARAGAMI_KONOKIZU' || atkName === 'KYO_ARAGAMI_YANOSABI') {
-      playKyoAragami(); if (combo > 0) playHit(0.5, combo);
-    }
-    else if (atkName === 'KYO_DOKUGAMI') {
-      playKyoDokugami(); if (combo > 0) playHit(0.5, combo);
-    }
-    // Iori 必杀技差异化音效
-    else if (atkName === 'IORI_AOIHANA' || atkName === 'IORI_AOIHANA_2' || atkName === 'IORI_AOIHANA_3') {
-      playIoriAoihana(); if (combo > 0) playHit(0.5, combo);
-    }
-    else if (atkName === 'IORI_ONIYAKI' || atkName === 'IORI_ONIYAKI_C') {
-      playIoriOniyaki(); if (combo > 0) playHit(0.5, combo);
-    }
-    else if (atkName === 'IORI_YAMIBARAI' || atkName === 'IORI_YAMIBARAI_C') {
-      playIoriYamibarai(); if (combo > 0) playHit(0.5, combo);
-    }
-    else if (atkName === 'IORI_KOTOTSUKI') {
-      playIoriKototsuki(); if (combo > 0) playHit(0.5, combo);
-    }
-    else if (atkName === 'IORI_KUZUKAZE') {
-      playIoriKuzukaze(); if (combo > 0) playHit(0.5, combo);
-    }
-    else if (isThrowAttack(attackType)) {
+    // === Character-specific SFX dispatch via plugin registry ===
+    else if (!dispatchHitSFX(hitEffectCtx) && isThrowAttack(attackType)) {
       playThrow();
       // 投技保留一层主火花，减少蓝白多段铺开
       const throwColor = atkChar.specialColor;

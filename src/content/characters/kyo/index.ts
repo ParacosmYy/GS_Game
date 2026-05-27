@@ -85,3 +85,6 @@ export {
   KYO_ACTION_CONTRACTS,
   getKyoFrameContractManifest,
 } from '../../../core/kyoFrameContract.js';
+
+// Hit Effects (VFX/SFX plugin)
+export { KYO_HIT_EFFECTS } from './hitEffects/kyoHitEffects.js';

@@ -55,6 +55,7 @@ import { TrainingModeState } from './state/trainingMode.js';
 import { drawPauseMenu } from './rendering/pauseMenu.js';
 import { drawCharacterKOOverlay } from './rendering/overlayScreens.js';
 import type { CharacterDefinition } from './characters/types.js';
+import { initCharacterHitEffects } from './content/registerHitEffects.js';
 
 const canvas = document.getElementById('gameCanvas') as HTMLCanvasElement;
 const ctx = canvas.getContext('2d')!;
@@ -413,6 +414,7 @@ function update(): void {
       }
       initAudio();
       initSampler();
+      initCharacterHitEffects();
       rounds.currentRound = 1;
       gs.isTimeOver = false;
       gs.setPhase(GamePhase.INTRO);

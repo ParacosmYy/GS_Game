@@ -86,3 +86,6 @@ export {
   getSubdomainsNeedingTests,
   type SubdomainStatus,
 } from './reports/ryoReports.js';
+
+// Hit Effects (VFX/SFX plugin)
+export { RYO_HIT_EFFECTS } from './hitEffects/ryoHitEffects.js';
