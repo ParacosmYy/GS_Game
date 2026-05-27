@@ -642,6 +642,7 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       deps.cinematic.addHitStop(1, defIdx);
       deps.screenShake.trigger(7, 7, attacker.facing * 4);
       deps.vfx.spawnHeavyDust(hitX, hitY + 20, 6);
+      deps.vfx.spawnProjectileExplosion(hitX, hitY, '#ff4400', '#ff8822');
     }
     // 75-Shiki Kai (百式·鬼焼き) — rapid rekka chain hit: escalating fire burst
     if (atkName === 'KYO_75KAI' || atkName === 'KYO_75KAI_2') {
@@ -700,6 +701,7 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       deps.cinematic.addHitStop(2, defIdx);
       deps.screenShake.trigger(8, 8, attacker.facing * 4);
       deps.vfx.spawnImpactRing(hitX, hitY, 1.2);
+      deps.vfx.spawnProjectileExplosion(hitX, hitY, '#6600aa', '#aa44ff');
     }
     // Kuzukaze (屑鉄) — command grab dark spin: purple burst
     if (atkName === 'IORI_KUZUKAZE') {
