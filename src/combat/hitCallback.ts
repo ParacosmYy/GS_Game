@@ -402,6 +402,9 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
     attacker.hitFlashFrames = fb.hitFlashFrames;
     attacker.hitFlashColor = isDM ? atkChar.specialColor : '#ffffff';
 
+    // KOF2002: DM/SDM命中时屏幕短暂暗化突出超必杀效果
+    if (isDM) { attacker.superBgFlashFrames = isSDM ? 12 : 8; }
+
     // 重攻击保留一层短促微闪，不再额外叠更多环
     if (isHeavyAttack(attackType) && !isSpecial && !isDM) {
       deps.vfx.spawnImpactRing(hitX, hitY, 0.75);

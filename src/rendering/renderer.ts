@@ -138,6 +138,15 @@ export class Renderer {
 
     drawFightersImpl(ctx, fighters, cameraX, this.globalTick, maxModes, hitStopDefender, hitStopBias, this.spriteRenderer);
 
+    // KOF2002: 超必杀命中时短暂暗化背景突出效果
+    for (const f of fighters) {
+      if (f.superBgFlashFrames > 0) {
+        const alpha = Math.min(0.35, f.superBgFlashFrames / 12 * 0.35);
+        ctx.fillStyle = `rgba(0, 0, 0, ${alpha})`;
+        ctx.fillRect(-10, -10, CANVAS_WIDTH + 20, CANVAS_HEIGHT + 20);
+      }
+    }
+
     // End zoom before HUD — HUD always renders at normal scale
     if (cameraZoom !== 1.0) ctx.restore();
 
