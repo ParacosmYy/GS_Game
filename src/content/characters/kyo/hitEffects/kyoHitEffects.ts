@@ -116,6 +116,17 @@ function kyoVFX(ctx: HitEffectContext): boolean {
     screenShake.trigger(18, 16, attackDirectionBias);
     handled = true;
   }
+  // HSDM Orochinagi — hidden ultimate, maximum fire drama
+  if (atkName === 'HSDM_OROCHINAGI') {
+    vfx.spawnSuperBurst(hitX, hitY, '#ff1100', '#ffff66', true);
+    vfx.spawnDMTenHaOuVFX(hitX, hitY, attacker.charId);
+    vfx.spawnGroundSlam(hitX, hitY);
+    vfx.spawnScreenCracks(hitX, hitY);
+    screenFlash.triggerDarken(10);
+    screenFlash.trigger('#ff3300', 0.55, 16);
+    screenShake.trigger(22, 18, attackDirectionBias);
+    handled = true;
+  }
 
   return handled;
 }

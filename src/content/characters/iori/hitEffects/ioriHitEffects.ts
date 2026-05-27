@@ -92,6 +92,17 @@ function ioriVFX(ctx: HitEffectContext): boolean {
     screenShake.trigger(18, 16, attackDirectionBias);
     handled = true;
   }
+  // HSDM Yaotome — hidden ultimate, maximum drama
+  if (atkName === 'HSDM_YAOTOME') {
+    vfx.spawnSuperBurst(hitX, hitY, '#220044', '#cc44ff', true);
+    vfx.spawnDMTenHaOuVFX(hitX, hitY, attacker.charId);
+    vfx.spawnGroundSlam(hitX, hitY);
+    vfx.spawnScreenCracks(hitX, hitY);
+    screenFlash.triggerDarken(10);
+    screenFlash.trigger('#7700cc', 0.55, 16);
+    screenShake.trigger(22, 18, attackDirectionBias);
+    handled = true;
+  }
 
   return handled;
 }
