@@ -25,7 +25,7 @@ import { KYO_WALK_FORWARD_FRAMES, KYO_WALK_BACKWARD_FRAMES } from './kyoWalkFram
 import { KYO_STAND_A_FRAMES, KYO_STAND_C_FRAMES } from './kyoAttackFrames.js';
 import { KYO_CROUCH_FRAMES } from './kyoCrouchFrames.js';
 import { KYO_JUMP_FRAMES } from './kyoJumpFrames.js';
-import { KYO_HURT_FRAMES, KYO_KNOCKDOWN_FRAMES } from './kyoDamageFrames.js';
+import { KYO_HURT_FRAMES, KYO_KNOCKDOWN_FRAMES, KYO_BLOCK_FRAMES } from './kyoDamageFrames.js';
 import { KYO_STAND_B_FRAMES, KYO_STAND_D_FRAMES } from './kyoKickFrames.js';
 
 // ===== Internal Frame Registry =====
