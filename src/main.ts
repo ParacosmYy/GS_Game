@@ -1288,7 +1288,9 @@ function render(): void {
     return;
   }
   if (gs.phase === GamePhase.CONTINUE) {
-    renderer.drawContinue(Math.ceil(gs.continueCountdown / 60), gs.continueCursorYes);
+    const defChar = ROSTER.find(c => c.id === p1.charId);
+    const winChar = ROSTER.find(c => c.id === p2.charId);
+    renderer.drawContinue(Math.ceil(gs.continueCountdown / 60), gs.continueCursorYes, defChar, winChar);
     return;
   }
   if (gs.phase === GamePhase.GAME_OVER) {
@@ -1537,7 +1539,7 @@ function render(): void {
     renderer.drawDebug([p1, p2], projectiles, camera, tickRef.value, renderer.getFps(), vfx.count, [toHist(p1Cmd), toHist(p2Cmd)]);
   }
   if (gs.isTrainingMode && (gs.phase === GamePhase.FIGHTING || gs.phase === GamePhase.KO)) {
-    renderer.drawTrainingHUD(training, combatSystem.getComboCount(0), combatSystem.getComboDamage(0), tickRef.value, p1Char.moveList);
+    renderer.drawTrainingHUD(training, combatSystem.getComboCount(0), combatSystem.getComboDamage(0), tickRef.value, p1Char.moveList, p1.currentAttack as string ?? null);
     // Hitbox/hurtbox debug visualization (F5 toggle)
     if (training.showHitboxes) {
       drawHitboxOverlay(ctx, [p1, p2], projectiles, camera);

@@ -1014,7 +1014,7 @@ export function drawOptionsScreen(
 
 // ===== Continue Screen =====
 
-export function drawContinue(ctx: CanvasRenderingContext2D, secondsLeft: number, cursorYes: boolean): void {
+export function drawContinue(ctx: CanvasRenderingContext2D, secondsLeft: number, cursorYes: boolean, defeatedChar?: import('../characters/types.js').CharacterDefinition, winnerChar?: import('../characters/types.js').CharacterDefinition): void {
   ctx.save();
 
   ctx.fillStyle = 'rgba(0,0,0,0.88)';
@@ -1024,6 +1024,57 @@ export function drawContinue(ctx: CanvasRenderingContext2D, secondsLeft: number,
   const pulseAlpha = secondsLeft <= 3 ? 0.15 + Math.sin(Date.now() * 0.01) * 0.1 : 0.05;
   ctx.fillStyle = `rgba(80, 0, 0, ${pulseAlpha})`;
   ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+  // KOF2002: 败者/胜者角色肖像 — 经典街机Continue仪式感
+  const portraitY = CANVAS_HEIGHT / 2 - 20;
+  const portraitH = 80;
+  const portraitW = 70;
+
+  if (defeatedChar) {
+    const dpx = CANVAS_WIDTH / 2 - 200;
+    const dpy = portraitY - portraitH / 2;
+    ctx.fillStyle = 'rgba(15,15,25,0.8)';
+    roundRect(ctx, dpx - 4, dpy - 4, portraitW + 8, portraitH + 8, 4);
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(100,100,120,0.4)';
+    ctx.lineWidth = 1;
+    roundRect(ctx, dpx - 4, dpy - 4, portraitW + 8, portraitH + 8, 4);
+    ctx.stroke();
+    ctx.save();
+    ctx.globalAlpha = 0.4;
+    ctx.font = `bold 36px "Courier New", monospace`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = '#666';
+    ctx.fillText(defeatedChar.portrait, dpx + portraitW / 2, dpy + portraitH / 2);
+    ctx.restore();
+    drawSNKText(ctx, defeatedChar.nameCn, dpx + portraitW / 2, dpy + portraitH + 14, 12, '#666666');
+    drawSNKText(ctx, 'DEFEATED', dpx + portraitW / 2, dpy - 14, 9, '#884444');
+  }
+
+  if (winnerChar) {
+    const wpx = CANVAS_WIDTH / 2 + 130;
+    const wpy = portraitY - portraitH / 2;
+    ctx.fillStyle = 'rgba(10,10,20,0.7)';
+    roundRect(ctx, wpx - 4, wpy - 4, portraitW + 8, portraitH + 8, 4);
+    ctx.fill();
+    ctx.strokeStyle = winnerChar.color + '66';
+    ctx.lineWidth = 1.5;
+    roundRect(ctx, wpx - 4, wpy - 4, portraitW + 8, portraitH + 8, 4);
+    ctx.stroke();
+    ctx.save();
+    ctx.shadowColor = winnerChar.color;
+    ctx.shadowBlur = 8;
+    ctx.font = `bold 36px "Courier New", monospace`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = winnerChar.color;
+    ctx.fillText(winnerChar.portrait, wpx + portraitW / 2, wpy + portraitH / 2);
+    ctx.shadowBlur = 0;
+    ctx.restore();
+    drawSNKText(ctx, winnerChar.nameCn, wpx + portraitW / 2, wpy + portraitH + 14, 12, winnerChar.color);
+    drawSNKText(ctx, 'WINNER', wpx + portraitW / 2, wpy - 14, 9, '#ffcc44');
+  }
 
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
@@ -1728,6 +1779,7 @@ export function drawScreenWipe(
 
 import type { TrainingModeState, FrameDataDisplay, InputHistoryEntry } from '../state/trainingMode.js';
 import type { MoveListEntry } from '../core/types.js';
+import { CN_MOVE_NAMES } from './moveNameDisplay.js';
 
 /**
  * Draw the full training mode HUD overlay.
@@ -1744,6 +1796,7 @@ export function drawTrainingHUD(
   comboDamage: number,
   tick: number,
   moveList: MoveListEntry[] = [],
+  lastAttackType: string | null = null,
 ): void {
   ctx.save();
 
@@ -1795,7 +1848,7 @@ export function drawTrainingHUD(
 
   // ===== Left bottom panel: Input history =====
   if (training.showInputHistory) {
-    drawInputHistoryPanelAdjusted(ctx, training.inputHistory, tick, training.showMoveList, moveList);
+    drawInputHistoryPanelAdjusted(ctx, training.inputHistory, tick, training.showMoveList, moveList, lastAttackType);
   }
 
   // ===== Bottom panel: Frame data =====
@@ -1823,6 +1876,7 @@ function drawMoveListPanel(ctx: CanvasRenderingContext2D, moveList: MoveListEntr
     { key: 'special', label: 'SPECIAL MOVES' },
     { key: 'dm', label: 'DESPERATION MOVES' },
     { key: 'sdm', label: 'MAX DM' },
+    { key: 'hsdm', label: 'HIDDEN SUPER DM' },
     { key: 'system', label: 'SYSTEM' },
   ];
 
@@ -1889,6 +1943,7 @@ function drawMoveListPanel(ctx: CanvasRenderingContext2D, moveList: MoveListEntr
     special: { color: '#ffcc44', bg: 'rgba(220, 180, 40, 0.1)' },
     dm: { color: '#ff8844', bg: 'rgba(220, 120, 40, 0.12)' },
     sdm: { color: '#ff4466', bg: 'rgba(220, 50, 80, 0.12)' },
+    hsdm: { color: '#ff66cc', bg: 'rgba(220, 80, 180, 0.15)' },
     system: { color: '#88ff88', bg: 'rgba(80, 200, 80, 0.1)' },
   };
 
@@ -1937,6 +1992,7 @@ function drawInputHistoryPanelAdjusted(
   tick: number,
   showMoveList: boolean,
   moveList: MoveListEntry[],
+  lastAttackType: string | null = null,
 ): void {
   // Calculate move list panel height to position input history below it
   let moveListBottom = 36;
@@ -1955,12 +2011,15 @@ function drawInputHistoryPanelAdjusted(
     moveListBottom = 36 + 44;
   }
 
+  // Detected move name banner height
+  const detectedMoveH = lastAttackType ? 18 : 0;
+
   const panelX = 4;
   const panelY = moveListBottom + 4;
   const panelW = 220;
   const lineH = 14;
   const maxLines = 12;
-  const panelH = 20 + maxLines * lineH;
+  const panelH = 20 + maxLines * lineH + detectedMoveH;
 
   // Background
   ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
@@ -1978,13 +2037,27 @@ function drawInputHistoryPanelAdjusted(
   ctx.fillStyle = '#44ff44';
   ctx.fillText('INPUT HISTORY', panelX + 8, panelY + 4);
 
+  // Detected move name banner
+  let entryStartY = panelY + 20;
+  if (lastAttackType) {
+    const cnName = CN_MOVE_NAMES[lastAttackType];
+    if (cnName) {
+      ctx.fillStyle = 'rgba(255, 200, 60, 0.12)';
+      ctx.fillRect(panelX + 2, panelY + 16, panelW - 4, detectedMoveH - 1);
+      ctx.fillStyle = '#ffcc44';
+      ctx.font = 'bold 10px "Courier New", monospace';
+      ctx.fillText('>> ' + cnName, panelX + 8, panelY + 19);
+    }
+    entryStartY = panelY + 20 + detectedMoveH;
+  }
+
   // Entries
   ctx.font = '10px "Courier New", monospace';
   const startIdx = Math.max(0, history.length - maxLines);
   for (let i = startIdx; i < history.length; i++) {
     const entry = history[i];
     const lineIdx = i - startIdx;
-    const y = panelY + 20 + lineIdx * lineH;
+    const y = entryStartY + lineIdx * lineH;
 
     // Fade older entries
     const age = tick - entry.frame;
@@ -2008,7 +2081,7 @@ function drawInputHistoryPanelAdjusted(
   if (history.length === 0) {
     ctx.fillStyle = '#555';
     ctx.font = '10px "Courier New", monospace';
-    ctx.fillText('(no input yet)', panelX + 8, panelY + 24);
+    ctx.fillText('(no input yet)', panelX + 8, entryStartY + 4);
   }
 }
 

@@ -427,8 +427,8 @@ export class Renderer {
     drawOptionsScreen(this.ctx, tick, cursor, options);
   }
 
-  drawContinue(secondsLeft: number, cursorYes: boolean): void {
-    drawContinue(this.ctx, secondsLeft, cursorYes);
+  drawContinue(secondsLeft: number, cursorYes: boolean, defeatedChar?: CharacterDefinition, winnerChar?: CharacterDefinition): void {
+    drawContinue(this.ctx, secondsLeft, cursorYes, defeatedChar, winnerChar);
   }
 
   drawGameOver(timer: number): void {
@@ -639,8 +639,8 @@ export class Renderer {
     ctx.textAlign = 'left';
   }
 
-  drawTrainingHUD(training: TrainingModeState, comboCount: number, comboDamage: number, tick: number, moveList: CharacterDefinition['moveList'] = []): void {
-    drawTrainingHUD(this.ctx, training, comboCount, comboDamage, tick, moveList ?? []);
+  drawTrainingHUD(training: TrainingModeState, comboCount: number, comboDamage: number, tick: number, moveList: CharacterDefinition['moveList'] = [], lastAttackType: string | null = null): void {
+    drawTrainingHUD(this.ctx, training, comboCount, comboDamage, tick, moveList ?? [], lastAttackType);
   }
 
   // ===== HUD Info Display (Phase 69) =====
