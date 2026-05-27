@@ -764,6 +764,7 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       deps.vfx.spawnDMTenHaOuVFX(hitX, hitY, attacker.charId);
       deps.vfx.spawnGroundSlam(hitX, hitY);
       deps.vfx.spawnSuperBurst(hitX, hitY, '#ffaa00', '#ffee44', isGeyserSDM);
+      deps.vfx.spawnScorchMark(hitX, hitY, '#331100');
       deps.screenFlash.triggerDarken(isGeyserSDM ? 8 : 6);
       deps.screenFlash.trigger('#ffaa00', isGeyserSDM ? 0.35 : 0.25, isGeyserSDM ? 12 : 8);
       deps.screenShake.trigger(isGeyserSDM ? 16 : 14, 14, getAttackDirectionBias(attacker, defender, attackType, counterHit));
@@ -1038,4 +1039,6 @@ export function triggerKOGroundEffect(deps: { vfx: VFXSystem; screenFlash: Scree
   deps.screenFlash.trigger('#ff2200', 0.35, 14);
   // KOF2002: KO落地震屏55帧, 模拟地面冲击波持续感 — 使用KO分层常量
   deps.screenShake.trigger(SHAKE_KO, SHAKE_DURATION_KO);
+  // KOF2002: KO落地焦痕
+  deps.vfx.spawnScorchMark(defender.x, defender.y, '#221100');
 }

@@ -48,6 +48,7 @@ import {
   spawnTierSparks,
   spawnScreenCracks,
   spawnRunSpeedLines,
+  spawnScorchMark,
 } from './vfxPresets.js';
 import { getStageDustColors } from './stageAtmosphere.js';
 import { getStage } from './stage.js';
@@ -295,6 +296,11 @@ export class VFXSystem {
     spawnRunSpeedLines(this.particles, x, y, facing, charColor);
   }
 
+  /** Ground scorch mark at heavy impact location */
+  spawnScorchMark(x: number, groundY: number, color?: string): void {
+    spawnScorchMark(this.particles, x, groundY, color);
+  }
+
   /** Ryo: Ko'ou Ken (虎煌拳) projectile ki blast VFX */
   spawnKooukenVFX(worldX: number, worldY: number, facing: number, charId: string): void {
     spawnKooukenVFX(this.particles, worldX, worldY, facing, charId);
@@ -483,6 +489,21 @@ export class VFXSystem {
           ctx.fillStyle = '#000';
           ctx.beginPath();
           ctx.ellipse(sx, p.y, p.size * 1.15, p.size * 0.85, 0, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+          break;
+        }
+        case 'scorch': {
+          ctx.save();
+          // Ground scorch mark — elliptical dark spot that fades
+          ctx.globalAlpha = alpha * 0.35;
+          const scGrad = ctx.createRadialGradient(sx, p.y, 0, sx, p.y, p.size);
+          scGrad.addColorStop(0, p.color);
+          scGrad.addColorStop(0.6, p.color);
+          scGrad.addColorStop(1, 'rgba(0,0,0,0)');
+          ctx.fillStyle = scGrad;
+          ctx.beginPath();
+          ctx.ellipse(sx, p.y, p.size * 1.2, p.size * 0.4, 0, 0, Math.PI * 2);
           ctx.fill();
           ctx.restore();
           break;

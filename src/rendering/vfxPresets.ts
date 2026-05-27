@@ -9,7 +9,7 @@ export interface Particle {
   maxLife: number;
   size: number;
   color: string;
-  type: 'spark' | 'flash' | 'ring' | 'text' | 'star' | 'slash' | 'superburst' | 'groundslam';
+  type: 'spark' | 'flash' | 'ring' | 'text' | 'star' | 'slash' | 'superburst' | 'groundslam' | 'scorch';
   text?: string;
   gravity?: number;
   friction?: number;
@@ -1403,4 +1403,21 @@ export function spawnRunSpeedLines(particles: Particle[], x: number, y: number, 
       friction: 0.92,
     });
   }
+}
+
+/** Ground scorch mark — fades over time, appears at heavy impact locations */
+export function spawnScorchMark(particles: Particle[], x: number, groundY: number, color: string = '#332211'): void {
+  particles.push({
+    x: x + (Math.random() - 0.5) * 8,
+    y: groundY,
+    vx: 0,
+    vy: 0,
+    life: 60,
+    maxLife: 60,
+    size: 12 + Math.random() * 8,
+    color,
+    type: 'scorch',
+    gravity: 0,
+    friction: 1,
+  });
 }
