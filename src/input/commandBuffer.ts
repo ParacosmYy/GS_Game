@@ -444,6 +444,16 @@ export class CommandBuffer {
       || this.matchSequence(recent, ['forward', 'down', 'back']);
   }
 
+  /** Check if HCF motion is present in recent history (←↓→) */
+  hasHCF(currentFrame: number): boolean {
+    const effectiveWindow = this.getEffectiveHCFWindow(currentFrame);
+    const recent = this.history.filter(
+      (r) => currentFrame - r.frame <= effectiveWindow,
+    );
+    return this.matchSequence(recent, ['back', 'downback', 'down', 'downforward', 'forward'])
+      || this.matchSequence(recent, ['back', 'down', 'forward']);
+  }
+
   /** Check if ↓↓ motion is present in recent history */
   hasDD(currentFrame: number): boolean {
     const effectiveWindow = this.getEffectiveCommandWindow(currentFrame);

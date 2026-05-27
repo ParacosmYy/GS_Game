@@ -197,9 +197,14 @@ export const IoriDef: CharacterDefinition = {
       return input.buttonCPressed ? AttackType.IORI_ONIYAKI_C : AttackType.IORI_ONIYAKI;
     }
 
-    // HCB+K → 琴月陰 (dash attack, B=short, D=long)
-    if (input.kickPressed && cmdBuf.hasHCB(tick)) {
+    // HCF+K → 琴月陰 (dash attack, B=short, D=long)
+    if (input.kickPressed && cmdBuf.hasHCF(tick)) {
       return input.buttonDPressed ? AttackType.IORI_KOTOTSUKI_D : AttackType.IORI_KOTOTSUKI;
+    }
+
+    // HCF+P → 屑風 (command grab, close range)
+    if (input.punchPressed && cmdBuf.hasHCF(tick)) {
+      return AttackType.IORI_KUZUKAZE;
     }
 
     // QCB+P → 葵花 (A version or C version)

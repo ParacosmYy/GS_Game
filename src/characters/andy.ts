@@ -203,8 +203,7 @@ export const AndyDef: CharacterDefinition = {
     }
 
     // HCF+K → Zan'ei Ryuusei Ken (斬影流星拳, 弱K/强K区分)
-    // HCF = ←↙↓↘→, detected via hasHCB (reversed direction from facing)
-    if (input.kickPressed && cmdBuf.hasHCB(tick)) {
+    if (input.kickPressed && cmdBuf.hasHCF(tick)) {
       return input.buttonDPressed ? AttackType.ANDY_ZANEI_RYUSEI_KEN_D : AttackType.ANDY_ZANEI_RYUSEI_KEN;
     }
 
