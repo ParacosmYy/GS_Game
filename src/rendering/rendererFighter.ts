@@ -337,10 +337,11 @@ export function drawFighters(
       ctx.fillStyle = 'rgba(255, 255, 255, ' + flashAlpha + ')';
       ctx.fillRect(-30, -f.displayHeight - 5, 60, f.displayHeight + 10);
     }
-    // Dizzy state wobble — KOF2002 unsteady sway when stunned
+    // Dizzy state wobble — KOF2002 unsteady sway when stunned (intensity grows over time)
     if (f.state === FighterState.DIZZY) {
-      const swayX = Math.sin(f.stateAge * 0.15) * 3;
-      const swayY = Math.sin(f.stateAge * 0.22) * 1.5;
+      const intensityMult = 1 + Math.min(f.stateAge * 0.005, 1.5);
+      const swayX = Math.sin(f.stateAge * 0.15) * 3 * intensityMult;
+      const swayY = Math.sin(f.stateAge * 0.22) * 1.5 * intensityMult;
       ctx.translate(swayX, swayY);
       // KOF2002: 眩晕星星 — 头顶3颗旋转星星(随时间增大)
       const starBaseY = sy - f.displayHeight - 12;
@@ -412,6 +413,16 @@ export function drawFighters(
       : Math.floor(f.stateAge / ticksPerFrame);
 
     // Priority: 1) high-res pixel frames  2) sprite atlas  3) skeletal fallback
+    // KOF2002: 地面阴影 — 角色脚下椭圆形阴影
+    if (f.isGrounded()) {
+      ctx.save();
+      ctx.globalAlpha = 0.18;
+      ctx.fillStyle = '#000000';
+      ctx.beginPath();
+      ctx.ellipse(sx + leanOffsetX, sy + 2, hw * 0.8, 4, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
     const highResDrawn = drawHighResFrame(ctx, f.charId ?? '', f.state, f.stateAge, sx + leanOffsetX, sy, f.facing, f.currentAttack, f.vx);
     if (!highResDrawn) {
       const spriteRendered = spriteRenderer?.canRender(f.charId)
