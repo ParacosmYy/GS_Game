@@ -247,8 +247,14 @@ const CB_F1: number[][] = [
 /* y=143 */ r(''),
 ];
 
-// CB_F2: recovery — back to crouch (same as base)
+// CB_F2: recovery — leg pulling back from low kick, body settling
+// Right leg retracting from extended position, foot pulling back under body
 const CB_F2 = clone(BASE);
+// Modify only the leg region (y~85-105) to show leg retracting
+CB_F2[85] = r('.......................................21eege122');
+CB_F2[86] = r('......................................21eege122');
+CB_F2[87] = r('.....................................21ege12');
+CB_F2[88] = r('....................................21ge122');
 
 // ═══════════════════════════════════════════════════════════════════
 // CROUCH_D — Crouch Sweep / Heavy Low Kick (5 frames)
@@ -865,9 +871,16 @@ const CD_F3: number[][] = [
 /* y=143 */ r('................................................................................................'),
 ];
 
-// CD_F4: recovery — return to crouch stance
-// Leg pulls back in, body returns to normal crouch position.
+// CD_F4: recovery — leg pulling back from sweep, body resettling to crouch
+// Right leg retracting from full sweep extension, body weight centering
 const CD_F4 = clone(BASE);
+// y=90-110: leg pulling back from sweep, foot moving back under body
+CD_F4[90] = r('............................21eege122');
+CD_F4[91] = r('...........................21eege122');
+CD_F4[92] = r('..........................21ege12');
+CD_F4[93] = r('.........................21ge122');
+CD_F4[94] = r('........................21ge12');
+CD_F4[95] = r('.......................21ge122');
 
 // ═══════════════════════════════════════════════════════════════════
 // Exports

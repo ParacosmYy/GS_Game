@@ -196,8 +196,14 @@ CB_F1[66] = r('.........................k1eeeeeeggieeeeegg1k1k...ke89k122');
 CB_F1[67] = r('........................k1eeeeeeggieeeegg1k1k2...k891k.22');
 CB_F1[68] = r('.......................k1eeeeeeggieeeegg1k1k....21d912.2');
 
-// CB_F2: recovery — back to guard
+// CB_F2: recovery — leg pulling back from close kick, body settling
 const CB_F2 = clone(BASE);
+CB_F2[60] = r('.......22.2.2.2.22............k11111111114111111111k');
+CB_F2[61] = r('........2.2.2.2.2............kk1111111114111111111kk');
+CB_F2[65] = r('..........................k1eeeegiegg1k1k2.1eee122');
+CB_F2[66] = r('.........................k1eeeegieegg1k.k.1eee12');
+CB_F2[67] = r('........................k1eeeegieegg1k1k21eee1');
+CB_F2[68] = r('.......................k1eeeegieegg1k.k21eee');
 
 // ═══════════════════════════════════════════════════════════════════
 // CLOSE_D — Close Standing D (Close Heavy Kick) — 4 frames
@@ -490,8 +496,13 @@ CD_F2[61] = r('...............................kk111111114111111111keeegeeg89ek1k
 CD_F2[62] = r('..............................kk11111111411111111kkeege89gek1k1k1d8d1..............');
 CD_F2[63] = r('.............................k111111114111111111kke89ge1k1k...1d8d1...............');
 
-// CD_F3: recovery — back to guard
+// CD_F3: recovery — knee dropping from heavy thrust, body settling
 const CD_F3 = clone(BASE);
+CD_F3[56] = r('..............................k1eeeeeeggieeeegg1k1k21eee12');
+CD_F3[57] = r('...............................k1eeeeeeggieeeegg1k1k21eee1');
+CD_F3[58] = r('................................k1eeeeeggieeeegg1k1k.1eee');
+CD_F3[59] = r('.................................k111111114111111111k21eee');
+CD_F3[60] = r('................................kk11111111411111111k.1eee');
 
 // ═══════════════════════════════════════════════════════════════════
 // Exports

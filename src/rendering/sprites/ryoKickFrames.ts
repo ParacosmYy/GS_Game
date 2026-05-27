@@ -276,8 +276,24 @@ SB_F2[141]= r('.....k3...........k3..................89a1.......................
 SB_F2[142]= r('......k3.........k3....................9a1.................................');
 SB_F2[143]= r('.......4142414141....................89a1.................................');
 
-// SB_F3: recovery — back to guard stance (same as BASE)
+// SB_F3: recovery — leg retracting from mid-height kick, body settling
 const SB_F3 = clone(BASE);
+// y=60-65: belt/waist area settling back
+SB_F3[60] = r('.......22.2.2.2.22............k11111111114111111111k');
+SB_F3[61] = r('........2.2.2.2.2............kk1111111114111111111kk');
+// y=65-75: right leg pulling back, foot at ~x=60 (halfway retracted)
+SB_F3[65] = r('..........................k1eeeegiegg1k1k2.1eee12');
+SB_F3[66] = r('.........................k1eeeegieegg1k.k.1eee1222');
+SB_F3[67] = r('........................k1eeeegieegg1k1k21eee12.2');
+SB_F3[68] = r('.......................k1eeeegieegg1k.k21eee1222');
+SB_F3[69] = r('......................k1eeeegieegg1k1k.1eee12.2');
+SB_F3[70] = r('......................1eeeegieegg1k.k21eee122');
+SB_F3[71] = r('.....................1eeeegieegg1k1k.1eee12');
+// y=72-80: leg mostly retracted, foot back near guard position
+SB_F3[72] = r('.....................1eeeegieegg1.k21eee122');
+SB_F3[73] = r('....................1eeeegieegg1.k.1eee12');
+SB_F3[74] = r('....................1eeegieegg1.k21eee12');
+SB_F3[75] = r('...................1eeegieegg1.k.1eee12');
 
 // ═══════════════════════════════════════════════════════════════════
 // STAND_D — Far Standing D (Heavy Kick / Roundhouse)
@@ -941,8 +957,27 @@ SD_F3[141]= r('.....k3...........k3.......................................189a1.
 SD_F3[142]= r('......k3.........k3........................................189a1.................');
 SD_F3[143]= r('.......4142414141........................................189a1.................');
 
-// SD_F4: recovery — back to guard stance (same as BASE)
+// SD_F4: recovery — leg dropping from roundhouse, body rotating back to guard
+// Heavy roundhouse recovery: leg swings down and back, body weight resettles
 const SD_F4 = clone(BASE);
+// y=50-58: upper body settling from backward lean
+SD_F4[50] = r('........22..22.............11k1111111111111111111k');
+SD_F4[51] = r('.......2.22.2.2...........1k111111111111111111k2');
+// y=60-65: belt/waist settling back to center
+SD_F4[60] = r('.......22.2.2.2.22............k11111111114111111111k');
+SD_F4[61] = r('........2.2.2.2.2............kk1111111114111111111kk');
+// y=65-75: right leg swinging down from high roundhouse, foot at ~x=62
+SD_F4[65] = r('..........................k1eeeegiegg1k1k2.1eee122');
+SD_F4[66] = r('.........................k1eeeegieegg1k.k.1eee1222');
+SD_F4[67] = r('........................k1eeeegieegg1k1k21eee12.2');
+SD_F4[68] = r('.......................k1eeeegieegg1k.k21eee122');
+SD_F4[69] = r('......................k1eeeegieegg1k1k.1eee12');
+SD_F4[70] = r('......................1eeeegieegg1k.k21eee122');
+SD_F4[71] = r('.....................1eeeegieegg1k1k.1eee12');
+SD_F4[72] = r('.....................1eeeegieegg1.k21eee12');
+SD_F4[73] = r('....................1eeeegieegg1.k.1eee1');
+SD_F4[74] = r('....................1eeegieegg1.k21eee12');
+SD_F4[75] = r('...................1eeegieegg1.k.1eee1');
 
 // ═══════════════════════════════════════════════════════════════════
 // Exports
