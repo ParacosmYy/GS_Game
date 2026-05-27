@@ -16,8 +16,8 @@
 | 舞台美术 | 100 | 7 | 5场景视差+动态元素+CRT扫描线后处理+暗角+场景飘浮微粒+5舞台专属色彩分级+光柱+氛围雾气 |
 | 音频品质 | 150 | 12 | 合成SFX+BGM+Kyo 7种火焰SFX+Iori 8种暗紫SFX+Kyo/Iori专属attackSFX接入+连段递增音效+里程碑音效 |
 | 角色内容 | 150 | 19 | Ryo全闭环+Kyo 14文件+Iori 14文件+三角色contentLoader集成 |
-| 战斗手感 | 150 | 23 | hitstop衰减+方向震屏+冲击环+斩击线+连段hitstop递减+Kyo火焰VFX+Iori暗紫VFX+气槽命中闪光+命中冲击分层光效+MAX模式金色反馈+HSDM专属档位+SDM震屏修正 |
-| 帧数据精度 | 100 | 15 | Frame Contract: Ryo+Kyo 47+Iori 47 ActionContract, 三角色逐帧碰撞对齐, 后退步行7tpf对齐元数据 |
+| 战斗手感 | 150 | 24 | hitstop衰减+方向震屏+冲击环+斩击线+连段hitstop递减+Kyo火焰VFX+Iori暗紫VFX+气槽命中闪光+命中冲击分层光效+MAX模式金色反馈+HSDM专属档位+SDM震屏修正+绝境反击红闪 |
+| 帧数据精度 | 100 | 16 | Frame Contract: Ryo+Kyo 47+Iori 47 ActionContract, 三角色逐帧碰撞对齐, 后退步行7tpf对齐元数据, idle变量帧呼吸节奏 |
 | 游戏流程 | 100 | 23 | 选人→对战→KO→结算+3v3+训练模式+舞台名intro+DM暗幕+暂停菜单+OPTIONS+MATCH POINT指示器 |
 | UI/HUD品质 | 50 | 14 | SNK风格能量槽+计时器+连段计数器+播报+像素帧缓存+暂停菜单(招式/按键)+训练模式SNK风格招式表 |
 
