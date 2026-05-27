@@ -227,6 +227,18 @@ export function drawFighters(
     if (f.invincible || f.throwInvulnFrames > 0) {
       ctx.globalAlpha = 0.6 + Math.sin(globalTick * 0.5) * 0.15;
     }
+    // KOF2002: 投技无敌金色轮廓 — throwInvuln期间金色边框
+    if (f.throwInvulnFrames > 0 && !f.invincible) {
+      ctx.save();
+      ctx.globalCompositeOperation = 'screen';
+      ctx.globalAlpha = 0.1;
+      ctx.strokeStyle = '#ffcc44';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.ellipse(sx, sy - f.displayHeight / 2, hw + 4, f.displayHeight / 2 + 4, 0, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.restore();
+    }
     // KOF2002: 后撤步渐隐 — 后dash期间身体更透明(幻影感)
     if (f.state === FighterState.BACKDASH) {
       ctx.globalAlpha = Math.min(ctx.globalAlpha || 1, 0.75);
