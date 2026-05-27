@@ -252,5 +252,7 @@ export function handleDizzy(ctx: FighterCtx, input: ResolvedInput): void {
     f.dizzyTimer = 0;
     f.dizzyMashCount = 0;
     f.throwInvincibilityTimer = THROW_INVINCIBILITY_POST_STUN;
+    // Recovery VFX: small spark burst
+    ctx.vfx.spawnRecoverySpark(f.x, f.y - f.displayHeight / 2);
   }
 }
