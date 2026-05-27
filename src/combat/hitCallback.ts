@@ -14,7 +14,7 @@ import { getFeedback } from '../core/feedbackManifest.js';
 import { ROSTER } from '../characters/index.js';
 import { isDM as isDMCheck } from '../core/attackClassifier.js';
 import { gainMeterOnHit, gainMeterOnBlock, gainMeterOnHitstun } from './meter.js';
-import { playHit, playBlock, playSpecial, playDM, playThrow, playCounter, playHeavyHit, playSuperFlash, playWire, playJuggleHit, playBlockSpecial, playBlockDM, playSpecialLight, playSpecialHeavy, playKOHit, playHitAccent, playLandingHeavy, playDizzyHit, playGroundBounce, playWallBounce, playGuardCrush, playKoouken, playKoHou, playHien, playHaou, playHioHacker, playZanretsuKen } from '../audio/sampler.js';
+import { playHit, playBlock, playSpecial, playDM, playThrow, playCounter, playHeavyHit, playSuperFlash, playWire, playJuggleHit, playBlockSpecial, playBlockDM, playSpecialLight, playSpecialHeavy, playKOHit, playHitAccent, playLandingHeavy, playDizzyHit, playGroundBounce, playWallBounce, playGuardCrush, playKoouken, playKoHou, playHien, playHaou, playHioHacker, playZanretsuKen, playKyoOniyaki, playKyoYamibarai, playKyoAragami, playKyoDokugami, playKyo75Kai, playKyoRedKick, playKyoOrochinagi, playIoriAoihana, playIoriYamibarai, playIoriOniyaki, playIoriKototsuki, playIoriKuzukaze } from '../audio/sampler.js';
 import { spawnTierSparks } from '../rendering/vfxPresets.js';
 import { bgm } from '../audio/bgm.js';
 import { announcer } from '../audio/announcer.js';
@@ -533,6 +533,75 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       deps.vfx.spawnImpactRing(hitX, hitY, 1.0);
     }
 
+    // === Kyo 角色专属必杀技VFX — 火焰主题 ===
+    // Oniyaki (鬼焼き) uppercut — fire column burst
+    if (atkName === 'KYO_ONIYAKI' || atkName === 'KYO_ONIYAKI_C') {
+      deps.vfx.spawnSuperBurst(hitX, hitY, '#ff4400', '#ffaa22', atkName === 'KYO_ONIYAKI_C');
+      deps.cinematic.addHitStop(atkName === 'KYO_ONIYAKI_C' ? 3 : 2, defIdx);
+      deps.screenShake.trigger(atkName === 'KYO_ONIYAKI_C' ? 10 : 7, 8, attacker.facing * 5);
+      deps.vfx.spawnImpactRing(hitX, hitY, atkName === 'KYO_ONIYAKI_C' ? 1.4 : 1.1);
+    }
+    // Yamibarai (闇払い) fire projectile — flame burst on hit
+    if (atkName === 'KYO_YAMIBARAI' || atkName === 'KYO_YAMIBARAI_C') {
+      deps.vfx.spawnProjectileExplosion(hitX, hitY, '#ff6622', '#ffcc44');
+      deps.screenFlash.trigger('#ff6600', 0.08, 3);
+    }
+    // Aragami (荒咬み) — fire punch impact
+    if (atkName === 'KYO_ARAGAMI') {
+      deps.cinematic.addHitStop(1, defIdx);
+      deps.screenShake.trigger(6, 6, attacker.facing * 3);
+      deps.vfx.spawnImpactRing(hitX, hitY, 0.9);
+    }
+    // Red Kick (七十五式·改) — flame kick sweep
+    if (atkName === 'KYO_RED_KICK') {
+      deps.cinematic.addHitStop(1, defIdx);
+      deps.screenShake.trigger(7, 7, attacker.facing * 4);
+      deps.vfx.spawnHeavyDust(hitX, hitY + 20, 6);
+    }
+    // DM Orochinagi (大蛇薙) — massive fire explosion
+    if (atkName === 'DM_OROCHINAGI') {
+      deps.vfx.spawnSuperBurst(hitX, hitY, '#ff4400', '#ffdd44', true);
+      deps.vfx.spawnDMTenHaOuVFX(hitX, hitY, attacker.charId);
+      deps.screenFlash.triggerDarken(6);
+      deps.screenFlash.trigger('#ff6600', 0.35, 10);
+      deps.screenShake.trigger(14, 14, getAttackDirectionBias(attacker, defender, attackType, counterHit));
+    }
+
+    // === Iori 角色专属必杀技VFX — 暗紫色主题 ===
+    // Oniyaki (鬼焼き) dark uppercut — purple burst
+    if (atkName === 'IORI_ONIYAKI' || atkName === 'IORI_ONIYAKI_C') {
+      deps.vfx.spawnSuperBurst(hitX, hitY, '#8800aa', '#cc44ff', atkName === 'IORI_ONIYAKI_C');
+      deps.cinematic.addHitStop(atkName === 'IORI_ONIYAKI_C' ? 3 : 2, defIdx);
+      deps.screenShake.trigger(atkName === 'IORI_ONIYAKI_C' ? 10 : 7, 8, attacker.facing * 5);
+      deps.vfx.spawnImpactRing(hitX, hitY, atkName === 'IORI_ONIYAKI_C' ? 1.4 : 1.1);
+    }
+    // Yamibarai (闇払い) dark projectile — purple explosion on hit
+    if (atkName === 'IORI_YAMIBARAI' || atkName === 'IORI_YAMIBARAI_C') {
+      deps.vfx.spawnProjectileExplosion(hitX, hitY, '#7722aa', '#bb55ff');
+      deps.screenFlash.trigger('#7722aa', 0.08, 3);
+    }
+    // Aoihana (葵花) rekka finisher — dark burst
+    if (atkName === 'IORI_AOIHANA_3') {
+      deps.vfx.spawnSuperBurst(hitX, hitY, '#660088', '#aa33dd', false);
+      deps.cinematic.addHitStop(2, defIdx);
+      deps.screenShake.trigger(9, 8, attacker.facing * 5);
+      deps.screenFlash.trigger('#8822cc', 0.1, 4);
+    }
+    // Kototsuki (琴月) — dark rush impact
+    if (atkName === 'IORI_KOTOTSUKI') {
+      deps.cinematic.addHitStop(2, defIdx);
+      deps.screenShake.trigger(8, 8, attacker.facing * 4);
+      deps.vfx.spawnImpactRing(hitX, hitY, 1.2);
+    }
+    // DM Yatagarasu (八咫烏) — dark energy burst
+    if (atkName === 'DM_YATAGARASU') {
+      deps.vfx.spawnSuperBurst(hitX, hitY, '#440066', '#8822cc', true);
+      deps.vfx.spawnDMTenHaOuVFX(hitX, hitY, attacker.charId);
+      deps.screenFlash.triggerDarken(6);
+      deps.screenFlash.trigger('#6622aa', 0.35, 10);
+      deps.screenShake.trigger(14, 14, getAttackDirectionBias(attacker, defender, attackType, counterHit));
+    }
+
     // SFX
     if (isDM) {
       const isHSDM = (attackType as string).startsWith('HSDM_');
@@ -563,6 +632,41 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
     }
     else if (atkName === 'RYO_ORISHI') {
       playSpecialLight(); if (combo > 0) playHit(0.5, combo);
+    }
+    // Kyo 必杀技差异化音效
+    else if (atkName === 'KYO_ONIYAKI' || atkName === 'KYO_ONIYAKI_C') {
+      playKyoOniyaki(); if (combo > 0) playHit(0.5, combo);
+    }
+    else if (atkName === 'KYO_YAMIBARAI' || atkName === 'KYO_YAMIBARAI_C') {
+      playKyoYamibarai(); if (combo > 0) playHit(0.5, combo);
+    }
+    else if (atkName === 'KYO_RED_KICK') {
+      playKyoRedKick(); if (combo > 0) playHit(0.5, combo);
+    }
+    else if (atkName === 'KYO_75KAI') {
+      playKyo75Kai(); if (combo > 0) playHit(0.5, combo);
+    }
+    else if (atkName === 'KYO_ARAGAMI' || atkName === 'KYO_ARAGAMI_KONOKIZU' || atkName === 'KYO_ARAGAMI_YANOSABI') {
+      playKyoAragami(); if (combo > 0) playHit(0.5, combo);
+    }
+    else if (atkName === 'KYO_DOKUGAMI') {
+      playKyoDokugami(); if (combo > 0) playHit(0.5, combo);
+    }
+    // Iori 必杀技差异化音效
+    else if (atkName === 'IORI_AOIHANA' || atkName === 'IORI_AOIHANA_2' || atkName === 'IORI_AOIHANA_3') {
+      playIoriAoihana(); if (combo > 0) playHit(0.5, combo);
+    }
+    else if (atkName === 'IORI_ONIYAKI' || atkName === 'IORI_ONIYAKI_C') {
+      playIoriOniyaki(); if (combo > 0) playHit(0.5, combo);
+    }
+    else if (atkName === 'IORI_YAMIBARAI' || atkName === 'IORI_YAMIBARAI_C') {
+      playIoriYamibarai(); if (combo > 0) playHit(0.5, combo);
+    }
+    else if (atkName === 'IORI_KOTOTSUKI') {
+      playIoriKototsuki(); if (combo > 0) playHit(0.5, combo);
+    }
+    else if (atkName === 'IORI_KUZUKAZE') {
+      playIoriKuzukaze(); if (combo > 0) playHit(0.5, combo);
     }
     else if (isThrowAttack(attackType)) {
       playThrow();
