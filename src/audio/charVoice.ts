@@ -113,6 +113,11 @@ const PATTERNS: Record<string, VoiceSyllable[]> = {
     { vowel: VOWEL_UH, durationMs: 200, freqOffset: -30, attackMs: 15, releaseMs: 80, pitchEnd: -20 },
     { vowel: VOWEL_OH, durationMs: 300, freqOffset: -40, attackMs: 10, releaseMs: 150, pitchEnd: 10 },
   ],
+  intro: [
+    // Brief ready stance grunt: short, sharp, determined
+    { vowel: VOWEL_EH, durationMs: 60,  freqOffset: 5,   attackMs: 3, releaseMs: 15 },
+    { vowel: VOWEL_AH, durationMs: 80,  freqOffset: 15,  attackMs: 4, releaseMs: 30, pitchEnd: 20 },
+  ],
 };
 
 // ─── Buffer cache ───────────────────────────────────────────────

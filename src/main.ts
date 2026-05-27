@@ -470,6 +470,8 @@ function update(): void {
       // Arrival dust puff
       vfx.spawnDust(p1.x, p1.y);
       vfx.spawnDust(p2.x, p2.y);
+      // KOF2002: P1 intro voice — brief ready stance grunt
+      playCharVoice(p1.charId, 'intro', 0.4);
     }
 
     // Tick announce sequence, play SFX on trigger frames
