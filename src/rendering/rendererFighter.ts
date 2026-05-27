@@ -626,6 +626,26 @@ export function drawFighters(
       ctx.fill();
       ctx.restore();
     }
+    // KOF2002: 超必杀命中能量环 — superBgFlashFrames时攻击者周围扩散环
+    if (f.superBgFlashFrames > 0) {
+      ctx.save();
+      const ringProgress = 1 - f.superBgFlashFrames / 12;
+      const ringRadius = 20 + ringProgress * 60;
+      ctx.globalAlpha = (1 - ringProgress) * 0.4;
+      ctx.strokeStyle = '#ffdd66';
+      ctx.lineWidth = 3 * (1 - ringProgress);
+      ctx.beginPath();
+      ctx.ellipse(sx, sy - f.displayHeight / 2, ringRadius, ringRadius * 0.6, 0, 0, Math.PI * 2);
+      ctx.stroke();
+      // 内层白色环
+      ctx.globalAlpha = (1 - ringProgress) * 0.2;
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.ellipse(sx, sy - f.displayHeight / 2, ringRadius * 0.7, ringRadius * 0.4, 0, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.restore();
+    }
     // KOF2002: MAX模式边框脉冲 — MAX模式时角色周围脉冲金色边框
     if (maxModeActive) {
       ctx.save();
