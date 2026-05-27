@@ -537,10 +537,11 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       deps.screenShake.trigger(9, 8, attacker.facing * 5);
       deps.vfx.spawnImpactRing(hitX, hitY, 1.1);
     }
-    // RYO_KOOUKEN_D (强虎煌拳D版) — 击倒版本强化反馈
+    // RYO_KOOUKEN_D (强虎煌拳D版) — 击倒版本强化反馈 + energy burst
     if (atkName === 'RYO_KOOUKEN_D') {
       deps.cinematic.addHitStop(2, defIdx);
       deps.screenShake.trigger(9, 9, attacker.facing * 5);
+      deps.vfx.spawnProjectileExplosion(hitX, hitY, '#4488ff', '#88ccff');
     }
     // RYO_HIO_HACKER (氷果斬) — 突进打击强化反馈
     if (atkName === 'RYO_HIO_HACKER') {
@@ -616,6 +617,12 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       deps.cinematic.addHitStop(1, defIdx);
       deps.screenShake.trigger(6, 6, attacker.facing * 3);
       deps.vfx.spawnImpactRing(hitX, hitY, 0.9);
+    }
+    // Dokugami (毒咬み) — flame followup: burst + shake
+    if (atkName === 'KYO_DOKUGAMI') {
+      deps.cinematic.addHitStop(1, defIdx);
+      deps.screenShake.trigger(7, 6, attacker.facing * 4);
+      deps.vfx.spawnProjectileExplosion(hitX, hitY, '#ff6622', '#ffaa44');
     }
     // Red Kick (七十五式·改) — flame kick sweep
     if (atkName === 'KYO_RED_KICK') {
