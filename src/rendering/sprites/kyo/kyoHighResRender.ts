@@ -32,7 +32,7 @@ import { KYO_STAND_B_FRAMES, KYO_STAND_D_FRAMES } from './kyoKickFrames.js';
 import { KYO_CROUCH_A_FRAMES, KYO_CROUCH_C_FRAMES, KYO_CROUCH_B_FRAMES, KYO_CROUCH_D_FRAMES } from './kyoCrouchAttackFrames.js';
 import { KYO_AIR_A_FRAMES, KYO_AIR_C_FRAMES, KYO_AIR_D_FRAMES } from './kyoAirAttackFrames.js';
 import { KYO_CLOSE_A_FRAMES, KYO_CLOSE_C_FRAMES, KYO_CLOSE_B_FRAMES, KYO_CLOSE_D_FRAMES } from './kyoCloseAttackFrames.js';
-import { KYO_ONIYAKI_FRAMES, KYO_ONIYAKI_C_FRAMES, KYO_YAMIBARAI_FRAMES, KYO_RED_KICK_FRAMES } from './kyoSpecialFrames.js';
+import { KYO_ONIYAKI_FRAMES, KYO_ONIYAKI_C_FRAMES, KYO_YAMIBARAI_FRAMES, KYO_RED_KICK_FRAMES, KYO_75KAI_FRAMES, KYO_ARAGAMI_FRAMES, KYO_DOKUGAMI_FRAMES, KYO_OROCHINAGI_DM_FRAMES, KYO_OROCHINAGI_SDM_FRAMES } from './kyoSpecialFrames.js';
 
 // ===== Registry & Cache =====
 
@@ -96,6 +96,11 @@ function initKyoFrames(): void {
   registerVariableFrames('ONIYAKI_C', KYO_ONIYAKI_C_FRAMES, [4, 3, 5, 6, 7, 10]);
   registerVariableFrames('YAMIBARAI', KYO_YAMIBARAI_FRAMES, [6, 3, 8, 12]);
   registerVariableFrames('RED_KICK', KYO_RED_KICK_FRAMES, [5, 3, 3, 6, 10]);
+  registerVariableFrames('75KAI', KYO_75KAI_FRAMES, [5, 3, 3, 8]);
+  registerVariableFrames('ARAGAMI', KYO_ARAGAMI_FRAMES, [6, 4, 8, 12]);
+  registerVariableFrames('DOKUGAMI', KYO_DOKUGAMI_FRAMES, [7, 5, 10, 12]);
+  registerVariableFrames('OROCHINAGI_DM', KYO_OROCHINAGI_DM_FRAMES, [8, 4, 14, 8, 12]);
+  registerVariableFrames('OROCHINAGI_SDM', KYO_OROCHINAGI_SDM_FRAMES, [10, 6, 20, 12, 8, 10]);
 
   // Damage
   registerVariableFrames('HURT', KYO_HURT_FRAMES, [3, 5, 6, 4]);
@@ -121,6 +126,14 @@ function resolveKyoFrameKey(
       if (currentAttack === AttackType.KYO_YAMIBARAI) return 'YAMIBARAI';
       if (currentAttack === AttackType.KYO_YAMIBARAI_C) return 'YAMIBARAI';
       if (currentAttack === AttackType.KYO_RED_KICK) return 'RED_KICK';
+      if (currentAttack === AttackType.KYO_75KAI || currentAttack === AttackType.KYO_75KAI_2) return '75KAI';
+      if (currentAttack === AttackType.KYO_ARAGAMI || currentAttack === AttackType.KYO_ARAGAMI_KONOKIZU ||
+          currentAttack === AttackType.KYO_ARAGAMI_YANOSABI || currentAttack === AttackType.KYO_NANASE ||
+          currentAttack === AttackType.KYO_KOTO_TSUKI || currentAttack === AttackType.KYO_YAKISOGI) return 'ARAGAMI';
+      if (currentAttack === AttackType.KYO_DOKUGAMI || currentAttack === AttackType.KYO_TSUMIYOMI ||
+          currentAttack === AttackType.KYO_BATSUYOMI) return 'DOKUGAMI';
+      if (currentAttack === AttackType.DM_OROCHINAGI) return 'OROCHINAGI_DM';
+      if (currentAttack === AttackType.SDM_OROCHINAGI) return 'OROCHINAGI_SDM';
       if (currentAttack === AttackType.STAND_C) return 'STAND_C';
       if (currentAttack === AttackType.CLOSE_C) return 'CLOSE_C';
       if (currentAttack === AttackType.STAND_D) return 'STAND_D';
