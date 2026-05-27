@@ -258,6 +258,20 @@ export class Renderer {
     ctx.fillStyle = fogGrad;
     ctx.fillRect(-10, STAGE_GROUND_Y + 10, CANVAS_WIDTH + 20, 60);
 
+    // KOF2002: 场景飘浮微粒 — 缓慢飘浮的环境粒子
+    ctx.save();
+    const particleColor = stageId === 'temple' ? '#ffddaa' : stageId === 'china' ? '#ffaaaa' : '#aaddff';
+    for (let pi = 0; pi < 8; pi++) {
+      const px = ((tick * 0.3 + pi * 120) % (CANVAS_WIDTH + 40)) - 20;
+      const py = CANVAS_HEIGHT * 0.3 + Math.sin(tick * 0.02 + pi * 1.7) * 60 + pi * 20;
+      ctx.globalAlpha = 0.08 + Math.sin(tick * 0.03 + pi) * 0.04;
+      ctx.fillStyle = particleColor;
+      ctx.beginPath();
+      ctx.arc(px, py, 1.5, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.restore();
+
     ctx.restore();
   }
 
