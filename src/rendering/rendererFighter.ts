@@ -417,6 +417,18 @@ export function drawFighters(
       ctx.translate(0, sy);
     }
 
+    // KOF2002: MAX模式跑步火花 — MAX+RUN时脚下绿色光点
+    if (maxModeActive && f.state === FighterState.RUN && f.stateAge % 4 === 0) {
+      ctx.save();
+      ctx.globalAlpha = 0.4;
+      ctx.fillStyle = '#44ff88';
+      const sparkX = sx + (Math.random() - 0.5) * 20;
+      ctx.beginPath();
+      ctx.arc(sparkX, sy, 3, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+
     // KOF2002: 受击恢复闪烁 — hitstun最后5帧身体闪烁
     if (f.state === FighterState.HITSTUN && f.hitstunTimer > 0 && f.hitstunTimer <= 5) {
       const flickerOn = f.hitstunTimer % 2 === 0;
