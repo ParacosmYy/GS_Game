@@ -78,3 +78,12 @@ export {
   type RyoCompletenessReport,
   type ActionStatus,
 } from './completeness.js';
+
+// Reports (dimension report + hitbox chain verification)
+export {
+  getRyoCompletenessReport,
+  getRyoHitboxChainReport,
+  getRyoHitboxChainSummary,
+  type HitboxChainStatus,
+  type HitboxChainSummary,
+} from './reports/ryoReports.js';
