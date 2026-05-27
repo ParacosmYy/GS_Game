@@ -16,6 +16,9 @@ import { FEEDBACK_MANIFEST, inferTier } from '../core/feedbackManifest.js';
 import { SPRITE_MANIFEST } from '../core/spriteManifestData.js';
 import { HURTBOX_TABLE } from '../core/hurtboxManifest.js';
 import { AttackType, FighterState } from '../core/types.js';
+import { hasKyoHighResFrame } from '../rendering/sprites/kyo/kyoHighResRender.js';
+import { hasIoriHighResFrame } from '../rendering/sprites/iori/ioriHighResRender.js';
+import { hasHighResFrame } from '../rendering/sprites/ryo/ryoHighResRender.js';
 import { getRegisteredEffectIds } from '../content/characterHitEffects.js';
 import { initCharacterHitEffects } from '../content/registerHitEffects.js';
 
@@ -221,6 +224,44 @@ function validateHitEffectsRegistration(charId: string): SectionResult {
   return result;
 }
 
+// Command normal high-res frame resolution checks
+const CMD_NORMAL_CHECKS: Record<string, Array<{ attack: AttackType; state: FighterState }>> = {
+  ryo: [
+    { attack: AttackType.RYO_TSURIZAO, state: FighterState.STAND_ATTACK },
+    { attack: AttackType.RYO_ORISHI, state: FighterState.STAND_ATTACK },
+  ],
+  kyo: [
+    { attack: AttackType.CMD_GOFU_YOU, state: FighterState.STAND_ATTACK },
+    { attack: AttackType.CMD_88SHIKI, state: FighterState.STAND_ATTACK },
+    { attack: AttackType.CMD_NARAKU, state: FighterState.AIR_ATTACK },
+  ],
+  iori: [
+    { attack: AttackType.IORI_YUMEYUMI, state: FighterState.STAND_ATTACK },
+    { attack: AttackType.IORI_KATANUGI, state: FighterState.STAND_ATTACK },
+    { attack: AttackType.IORI_YUKIWARUI, state: FighterState.STAND_ATTACK },
+  ],
+};
+
+function validateCommandNormalFrames(charId: string): SectionResult {
+  const checks = CMD_NORMAL_CHECKS[charId] ?? [];
+  const result: SectionResult = { total: checks.length, pass: 0, issues: [] };
+
+  for (const { attack, state } of checks) {
+    let resolved = false;
+    if (charId === 'kyo') resolved = hasKyoHighResFrame(state, attack, 0, 1);
+    else if (charId === 'iori') resolved = hasIoriHighResFrame(state, attack, 0, 1);
+    else if (charId === 'ryo') resolved = hasHighResFrame(charId, state, attack, 0, 1);
+
+    if (resolved) {
+      result.pass++;
+    } else {
+      result.issues.push(`${attack}: no high-res frame registered for state ${state}`);
+    }
+  }
+
+  return result;
+}
+
 // Register hit effects so we can validate them
 initCharacterHitEffects();
 
@@ -230,6 +271,7 @@ export function validateCharacter(charId: string): CharacterReport {
     { name: 'feedback tier mapping', result: validateFeedbackTiers(charId) },
     { name: 'sprite manifest', result: validateSpriteManifest(charId) },
     { name: 'hit effects registration', result: validateHitEffectsRegistration(charId) },
+    { name: 'command normal high-res frames', result: validateCommandNormalFrames(charId) },
   ];
 
   // Hurtbox coverage is global, only include once
