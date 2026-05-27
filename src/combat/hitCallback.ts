@@ -482,6 +482,20 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       deps.screenFlash.trigger('#ffcc00', 0.35, 10);
       deps.screenShake.trigger(14, 14, getAttackDirectionBias(attacker, defender, attackType, counterHit));
     }
+    // SDM Ten Ha Ou — enhanced energy burst + longer flash
+    if (atkName === 'SDM_TEN_HA_OU') {
+      deps.vfx.spawnDMTenHaOuVFX(hitX, hitY, attacker.charId);
+      deps.screenFlash.trigger('#ffdd44', 0.45, 14);
+      deps.screenShake.trigger(16, 16, getAttackDirectionBias(attacker, defender, attackType, counterHit));
+    }
+    // DM/SDM/HSDM Ryuko Ranbu — rush multi-hit feedback
+    if (atkName === 'DM_RYUKO_RANBU' || atkName === 'SDM_RYUKO_RANBU' || atkName === 'HSDM_RYUKO_RANBU') {
+      const isHSDM = atkName === 'HSDM_RYUKO_RANBU';
+      const isSDM = atkName === 'SDM_RYUKO_RANBU';
+      deps.vfx.spawnImpactRing(hitX, hitY, isHSDM ? 1.8 : isSDM ? 1.5 : 1.2);
+      deps.screenFlash.trigger(isHSDM ? '#ffaa22' : '#ffcc00', isHSDM ? 0.5 : 0.3, isHSDM ? 16 : 10);
+      deps.screenShake.trigger(isHSDM ? 18 : isSDM ? 16 : 14, isHSDM ? 18 : isSDM ? 16 : 14, getAttackDirectionBias(attacker, defender, attackType, counterHit));
+    }
     // Haou Shou Kou Ken (霸王翔吼拳) counter flash
     if (atkName === 'RYO_HAOU') {
       deps.vfx.spawnHaouFlash(attacker.x, attacker.y, attacker.charId);
