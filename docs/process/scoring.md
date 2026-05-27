@@ -2,7 +2,7 @@
 
 ## 1. 当前分数
 
-当前总分：`102/2000`
+当前总分：`103/2000`
 
 完整历史见 [SCORE.history.md](../archive/SCORE.history.md)。
 
@@ -12,7 +12,7 @@
 | --- | ---: | ---: | --- |
 | 角色美术 | 200 | 12 | Ryo像素帧42/42状态覆盖，仍是程序化非SNK精灵图 |
 | 舞台美术 | 100 | 5 | 5场景视差+动态元素，程序化非位图 |
-| 音频品质 | 150 | 8 | 合成SFX+BGM，非采样音效 |
+| 音频品质 | 150 | 9 | 合成SFX+BGM+Kyo 7种火焰SFX，非采样音效 |
 | 角色内容 | 150 | 17 | Ryo全闭环+Kyo内容包14文件(attacks/hitboxes/feedback/moves/commands/animations/cancelPaths) |
 | 战斗手感 | 150 | 18 | hitstop衰减+方向震屏+冲击环+斩击线+连段hitstop递减 |
 | 帧数据精度 | 100 | 12 | Frame Contract全攻击对齐，逐帧判定可测试 |
