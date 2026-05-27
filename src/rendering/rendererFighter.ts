@@ -309,6 +309,11 @@ export function drawFighters(
       const squashX = 1 - (1 - squashProgress) * 0.1;
       ctx.scale(squashX, squashY);
     }
+    // KOF2002: 防御冲击压扁 — 防御硬直前3帧身体微压
+    if (f.state === FighterState.BLOCKSTUN && f.blockstunTimer > 0 && f.stateAge < 3) {
+      const blockSquash = (3 - f.stateAge) / 3;
+      ctx.scale(1 + blockSquash * 0.04, 1 - blockSquash * 0.06);
+    }
     // KOF2002: 起身恢复闪光 — GETUP最后3帧微闪白光
     if (f.state === FighterState.GETUP && f.getupTimer > 0 && f.getupTimer <= 3) {
       const flashAlpha = f.getupTimer / 3 * 0.15;
