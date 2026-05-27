@@ -608,9 +608,16 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       deps.vfx.spawnImpactRing(hitX, hitY, atkName === 'KYO_ONIYAKI_C' ? 1.4 : 1.1);
     }
     // Yamibarai (闇払い) fire projectile — flame burst on hit
-    if (atkName === 'KYO_YAMIBARAI' || atkName === 'KYO_YAMIBARAI_C') {
+    if (atkName === 'KYO_YAMIBARAI') {
       deps.vfx.spawnProjectileExplosion(hitX, hitY, '#ff6622', '#ffcc44');
       deps.screenFlash.trigger('#ff6600', 0.08, 3);
+    }
+    // Yamibarai C (strong) — bigger flame burst + hitStop
+    if (atkName === 'KYO_YAMIBARAI_C') {
+      deps.vfx.spawnProjectileExplosion(hitX, hitY, '#ff4400', '#ffee66');
+      deps.vfx.spawnImpactRing(hitX, hitY, 0.8);
+      deps.cinematic.addHitStop(1, defIdx);
+      deps.screenFlash.trigger('#ff4400', 0.12, 4);
     }
     // Aragami (荒咬み) — fire punch impact
     if (atkName === 'KYO_ARAGAMI') {
@@ -654,9 +661,16 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       deps.vfx.spawnImpactRing(hitX, hitY, atkName === 'IORI_ONIYAKI_C' ? 1.4 : 1.1);
     }
     // Yamibarai (闇払い) dark projectile — purple explosion on hit
-    if (atkName === 'IORI_YAMIBARAI' || atkName === 'IORI_YAMIBARAI_C') {
+    if (atkName === 'IORI_YAMIBARAI') {
       deps.vfx.spawnProjectileExplosion(hitX, hitY, '#7722aa', '#bb55ff');
       deps.screenFlash.trigger('#7722aa', 0.08, 3);
+    }
+    // Yamibarai C (strong) — larger burst + impact ring
+    if (atkName === 'IORI_YAMIBARAI_C') {
+      deps.vfx.spawnProjectileExplosion(hitX, hitY, '#6611aa', '#cc66ff');
+      deps.vfx.spawnImpactRing(hitX, hitY, 0.8);
+      deps.cinematic.addHitStop(1, defIdx);
+      deps.screenFlash.trigger('#6611aa', 0.12, 4);
     }
     // Aoihana (葵花) rekka chain — escalating VFX per hit
     if (atkName === 'IORI_AOIHANA') {
