@@ -56,6 +56,7 @@ import {
   spawnIoriAoihanaTrail,
   spawnKyoDokugamiTrail,
   spawnIoriYatagarasuVFX,
+  spawnVictoryAuraSpark,
   spawnRunSpeedLines,
   spawnScorchMark,
   spawnKOSuperBurst,
@@ -349,6 +350,11 @@ export class VFXSystem {
   /** Iori: Yatagarasu (八咫烏) DM startup — dark energy spiral vortex */
   spawnIoriYatagarasuVFX(worldX: number, worldY: number, facing: number): void {
     spawnIoriYatagarasuVFX(this.particles, worldX, worldY, facing);
+  }
+
+  /** Victory aura sparkle — element-coded rising energy around winner */
+  spawnVictoryAuraSpark(worldX: number, worldY: number, charColor: string): void {
+    spawnVictoryAuraSpark(this.particles, worldX, worldY, charColor);
   }
 
   /** Ryo: Ko Hou (虎咲) uppercut flame column VFX */

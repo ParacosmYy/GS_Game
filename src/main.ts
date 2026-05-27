@@ -1458,14 +1458,14 @@ function render(): void {
     if (!winPoseDrawn) {
       drawVictoryPose(ctx, wx, wy, winner.facing, winner.color, '#ffffff30', tickRef.value, winner.charId);
     }
-    // Victory sparkle — occasional character-colored sparkles around winner
-    if (gs.winQuoteTimer % 12 === 0) {
+    // Victory aura — character-element-coded rising energy around winner
+    if (gs.winQuoteTimer % 8 === 0) {
       const charDef = ROSTER.find(c => c.id === winner.charId);
       const sparkColor = charDef?.specialColor ?? '#ffcc00';
-      vfx.spawnCharacterHitSparks(
+      vfx.spawnVictoryAuraSpark(
         winner.x + (Math.random() - 0.5) * 40,
-        winner.y - winner.displayHeight * 0.6 + Math.random() * 30,
-        3, sparkColor, 0.4, 0.3, 0.15, false, winner.facing,
+        winner.y - winner.displayHeight * 0.5 + Math.random() * 20,
+        sparkColor,
       );
     }
     const charDef = ROSTER.find(c => c.id === winner.charId);

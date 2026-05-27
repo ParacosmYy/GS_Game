@@ -2194,3 +2194,37 @@ export function spawnIoriYatagarasuVFX(particles: Particle[], x: number, y: numb
     });
   }
 }
+
+/** Victory aura sparkle — character-element-coded rising energy around the winner.
+ *  Replaces generic hit sparks with themed energy wisps.
+ */
+export function spawnVictoryAuraSpark(particles: Particle[], x: number, y: number, charColor: string): void {
+  // Rising energy wisp from ground
+  const angle = -Math.PI / 2 + (Math.random() - 0.5) * Math.PI * 0.6;
+  const speed = 1.5 + Math.random() * 2;
+  particles.push({
+    x: x + (Math.random() - 0.5) * 30,
+    y: y - Math.random() * 20,
+    vx: Math.cos(angle) * speed,
+    vy: Math.sin(angle) * speed - 1,
+    life: 20 + Math.floor(Math.random() * 10),
+    maxLife: 30,
+    size: 2 + Math.random() * 3,
+    color: Math.random() < 0.3 ? '#ffffff' : charColor,
+    type: Math.random() < 0.2 ? 'star' : 'spark',
+    gravity: -0.15,
+    friction: 0.96,
+    rotation: Math.random() * Math.PI * 2,
+    rotSpeed: (Math.random() - 0.5) * 0.2,
+  });
+  // Occasional larger flash
+  if (Math.random() < 0.15) {
+    particles.push({
+      x: x + (Math.random() - 0.5) * 40,
+      y: y - 10 - Math.random() * 30,
+      vx: 0, vy: -0.5,
+      life: 6, maxLife: 6, size: 12 + Math.random() * 8,
+      color: charColor, type: 'flash',
+    });
+  }
+}
