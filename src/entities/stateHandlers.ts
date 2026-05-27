@@ -341,6 +341,14 @@ export function handleAttack(ctx: FighterCtx, input: ResolvedInput): void {
   // Character-specific onAttackActive (fireballs, uppercuts etc.)
   if (f.attackPhase === 'active' && f.currentAttack) {
     ctx.character.onAttackActive(f, f.currentAttack, ctx.projectiles, ctx.playerIndex);
+    // KOF2002: heavy attack swoosh effect — air displacement during active frames
+    const atkStr = f.currentAttack as string;
+    if (f.attackFrame === 1 && (atkStr.endsWith('_C') || atkStr.endsWith('_D') || atkStr === 'STAND_CD')) {
+      ctx.vfx.spawnCharacterHitSparks(
+        f.x + f.facing * 30, f.y - f.displayHeight * 0.5,
+        3, 'rgba(255,255,255,0.4)', 0.5, 0.6, 0.1, false, f.facing,
+      );
+    }
   }
 
   // 新攻击开始时清除上一招的取消缓冲
