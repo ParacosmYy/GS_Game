@@ -62,6 +62,10 @@ export function drawFighters(
       ctx.ellipse(sx, STAGE_GROUND_Y + 2, shadowW * 1.5, shadowH * 2, 0, 0, Math.PI * 2);
       ctx.fill();
       ctx.restore();
+      // KOF2002: KO击败身体摇摆 — defeated时身体微弱摇摆
+      if (f.state === FighterState.KNOCKDOWN && f.isGrounded()) {
+        ctx.translate(Math.sin(globalTick * 0.3) * 1.5, 0);
+      }
     }
 
     const { bodyColor, outlineColor, glowColor } = resolveFighterColors(f, globalTick);
@@ -1040,6 +1044,25 @@ export function drawFighters(
       ctx.lineWidth = 2;
       ctx.beginPath();
       ctx.ellipse(sx, sy - f.displayHeight / 2, hw + 6, f.displayHeight / 2 + 6, 0, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.restore();
+    }
+    // KOF2002: MAX模式激活爆发 — MAX_MODE stateAge<3时明亮扩散环
+    if (f.state === FighterState.MAX_MODE && f.stateAge < 3) {
+      ctx.save();
+      ctx.globalAlpha = (3 - f.stateAge) / 3 * 0.4;
+      ctx.strokeStyle = '#44ff88';
+      ctx.lineWidth = 3;
+      const maxBurstR = 15 + f.stateAge * 20;
+      ctx.beginPath();
+      ctx.ellipse(sx, sy - f.displayHeight / 2, maxBurstR, maxBurstR * 0.6, 0, 0, Math.PI * 2);
+      ctx.stroke();
+      // 内层白色
+      ctx.globalAlpha = (3 - f.stateAge) / 3 * 0.2;
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.ellipse(sx, sy - f.displayHeight / 2, maxBurstR * 0.6, maxBurstR * 0.35, 0, 0, Math.PI * 2);
       ctx.stroke();
       ctx.restore();
     }
