@@ -738,6 +738,17 @@ export function drawFighters(
       }
       ctx.restore();
     }
+    // KOF2002: 倒地着地烟尘 — KNOCKDOWN着陆时扩散灰色圆
+    if (f.state === FighterState.KNOCKDOWN && f.stateAge >= 2 && f.stateAge <= 5 && f.isGrounded()) {
+      ctx.save();
+      ctx.globalAlpha = (5 - f.stateAge) / 3 * 0.25;
+      ctx.fillStyle = '#888888';
+      const dustR = 8 + (f.stateAge - 2) * 6;
+      ctx.beginPath();
+      ctx.ellipse(sx, sy, dustR, dustR * 0.3, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
 
     // KOF2002: 反击架势蓄力发光 — COUNTER_STANCE时身体蓄力蓝色光环
     if (f.state === FighterState.COUNTER_STANCE && f.stateAge > 5) {
