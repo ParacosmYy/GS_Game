@@ -161,6 +161,11 @@ export class Renderer {
           ctx.fillRect(-10, -10, CANVAS_WIDTH + 20, CANVAS_HEIGHT + 20);
         }
       }
+      // KOF2002: Counter Hit橙色闪屏 — counterGlowFrames时短暂橙色叠加
+      if (f.counterGlowFrames > 0 && f.counterGlowFrames > 3) {
+        ctx.fillStyle = 'rgba(255, 140, 0, 0.06)';
+        ctx.fillRect(-10, -10, CANVAS_WIDTH + 20, CANVAS_HEIGHT + 20);
+      }
     }
 
     // End zoom before HUD — HUD always renders at normal scale

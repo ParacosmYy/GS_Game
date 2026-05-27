@@ -609,6 +609,19 @@ export function drawFighters(
       const blockSquash = (3 - f.stateAge) / 3;
       ctx.scale(1 + blockSquash * 0.04, 1 - blockSquash * 0.06);
     }
+    // KOF2002: 防御推回扬尘 — BLOCKSTUN前3帧脚下扬尘
+    if (f.state === FighterState.BLOCKSTUN && f.blockstunTimer > 0 && f.stateAge < 3) {
+      ctx.save();
+      ctx.globalAlpha = (3 - f.stateAge) / 3 * 0.25;
+      ctx.fillStyle = '#ccbb99';
+      for (let bd = 0; bd < 3; bd++) {
+        const bx = sx - f.facing * (8 + bd * 6 + f.stateAge * 5);
+        ctx.beginPath();
+        ctx.ellipse(bx, sy + 2, 3 + bd * 2, 1.5, 0, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.restore();
+    }
     // KOF2002: 起身恢复闪光 — GETUP最后3帧微闪白光
     if (f.state === FighterState.GETUP && f.getupTimer > 0 && f.getupTimer <= 3) {
       const flashAlpha = f.getupTimer / 3 * 0.15;
