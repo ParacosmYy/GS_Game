@@ -54,6 +54,8 @@ export class Renderer {
   private globalTick = 0;
   private stars: Star[];
   private spriteRenderer: SpriteRenderer | null = null;
+  /** CRT scanline overlay toggle — Neo Geo aesthetic */
+  crtEnabled = true;
 
   constructor(ctx: CanvasRenderingContext2D) {
     this.ctx = ctx;
@@ -273,10 +275,52 @@ export class Renderer {
     ctx.restore();
 
     ctx.restore();
+
+    // KOF2002: CRT scanline overlay — Neo Geo aesthetic
+    this._drawCRTOverlay();
   }
 
   getFps(): number {
     return this.currentFps;
+  }
+
+  /** Toggle CRT scanline overlay */
+  toggleCRT(): void {
+    this.crtEnabled = !this.crtEnabled;
+  }
+
+  /** KOF2002 CRT scanline overlay — simulates Neo Geo horizontal scanlines + phosphor glow */
+  private _drawCRTOverlay(): void {
+    if (!this.crtEnabled) return;
+    const ctx = this.ctx;
+    ctx.save();
+
+    // Scanlines: semi-transparent dark horizontal lines every 2px
+    ctx.globalAlpha = 0.06;
+    ctx.fillStyle = '#000000';
+    for (let y = 0; y < CANVAS_HEIGHT; y += 2) {
+      ctx.fillRect(0, y, CANVAS_WIDTH, 1);
+    }
+
+    // Phosphor bloom: very subtle horizontal brightening between scanlines
+    ctx.globalAlpha = 0.015;
+    ctx.fillStyle = '#aaaacc';
+    for (let y = 1; y < CANVAS_HEIGHT; y += 4) {
+      ctx.fillRect(0, y, CANVAS_WIDTH, 1);
+    }
+
+    // Subtle RGB sub-pixel simulation at edges
+    ctx.globalAlpha = 0.02;
+    ctx.fillStyle = '#ff0000';
+    for (let y = 0; y < CANVAS_HEIGHT; y += 3) {
+      ctx.fillRect(0, y, 1, 1);
+    }
+    ctx.fillStyle = '#0000ff';
+    for (let y = 1; y < CANVAS_HEIGHT; y += 3) {
+      ctx.fillRect(CANVAS_WIDTH - 1, y, 1, 1);
+    }
+
+    ctx.restore();
   }
 
   // ===== Projectile rendering (delegated) =====

@@ -214,6 +214,7 @@ function drawControls(
     { label: 'P2 MAX/Burst', keys: 'Numpad .' },
     { label: '', keys: '' },
     { label: 'Pause / Resume', keys: 'Escape' },
+    { label: 'CRT Filter Toggle', keys: 'F6' },
     { label: 'Start', keys: 'P (P1) / Numpad 9 (P2)' },
   ];
 

@@ -1230,6 +1230,7 @@ window.addEventListener('keydown', e => {
   // HUD Info Display toggles
   if (e.code === 'F12') { e.preventDefault(); renderer.toggleDebugOverlay(); }
   if (!gs.isTrainingMode && e.code === 'F3') { e.preventDefault(); renderer.toggleInputDisplay(); }
+  if (e.code === 'F6') { e.preventDefault(); renderer.toggleCRT(); }
 });
 window.addEventListener('keyup', e => {
   if (e.code === 'F1') f1Down = false;

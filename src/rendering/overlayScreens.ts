@@ -1567,7 +1567,7 @@ function drawFrameDataPanel(
 /** Controls help panel on the right side */
 function drawControlsPanel(ctx: CanvasRenderingContext2D): void {
   const panelW = 155;
-  const panelH = 118;
+  const panelH = 136;
   const panelX = CANVAS_WIDTH - panelW - 4;
   const panelY = 36;
 
@@ -1589,6 +1589,7 @@ function drawControlsPanel(ctx: CanvasRenderingContext2D): void {
     { key: 'F3', desc: 'Input display' },
     { key: 'F4', desc: 'Frame data' },
     { key: 'F5', desc: 'Move list' },
+    { key: 'F6', desc: 'CRT filter' },
     { key: 'ESC', desc: 'Back to select' },
   ];
 
