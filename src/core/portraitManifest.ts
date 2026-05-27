@@ -318,3 +318,7 @@ registerSizedPortrait('iori', 'select', ioriSelectPortrait);
 // ===== 注册 Kyo 的 select 肖像 =====
 import { kyoSelectPortrait } from '../rendering/portraits/kyoSelectPortrait.js';
 registerSizedPortrait('kyo', 'select', kyoSelectPortrait);
+
+// ===== 注册 Kyo/Iori VS 肖像 (复用 select 肖像，比 32x40 base 好很多) =====
+registerSizedPortrait('kyo', 'vs', kyoSelectPortrait);
+registerSizedPortrait('iori', 'vs', ioriSelectPortrait);
