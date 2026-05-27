@@ -742,6 +742,24 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       deps.vfx.spawnImpactRing(hitX, hitY, 0.9);
     }
 
+    // DM Power Geyser (Terry) — massive ground energy eruption
+    if (atkName === 'DM_POWER_GEYSER' || atkName === 'SDM_POWER_GEYSER') {
+      const isGeyserSDM = atkName === 'SDM_POWER_GEYSER';
+      deps.vfx.spawnDMTenHaOuVFX(hitX, hitY, attacker.charId);
+      deps.vfx.spawnGroundSlam(hitX, hitY);
+      deps.vfx.spawnSuperBurst(hitX, hitY, '#ffaa00', '#ffee44', isGeyserSDM);
+      deps.screenFlash.triggerDarken(isGeyserSDM ? 8 : 6);
+      deps.screenFlash.trigger('#ffaa00', isGeyserSDM ? 0.35 : 0.25, isGeyserSDM ? 12 : 8);
+      deps.screenShake.trigger(isGeyserSDM ? 16 : 14, 14, getAttackDirectionBias(attacker, defender, attackType, counterHit));
+    }
+    // SDM Phoenix Kick (Kim) — soaring fire kick
+    if (atkName === 'SDM_PHOENIX_KICK') {
+      deps.vfx.spawnSuperBurst(hitX, hitY, '#ff4400', '#ffcc44', true);
+      deps.screenFlash.triggerDarken(6);
+      deps.screenFlash.trigger('#ff6600', 0.3, 10);
+      deps.screenShake.trigger(14, 14, getAttackDirectionBias(attacker, defender, attackType, counterHit));
+    }
+
     // SFX
     if (isDM) {
       const isHSDM = (attackType as string).startsWith('HSDM_');
