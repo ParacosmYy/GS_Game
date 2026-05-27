@@ -323,7 +323,9 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       : 0.5;
     // 低血补强: 不受连击递减
     const criticalStop = defender.health < defender.maxHealth * 0.15 ? 1 : 0;
-    deps.cinematic.triggerHitStop(Math.round(baseStop * comboDecayMultiplier) + criticalStop, defIdx, attacker.facing);
+    // KOF2002: MAX模式命中加成 — 攻击者在MAX模式下命中获得额外hitstop
+    const maxModeStop = attacker.maxModeActive && !isDM ? 3 : 0;
+    deps.cinematic.triggerHitStop(Math.round(baseStop * comboDecayMultiplier) + criticalStop + maxModeStop, defIdx, attacker.facing);
     gainMeterOnHitstun(deps.gauges[defIdx], attackType, defender.health, defender.maxHealth);
     // 风云再起特色: 第一次命中奖励 — 每回合首次命中额外+30气槽
     if (!deps.combatSystem.wasFirstHitAwarded(defIdx)) {
@@ -360,6 +362,16 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
     deps.vfx.spawnCharacterHitSparks(hitX, hitY, sparks, sparkColor, sparkSize * comboSparkScale * chSizeBonus, sparkSpeed, sparkStarRatio, sparkLowGrav, attacker.facing);
     // FR-2: Tier-differentiated sparks from manifest
     deps.vfx.spawnTierSparks(hitX, hitY, fb.sparkCount, fb.sparkType, fb.sparkPalette, fb.sparkSpeed);
+
+    // KOF2002: MAX模式命中视觉强化 — 金色火花+冲击环+闪光
+    if (attacker.maxModeActive && !isDM) {
+      const maxSparks = isSpecial ? 6 : isHeavyAttack(attackType) ? 4 : 3;
+      deps.vfx.spawnCharacterHitSparks(hitX, hitY, maxSparks, '#ffcc00', sparkSize * 0.7, sparkSpeed * 1.1, 0.15, false, attacker.facing);
+      deps.vfx.spawnImpactRing(hitX, hitY, 1.0);
+      if (isSpecial) {
+        deps.screenFlash.trigger('#ffcc00', 0.08, 3);
+      }
+    }
 
     // === DM (200+ damage): 屏幕宽闪光 + 巨大火花 ===
     if (isDM) {
@@ -723,6 +735,10 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
 
     // Sidechain duck: manifest驱动基础值
     bgm.duck(fb.bgmDuckVolume, fb.bgmDuckDuration);
+    // KOF2002: MAX模式命中时BGM更深沉地压低
+    if (attacker.maxModeActive && !isDM) {
+      bgm.duck(Math.max(0.4, fb.bgmDuckVolume - 0.15), fb.bgmDuckDuration + 40);
+    }
 
     // === Counter Hit 增强 ===
     if (counterHit) {
