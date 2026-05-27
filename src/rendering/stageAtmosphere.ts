@@ -282,10 +282,28 @@ export function drawStageParticles(
     return;
   }
 
+  // Street stage: light rain streaks
+  if (stageId === 'street') {
+    for (let pi = 0; pi < 20; pi++) {
+      const px = ((pi * 53 + tick * 1.2) % (CANVAS_WIDTH + 20)) - 10;
+      const py = ((tick * 2.5 + pi * 37) % (STAGE_GROUND_Y + 30)) - 15;
+      const alpha = 0.06 + Math.sin(tick * 0.02 + pi * 0.5) * 0.03;
+      ctx.globalAlpha = alpha;
+      ctx.strokeStyle = '#aabbcc';
+      ctx.lineWidth = 0.5;
+      ctx.beginPath();
+      ctx.moveTo(px, py);
+      ctx.lineTo(px - 1, py + 6);
+      ctx.stroke();
+    }
+    ctx.restore();
+    return;
+  }
+
   // Standard floating particles with per-stage count and behavior
-  const count = stageId === 'street' ? 6 : 8;
+  const count = 8;
   for (let pi = 0; pi < count; pi++) {
-    const speed = stageId === 'street' ? 0.5 : 0.3;
+    const speed = 0.3;
     const px = ((tick * speed + pi * 120) % (CANVAS_WIDTH + 40)) - 20;
     const py = CANVAS_HEIGHT * 0.3 + Math.sin(tick * 0.02 + pi * 1.7) * 60 + pi * 20;
     const alpha = 0.08 + Math.sin(tick * 0.03 + pi) * 0.04;
