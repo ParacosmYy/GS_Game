@@ -40,8 +40,9 @@ export const IORI_ATTACK_KEYS: string[] = [
   // CD blowback
   'STAND_CD', 'JUMP_CD',
   // DM / SDM
-  'DM_YAOTOME',    // 八稚女 DM
-  'SDM_YAOTOME',   // 八稚女 SDM
+  'DM_YATAGARASU',    // 八稚女 DM
+  'SDM_YATAGARASU',   // 八稚女 SDM
+  'HSDM_YAOTOME',     // 八稚女 HSDM (MAX + red health)
 ];
 
 /** Iori's frame data, keyed by AttackType string */

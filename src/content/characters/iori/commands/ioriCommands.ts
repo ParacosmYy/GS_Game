@@ -33,9 +33,9 @@ export const IORI_MOVE_LIST: IoriMoveEntry[] = [
   { name: '葵花 追撃 弐', input: '葵花中 ↓↙← + P', type: 'special', attackTypeKey: 'IORI_AOIHANA_2' },
   { name: '葵花 追撃 参', input: '葵花弐中 ↓↙← + P', type: 'special', attackTypeKey: 'IORI_AOIHANA_3' },
   // DMs — 超必杀技
-  { name: '八稚女 (Yaotome)', input: '↓↙←↙↓↘→ + A / C', type: 'dm', attackTypeKey: 'DM_YAOTOME' },
+  { name: '八稚女 (Yaotome)', input: '↓↙←↙↓↘→ + A / C', type: 'dm', attackTypeKey: 'DM_YATAGARASU' },
   // SDMs — MAX超必杀技
-  { name: '八稚女 (MAX)', input: '↓↙←↙↓↘→ + AC', type: 'sdm', attackTypeKey: 'SDM_YAOTOME' },
+  { name: '八稚女 (MAX)', input: '↓↙←↙↓↘→ + AC', type: 'sdm', attackTypeKey: 'SDM_YATAGARASU' },
   // System — 系统动作
   { name: '爆气 (MAX Mode)', input: 'K+U / O (shortcut)', type: 'system' },
 ];

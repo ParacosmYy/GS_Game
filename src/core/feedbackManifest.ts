@@ -327,6 +327,7 @@ export const FEEDBACK_MANIFEST: FeedbackManifest = {
     // ===== Kyo DM / SDM =====
     DM_OROCHINAGI: 'dm',
     SDM_OROCHINAGI: 'sdm',
+    HSDM_OROCHINAGI: 'hsdm',
 
     // ===== Iori 必杀技 (special) =====
     IORI_YAMIBARAI: 'special',
@@ -346,9 +347,10 @@ export const FEEDBACK_MANIFEST: FeedbackManifest = {
     IORI_KATANUGI: 'special',
     IORI_YUKIWARUI: 'special',
 
-    // ===== Iori DM / SDM =====
-    DM_YAOTOME: 'dm',
-    SDM_YAOTOME: 'sdm',
+    // ===== Iori DM / SDM / HSDM =====
+    DM_YATAGARASU: 'dm',
+    SDM_YATAGARASU: 'sdm',
+    HSDM_YAOTOME: 'hsdm',
   } as Partial<Record<AttackType, FeedbackTier>>,
 };
 

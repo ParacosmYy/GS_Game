@@ -200,7 +200,7 @@ const KYO_SEQUENCES: Record<string, AnimSequence> = {
 // 通常技 FRAME_DATA: STAND_A/B/C/D, CROUCH_A/B/C/D
 // 必杀技: IORI_AOIHANA (葵花), IORI_ONIYAKI (鬼焼き), IORI_YAMIBARAI (闇払い),
 //          IORI_KOTOTSUKI (琴月陰), IORI_KUZUKAZE (屑風)
-// DM: DM_YAOTOME (八稚女)
+// DM: DM_YATAGARASU (八稚女)
 
 const IORI_SEQUENCES: Record<string, AnimSequence> = {
   // ── 基础动作 ──
@@ -238,7 +238,7 @@ const IORI_SEQUENCES: Record<string, AnimSequence> = {
   kuzukaze:   attackSequence('kuzukaze', 'IORI_KUZUKAZE', 10),       // 屑風 (指令投)
 
   // ── DM ──
-  dm_yaotome: attackSequence('dm_yaotome', 'DM_YAOTOME', 18),        // 八稚女
+  dm_yaotome: attackSequence('dm_yaotome', 'DM_YATAGARASU', 18),        // 八稚女
 };
 
 // ============================================================================

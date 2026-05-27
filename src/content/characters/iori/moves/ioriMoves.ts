@@ -256,7 +256,7 @@ export const IORI_MOVES: MoveDefinition[] = [
   // ── DM (超必杀技) ──
 
   {
-    key: 'DM_YAOTOME',
+    key: 'DM_YATAGARASU',
     nameJa: '八稚女',
     nameEn: 'Yaotome (Eight Maidens)',
     category: 'dm',
@@ -264,7 +264,7 @@ export const IORI_MOVES: MoveDefinition[] = [
     versions: [
       {
         version: 'A',
-        attackTypeKey: 'DM_YAOTOME',
+        attackTypeKey: 'DM_YATAGARASU',
         differences: '八稚女 DM，狂暴连斩，消耗1条stock',
         damageMultiplier: 1.0,
         knockdown: true,
@@ -277,7 +277,7 @@ export const IORI_MOVES: MoveDefinition[] = [
   // ── SDM (MAX超必杀技) ──
 
   {
-    key: 'SDM_YAOTOME',
+    key: 'SDM_YATAGARASU',
     nameJa: '八稚女 (MAX)',
     nameEn: 'Yaotome MAX',
     category: 'sdm',
@@ -285,7 +285,7 @@ export const IORI_MOVES: MoveDefinition[] = [
     versions: [
       {
         version: 'MAX',
-        attackTypeKey: 'SDM_YAOTOME',
+        attackTypeKey: 'SDM_YATAGARASU',
         differences: '强化版，伤害更高，攻击帧更长，最终段紫焰爆发',
         damageMultiplier: 1.6,
         knockdown: true,

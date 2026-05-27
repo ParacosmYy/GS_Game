@@ -585,8 +585,8 @@ export const FRAME_DATA_CHARS = {
     knockdown: true,
     chipDamage: 30,
   },
-  // 八壺·DM — Iori经典DM
-  DM_YAOTOME: {
+  // 八壺·DM — Iori经典DM (Yaotome)
+  DM_YATAGARASU: {
     startup: 5,
     active: 14,
     recovery: 30,
@@ -599,7 +599,7 @@ export const FRAME_DATA_CHARS = {
     chipDamage: 22,
   },
   // 八壺·SDM
-  SDM_YAOTOME: {
+  SDM_YATAGARASU: {
     startup: 4,
     active: 18,
     recovery: 32,
@@ -1035,20 +1035,6 @@ export const FRAME_DATA_CHARS = {
     pushback: 8,
     hitLevel: "MID" as const,
     knockdown: true,
-  },
-  // ── DM超必杀技 (Kim) ── KOF2002UM calibrated
-  // 鳳凰脚 (Hou'ou Kyaku, rushing DM)
-  DM_YATAGARASU: {
-    startup: 8,
-    active: 16,
-    recovery: 42,
-    damage: 200,
-    hitstun: 0,
-    blockstun: 21,
-    pushback: 8,
-    hitLevel: "MID" as const,
-    knockdown: true,
-    chipDamage: 18,
   },
   // 鳳凰天舞脚 (air/ground DM phoenix kick)
   DM_PHOENIX_KICK: {
@@ -2253,19 +2239,6 @@ export const FRAME_DATA_CHARS = {
     hitLevel: "MID" as const,
     knockdown: true,
     chipDamage: 38,
-  },
-  // ── SDM (Super Desperation Moves — MAX mode only) ──
-  SDM_YATAGARASU: {
-    startup: 6,
-    active: 12,
-    recovery: 38,
-    damage: 310,
-    hitstun: 0,
-    blockstun: 21,
-    pushback: 10,
-    hitLevel: "MID" as const,
-    knockdown: true,
-    chipDamage: 28,
   },
   SDM_POWER_GEYSER: {
     startup: 14,

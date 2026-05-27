@@ -46,6 +46,7 @@ export const KYO_ATTACK_KEYS: string[] = [
   // DM / SDM
   'DM_OROCHINAGI',   // Saishu no Kamae DM (Orochinagi)
   'SDM_OROCHINAGI',  // SDM version
+  'HSDM_OROCHINAGI', // HSDM version (MAX + red health)
 ];
 
 /** Kyo's frame data, keyed by AttackType string */

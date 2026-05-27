@@ -463,6 +463,22 @@ export const SDM_OROCHINAGI_FRAMES: AttackFrame[] = [
   ),
 ];
 
+export const HSDM_OROCHINAGI_FRAMES: AttackFrame[] = [
+  F([{ ox: 34, oy: -74, w: 72, h: 58 }]),
+  F([{ ox: 42, oy: -70, w: 82, h: 64 }]),
+  F([{ ox: 48, oy: -66, w: 95, h: 70 }]),
+  F([{ ox: 50, oy: -64, w: 100, h: 72 }]),
+  F([{ ox: 50, oy: -63, w: 100, h: 72 }]),
+  F([{ ox: 50, oy: -63, w: 100, h: 72 }]),
+  F([{ ox: 48, oy: -65, w: 94, h: 68 }]),
+  F([{ ox: 46, oy: -67, w: 88, h: 64 }]),
+  F([{ ox: 44, oy: -69, w: 82, h: 60 }]),
+  F([{ ox: 42, oy: -71, w: 76, h: 56 }]),
+  ...Array.from({ length: 20 }, (_, i) =>
+    F([{ ox: 38 - i * 0.4, oy: -73 + i * 0.6, w: 70 - i * 2, h: 54 - i * 1.2 }])
+  ),
+];
+
 export const DM_YATAGARASU_FRAMES: AttackFrame[] = [
   F([{ ox: 28, oy: -62, w: 55, h: 48 }]),
   F([{ ox: 34, oy: -60, w: 65, h: 52 }]),
@@ -485,6 +501,22 @@ export const SDM_YATAGARASU_FRAMES: AttackFrame[] = [
   F([{ ox: 36, oy: -62, w: 70, h: 55 }]),
   ...Array.from({ length: 20 }, (_, i) =>
     F([{ ox: 34 - i * 0.2, oy: -64 + i * 0.3, w: 66 - i, h: 52 - i * 0.5 }])
+  ),
+];
+
+export const HSDM_YAOTOME_FRAMES: AttackFrame[] = [
+  F([{ ox: 32, oy: -68, w: 66, h: 56 }]),
+  F([{ ox: 38, oy: -64, w: 78, h: 62 }]),
+  F([{ ox: 44, oy: -60, w: 90, h: 68 }]),
+  F([{ ox: 46, oy: -58, w: 95, h: 70 }]),
+  F([{ ox: 46, oy: -56, w: 95, h: 70 }]),
+  F([{ ox: 44, oy: -58, w: 90, h: 66 }]),
+  F([{ ox: 42, oy: -60, w: 84, h: 62 }]),
+  F([{ ox: 40, oy: -62, w: 78, h: 58 }]),
+  F([{ ox: 38, oy: -64, w: 72, h: 55 }]),
+  F([{ ox: 36, oy: -66, w: 66, h: 52 }]),
+  ...Array.from({ length: 12 }, (_, i) =>
+    F([{ ox: 34 - i * 0.3, oy: -66 + i * 0.4, w: 62 - i * 1.5, h: 50 - i }])
   ),
 ];
 

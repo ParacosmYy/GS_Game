@@ -6,7 +6,7 @@
  * - Rapid cancel chains (light normals)
  * - Rekka followup chains (Aoihana -> Aoihana_2 -> Aoihana_3)
  * - Command normal routes (Yume Yumi from stand A, Katanugi from crouch B)
- * - Special -> Super (DM) cancels (e.g. IORI_ONIYAKI -> DM_YAOTOME)
+ * - Special -> Super (DM) cancels (e.g. IORI_ONIYAKI -> DM_YATAGARASU)
  * - Free cancel routes (MAX mode: special -> special)
  *
  * KOF2002 cancel rules:
@@ -220,7 +220,7 @@ const IORI_REKKA_CHAINS: CancelRoute[] = [
 const IORI_SPECIAL_TO_DM: CancelRoute[] = [
   {
     from: 'IORI_YAMIBARAI',
-    to: ['DM_YAOTOME'],
+    to: ['DM_YATAGARASU'],
     cancelType: 'super',
     requiresHit: true,
     stockCost: SUPER_CANCEL_STOCK_COST,
@@ -229,7 +229,7 @@ const IORI_SPECIAL_TO_DM: CancelRoute[] = [
   },
   {
     from: 'IORI_YAMIBARAI_C',
-    to: ['DM_YAOTOME'],
+    to: ['DM_YATAGARASU'],
     cancelType: 'super',
     requiresHit: true,
     stockCost: SUPER_CANCEL_STOCK_COST,
@@ -238,7 +238,7 @@ const IORI_SPECIAL_TO_DM: CancelRoute[] = [
   },
   {
     from: 'IORI_ONIYAKI',
-    to: ['DM_YAOTOME'],
+    to: ['DM_YATAGARASU'],
     cancelType: 'super',
     requiresHit: true,
     stockCost: SUPER_CANCEL_STOCK_COST,
@@ -247,7 +247,7 @@ const IORI_SPECIAL_TO_DM: CancelRoute[] = [
   },
   {
     from: 'IORI_ONIYAKI_C',
-    to: ['DM_YAOTOME'],
+    to: ['DM_YATAGARASU'],
     cancelType: 'super',
     requiresHit: true,
     stockCost: SUPER_CANCEL_STOCK_COST,
@@ -256,7 +256,7 @@ const IORI_SPECIAL_TO_DM: CancelRoute[] = [
   },
   {
     from: 'IORI_KOTOTSUKI',
-    to: ['DM_YAOTOME'],
+    to: ['DM_YATAGARASU'],
     cancelType: 'super',
     requiresHit: true,
     stockCost: SUPER_CANCEL_STOCK_COST,
@@ -265,7 +265,7 @@ const IORI_SPECIAL_TO_DM: CancelRoute[] = [
   },
   {
     from: 'IORI_AOIHANA',
-    to: ['DM_YAOTOME'],
+    to: ['DM_YATAGARASU'],
     cancelType: 'super',
     requiresHit: true,
     stockCost: SUPER_CANCEL_STOCK_COST,
@@ -274,7 +274,7 @@ const IORI_SPECIAL_TO_DM: CancelRoute[] = [
   },
   {
     from: 'IORI_AOIHANA_2',
-    to: ['DM_YAOTOME'],
+    to: ['DM_YATAGARASU'],
     cancelType: 'super',
     requiresHit: true,
     stockCost: SUPER_CANCEL_STOCK_COST,

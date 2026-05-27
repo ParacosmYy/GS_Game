@@ -21,7 +21,7 @@ const PIXEL_KEYS: Record<string, string> = {
   iori_oniyaki: 'IORI_ONIYAKI', iori_oniyaki_c: 'IORI_ONIYAKI_C',
   iori_kototsuki: 'IORI_KOTOTSUKI', iori_kuzukaze: 'IORI_KUZUKAZE',
   // DM/SDM
-  dm_yaotome: 'DM_YAOTOME', sdm_yaotome: 'SDM_YAOTOME',
+  dm_yaotome: 'DM_YATAGARASU', sdm_yaotome: 'SDM_YATAGARASU',
 };
 
 // Ticks per frame from pixel frame registry in ioriHighResRender.ts
@@ -39,7 +39,7 @@ const TPF: Record<string, number> = {
   IORI_YAMIBARAI: 14, IORI_YAMIBARAI_C: 14,
   IORI_ONIYAKI: 6, IORI_ONIYAKI_C: 7,
   IORI_KOTOTSUKI: 6, IORI_KUZUKAZE: 5,
-  DM_YAOTOME: 10, SDM_YAOTOME: 12,
+  DM_YATAGARASU: 10, SDM_YATAGARASU: 12,
 };
 
 function makeFrames(actionId: string, count: number): FrameContract[] {
