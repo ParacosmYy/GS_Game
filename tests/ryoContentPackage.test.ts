@@ -296,7 +296,6 @@ describe('Content Loader', () => {
   });
 
   it('hasCharacterContent returns false for unknown', () => {
-    expect(hasCharacterContent('kyo')).toBe(false);
     expect(hasCharacterContent('unknown')).toBe(false);
   });
 

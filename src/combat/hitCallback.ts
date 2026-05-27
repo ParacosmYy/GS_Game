@@ -40,6 +40,8 @@ const MOVE_NAME_MAP: Partial<Record<AttackType, string>> = {
   [AttackType.SDM_RYUKO_RANBU]: '龍虎乱舞',
   [AttackType.HSDM_RYUKO_RANBU]: '龍虎乱舞',
   // Kyo (草薙京)
+  [AttackType.KYO_YAMIBARAI]: '闇払い',
+  [AttackType.KYO_YAMIBARAI_C]: '闇払い',
   [AttackType.KYO_ARAGAMI]: '荒咬み',
   [AttackType.KYO_DOKUGAMI]: '毒咬み',
   [AttackType.KYO_ONIYAKI]: '鬼焼き',
@@ -49,10 +51,14 @@ const MOVE_NAME_MAP: Partial<Record<AttackType, string>> = {
   [AttackType.KYO_YAKISOGI]: '破砕',
   [AttackType.KYO_BATSUYOMI]: '罰詠み',
   [AttackType.KYO_TSUMIYOMI]: '罪詠み',
+  [AttackType.KYO_75KAI]: '七拾五式・改',
+  [AttackType.KYO_75KAI_2]: '七拾五式・改',
   [AttackType.KYO_RED_KICK]: 'R.E.D.KICK',
   [AttackType.DM_OROCHINAGI]: '大蛇薙',
   [AttackType.SDM_OROCHINAGI]: '大蛇薙',
   // Iori (八神庵)
+  [AttackType.IORI_YAMIBARAI]: '闇払い',
+  [AttackType.IORI_YAMIBARAI_C]: '闇払い',
   [AttackType.DM_YATAGARASU]: '八稚女',
   [AttackType.SDM_YATAGARASU]: '八稚女',
   [AttackType.IORI_AOIHANA]: '葵花',

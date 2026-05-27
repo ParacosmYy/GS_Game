@@ -8,7 +8,7 @@ import {
 describe('contentLoader', () => {
   describe('hasCharacterContent', () => {
     it('ryo has content', () => expect(hasCharacterContent('ryo')).toBe(true));
-    it('kyo has no content yet', () => expect(hasCharacterContent('kyo')).toBe(false));
+    it('kyo has content', () => expect(hasCharacterContent('kyo')).toBe(true));
     it('empty string has no content', () => expect(hasCharacterContent('')).toBe(false));
     it('random id has no content', () => expect(hasCharacterContent('random')).toBe(false));
   });

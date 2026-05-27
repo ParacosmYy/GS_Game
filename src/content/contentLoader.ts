@@ -96,7 +96,7 @@ export function getAvailableCharacterIds(): string[] {
 
 function loadRyoContent(): CharacterContent {
   return {
-    data: { id: RYO_CHARACTER_DATA.id, name: RYO_CHARACTER_DATA.displayName, nameCn: RYO_CHARACTER_DATA.nameCn, color: '#2196F3' },
+    data: { ...RYO_CHARACTER_DATA, name: RYO_CHARACTER_DATA.displayName, color: '#2196F3' },
     attacks: getRyoFrameData(),
     attackKeys: RYO_ATTACK_KEYS,
     commands: RYO_MOVE_LIST,
