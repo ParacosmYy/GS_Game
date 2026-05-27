@@ -33,6 +33,7 @@ import { initAudio, initSampler, playKO, playVictoryFanfare, playMAXActivation, 
 import { tickAttackSFX, dispatchContractSFX } from './audio/attackSFX.js';
 import { getContractEventTags } from './entities/fighter.js';
 import { tickMotionSFX } from './audio/motionSFX.js';
+import { playCharVoice } from './audio/charVoice.js';
 import { createTeam, defeatActive, switchToNext, activeChar, teamOrderString, type TeamState } from './state/teamState.js';
 import { resolveSimplified } from './input/simplifiedInput.js';
 import { bgm } from './audio/bgm.js';
@@ -601,6 +602,12 @@ function update(): void {
   if (gs.phase === GamePhase.MATCH_END) {
     gs.koTimer++;
     if (!cinematic.victoryFanfarePlayed) { cinematic.victoryFanfarePlayed = true; playVictoryFanfare(); }
+    // KOF2002: Victory voice — winning character's triumphant shout
+    if (!cinematic.victoryVoicePlayed && gs.winner !== null) {
+      cinematic.victoryVoicePlayed = true;
+      const winner = gs.winner === 0 ? p1 : p2;
+      playCharVoice(winner.charId, 'victory', 0.45);
+    }
     // Tick announce sequence for winner name animation
     if (gs.announceSequence.isRunning()) {
       const sfxId = gs.announceSequence.tick();

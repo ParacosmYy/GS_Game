@@ -102,6 +102,12 @@ const PATTERNS: Record<string, VoiceSyllable[]> = {
   hurt: [
     { vowel: VOWEL_UH, durationMs: 90, freqOffset: -10, attackMs: 8, releaseMs: 40, pitchEnd: -50 },
   ],
+  victory: [
+    // Triumphant rising shout: "Ha!" → held "Aaah" → confident finish
+    { vowel: VOWEL_AH, durationMs: 60,  freqOffset: 10,  attackMs: 3, releaseMs: 10 },
+    { vowel: VOWEL_AH, durationMs: 120, freqOffset: 30,  attackMs: 4, releaseMs: 20, pitchEnd: 50 },
+    { vowel: VOWEL_OH, durationMs: 200, freqOffset: 0,   attackMs: 5, releaseMs: 80, pitchEnd: -20 },
+  ],
 };
 
 // ─── Buffer cache ───────────────────────────────────────────────

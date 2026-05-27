@@ -72,6 +72,7 @@ export class CinematicState {
   /** KO impact dust particles — spawned at KO hit location */
   koDustParticles: KODustParticle[] = [];
   victoryFanfarePlayed = false;
+  victoryVoicePlayed = false;
   p1DamageTaken = 0;
   p2DamageTaken = 0;
   /** KO state machine — tracks the full KO sequence */
@@ -333,6 +334,7 @@ export class CinematicState {
     this.koVignetteTimer = 0;
     this.koDustParticles = [];
     this.victoryFanfarePlayed = false;
+    this.victoryVoicePlayed = false;
     this.p1DamageTaken = 0;
     this.p2DamageTaken = 0;
     this.koState = createKOStateMachine();
