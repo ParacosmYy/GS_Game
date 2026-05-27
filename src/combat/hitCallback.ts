@@ -651,7 +651,17 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       deps.vfx.spawnProjectileExplosion(hitX, hitY, '#7722aa', '#bb55ff');
       deps.screenFlash.trigger('#7722aa', 0.08, 3);
     }
-    // Aoihana (葵花) rekka finisher — dark burst
+    // Aoihana (葵花) rekka chain — escalating VFX per hit
+    if (atkName === 'IORI_AOIHANA') {
+      deps.cinematic.addHitStop(1, defIdx);
+      deps.vfx.spawnImpactRing(hitX, hitY, 0.7);
+    }
+    if (atkName === 'IORI_AOIHANA_2') {
+      deps.cinematic.addHitStop(1, defIdx);
+      deps.screenShake.trigger(5, 5, attacker.facing * 3);
+      deps.vfx.spawnImpactRing(hitX, hitY, 0.9);
+    }
+    // Aoihana finisher — dark burst
     if (atkName === 'IORI_AOIHANA_3') {
       deps.vfx.spawnSuperBurst(hitX, hitY, '#660088', '#aa33dd', false);
       deps.cinematic.addHitStop(2, defIdx);
