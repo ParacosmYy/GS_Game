@@ -1035,6 +1035,24 @@ export function drawFighters(
       ctx.fillRect(sx + leanOffsetX - hw - 8, sy - f.displayHeight - 8, (hw + 8) * 2, f.displayHeight + 16);
       ctx.restore();
     }
+    // KOF2002: 命中冲击光效 — 被击者按档位显示不同颜色/大小的强调光
+    if (f.hitImpactGlowFrames > 0) {
+      const glowProgress = f.hitImpactGlowFrames / 6;
+      const glowR = f.hitImpactGlowSize;
+      const glowAlpha = glowProgress * 0.25;
+      ctx.save();
+      const glowGrad = ctx.createRadialGradient(
+        sx, sy - f.displayHeight / 2, glowR * 0.1,
+        sx, sy - f.displayHeight / 2, glowR,
+      );
+      glowGrad.addColorStop(0, f.hitImpactGlowColor + 'aa');
+      glowGrad.addColorStop(0.4, f.hitImpactGlowColor + '44');
+      glowGrad.addColorStop(1, f.hitImpactGlowColor + '00');
+      ctx.globalAlpha = glowAlpha;
+      ctx.fillStyle = glowGrad;
+      ctx.fillRect(sx - glowR, sy - f.displayHeight / 2 - glowR, glowR * 2, glowR * 2);
+      ctx.restore();
+    }
     // KOF2002: MAX模式边框脉冲 — MAX模式时角色周围脉冲金色边框
     if (maxModeActive) {
       ctx.save();

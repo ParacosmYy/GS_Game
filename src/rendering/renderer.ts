@@ -187,6 +187,12 @@ export class Renderer {
         ctx.fillStyle = 'rgba(255, 140, 0, 0.06)';
         ctx.fillRect(-10, -10, CANVAS_WIDTH + 20, CANVAS_HEIGHT + 20);
       }
+      // KOF2002: 命中冲击背景色调 — special/heavy命中时短暂背景着色
+      if (f.hitImpactGlowFrames > 0) {
+        const bgAlpha = (f.hitImpactGlowFrames / 6) * 0.05;
+        ctx.fillStyle = f.hitImpactGlowColor + Math.round(bgAlpha * 255).toString(16).padStart(2, '0');
+        ctx.fillRect(-10, -10, CANVAS_WIDTH + 20, CANVAS_HEIGHT + 20);
+      }
     }
 
     // End zoom before HUD — HUD always renders at normal scale

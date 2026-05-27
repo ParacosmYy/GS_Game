@@ -310,3 +310,11 @@ registerSizedPortrait('kyo', 'hud', kyoHudPortrait);
 // ===== 注册 Iori 的 HUD 肖像 =====
 import { ioriHudPortrait } from '../rendering/portraits/ioriHudPortrait.js';
 registerSizedPortrait('iori', 'hud', ioriHudPortrait);
+
+// ===== 注册 Iori 的 select 肖像 =====
+import { ioriSelectPortrait } from '../rendering/portraits/ioriSelectPortrait.js';
+registerSizedPortrait('iori', 'select', ioriSelectPortrait);
+
+// ===== 注册 Kyo 的 select 肖像 =====
+import { kyoSelectPortrait } from '../rendering/portraits/kyoSelectPortrait.js';
+registerSizedPortrait('kyo', 'select', kyoSelectPortrait);

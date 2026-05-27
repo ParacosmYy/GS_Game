@@ -412,6 +412,18 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
     attacker.hitFlashFrames = fb.hitFlashFrames;
     attacker.hitFlashColor = isDM ? atkChar.specialColor : '#ffffff';
 
+    // KOF2002: 被击者按档位产生不同强度的强调光效
+    // heavy: 橙色微光 / special: 蓝白光 / DM/SDM: 强闪光 (已有superBgFlash)
+    if (isSpecial && !isDM) {
+      defender.hitImpactGlowFrames = 6;
+      defender.hitImpactGlowColor = '#88ccff';
+      defender.hitImpactGlowSize = 40;
+    } else if (isHeavyAttack(attackType) && !isSpecial && !isDM) {
+      defender.hitImpactGlowFrames = 4;
+      defender.hitImpactGlowColor = '#ff8833';
+      defender.hitImpactGlowSize = 25;
+    }
+
     // KOF2002: DM/SDM命中时屏幕短暂暗化突出超必杀效果
     if (isDM) { attacker.superBgFlashFrames = isSDM ? 12 : 8; }
 
