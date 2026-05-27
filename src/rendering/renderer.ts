@@ -183,6 +183,14 @@ export class Renderer {
         ctx.fillRect(-10, -10, CANVAS_WIDTH + 20, CANVAS_HEIGHT + 20);
         ctx.restore();
       }
+      // KOF2002: KO持续红色叠加 — KO后持续微红叠加(紧迫感)
+      if (koTimer > 3 && koTimer < 30) {
+        ctx.save();
+        ctx.globalAlpha = Math.max(0, (30 - koTimer) / 30 * 0.06);
+        ctx.fillStyle = '#ff2200';
+        ctx.fillRect(-10, -10, CANVAS_WIDTH + 20, CANVAS_HEIGHT + 20);
+        ctx.restore();
+      }
     }
 
     // KOF2002: 暗角效果 — 聚焦中心, 边缘渐暗 (场景色温)

@@ -553,9 +553,20 @@ export function drawFighters(
           ctx.fillStyle = '#ffee66';
           ctx.beginPath();
           ctx.arc(sparkX, sparkY, 2 - f.stateAge * 0.5, 0, Math.PI * 2);
-          ctx.fill();
-        }
-        ctx.restore();
+        ctx.fill();
+      }
+      // KOF2002: 蓄力脉冲环 — COUNTER_STANCE每10帧脉冲扩散环
+      if (f.stateAge % 10 < 3) {
+        const ringT = f.stateAge % 10;
+        ctx.globalAlpha = (3 - ringT) / 3 * 0.15;
+        ctx.strokeStyle = '#4488ff';
+        ctx.lineWidth = 1;
+        const pulseR = hw + 12 + ringT * 5;
+        ctx.beginPath();
+        ctx.ellipse(sx, sy - f.displayHeight / 2, pulseR, pulseR * 0.5, 0, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+      ctx.restore();
       }
     }
     // KOF2002: 浮空受击下落粒子 — HITSTUN空中时蓝色粒子下落
