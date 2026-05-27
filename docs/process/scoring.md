@@ -2,7 +2,7 @@
 
 ## 1. 当前分数
 
-当前总分：`114/2000`
+当前总分：`115/2000`
 
 完整历史见 [SCORE.history.md](../archive/SCORE.history.md)。
 
@@ -19,7 +19,7 @@
 | 战斗手感 | 150 | 19 | hitstop衰减+方向震屏+冲击环+斩击线+连段hitstop递减+Kyo火焰VFX+Iori暗紫VFX |
 | 帧数据精度 | 100 | 14 | Frame Contract: Ryo+Kyo 47+Iori 47 ActionContract, 三角色逐帧碰撞对齐 |
 | 游戏流程 | 100 | 21 | 选人→对战→KO→结算+3v3+训练模式+舞台名intro+DM暗幕+Escape暂停菜单 |
-| UI/HUD品质 | 50 | 13 | SNK风格能量槽+计时器+连段计数器+播报+像素帧缓存+暂停菜单(招式/按键) |
+| UI/HUD品质 | 50 | 14 | SNK风格能量槽+计时器+连段计数器+播报+像素帧缓存+暂停菜单(招式/按键)+训练模式SNK风格招式表 |
 
 ## 2.1 Phase 2 千分制维度（1001-2000）
 
@@ -31,7 +31,7 @@
 | 深层机制 | 200 | MAX模式/FreeCancel/GuardCancel/Juggle/CounterWire/Blowback |
 | 音频品质（进阶） | 100 | 逐角色SFX差异化/连段音/BGM编曲方向 |
 | 游戏流程（进阶） | 150 | 完整街机流程/3v3组队/训练模式完善/设置/Title |
-| UI/HUD品质（进阶） | 100 | SNK风格菜单/选人界面/VS画面/胜负画面 |
+| UI/HUD品质（进阶） | 100 | 训练模式SNK风格招式表→SNK风格菜单/选人界面/VS画面/胜负画面 |
 
 Phase 2 总计：1000 分。
 
