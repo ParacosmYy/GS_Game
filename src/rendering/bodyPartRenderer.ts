@@ -14,7 +14,7 @@ const OUTLINE_WIDTH = 2.5;
 let _tick = 0;
 export function setBodyPartTick(t: number): void { _tick = t; }
 
-/** 画像素风格躯干 — 肩宽腰窄梯形 + 角色专属服装细节 */
+/** 画像素风格躯干 — S-curve解剖形状(胸宽→腰窄→臀稍宽) + 圆角 + 角色专属服装细节 */
 export function drawPixelTorso(
   ctx: CanvasRenderingContext2D, charId: string, w: number, h: number,
   colorIndex?: number,
@@ -22,59 +22,103 @@ export function drawPixelTorso(
   const outfit = getOutfit(charId, colorIndex);
   const hw = w / 2, hh = h / 2;
   const shoulderW = hw;
-  const waistW = hw * 0.82;
+  const chestW = hw * 0.95;      // 胸部略窄于肩
+  const waistW = hw * 0.72;      // 腰部明显收窄
+  const hipW = hw * 0.78;        // 臀部比腰稍宽
+  const cr = Math.max(2, hw * 0.12); // 圆角半径
 
-  // 主形状 — 梯形
+  // 主形状 — S-curve解剖路径（肩→胸→腰→臀），用bezierCurve实现圆角
   ctx.fillStyle = outfit.shirt;
   ctx.beginPath();
-  ctx.moveTo(-shoulderW, -hh);
-  ctx.lineTo(shoulderW, -hh);
-  ctx.lineTo(waistW, hh);
-  ctx.lineTo(-waistW, hh);
+  // 左上肩起点（带圆角）
+  ctx.moveTo(-shoulderW + cr, -hh);
+  ctx.lineTo(shoulderW - cr, -hh);
+  ctx.quadraticCurveTo(shoulderW, -hh, shoulderW, -hh + cr);
+  // 右肩→右胸→右腰（S-curve内收）
+  ctx.bezierCurveTo(shoulderW, -hh + h * 0.15, chestW, -hh + h * 0.25, chestW, -hh + h * 0.3);
+  ctx.bezierCurveTo(chestW, -hh + h * 0.4, waistW + 1, -hh + h * 0.5, waistW, -hh + h * 0.55);
+  // 右腰→右臀（S-curve外扩）
+  ctx.bezierCurveTo(waistW - 1, -hh + h * 0.65, hipW, -hh + h * 0.78, hipW, -hh + h * 0.85);
+  ctx.quadraticCurveTo(hipW, hh, hipW - cr, hh);
+  // 底边
+  ctx.lineTo(-hipW + cr, hh);
+  ctx.quadraticCurveTo(-hipW, hh, -hipW, -hh + h * 0.85);
+  // 左臀→左腰（S-curve外扩→内收）
+  ctx.bezierCurveTo(-hipW, -hh + h * 0.78, -waistW + 1, -hh + h * 0.65, -waistW, -hh + h * 0.55);
+  ctx.bezierCurveTo(-waistW - 1, -hh + h * 0.5, -chestW, -hh + h * 0.4, -chestW, -hh + h * 0.3);
+  ctx.bezierCurveTo(-chestW, -hh + h * 0.25, -shoulderW, -hh + h * 0.15, -shoulderW, -hh + cr);
+  ctx.quadraticCurveTo(-shoulderW, -hh, -shoulderW + cr, -hh);
   ctx.closePath();
   ctx.fill();
 
-  // 高光带（上部18%）
+  // 高光带（上部18%）— 跟随S-curve
   ctx.fillStyle = shiftColor(outfit.shirt, 22);
   const hlY = -hh + h * 0.18;
   ctx.beginPath();
   ctx.moveTo(-shoulderW + 1, -hh + 1);
   ctx.lineTo(shoulderW - 1, -hh + 1);
-  ctx.lineTo(shoulderW - (shoulderW - waistW) * 0.18, hlY);
-  ctx.lineTo(-shoulderW + (shoulderW - waistW) * 0.18, hlY);
+  ctx.lineTo(shoulderW - (shoulderW - chestW) * 0.5, hlY);
+  ctx.lineTo(-shoulderW + (shoulderW - chestW) * 0.5, hlY);
   ctx.closePath();
   ctx.fill();
 
-  // 暗影带（下部18%）
+  // 暗影带（下部18%）— 跟随S-curve
   ctx.fillStyle = shiftColor(outfit.shirt, -18);
   const shY = hh - h * 0.18;
   ctx.beginPath();
-  ctx.moveTo(-waistW + (shoulderW - waistW) * 0.15, shY);
-  ctx.lineTo(waistW - (shoulderW - waistW) * 0.15, shY);
-  ctx.lineTo(waistW - 1, hh - 1);
-  ctx.lineTo(-waistW + 1, hh - 1);
+  ctx.moveTo(-hipW + 1, shY);
+  ctx.lineTo(hipW - 1, shY);
+  ctx.lineTo(hipW - 1, hh - 1);
+  ctx.lineTo(-hipW + 1, hh - 1);
   ctx.closePath();
   ctx.fill();
 
-  // 腰带
+  // 腰线阴影 — 在腰部最窄处加暗影强调S-curve
+  ctx.fillStyle = shiftColor(outfit.shirt, -10);
+  const waistY = -hh + h * 0.55;
+  ctx.beginPath();
+  ctx.moveTo(-chestW, waistY - h * 0.05);
+  ctx.quadraticCurveTo(-waistW - 1, waistY, -hipW, waistY + h * 0.08);
+  ctx.lineTo(-hipW + 2, waistY + h * 0.08);
+  ctx.quadraticCurveTo(-waistW + 1, waistY, -chestW + 2, waistY - h * 0.03);
+  ctx.closePath();
+  ctx.fill();
+  ctx.beginPath();
+  ctx.moveTo(chestW, waistY - h * 0.05);
+  ctx.quadraticCurveTo(waistW + 1, waistY, hipW, waistY + h * 0.08);
+  ctx.lineTo(hipW - 2, waistY + h * 0.08);
+  ctx.quadraticCurveTo(waistW - 1, waistY, chestW - 2, waistY - h * 0.03);
+  ctx.closePath();
+  ctx.fill();
+
+  // 腰带 — 放在臀部区域
   const beltH = Math.max(3, h * 0.08);
   ctx.fillStyle = outfit.belt;
-  ctx.fillRect(-waistW + 2, hh - beltH * 3, (waistW - 2) * 2, beltH);
+  ctx.fillRect(-hipW + 2, hh - beltH * 3, (hipW - 2) * 2, beltH);
   ctx.fillStyle = shiftColor(outfit.belt, 30);
   ctx.fillRect(-2, hh - beltH * 3, 4, beltH);
 
   // 角色专属服装细节
   drawTorsoDetail(ctx, charId, w, h, outfit, shoulderW, waistW, hh);
 
-  // SNK风格轮廓线
+  // SNK风格轮廓线 — 沿S-curve路径描边
   ctx.strokeStyle = OUTLINE_COLOR;
   ctx.lineWidth = OUTLINE_WIDTH;
   ctx.lineJoin = 'round';
   ctx.beginPath();
-  ctx.moveTo(-shoulderW, -hh);
-  ctx.lineTo(shoulderW, -hh);
-  ctx.lineTo(waistW, hh);
-  ctx.lineTo(-waistW, hh);
+  ctx.moveTo(-shoulderW + cr, -hh);
+  ctx.lineTo(shoulderW - cr, -hh);
+  ctx.quadraticCurveTo(shoulderW, -hh, shoulderW, -hh + cr);
+  ctx.bezierCurveTo(shoulderW, -hh + h * 0.15, chestW, -hh + h * 0.25, chestW, -hh + h * 0.3);
+  ctx.bezierCurveTo(chestW, -hh + h * 0.4, waistW + 1, -hh + h * 0.5, waistW, -hh + h * 0.55);
+  ctx.bezierCurveTo(waistW - 1, -hh + h * 0.65, hipW, -hh + h * 0.78, hipW, -hh + h * 0.85);
+  ctx.quadraticCurveTo(hipW, hh, hipW - cr, hh);
+  ctx.lineTo(-hipW + cr, hh);
+  ctx.quadraticCurveTo(-hipW, hh, -hipW, -hh + h * 0.85);
+  ctx.bezierCurveTo(-hipW, -hh + h * 0.78, -waistW + 1, -hh + h * 0.65, -waistW, -hh + h * 0.55);
+  ctx.bezierCurveTo(-waistW - 1, -hh + h * 0.5, -chestW, -hh + h * 0.4, -chestW, -hh + h * 0.3);
+  ctx.bezierCurveTo(-chestW, -hh + h * 0.25, -shoulderW, -hh + h * 0.15, -shoulderW, -hh + cr);
+  ctx.quadraticCurveTo(-shoulderW, -hh, -shoulderW + cr, -hh);
   ctx.closePath();
   ctx.stroke();
 }
@@ -1066,7 +1110,7 @@ function drawStarEmblem(
   ctx.stroke();
 }
 
-/** 画像素风格手臂 — 袖口 + 前臂皮肤 + 手 + 角色专属细节 */
+/** 画像素风格手臂 — 锥形(肩宽→肘中→腕窄→拳击手套拳) + 肘关节 + 椭圆拳击手套 */
 export function drawPixelArm(
   ctx: CanvasRenderingContext2D, charId: string, w: number, h: number, isBack: boolean,
   colorIndex?: number,
@@ -1080,56 +1124,132 @@ export function drawPixelArm(
   const sleeveH = h * 0.3;
   const shirtColor = isBack ? shiftColor(outfit.shirt, -8) : outfit.shirt;
 
-  // 袖子 — 渐变质感
+  // 锥形宽度: 肩部hw → 肘部(0.7*hw) → 腕部(0.5*hw)
+  const shoulderHW = hw;
+  const elbowHW = hw * 0.7;
+  const wristHW = hw * 0.5;
+  const elbowY = -hh + sleeveH;
+  const midForearmY = -hh + sleeveH + (h * 0.55) * 0.5;
+  const wristY = -hh + sleeveH + h * 0.55;
+
+  // 袖子 — 锥形(肩→肘) + 渐变质感
   ctx.fillStyle = shirtColor;
-  ctx.fillRect(-hw, -hh, w, sleeveH);
+  ctx.beginPath();
+  ctx.moveTo(-shoulderHW, -hh);
+  ctx.lineTo(shoulderHW, -hh);
+  ctx.lineTo(elbowHW, elbowY);
+  ctx.lineTo(-elbowHW, elbowY);
+  ctx.closePath();
+  ctx.fill();
   // 袖子高光
   ctx.fillStyle = shiftColor(shirtColor, 18);
-  ctx.fillRect(-hw + 1, -hh + 1, w - 2, sleeveH * 0.3);
+  ctx.beginPath();
+  ctx.moveTo(-shoulderHW + 1, -hh + 1);
+  ctx.lineTo(shoulderHW - 1, -hh + 1);
+  ctx.lineTo(elbowHW - 1, elbowY - sleeveH * 0.15);
+  ctx.lineTo(-elbowHW + 1, elbowY - sleeveH * 0.15);
+  ctx.closePath();
+  ctx.fill();
   // 袖子暗影
   ctx.fillStyle = shiftColor(shirtColor, -12);
-  ctx.fillRect(-hw + 1, -hh + sleeveH * 0.7, w - 2, sleeveH * 0.3);
+  ctx.beginPath();
+  ctx.moveTo(-elbowHW + 1, elbowY - sleeveH * 0.25);
+  ctx.lineTo(elbowHW - 1, elbowY - sleeveH * 0.25);
+  ctx.lineTo(elbowHW - 1, elbowY);
+  ctx.lineTo(-elbowHW + 1, elbowY);
+  ctx.closePath();
+  ctx.fill();
 
-  // 前臂 — 皮肤渐变
+  // 前臂 — 锥形皮肤(肘→腕)
   ctx.fillStyle = isBack ? shiftColor(skinColor, -8) : skinColor;
-  ctx.fillRect(-hw + 1, -hh + sleeveH, w - 2, h * 0.55);
+  ctx.beginPath();
+  ctx.moveTo(-elbowHW, elbowY);
+  ctx.lineTo(elbowHW, elbowY);
+  ctx.lineTo(wristHW, wristY);
+  ctx.lineTo(-wristHW, wristY);
+  ctx.closePath();
+  ctx.fill();
   // 前臂高光
   ctx.fillStyle = skinLight;
-  ctx.fillRect(-hw + 2, -hh + sleeveH, w * 0.3, h * 0.3);
+  ctx.beginPath();
+  ctx.moveTo(-elbowHW + 2, elbowY);
+  ctx.lineTo(-elbowHW * 0.4, elbowY);
+  ctx.lineTo(-wristHW * 0.3, wristY);
+  ctx.lineTo(-wristHW, wristY);
+  ctx.closePath();
+  ctx.fill();
 
-  // 手掌
+  // 肘关节圆
+  const elbowR = Math.max(2, elbowHW * 0.35);
+  ctx.fillStyle = shiftColor(skinColor, -6);
+  ctx.beginPath();
+  ctx.arc(0, elbowY, elbowR, 0, Math.PI * 2);
+  ctx.fill();
+  // 肘关节高光
+  ctx.fillStyle = shiftColor(skinColor, 12);
+  ctx.beginPath();
+  ctx.arc(-elbowR * 0.2, elbowY - elbowR * 0.25, elbowR * 0.4, 0, Math.PI * 2);
+  ctx.fill();
+
+  // 手掌 — 椭圆拳击手套形状
   const fistY = hh - h * 0.15;
+  const fistW = hw * 0.95;   // 手套宽度(比腕宽大)
+  const fistH = h * 0.18;    // 手套高度
   ctx.fillStyle = skinColor;
-  roundRect(ctx, -hw * 0.8, fistY - 1, w * 0.8, h * 0.15 + 2, 2);
+  ctx.beginPath();
+  ctx.ellipse(0, fistY + fistH * 0.3, fistW, fistH, 0, 0, Math.PI * 2);
+  ctx.fill();
+  // 拳套暗影侧
+  ctx.fillStyle = skinDark;
+  ctx.beginPath();
+  ctx.ellipse(fistW * 0.2, fistY + fistH * 0.35, fistW * 0.6, fistH * 0.85, 0.15, 0, Math.PI * 2);
   ctx.fill();
   // 手指暗示线
   ctx.strokeStyle = skinDark;
   ctx.lineWidth = 0.5;
-  ctx.beginPath(); ctx.moveTo(-hw * 0.4, fistY + 1); ctx.lineTo(-hw * 0.4, fistY + h * 0.1); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(hw * 0.1, fistY + 1); ctx.lineTo(hw * 0.1, fistY + h * 0.1); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(-fistW * 0.35, fistY + 1); ctx.lineTo(-fistW * 0.35, fistY + h * 0.1); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(fistW * 0.1, fistY + 1); ctx.lineTo(fistW * 0.1, fistY + h * 0.1); ctx.stroke();
 
   // 角色专属手套/护腕/手部细节
   drawArmDetail(ctx, charId, w, h, hw, hh, sleeveH, fistY, skinColor, shirtColor, isBack);
 
-  // SNK风格轮廓线
+  // SNK风格轮廓线 — 沿锥形路径描边
   ctx.strokeStyle = OUTLINE_COLOR;
   ctx.lineWidth = OUTLINE_WIDTH;
   ctx.lineJoin = 'round';
-  roundRect(ctx, -hw, -hh, w, h, 3);
+  // 上臂轮廓
+  ctx.beginPath();
+  ctx.moveTo(-shoulderHW, -hh);
+  ctx.lineTo(shoulderHW, -hh);
+  ctx.lineTo(elbowHW, elbowY);
+  ctx.lineTo(-elbowHW, elbowY);
+  ctx.closePath();
+  ctx.stroke();
+  // 前臂轮廓
+  ctx.beginPath();
+  ctx.moveTo(-elbowHW, elbowY);
+  ctx.lineTo(elbowHW, elbowY);
+  ctx.lineTo(wristHW, wristY);
+  ctx.lineTo(-wristHW, wristY);
+  ctx.closePath();
+  ctx.stroke();
+  // 拳套轮廓 — 椭圆描边
+  ctx.beginPath();
+  ctx.ellipse(0, fistY + fistH * 0.3, fistW + 1, fistH + 1, 0, 0, Math.PI * 2);
   ctx.stroke();
 
   // 袖口分界线 — 加粗+阴影
   ctx.strokeStyle = shiftColor(outfit.shirt, -30);
   ctx.lineWidth = 1.2;
   ctx.beginPath();
-  ctx.moveTo(-hw, -hh + sleeveH);
-  ctx.lineTo(hw, -hh + sleeveH);
+  ctx.moveTo(-elbowHW, elbowY);
+  ctx.lineTo(elbowHW, elbowY);
   ctx.stroke();
   ctx.strokeStyle = shiftColor(outfit.shirt, 10);
   ctx.lineWidth = 0.5;
   ctx.beginPath();
-  ctx.moveTo(-hw + 1, -hh + sleeveH + 1);
-  ctx.lineTo(hw - 1, -hh + sleeveH + 1);
+  ctx.moveTo(-elbowHW + 1, elbowY + 1);
+  ctx.lineTo(elbowHW - 1, elbowY + 1);
   ctx.stroke();
 }
 
@@ -1501,7 +1621,7 @@ function drawArmDetail(
   }
 }
 
-/** 画像素风格腿 — 裤子 + 鞋 + 角色专属细节 */
+/** 画像素风格腿 — 锥形(大腿宽→膝→小腿窄→踝) + 膝关节 + 鞋 */
 export function drawPixelLeg(
   ctx: CanvasRenderingContext2D, charId: string, w: number, h: number, isBack: boolean,
   colorIndex?: number,
@@ -1511,17 +1631,63 @@ export function drawPixelLeg(
   const shoeH = Math.max(6, h * 0.12);
 
   const pantsColor = isBack ? shiftColor(outfit.pants, -8) : outfit.pants;
-  // 裤子主形状
+
+  // 锥形宽度: 大腿hw → 膝部(0.8*hw) → 小腿下端(0.6*hw)
+  const thighHW = hw;
+  const kneeHW = hw * 0.8;
+  const calfHW = hw * 0.6;
+  const kneeY = -hh + (h - shoeH) * 0.48;
+  const calfBottomY = hh - shoeH;
+
+  // 裤子主形状 — 锥形(大腿→膝盖→小腿)
   ctx.fillStyle = pantsColor;
-  roundRect(ctx, -hw, -hh, w, h - shoeH, 2);
+  ctx.beginPath();
+  ctx.moveTo(-thighHW, -hh);
+  ctx.lineTo(thighHW, -hh);
+  ctx.lineTo(kneeHW, kneeY);
+  ctx.lineTo(calfHW, calfBottomY);
+  ctx.lineTo(-calfHW, calfBottomY);
+  ctx.lineTo(-kneeHW, kneeY);
+  ctx.closePath();
   ctx.fill();
 
   // 裤子高光（内侧）
   ctx.fillStyle = shiftColor(pantsColor, 15);
-  ctx.fillRect(-hw * 0.2, -hh + 2, w * 0.2, h - shoeH - 4);
+  ctx.beginPath();
+  ctx.moveTo(-thighHW * 0.3, -hh + 2);
+  ctx.lineTo(-thighHW * 0.1, -hh + 2);
+  ctx.lineTo(-kneeHW * 0.1, kneeY);
+  ctx.lineTo(-calfHW * 0.1, calfBottomY);
+  ctx.lineTo(-calfHW * 0.4, calfBottomY);
+  ctx.lineTo(-kneeHW * 0.4, kneeY);
+  ctx.lineTo(-thighHW * 0.5, -hh + 2);
+  ctx.closePath();
+  ctx.fill();
+
   // 裤子暗影（外侧）
   ctx.fillStyle = shiftColor(pantsColor, -12);
-  ctx.fillRect(hw * 0.3, -hh + 2, w * 0.15, h - shoeH - 4);
+  ctx.beginPath();
+  ctx.moveTo(thighHW * 0.5, -hh + 2);
+  ctx.lineTo(thighHW, -hh + 2);
+  ctx.lineTo(kneeHW, kneeY);
+  ctx.lineTo(calfHW, calfBottomY);
+  ctx.lineTo(calfHW * 0.6, calfBottomY);
+  ctx.lineTo(kneeHW * 0.6, kneeY);
+  ctx.lineTo(thighHW * 0.6, -hh + 2);
+  ctx.closePath();
+  ctx.fill();
+
+  // 膝关节圆
+  const kneeR = Math.max(2, kneeHW * 0.3);
+  ctx.fillStyle = shiftColor(pantsColor, -5);
+  ctx.beginPath();
+  ctx.arc(0, kneeY, kneeR, 0, Math.PI * 2);
+  ctx.fill();
+  // 膝关节高光
+  ctx.fillStyle = shiftColor(pantsColor, 12);
+  ctx.beginPath();
+  ctx.arc(-kneeR * 0.2, kneeY - kneeR * 0.25, kneeR * 0.4, 0, Math.PI * 2);
+  ctx.fill();
 
   // 角色专属腿部细节
   drawLegDetail(ctx, charId, w, h, hw, hh, shoeH, pantsColor, outfit, isBack);
@@ -1529,19 +1695,29 @@ export function drawPixelLeg(
   // 鞋子 — 更详细的分层绘制
   drawShoeDetail(ctx, charId, w, hw, hh, shoeH, outfit);
 
-  // SNK风格轮廓线
+  // SNK风格轮廓线 — 沿锥形路径描边
   ctx.strokeStyle = OUTLINE_COLOR;
   ctx.lineWidth = OUTLINE_WIDTH;
   ctx.lineJoin = 'round';
-  roundRect(ctx, -hw, -hh, w, h, 3);
+  ctx.beginPath();
+  ctx.moveTo(-thighHW, -hh);
+  ctx.lineTo(thighHW, -hh);
+  ctx.lineTo(kneeHW, kneeY);
+  ctx.lineTo(calfHW, calfBottomY);
+  ctx.lineTo(-calfHW, calfBottomY);
+  ctx.lineTo(-kneeHW, kneeY);
+  ctx.closePath();
+  ctx.stroke();
+  // 鞋底轮廓
+  roundRect(ctx, -hw, hh - shoeH, w, shoeH, 2);
   ctx.stroke();
 
   // 鞋裤分界线
   ctx.strokeStyle = shiftColor(outfit.shoes, -25);
   ctx.lineWidth = 1.2;
   ctx.beginPath();
-  ctx.moveTo(-hw, hh - shoeH);
-  ctx.lineTo(hw, hh - shoeH);
+  ctx.moveTo(-calfHW, calfBottomY);
+  ctx.lineTo(calfHW, calfBottomY);
   ctx.stroke();
 }
 

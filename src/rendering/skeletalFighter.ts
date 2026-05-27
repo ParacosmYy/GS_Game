@@ -913,6 +913,78 @@ export function drawSkeletalFighter(
   drawPixelArm(ctx, f.charId, armW * p.armFront.scale, armH * p.armFront.scale, false, colorIdx);
   ctx.restore();
 
+  // === Joint balls at shoulder/elbow/knee/ankle for solid body look ===
+  const jointR = Math.max(3, Math.min(4, armW * 0.18));
+  const jointColor = '#e8b88a';
+  const jointDark = shiftColor(jointColor, -20);
+  const jointHighlight = shiftColor(jointColor, 15);
+  // Helper to draw a joint ball
+  const drawJoint = (jx: number, jy: number) => {
+    ctx.fillStyle = jointColor;
+    ctx.beginPath();
+    ctx.arc(jx, jy, jointR, 0, Math.PI * 2);
+    ctx.fill();
+    // Highlight
+    ctx.fillStyle = jointHighlight;
+    ctx.beginPath();
+    ctx.arc(jx - jointR * 0.2, jy - jointR * 0.25, jointR * 0.4, 0, Math.PI * 2);
+    ctx.fill();
+    // Outline
+    ctx.strokeStyle = jointDark;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.arc(jx, jy, jointR, 0, Math.PI * 2);
+    ctx.stroke();
+  };
+
+  // Shoulder joints — where arms connect to torso
+  const shoulderLX = torsoX - torsoW * 0.45 * f.facing;
+  const shoulderRX = torsoX + torsoW * 0.45 * f.facing;
+  drawJoint(shoulderLX, shoulderY);
+  drawJoint(shoulderRX, shoulderY);
+
+  // Elbow joints — midpoint of each arm
+  const backArmElbowX = backArm.x + Math.cos(backArm.rot) * armH * p.armBack.scale * 0.3 * 0;
+  const backArmElbowY = (shoulderY + p.armBack.oy * heightFactor) + Math.sin(backArm.rot) * armH * p.armBack.scale * 0.3;
+  // Calculate arm midpoint in rotated space
+  const backArmMidDist = armH * p.armBack.scale * 0.3;
+  const baElbowX = backArm.x + Math.sin(backArm.rot) * backArmMidDist;
+  const baElbowY = (shoulderY + p.armBack.oy * heightFactor) + Math.cos(backArm.rot) * backArmMidDist;
+  drawJoint(baElbowX, baElbowY);
+
+  const frontArmMidDist = armH * p.armFront.scale * 0.3;
+  const faElbowX = frontArm.x + Math.sin(frontArm.rot) * frontArmMidDist;
+  const faElbowY = (shoulderY + p.armFront.oy * heightFactor) + Math.cos(frontArm.rot) * frontArmMidDist;
+  drawJoint(faElbowX, faElbowY);
+
+  // Knee joints — midpoint of each leg
+  const backLegMidDist = legH * p.legBack.scale * 0.45;
+  const blKneeX = backLeg.x + Math.sin(backLeg.rot) * backLegMidDist;
+  const blKneeY = (hipY + p.legBack.oy * heightFactor) + Math.cos(backLeg.rot) * backLegMidDist;
+  drawJoint(blKneeX, blKneeY);
+
+  const frontLegMidDist = legH * p.legFront.scale * 0.45;
+  const flKneeX = frontLeg.x + Math.sin(frontLeg.rot) * frontLegMidDist;
+  const flKneeY = (hipY + p.legFront.oy * heightFactor) + Math.cos(frontLeg.rot) * frontLegMidDist;
+  drawJoint(flKneeX, flKneeY);
+
+  // Ankle joints — near bottom of each leg
+  const ankleDist = legH * p.legBack.scale * 0.85;
+  const blAnkleX = backLeg.x + Math.sin(backLeg.rot) * ankleDist;
+  const blAnkleY = (hipY + p.legBack.oy * heightFactor) + Math.cos(backLeg.rot) * ankleDist;
+  drawJoint(blAnkleX, blAnkleY);
+
+  const flAnkleDist = legH * p.legFront.scale * 0.85;
+  const flAnkleX = frontLeg.x + Math.sin(frontLeg.rot) * flAnkleDist;
+  const flAnkleY = (hipY + p.legFront.oy * heightFactor) + Math.cos(frontLeg.rot) * flAnkleDist;
+  drawJoint(flAnkleX, flAnkleY);
+
+  // Hip joints — where legs connect to body
+  const hipLX = torsoX - torsoW * 0.25 * f.facing;
+  const hipRX = torsoX + torsoW * 0.25 * f.facing;
+  drawJoint(hipLX, hipY);
+  drawJoint(hipRX, hipY);
+
   if (isFlashing) {
     ctx.save();
     ctx.globalCompositeOperation = 'screen';
@@ -1262,6 +1334,42 @@ function drawCachedSkeletalFrame(
   ctx.rotate(frontArm.rot);
   drawPixelArm(ctx, charId, armW * p.armFront.scale, armH * p.armFront.scale, false, colorIdx);
   ctx.restore();
+
+  // === Joint balls (cached version — same logic as main render) ===
+  const cJointR = Math.max(3, Math.min(4, armW * 0.18));
+  const cJointColor = '#e8b88a';
+  const cJointDark = shiftColor(cJointColor, -20);
+  const cJointHL = shiftColor(cJointColor, 15);
+  const drawCJoint = (jx: number, jy: number) => {
+    ctx.fillStyle = cJointColor;
+    ctx.beginPath(); ctx.arc(jx, jy, cJointR, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = cJointHL;
+    ctx.beginPath(); ctx.arc(jx - cJointR * 0.2, jy - cJointR * 0.25, cJointR * 0.4, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = cJointDark;
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.arc(jx, jy, cJointR, 0, Math.PI * 2); ctx.stroke();
+  };
+  // Shoulders
+  drawCJoint(torsoX - torsoW * 0.45 * f.facing, shoulderY);
+  drawCJoint(torsoX + torsoW * 0.45 * f.facing, shoulderY);
+  // Elbows
+  const cBAMid = armH * p.armBack.scale * 0.3;
+  drawCJoint(backArm.x + Math.sin(backArm.rot) * cBAMid, (shoulderY + p.armBack.oy * heightFactor) + Math.cos(backArm.rot) * cBAMid);
+  const cFAMid = armH * p.armFront.scale * 0.3;
+  drawCJoint(frontArm.x + Math.sin(frontArm.rot) * cFAMid, (shoulderY + p.armFront.oy * heightFactor) + Math.cos(frontArm.rot) * cFAMid);
+  // Knees
+  const cBLMid = legH * p.legBack.scale * 0.45;
+  drawCJoint(backLeg.x + Math.sin(backLeg.rot) * cBLMid, (hipY + p.legBack.oy * heightFactor) + Math.cos(backLeg.rot) * cBLMid);
+  const cFLMid = legH * p.legFront.scale * 0.45;
+  drawCJoint(frontLeg.x + Math.sin(frontLeg.rot) * cFLMid, (hipY + p.legFront.oy * heightFactor) + Math.cos(frontLeg.rot) * cFLMid);
+  // Ankles
+  const cBLAnk = legH * p.legBack.scale * 0.85;
+  drawCJoint(backLeg.x + Math.sin(backLeg.rot) * cBLAnk, (hipY + p.legBack.oy * heightFactor) + Math.cos(backLeg.rot) * cBLAnk);
+  const cFLAnk = legH * p.legFront.scale * 0.85;
+  drawCJoint(frontLeg.x + Math.sin(frontLeg.rot) * cFLAnk, (hipY + p.legFront.oy * heightFactor) + Math.cos(frontLeg.rot) * cFLAnk);
+  // Hips
+  drawCJoint(torsoX - torsoW * 0.25 * f.facing, hipY);
+  drawCJoint(torsoX + torsoW * 0.25 * f.facing, hipY);
 
   // Hit flash overlay (simplified — no radial gradient for cache)
   if (isFlashing) {

@@ -107,6 +107,46 @@ function cropPortraitToVisibleBounds(portrait: PixelPortraitData): PixelPortrait
   };
 }
 
+function cropPortraitToAspect(
+  portrait: PixelPortraitData,
+  targetAspect: number,
+  focusX: number = 0.5,
+  focusY: number = 0.42,
+): PixelPortraitData {
+  const currentAspect = portrait.width / portrait.height;
+  let cropX = 0;
+  let cropY = 0;
+  let cropWidth = portrait.width;
+  let cropHeight = portrait.height;
+
+  if (currentAspect > targetAspect) {
+    cropHeight = portrait.height;
+    cropWidth = Math.max(1, Math.round(cropHeight * targetAspect));
+    cropX = Math.max(0, Math.min(portrait.width - cropWidth, Math.round(portrait.width * focusX - cropWidth / 2)));
+  } else if (currentAspect < targetAspect) {
+    cropWidth = portrait.width;
+    cropHeight = Math.max(1, Math.round(cropWidth / targetAspect));
+    cropY = Math.max(0, Math.min(portrait.height - cropHeight, Math.round(portrait.height * focusY - cropHeight / 2)));
+  }
+
+  if (cropX === 0 && cropY === 0 && cropWidth === portrait.width && cropHeight === portrait.height) {
+    return portrait;
+  }
+
+  const pixels: number[][] = [];
+  for (let row = 0; row < cropHeight; row++) {
+    const sourceRow = portrait.pixels[cropY + row] ?? [];
+    pixels.push(sourceRow.slice(cropX, cropX + cropWidth));
+  }
+
+  return {
+    width: cropWidth,
+    height: cropHeight,
+    palette: portrait.palette,
+    pixels,
+  };
+}
+
 function drawPortraitFitVisibleBoundsInBox(
   ctx: CanvasRenderingContext2D,
   portrait: PixelPortraitData,
@@ -118,14 +158,75 @@ function drawPortraitFitVisibleBoundsInBox(
 ): boolean {
   const cropped = cropPortraitToVisibleBounds(portrait);
   if (!cropped) return false;
+  const framed = cropPortraitToAspect(cropped, 0.78);
 
-  const scale = Math.min(boxWidth / cropped.width, boxHeight / cropped.height);
-  const drawWidth = cropped.width * scale;
-  const drawHeight = cropped.height * scale;
-  const drawX = boxX + (boxWidth - drawWidth) / 2;
-  const drawY = boxY + (boxHeight - drawHeight) / 2;
+  const scale = Math.min(boxWidth / framed.width, boxHeight / framed.height);
+  const drawWidth = Math.max(1, Math.floor(framed.width * scale));
+  const drawHeight = Math.max(1, Math.floor(framed.height * scale));
+  const drawX = Math.round(boxX + (boxWidth - drawWidth) / 2);
+  const drawY = Math.round(boxY + (boxHeight - drawHeight) / 2);
 
-  drawPixelPortrait(ctx, cropped, drawX, drawY, scale, options);
+  ctx.save();
+
+  if (options.shadowColor) {
+    ctx.shadowColor = options.shadowColor;
+    ctx.shadowBlur = 14;
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.16)';
+    ctx.fillRect(drawX + 1, drawY + 2, drawWidth, drawHeight);
+    ctx.shadowBlur = 0;
+  }
+
+  if (options.backdropColor) {
+    const pad = 3;
+    ctx.fillStyle = options.backdropColor;
+    ctx.fillRect(drawX - pad, drawY - pad, drawWidth + pad * 2, drawHeight + pad * 2);
+    const glass = ctx.createLinearGradient(drawX, drawY - pad, drawX, drawY + drawHeight + pad);
+    glass.addColorStop(0, 'rgba(255, 255, 255, 0.12)');
+    glass.addColorStop(0.28, 'rgba(255, 255, 255, 0.04)');
+    glass.addColorStop(0.65, 'rgba(255, 255, 255, 0.00)');
+    glass.addColorStop(1, 'rgba(0, 0, 0, 0.18)');
+    ctx.fillStyle = glass;
+    ctx.fillRect(drawX - pad, drawY - pad, drawWidth + pad * 2, drawHeight + pad * 2);
+  }
+
+  for (let targetY = 0; targetY < drawHeight; targetY++) {
+    const sourceY = Math.min(framed.height - 1, Math.floor(targetY * framed.height / drawHeight));
+    const rowData = framed.pixels[sourceY] ?? [];
+    for (let targetX = 0; targetX < drawWidth; targetX++) {
+      const sourceX = Math.min(framed.width - 1, Math.floor(targetX * framed.width / drawWidth));
+      const idx = rowData[sourceX] ?? 0;
+      if (idx === 0) continue;
+      const color = framed.palette[idx];
+      if (!color) continue;
+      ctx.fillStyle = color;
+      ctx.fillRect(drawX + targetX, drawY + targetY, 1, 1);
+    }
+  }
+
+  if (options.scanlines) {
+    ctx.fillStyle = '#000';
+    ctx.globalAlpha = 0.06;
+    for (let row = 0; row < drawHeight; row += 3) {
+      ctx.fillRect(drawX, drawY + row, drawWidth, 1);
+    }
+    ctx.globalAlpha = 0.025;
+    for (let row = 1; row < drawHeight; row += 6) {
+      ctx.fillRect(drawX, drawY + row, drawWidth, 1);
+    }
+  }
+
+  if (options.frameColor) {
+    ctx.globalAlpha = 1;
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = options.frameColor;
+    ctx.strokeRect(drawX - 2, drawY - 2, drawWidth + 4, drawHeight + 4);
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.16)';
+    ctx.strokeRect(drawX - 1, drawY - 1, drawWidth + 2, drawHeight + 2);
+    ctx.strokeStyle = 'rgba(0, 0, 0, 0.58)';
+    ctx.strokeRect(drawX, drawY, drawWidth, drawHeight);
+  }
+
+  ctx.restore();
   return true;
 }
 

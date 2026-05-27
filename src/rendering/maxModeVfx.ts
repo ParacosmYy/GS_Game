@@ -40,9 +40,9 @@ export function drawMAXModeAura(
   const centerY = groundY - displayHeight / 2;
   const auraRadius = displayHeight * 0.75;
 
-  // Pulsing alpha between 0.15 and 0.35
+  // Pulsing alpha between 0.20 and 0.45 (enhanced visibility — was 0.15–0.35)
   const pulsePhase = Math.sin(tick * 0.08);
-  const baseAlpha = 0.25 + pulsePhase * 0.10;
+  const baseAlpha = 0.325 + pulsePhase * 0.125;
 
   // === 1. Radial gradient aura (blue-white glow) ===
   ctx.save();
@@ -75,6 +75,31 @@ export function drawMAXModeAura(
   ctx.arc(centerX, centerY, ringR, 0, Math.PI * 2);
   ctx.stroke();
   ctx.restore();
+
+  // === 5. Golden outline pulse (KOF2002 MAX mode signature) ===
+  const goldPulse = Math.sin(tick * 0.12) * 0.15 + 0.2;
+  ctx.save();
+  ctx.strokeStyle = `rgba(255, 215, 0, ${Math.max(0, goldPulse)})`;
+  ctx.lineWidth = 1.5 + Math.sin(tick * 0.1) * 0.5;
+  ctx.beginPath();
+  ctx.ellipse(centerX, centerY, auraRadius * 0.55, auraRadius * 0.45, 0, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.restore();
+
+  // === 6. Foot-level golden spark particles ===
+  if (tick % 3 === 0) {
+    const sparkAngle = Math.random() * Math.PI * 2;
+    const sparkDist = 5 + Math.random() * 15;
+    const sparkX = centerX + Math.cos(sparkAngle) * sparkDist;
+    const sparkY = groundY - 2 + Math.sin(sparkAngle) * 3;
+    ctx.save();
+    ctx.globalAlpha = 0.6;
+    ctx.fillStyle = '#ffd700';
+    ctx.beginPath();
+    ctx.arc(sparkX, sparkY, 1.5, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
 
   // === 3. Energy wisps (small upward-drifting particles) ===
   spawnWisps(playerIdx, centerX, centerY, auraRadius, tick);
@@ -181,7 +206,7 @@ export function drawMAXActivationFlash(
 
   const centerY = groundY - displayHeight / 2;
 
-  // Phase 1: White flash centered on fighter (4 ticks)
+  // Phase 1: White flash centered on fighter (4 ticks) — enhanced with cross-star burst
   if (timer > 0) {
     const flashAlpha = Math.min(1, timer / 4);
     const flashRadius = displayHeight * 0.8;
@@ -191,9 +216,9 @@ export function drawMAXActivationFlash(
       screenX, centerY, 0,
       screenX, centerY, flashRadius,
     );
-    flashGrad.addColorStop(0, `rgba(255, 255, 255, ${flashAlpha * 0.9})`);
-    flashGrad.addColorStop(0.3, `rgba(200, 230, 255, ${flashAlpha * 0.5})`);
-    flashGrad.addColorStop(0.6, `rgba(150, 200, 255, ${flashAlpha * 0.2})`);
+    flashGrad.addColorStop(0, `rgba(255, 255, 255, ${flashAlpha * 0.95})`);
+    flashGrad.addColorStop(0.3, `rgba(200, 230, 255, ${flashAlpha * 0.55})`);
+    flashGrad.addColorStop(0.6, `rgba(150, 200, 255, ${flashAlpha * 0.25})`);
     flashGrad.addColorStop(1, 'rgba(100, 150, 255, 0)');
     ctx.fillStyle = flashGrad;
     ctx.fillRect(
@@ -203,6 +228,26 @@ export function drawMAXActivationFlash(
       Math.round(flashRadius * 2),
     );
     ctx.restore();
+
+    // Cross-star burst rays during first 2 frames
+    if (timer >= 2) {
+      ctx.save();
+      ctx.globalAlpha = flashAlpha * 0.6;
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 2;
+      for (let i = 0; i < 4; i++) {
+        const angle = (i / 4) * Math.PI * 2 + Math.PI / 8;
+        const rayLen = flashRadius * 0.8;
+        ctx.beginPath();
+        ctx.moveTo(screenX, centerY);
+        ctx.lineTo(
+          screenX + Math.cos(angle) * rayLen,
+          centerY + Math.sin(angle) * rayLen,
+        );
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
   }
 
   // Phase 2: Golden screen-wide tint (2 ticks)

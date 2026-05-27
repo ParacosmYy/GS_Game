@@ -19,6 +19,8 @@ const fighterDebugOverlayEnabled = isFighterDebugOverlayEnabled();
 
 // Track previous state per fighter for blend trigger
 const prevStateMap = new Map<number, string>();
+// Track knockdown landing squash per fighter (frames remaining)
+const knockdownLandingSquash = new Map<number, number>();
 
 /** Draw all fighters with shadows, glows, trails, and attack limbs */
 export function drawFighters(
@@ -225,6 +227,15 @@ export function drawFighters(
     if (f.state === FighterState.HITSTUN) {
       leanOffsetX = -4 * f.facing + blendOffsetX;
       leanAngle = -0.06 * f.facing;
+      // KOF2002: Hitstun body shake — first half of hitstun, decaying sinusoidal shake
+      if (f.hitstunTimer > 0) {
+        const halfStun = f.hitstunTimer; // hitstunTimer counts down, so remaining >0 means early
+        const shakeAmount = Math.max(0, 2 - f.stateAge * 0.3);
+        if (shakeAmount > 0 && f.stateAge < f.hitstunTimer + f.stateAge) {
+          // Apply shake for first ~7 frames (where shakeAmount is still > 0)
+          leanOffsetX += Math.sin(globalTick * 3) * shakeAmount;
+        }
+      }
     } else if (f.state === FighterState.KNOCKDOWN && !f.isGrounded()) {
       // KOF2002: 空中击飞旋转 — 浮空KNOCKDOWN时身体翻转
       leanAngle = f.stateAge * 0.08 * f.facing;
@@ -952,60 +963,60 @@ export function drawFighters(
       }
     }
 
-    // Hit flash overlay
+    // Hit flash overlay — full-body screen blend + cross-star for DM/SDM tier
     if (f.hitFlashFrames > 0) {
       ctx.save();
       ctx.globalCompositeOperation = 'screen';
-      ctx.globalAlpha = 0.24;
-      ctx.fillStyle = f.hitFlashColor || '#ffffff';
+      // Full-body white overlay with screen blend mode
+      const flashIntensity = Math.min(f.hitFlashFrames / 3, 1);
+      ctx.globalAlpha = 0.35 * flashIntensity;
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(sx + leanOffsetX - hw - 4, sy - f.displayHeight - 4, (hw + 4) * 2, f.displayHeight + 8);
+      // Outer glow aura
       const flashX = sx + leanOffsetX;
-      const flashY = sy - f.displayHeight * 0.56;
-      const flashW = Math.max(18, hw * 0.55);
-      const flashH = Math.max(28, f.displayHeight * 0.26);
-      const flashGrad = ctx.createRadialGradient(
-        flashX, flashY, 2,
-        flashX, flashY, Math.max(flashW, flashH) * 1.6,
-      );
-      flashGrad.addColorStop(0, 'rgba(255,255,255,0.95)');
-      flashGrad.addColorStop(0.45, 'rgba(255,255,255,0.40)');
-      flashGrad.addColorStop(1, 'rgba(255,255,255,0)');
-      ctx.fillStyle = flashGrad;
-      ctx.beginPath();
-      ctx.ellipse(flashX, flashY, flashW, flashH, 0, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.globalAlpha = 0.14;
-      ctx.strokeStyle = '#ffffff';
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.ellipse(flashX, flashY, flashW * 1.1, flashH * 1.05, 0, 0, Math.PI * 2);
-      ctx.stroke();
-      ctx.restore();
-      // KOF2002: 命中闪光外发光 — 角色躯干附近的局部辉光，避免整块白框
-      ctx.save();
-      ctx.globalCompositeOperation = 'screen';
-      ctx.globalAlpha = 0.12;
+      const flashY = sy - f.displayHeight * 0.5;
+      ctx.globalAlpha = 0.18 * flashIntensity;
       const auraGrad = ctx.createRadialGradient(
-        flashX, flashY, 6,
-        flashX, flashY, Math.max(flashW, flashH) * 2.2,
+        flashX, flashY, 5,
+        flashX, flashY, Math.max(hw, f.displayHeight * 0.5) * 1.8,
       );
-      auraGrad.addColorStop(0, 'rgba(255,255,255,0.35)');
-      auraGrad.addColorStop(0.6, 'rgba(255,255,255,0.18)');
+      auraGrad.addColorStop(0, 'rgba(255,255,255,0.5)');
+      auraGrad.addColorStop(0.5, 'rgba(255,255,255,0.15)');
       auraGrad.addColorStop(1, 'rgba(255,255,255,0)');
       ctx.fillStyle = auraGrad;
       ctx.beginPath();
-      ctx.ellipse(flashX, flashY, flashW * 1.5, flashH * 1.35, 0, 0, Math.PI * 2);
+      ctx.ellipse(flashX, flashY, hw * 1.5, f.displayHeight * 0.65, 0, 0, Math.PI * 2);
       ctx.fill();
-      const innerGrad = ctx.createRadialGradient(
-        flashX, flashY, 5,
-        flashX, flashY, f.displayHeight * 0.45,
-      );
-      innerGrad.addColorStop(0, '#ffffff');
-      innerGrad.addColorStop(0.4, 'rgba(255,255,255,0.3)');
-      innerGrad.addColorStop(1, 'rgba(255,255,255,0)');
-      ctx.fillStyle = innerGrad;
-      ctx.beginPath();
-      ctx.ellipse(flashX, flashY, flashW * 0.9, flashH * 0.9, 0, 0, Math.PI * 2);
-      ctx.fill();
+      // Cross-star burst for DM/SDM tier (hitFlashFrames >= 4)
+      if (f.hitFlashFrames >= 4) {
+        const starLen = 30 + f.hitFlashFrames * 4;
+        const starAlpha = Math.min(f.hitFlashFrames / 6, 0.7);
+        ctx.globalAlpha = starAlpha;
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 2.5;
+        for (let ray = 0; ray < 4; ray++) {
+          const rayAngle = (ray / 4) * Math.PI + Math.PI / 8;
+          const dx = Math.cos(rayAngle) * starLen;
+          const dy = Math.sin(rayAngle) * starLen * 0.5;
+          ctx.beginPath();
+          ctx.moveTo(flashX, flashY);
+          ctx.lineTo(flashX + dx, flashY + dy);
+          ctx.stroke();
+        }
+        // Secondary shorter cross at 45° offset
+        ctx.globalAlpha = starAlpha * 0.5;
+        ctx.lineWidth = 1.5;
+        const shortLen = starLen * 0.55;
+        for (let ray = 0; ray < 4; ray++) {
+          const rayAngle = (ray / 4) * Math.PI;
+          const dx = Math.cos(rayAngle) * shortLen;
+          const dy = Math.sin(rayAngle) * shortLen * 0.5;
+          ctx.beginPath();
+          ctx.moveTo(flashX, flashY);
+          ctx.lineTo(flashX + dx, flashY + dy);
+          ctx.stroke();
+        }
+      }
       ctx.restore();
     }
     // KOF2002: 超必杀命中能量环 — superBgFlashFrames时攻击者周围扩散环

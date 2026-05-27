@@ -186,16 +186,21 @@ function renderHitLight(sr: number): Float32Array {
   // 中高频"呼吸"层 — 手套击打的空气挤出感
   const airPop = highPass(renderNoise(sr, 0.025, t => expDecay(t, 0.15, 55)), sr, 5000);
 
+  // === v3新增：高频crack层 ===
+  // 高频"crack"正弦波 — 3000-4000Hz范围，20ms快速衰减，给轻击增加snappy/crisp质感
+  const crack = renderOsc(sr, 0.02, 'sine', t => 3500 - 20000 * t, t => expDecay(t, 0.28, 70));
+
   const total = Math.ceil(sr * dur);
   const snapP = padTo(snap, total);
   const midP = padTo(mid, total);
   const gloveSlapP = padTo(gloveSlap, total);
   const clickP = padTo(clickOsc, total);
   const airPopP = padTo(airPop, total);
+  const crackP = padTo(crack, total);
 
   return normalize(mixLayers(
-    [noiseMid, noiseHi, body, snapP, midP, gloveSlapP, clickP, airPopP],
-    [1, 0.55, 0.7, 0.55, 0.3, 0.7, 0.5, 0.35]
+    [noiseMid, noiseHi, body, snapP, midP, gloveSlapP, clickP, airPopP, crackP],
+    [1, 0.55, 0.7, 0.55, 0.3, 0.7, 0.5, 0.35, 0.65]
   ));
 }
 
@@ -228,6 +233,11 @@ function renderHitHeavy(sr: number): Float32Array {
   const chestThud = bandPass(renderNoise(sr, 0.12, t => expDecay(t, 0.4, 10)), sr, 120, 500);
   // 低频二次脉冲 — 击打后的"余震"
   const aftershock = renderOsc(sr, 0.2, 'sine', t => 55 - 45 * t, t => t < 0.02 ? 0 : expDecay(t - 0.02, 0.35, 4));
+  // === v3新增：body impact thump层 ===
+  // 低频体感冲击sweep — 200→80Hz over 60ms，更prominent的"thump"质感
+  const bodyThump = renderOsc(sr, 0.06, 'sine', t => 200 - 2000 * t, t => expDecay(t, 0.5, 12));
+  // 金属ring tail — 1200Hz sine, exponential decay over 100ms
+  const metalRing = renderOsc(sr, 0.1, 'sine', t => 1200, t => expDecay(t, 0.08, 18));
 
   const total = Math.ceil(sr * dur);
   const crackP = padTo(crack, total);
@@ -238,10 +248,12 @@ function renderHitHeavy(sr: number): Float32Array {
   const bodyImpactP = padTo(bodyImpact, total);
   const chestThudP = padTo(chestThud, total);
   const aftershockP = padTo(aftershock, total, Math.floor(sr * 0.04));
+  const bodyThumpP = padTo(bodyThump, total);
+  const metalRingP = padTo(metalRing, total, Math.floor(sr * 0.03));
 
   return normalize(mixLayers(
-    [noiseMid, noiseHi, body, sub, crackP, metalP, harmP, hiP, weightP, bodyImpactP, chestThudP, aftershockP],
-    [1, 0.35, 1.3, 1.0, 0.65, 0.3, 0.35, 0.22, 0.9, 1.1, 0.8, 0.7]
+    [noiseMid, noiseHi, body, sub, crackP, metalP, harmP, hiP, weightP, bodyImpactP, chestThudP, aftershockP, bodyThumpP, metalRingP],
+    [1, 0.35, 1.3, 1.0, 0.65, 0.3, 0.35, 0.22, 0.9, 1.1, 0.8, 0.7, 1.2, 0.55]
   ));
 }
 
@@ -455,6 +467,8 @@ function renderCounter(sr: number): Float32Array {
   const airCrack = highPass(renderNoise(sr, 0.04, t => expDecay(t, 0.2, 35)), sr, 8000);
   // 尖锐泛音碎片 — 延迟0.02s
   const shard = renderOsc(sr, 0.03, 'sawtooth', t => 4500 - 50000 * t, t => expDecay(t, 0.12, 50));
+  // === v3新增：counter hit特有"ding"层 — 2500Hz sine, 80ms, medium decay ===
+  const ding = renderOsc(sr, 0.08, 'sine', t => 2500, t => expDecay(t, 0.15, 12));
 
   const total = Math.ceil(sr * dur);
   const osc1P = padTo(osc1, total);
@@ -980,12 +994,15 @@ function renderSpecialLight(sr: number): Float32Array {
   const noiseBp = bandPass(renderNoise(sr, 0.12, t => expDecay(t, 0.12, 12)), sr, 500, 2500);
   const metal = renderOsc(sr, 0.06, 'triangle', _t => 2000, t => expDecay(t, 0.08, 25));
   const impact = renderOsc(sr, 0.1, 'sine', t => 120 - 800 * t, t => expDecay(t, 0.2, 15));
+  // === v3新增：energy whoosh层 — 过滤噪声从高频扫到低频，区分特殊技命中 ===
+  const energyWhoosh = bandPass(renderNoise(sr, 0.08, t => expDecay(t, 0.25, 18)), sr, 6000, 12000);
   const total = Math.ceil(sr * dur);
   const sweepP = padTo(sweep, total);
   const noiseBpP = padTo(noiseBp, total);
   const metalP = padTo(metal, total, Math.floor(sr * 0.02));
   const impactP = padTo(impact, total, Math.floor(sr * 0.04));
-  return normalize(mixLayers([sweepP, noiseBpP, metalP, impactP], [0.8, 1, 0.45, 0.7]));
+  const energyWhooshP = padTo(energyWhoosh, total);
+  return normalize(mixLayers([sweepP, noiseBpP, metalP, impactP, energyWhooshP], [0.8, 1, 0.45, 0.7, 0.7]));
 }
 
 // 强必杀命中：在renderSpecial基础上增加子低音层
@@ -999,13 +1016,16 @@ function renderSpecialHeavy(sr: number): Float32Array {
   const metal = renderOsc(sr, 0.08, 'triangle', t => 2400 - 28000 * t, t => expDecay(t, 0.09, 30));
   const impact = renderOsc(sr, 0.15, 'sine', t => 120 - 1000 * t, t => expDecay(t, 0.3, 12));
   const sub = renderOsc(sr, 0.2, 'sine', t => 50 - 40 * t, t => expDecay(t, 0.35, 4));
+  // === v3新增：energy whoosh层 — 过滤噪声从高频扫到低频，80ms ===
+  const energyWhoosh = bandPass(renderNoise(sr, 0.08, t => expDecay(t, 0.2, 16)), sr, 5000, 10000);
   const total = Math.ceil(sr * dur);
   const nMidP = padTo(noiseMid, total);
   const nHiP = padTo(noiseHi, total);
   const metalP = padTo(metal, total);
   const impactP = padTo(impact, total, Math.floor(sr * 0.06));
   const subP = padTo(sub, total);
-  return normalize(mixLayers([whoosh, nMidP, nHiP, metalP, impactP, subP], [1, 0.6, 0.3, 0.5, 0.7, 1.0]));
+  const energyWhooshP = padTo(energyWhoosh, total);
+  return normalize(mixLayers([whoosh, nMidP, nHiP, metalP, impactP, subP, energyWhooshP], [1, 0.6, 0.3, 0.5, 0.7, 1.0, 0.65]));
 }
 
 // === KO命中音效 — 击中KO时的独立音效 ===

@@ -17,7 +17,8 @@ export interface Particle {
   rotSpeed?: number;
 }
 
-/** Tier-aware spark spawning — each sparkType produces a distinct pattern */
+/** Tier-aware spark spawning — each sparkType produces a distinct pattern.
+ *  biasX: direction bias for sparks (>0 = rightward density, <0 = leftward, 0 = uniform) */
 export function spawnTierSparks(
   particles: Particle[],
   x: number, y: number,
@@ -25,14 +26,30 @@ export function spawnTierSparks(
   sparkType: 'small' | 'medium' | 'large' | 'burst' | 'mega' | 'hyper',
   sparkPalette: string[],
   sparkSpeed: number,
+  biasX: number = 0,
 ): void {
   const pick = () => sparkPalette[Math.floor(Math.random() * sparkPalette.length)];
 
+  // Direction bias: 70% of sparks concentrated toward attack direction, 30% uniform
+  const biasedAngle = (): number => {
+    if (biasX === 0) return Math.random() * Math.PI * 2;
+    if (Math.random() < 0.7) {
+      const base = biasX > 0 ? 0 : Math.PI;
+      return base + (Math.random() - 0.5) * Math.PI;
+    }
+    return Math.random() * Math.PI * 2;
+  };
+
   switch (sparkType) {
     case 'small': {
-      // Same as existing spawnHitSparks behavior: random velocity, short life
+      // WHITE core flash — 2-frame radial gradient burst before sparks scatter
+      particles.push({
+        x, y, vx: 0, vy: 0,
+        life: 2, maxLife: 2, size: 10,
+        color: '#ffffff', type: 'flash',
+      });
       for (let i = 0; i < count; i++) {
-        const angle = -Math.PI * 0.8 + Math.random() * Math.PI * 1.6;
+        const angle = biasX !== 0 ? biasedAngle() : -Math.PI * 0.8 + Math.random() * Math.PI * 1.6;
         const speed = (2 + Math.random() * 5) * sparkSpeed;
         particles.push({
           x, y,
@@ -50,19 +67,30 @@ export function spawnTierSparks(
       break;
     }
     case 'medium': {
-      // Larger particles, more spread, slightly longer life
+      // 3-layer structure: white core → yellow mid → orange outer, 2-frame fade
       particles.push({
         x, y, vx: 0, vy: 0,
-        life: 8, maxLife: 8, size: 18,
-        color: pick(), type: 'flash',
+        life: 2, maxLife: 2, size: 8,
+        color: '#ffffff', type: 'flash',
       });
+      particles.push({
+        x, y, vx: 0, vy: 0,
+        life: 2, maxLife: 2, size: 16,
+        color: '#ffcc44', type: 'flash',
+      });
+      particles.push({
+        x, y, vx: 0, vy: 0,
+        life: 2, maxLife: 2, size: 24,
+        color: '#ff8844', type: 'flash',
+      });
+      // Sparks radiate OUTWARD from impact point (not upward)
       for (let i = 0; i < count; i++) {
-        const angle = Math.random() * Math.PI * 2;
+        const angle = biasedAngle();
         const speed = (2.5 + Math.random() * 6) * sparkSpeed;
         particles.push({
           x, y,
           vx: Math.cos(angle) * speed,
-          vy: Math.sin(angle) * speed - 3,
+          vy: Math.sin(angle) * speed,
           life: 12 + Math.floor(Math.random() * 8),
           maxLife: 22,
           size: 2.5 + Math.random() * 3,
@@ -77,7 +105,31 @@ export function spawnTierSparks(
       break;
     }
     case 'large': {
-      // Radial burst pattern, star-shaped particles with higher sparkSpeed
+      // Star-shaped burst: 6 rays + center white dot, 4-frame fade
+      particles.push({
+        x, y, vx: 0, vy: 0,
+        life: 4, maxLife: 4, size: 14,
+        color: '#ffffff', type: 'flash',
+      });
+      // 6 directional rays
+      for (let r = 0; r < 6; r++) {
+        const rayAngle = (r / 6) * Math.PI * 2;
+        const speed = (4 + Math.random() * 3) * sparkSpeed;
+        particles.push({
+          x, y,
+          vx: Math.cos(rayAngle) * speed,
+          vy: Math.sin(rayAngle) * speed,
+          life: 4, maxLife: 4,
+          size: 5 + Math.random() * 3,
+          color: '#ffffff',
+          type: 'star',
+          gravity: 0,
+          friction: 0.9,
+          rotation: rayAngle,
+          rotSpeed: 0,
+        });
+      }
+      // Original radial burst (enhanced)
       particles.push({
         x, y, vx: 0, vy: 0,
         life: 10, maxLife: 10, size: 28,
@@ -109,7 +161,35 @@ export function spawnTierSparks(
       break;
     }
     case 'burst': {
-      // Ring pattern + center flash particles, wide spread
+      // Double ring shockwave: inner fast white + outer slow yellow
+      particles.push({
+        x, y, vx: 0, vy: 0,
+        life: 8, maxLife: 8, size: 4,
+        color: '#ffffff', type: 'ring',
+      });
+      particles.push({
+        x, y, vx: 0, vy: 0,
+        life: 14, maxLife: 14, size: 6,
+        color: '#ffcc44', type: 'ring',
+      });
+      // Fragment particles — small sharp debris scattering
+      for (let i = 0; i < 8; i++) {
+        const angle = biasedAngle();
+        const speed = (2 + Math.random() * 4) * sparkSpeed;
+        particles.push({
+          x, y,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed,
+          life: 6 + Math.floor(Math.random() * 6),
+          maxLife: 12,
+          size: 1.5 + Math.random() * 2,
+          color: Math.random() > 0.5 ? '#ffffff' : pick(),
+          type: 'spark',
+          gravity: 0.05,
+          friction: 0.92,
+        });
+      }
+      // Center superburst
       particles.push({
         x, y, vx: 0, vy: 0,
         life: 12, maxLife: 12, size: 40,
@@ -141,7 +221,7 @@ export function spawnTierSparks(
       }
       // Center flash particles (extra scatter)
       for (let i = 0; i < 6; i++) {
-        const angle = Math.random() * Math.PI * 2;
+        const angle = biasedAngle();
         const speed = (1.5 + Math.random() * 3) * sparkSpeed;
         particles.push({
           x, y,
@@ -159,7 +239,28 @@ export function spawnTierSparks(
       break;
     }
     case 'mega': {
-      // Double ring + center superburst, largest spread
+      // Triple ring shockwave (white→yellow→orange at decreasing speeds) + center explosion
+      particles.push({
+        x, y, vx: 0, vy: 0,
+        life: 8, maxLife: 8, size: 5,
+        color: '#ffffff', type: 'ring',
+      });
+      particles.push({
+        x, y, vx: 0, vy: 0,
+        life: 14, maxLife: 14, size: 7,
+        color: '#ffcc44', type: 'ring',
+      });
+      particles.push({
+        x, y, vx: 0, vy: 0,
+        life: 20, maxLife: 20, size: 9,
+        color: '#ff8844', type: 'ring',
+      });
+      // Center explosion
+      particles.push({
+        x, y, vx: 0, vy: 0,
+        life: 12, maxLife: 12, size: 50,
+        color: '#ffffff', type: 'superburst',
+      });
       particles.push({
         x, y, vx: 0, vy: 0,
         life: 14, maxLife: 14, size: 55,
@@ -211,7 +312,57 @@ export function spawnTierSparks(
       break;
     }
     case 'hyper': {
-      // HSDM climax: triple superburst + radial shockwave + star cascade
+      // Four-layer ring + cross burst + center mega-flash + screen crack lines
+      // Four-layer expanding ring
+      const ringColors = ['#ffffff', '#ffee44', '#ffaa22', '#ff6622'];
+      for (let r = 0; r < 4; r++) {
+        particles.push({
+          x, y, vx: 0, vy: 0,
+          life: 8 + r * 5, maxLife: 8 + r * 5, size: 5 + r * 2.5,
+          color: ringColors[r], type: 'ring',
+        });
+      }
+      // Cross burst: 4 directional star projectiles in + pattern
+      for (let c = 0; c < 4; c++) {
+        const crossAngle = (c / 4) * Math.PI * 2;
+        const speed = 10 * sparkSpeed;
+        particles.push({
+          x, y,
+          vx: Math.cos(crossAngle) * speed,
+          vy: Math.sin(crossAngle) * speed,
+          life: 10, maxLife: 10,
+          size: 6,
+          color: '#ffffff',
+          type: 'star',
+          gravity: 0,
+          friction: 0.85,
+          rotation: crossAngle,
+          rotSpeed: 0,
+        });
+      }
+      // Center mega-flash
+      particles.push({
+        x, y, vx: 0, vy: 0,
+        life: 16, maxLife: 16, size: 80,
+        color: '#ffffff', type: 'superburst',
+      });
+      // Screen crack lines — radial slash particles simulating cracks
+      for (let i = 0; i < 8; i++) {
+        const crackAngle = (i / 8) * Math.PI * 2 + (Math.random() - 0.5) * 0.3;
+        particles.push({
+          x: x + Math.cos(crackAngle) * 15,
+          y: y + Math.sin(crackAngle) * 15,
+          vx: Math.cos(crackAngle) * 2,
+          vy: Math.sin(crackAngle) * 2,
+          life: 14 + Math.floor(Math.random() * 8),
+          maxLife: 22,
+          size: 25 + Math.random() * 15,
+          color: i % 2 === 0 ? '#ff2244' : '#ff6644',
+          type: 'slash',
+          rotation: crackAngle,
+        });
+      }
+      // Original triple superburst
       particles.push({
         x, y, vx: 0, vy: 0,
         life: 18, maxLife: 18, size: 65,
@@ -266,7 +417,7 @@ export function spawnTierSparks(
       // Inner dense sparks
       const innerCount = count - outerCount;
       for (let i = 0; i < innerCount; i++) {
-        const angle = (i / innerCount) * Math.PI * 2;
+        const angle = biasedAngle();
         const speed = (3 + Math.random() * 5) * sparkSpeed;
         particles.push({
           x, y,
@@ -305,11 +456,43 @@ export function spawnHitSparks(particles: Particle[], worldX: number, worldY: nu
   }
 }
 
+/** Block flash — BLUE-TINTED defensive sparks (distinct from orange/yellow hit sparks).
+ *  Block = defensive blue, Hit = offensive orange. */
 export function spawnBlockFlash(particles: Particle[], worldX: number, worldY: number, scale: number = 1.0): void {
+  // Blue core flash
   particles.push({
     x: worldX, y: worldY, vx: 0, vy: 0,
     life: 8, maxLife: 8, size: 30 * scale,
-    color: '#aaccff', type: 'flash',
+    color: '#4488ff', type: 'flash',
+  });
+  // White-hot center for contrast
+  particles.push({
+    x: worldX, y: worldY, vx: 0, vy: 0,
+    life: 4, maxLife: 4, size: 14 * scale,
+    color: '#ffffff', type: 'flash',
+  });
+  // Blue spark particles scattered around — defensive barrier feel
+  for (let i = 0; i < 6; i++) {
+    const angle = Math.random() * Math.PI * 2;
+    const speed = 1.5 + Math.random() * 3;
+    particles.push({
+      x: worldX, y: worldY,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed,
+      life: 8 + Math.floor(Math.random() * 6),
+      maxLife: 14,
+      size: 2 + Math.random() * 2,
+      color: i % 2 === 0 ? '#4488ff' : '#88bbff',
+      type: 'spark',
+      gravity: 0.05,
+      friction: 0.92,
+    });
+  }
+  // Blue impact ring — shield barrier visual
+  particles.push({
+    x: worldX, y: worldY, vx: 0, vy: 0,
+    life: 10, maxLife: 10, size: 4 * scale,
+    color: '#6699ff', type: 'ring',
   });
 }
 
@@ -1008,28 +1191,73 @@ export function spawnDizzyStars(particles: Particle[], worldX: number, worldY: n
 
 /**
  * Ko'ou Ken (虎煌拳) projectile VFX — bright orange/yellow ki blast orb with trailing particles.
- * Orb is 30x30 effective size, 8 trailing particles fading from orange to transparent.
+ * Orb is 39x39 effective size (+30%), rotating particle ring (6 orbiting dots),
+ * 3 trailing blue energy dots per position that fade over 8 frames.
  * Trailing particles move forward at 8px/frame equivalent, duration 40 frames.
  */
 export function spawnKooukenVFX(particles: Particle[], x: number, y: number, facing: number, _charId: string): void {
-  // Core ki blast orb — orange/yellow flash
+  const coreY = y - 10;
+  const coreVx = facing * 8;
+  // Core ki blast orb — orange/yellow flash (size increased by 30%: 30 → 39)
   particles.push({
-    x, y: y - 10, vx: facing * 8, vy: 0,
-    life: 40, maxLife: 40, size: 30,
+    x, y: coreY, vx: coreVx, vy: 0,
+    life: 40, maxLife: 40, size: 39,
     color: '#ffaa22', type: 'flash',
   });
-  // White-hot center
+  // White-hot center (size increased by 30%: 15 → 20)
   particles.push({
-    x, y: y - 10, vx: facing * 8, vy: 0,
-    life: 35, maxLife: 35, size: 15,
+    x, y: coreY, vx: coreVx, vy: 0,
+    life: 35, maxLife: 35, size: 20,
     color: '#ffffff', type: 'flash',
   });
-  // 8 trailing particles — fading orange to transparent
+
+  // === Rotating particle ring: 6 small particles orbiting the projectile center ===
+  const ringCount = 6;
+  const ringRadius = 22; // orbit radius around core
+  const ringSpeed = 0.35; // angular speed per frame
+  for (let i = 0; i < ringCount; i++) {
+    const baseAngle = (i / ringCount) * Math.PI * 2;
+    particles.push({
+      x: x + Math.cos(baseAngle) * ringRadius,
+      y: coreY + Math.sin(baseAngle) * ringRadius,
+      vx: coreVx,
+      vy: 0,
+      life: 40, maxLife: 40, size: 3,
+      color: i % 2 === 0 ? '#ffdd66' : '#ffffff',
+      type: 'spark',
+      gravity: 0,
+      friction: 1.0,
+      rotation: baseAngle,
+      rotSpeed: ringSpeed,
+    });
+  }
+
+  // === Trailing blue energy dots: 3 dots per frame position, fade over 8 frames ===
+  // Simulate 3 trailing "frame positions" behind the projectile
+  for (let t = 0; t < 5; t++) {
+    const trailX = x - facing * (8 + t * 6);
+    for (let j = 0; j < 3; j++) {
+      particles.push({
+        x: trailX + (Math.random() - 0.5) * 6,
+        y: coreY + (Math.random() - 0.5) * 8,
+        vx: facing * (2 + Math.random() * 2),
+        vy: (Math.random() - 0.5) * 1.5,
+        life: 8, maxLife: 8,
+        size: 2 + Math.random() * 2,
+        color: j === 0 ? '#4488ff' : j === 1 ? '#66aaff' : '#88ccff',
+        type: 'spark',
+        gravity: 0,
+        friction: 0.92,
+      });
+    }
+  }
+
+  // Original trailing particles — fading orange to transparent
   for (let i = 0; i < 8; i++) {
     const delay = i * 3;
     particles.push({
       x: x - facing * (8 + i * 6),
-      y: y - 10 + (Math.random() - 0.5) * 10,
+      y: coreY + (Math.random() - 0.5) * 10,
       vx: facing * (8 - i * 0.6),
       vy: (Math.random() - 0.5) * 1.2,
       life: 20 - i * 2 + delay,
@@ -1047,6 +1275,7 @@ export function spawnKooukenVFX(particles: Particle[], x: number, y: number, fac
  * Ko Hou (虎咲) uppercut flame column — rising flame from ground to peak.
  * Orange-red with white core, 12 particles in a column pattern, rising and fading.
  * Duration: 20 frames.
+ * Enhanced: ground dust burst (5 brown/gray fan particles) + ascending air lines (3 vertical speed lines).
  */
 export function spawnKoHouVFX(particles: Particle[], x: number, y: number, _charId: string): void {
   // White-hot core flash at ground level
@@ -1079,11 +1308,134 @@ export function spawnKoHouVFX(particles: Particle[], x: number, y: number, _char
     life: 12, maxLife: 12, size: 8,
     color: '#ff6600', type: 'ring',
   });
+
+  // === Ground dust burst: 5 brown/gray fan-shaped particles rising from ground ===
+  const dustColors = ['#9a7b5d', '#bb9a73', '#887766', '#aa9070', '#776655'];
+  for (let i = 0; i < 5; i++) {
+    const angle = -Math.PI * 0.15 - (i / 4) * Math.PI * 0.7; // fan spread upward
+    const speed = 2.5 + Math.random() * 3;
+    particles.push({
+      x: x + (Math.random() - 0.5) * 20,
+      y: y,
+      vx: Math.cos(angle) * speed * (i < 2 ? -1 : 1) * 0.8,
+      vy: -Math.abs(Math.sin(angle) * speed) - 1,
+      life: 16 + Math.floor(Math.random() * 8),
+      maxLife: 24,
+      size: 4 + Math.random() * 5,
+      color: dustColors[i],
+      type: 'spark',
+      gravity: 0.12,
+      friction: 0.95,
+    });
+  }
+
+  // === Ascending air lines: 3 vertical speed lines rising alongside the character ===
+  for (let i = 0; i < 3; i++) {
+    const lineX = x + (i - 1) * 14;
+    particles.push({
+      x: lineX,
+      y: y + 10,
+      vx: (Math.random() - 0.5) * 0.3,
+      vy: -8 - Math.random() * 4,
+      life: 12 + Math.floor(Math.random() * 4),
+      maxLife: 16,
+      size: 20 + Math.random() * 15,
+      color: i === 1 ? '#ffffff' : '#ffddaa',
+      type: 'slash',
+      rotation: -Math.PI / 2, // vertical
+    });
+  }
+}
+
+/**
+ * Ko Hou C version (虎咲C) — doubled intensity: larger flame, more particles.
+ * Same as spawnKoHouVFX but with 2x particle counts and larger sizes.
+ */
+export function spawnKoHouCVFX(particles: Particle[], x: number, y: number, _charId: string): void {
+  // White-hot core flash — doubled size
+  particles.push({
+    x, y: y - 20, vx: 0, vy: -6,
+    life: 16, maxLife: 16, size: 50,
+    color: '#ffffff', type: 'flash',
+  });
+  // Extra bright core layer
+  particles.push({
+    x, y: y - 30, vx: 0, vy: -5,
+    life: 14, maxLife: 14, size: 40,
+    color: '#ffcc66', type: 'flash',
+  });
+  // Orange-red flame column — 24 particles (doubled), larger
+  for (let i = 0; i < 24; i++) {
+    const heightOffset = i * 7;
+    const spread = (Math.random() - 0.5) * 14;
+    particles.push({
+      x: x + spread,
+      y: y - heightOffset,
+      vx: (Math.random() - 0.5) * 2,
+      vy: -5 - Math.random() * 4,
+      life: 22 - Math.floor(i * 0.7),
+      maxLife: 24,
+      size: 8 + Math.random() * 6,
+      color: i < 4 ? '#ffffff' : i < 8 ? '#ffcc44' : i < 16 ? '#ff8800' : '#ff4400',
+      type: 'spark',
+      gravity: -0.18,
+      friction: 0.93,
+    });
+  }
+  // Base impact ring — doubled
+  particles.push({
+    x, y: y, vx: 0, vy: 0,
+    life: 14, maxLife: 14, size: 12,
+    color: '#ff6600', type: 'ring',
+  });
+  particles.push({
+    x, y: y, vx: 0, vy: 0,
+    life: 10, maxLife: 10, size: 6,
+    color: '#ffffff', type: 'ring',
+  });
+
+  // === Ground dust burst: 10 brown/gray particles (doubled) ===
+  const dustColors = ['#9a7b5d', '#bb9a73', '#887766', '#aa9070', '#776655'];
+  for (let i = 0; i < 10; i++) {
+    const angle = -Math.PI * 0.15 - (i / 9) * Math.PI * 0.7;
+    const speed = 3 + Math.random() * 4;
+    particles.push({
+      x: x + (Math.random() - 0.5) * 30,
+      y: y,
+      vx: Math.cos(angle) * speed * (i < 5 ? -1 : 1) * 0.8,
+      vy: -Math.abs(Math.sin(angle) * speed) - 1.5,
+      life: 20 + Math.floor(Math.random() * 10),
+      maxLife: 30,
+      size: 5 + Math.random() * 6,
+      color: dustColors[i % 5],
+      type: 'spark',
+      gravity: 0.12,
+      friction: 0.94,
+    });
+  }
+
+  // === Ascending air lines: 6 vertical speed lines (doubled) ===
+  for (let i = 0; i < 6; i++) {
+    const lineX = x + (i - 2.5) * 10;
+    particles.push({
+      x: lineX,
+      y: y + 10,
+      vx: (Math.random() - 0.5) * 0.4,
+      vy: -9 - Math.random() * 5,
+      life: 14 + Math.floor(Math.random() * 4),
+      maxLife: 18,
+      size: 25 + Math.random() * 20,
+      color: i % 2 === 0 ? '#ffffff' : '#ffddaa',
+      type: 'slash',
+      rotation: -Math.PI / 2,
+    });
+  }
 }
 
 /**
  * Hien (飛燕) flying kick trail — speed lines behind the character during flight.
  * 6 horizontal lines with alpha fade. Color based on character accent color.
+ * Enhanced: 3 parallel curved lines following the kick arc trajectory.
  */
 export function spawnHienTrail(particles: Particle[], x: number, y: number, facing: number, _charId: string): void {
   for (let i = 0; i < 6; i++) {
@@ -1099,6 +1451,50 @@ export function spawnHienTrail(particles: Particle[], x: number, y: number, faci
       color: i % 2 === 0 ? '#ffcc44' : '#ff8833',
       type: 'slash',
       rotation: facing > 0 ? 0 : Math.PI,
+    });
+  }
+
+  // === Arc speed lines: 3 parallel curved lines following the kick arc ===
+  for (let i = 0; i < 3; i++) {
+    const arcOffset = (i - 1) * 12; // parallel offset
+    const arcAngle = facing > 0 ? -0.4 + i * 0.2 : Math.PI + 0.4 - i * 0.2;
+    particles.push({
+      x: x - facing * (15 + i * 8),
+      y: y - 20 + arcOffset,
+      vx: -facing * (2 + Math.random() * 2),
+      vy: 1.5 + Math.random(),
+      life: 10 + i * 2,
+      maxLife: 14,
+      size: 28 + Math.random() * 12,
+      color: '#ffdd66',
+      type: 'slash',
+      rotation: arcAngle,
+    });
+  }
+}
+
+/**
+ * Hien (飛燕) landing dust — fan of dust particles when the character lands after the flying kick.
+ * 5 particles in a fan shape rising from the ground.
+ */
+export function spawnHienLandingDust(particles: Particle[], x: number, y: number): void {
+  const dustColors = ['#9a7b5d', '#bb9a73', '#887766', '#aa9070', '#776655'];
+  for (let i = 0; i < 5; i++) {
+    const fanAngle = -Math.PI * 0.1 - (i / 4) * Math.PI * 0.8;
+    const speed = 2 + Math.random() * 3;
+    const dir = (i < 2) ? -1 : (i > 2) ? 1 : 0;
+    particles.push({
+      x: x + dir * 8 + (Math.random() - 0.5) * 10,
+      y: y,
+      vx: dir * speed * 1.5,
+      vy: -Math.abs(Math.sin(fanAngle) * speed) - 1,
+      life: 14 + Math.floor(Math.random() * 8),
+      maxLife: 22,
+      size: 4 + Math.random() * 5,
+      color: dustColors[i],
+      type: 'spark',
+      gravity: 0.12,
+      friction: 0.95,
     });
   }
 }
@@ -1381,6 +1777,122 @@ export function spawnComboSpeedLines(particles: Particle[], centerX: number, cen
       type: 'spark',
       gravity: 0,
       friction: 0.95,
+    });
+  }
+}
+
+/**
+ * DM Ryuko Ranbu (龍虎乱舞) speed line background — parallel lines streaming from edges toward center.
+ * Creates the classic "rush" background effect during multi-hit DM.
+ */
+export function spawnRyukoRanbuSpeedLines(particles: Particle[], centerX: number, centerY: number): void {
+  const lineCount = 12;
+  for (let i = 0; i < lineCount; i++) {
+    // Lines stream from left/right edges toward center
+    const fromLeft = i < lineCount / 2;
+    const edgeX = fromLeft ? centerX - 200 : centerX + 200;
+    const yOffset = (Math.random() - 0.5) * 100;
+    const speed = 8 + Math.random() * 6;
+    particles.push({
+      x: edgeX,
+      y: centerY + yOffset,
+      vx: fromLeft ? speed : -speed,
+      vy: (Math.random() - 0.5) * 2,
+      life: 10 + Math.floor(Math.random() * 6),
+      maxLife: 16,
+      size: 1.5 + Math.random(),
+      color: i % 3 === 0 ? '#ffffff' : '#ffddaa',
+      type: 'spark',
+      gravity: 0,
+      friction: 0.88,
+    });
+  }
+}
+
+/**
+ * DM Ryuko Ranbu (龍虎乱舞) final hit burst — large impact burst + extra knockback spark.
+ * Called on the final hit of the rush combo for a dramatic finisher.
+ */
+export function spawnRyukoRanbuFinalBurst(particles: Particle[], x: number, y: number, facing: number): void {
+  // Massive white-gold impact burst
+  particles.push({
+    x, y: y - 20, vx: 0, vy: 0,
+    life: 16, maxLife: 16, size: 70,
+    color: '#ffffff', type: 'superburst',
+  });
+  particles.push({
+    x, y: y - 20, vx: 0, vy: 0,
+    life: 22, maxLife: 22, size: 90,
+    color: '#ffcc00', type: 'superburst',
+  });
+  // Directional knockback sparks
+  for (let i = 0; i < 16; i++) {
+    const spreadAngle = (Math.random() - 0.5) * Math.PI * 0.8;
+    const speed = 5 + Math.random() * 7;
+    particles.push({
+      x, y: y - 20,
+      vx: Math.cos(spreadAngle) * speed * facing,
+      vy: Math.sin(spreadAngle) * speed - 3,
+      life: 14 + Math.floor(Math.random() * 8),
+      maxLife: 22,
+      size: 3 + Math.random() * 5,
+      color: i % 3 === 0 ? '#ffffff' : '#ffcc00',
+      type: 'star',
+      gravity: 0.1,
+      friction: 0.93,
+      rotation: spreadAngle,
+      rotSpeed: (Math.random() - 0.5) * 0.5,
+    });
+  }
+  // Impact rings
+  for (let r = 0; r < 3; r++) {
+    particles.push({
+      x, y: y - 20, vx: 0, vy: 0,
+      life: 10 + r * 4, maxLife: 10 + r * 4, size: 5 + r * 3,
+      color: r === 0 ? '#ffffff' : '#ffcc00',
+      type: 'ring',
+    });
+  }
+}
+
+/**
+ * KO super-burst spark — massive impact spark at KO hit point (2x size of DM spark).
+ * Used for the conclusive KO effect.
+ */
+export function spawnKOSuperBurst(particles: Particle[], x: number, y: number): void {
+  // Triple-layer superburst at 2x DM size
+  particles.push({
+    x, y, vx: 0, vy: 0,
+    life: 24, maxLife: 24, size: 140,
+    color: '#ffffff', type: 'superburst',
+  });
+  particles.push({
+    x, y, vx: 0, vy: 0,
+    life: 30, maxLife: 30, size: 180,
+    color: '#ffcc00', type: 'superburst',
+  });
+  particles.push({
+    x, y, vx: 0, vy: 0,
+    life: 36, maxLife: 36, size: 220,
+    color: '#ff4400', type: 'superburst',
+  });
+  // Radiating impact sparks
+  for (let i = 0; i < 40; i++) {
+    const angle = (i / 40) * Math.PI * 2;
+    const speed = 6 + Math.random() * 10;
+    particles.push({
+      x, y,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed - 3,
+      life: 20 + Math.floor(Math.random() * 12),
+      maxLife: 32,
+      size: 3 + Math.random() * 6,
+      color: i % 4 === 0 ? '#ffffff' : i % 3 === 0 ? '#ffdd66' : '#ffaa00',
+      type: 'star',
+      gravity: 0.08,
+      friction: 0.93,
+      rotation: angle,
+      rotSpeed: (Math.random() - 0.5) * 0.6,
     });
   }
 }

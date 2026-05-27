@@ -41,7 +41,9 @@ import {
   spawnComboSpeedLines,
   spawnKooukenVFX,
   spawnKoHouVFX,
+  spawnKoHouCVFX,
   spawnHienTrail,
+  spawnHienLandingDust,
   spawnDMTenHaOuVFX,
   spawnHaouFlash,
   spawnMoveNameText,
@@ -49,6 +51,7 @@ import {
   spawnScreenCracks,
   spawnRunSpeedLines,
   spawnScorchMark,
+  spawnKOSuperBurst,
 } from './vfxPresets.js';
 import { getStageDustColors } from './stageAtmosphere.js';
 import { getStage } from './stage.js';
@@ -311,9 +314,19 @@ export class VFXSystem {
     spawnKoHouVFX(this.particles, worldX, worldY, charId);
   }
 
+  /** Ryo: Ko Hou C version (虎咲C) — doubled intensity */
+  spawnKoHouCVFX(worldX: number, worldY: number, charId: string): void {
+    spawnKoHouCVFX(this.particles, worldX, worldY, charId);
+  }
+
   /** Ryo: Hien (飛燕) flying kick speed line trail */
   spawnHienTrail(worldX: number, worldY: number, facing: number, charId: string): void {
     spawnHienTrail(this.particles, worldX, worldY, facing, charId);
+  }
+
+  /** Ryo: Hien (飛燕) landing dust — fan of dust particles on landing */
+  spawnHienLandingDust(worldX: number, worldY: number): void {
+    spawnHienLandingDust(this.particles, worldX, worldY);
   }
 
   /** Ryo: DM Ten Ha Ou (天地霸煌拳) massive energy burst */
