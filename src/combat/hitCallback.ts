@@ -459,6 +459,16 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       deps.cinematic.addHitStop(2, defIdx);
       deps.screenShake.trigger(9, 9, attacker.facing * 5);
     }
+    // RYO_HIO_HACKER (氷果斬) — 突进打击强化反馈
+    if (atkName === 'RYO_HIO_HACKER') {
+      deps.cinematic.addHitStop(1, defIdx);
+      deps.screenShake.trigger(6, 6, attacker.facing * 3);
+      deps.vfx.spawnImpactRing(hitX, hitY, 0.8);
+    }
+    // RYO_ZANRETSU_KEN (斩裂拳) — 连打命中反馈
+    if (atkName === 'RYO_ZANRETSU_KEN' && combo > 0) {
+      deps.cinematic.addHitStop(1, defIdx);
+    }
     // DM Ten Ha Ou (天地霸煌拳) — massive energy burst + screen flash
     if (atkName === 'DM_TEN_HA_OU') {
       deps.vfx.spawnDMTenHaOuVFX(hitX, hitY, attacker.charId);
