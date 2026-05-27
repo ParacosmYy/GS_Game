@@ -255,7 +255,7 @@ function drawHUDPortrait(
   } else {
     // Fallback: colored square with initial letter
     const colors: Record<string, string> = {
-      kyo: '#FF6600', iori: '#AA1133', terry: '#CC8800', andy: '#FFAA22',
+      ryo: '#DD6600', kyo: '#FF6600', iori: '#AA1133', terry: '#CC8800', andy: '#FFAA22',
       joe: '#FF8800', kim: '#2288CC', chang: '#885522', choi: '#66CC66',
       robert: '#22AA44', leona: '#2266BB', ralf: '#CC6633', clark: '#556B2F',
       athena: '#FF66AA', mai: '#FF4488', kdash: '#444466', kula: '#4488CC',

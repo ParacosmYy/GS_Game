@@ -293,7 +293,20 @@ function update(): void {
   if (gs.phase === GamePhase.GAME_OVER) {
     tickRef.value++;
     gs.gameOverTimer++;
-    if (gs.gameOverTimer >= 180) {
+    // Arcade complete: "PRESS ANY KEY" dismiss on input, with 5s auto-timeout
+    if (gs.arcadeComplete) {
+      const p1In = inputManager.getP1Input();
+      const p2In = inputManager.getP2Input();
+      const anyKey = p1In.buttonA || p1In.buttonB || p1In.buttonC || p1In.buttonD || p1In.burst
+        || p2In.buttonA || p2In.buttonB || p2In.buttonC || p2In.buttonD || p2In.burst
+        || inputManager.isKeyDown('Enter') || inputManager.isKeyDown('Space');
+      if ((gs.gameOverTimer > 60 && anyKey) || gs.gameOverTimer >= 300) {
+        gs.setPhase(GamePhase.TITLE);
+        gs.gameOverTimer = 0;
+        gs.arcadeComplete = false;
+      }
+    } else if (gs.gameOverTimer >= 180) {
+      // Non-arcade GAME_OVER: auto-timeout after 3s
       gs.setPhase(GamePhase.TITLE);
       gs.gameOverTimer = 0;
     }
