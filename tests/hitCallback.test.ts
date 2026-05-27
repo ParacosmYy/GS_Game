@@ -112,7 +112,7 @@ function mockScreenShake() {
 }
 
 function mockScreenFlash() {
-  return { trigger: vi.fn() };
+  return { trigger: vi.fn(), triggerDarken: vi.fn() };
 }
 
 function mockCinematic() {

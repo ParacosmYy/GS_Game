@@ -60,6 +60,9 @@ export class ScreenFlash {
   private maxTimer = 0;
   private color = '#ffffff';
   private intensity = 0;
+  // KOF2002: DM activation background darkening — brief dim before flash
+  private darkenTimer = 0;
+  private darkenMaxTimer = 0;
 
   trigger(color: string, intensity: number, frames: number): void {
     this.color = color;
@@ -68,11 +71,30 @@ export class ScreenFlash {
     this.maxTimer = frames;
   }
 
+  /** Trigger DM-style darkening: background dims briefly before the flash */
+  triggerDarken(frames: number = 6): void {
+    this.darkenTimer = frames;
+    this.darkenMaxTimer = frames;
+  }
+
   update(): void {
     if (this.timer > 0) this.timer--;
+    if (this.darkenTimer > 0) this.darkenTimer--;
   }
 
   render(ctx: CanvasRenderingContext2D, canvasW: number, canvasH: number): void {
+    // KOF2002: DM暗幕 — 超必杀激活时背景短暂变暗
+    if (this.darkenTimer > 0) {
+      const darkenProgress = this.darkenTimer / this.darkenMaxTimer;
+      // Peak at 40% into the duration, then fade
+      const peak = Math.sin(darkenProgress * Math.PI) * 0.45;
+      ctx.save();
+      ctx.globalAlpha = peak;
+      ctx.fillStyle = '#000000';
+      ctx.fillRect(0, 0, canvasW, canvasH);
+      ctx.restore();
+    }
+
     if (this.timer <= 0) return;
     // KOF2002: 闪光先快后慢衰减 (ease-out quartic) — 首帧更突出
     const linear = this.timer / this.maxTimer;
@@ -87,9 +109,9 @@ export class ScreenFlash {
     ctx.restore();
   }
 
-  get active(): boolean { return this.timer > 0; }
+  get active(): boolean { return this.timer > 0 || this.darkenTimer > 0; }
 
-  reset(): void { this.timer = 0; }
+  reset(): void { this.timer = 0; this.darkenTimer = 0; }
 }
 
 export class VFXSystem {

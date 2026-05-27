@@ -506,12 +506,14 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
     // DM Ten Ha Ou (天地霸煌拳) — massive energy burst + screen flash
     if (atkName === 'DM_TEN_HA_OU') {
       deps.vfx.spawnDMTenHaOuVFX(hitX, hitY, attacker.charId);
+      deps.screenFlash.triggerDarken(6);
       deps.screenFlash.trigger('#ffcc00', 0.35, 10);
       deps.screenShake.trigger(14, 14, getAttackDirectionBias(attacker, defender, attackType, counterHit));
     }
     // SDM Ten Ha Ou — enhanced energy burst + longer flash
     if (atkName === 'SDM_TEN_HA_OU') {
       deps.vfx.spawnDMTenHaOuVFX(hitX, hitY, attacker.charId);
+      deps.screenFlash.triggerDarken(8);
       deps.screenFlash.trigger('#ffdd44', 0.45, 14);
       deps.screenShake.trigger(16, 16, getAttackDirectionBias(attacker, defender, attackType, counterHit));
     }
