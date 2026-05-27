@@ -158,8 +158,6 @@ export function drawFighters(
       }
       // KOF2002: 步行节奏微弹 — 走路时轻微上下弹动
       leanOffsetY += Math.sin(f.stateAge * 0.4) * 2;
-      // KOF2002: 步行微弹 — 每6帧上下2px弹跳模拟步伐
-      leanOffsetY = Math.abs(Math.sin(f.stateAge * 0.5)) * 2;
     }
     // KOF2002: 受击/防御后仰 — 被打时身体向后方微倾
     if (f.state === FighterState.HITSTUN) {
