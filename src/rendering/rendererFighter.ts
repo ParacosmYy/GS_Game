@@ -646,6 +646,15 @@ export function drawFighters(
       ctx.stroke();
       ctx.restore();
     }
+    // KOF2002: Counter Hit橙色爆发 — counterGlowFrames时额外橙色扩散
+    if (f.counterGlowFrames > 0) {
+      ctx.save();
+      ctx.globalCompositeOperation = 'screen';
+      ctx.globalAlpha = (f.counterGlowFrames / 6) * 0.2;
+      ctx.fillStyle = '#ff8800';
+      ctx.fillRect(sx + leanOffsetX - hw - 8, sy - f.displayHeight - 8, (hw + 8) * 2, f.displayHeight + 16);
+      ctx.restore();
+    }
     // KOF2002: MAX模式边框脉冲 — MAX模式时角色周围脉冲金色边框
     if (maxModeActive) {
       ctx.save();
