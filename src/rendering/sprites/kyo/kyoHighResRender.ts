@@ -14,14 +14,14 @@
  *   JUMP (all jump types), HITSTUN, KNOCKDOWN
  */
 
-import { FighterState, AttackType } from '../../core/types.js';
+import { FighterState, AttackType } from '../../../core/types.js';
 import {
   registerFrames as reg,
   registerVariableFrames as regV,
   drawFromRegistry,
   drawAfterimageFromRegistry,
   type FrameEntry,
-} from './baseHighResRenderer.js';
+} from '../shared/baseHighResRenderer.js';
 import { KYO_IDLE_FRAMES } from './kyoIdleFrames.js';
 import { KYO_WALK_FORWARD_FRAMES, KYO_WALK_BACKWARD_FRAMES } from './kyoWalkFrames.js';
 import { KYO_STAND_A_FRAMES, KYO_STAND_C_FRAMES } from './kyoAttackFrames.js';
@@ -32,6 +32,7 @@ import { KYO_STAND_B_FRAMES, KYO_STAND_D_FRAMES } from './kyoKickFrames.js';
 import { KYO_CROUCH_A_FRAMES, KYO_CROUCH_C_FRAMES, KYO_CROUCH_B_FRAMES, KYO_CROUCH_D_FRAMES } from './kyoCrouchAttackFrames.js';
 import { KYO_AIR_A_FRAMES, KYO_AIR_C_FRAMES, KYO_AIR_D_FRAMES } from './kyoAirAttackFrames.js';
 import { KYO_CLOSE_A_FRAMES, KYO_CLOSE_C_FRAMES, KYO_CLOSE_B_FRAMES, KYO_CLOSE_D_FRAMES } from './kyoCloseAttackFrames.js';
+import { KYO_ONIYAKI_FRAMES, KYO_ONIYAKI_C_FRAMES, KYO_YAMIBARAI_FRAMES, KYO_RED_KICK_FRAMES } from './kyoSpecialFrames.js';
 
 // ===== Registry & Cache =====
 
@@ -90,6 +91,12 @@ function initKyoFrames(): void {
   // Jump
   registerVariableFrames('JUMP', KYO_JUMP_FRAMES, [4, 3, 5, 6, 5, 4]);
 
+  // Special moves
+  registerVariableFrames('ONIYAKI', KYO_ONIYAKI_FRAMES, [4, 3, 5, 7, 10]);
+  registerVariableFrames('ONIYAKI_C', KYO_ONIYAKI_C_FRAMES, [4, 3, 5, 6, 7, 10]);
+  registerVariableFrames('YAMIBARAI', KYO_YAMIBARAI_FRAMES, [6, 3, 8, 12]);
+  registerVariableFrames('RED_KICK', KYO_RED_KICK_FRAMES, [5, 3, 3, 6, 10]);
+
   // Damage
   registerVariableFrames('HURT', KYO_HURT_FRAMES, [3, 5, 6, 4]);
   registerVariableFrames('KNOCKDOWN', KYO_KNOCKDOWN_FRAMES, [4, 5, 6, 8, 10, 12]);
@@ -109,6 +116,11 @@ function resolveKyoFrameKey(
     case FighterState.WALK:
       return (vx * facing > 0) ? 'WALK_FORWARD' : 'WALK_BACKWARD';
     case FighterState.STAND_ATTACK:
+      if (currentAttack === AttackType.KYO_ONIYAKI) return 'ONIYAKI';
+      if (currentAttack === AttackType.KYO_ONIYAKI_C) return 'ONIYAKI_C';
+      if (currentAttack === AttackType.KYO_YAMIBARAI) return 'YAMIBARAI';
+      if (currentAttack === AttackType.KYO_YAMIBARAI_C) return 'YAMIBARAI';
+      if (currentAttack === AttackType.KYO_RED_KICK) return 'RED_KICK';
       if (currentAttack === AttackType.STAND_C) return 'STAND_C';
       if (currentAttack === AttackType.CLOSE_C) return 'CLOSE_C';
       if (currentAttack === AttackType.STAND_D) return 'STAND_D';

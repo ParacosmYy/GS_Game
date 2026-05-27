@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
-import { RYO_BLOCK_FRAMES } from '../src/rendering/sprites/ryoBlockFrames.js';
-import { RYO_WIN_FRAMES } from '../src/rendering/sprites/ryoWinFrames.js';
-import { getResolvedFrameKey, drawRyoWinPose } from '../src/rendering/sprites/ryoHighResRender.js';
+import { RYO_BLOCK_FRAMES } from '../src/rendering/sprites/ryo/ryoBlockFrames.js';
+import { RYO_WIN_FRAMES } from '../src/rendering/sprites/ryo/ryoWinFrames.js';
+import { getResolvedFrameKey, drawRyoWinPose } from '../src/rendering/sprites/ryo/ryoHighResRender.js';
 import { FighterState } from '../src/core/types.js';
 
 describe('ryoBlockFrames', () => {

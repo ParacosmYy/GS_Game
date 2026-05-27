@@ -26,7 +26,7 @@ import { getFeedback, inferTier, type FeedbackTier } from '../core/feedbackManif
 import { HURTBOX_TABLE } from '../core/hurtboxManifest.js';
 import type { Pose, PoseSet } from '../characters/types.js';
 import { FighterState, AttackType } from '../core/types.js';
-import { getResolvedFrameKey, drawRyoWinPose } from '../rendering/sprites/ryoHighResRender.js';
+import { getResolvedFrameKey, drawRyoWinPose } from '../rendering/sprites/ryo/ryoHighResRender.js';
 
 // ===== Type Definitions =====
 

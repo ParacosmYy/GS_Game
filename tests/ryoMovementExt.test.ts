@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { RYO_ROLL_FRAMES, RYO_BACK_ROLL_FRAMES, RYO_GUARD_CRUSH_FRAMES, RYO_MAX_MODE_FRAMES, RYO_TAUNT_FRAMES, RYO_COUNTER_STANCE_FRAMES, RYO_RYUKO_RANBU_FRAMES } from '../src/rendering/sprites/ryoMovementFrames.js';
+import { RYO_ROLL_FRAMES, RYO_BACK_ROLL_FRAMES, RYO_GUARD_CRUSH_FRAMES, RYO_MAX_MODE_FRAMES, RYO_TAUNT_FRAMES, RYO_COUNTER_STANCE_FRAMES, RYO_RYUKO_RANBU_FRAMES } from '../src/rendering/sprites/ryo/ryoMovementFrames.js';
 
 describe('ryoMovementFrames extended', () => {
   it('RYO_ROLL_FRAMES is non-empty', () => {

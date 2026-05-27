@@ -1,13 +1,13 @@
 import { describe, it, expect } from 'vitest';
-import { RYO_CROUCH_A_FRAMES } from '../src/rendering/sprites/ryoCrouchFrames.js';
-import { RYO_CROUCH_B_FRAMES } from '../src/rendering/sprites/ryoCrouchKickFrames.js';
-import { RYO_BLOCK_FRAMES } from '../src/rendering/sprites/ryoBlockFrames.js';
-import { RYO_HURT_FRAMES, RYO_KNOCKDOWN_FRAMES } from '../src/rendering/sprites/ryoDamageFrames.js';
-import { RYO_KO_HOU_FRAMES, RYO_KOOU_FRAMES } from '../src/rendering/sprites/ryoSpecialFrames.js';
-import { RYO_DM_TEN_HA_OU_FRAMES } from '../src/rendering/sprites/ryoSuperFrames.js';
-import { RYO_THROW_FRAMES } from '../src/rendering/sprites/ryoThrowFrames.js';
-import { RYO_WIN_FRAMES } from '../src/rendering/sprites/ryoWinFrames.js';
-import { RYO_DIZZY_FRAMES } from '../src/rendering/sprites/ryoDizzyFrames.js';
+import { RYO_CROUCH_A_FRAMES } from '../src/rendering/sprites/ryo/ryoCrouchFrames.js';
+import { RYO_CROUCH_B_FRAMES } from '../src/rendering/sprites/ryo/ryoCrouchKickFrames.js';
+import { RYO_BLOCK_FRAMES } from '../src/rendering/sprites/ryo/ryoBlockFrames.js';
+import { RYO_HURT_FRAMES, RYO_KNOCKDOWN_FRAMES } from '../src/rendering/sprites/ryo/ryoDamageFrames.js';
+import { RYO_KO_HOU_FRAMES, RYO_KOOU_FRAMES } from '../src/rendering/sprites/ryo/ryoSpecialFrames.js';
+import { RYO_DM_TEN_HA_OU_FRAMES } from '../src/rendering/sprites/ryo/ryoSuperFrames.js';
+import { RYO_THROW_FRAMES } from '../src/rendering/sprites/ryo/ryoThrowFrames.js';
+import { RYO_WIN_FRAMES } from '../src/rendering/sprites/ryo/ryoWinFrames.js';
+import { RYO_DIZZY_FRAMES } from '../src/rendering/sprites/ryo/ryoDizzyFrames.js';
 
 describe('ryoSpriteFrames batch3', () => {
   it('RYO_CROUCH_A_FRAMES is non-empty', () => {

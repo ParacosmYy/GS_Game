@@ -5,10 +5,10 @@
  * Each recovery frame should have unique pixel data showing arm/leg retraction.
  */
 import { describe, it, expect } from 'vitest';
-import { RYO_STAND_A_FRAMES, RYO_STAND_C_FRAMES, RYO_CLOSE_A_FRAMES, RYO_CLOSE_C_FRAMES } from '../src/rendering/sprites/ryoAttackFrames.js';
-import { RYO_STAND_B_FRAMES, RYO_STAND_D_FRAMES } from '../src/rendering/sprites/ryoKickFrames.js';
-import { RYO_CROUCH_B_FRAMES, RYO_CROUCH_D_FRAMES } from '../src/rendering/sprites/ryoCrouchKickFrames.js';
-import { RYO_CLOSE_B_FRAMES, RYO_CLOSE_D_FRAMES } from '../src/rendering/sprites/ryoCloseKickFrames.js';
+import { RYO_STAND_A_FRAMES, RYO_STAND_C_FRAMES, RYO_CLOSE_A_FRAMES, RYO_CLOSE_C_FRAMES } from '../src/rendering/sprites/ryo/ryoAttackFrames.js';
+import { RYO_STAND_B_FRAMES, RYO_STAND_D_FRAMES } from '../src/rendering/sprites/ryo/ryoKickFrames.js';
+import { RYO_CROUCH_B_FRAMES, RYO_CROUCH_D_FRAMES } from '../src/rendering/sprites/ryo/ryoCrouchKickFrames.js';
+import { RYO_CLOSE_B_FRAMES, RYO_CLOSE_D_FRAMES } from '../src/rendering/sprites/ryo/ryoCloseKickFrames.js';
 
 function pixelHash(pixels: number[][]): number {
   let h = 0;

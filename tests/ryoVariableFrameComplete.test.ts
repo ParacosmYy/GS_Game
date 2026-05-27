@@ -9,7 +9,7 @@ import { describe, it, expect } from 'vitest';
 import * as fs from 'fs';
 import * as path from 'path';
 
-const RENDER_FILE = path.resolve(__dirname, '../src/rendering/sprites/ryoHighResRender.ts');
+const RENDER_FILE = path.resolve(__dirname, '../src/rendering/sprites/ryo/ryoHighResRender.ts');
 
 describe('Ryo Variable Frame Completeness', () => {
   const source = fs.readFileSync(RENDER_FILE, 'utf8');

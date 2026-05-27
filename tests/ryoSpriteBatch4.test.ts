@@ -1,9 +1,9 @@
 import { describe, it, expect } from 'vitest';
-import { RYO_SDM_TEN_HA_OU_FRAMES, RYO_HSDM_RYUKO_RANBU_FRAMES } from '../src/rendering/sprites/ryoSuperFrames.js';
-import { RYO_DM_RYUKO_RANBU_FRAMES } from '../src/rendering/sprites/ryoSuperFrames.js';
-import { RYO_STAND_D_FRAMES } from '../src/rendering/sprites/ryoKickFrames.js';
-import { RYO_CROUCH_D_FRAMES } from '../src/rendering/sprites/ryoCrouchKickFrames.js';
-import { RYO_AIR_C_FRAMES } from '../src/rendering/sprites/ryoAirAttackFrames.js';
+import { RYO_SDM_TEN_HA_OU_FRAMES, RYO_HSDM_RYUKO_RANBU_FRAMES } from '../src/rendering/sprites/ryo/ryoSuperFrames.js';
+import { RYO_DM_RYUKO_RANBU_FRAMES } from '../src/rendering/sprites/ryo/ryoSuperFrames.js';
+import { RYO_STAND_D_FRAMES } from '../src/rendering/sprites/ryo/ryoKickFrames.js';
+import { RYO_CROUCH_D_FRAMES } from '../src/rendering/sprites/ryo/ryoCrouchKickFrames.js';
+import { RYO_AIR_C_FRAMES } from '../src/rendering/sprites/ryo/ryoAirAttackFrames.js';
 
 describe('ryoSpriteFrames batch4', () => {
   it('RYO_SDM_TEN_HA_OU_FRAMES is non-empty', () => {

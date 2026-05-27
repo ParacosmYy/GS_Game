@@ -18,7 +18,7 @@ import { Renderer } from './rendering/renderer.js';
 import { VFXSystem, ScreenShake, ScreenFlash } from './rendering/vfx.js';
 import { cycleStage, setStage, getStage, getAllStages, type StageId } from './rendering/stage.js';
 import { drawVictoryPose } from './rendering/skeletalFighter.js';
-import { drawRyoWinPose } from './rendering/sprites/ryoHighResRender.js';
+import { drawRyoWinPose } from './rendering/sprites/ryo/ryoHighResRender.js';
 import type { TeamDisplayInfo } from './rendering/hud.js';
 import { addArcadeScore, resetArcadeScore, addArcadePerfect, addArcadeMatchWin, getArcadeStats, addArcadeCumulativeStats } from './rendering/hud.js';
 import { ROSTER } from './characters/index.js';

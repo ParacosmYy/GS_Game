@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
-import { RYO_DIZZY_FRAMES } from '../src/rendering/sprites/ryoDizzyFrames.js';
-import { RYO_THROW_FRAMES } from '../src/rendering/sprites/ryoThrowFrames.js';
-import { getResolvedFrameKey } from '../src/rendering/sprites/ryoHighResRender.js';
+import { RYO_DIZZY_FRAMES } from '../src/rendering/sprites/ryo/ryoDizzyFrames.js';
+import { RYO_THROW_FRAMES } from '../src/rendering/sprites/ryo/ryoThrowFrames.js';
+import { getResolvedFrameKey } from '../src/rendering/sprites/ryo/ryoHighResRender.js';
 import { FighterState } from '../src/core/types.js';
 
 describe('ryoDizzyFrames', () => {

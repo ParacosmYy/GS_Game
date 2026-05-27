@@ -1,9 +1,9 @@
 import { describe, it, expect } from 'vitest';
-import { RYO_IDLE_FRAMES } from '../src/rendering/sprites/ryoIdleFrames.js';
-import { RYO_WALK_FORWARD_FRAMES, RYO_WALK_BACKWARD_FRAMES } from '../src/rendering/sprites/ryoWalkFrames.js';
-import { RYO_RUN_FRAMES, RYO_BACKDASH_FRAMES } from '../src/rendering/sprites/ryoMovementFrames.js';
-import { RYO_JUMP_FRAMES } from '../src/rendering/sprites/ryoJumpFrames.js';
-import { RYO_CROUCH_FRAMES } from '../src/rendering/sprites/ryoCrouchFrames.js';
+import { RYO_IDLE_FRAMES } from '../src/rendering/sprites/ryo/ryoIdleFrames.js';
+import { RYO_WALK_FORWARD_FRAMES, RYO_WALK_BACKWARD_FRAMES } from '../src/rendering/sprites/ryo/ryoWalkFrames.js';
+import { RYO_RUN_FRAMES, RYO_BACKDASH_FRAMES } from '../src/rendering/sprites/ryo/ryoMovementFrames.js';
+import { RYO_JUMP_FRAMES } from '../src/rendering/sprites/ryo/ryoJumpFrames.js';
+import { RYO_CROUCH_FRAMES } from '../src/rendering/sprites/ryo/ryoCrouchFrames.js';
 
 describe('ryoSpriteFrames batch1', () => {
   it('RYO_IDLE_FRAMES is non-empty', () => {

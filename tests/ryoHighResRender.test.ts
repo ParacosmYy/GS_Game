@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { hasHighResFrame, getResolvedFrameKey } from '../src/rendering/sprites/ryoHighResRender.js';
+import { hasHighResFrame, getResolvedFrameKey } from '../src/rendering/sprites/ryo/ryoHighResRender.js';
 import { FighterState } from '../src/core/types.js';
 
 describe('ryoHighResRender', () => {

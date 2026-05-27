@@ -8,15 +8,15 @@
  * the generic rendering pipeline in rendererFighter.ts.
  */
 
-import { FighterState, AttackType } from '../../core/types.js';
+import { FighterState, AttackType } from '../../../core/types.js';
 import {
   registerFrames as reg,
   registerVariableFrames as regV,
   drawFromRegistry,
   drawAfterimageFromRegistry,
   type FrameEntry,
-} from './baseHighResRenderer.js';
-import { drawPixelFrame } from './pixelFrameRenderer.js';
+} from '../shared/baseHighResRenderer.js';
+import { drawPixelFrame } from '../shared/pixelFrameRenderer.js';
 import { RYO_IDLE_FRAMES } from './ryoIdleFrames.js';
 import { RYO_WALK_FORWARD_FRAMES, RYO_WALK_BACKWARD_FRAMES } from './ryoWalkFrames.js';
 import { RYO_STAND_A_FRAMES, RYO_STAND_C_FRAMES, RYO_CLOSE_A_FRAMES, RYO_CLOSE_C_FRAMES } from './ryoAttackFrames.js';

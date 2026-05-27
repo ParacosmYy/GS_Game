@@ -6,7 +6,7 @@
  */
 import { describe, it, expect } from 'vitest';
 import { AttackType } from '../src/core/types.js';
-import { hasHighResFrame } from '../src/rendering/sprites/ryoHighResRender.js';
+import { hasHighResFrame } from '../src/rendering/sprites/ryo/ryoHighResRender.js';
 
 describe('Ryo Pixel Frame Resolution', () => {
   describe('Stand attacks', () => {

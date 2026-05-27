@@ -8,14 +8,14 @@
  *   HITSTUN, KNOCKDOWN, GETUP, BLOCK
  */
 
-import { FighterState, AttackType } from '../../core/types.js';
+import { FighterState, AttackType } from '../../../core/types.js';
 import {
   registerFrames as reg,
   registerVariableFrames as regV,
   drawFromRegistry,
   drawAfterimageFromRegistry,
   type FrameEntry,
-} from './baseHighResRenderer.js';
+} from '../shared/baseHighResRenderer.js';
 import { IORI_IDLE_FRAMES } from './ioriIdleFrames.js';
 import { IORI_WALK_FORWARD_FRAMES, IORI_WALK_BACKWARD_FRAMES } from './ioriWalkFrames.js';
 import { IORI_CROUCH_FRAMES } from './ioriCrouchFrames.js';

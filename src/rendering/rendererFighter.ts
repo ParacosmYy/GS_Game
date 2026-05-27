@@ -11,9 +11,9 @@ import { drawSkeletalFighter } from './skeletalFighter.js';
 import { drawAttackLimb } from './attackLimb.js';
 import type { SpriteRenderer } from './spriteRenderer.js';
 import { getCharacterColors } from './manifestRenderData.js';
-import { drawHighResFrame, drawHighResAfterimage } from './sprites/ryoHighResRender.js';
-import { drawKyoHighResFrame, drawKyoHighResAfterimage } from './sprites/kyoHighResRender.js';
-import { drawIoriHighResFrame, drawIoriHighResAfterimage } from './sprites/ioriHighResRender.js';
+import { drawHighResFrame, drawHighResAfterimage } from './sprites/ryo/ryoHighResRender.js';
+import { drawKyoHighResFrame, drawKyoHighResAfterimage } from './sprites/kyo/kyoHighResRender.js';
+import { drawIoriHighResFrame, drawIoriHighResAfterimage } from './sprites/iori/ioriHighResRender.js';
 import { getFighterBlender } from './animationBlender.js';
 
 const fighterDebugOverlayEnabled = isFighterDebugOverlayEnabled();
