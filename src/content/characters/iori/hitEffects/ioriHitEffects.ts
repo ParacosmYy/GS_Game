@@ -102,7 +102,7 @@ function ioriVFX(ctx: HitEffectContext): boolean {
   // DM Yatagarasu (八咫烏)
   if (atkName === 'DM_YATAGARASU') {
     vfx.spawnSuperBurst(hitX, hitY, '#440066', '#8822cc', true);
-    vfx.spawnDMTenHaOuVFX(hitX, hitY, attacker.charId);
+    vfx.spawnIoriYatagarasuVFX(hitX, hitY, attacker.facing);
     screenFlash.triggerDarken(6);
     screenFlash.trigger('#6622aa', 0.35, 10);
     screenShake.trigger(14, 14, attackDirectionBias);
@@ -111,7 +111,7 @@ function ioriVFX(ctx: HitEffectContext): boolean {
   // SDM Yatagarasu
   if (atkName === 'SDM_YATAGARASU') {
     vfx.spawnSuperBurst(hitX, hitY, '#330055', '#aa33ee', true);
-    vfx.spawnDMTenHaOuVFX(hitX, hitY, attacker.charId);
+    vfx.spawnIoriYatagarasuVFX(hitX, hitY, attacker.facing);
     vfx.spawnGroundSlam(hitX, hitY);
     screenFlash.triggerDarken(8);
     screenFlash.trigger('#5500aa', 0.45, 14);
@@ -121,7 +121,7 @@ function ioriVFX(ctx: HitEffectContext): boolean {
   // HSDM Yaotome — hidden ultimate, maximum drama
   if (atkName === 'HSDM_YAOTOME') {
     vfx.spawnSuperBurst(hitX, hitY, '#220044', '#cc44ff', true);
-    vfx.spawnDMTenHaOuVFX(hitX, hitY, attacker.charId);
+    vfx.spawnIoriYatagarasuVFX(hitX, hitY, attacker.facing);
     vfx.spawnGroundSlam(hitX, hitY);
     vfx.spawnScreenCracks(hitX, hitY);
     screenFlash.triggerDarken(10);

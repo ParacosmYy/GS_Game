@@ -2124,3 +2124,73 @@ export function spawnKyoDokugamiTrail(particles: Particle[], x: number, y: numbe
     });
   }
 }
+
+/** Iori Yatagarasu (八咫烏) DM startup — dark energy spiral vortex
+ *  Dark purple flames spiraling upward with a central dark orb.
+ *  Contrast with Kyo's Orochinagi which is a vertical flame column.
+ */
+export function spawnIoriYatagarasuVFX(particles: Particle[], x: number, y: number, facing: number): void {
+  // Dark energy spiral — 16 particles spiraling upward
+  for (let i = 0; i < 16; i++) {
+    const spiralAngle = (i / 16) * Math.PI * 4 + i * 0.4;
+    const spiralRadius = 4 + i * 1.5;
+    const heightOffset = i * 6;
+    particles.push({
+      x: x + Math.cos(spiralAngle) * spiralRadius,
+      y: y - heightOffset,
+      vx: Math.cos(spiralAngle) * 1.5 + facing * 0.5,
+      vy: -(3 + Math.random() * 3),
+      life: 16 + Math.random() * 8,
+      maxLife: 24,
+      size: 4 + Math.random() * 5,
+      color: i < 4 ? '#ffffff' : i < 8 ? '#cc66ff' : i < 12 ? '#7722cc' : '#330066',
+      type: 'spark',
+      gravity: -0.35,
+      friction: 0.93,
+      rotation: spiralAngle,
+      rotSpeed: 0.15,
+    });
+  }
+  // Central dark orb flash
+  particles.push({
+    x, y: y - 25,
+    vx: 0, vy: 0,
+    life: 10, maxLife: 10, size: 45,
+    color: '#5500aa',
+    type: 'flash',
+  });
+  // Inner white-hot core
+  particles.push({
+    x, y: y - 25,
+    vx: 0, vy: 0,
+    life: 6, maxLife: 6, size: 20,
+    color: '#ddbbff',
+    type: 'flash',
+  });
+  // Dark flame ring
+  particles.push({
+    x, y: y - 30,
+    vx: 0, vy: 0,
+    life: 14, maxLife: 14, size: 35,
+    color: '#6600aa',
+    type: 'ring',
+  });
+  // Outer scattering dark wisps
+  for (let i = 0; i < 8; i++) {
+    const angle = (i / 8) * Math.PI * 2 + (Math.random() - 0.5) * 0.3;
+    const speed = 2 + Math.random() * 3;
+    particles.push({
+      x: x + Math.cos(angle) * 10,
+      y: y - 20 + Math.sin(angle) * 10,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed - 2,
+      life: 14 + Math.floor(Math.random() * 6),
+      maxLife: 20,
+      size: 3 + Math.random() * 3,
+      color: i % 2 === 0 ? '#8833dd' : '#440088',
+      type: 'spark',
+      gravity: -0.2,
+      friction: 0.94,
+    });
+  }
+}

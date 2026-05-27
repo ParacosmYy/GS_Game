@@ -55,6 +55,7 @@ import {
   spawnIoriOniyakiVFX,
   spawnIoriAoihanaTrail,
   spawnKyoDokugamiTrail,
+  spawnIoriYatagarasuVFX,
   spawnRunSpeedLines,
   spawnScorchMark,
   spawnKOSuperBurst,
@@ -343,6 +344,11 @@ export class VFXSystem {
   /** Kyo: Dokugami (毒咬み) rekka chain trail — escalating per hit */
   spawnKyoDokugamiTrail(worldX: number, worldY: number, facing: number, hitIndex: number): void {
     spawnKyoDokugamiTrail(this.particles, worldX, worldY, facing, hitIndex);
+  }
+
+  /** Iori: Yatagarasu (八咫烏) DM startup — dark energy spiral vortex */
+  spawnIoriYatagarasuVFX(worldX: number, worldY: number, facing: number): void {
+    spawnIoriYatagarasuVFX(this.particles, worldX, worldY, facing);
   }
 
   /** Ryo: Ko Hou (虎咲) uppercut flame column VFX */
