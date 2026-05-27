@@ -246,6 +246,16 @@ export function drawFighters(
       ctx.stroke();
       ctx.restore();
     }
+    // KOF2002: HOP落地烟尘 — HOP着陆时脚边小尘团
+    if (f.state === FighterState.IDLE && f.landingRecovery > 0 && f.landingRecovery > 5) {
+      ctx.save();
+      ctx.globalAlpha = 0.15;
+      ctx.fillStyle = '#bbbbbb';
+      ctx.beginPath();
+      ctx.ellipse(sx, sy, 10, 3, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
     // KOF2002: 被投技摇晃 — isBeingThrown时身体微抖
     if (f.isBeingThrown) {
       ctx.translate(Math.sin(globalTick * 2) * 2, 0);
