@@ -1384,3 +1384,23 @@ export function spawnComboSpeedLines(particles: Particle[], centerX: number, cen
     });
   }
 }
+
+/** KOF2002: Running speed lines — horizontal streaks behind a dashing character */
+export function spawnRunSpeedLines(particles: Particle[], x: number, y: number, facing: number, charColor: string): void {
+  const lineCount = 2;
+  for (let i = 0; i < lineCount; i++) {
+    particles.push({
+      x: x - facing * (8 + Math.random() * 12),
+      y: y - 10 - Math.random() * (60 + i * 20),
+      vx: -facing * (2.5 + Math.random() * 2),
+      vy: (Math.random() - 0.5) * 0.5,
+      life: 6 + Math.floor(Math.random() * 4),
+      maxLife: 10,
+      size: 0.8 + Math.random() * 0.4,
+      color: charColor,
+      type: 'spark',
+      gravity: 0,
+      friction: 0.92,
+    });
+  }
+}

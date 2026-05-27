@@ -967,6 +967,13 @@ function update(): void {
     }
   }
 
+  // Running speed lines
+  for (const f of [p1, p2]) {
+    if (f.state === FighterState.RUN && tickRef.value % 3 === 0) {
+      vfx.spawnRunSpeedLines(f.x, f.y, f.facing, f.color);
+    }
+  }
+
   for (let i = projectiles.length - 1; i >= 0; i--) { if (!projectiles[i].active) projectiles.splice(i, 1); }
 
   for (let i = 0; i < projectiles.length; i++) {

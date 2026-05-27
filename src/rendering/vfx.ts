@@ -47,6 +47,7 @@ import {
   spawnMoveNameText,
   spawnTierSparks,
   spawnScreenCracks,
+  spawnRunSpeedLines,
 } from './vfxPresets.js';
 import { getStageDustColors } from './stageAtmosphere.js';
 import { getStage } from './stage.js';
@@ -287,6 +288,11 @@ export class VFXSystem {
   /** KOF2002: Screen cracks at KO */
   spawnScreenCracks(worldX: number, worldY: number): void {
     spawnScreenCracks(this.particles, worldX, worldY);
+  }
+
+  /** KOF2002: Running speed lines behind dashing character */
+  spawnRunSpeedLines(x: number, y: number, facing: number, charColor: string): void {
+    spawnRunSpeedLines(this.particles, x, y, facing, charColor);
   }
 
   /** Ryo: Ko'ou Ken (虎煌拳) projectile ki blast VFX */
