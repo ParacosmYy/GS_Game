@@ -704,11 +704,11 @@ export function drawFighters(
       }
       ctx.restore();
     }
-    // KOF2002: 命中停顿攻击者发光 — hitstop时攻击者微白轮廓
+    // KOF2002: 命中停顿攻击者发光 — hitstop时攻击者角色属性色轮廓
     if (f.hitFlashFrames > 0 && f.state !== FighterState.HITSTUN && f.state !== FighterState.KNOCKDOWN) {
       ctx.save();
       ctx.globalCompositeOperation = 'screen';
-      const hitGlowColor = maxModeActive ? maxAura.css : '#ffffff';
+      const hitGlowColor = maxAura.css;
       ctx.globalAlpha = maxModeActive ? 0.12 : 0.08;
       ctx.fillStyle = hitGlowColor;
       ctx.fillRect(sx + leanOffsetX - hw - 3, sy - f.displayHeight - 3, (hw + 3) * 2, f.displayHeight + 6);
@@ -721,11 +721,11 @@ export function drawFighters(
       ctx.fill();
       ctx.restore();
     }
-    // KOF2002: 攻击命中残影 — hitstop时攻击者后方微弱残影
+    // KOF2002: 攻击命中残影 — hitstop时攻击者后方角色属性色残影
     if (f.hitFlashFrames > 0 && f.state !== FighterState.HITSTUN && f.state !== FighterState.KNOCKDOWN) {
       ctx.save();
       ctx.globalAlpha = 0.12;
-      ctx.fillStyle = 'rgba(255, 255, 200, 0.15)';
+      ctx.fillStyle = `${maxAura.css}26`;
       ctx.fillRect(sx + leanOffsetX - hw - 3 - f.facing * 12, sy - f.displayHeight - 3, (hw + 3) * 2, f.displayHeight + 6);
       ctx.restore();
     }
@@ -1004,20 +1004,21 @@ export function drawFighters(
       ctx.ellipse(flashX, flashY, hw * 0.7, f.displayHeight * 0.22, 0, 0, Math.PI * 2);
       ctx.fill();
 
-      // Outer glow aura
+      // Outer glow aura — element-coded by character
       ctx.globalAlpha = 0.18 * flashIntensity;
       const auraGrad = ctx.createRadialGradient(
         flashX, flashY, 5,
         flashX, flashY, Math.max(hw, f.displayHeight * 0.5) * 1.8,
       );
       auraGrad.addColorStop(0, 'rgba(255,255,255,0.5)');
-      auraGrad.addColorStop(0.5, 'rgba(255,255,255,0.15)');
+      auraGrad.addColorStop(0.3, `${maxAura.css}60`);
+      auraGrad.addColorStop(0.7, `${maxAura.css}25`);
       auraGrad.addColorStop(1, 'rgba(255,255,255,0)');
       ctx.fillStyle = auraGrad;
       ctx.beginPath();
       ctx.ellipse(flashX, flashY, hw * 1.15, f.displayHeight * 0.46, 0, 0, Math.PI * 2);
       ctx.fill();
-      // Cross-star burst for DM/SDM tier (hitFlashFrames >= 4)
+      // Cross-star burst for DM/SDM tier — element-coded rays
       if (f.hitFlashFrames >= 4) {
         const starLen = 30 + f.hitFlashFrames * 4;
         const starAlpha = Math.min(f.hitFlashFrames / 6, 0.7);
@@ -1033,8 +1034,9 @@ export function drawFighters(
           ctx.lineTo(flashX + dx, flashY + dy);
           ctx.stroke();
         }
-        // Secondary shorter cross at 45° offset
-        ctx.globalAlpha = starAlpha * 0.5;
+        // Secondary shorter cross at 45° offset — element-coded
+        ctx.globalAlpha = starAlpha * 0.6;
+        ctx.strokeStyle = maxAura.css;
         ctx.lineWidth = 1.5;
         const shortLen = starLen * 0.55;
         for (let ray = 0; ray < 4; ray++) {
@@ -1604,11 +1606,11 @@ export function resolveFighterColors(f: Fighter, globalTick: number): { bodyColo
       bodyColor = accent.body;
       outlineColor = accent.outline;
       glowColor = accent.glow;
-      // KOF2002: 攻击命中暖色增强 — hitstop时攻击色偏暖(力量感)
+      // KOF2002: 攻击命中角色属性色增强 — hitstop时攻击色偏属性色(力量感)
       if (f.hitFlashFrames > 0) {
         bodyColor = '#ffffff';
-        outlineColor = '#ffdd8860';
-        glowColor = '#ffaa0030';
+        outlineColor = `${maxAura.css}60`;
+        glowColor = `${maxAura.css}30`;
       }
       break;
     }
