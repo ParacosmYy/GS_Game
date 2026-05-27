@@ -15,6 +15,7 @@ import { type FeedbackTier } from '../core/feedbackManifest.js';
 import { RYO_MOVE_LIST } from '../content/characters/ryo/commands/ryoCommands.js';
 import { KYO_MOVE_LIST } from '../content/characters/kyo/commands/kyoCommands.js';
 import { IORI_MOVE_LIST } from '../content/characters/iori/commands/ioriCommands.js';
+import { MOVE_NAME_MAP } from '../combat/hitCallback.js';
 
 // ─── Move name registry ─────────────────────────────────────────
 
@@ -23,7 +24,7 @@ interface MoveNameEntry {
   tier: FeedbackTier;
 }
 
-/** Build AttackType → MoveNameEntry map from a move list */
+/** Build AttackType → MoveNameEntry map from a move list, using Chinese names from MOVE_NAME_MAP */
 function buildMap(
   list: ReadonlyArray<{ name: string; type: string; attackTypeKey?: string }>,
 ): Partial<Record<string, MoveNameEntry>> {
@@ -32,7 +33,9 @@ function buildMap(
     if (!entry.attackTypeKey) continue;
     const tier = entry.type as FeedbackTier;
     if (tier !== 'special' && tier !== 'dm' && tier !== 'sdm' && tier !== 'hsdm') continue;
-    map[entry.attackTypeKey] = { displayName: entry.name, tier };
+    const atkType = entry.attackTypeKey as AttackType;
+    const cnName = MOVE_NAME_MAP[atkType];
+    map[entry.attackTypeKey] = { displayName: cnName ?? entry.name, tier };
   }
   return map;
 }
