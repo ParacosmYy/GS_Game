@@ -49,5 +49,9 @@ export function updateMovementVfx(fighters: Fighter[], vfx: VFXSystem, tick: num
     if (f.prevState === FighterState.GETUP && f.state === FighterState.IDLE) {
       vfx.spawnHeavyDust(f.x, STAGE_GROUND_Y, 4);
     }
+    // KOF2002: 跑步急停尘埃 — 从RUN转到IDLE时产生更大的灰尘
+    if (f.prevState === FighterState.RUN && f.state === FighterState.IDLE) {
+      vfx.spawnHeavyDust(f.x, STAGE_GROUND_Y, 8);
+    }
   }
 }
