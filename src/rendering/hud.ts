@@ -1309,7 +1309,9 @@ function drawTeamSide(ctx: CanvasRenderingContext2D, team: TeamDisplayInfo, base
  * KOF2002 win diamond — inner gradient + gold border + highlight
  */
 function drawWinDiamond(ctx: CanvasRenderingContext2D, x: number, y: number, size: number, color: string, tick: number): void {
-  const s = size;
+  // KOF2002: subtle pulse on win diamonds
+  const pulse = 1 + 0.06 * Math.sin(tick * 0.15);
+  const s = size * pulse;
   ctx.save();
   ctx.shadowColor = 'rgba(0,0,0,0.5)';
   ctx.shadowBlur = 3;
