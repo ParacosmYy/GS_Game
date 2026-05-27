@@ -164,6 +164,40 @@ export const IORI_FRAME_DATA = {
     hitLevel: "MID" as const,
     knockdown: false,
   },
+  // ── 八神庵 Command Normals ──
+  IORI_YUMEYUMI: {
+    startup: 10,
+    active: 4,
+    recovery: 20,
+    damage: 45,
+    hitstun: 19,
+    blockstun: 17,
+    pushback: 4,
+    hitLevel: "HIGH" as const,
+    knockdown: false,
+  },
+  IORI_KATANUGI: {
+    startup: 12,
+    active: 4,
+    recovery: 22,
+    damage: 55,
+    hitstun: 20,
+    blockstun: 18,
+    pushback: 5,
+    hitLevel: "MID" as const,
+    knockdown: true,
+  },
+  IORI_YUKIWARUI: {
+    startup: 8,
+    active: 7,
+    recovery: 18,
+    damage: 40,
+    hitstun: 17,
+    blockstun: 15,
+    pushback: 3,
+    hitLevel: "MID" as const,
+    knockdown: false,
+  },
   // ── 八神庵DM/SDM ── Dream Cancel Wiki KOF2002UM 精确数据
   // 八壺·DM — Iori经典DM (Yaotome)
   DM_YATAGARASU: {

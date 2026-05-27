@@ -199,7 +199,8 @@ const KYO_MOVESET: CharacterAIMoveset = {
   projectileStrong: AttackType.KYO_YAMIBARAI_C,
   pressure: AttackType.KYO_ARAGAMI,
   closeMixup: AttackType.KYO_DOKUGAMI,
-  dmRanbu: AttackType.SDM_OROCHINAGI,
+  dmRanbu: AttackType.DM_OROCHINAGI,
+  sdmRanbu: AttackType.SDM_OROCHINAGI,
   hsdm: AttackType.HSDM_OROCHINAGI,
   simpleCombo: {
     steps: [
