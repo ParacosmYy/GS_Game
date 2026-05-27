@@ -47,6 +47,9 @@ export const KyoDef: CharacterDefinition = {
   rivalWinQuotes: {
     iori: ['お前の蒼炎じゃ俺は焼けない', 'まだ俺を殺せないのか、八神!', '三種の神器の宿命、背負いきれないか'],
     ryo: ['極限流か…悪くない拳だ', '武術は喧嘩じゃねえぞ'],
+    kdash: ['俺の炎を真似するなよ', '新しい炎？…まだまだ青いな'],
+    terry: ['餓狼伝説か…悪くない喧嘩だったぜ', 'サウスタウンの英雄か、いい勝負だ'],
+    athena: ['歌はいいが、戦いは別だぜ', 'アイドルでも容赦はしねえ'],
   },
   moveList: KYO_MOVE_LIST.map(e => ({ name: e.name, input: e.input, type: e.type })),
 

@@ -31,6 +31,9 @@ export const RyoDef: CharacterDefinition = {
   rivalWinQuotes: {
     kyo: ['炎を使おうが拳は拳だ', '草薙の家伝など関係ない'],
     iori: ['その蒼い炎…正気じゃないな', '八神の血に呑まれるな'],
+    robert: ['親友だが手加減はしない', '龍虎の拳、勝った方が上だ'],
+    terry: ['餓狼か…最高の勝負だった', 'サウスタウンの狼も悪くない'],
+    mrkarate: ['父さんの仮面…もう外してください', ' Mr.カラテ、俺は負けない!'],
   },
   moveList: [
     // 命令通常技

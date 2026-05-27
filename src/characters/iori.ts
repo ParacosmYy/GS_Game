@@ -34,6 +34,8 @@ export const IoriDef: CharacterDefinition = {
   rivalWinQuotes: {
     kyo: ['京…お前を殺せるのは俺だけだ', '三神器の意味、教えてやろうか', '草薙の炎も所詮は燃えカスだ'],
     ryo: ['極限流など…所詮は拳法ごっこ', '俺の血騒ぎにはならないな'],
+    leona: ['大蛇の血か…俺には関係ない', 'ハイデルンの兵士ごときが'],
+    chris: ['大蛇の息吹か…つまらん', 'お前の役目はもう終わりだ'],
   },
   moveList: IORI_MOVE_LIST.map(e => ({ name: e.name, input: e.input, type: e.type })),
 
