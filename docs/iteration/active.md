@@ -2,40 +2,25 @@
 
 ## 目标
 
-- Phase 2 (1004→2000) 持续迭代
-- 当前分数：117/2000
-- 本轮：OPTIONS设置界面+CRT扫描线后处理+SNK招式表
+- Phase 2 (119→2000) 持续迭代
+- 当前分数：119/2000
+- 本轮：Kyo/Iori win肖像+HUD肖像 — 闭合差距矩阵 1.1 肖像气质差距
 
 ## 当前状态
 
-- 当前主线：Phase 2 质量提升 + 多角色闭环
-- Phase 1：Ryo Vertical Slice 100% 完成，退出条件全部满足
+- 当前主线：Phase 2 多角色肖像管线 + 质量提升
+- Phase 1：Ryo Vertical Slice 100% 完成
 - 战斗系统：8/8 KOF2002 深层机制已实现
 - 当前最高优先级仍然是按 [KOF 差距矩阵](../product/kof-gap-matrix.md) 逐项闭合差距
 
-## Phase 2 维度与进度
-
-| 维度 | 满分 | 当前进度 | 下一目标 |
-| --- | ---: | --- | --- |
-| 角色美术（进阶） | 150 | 4/150 | SNK风格纹理深化 |
-| 多角色闭环 | 200 | 30/200 | Kyo/Iori管线验证 |
-| 舞台美术（进阶） | 100 | 1/100 | CRT后处理完成→位图品质提升 |
-| 深层机制 | 200 | ~80/200 | 多角色cancel paths+验证 |
-| 音频品质（进阶） | 100 | 16/100 | 连段音/BGM编曲 |
-| 游戏流程（进阶） | 150 | 1/150 | OPTIONS设置完成→完整街机流程 |
-| UI/HUD品质（进阶） | 100 | 1/100 | 训练模式SNK招式表→SNK风格菜单/VS画面 |
-
 ## 本轮任务
 
-- 本轮已完成：OPTIONS设置界面 + CRT扫描线 + SNK招式表
-  - 模式选择添加 OPTIONS 卡片（4个模式）
-  - OPTIONS 界面：难度/回合数/时间限制/CRT/简化模式
-  - 左右键切换值，Enter/ESC返回
-  - CRT后处理：扫描线+磷光发光+RGB边缘
-  - SNK风格招式表：分类分组+金色标题+彩色标签+F5切换
-  - GamePhase.OPTIONS 新阶段
+- 已完成：Kyo/Iori 64x80 win肖像创建+sizedPortraits注册
+- 已完成：matchEnd改用getPortraitForSize('win')适配
+- 进行中：Kyo/Iori 48x48 HUD肖像创建（后台agent）
+- 待做：注册HUD肖像+验证build+commit
 
 ## 回退方案
 
-- 所有改动只涉及 UI 渲染和状态管理
+- 所有改动只涉及渲染层肖像数据和portraitManifest注册
 - 回退 git revert 即可

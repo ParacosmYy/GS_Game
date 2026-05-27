@@ -2354,8 +2354,8 @@ function playPitched(id: SampleId, combo: number, volume: number = 1.0): void {
 export function playHit(intensity: number = 1, combo: number = 0): void {
   initSampler(); playPitched('hit_light', combo, Math.min(intensity * 0.8, 1));
 }
-export function playHeavyHit(intensity: number = 1): void {
-  initSampler(); play('hit_heavy', Math.min(intensity * 0.8, 1));
+export function playHeavyHit(intensity: number = 1, combo: number = 0): void {
+  initSampler(); playPitched('hit_heavy', combo, Math.min(intensity * 0.8, 1));
 }
 export function playBlock(heavy: boolean = false): void {
   initSampler(); play(heavy ? 'block_heavy' : 'block');
@@ -2370,6 +2370,24 @@ export function playSuperFlash(flashType: 'DM' | 'SDM' | 'HSDM' = 'DM'): void {
   else play('super_flash');
 }
 export function playCounter(): void { initSampler(); play('counter'); }
+
+/** Combo milestone sound — plays at combo thresholds (5, 10, 15+) for escalating intensity */
+export function playComboMilestone(combo: number): void {
+  if (combo < 5) return;
+  initSampler();
+  if (combo >= 15) {
+    // Extreme combo — layered: super flash + heavy hit
+    play('super_flash', 0.4);
+    play('ko_hit', 0.5);
+  } else if (combo >= 10) {
+    // High combo — counter hit ring sound
+    play('counter', 0.5);
+  } else if (combo >= 5) {
+    // 5-hit combo — subtle escalation
+    play('hit_crit', 0.35);
+  }
+}
+}
 export function playGuardCrush(): void { initSampler(); play('guard_crush'); }
 export function playChip(): void { initSampler(); play('chip'); }
 export function playWallBounce(): void { initSampler(); play('wall_bounce'); }
