@@ -672,6 +672,19 @@ export function drawFighters(
         const limbY = sy - f.displayHeight / 2;
         ctx.arc(limbX, limbY, 5 - f.stateAge, 0, Math.PI * 2);
         ctx.fill();
+        // KOF2002: 攻击发动冲击波 — 放射状短线
+        if (f.stateAge === 0) {
+          ctx.globalAlpha = 0.3;
+          ctx.strokeStyle = '#ffffff';
+          ctx.lineWidth = 1;
+          for (let r = 0; r < 6; r++) {
+            const rayAngle = (r / 6) * Math.PI * 2;
+            ctx.beginPath();
+            ctx.moveTo(limbX + Math.cos(rayAngle) * 3, limbY + Math.sin(rayAngle) * 3);
+            ctx.lineTo(limbX + Math.cos(rayAngle) * 12, limbY + Math.sin(rayAngle) * 12);
+            ctx.stroke();
+          }
+        }
         ctx.restore();
       }
     }
