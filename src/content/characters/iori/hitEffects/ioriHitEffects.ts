@@ -92,12 +92,12 @@ function ioriVFX(ctx: HitEffectContext): boolean {
     vfx.spawnIoriAoihanaTrail(hitX, hitY, attacker.facing, 2);
     handled = true;
   }
-  // Kuzukaze (屑風) — command grab
+  // Kuzukaze (屑風) — command grab dark vortex
   if (atkName === 'IORI_KUZUKAZE') {
-    cinematic.addHitStop(2, ctx.defIdx);
-    screenShake.trigger(8, 10, attacker.facing * 4);
-    vfx.spawnProjectileExplosion(hitX, hitY, '#660088', '#aa44cc');
-    screenFlash.trigger('#6622aa', 0.12, 4);
+    cinematic.addHitStop(3, ctx.defIdx);
+    screenShake.trigger(10, 10, attacker.facing * 5);
+    vfx.spawnIoriKuzukazeVFX(hitX, hitY, attacker.facing);
+    screenFlash.trigger('#6622aa', 0.15, 5);
     handled = true;
   }
   // DM Yatagarasu (八咫烏)

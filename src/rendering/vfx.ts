@@ -58,6 +58,7 @@ import {
   spawnIoriYatagarasuVFX,
   spawnVictoryAuraSpark,
   spawnKyoFireKickTrail,
+  spawnIoriKuzukazeVFX,
   spawnRunSpeedLines,
   spawnScorchMark,
   spawnKOSuperBurst,
@@ -361,6 +362,11 @@ export class VFXSystem {
   /** Kyo: Red Kick (紅丸脚) fire arc trail on impact */
   spawnKyoFireKickTrail(worldX: number, worldY: number, facing: number): void {
     spawnKyoFireKickTrail(this.particles, worldX, worldY, facing);
+  }
+
+  /** Iori: Kuzukaze (屑風) dark vortex on command grab */
+  spawnIoriKuzukazeVFX(worldX: number, worldY: number, facing: number): void {
+    spawnIoriKuzukazeVFX(this.particles, worldX, worldY, facing);
   }
 
   /** Ryo: Ko Hou (虎咲) uppercut flame column VFX */

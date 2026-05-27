@@ -2289,3 +2289,65 @@ export function spawnVictoryAuraSpark(particles: Particle[], x: number, y: numbe
     });
   }
 }
+
+/**
+ * Iori Kuzukaze (屑風) dark vortex — command grab dark energy twist.
+ * Spiral of dark purple energy + claw mark slashes ripping outward.
+ * 14 particles: 6 spiral orbs + 4 claw slashes + 4 dark wisps.
+ */
+export function spawnIoriKuzukazeVFX(particles: Particle[], x: number, y: number, facing: number): void {
+  const purpleCore = '#6600aa';
+  const darkOuter = '#330066';
+  const clawWhite = '#cc88ff';
+  // Spiral orbs — dark energy twisting inward then outward
+  for (let i = 0; i < 6; i++) {
+    const angle = (i / 6) * Math.PI * 2;
+    const radius = 15 + i * 4;
+    particles.push({
+      x: x + Math.cos(angle) * radius,
+      y: y + Math.sin(angle) * radius * 0.6 - 10,
+      vx: Math.cos(angle + Math.PI) * 2.5,
+      vy: Math.sin(angle + Math.PI) * 1.5,
+      life: 14 + Math.floor(Math.random() * 6),
+      maxLife: 20,
+      size: 6 + Math.random() * 4,
+      color: i % 2 === 0 ? purpleCore : darkOuter,
+      type: 'spark',
+      gravity: -0.05,
+      friction: 0.93,
+    });
+  }
+  // Claw slashes — 4 diagonal marks ripping outward
+  const clawAngles = [-0.4, 0.4, -1.2, 1.2];
+  for (let i = 0; i < 4; i++) {
+    const angle = clawAngles[i] + (facing > 0 ? 0 : Math.PI);
+    particles.push({
+      x: x + Math.cos(angle) * 10,
+      y: y - 15 + Math.sin(angle) * 8,
+      vx: Math.cos(angle) * 5,
+      vy: Math.sin(angle) * 3,
+      life: 10 + Math.floor(Math.random() * 4),
+      maxLife: 14,
+      size: 20 + Math.random() * 10,
+      color: clawWhite,
+      type: 'slash',
+      rotation: angle,
+    });
+  }
+  // Dark wisps — residual shadow energy
+  for (let i = 0; i < 4; i++) {
+    particles.push({
+      x: x + (Math.random() - 0.5) * 20,
+      y: y - 5 + (Math.random() - 0.5) * 20,
+      vx: (Math.random() - 0.5) * 3,
+      vy: -1.5 - Math.random() * 2,
+      life: 18 + Math.floor(Math.random() * 8),
+      maxLife: 26,
+      size: 3 + Math.random() * 3,
+      color: '#440088',
+      type: 'spark',
+      gravity: -0.03,
+      friction: 0.97,
+    });
+  }
+}
