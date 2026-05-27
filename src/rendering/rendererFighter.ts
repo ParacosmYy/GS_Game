@@ -247,6 +247,12 @@ export function drawFighters(
       const getYOffset = 20 * (1 - getupProgress);
       ctx.translate(0, getYOffset);
     }
+    // Landing recovery crouch — KOF2002: fighter stays low briefly after landing
+    if (f.landingRecovery > 0 && f.state === FighterState.IDLE) {
+      const recoveryT = f.landingRecovery / 10; // normalize (max ~10 frames)
+      const crouchOffset = 12 * Math.min(1, recoveryT);
+      ctx.translate(0, crouchOffset);
+    }
 
     // Compute animation frame index: attacks use attackFrame, cyclic states use stateAge
     const isAttackState = f.state === FighterState.STAND_ATTACK
