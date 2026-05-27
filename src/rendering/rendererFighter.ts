@@ -12,6 +12,7 @@ import { drawAttackLimb } from './attackLimb.js';
 import type { SpriteRenderer } from './spriteRenderer.js';
 import { getCharacterColors } from './manifestRenderData.js';
 import { drawHighResFrame, drawHighResAfterimage } from './sprites/ryoHighResRender.js';
+import { drawKyoHighResFrame, drawKyoHighResAfterimage } from './sprites/kyoHighResRender.js';
 import { getFighterBlender } from './animationBlender.js';
 
 const fighterDebugOverlayEnabled = isFighterDebugOverlayEnabled();
@@ -934,7 +935,14 @@ export function drawFighters(
       ctx.fill();
       ctx.restore();
     }
-    const highResDrawn = drawHighResFrame(ctx, f.charId ?? '', f.state, f.stateAge, sx + leanOffsetX, sy, f.facing, f.currentAttack, f.vx);
+    // Try Kyo high-res first if character is Kyo, then Ryo, then fallback chain
+    let highResDrawn = false;
+    const charId = f.charId ?? '';
+    if (charId === 'kyo') {
+      highResDrawn = drawKyoHighResFrame(ctx, f.state, f.stateAge, sx + leanOffsetX, sy, f.facing, f.currentAttack, f.vx);
+    } else {
+      highResDrawn = drawHighResFrame(ctx, charId, f.state, f.stateAge, sx + leanOffsetX, sy, f.facing, f.currentAttack, f.vx);
+    }
     if (!highResDrawn) {
       const spriteRendered = spriteRenderer?.canRender(f.charId)
         ? spriteRenderer.render(ctx, f.charId, f.state, frameIdx, sx + leanOffsetX, sy, f.facing, getCharacterColors(f.charId ?? '').outfit)
@@ -1699,12 +1707,22 @@ function drawAfterimageTrail(
   for (let i = 1; i <= ghostCount; i++) {
     const ghostAlpha = 0.32 / i;
     const trailX = sx - leanOffsetX * i * 1.5 - f.facing * 12 * i;
-    // Try pixel frame afterimage first (for Ryo), fall back to skeletal
-    const pixelDrawn = drawHighResAfterimage(
-      ctx, f.charId ?? '', f.state, f.stateAge,
-      trailX, f.y, f.facing, f.currentAttack, f.vx,
-      trailTint, ghostAlpha,
-    );
+    // Try pixel frame afterimage first (for Ryo/Kyo), fall back to skeletal
+    let pixelDrawn = false;
+    const ghostCharId = f.charId ?? '';
+    if (ghostCharId === 'kyo') {
+      pixelDrawn = drawKyoHighResAfterimage(
+        ctx, f.state, f.stateAge,
+        trailX, f.y, f.facing, f.currentAttack, f.vx,
+        trailTint, ghostAlpha,
+      );
+    } else {
+      pixelDrawn = drawHighResAfterimage(
+        ctx, ghostCharId, f.state, f.stateAge,
+        trailX, f.y, f.facing, f.currentAttack, f.vx,
+        trailTint, ghostAlpha,
+      );
+    }
     if (!pixelDrawn) {
       // Skeletal fallback for non-pixel-frame characters
       const trailManifestColors = getCharacterColors(f.charId ?? '');
