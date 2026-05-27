@@ -4,8 +4,8 @@
  * Integration layer: connects Iori's high-resolution pixel frame data
  * with the pixelFrameRenderer drawing API.
  *
- * Currently supports: IDLE, WALK (forward/backward), CROUCH, STAND_ATTACK (A/C)
- * Fallback states (jump, damage, etc.) will be added as frames are created.
+ * Currently supports: IDLE, WALK (forward/backward), CROUCH, STAND_ATTACK (A/C), JUMP
+ * Fallback states (damage, etc.) will be added as frames are created.
  */
 
 import { FighterState, AttackType } from '../../core/types.js';
@@ -14,6 +14,7 @@ import { IORI_IDLE_FRAMES } from './ioriIdleFrames.js';
 import { IORI_WALK_FORWARD_FRAMES, IORI_WALK_BACKWARD_FRAMES } from './ioriWalkFrames.js';
 import { IORI_CROUCH_FRAMES } from './ioriCrouchFrames.js';
 import { IORI_STAND_A_FRAMES, IORI_STAND_C_FRAMES } from './ioriAttackFrames.js';
+import { IORI_JUMP_FRAMES } from './ioriJumpFrames.js';
 
 // ===== Internal Frame Registry =====
 
@@ -108,6 +109,9 @@ function initAllFrames(): void {
   // ATTACKS — STAND_A (4 frames) + STAND_C (5 frames)
   registerVariableFrames('STAND_A', IORI_STAND_A_FRAMES, [4, 3, 4, 8]);
   registerVariableFrames('STAND_C', IORI_STAND_C_FRAMES, [6, 4, 5, 5, 10]);
+
+  // JUMP — 6-frame jump arc
+  registerVariableFrames('JUMP', IORI_JUMP_FRAMES, [4, 3, 5, 6, 5, 4]);
 }
 
 // ===== State Resolution =====
@@ -126,10 +130,18 @@ function resolveFrameKey(
     case FighterState.CROUCH:
     case FighterState.CROUCH_ATTACK:
       return 'CROUCH';
+    case FighterState.JUMP:
+    case FighterState.RUN_JUMP:
+    case FighterState.HOP:
+    case FighterState.HYPER_JUMP:
+    case FighterState.AIR_ATTACK:
+    case FighterState.AIR_BLOCK:
+      return 'JUMP';
     case FighterState.STAND_ATTACK:
-      if (_currentAttack === AttackType.STAND_C) {
+      if (_currentAttack === AttackType.STAND_C || _currentAttack === AttackType.CLOSE_C) {
         return 'STAND_C';
       }
+      // Kick types fall back to STAND_A frames (no dedicated kick frames yet)
       return 'STAND_A';
     default:
       return null;
