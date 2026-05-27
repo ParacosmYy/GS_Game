@@ -281,6 +281,9 @@ const RYO_SEQUENCES: Record<string, AnimSequence> = {
   ryo_ko_hou: attackSequence('ryo_ko_hou', 'RYO_KO_HOU', 15, 3),      // 虎咆 →↓↘+A, startup前3帧无敌
   ryo_hien:   attackSequence('ryo_hien', 'RYO_HIEN', 15),             // 飛燕疾風脚 ←↙↓+K
   ryo_haou:   attackSequence('ryo_haou', 'RYO_HAOU', 15),             // 霸王翔吼拳 ↓↘→+K
+  ryo_koouken_d:  attackSequence('ryo_koouken_d', 'RYO_KOOUKEN_D', 15),  // 虎煌拳D版 ↓↘→+D
+  ryo_hio_hacker: attackSequence('ryo_hio_hacker', 'RYO_HIO_HACKER', 12), // 氷果斬 →+A
+  ryo_zanretsu_ken: attackSequence('ryo_zanretsu_ken', 'RYO_ZANRETSU_KEN', 12), // 斩裂拳 ←↙↓+P
   ryo_tsurizao:  attackSequence('ryo_tsurizao', 'RYO_TSURIZAO', 18),  // 釣瓶打
   ryo_orishi:    attackSequence('ryo_orishi', 'RYO_ORISHI', 17),      // 卸し
 

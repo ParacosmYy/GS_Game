@@ -8,6 +8,7 @@ import { describe, it, expect } from 'vitest';
 import { RYO_ACTION_CONTRACTS } from '../src/core/ryoFrameContract.js';
 import { ANIMATION_MANIFEST } from '../src/core/animationManifestData.js';
 import { FRAME_DATA } from '../src/core/frameDataConstants.js';
+import { RYO_ANIMATION_META } from '../src/content/characters/ryo/animations/ryoAnimations.js';
 
 const ryoManifest = ANIMATION_MANIFEST.characters.ryo;
 
@@ -22,6 +23,9 @@ describe('Frame Contract ↔ Animation Manifest alignment', () => {
     { action: 'knockdown', anim: 'knockdown' },
     { action: 'ryo_koou', anim: 'ryo_koou' },
     { action: 'ryo_ko_hou', anim: 'ryo_ko_hou' },
+    { action: 'ryo_koouken_d', anim: 'ryo_koouken_d' },
+    { action: 'ryo_hio_hacker', anim: 'ryo_hio_hacker' },
+    { action: 'ryo_zanretsu_ken', anim: 'ryo_zanretsu_ken' },
     { action: 'dm_ten_ha_ou', anim: 'dm_ten_ha_ou' },
   ];
 
@@ -87,4 +91,25 @@ describe('Frame Contract ↔ Animation Manifest alignment', () => {
       }
     }
   });
+});
+
+// ═══ Frame Contract ↔ Animation Meta alignment ═══
+
+describe('Frame Contract ↔ Animation Meta totalFrames alignment', () => {
+  const specialActions = [
+    'ryo_koou', 'ryo_koou_c', 'ryo_ko_hou', 'ryo_ko_hou_c',
+    'ryo_hien', 'ryo_haou',
+    'ryo_koouken_d', 'ryo_hio_hacker', 'ryo_zanretsu_ken',
+    'dm_ten_ha_ou', 'sdm_ten_ha_ou',
+    'dm_ryuko_ranbu', 'sdm_ryuko_ranbu', 'hsdm_ryuko_ranbu',
+  ];
+
+  for (const action of specialActions) {
+    it(`${action}: Frame Contract totalFrames matches Animation Meta`, () => {
+      const fc = RYO_ACTION_CONTRACTS.get(action);
+      const meta = RYO_ANIMATION_META[action];
+      if (!fc || !meta) return;
+      expect(fc.totalFrames).toBe(meta.totalFrames);
+    });
+  }
 });
