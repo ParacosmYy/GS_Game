@@ -63,6 +63,11 @@ import { CinematicState } from '../src/state/cinematicState.js';
 import type { IInputProvider } from '../src/input/inputProvider.js';
 import type { PlayerInput } from '../src/core/types.js';
 import { FRAME_DATA } from '../src/core/constants.js';
+import { registerHitEffects } from '../src/content/characterHitEffects.js';
+import { RYO_HIT_EFFECTS } from '../src/content/characters/ryo/hitEffects/ryoHitEffects.js';
+
+// Register Ryo hit effects plugin so dispatchHitSFX can route character-specific SFX
+registerHitEffects(RYO_HIT_EFFECTS);
 
 // ═══════════════════════════════════════════════════════════════
 // Mocks & helpers

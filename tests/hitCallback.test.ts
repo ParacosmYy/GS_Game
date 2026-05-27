@@ -18,6 +18,8 @@ import { FRAME_DATA, MAX_STOCKS, METER_PER_STOCK } from '../src/core/constants.j
 import { getFeedback } from '../src/core/feedbackManifest.js';
 import type { Fighter } from '../src/entities/fighter.js';
 import type { PowerGauge } from '../src/core/types.js';
+import { registerHitEffects } from '../src/content/characterHitEffects.js';
+import { RYO_HIT_EFFECTS } from '../src/content/characters/ryo/hitEffects/ryoHitEffects.js';
 
 // Mock audio modules to avoid AudioContext dependency
 vi.mock('../src/audio/sampler.js', () => ({
@@ -463,6 +465,9 @@ describe('createHitCallback — hit resolution', () => {
 });
 
 // ===== 8. createHitCallback — Ryo-specific VFX =====
+
+// Register Ryo hit effects plugin so dispatchHitVFX/SFX can route to it
+registerHitEffects(RYO_HIT_EFFECTS);
 
 describe('createHitCallback — Ryo character-specific VFX', () => {
   it('Ko\'ou Ken triggers koouken VFX', () => {
