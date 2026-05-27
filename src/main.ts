@@ -1173,6 +1173,12 @@ function render(): void {
     } else {
       renderer.drawIntro(gs.phaseTimer, rounds.currentRound, p1Char.nameCn, p2Char.nameCn, getStage());
     }
+    // KOF2002: Round transition fade-in from black (30 frames = 0.5s)
+    if (gs.phaseTimer < 30) {
+      const alpha = 1 - gs.phaseTimer / 30;
+      ctx.fillStyle = `rgba(0, 0, 0, ${alpha})`;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
   }
   if (gs.phase === GamePhase.KO && gs.announceSequence.isRunning()) {
     drawAnnounceSequence(ctx, gs.announceSequence, canvas.width, canvas.height);
