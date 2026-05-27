@@ -104,14 +104,15 @@ export function drawFighters(
       ctx.stroke();
     }
 
-    // Ground reflection
+    // Ground reflection — KOF2002: 角色脚下微弱倒影
     if (f.isGrounded()) {
       ctx.save();
-      ctx.globalAlpha = 0.06;
+      ctx.globalAlpha = 0.08;
       ctx.translate(sx, STAGE_GROUND_Y);
       ctx.scale(1, -0.15);
       ctx.translate(-sx, -STAGE_GROUND_Y);
-      drawSkeletalFighter(ctx, f, sx, f.y, getCharacterColors(f.charId ?? '').outfit, '#000000', globalTick, maxModeActive, playerIdx);
+      const refColors = getCharacterColors(f.charId ?? '');
+      drawSkeletalFighter(ctx, f, sx, f.y, refColors.outfit, refColors.outline || '#000000', globalTick, maxModeActive, playerIdx);
       ctx.restore();
     }
 
