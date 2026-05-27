@@ -466,10 +466,18 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       deps.screenFlash.trigger('#ffffcc', 0.05, 2);
     }
 
-    // KOF2002: Counter hit发光轮廓 — 反击命中时攻击者短暂橙色轮廓+屏幕闪烁
+    // KOF2002: Counter hit发光轮廓 — 反击命中时攻击者短暂轮廓+屏幕闪烁
+    // Escalating feedback: special/DM counter hits are more dramatic
     if (counterHit) {
-      attacker.counterGlowFrames = 6;
-      deps.screenFlash.trigger('#ff8800', 0.08, 3);
+      attacker.counterGlowFrames = isDM ? 10 : isSpecial ? 8 : 6;
+      const counterFlashColor = isDM ? '#ff4400' : isSpecial ? '#ff6600' : '#ff8800';
+      const counterFlashAlpha = isDM ? 0.15 : isSpecial ? 0.12 : 0.08;
+      const counterFlashFrames = isDM ? 6 : isSpecial ? 4 : 3;
+      deps.screenFlash.trigger(counterFlashColor, counterFlashAlpha, counterFlashFrames);
+      // Special/DM counter: extra impact ring
+      if (isSpecial || isDM) {
+        deps.vfx.spawnImpactRing(hitX, hitY, isDM ? 1.6 : 1.2);
+      }
     }
 
     // KOF2002: 绝境反击视觉 — 攻击者低血量时命中闪现红色边框暗示危机反击
