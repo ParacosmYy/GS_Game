@@ -970,6 +970,20 @@ export function drawFighters(
       ctx.beginPath();
       ctx.ellipse(sx, sy, dustR, dustR * 0.3, 0, 0, Math.PI * 2);
       ctx.fill();
+      // KOF2002: 倒地着地辐射线 — 扩散水平线
+      if (f.stateAge <= 3) {
+        ctx.globalAlpha = (3 - f.stateAge) / 3 * 0.2;
+        ctx.strokeStyle = '#ffcc44';
+        ctx.lineWidth = 1;
+        for (let ln = 0; ln < 2; ln++) {
+          const dir = ln === 0 ? -1 : 1;
+          const lineLen = 15 + f.stateAge * 10;
+          ctx.beginPath();
+          ctx.moveTo(sx, sy);
+          ctx.lineTo(sx + dir * lineLen, sy + 2);
+          ctx.stroke();
+        }
+      }
       ctx.restore();
     }
 
