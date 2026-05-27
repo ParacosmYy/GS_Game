@@ -166,8 +166,12 @@ export enum AttackType {
   IORI_YAMIBARAI_C = 'IORI_YAMIBARAI_C', // 闇払い ↓↘→+C (strong projectile, faster)
   IORI_ONIYAKI = 'IORI_ONIYAKI',       // 鬼焼き →↓↘+A (weak upper)
   IORI_ONIYAKI_C = 'IORI_ONIYAKI_C',   // 鬼焼き →↓↘+C (strong upper, invincible)
-  IORI_KOTOTSUKI = 'IORI_KOTOTSUKI',   // 琴月陰 ←↙↓↘→+K (dash)
+  IORI_KOTOTSUKI = 'IORI_KOTOTSUKI',   // 琴月陰 ←↙↓↘→+B (dash, short)
+  IORI_KOTOTSUKI_D = 'IORI_KOTOTSUKI_D', // 琴月陰 ←↙↓↘→+D (dash, long)
   IORI_KUZUKAZE = 'IORI_KUZUKAZE',     // 屑風 ←↙↓↘→↗↓↙←+P (command throw)
+  IORI_AOIHANA_C = 'IORI_AOIHANA_C',   // 葵花 C版 QCB+C (rekka, different timing)
+  IORI_AOIHANA_C_2 = 'IORI_AOIHANA_C_2', // 葵花 C版 第二段
+  IORI_AOIHANA_C_3 = 'IORI_AOIHANA_C_3', // 葵花 C版 第三段
   // 特瑞必杀技 (Terry Specials)
   TERRY_POWER_WAVE = 'TERRY_POWER_WAVE',       // Power Wave ↓↘→+P (projectile)
   TERRY_BURN_KNUCKLE = 'TERRY_BURN_KNUCKLE',   // Burn Knuckle ←↙↓+P

@@ -25,12 +25,16 @@ export const IORI_ATTACK_KEYS: string[] = [
   'IORI_YAMIBARAI_C',    // ↓↘→+C 闇払い (strong projectile)
   'IORI_ONIYAKI',        // →↓↘+A 鬼焼き (weak upper)
   'IORI_ONIYAKI_C',      // →↓↘+C 鬼焼き (strong upper, invincible)
-  'IORI_KOTOTSUKI',      // ←↙↓↘→+K 琴月陰 (dash)
+  'IORI_KOTOTSUKI',      // ←↙↓↘→+B 琴月陰 (dash, short)
+  'IORI_KOTOTSUKI_D',    // ←↙↓↘→+D 琴月陰 (dash, long)
   'IORI_KUZUKAZE',       // ←↙↓↘→↗↓↙←+P 屑風 (command throw)
   // Rekka chain — 葵花 (Aoihana)
-  'IORI_AOIHANA',        // ↓↙←+P (rekka starter)
+  'IORI_AOIHANA',        // ↓↙←+P (rekka starter, A version)
   'IORI_AOIHANA_2',      // 葵花 second hit
   'IORI_AOIHANA_3',      // 葵花 third hit (overhead HKD)
+  'IORI_AOIHANA_C',      // ↓↙←+C (rekka starter, C version)
+  'IORI_AOIHANA_C_2',    // 葵花 C版 second hit
+  'IORI_AOIHANA_C_3',    // 葵花 C版 third hit
   // Throws
   'THROW', 'THROW_FORWARD', 'THROW_BACK',
   // CD blowback

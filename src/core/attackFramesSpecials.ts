@@ -160,6 +160,36 @@ export const IORI_AOIHANA_3_FRAMES: AttackFrame[] = [
   F([{ ox: 40, oy: -65, w: 45, h: 40 }]),
 ];
 
+// 葵花 C版 1段 — stronger claw swipe, wider hitbox
+export const IORI_AOIHANA_C_FRAMES: AttackFrame[] = [
+  F([{ ox: 44, oy: -56, w: 50, h: 36 }]),
+  F([{ ox: 50, oy: -52, w: 56, h: 38 }]),
+  F([{ ox: 50, oy: -52, w: 56, h: 38 }]),
+  F([{ ox: 48, oy: -55, w: 52, h: 36 }]),
+  F([{ ox: 46, oy: -56, w: 50, h: 34 }]),
+  F([{ ox: 44, oy: -55, w: 48, h: 32 }]),
+];
+
+// 葵花 C版 2段 — mid-body dark energy swipe
+export const IORI_AOIHANA_C_2_FRAMES: AttackFrame[] = [
+  F([{ ox: 44, oy: -20, w: 52, h: 26 }]),
+  F([{ ox: 50, oy: -16, w: 58, h: 28 }]),
+  F([{ ox: 50, oy: -16, w: 58, h: 28 }]),
+  F([{ ox: 48, oy: -18, w: 54, h: 26 }]),
+  F([{ ox: 46, oy: -20, w: 50, h: 24 }]),
+  F([{ ox: 44, oy: -18, w: 48, h: 22 }]),
+];
+
+// 葵花 C版 3段 — overhead knockdown slam, bigger arc
+export const IORI_AOIHANA_C_3_FRAMES: AttackFrame[] = [
+  F([{ ox: 40, oy: -68, w: 50, h: 42 }], { ox: 3, oy: -5, w: -10, h: -20 }),
+  F([{ ox: 44, oy: -74, w: 54, h: 46 }], { ox: 3, oy: -5, w: -10, h: -20 }),
+  F([{ ox: 48, oy: -78, w: 56, h: 48 }]),
+  F([{ ox: 46, oy: -74, w: 54, h: 46 }]),
+  F([{ ox: 44, oy: -70, w: 50, h: 42 }]),
+  F([{ ox: 42, oy: -66, w: 48, h: 40 }]),
+];
+
 export const IORI_YAMIBARAI_FRAMES: AttackFrame[] = [
   F([{ ox: 48, oy: -58, w: 36, h: 28 }]),
 ];
@@ -194,6 +224,16 @@ export const IORI_KOTOTSUKI_FRAMES: AttackFrame[] = [
   F([{ ox: 55, oy: -52, w: 48, h: 42 }]),
   F([{ ox: 58, oy: -50, w: 52, h: 44 }]),
   F([{ ox: 55, oy: -52, w: 48, h: 42 }]),
+];
+
+// 琴月陰 D版 — full-screen rush grab, wider + longer hitbox
+export const IORI_KOTOTSUKI_D_FRAMES: AttackFrame[] = [
+  F([{ ox: 52, oy: -56, w: 48, h: 42 }]),
+  F([{ ox: 58, oy: -52, w: 55, h: 46 }]),
+  F([{ ox: 62, oy: -50, w: 60, h: 48 }]),
+  F([{ ox: 60, oy: -48, w: 58, h: 50 }]),
+  F([{ ox: 56, oy: -50, w: 54, h: 48 }]),
+  F([{ ox: 52, oy: -52, w: 50, h: 44 }]),
 ];
 
 export const IORI_KUZUKAZE_FRAMES: AttackFrame[] = [
