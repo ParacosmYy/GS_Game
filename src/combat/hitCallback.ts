@@ -309,6 +309,10 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       if (blkDM) playBlockDM();
       else if (blkSpecial) playBlockSpecial();
       else playBlock(blkHeavy);
+      // KOF2002: Block sparks — small white sparks at block point
+      const blockSparkCount = blkDM ? 6 : blkSpecial ? 4 : blkHeavy ? 3 : 2;
+      const blockSparkColor = blkDM ? '#ffcc00' : '#88aacc';
+      deps.vfx.spawnCharacterHitSparks(hitX, hitY, blockSparkCount, blockSparkColor, 0.5, 0.4, 0.2, false, attacker.facing);
       // Guard Crush: 防御槽耗尽时播放金属碎裂声
       // (onGuardCrush回调在main.ts中也会触发VFX，此处补充SFX)
       if (defender.state === FighterState.GUARD_CRUSH) {
