@@ -253,6 +253,8 @@ export class FighterController {
       const wallX = f.x <= STAGE_LEFT ? STAGE_LEFT : STAGE_RIGHT;
       this.vfx.spawnHeavyDust(wallX, f.y - f.displayHeight / 2, 6);
       this.vfx.spawnImpactRing(wallX, f.y - f.displayHeight / 2, 0.6);
+      // KOF2002: 壁叩き火花 — 壁叩き时产生橙色火花
+      this.vfx.spawnHitSparks(wallX, f.y - f.displayHeight / 2, 8);
       // Screen shake for wall splat (2 ticks)
       this.onScreenShake?.(4, WALL_SPLAT_SHAKE_DURATION);
       // Reduce velocity on wall hit (wall pressure: opponent stays near wall)

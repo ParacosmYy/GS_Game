@@ -147,6 +147,8 @@ export function drawFighters(
         leanOffsetX = -2 * f.facing + blendOffsetX;
         leanAngle = -0.03 * f.facing;
       }
+      // KOF2002: 步行节奏微弹 — 走路时轻微上下弹动
+      leanOffsetY = Math.sin(f.stateAge * 0.4) * 2;
       // KOF2002: 步行微弹 — 每6帧上下2px弹跳模拟步伐
       leanOffsetY = Math.abs(Math.sin(f.stateAge * 0.5)) * 2;
     }
@@ -174,6 +176,10 @@ export function drawFighters(
       // KOF2002: 空中攻击俯冲前倾
       leanOffsetX = 4 * f.facing + blendOffsetX;
       leanAngle = 0.07 * f.facing;
+    } else if (f.state === FighterState.AIR_BLOCK) {
+      // KOF2002: 空中防御收缩 — 空中防御时蜷缩姿态
+      leanOffsetY = 5;
+      leanAngle = -0.04 * f.facing;
     } else if (f.state === FighterState.COUNTER_STANCE) {
       // KOF2002: 反击架势后仰
       leanOffsetX = -3 * f.facing + blendOffsetX;
@@ -480,6 +486,14 @@ export function drawFighters(
       const redAlpha = (1 - hpRatio) * 0.12;
       ctx.fillStyle = 'rgba(200, 30, 30, ' + redAlpha + ')';
       ctx.fillRect(sx + leanOffsetX - hw - 5, sy - f.displayHeight - 5, (hw + 5) * 2, f.displayHeight + 10);
+    }
+
+    // KOF2002: 削血致死警告 — HP<10%且防御中时脉冲红光
+    if (f.health > 0 && f.health < f.maxHealth * 0.1
+      && (f.state === FighterState.BLOCK || f.state === FighterState.BLOCKSTUN)) {
+      const dangerPulse = Math.sin(globalTick * 0.6) * 0.5 + 0.5;
+      ctx.fillStyle = 'rgba(255, 50, 0, ' + (dangerPulse * 0.18) + ')';
+      ctx.fillRect(sx + leanOffsetX - hw - 8, sy - f.displayHeight - 8, (hw + 8) * 2, f.displayHeight + 16);
     }
 
     ctx.restore();
