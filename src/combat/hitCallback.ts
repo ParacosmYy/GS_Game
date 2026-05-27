@@ -10,7 +10,7 @@ import {
   FRAME_DATA, STAGE_WIDTH, MAX_STOCKS, METER_PER_STOCK,
   SHAKE_KO, SHAKE_DURATION_KO,
 } from '../core/constants.js';
-import { getFeedback, getFeedbackTier } from '../core/feedbackManifest.js';
+import { getFeedback, getFeedbackTier, getCharacterDMPalette } from '../core/feedbackManifest.js';
 import { ROSTER } from '../characters/index.js';
 import { isDM as isDMCheck } from '../core/attackClassifier.js';
 import { gainMeterOnHit, gainMeterOnBlock, gainMeterOnHitstun } from './meter.js';
@@ -378,8 +378,9 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
     const sparkLowGrav = !defender.isGrounded() && !isDM;
     // === 传递facing参数，让火花方向基于攻击者朝向 ===
     deps.vfx.spawnCharacterHitSparks(hitX, hitY, sparks, sparkColor, sparkSize * comboSparkScale * chSizeBonus, sparkSpeed, sparkStarRatio, sparkLowGrav, attacker.facing);
-    // FR-2: Tier-differentiated sparks from manifest
-    deps.vfx.spawnTierSparks(hitX, hitY, fb.sparkCount, fb.sparkType, fb.sparkPalette, fb.sparkSpeed);
+    // FR-2: Tier-differentiated sparks from manifest (character-specific for DM/SDM/HSDM)
+    const dmPalette = isDM ? getCharacterDMPalette(attacker.charId, fb.tier) : null;
+    deps.vfx.spawnTierSparks(hitX, hitY, fb.sparkCount, fb.sparkType, dmPalette ?? fb.sparkPalette, fb.sparkSpeed);
 
     // KOF2002: MAX模式命中视觉强化 — 金色火花+冲击环+闪光
     if (attacker.maxModeActive && !isDM) {

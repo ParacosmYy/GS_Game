@@ -386,3 +386,34 @@ export function getFeedbackTier(attackType: AttackType): FeedbackTier {
 export function getFeedbackByTier(tier: FeedbackTier): FeedbackParams {
   return FEEDBACK_MANIFEST.tiers[tier];
 }
+
+// ===== 角色专属 DM/SDM/HSDM 火花色板 =====
+// KOF2002 每个角色超必杀有独特元素色调
+
+const CHARACTER_DM_PALETTES: Record<string, { dm: string[]; sdm: string[]; hsdm: string[] }> = {
+  kyo: {
+    dm: ['#ff4400', '#ff8800', '#ffcc00', '#ffffff'],
+    sdm: ['#ff2200', '#ff6600', '#ffaa00', '#ffffff', '#ffff66'],
+    hsdm: ['#ff0000', '#ff4400', '#ff8800', '#ffcc00', '#ffffff'],
+  },
+  iori: {
+    dm: ['#8800ff', '#cc44ff', '#ff00aa', '#ffffff'],
+    sdm: ['#6600cc', '#aa22ff', '#ff0088', '#ffffff', '#ff44cc'],
+    hsdm: ['#440088', '#8800ff', '#cc00ff', '#ff0066', '#ffffff'],
+  },
+  ryo: {
+    dm: ['#0088ff', '#44ccff', '#ffffff', '#ffcc00'],
+    sdm: ['#0066cc', '#2299ff', '#66ddff', '#ffffff', '#ffee88'],
+    hsdm: ['#0044aa', '#0088ff', '#44ccff', '#ffffff', '#ffff00'],
+  },
+};
+
+/** Get character-specific spark palette for DM/SDM/HSDM tier. Falls back to tier default. */
+export function getCharacterDMPalette(charId: string, tier: FeedbackTier): string[] | null {
+  const char = CHARACTER_DM_PALETTES[charId];
+  if (!char) return null;
+  if (tier === 'hsdm') return char.hsdm;
+  if (tier === 'sdm') return char.sdm;
+  if (tier === 'dm') return char.dm;
+  return null;
+}
