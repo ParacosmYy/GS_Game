@@ -17,6 +17,7 @@ import type { StageId } from './stage.js';
 import type { AnnounceSequence } from '../state/announceSequence.js';
 import type { KODustParticle, KOPhase } from '../state/cinematicState.js';
 import { KO_FLASH_DURATION, KO_ANNOUNCE_DURATION, KO_TRANSITION_PAUSE } from '../state/cinematicState.js';
+import { CN_MOVE_NAMES, CHAR_COLORS } from './moveNameDisplay.js';
 
 // ===== 舞台名称映射 =====
 const STAGE_NAMES: Record<StageId, string> = {
@@ -1183,6 +1184,8 @@ export function drawKO(
   cameraX: number = 0,
   koPhase?: KOPhase,
   koPhaseTimer: number = 0,
+  finishingAttackType: string = '',
+  finishingCharId: string = '',
 ): void {
   ctx.save();
 
@@ -1345,6 +1348,35 @@ export function drawKO(
     ctx.globalAlpha = 1;
   }
 
+  // Finishing move name display for DM/SDM/HSDM KOs
+  if (finishingAttackType && koTimer > 20) {
+    const finishAlpha = Math.min(1, Math.max(0, (koTimer - 20) / 15));
+    ctx.globalAlpha = finishAlpha;
+    const tier = finishingAttackType.startsWith('HSDM_') ? 'HSDM'
+      : finishingAttackType.startsWith('SDM_') ? 'SDM' : 'DM';
+    const tierColor = tier === 'HSDM' ? '#ffff44'
+      : tier === 'SDM' ? '#ff44ff' : '#ff6644';
+    const tierLabel = tier === 'HSDM' ? 'HIDDEN SUPER'
+      : tier === 'SDM' ? 'SUPER' : 'SUPER';
+
+    // Tier label
+    drawSNKText(ctx, tierLabel, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 82, 10, tierColor);
+
+    // Attack name
+    ctx.shadowColor = tierColor;
+    ctx.shadowBlur = 10;
+    const nameMap: Record<string, string> = {
+      DM_TEN_HA_OU: '天地霸煌拳', SDM_TEN_HA_OU: '天地霸煌拳(MAX)',
+      HSDM_RYUKO_RANBU: '龍虎乱舞(HSDM)', DM_RYUKO_RANBU: '龍虎乱舞', SDM_RYUKO_RANBU: '龍虎乱舞(MAX)',
+      DM_OROCHINAGI: '大蛇薙', SDM_OROCHINAGI: '大蛇薙(MAX)', HSDM_OROCHINAGI: '大蛇薙(HSDM)',
+      DM_YATAGARASU: '八咫烏', SDM_YATAGARASU: '八咫烏(MAX)', HSDM_YAOTOME: '八百萬夜闇(HSDM)',
+    };
+    const attackName = nameMap[finishingAttackType] ?? finishingAttackType.replace(/_/g, ' ');
+    drawSNKText(ctx, attackName, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 98, 16, '#ffffff');
+    ctx.shadowBlur = 0;
+    ctx.globalAlpha = 1;
+  }
+
   // PERFECT with golden glow and sparkles — enhanced with gold flash
   if (perfectPlayer !== null) {
     const perfAlpha = Math.min(1, Math.max(0, (koTimer - 50) / 20));
@@ -1497,6 +1529,84 @@ export function drawKO(
     drawSNKText(ctx, 'WIN', winLabelX, barY + barH + 6, 8, '#ffcc00');
 
     ctx.globalAlpha = 1;
+  }
+
+  // ─── Super Finish overlay (DM/SDM/HSDM KO) ────────────────────
+  if (finishingAttackType && koTimer > 20) {
+    const sfAlpha = Math.min(1, (koTimer - 20) / 25);
+    const moveName = CN_MOVE_NAMES[finishingAttackType] ?? finishingAttackType.replace(/_/g, ' ');
+    const tier: 'dm' | 'sdm' | 'hsdm' = finishingAttackType.startsWith('HSDM_') ? 'hsdm' : finishingAttackType.startsWith('SDM_') ? 'sdm' : 'dm';
+    const charColor = CHAR_COLORS[finishingCharId] ?? '#ff4400';
+
+    ctx.save();
+    ctx.globalAlpha = sfAlpha;
+
+    // Move name — large text at upper area
+    const sfY = CANVAS_HEIGHT / 2 - 110;
+    const sfBaseSize = tier === 'hsdm' ? 30 : tier === 'sdm' ? 26 : 22;
+    const sfBurstScale = koTimer < 28 ? 1 + (1 - (koTimer - 20) / 8) * 0.5 : 1;
+    const sfFontSize = Math.round(sfBaseSize * sfBurstScale);
+
+    ctx.shadowColor = tier === 'hsdm' ? '#ffcc00' : tier === 'sdm' ? '#ffaa00' : charColor;
+    ctx.shadowBlur = tier === 'hsdm' ? 25 : 18;
+    // Outline
+    ctx.font = `bold ${sfFontSize}px "Courier New", monospace`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.strokeStyle = '#000000';
+    ctx.lineWidth = Math.max(3, sfFontSize * 0.1);
+    ctx.lineJoin = 'round';
+    ctx.strokeText(moveName, CANVAS_WIDTH / 2, sfY);
+    // Fill
+    ctx.fillStyle = tier === 'hsdm' ? '#ffdd66' : tier === 'sdm' ? '#ffcc44' : charColor;
+    ctx.fillText(moveName, CANVAS_WIDTH / 2, sfY);
+    ctx.shadowBlur = 0;
+
+    // Tier label
+    const tierLabel = tier === 'hsdm' ? 'HIDDEN SUPER FINISH' : tier === 'sdm' ? 'MAX SUPER FINISH' : 'SUPER FINISH';
+    const tierColor = tier === 'hsdm' ? '#ff6688' : tier === 'sdm' ? '#ffaa44' : '#ccddff';
+    const labelAlpha = Math.min(1, Math.max(0, (koTimer - 30) / 15));
+    ctx.globalAlpha = sfAlpha * labelAlpha;
+    ctx.font = `bold 12px "Courier New", monospace`;
+    ctx.strokeStyle = '#000000';
+    ctx.lineWidth = 2;
+    ctx.strokeText(tierLabel, CANVAS_WIDTH / 2, sfY + sfFontSize * 0.7 + 4);
+    ctx.fillStyle = tierColor;
+    ctx.fillText(tierLabel, CANVAS_WIDTH / 2, sfY + sfFontSize * 0.7 + 4);
+
+    // HSDM extra: dual energy lines
+    if (tier === 'hsdm' && koTimer < 55) {
+      const lineP = (koTimer - 20) / 35;
+      const lineW = Math.min(CANVAS_WIDTH * 0.8, lineP * CANVAS_WIDTH);
+      const lineY1 = sfY - sfFontSize / 2 - 8;
+      const lineY2 = sfY + sfFontSize / 2 + 20;
+      ctx.globalAlpha = sfAlpha * Math.max(0, 1 - lineP) * 0.6;
+      const hLineGrad = ctx.createLinearGradient(CANVAS_WIDTH / 2 - lineW / 2, 0, CANVAS_WIDTH / 2 + lineW / 2, 0);
+      hLineGrad.addColorStop(0, 'rgba(255,200,60,0)');
+      hLineGrad.addColorStop(0.3, 'rgba(255,200,60,0.8)');
+      hLineGrad.addColorStop(0.5, 'rgba(255,255,200,1)');
+      hLineGrad.addColorStop(0.7, 'rgba(255,200,60,0.8)');
+      hLineGrad.addColorStop(1, 'rgba(255,200,60,0)');
+      ctx.fillStyle = hLineGrad;
+      ctx.fillRect(CANVAS_WIDTH / 2 - lineW / 2, lineY1, lineW, 2);
+      ctx.fillRect(CANVAS_WIDTH / 2 - lineW / 2, lineY2, lineW, 2);
+    }
+
+    // SDM/HSDM: background glow pulse
+    if ((tier === 'sdm' || tier === 'hsdm') && koTimer < 50) {
+      const glowP = (koTimer - 20) / 30;
+      const glowR = 60 + glowP * 100;
+      const glowAlpha = Math.max(0, (1 - glowP) * 0.25);
+      ctx.globalAlpha = sfAlpha * glowAlpha;
+      const sfGlow = ctx.createRadialGradient(CANVAS_WIDTH / 2, sfY, 5, CANVAS_WIDTH / 2, sfY, glowR);
+      sfGlow.addColorStop(0, tier === 'hsdm' ? 'rgba(255,220,80,0.6)' : 'rgba(255,180,40,0.5)');
+      sfGlow.addColorStop(1, 'rgba(255,180,40,0)');
+      ctx.fillStyle = sfGlow;
+      ctx.fillRect(CANVAS_WIDTH / 2 - glowR, sfY - glowR, glowR * 2, glowR * 2);
+    }
+
+    ctx.globalAlpha = 1;
+    ctx.restore();
   }
 
   ctx.fillStyle = 'rgba(255,255,255,0.4)';

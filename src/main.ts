@@ -1191,8 +1191,11 @@ function update(): void {
       const killer = p1.health <= 0 ? p2 : p1;
       const loser = p1.health <= 0 ? p1 : p2;
       const killerAttack = killer.currentAttack as string;
-      const isDMKill = killerAttack?.startsWith('DM_') || killerAttack?.startsWith('SDM_');
-      if (isDMKill) cinematic.triggerDMKOSlowMo();
+      const isDMKill = killerAttack?.startsWith('DM_') || killerAttack?.startsWith('SDM_') || killerAttack?.startsWith('HSDM_');
+      if (isDMKill) {
+        cinematic.triggerDMKOSlowMo();
+        cinematic.setFinishingAttack(killerAttack ?? '', killer.charId);
+      }
       else cinematic.triggerKOSlowMo();
       // GameSpeed slow-mo on KO: 15 ticks at 0.2x
       gameSpeed.triggerSlowMo(SLOWMO_KO.slowMoDuration, SLOWMO_KO.slowMoSpeed);
@@ -1351,7 +1354,7 @@ function render(): void {
   renderer.render([p1, p2], camera.x, tickRef.value, gs.phase === GamePhase.KO, gs.winner, screenShake.offsetX, screenShake.offsetY,
     [p1DelayedHealth, p2DelayedHealth], maxModes, perfectPlayer, rounds.p1Wins, rounds.p2Wins, p1Char.nameCn, p2Char.nameCn, gs.isTimeOver, rounds.currentRound, gs.firstAttacker,
     cinematic.hitStopDefender, cinematic.hitStopBias, [p1Char.specialColor, p2Char.specialColor], gs.koTimer, cinematic.koDustParticles, camera.zoom, p1Char.moveList, gs.simplifiedMode,
-    cinematic.getKOPhase(), cinematic.getKOTimer());
+    cinematic.getKOPhase(), cinematic.getKOTimer(), cinematic.finishingAttackType, cinematic.finishingCharId);
   renderer.drawProjectiles(projectiles, camera);
   vfx.render(ctx, camera.x);
 

@@ -39,7 +39,7 @@ function buildMap(
 }
 
 /** Chinese move name registry — KOF2002 authentic naming */
-const CN_MOVE_NAMES: Record<string, string> = {
+export const CN_MOVE_NAMES: Record<string, string> = {
   // Ryo
   RYO_KOOU: '虎煌拳', RYO_KOOU_C: '虎煌拳', RYO_KO_HOU: '虎咆', RYO_KO_HOU_C: '虎咆',
   RYO_HIEN: '飛燕疾風脚', RYO_HAOU: '霸王翔吼拳', RYO_KOOUKEN_D: '虎煌拳',
@@ -72,7 +72,7 @@ const MOVE_NAMES: Record<string, Partial<Record<string, MoveNameEntry>>> = {
 
 // ─── Character color for move name display ──────────────────────
 
-const CHAR_COLORS: Record<string, string> = {
+export const CHAR_COLORS: Record<string, string> = {
   ryo: '#ff6644',
   kyo: '#ff4400',
   iori: '#aa44ff',

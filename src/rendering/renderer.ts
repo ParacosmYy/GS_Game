@@ -98,6 +98,8 @@ export class Renderer {
     simplifiedMode: boolean = false,
     koPhase?: KOPhase,
     koPhaseTimer: number = 0,
+    finishingAttackType: string = '',
+    finishingCharId: string = '',
   ): void {
     this.frameCount++;
     this.globalTick = tick;
@@ -201,7 +203,7 @@ export class Renderer {
     drawHUD(ctx, fighters, tick, delayedHealth, p1Wins, p2Wins, p1Name, p2Name, currentRound, firstAttacker, p1MoveList ?? [], simplifiedMode);
 
     if (ko) {
-      drawKO(ctx, winner, perfectPlayer, isTimeOver, fighters[0].health, fighters[1].health, fighters[0].maxHealth, koTimer, koDustParticles, cameraX, koPhase, koPhaseTimer);
+      drawKO(ctx, winner, perfectPlayer, isTimeOver, fighters[0].health, fighters[1].health, fighters[0].maxHealth, koTimer, koDustParticles, cameraX, koPhase, koPhaseTimer, finishingAttackType, finishingCharId);
       // KOF2002: KO瞬间白色闪光 — KO前3帧全屏白闪
       if (koTimer < 3 && !isTimeOver) {
         ctx.save();

@@ -79,6 +79,25 @@ export class CinematicState {
   koState: KOStateMachine = createKOStateMachine();
   /** Whether perfect KO meter bonus has been awarded */
   perfectMeterAwarded = false;
+  /** AttackType that caused the KO (DM/SDM/HSDM only — empty string = normal KO) */
+  finishingAttackType = '';
+  /** Character ID of the fighter who dealt the finishing blow */
+  finishingCharId = '';
+
+  /** Set finishing attack info when KO is detected via DM/SDM/HSDM */
+  setFinishingAttack(attackType: string, charId: string): void {
+    this.finishingAttackType = attackType;
+    this.finishingCharId = charId;
+  }
+
+  /** Get the finishing attack tier: 'dm' | 'sdm' | 'hsdm' | '' */
+  getFinishTier(): 'dm' | 'sdm' | 'hsdm' | '' {
+    const k = this.finishingAttackType;
+    if (k.startsWith('HSDM_')) return 'hsdm';
+    if (k.startsWith('SDM_')) return 'sdm';
+    if (k.startsWith('DM_')) return 'dm';
+    return '';
+  }
 
   /** Tick MAX mode timers (always ticks, even during hit-stop) */
   tickMaxModes(maxModes: [MaxModeState, MaxModeState]): void {
@@ -339,6 +358,8 @@ export class CinematicState {
     this.p2DamageTaken = 0;
     this.koState = createKOStateMachine();
     this.perfectMeterAwarded = false;
+    this.finishingAttackType = '';
+    this.finishingCharId = '';
   }
 
   /** Reset between rounds: slow-mo + hit-stop + superFlash + damage, keep victory fanfare */
@@ -360,5 +381,7 @@ export class CinematicState {
     this.p2DamageTaken = 0;
     this.koState = createKOStateMachine();
     this.perfectMeterAwarded = false;
+    this.finishingAttackType = '';
+    this.finishingCharId = '';
   }
 }
