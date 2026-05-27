@@ -40,6 +40,13 @@
 
 ### 1.3 打击反馈差距
 
+- 已闭合项：
+  - 6档反馈矩阵 light/heavy/special/dm/sdm/hsdm 全部参数化 (hitstop/shake/spark/pushback/impactRing/bodyShake)
+  - feedbackManifest.ts 数据驱动 manifest，attackTierMap 覆盖 Ryo/Kyo/Iori 全部招式
+  - 命中事件统一触发链 (hitCallback → feedbackManifest → cinematicState)
+  - 受击反馈与攻击重量绑定 (inferTier 自动分类 + 显式映射)
+  - 角色专属 DM/SDM/HSDM 火花色板 (Kyo 火/Iori 紫/Ryo 雷)
+  - 23+ 回归测试保护反馈矩阵完整性和层级递进
 - 当前差距：hitstop、spark、shake、pushback、SFX 还没有按轻重/特殊/爆气状态形成稳定矩阵。
 - 新功能添加点：
   - feedback manifest
@@ -60,8 +67,8 @@
   - 训练模式指令进度可视化 (QCF/QCB/DP/HCF/HCB 部分匹配进度条)
   - HSDM 分类补全 (招式表 + 训练模式面板均显示 HIDDEN SUPER DM)
   - 街机模式 Tab 招式表面板
+  - 训练模式 MAX/Burst 系统说明面板 (右侧面板显示激活条件、消耗、升级规则)
 - 新功能添加点：
-  - burst / MAX 说明栏
   - 训练模式招式卡片(视觉图标输入)
 - 期望结果：
   - 用户一眼知道怎么出招，怎么爆气，怎么理解角色。
@@ -94,7 +101,8 @@
 
 - 当前差距：部分输入、镜头、特效、命中边界虽然已改善，但仍需要更强回归保护。
 - 已闭合项：
-  - 4105 tests 全部通过 (vitest)
+  - 4117 tests 全部通过 (vitest)
+  - 6档反馈矩阵回归测试 (23 tests, 层级递进+参数完整性+3角色映射)
   - 3角色 manifest 校验工具 全绿 (82+89+89 checks)
   - HSDM招式表分类+CN_MOVE_NAMES覆盖回归测试 (11 tests)
 - 新功能添加点：
