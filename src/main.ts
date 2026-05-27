@@ -56,6 +56,7 @@ import { drawPauseMenu } from './rendering/pauseMenu.js';
 import { drawCharacterKOOverlay } from './rendering/overlayScreens.js';
 import { triggerMoveName, tickMoveNameDisplay, drawMoveNameDisplay, resetMoveNameDisplay } from './rendering/moveNameDisplay.js';
 import { startCharIntro, tickCharIntro, drawCharIntro, resetCharIntro, isIntroActive } from './rendering/charIntro.js';
+import { drawHitboxOverlay } from './rendering/hitboxDebug.js';
 import type { CharacterDefinition } from './characters/types.js';
 import { initCharacterHitEffects } from './content/registerHitEffects.js';
 
@@ -1523,6 +1524,10 @@ function render(): void {
   }
   if (gs.isTrainingMode && (gs.phase === GamePhase.FIGHTING || gs.phase === GamePhase.KO)) {
     renderer.drawTrainingHUD(training, combatSystem.getComboCount(0), combatSystem.getComboDamage(0), tickRef.value, p1Char.moveList);
+    // Hitbox/hurtbox debug visualization (F5 toggle)
+    if (training.showHitboxes) {
+      drawHitboxOverlay(ctx, [p1, p2], projectiles, camera);
+    }
   }
 
   // ===== HUD Info Display (Phase 69) =====
