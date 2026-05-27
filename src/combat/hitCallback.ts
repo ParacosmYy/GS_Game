@@ -747,6 +747,16 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       deps.screenShake.trigger(7, 7, attacker.facing * 4);
       deps.vfx.spawnImpactRing(hitX, hitY, 0.9);
     }
+    // Haki (蹴り払い) — axe kick slam
+    if (atkName === 'KIM_HAKI') {
+      deps.vfx.spawnHeavyDust(hitX, hitY, 4);
+      deps.screenShake.trigger(5, 5, attacker.facing * 3);
+    }
+    // Sanren (三連撃) — triple kick combo
+    if (atkName === 'KIM_SANREN') {
+      deps.cinematic.addHitStop(1, defIdx);
+      deps.screenShake.trigger(5, 5, attacker.facing * 3);
+    }
 
     // DM Power Geyser (Terry) — massive ground energy eruption
     if (atkName === 'DM_POWER_GEYSER' || atkName === 'SDM_POWER_GEYSER') {
