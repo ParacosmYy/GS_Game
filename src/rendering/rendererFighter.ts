@@ -193,10 +193,21 @@ export function drawFighters(
       ctx.translate(jitterX, jitterY);
     }
 
-    // Hitstun body shake
+    // Hitstun body shake — KOF2002 tiered body wobble
+    // Light hit: subtle jitter (1-2px), Heavy: strong wobble (3-4px), Special/DM: violent shake (5+px)
+    // hitstunTimer carries tier info: light=11, heavy=19, special=22+, DM=0(knockdown)
     if (f.state === FighterState.HITSTUN && f.hitstunTimer > 0) {
-      const shakeAmt = Math.min(3, f.hitstunTimer * 0.2);
-      ctx.translate((Math.random() - 0.5) * shakeAmt, (Math.random() - 0.5) * shakeAmt * 0.5);
+      // Determine shake intensity from hitstun duration (proxy for feedback tier)
+      const baseShake = f.hitstunTimer > 20 ? 4.5 : f.hitstunTimer > 14 ? 3.0 : 1.5;
+      const decay = f.hitstunTimer > 20 ? 0.15 : f.hitstunTimer > 14 ? 0.2 : 0.3;
+      // Progress: 0 at hit -> 1 at hitstun end
+      const maxHitstun = f.hitstunTimer + (f.stateAge || 0);
+      const progress = maxHitstun > 0 ? 1 - (f.hitstunTimer / maxHitstun) : 1;
+      const shakeAmt = baseShake * Math.max(0, 1 - progress * (1 + decay));
+      // Directional wobble: pushed backward (in facing direction of attacker)
+      const wobbleX = Math.sin(f.stateAge * 0.8) * shakeAmt;
+      const jitterY = (Math.random() - 0.5) * shakeAmt * 0.4;
+      ctx.translate(wobbleX, jitterY);
     }
 
     // Getup Y offset — interpolate from lying (ground) to standing position
