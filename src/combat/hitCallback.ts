@@ -14,7 +14,7 @@ import { getFeedback } from '../core/feedbackManifest.js';
 import { ROSTER } from '../characters/index.js';
 import { isDM as isDMCheck } from '../core/attackClassifier.js';
 import { gainMeterOnHit, gainMeterOnBlock, gainMeterOnHitstun } from './meter.js';
-import { playHit, playBlock, playSpecial, playDM, playThrow, playCounter, playHeavyHit, playSuperFlash, playWire, playJuggleHit, playBlockSpecial, playBlockDM, playSpecialLight, playSpecialHeavy, playKOHit, playHitAccent, playLandingHeavy, playDizzyHit, playGroundBounce, playWallBounce, playGuardCrush, playKoouken, playKoHou, playHien, playHaou } from '../audio/sampler.js';
+import { playHit, playBlock, playSpecial, playDM, playThrow, playCounter, playHeavyHit, playSuperFlash, playWire, playJuggleHit, playBlockSpecial, playBlockDM, playSpecialLight, playSpecialHeavy, playKOHit, playHitAccent, playLandingHeavy, playDizzyHit, playGroundBounce, playWallBounce, playGuardCrush, playKoouken, playKoHou, playHien, playHaou, playHioHacker, playZanretsuKen } from '../audio/sampler.js';
 import { spawnTierSparks } from '../rendering/vfxPresets.js';
 import { bgm } from '../audio/bgm.js';
 import { announcer } from '../audio/announcer.js';
@@ -491,6 +491,12 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
     }
     else if (atkName === 'RYO_HAOU') {
       playHaou(); if (combo > 0) playHit(0.5, combo);
+    }
+    else if (atkName === 'RYO_HIO_HACKER') {
+      playHioHacker(); if (combo > 0) playHit(0.5, combo);
+    }
+    else if (atkName === 'RYO_ZANRETSU_KEN') {
+      playZanretsuKen(); if (combo > 0) playHit(0.4, combo);
     }
     else if (isThrowAttack(attackType)) {
       playThrow();

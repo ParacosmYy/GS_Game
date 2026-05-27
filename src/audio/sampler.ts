@@ -2041,3 +2041,9 @@ export function playSlice(): void { initSampler(); play('ryo_tsurizao', 0.65); }
 
 /** 播放落蹴音效 — ↘+B 低扫踢：低沉thud声 */
 export function playThudKick(): void { initSampler(); play('ryo_orishi', 0.6); }
+
+/** 播放氷果斬音效 — →+A 突进技：重击冲刺声 */
+export function playHioHacker(): void { initSampler(); play('ryo_hio_hacker', 0.65); }
+
+/** 播放斩裂拳音效 — qcb+P 连打技：快速连击声 */
+export function playZanretsuKen(): void { initSampler(); play('ryo_zanretsu_ken', 0.6); }
