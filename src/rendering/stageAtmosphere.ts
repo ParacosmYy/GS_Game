@@ -282,6 +282,25 @@ export function drawStageParticles(
     return;
   }
 
+  // Factory stage: rising smoke wisps
+  if (stageId === 'factory') {
+    for (let pi = 0; pi < 8; pi++) {
+      const px = CANVAS_WIDTH * 0.3 + pi * 60 + Math.sin(tick * 0.01 + pi * 1.5) * 15;
+      const py = STAGE_GROUND_Y - ((tick * 0.3 + pi * 80) % (STAGE_GROUND_Y * 0.6));
+      const drift = Math.sin(tick * 0.015 + pi * 2) * 20;
+      const lifeT = ((tick * 0.3 + pi * 80) % (STAGE_GROUND_Y * 0.6)) / (STAGE_GROUND_Y * 0.6);
+      const alpha = (1 - lifeT) * 0.06;
+      const size = 8 + lifeT * 12;
+      ctx.globalAlpha = alpha;
+      ctx.fillStyle = '#889098';
+      ctx.beginPath();
+      ctx.arc(px + drift, py, size, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.restore();
+    return;
+  }
+
   // Street stage: light rain streaks
   if (stageId === 'street') {
     for (let pi = 0; pi < 20; pi++) {
