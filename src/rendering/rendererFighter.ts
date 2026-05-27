@@ -193,7 +193,15 @@ export function drawFighters(
       ctx.translate(jitterX, jitterY);
     }
 
-    // Hitstun body shake — KOF2002 tiered body wobble
+
+
+    // Hitstop defender tint - brief red overlay during freeze to show impact
+    if (f.hitFlashFrames > 0 && f.state === FighterState.HITSTUN) {
+      ctx.globalAlpha = 0.3;
+      ctx.fillStyle = '#ff4444';
+      ctx.fillRect(-25, -f.displayHeight - 10, 50, f.displayHeight + 20);
+      ctx.globalAlpha = 1.0;
+    }    // Hitstun body shake — KOF2002 tiered body wobble
     // Light hit: subtle jitter (1-2px), Heavy: strong wobble (3-4px), Special/DM: violent shake (5+px)
     // hitstunTimer carries tier info: light=11, heavy=19, special=22+, DM=0(knockdown)
     if (f.state === FighterState.HITSTUN && f.hitstunTimer > 0) {
