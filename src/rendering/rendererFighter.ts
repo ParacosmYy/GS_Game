@@ -218,7 +218,13 @@ export function drawFighters(
       const wobbleX = Math.sin(f.stateAge * 1.2) * blockShake;
       ctx.translate(wobbleX, 0);
     }
-    // Getup Y offset — interpolate from lying (ground) to standing position
+
+    // Dizzy state wobble — KOF2002 unsteady sway when stunned
+    if (f.state === FighterState.DIZZY) {
+      const swayX = Math.sin(f.stateAge * 0.15) * 3;
+      const swayY = Math.sin(f.stateAge * 0.22) * 1.5;
+      ctx.translate(swayX, swayY);
+    }    // Getup Y offset — interpolate from lying (ground) to standing position
     if (f.state === FighterState.GETUP && f.getupTimer > 0) {
       const getupProgress = 1 - (f.getupTimer / (f.getupDuration || 15));
       // Fighter rises from 20px below ground level to standing
