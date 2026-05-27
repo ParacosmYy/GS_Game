@@ -223,6 +223,17 @@ export class Renderer {
       }
     }
 
+    // KOF2002: 决胜局紧张气氛 — 任一方match point时边缘红光脉冲
+    if (p1Wins >= 1 || p2Wins >= 1) {
+      const tensionPulse = Math.sin(tick * 0.05) * 0.03 + 0.04;
+      ctx.save();
+      ctx.globalAlpha = Math.max(0, tensionPulse);
+      ctx.strokeStyle = '#ff3300';
+      ctx.lineWidth = 6;
+      ctx.strokeRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+      ctx.restore();
+    }
+
     // KOF2002: 暗角效果 — 聚焦中心, 边缘渐暗 (场景色温)
     const stageId = getStage();
     const vigTint = stageId === 'temple' ? '30, 15, 5'

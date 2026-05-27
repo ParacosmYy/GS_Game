@@ -53,6 +53,17 @@ export function drawFighters(
     ctx.ellipse(sx, STAGE_GROUND_Y + 2, shadowW, shadowH, 0, 0, Math.PI * 2);
     ctx.fill();
 
+    // KOF2002: KO击败扩大阴影 — KO时阴影变大变深
+    if (f.health <= 0) {
+      ctx.save();
+      ctx.globalAlpha = 0.3;
+      ctx.fillStyle = '#000000';
+      ctx.beginPath();
+      ctx.ellipse(sx, STAGE_GROUND_Y + 2, shadowW * 1.5, shadowH * 2, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+
     const { bodyColor, outlineColor, glowColor } = resolveFighterColors(f, globalTick);
 
     // ── Animation blending: check state transition and interpolate offset ──
