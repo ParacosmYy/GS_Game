@@ -26,6 +26,7 @@ import { KYO_STAND_A_FRAMES, KYO_STAND_C_FRAMES } from './kyoAttackFrames.js';
 import { KYO_CROUCH_FRAMES } from './kyoCrouchFrames.js';
 import { KYO_JUMP_FRAMES } from './kyoJumpFrames.js';
 import { KYO_HURT_FRAMES, KYO_KNOCKDOWN_FRAMES } from './kyoDamageFrames.js';
+import { KYO_STAND_B_FRAMES, KYO_STAND_D_FRAMES } from './kyoKickFrames.js';
 
 // ===== Internal Frame Registry =====
 
@@ -150,6 +151,10 @@ function initAllFrames(): void {
   registerVariableFrames('HURT', KYO_HURT_FRAMES, [3, 5, 6, 4]);
   // KNOCKDOWN: fly up slow, slam fast, ground settle
   registerVariableFrames('KNOCKDOWN', KYO_KNOCKDOWN_FRAMES, [4, 5, 6, 8, 10, 12]);
+
+  // KICK ATTACKS
+  registerVariableFrames('STAND_B', KYO_STAND_B_FRAMES, [7, 3, 2, 12]);
+  registerVariableFrames('STAND_D', KYO_STAND_D_FRAMES, [10, 4, 4, 8, 12]);
 }
 
 // ===== State Resolution =====
