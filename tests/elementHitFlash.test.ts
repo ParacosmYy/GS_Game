@@ -89,3 +89,30 @@ describe('Element-coded hit flash', () => {
     expect(glow.slice(7)).toBe('30');
   });
 });
+
+// ===== Direct getMaxAuraColor import tests =====
+describe('getMaxAuraColor direct import', () => {
+  it('returns Ryo blue element for ryo', async () => {
+    const { getMaxAuraColor: fn } = await import('../src/rendering/rendererFighter.js');
+    const c = fn('ryo');
+    expect(c.css).toBe('#4488ff');
+  });
+
+  it('returns Kyo fire orange for kyo', async () => {
+    const { getMaxAuraColor: fn } = await import('../src/rendering/rendererFighter.js');
+    const c = fn('kyo');
+    expect(c.css).toBe('#ff8c1e');
+  });
+
+  it('returns Iori purple for iori', async () => {
+    const { getMaxAuraColor: fn } = await import('../src/rendering/rendererFighter.js');
+    const c = fn('iori');
+    expect(c.css).toBe('#aa00ff');
+  });
+
+  it('returns green fallback for unknown character', async () => {
+    const { getMaxAuraColor: fn } = await import('../src/rendering/rendererFighter.js');
+    const c = fn('unknown');
+    expect(c.css).toBe('#44ff88');
+  });
+});
