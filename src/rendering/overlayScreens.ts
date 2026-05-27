@@ -1895,6 +1895,7 @@ export function drawTrainingHUD(
   tick: number,
   moveList: MoveListEntry[] = [],
   lastAttackType: string | null = null,
+  motionProgress: { motion: string; steps: number; total: number } | null = null,
 ): void {
   ctx.save();
 
@@ -1956,6 +1957,70 @@ export function drawTrainingHUD(
 
   // ===== Right panel: Controls help =====
   drawControlsPanel(ctx);
+
+  // ===== Motion progress indicator (bottom-right) =====
+  if (motionProgress) {
+    drawMotionProgress(ctx, motionProgress, tick);
+  }
+
+  ctx.restore();
+}
+
+/** Motion progress indicator — shows partial command input status */
+function drawMotionProgress(
+  ctx: CanvasRenderingContext2D,
+  progress: { motion: string; steps: number; total: number },
+  tick: number,
+): void {
+  const panelW = 120;
+  const panelH = 28;
+  const panelX = CANVAS_WIDTH - panelW - 4;
+  const panelY = CANVAS_HEIGHT - panelH - 30;
+
+  ctx.save();
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+  roundRect(ctx, panelX, panelY, panelW, panelH, 4);
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(68, 255, 68, 0.15)';
+  ctx.lineWidth = 1;
+  roundRect(ctx, panelX, panelY, panelW, panelH, 4);
+  ctx.stroke();
+
+  // Motion name
+  ctx.font = 'bold 9px "Courier New", monospace';
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'top';
+  ctx.fillStyle = '#88ccff';
+  ctx.fillText(progress.motion, panelX + 6, panelY + 3);
+
+  // Progress bar
+  const barX = panelX + 40;
+  const barY = panelY + 5;
+  const barW = 70;
+  const barH = 6;
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+  ctx.fillRect(barX, barY, barW, barH);
+
+  const fillRatio = progress.steps / progress.total;
+  const isComplete = fillRatio >= 1;
+  const fillColor = isComplete ? '#44ff44' : fillRatio > 0.5 ? '#ffcc44' : '#ff8844';
+  ctx.fillStyle = fillColor;
+  ctx.fillRect(barX, barY, barW * fillRatio, barH);
+
+  // Step dots
+  ctx.font = '9px "Courier New", monospace';
+  ctx.fillStyle = isComplete ? '#44ff44' : '#888';
+  ctx.textAlign = 'left';
+  ctx.fillText(`${progress.steps}/${progress.total}`, barX, barY + 10);
+
+  // Pulse effect when complete
+  if (isComplete) {
+    const pulse = Math.sin(tick * 0.3) * 0.3 + 0.7;
+    ctx.strokeStyle = `rgba(68, 255, 68, ${pulse * 0.5})`;
+    ctx.lineWidth = 2;
+    roundRect(ctx, panelX, panelY, panelW, panelH, 4);
+    ctx.stroke();
+  }
 
   ctx.restore();
 }

@@ -1563,7 +1563,7 @@ function render(): void {
     renderer.drawDebug([p1, p2], projectiles, camera, tickRef.value, renderer.getFps(), vfx.count, [toHist(p1Cmd), toHist(p2Cmd)]);
   }
   if (gs.isTrainingMode && (gs.phase === GamePhase.FIGHTING || gs.phase === GamePhase.KO)) {
-    renderer.drawTrainingHUD(training, combatSystem.getComboCount(0), combatSystem.getComboDamage(0), tickRef.value, p1Char.moveList, p1.currentAttack as string ?? null);
+    renderer.drawTrainingHUD(training, combatSystem.getComboCount(0), combatSystem.getComboDamage(0), tickRef.value, p1Char.moveList, p1.currentAttack as string ?? null, p1Cmd.getMotionProgress(tickRef.value));
     // Hitbox/hurtbox debug visualization (F5 toggle)
     if (training.showHitboxes) {
       drawHitboxOverlay(ctx, [p1, p2], projectiles, camera);

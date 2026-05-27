@@ -513,6 +513,42 @@ export class CommandBuffer {
   }
 
   /**
+   * Detect partial motion progress for training mode visualization.
+   * Returns the best matching partial motion and how many steps are complete.
+   */
+  getMotionProgress(currentFrame: number): { motion: string; steps: number; total: number } | null {
+    const window = this.getEffectiveCommandWindow(currentFrame);
+    const recent = this.history.filter(r => currentFrame - r.frame <= window);
+    if (recent.length === 0) return null;
+
+    // Check known motions in priority order
+    const motions: Array<{ name: string; sequence: DirectionInput[] }> = [
+      { name: 'QCF', sequence: ['down', 'downforward', 'forward'] },
+      { name: 'QCB', sequence: ['down', 'downback', 'back'] },
+      { name: 'DP', sequence: ['forward', 'down', 'downforward'] },
+      { name: 'HCF', sequence: ['back', 'downback', 'down', 'downforward', 'forward'] },
+      { name: 'HCB', sequence: ['forward', 'downforward', 'down', 'downback', 'back'] },
+    ];
+
+    let best: { motion: string; steps: number; total: number } | null = null;
+    for (const m of motions) {
+      let matched = 0;
+      for (let i = 0; i < m.sequence.length; i++) {
+        let found = false;
+        for (const r of recent) {
+          if (r.direction === m.sequence[i]) { found = true; break; }
+        }
+        if (found) matched++;
+        else break;
+      }
+      if (matched > 0 && (!best || matched / m.sequence.length > best.steps / best.total)) {
+        best = { motion: m.name, steps: matched, total: m.sequence.length };
+      }
+    }
+    return best;
+  }
+
+  /**
    * Match an exact direction sequence within the recent history.
    * The sequence must appear in order, but other directions can appear between them.
    */

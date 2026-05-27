@@ -643,8 +643,8 @@ export class Renderer {
     ctx.textAlign = 'left';
   }
 
-  drawTrainingHUD(training: TrainingModeState, comboCount: number, comboDamage: number, tick: number, moveList: CharacterDefinition['moveList'] = [], lastAttackType: string | null = null): void {
-    drawTrainingHUD(this.ctx, training, comboCount, comboDamage, tick, moveList ?? [], lastAttackType);
+  drawTrainingHUD(training: TrainingModeState, comboCount: number, comboDamage: number, tick: number, moveList: CharacterDefinition['moveList'] = [], lastAttackType: string | null = null, motionProgress: { motion: string; steps: number; total: number } | null = null): void {
+    drawTrainingHUD(this.ctx, training, comboCount, comboDamage, tick, moveList ?? [], lastAttackType, motionProgress);
   }
 
   // ===== HUD Info Display (Phase 69) =====
