@@ -7,6 +7,7 @@
 import { Fighter } from '../entities/fighter.js';
 import { Camera } from '../core/camera.js';
 import type { PowerGauge, MaxModeState, MoveListEntry } from '../core/types.js';
+import { meterFlashTimers, meterStockFlashes } from './meterFlash.js';
 import {
   CANVAS_WIDTH, CANVAS_HEIGHT, MAX_HEALTH, MAX_STOCKS, ROUND_TIME,
   HUD_BAR_WIDTH, HUD_BAR_HEIGHT, HUD_BAR_Y, HUD_MARGIN,
@@ -1139,6 +1140,36 @@ export function drawPowerGauges(ctx: CanvasRenderingContext2D, gauges: [PowerGau
       ctx.stroke();
       ctx.textAlign = 'left';
       ctx.textBaseline = 'alphabetic';
+    }
+
+    // ---- Meter gain flash — brief white/gold flash on hit/block meter gain ----
+    const flashTimer = meterFlashTimers[p];
+    if (flashTimer > 0) {
+      const flashAlpha = (flashTimer / 12) * 0.45;
+      ctx.save();
+      ctx.globalAlpha = flashAlpha;
+      const flashGrad = ctx.createLinearGradient(baseX, gaugeY, baseX + gaugeW, gaugeY + gaugeH);
+      flashGrad.addColorStop(0, '#ffffff');
+      flashGrad.addColorStop(0.3, '#ffeedd');
+      flashGrad.addColorStop(0.7, '#ffcc66');
+      flashGrad.addColorStop(1, '#ffffff');
+      ctx.fillStyle = flashGrad;
+      ctx.fillRect(baseX, gaugeY, gaugeW, gaugeH);
+      ctx.restore();
+    }
+
+    // ---- Stock gain flash — gold burst when a stock is earned ----
+    const stockFlash = meterStockFlashes[p];
+    if (stockFlash > 0) {
+      const stockAlpha = (stockFlash / 20) * 0.6;
+      ctx.save();
+      ctx.shadowColor = '#ffcc00';
+      ctx.shadowBlur = 12 * (stockFlash / 20);
+      ctx.strokeStyle = `rgba(255, 200, 0, ${stockAlpha})`;
+      ctx.lineWidth = 3;
+      roundRect(ctx, baseX - 6, gaugeY - 6, gaugeW + 12, gaugeH + 12, 8);
+      ctx.stroke();
+      ctx.restore();
     }
   }
 }

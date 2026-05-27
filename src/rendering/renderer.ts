@@ -21,6 +21,7 @@ import { drawStage, generateStars, getStage } from './stage.js';
 import type { Star } from './stage.js';
 import { drawFighters as drawFightersImpl } from './rendererFighter.js';
 import { drawHUD, drawPowerGauges, drawComboCounters, drawTeamOrder, type TeamDisplayInfo } from './hud.js';
+import { subscribeMeterFlash, tickMeterFlash } from './meterFlash.js';
 import { drawCharacterSelect, drawIntro, drawKO, drawWinQuote, drawVSSplash, drawStageSelect, drawTeamOrderSelect, drawTransition, WIN_QUOTE_DURATION } from './screens.js';
 import type { KODustParticle, KOPhase } from '../state/cinematicState.js';
 import { drawSuperFlash, drawMatchEnd, drawModeIndicator, drawStageIndicator, drawTitle, drawContinue, drawModeSelect, drawTrainingHUD, drawGameOver, drawOptionsScreen, getSuperFlashZoom, updateSuperFlashZoom } from './overlayScreens.js';
@@ -61,6 +62,7 @@ export class Renderer {
   constructor(ctx: CanvasRenderingContext2D) {
     this.ctx = ctx;
     this.stars = generateStars(60);
+    subscribeMeterFlash();
   }
 
   setSpriteRenderer(sr: SpriteRenderer): void {
@@ -98,6 +100,7 @@ export class Renderer {
   ): void {
     this.frameCount++;
     this.globalTick = tick;
+    tickMeterFlash();
     const now = performance.now();
     if (now - this.fpsTime >= 1000) {
       this.currentFps = this.frameCount;
