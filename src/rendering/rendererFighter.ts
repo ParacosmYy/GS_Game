@@ -266,7 +266,7 @@ export function drawFighters(
     if (f.state === FighterState.IDLE && f.landingRecovery > 0 && f.landingRecovery > 5) {
       ctx.save();
       ctx.globalAlpha = 0.15;
-      ctx.fillStyle = '#bbbbbb';
+      ctx.fillStyle = maxModeActive ? '#44ff88' : '#bbbbbb';
       ctx.beginPath();
       ctx.ellipse(sx, sy, 10, 3, 0, 0, Math.PI * 2);
       ctx.fill();
@@ -389,6 +389,16 @@ export function drawFighters(
       ctx.translate(0, -sy);
       ctx.scale(1 + crouchBreathe, 1 - crouchBreathe);
       ctx.translate(0, sy);
+    }
+    // KOF2002: 蹲下瞬间烟尘 — CROUCH首帧脚底微尘
+    if (f.state === FighterState.CROUCH && f.stateAge === 0) {
+      ctx.save();
+      ctx.globalAlpha = 0.15;
+      ctx.fillStyle = '#999999';
+      ctx.beginPath();
+      ctx.ellipse(sx, sy, 8, 3, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
     }
 
     // KOF2002: Hit-stop defender jitter — 确定性正弦抖动产生稳定震动感
