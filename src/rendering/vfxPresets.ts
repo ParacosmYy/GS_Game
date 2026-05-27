@@ -1506,18 +1506,26 @@ export function spawnHienLandingDust(particles: Particle[], x: number, y: number
  * 30+ particles in expanding circle pattern. Screen flash for 10 frames.
  * Duration: 40 frames.
  */
-export function spawnDMTenHaOuVFX(particles: Particle[], x: number, y: number, _charId: string): void {
+export function spawnDMTenHaOuVFX(particles: Particle[], x: number, y: number, charId: string): void {
+  // Character-specific DM burst colors
+  const dmColors: Record<string, { burst: string; stars: string[] }> = {
+    kyo: { burst: '#ff6600', stars: ['#ffffff', '#ffee66', '#ff4400'] },
+    iori: { burst: '#8822cc', stars: ['#ffffff', '#cc66ff', '#6600aa'] },
+    ryo: { burst: '#4488ff', stars: ['#ffffff', '#88ccff', '#2266dd'] },
+  };
+  const colors = dmColors[charId] ?? { burst: '#ffcc00', stars: ['#ffffff', '#ffee66', '#ffaa00'] };
+
   // Massive white core explosion
   particles.push({
     x, y: y - 20, vx: 0, vy: 0,
     life: 20, maxLife: 20, size: 90,
     color: '#ffffff', type: 'superburst',
   });
-  // Golden yellow main burst
+  // Character-colored main burst
   particles.push({
     x, y: y - 20, vx: 0, vy: 0,
     life: 30, maxLife: 30, size: 110,
-    color: '#ffcc00', type: 'superburst',
+    color: colors.burst, type: 'superburst',
   });
   // 30+ particles in expanding circle pattern
   for (let i = 0; i < 32; i++) {
@@ -1530,7 +1538,7 @@ export function spawnDMTenHaOuVFX(particles: Particle[], x: number, y: number, _
       life: 18 + Math.floor(Math.random() * 14),
       maxLife: 35,
       size: 3 + Math.random() * 5,
-      color: i % 4 === 0 ? '#ffffff' : i % 3 === 0 ? '#ffee66' : '#ffaa00',
+      color: colors.stars[i % colors.stars.length],
       type: 'star',
       gravity: 0.1,
       friction: 0.94,
@@ -1543,7 +1551,7 @@ export function spawnDMTenHaOuVFX(particles: Particle[], x: number, y: number, _
     particles.push({
       x, y: y - 20, vx: 0, vy: 0,
       life: 15 + r * 5, maxLife: 15 + r * 5, size: 6 + r * 3,
-      color: r === 0 ? '#ffffff' : r === 1 ? '#ffee66' : '#ffaa00',
+      color: r === 0 ? '#ffffff' : r === 1 ? colors.stars[1] : colors.burst,
       type: 'ring',
     });
   }
