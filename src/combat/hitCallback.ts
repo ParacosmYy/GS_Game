@@ -25,7 +25,7 @@ import type { CinematicState } from '../state/cinematicState.js';
 // ===== KOF2002: 命中招式名映射 =====
 // AttackType → 中文招式名, 按角色分组
 // 只包含必杀技/DM级别, 通常技不显示招式名
-const MOVE_NAME_MAP: Partial<Record<AttackType, string>> = {
+export const MOVE_NAME_MAP: Partial<Record<AttackType, string>> = {
   // Ryo (坂崎亮)
   [AttackType.RYO_KOOU]: '虎煌拳',
   [AttackType.RYO_KOOU_C]: '虎煌拳',

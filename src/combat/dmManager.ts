@@ -10,9 +10,12 @@ import { spendStocks, activateMaxMode, isDesperation, drainMaxModeTimer } from '
 import type { CinematicState } from '../state/cinematicState.js';
 import type { VFXSystem, ScreenShake } from '../rendering/vfx.js';
 import type { ResolvedInput } from '../input/inputResolver.js';
+import { MOVE_NAME_MAP } from './hitCallback.js';
 
-/** Format attack ID to display-friendly move name */
+/** Format attack ID to display-friendly move name (Chinese from MOVE_NAME_MAP) */
 function formatMoveName(atk: string): string {
+  const cn = MOVE_NAME_MAP[atk as AttackType];
+  if (cn) return cn;
   return atk
     .replace(/^(DM_|SDM_|HSDM_)/, '')
     .replace(/_/g, ' ')
