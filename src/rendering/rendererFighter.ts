@@ -178,6 +178,22 @@ export function drawFighters(
       // KOF2002: 反击架势后仰
       leanOffsetX = -3 * f.facing + blendOffsetX;
       leanAngle = -0.05 * f.facing;
+    } else if (f.state === FighterState.JUMP || f.state === FighterState.RUN_JUMP) {
+      // KOF2002: 跳跃微前倾
+      leanOffsetX = 2 * f.facing + blendOffsetX;
+      leanAngle = 0.03 * f.facing;
+    } else if (f.state === FighterState.HOP) {
+      // KOF2002: 小跳微缩 — 紧凑姿态
+      leanOffsetY = 3;
+    } else if (f.state === FighterState.HYPER_JUMP) {
+      // KOF2002: 超跳大幅前倾
+      leanOffsetX = 4 * f.facing + blendOffsetX;
+      leanAngle = 0.06 * f.facing;
+    } else if (f.state === FighterState.TAUNT) {
+      // KOF2002: 挑衅后仰
+      leanOffsetX = -4 * f.facing + blendOffsetX;
+      leanAngle = -0.08 * f.facing;
+      leanOffsetY = Math.sin(f.stateAge * 0.3) * 2;
     }
 
     // Afterimage trail
