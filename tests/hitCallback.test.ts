@@ -651,3 +651,41 @@ describe('New Ryo Specials VFX (KOOUKEN_D / HIO_HACKER / ZANRETSU_KEN)', () => {
     expect(deps.cinematic.triggerHitStop).toHaveBeenCalled();
   });
 });
+
+// ===== 13. Super Move VFX Differentiation =====
+
+describe('Super Move VFX (SDM_TEN_HA_OU / RYUKO_RANBU tiers)', () => {
+  it('SDM_TEN_HA_OU triggers screenFlash + impactRing + shake', () => {
+    const deps = createDeps();
+    (deps.combatSystem.getComboCount as ReturnType<typeof vi.fn>).mockReturnValue(0);
+    const onHit = createHitCallback(deps);
+    onHit(deps.fighters[0], deps.fighters[1], AttackType.SDM_TEN_HA_OU, false, false);
+
+    expect(deps.screenFlash.trigger).toHaveBeenCalled();
+    expect(deps.screenShake.trigger).toHaveBeenCalled();
+    const shakeArgs = (deps.screenShake.trigger as ReturnType<typeof vi.fn>).mock.calls[0];
+    // SDM shake should be >= 16 (stronger than DM)
+    expect(shakeArgs[0]).toBeGreaterThanOrEqual(16);
+  });
+
+  it('DM_RYUKO_RANBU triggers impactRing + screenFlash + shake', () => {
+    const deps = createDeps();
+    (deps.combatSystem.getComboCount as ReturnType<typeof vi.fn>).mockReturnValue(0);
+    const onHit = createHitCallback(deps);
+    onHit(deps.fighters[0], deps.fighters[1], AttackType.DM_RYUKO_RANBU, false, false);
+
+    expect(deps.vfx.spawnImpactRing).toHaveBeenCalled();
+    expect(deps.screenFlash.trigger).toHaveBeenCalled();
+    expect(deps.screenShake.trigger).toHaveBeenCalled();
+  });
+
+  it('HSDM_RYUKO_RANBU triggers strongest shake (>= 18)', () => {
+    const deps = createDeps();
+    (deps.combatSystem.getComboCount as ReturnType<typeof vi.fn>).mockReturnValue(0);
+    const onHit = createHitCallback(deps);
+    onHit(deps.fighters[0], deps.fighters[1], AttackType.HSDM_RYUKO_RANBU, false, false);
+
+    const shakeArgs = (deps.screenShake.trigger as ReturnType<typeof vi.fn>).mock.calls[0];
+    expect(shakeArgs[0]).toBeGreaterThanOrEqual(18);
+  });
+});
