@@ -36,6 +36,7 @@ src/
 - `combat/` 和 frame data 已有基础，但 hit feedback 还未形成统一矩阵。
 - 文件体积偏大，后续只在服务 Ryo 样板时拆分。
 - `src/` 仍按技术层粗分，没有形成大型项目中常见的 `app/engine/simulation/content/tools` 边界。
+- `src/content/characters/ryo/` 已开始建立内容包骨架，但还需要继续把 commands / moves / attacks / animations / hitboxes / feedback / portraits / reports 落到真实数据里。
 
 ## 4. 下一阶段架构方向
 
@@ -46,6 +47,7 @@ src/
 - 把 Ryo 动作接入 animation manifest。
 - 把 Ryo 判定接入 hitbox manifest。
 - 把 Ryo 命中事件接入 feedback manifest。
+- 把 Ryo 内容包从单一入口拆成子目录，确保 commands / moves / attacks / animations / hitboxes / feedback / portraits / reports 有固定归属。
 - 用 Frame Contract 连接 rendering/combat/audio/vfx。
 - 逐步迁移到 `content/characters/ryo` 和 `simulation/`，但每轮只迁一个领域。
 

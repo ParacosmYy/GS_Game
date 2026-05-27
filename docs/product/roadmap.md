@@ -20,6 +20,12 @@
 - 定义 feedback manifest。
 - 定义 Frame Contract。
 
+## P1.5 Ryo 内容包细分
+
+- 把 Ryo 内容包拆成 `commands/`、`moves/`、`attacks/`、`animations/`、`hitboxes/`、`feedback/`、`portraits/`、`reports/`。
+- 把 definition / stats / completeness 保留为兼容入口。
+- 让新增内容优先进入对应子目录，不再回流到单个大文件。
+
 ## P2 Ryo 最小动作闭环
 
 - `idle`

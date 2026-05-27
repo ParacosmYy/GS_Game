@@ -67,11 +67,26 @@ Ryo 必须具备以下 manifest：
 
 Ryo 相关新增数据文件优先落到 [工作区目标架构](../architecture/workspace-architecture-target.md) 规定的 `src/content/characters/ryo/` 方向；如果暂时留在旧目录，必须说明迁移原因和回退方式。
 
+### 4.1 当前下一步
+
+当前不是继续扩角色，而是把 Ryo 内容包从“有入口”推进到“有分层”：
+
+- `commands/`：把出招、快捷键、标准键位和路由说明固定下来。
+- `moves/`：把普通技、必杀技、DM/MAX/强化版的关系拆清楚。
+- `attacks/`：把普通攻击、命令通常技、空中攻击的分类拆清楚。
+- `animations/`：把动作帧、pose、manifest 和 fallback 分层。
+- `hitboxes/`：把判定、受击框、攻击框与调试校验拆清楚。
+- `feedback/`：把 light/heavy/special/DM 的反馈矩阵拆清楚。
+- `portraits/`：把 select/HUD/win portrait 的规范和资源来源拆清楚。
+- `reports/`：把完整度、校验、迁移状态写成机器可读报告。
+
+这一步的目标不是“更多文件”，而是让每一类 Ryo 内容都有固定归属，方便下一轮继续迁移而不再散落。
+
 ## 5. 每轮推进顺序
 
 1. 定义或修正数据格式。
 2. 写校验测试或校验工具。
-3. 接入 Ryo 的一个动作或一个肖像尺寸。
+3. 接入 Ryo 内容包的一个明确子域（commands/moves/attacks/animations/hitboxes/feedback/portraits/reports 之一）。
 4. 保留 fallback。
 5. 验证构建。
 6. 复盘是否更像 KOF。
