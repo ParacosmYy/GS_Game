@@ -71,3 +71,50 @@ export {
   type CancelType as KyoCancelType,
   type CancelRoute as KyoCancelRoute,
 } from './kyo/cancelPaths.js';
+
+// Iori content package — prefixed to avoid type name collisions
+export {
+  IORI_ATTACK_KEYS,
+  getIoriFrameData,
+  getIoriAttackFrameData,
+} from './iori/attacks.js';
+
+export {
+  IORI_MOVE_LIST,
+  IORI_WIN_QUOTES,
+  IORI_AVAILABLE_ACTIONS,
+  type IoriMoveEntry,
+} from './iori/commands.js';
+
+export {
+  IORI_HITBOX_KEYS,
+  getIoriHitboxOffsets,
+  IORI_ATTACK_FRAME_KEYS,
+  getIoriAttackFrames,
+} from './iori/hitboxes.js';
+
+export {
+  getIoriFeedbackTiers,
+  getIoriFeedback,
+  IORI_FEEDBACK_SUMMARY,
+} from './iori/feedback.js';
+
+export {
+  IORI_ANIMATION_META,
+  getIoriAnimationNames,
+  getIoriAnimMeta,
+  getIoriAttackAnimations,
+  getIoriLoopAnimations,
+} from './iori/animations.js';
+
+export {
+  IORI_CANCEL_PATHS,
+  findCancelRoute as findIoriCancelRoute,
+  getCancelTargets as getIoriCancelTargets,
+  validateCancel as validateIoriCancel,
+  getCancelRoutesByType as getIoriCancelRoutesByType,
+  isCancelSource as isIoriCancelSource,
+  getBestCancelRoute as getIoriBestCancelRoute,
+  type CancelType as IoriCancelType,
+  type CancelRoute as IoriCancelRoute,
+} from './iori/cancelPaths.js';
