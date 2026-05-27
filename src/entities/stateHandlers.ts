@@ -284,7 +284,10 @@ export function handleBackdash(ctx: FighterCtx): void {
   if (f.isGrounded() && f.vy >= 0) {
     f.state = FighterState.IDLE; f.vx = 0; f.vy = 0; f.displayHeight = 100;
     f.backdashTimer = 0;
-    f.landingRecovery = LANDING_RECOVERY; ctx.vfx.spawnDust(f.x, STAGE_GROUND_Y);
+    f.landingRecovery = LANDING_RECOVERY;
+    ctx.vfx.spawnDust(f.x, STAGE_GROUND_Y);
+    // Backdash landing: extra heavy dust burst
+    ctx.vfx.spawnHeavyDust(f.x, STAGE_GROUND_Y, 6);
   }
 }
 
