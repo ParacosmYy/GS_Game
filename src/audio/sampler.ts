@@ -2387,7 +2387,6 @@ export function playComboMilestone(combo: number): void {
     play('hit_crit', 0.35);
   }
 }
-}
 export function playGuardCrush(): void { initSampler(); play('guard_crush'); }
 export function playChip(): void { initSampler(); play('chip'); }
 export function playWallBounce(): void { initSampler(); play('wall_bounce'); }
