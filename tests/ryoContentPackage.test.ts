@@ -266,7 +266,7 @@ describe('Ryo Feedback', () => {
     const tiers = getRyoFeedbackTiers();
     expect(tiers['DM_TEN_HA_OU']).toBe('dm');
     expect(tiers['SDM_RYUKO_RANBU']).toBe('sdm');
-    expect(tiers['HSDM_RYUKO_RANBU']).toBe('sdm');
+    expect(tiers['HSDM_RYUKO_RANBU']).toBe('hsdm');
   });
 
   it('getRyoFeedback returns valid params', () => {

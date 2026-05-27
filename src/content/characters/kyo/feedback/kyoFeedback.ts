@@ -50,4 +50,5 @@ export const KYO_FEEDBACK_SUMMARY: Record<FeedbackTier, string[]> = {
   ],
   dm: ['DM_OROCHINAGI'],
   sdm: ['SDM_OROCHINAGI'],
+  hsdm: [],
 };

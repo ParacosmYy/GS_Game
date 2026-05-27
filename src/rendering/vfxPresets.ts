@@ -22,7 +22,7 @@ export function spawnTierSparks(
   particles: Particle[],
   x: number, y: number,
   count: number,
-  sparkType: 'small' | 'medium' | 'large' | 'burst' | 'mega',
+  sparkType: 'small' | 'medium' | 'large' | 'burst' | 'mega' | 'hyper',
   sparkPalette: string[],
   sparkSpeed: number,
 ): void {
@@ -202,6 +202,79 @@ export function spawnTierSparks(
           life: 10 + Math.floor(Math.random() * 8),
           maxLife: 18,
           size: 2 + Math.random() * 3,
+          color: '#ffffff',
+          type: 'spark',
+          gravity: 0.05,
+          friction: 0.92,
+        });
+      }
+      break;
+    }
+    case 'hyper': {
+      // HSDM climax: triple superburst + radial shockwave + star cascade
+      particles.push({
+        x, y, vx: 0, vy: 0,
+        life: 18, maxLife: 18, size: 65,
+        color: '#ffffff', type: 'superburst',
+      });
+      particles.push({
+        x, y, vx: 0, vy: 0,
+        life: 24, maxLife: 24, size: 90,
+        color: pick(), type: 'superburst',
+      });
+      particles.push({
+        x, y, vx: 0, vy: 0,
+        life: 30, maxLife: 30, size: 110,
+        color: '#ff44ff', type: 'superburst',
+      });
+      // Shockwave ring particles
+      for (let i = 0; i < 8; i++) {
+        const angle = (i / 8) * Math.PI * 2;
+        const speed = 8 * sparkSpeed;
+        particles.push({
+          x, y,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed,
+          life: 12, maxLife: 12,
+          size: 4,
+          color: '#ff44ff',
+          type: 'spark',
+          gravity: 0,
+          friction: 0.88,
+        });
+      }
+      // Outer star cascade — widest spread
+      const outerCount = Math.ceil(count * 0.5);
+      for (let i = 0; i < outerCount; i++) {
+        const angle = (i / outerCount) * Math.PI * 2;
+        const speed = (5 + Math.random() * 9) * sparkSpeed;
+        particles.push({
+          x, y,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed - 4,
+          life: 18 + Math.floor(Math.random() * 14),
+          maxLife: 34,
+          size: 3 + Math.random() * 6,
+          color: pick(),
+          type: 'star',
+          gravity: 0.08,
+          friction: 0.94,
+          rotation: angle,
+          rotSpeed: (Math.random() - 0.5) * 0.6,
+        });
+      }
+      // Inner dense sparks
+      const innerCount = count - outerCount;
+      for (let i = 0; i < innerCount; i++) {
+        const angle = (i / innerCount) * Math.PI * 2;
+        const speed = (3 + Math.random() * 5) * sparkSpeed;
+        particles.push({
+          x, y,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed - 1,
+          life: 14 + Math.floor(Math.random() * 10),
+          maxLife: 24,
+          size: 2 + Math.random() * 4,
           color: '#ffffff',
           type: 'spark',
           gravity: 0.05,

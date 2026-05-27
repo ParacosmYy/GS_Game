@@ -45,5 +45,6 @@ export const RYO_FEEDBACK_SUMMARY: Record<FeedbackTier, string[]> = {
     'RYO_KOOUKEN_D', 'RYO_HIO_HACKER', 'RYO_ZANRETSU_KEN',
   ],
   dm: ['DM_TEN_HA_OU', 'DM_RYUKO_RANBU'],
-  sdm: ['SDM_TEN_HA_OU', 'SDM_RYUKO_RANBU', 'HSDM_RYUKO_RANBU'],
+  sdm: ['SDM_TEN_HA_OU', 'SDM_RYUKO_RANBU'],
+  hsdm: ['HSDM_RYUKO_RANBU'],
 };

@@ -131,7 +131,7 @@ export class VFXSystem {
   }
 
   /** Tier-aware spark spawning — distinct patterns per sparkType */
-  spawnTierSparks(x: number, y: number, count: number, sparkType: 'small' | 'medium' | 'large' | 'burst' | 'mega', sparkPalette: string[], sparkSpeed: number): void {
+  spawnTierSparks(x: number, y: number, count: number, sparkType: 'small' | 'medium' | 'large' | 'burst' | 'mega' | 'hyper', sparkPalette: string[], sparkSpeed: number): void {
     spawnTierSparks(this.particles, x, y, count, sparkType, sparkPalette, sparkSpeed);
   }
 

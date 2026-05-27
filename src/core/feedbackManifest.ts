@@ -13,7 +13,7 @@ import { AttackType } from './types.js';
 // ===== 类型定义 =====
 
 /** 反馈档位 */
-export type FeedbackTier = 'light' | 'heavy' | 'special' | 'dm' | 'sdm';
+export type FeedbackTier = 'light' | 'heavy' | 'special' | 'dm' | 'sdm' | 'hsdm';
 
 /** 单个反馈档位的参数 */
 export interface FeedbackParams {
@@ -46,7 +46,7 @@ export interface FeedbackParams {
   /** 火花颜色方案 */
   sparkPalette: string[];
   /** 火花类型 */
-  sparkType: 'small' | 'medium' | 'large' | 'burst' | 'mega';
+  sparkType: 'small' | 'medium' | 'large' | 'burst' | 'mega' | 'hyper';
   /** 火花速度缩放 */
   sparkSpeed: number;
   /** 命中推退力度乘数 */
@@ -173,7 +173,7 @@ export const FEEDBACK_TIERS: Record<FeedbackTier, FeedbackParams> = {
     tier: 'sdm',
     hitstop: 22,
     blockstop: 8,
-    shakeIntensity: 14,
+    shakeIntensity: 18,
     shakeDuration: 18,
     blockShakeIntensity: 8,
     blockShakeDuration: 12,
@@ -192,6 +192,30 @@ export const FEEDBACK_TIERS: Record<FeedbackTier, FeedbackParams> = {
     impactRingScale: 2.0,
     hitstunBodyShake: 6.5,
     hitstunBodyShakeDecay: 0.1,
+  },
+  hsdm: {
+    tier: 'hsdm',
+    hitstop: 26,
+    blockstop: 10,
+    shakeIntensity: 22,
+    shakeDuration: 22,
+    blockShakeIntensity: 10,
+    blockShakeDuration: 14,
+    sparkCount: 22,
+    sparkSize: 1.7,
+    sparkStarRatio: 0.45,
+    hitFlashFrames: 5,
+    bgmDuckVolume: 0.45,
+    bgmDuckDuration: 300,
+    sparkPalette: ['#ffffff', '#ff44ff', '#ff0088', '#ffcc00'],
+    sparkType: 'hyper',
+    sparkSpeed: 3.0,
+    hitPushbackScale: 4.0,
+    blockPushbackScale: 3.0,
+    impactRingCount: 5,
+    impactRingScale: 2.4,
+    hitstunBodyShake: 8.0,
+    hitstunBodyShakeDecay: 0.08,
   },
 };
 
@@ -223,7 +247,7 @@ function isHeavy(at: string): boolean {
  */
 export function inferTier(attackType: AttackType): FeedbackTier {
   const at = attackType as string;
-  if (at.startsWith('HSDM_')) return 'sdm';
+  if (at.startsWith('HSDM_')) return 'hsdm';
   if (at.startsWith('SDM_')) return 'sdm';
   if (at.startsWith('DM_')) return 'dm';
   if (isSpecial(at) && !isDm(at)) return 'special';
@@ -277,7 +301,7 @@ export const FEEDBACK_MANIFEST: FeedbackManifest = {
     SDM_TEN_HA_OU: 'sdm',
     DM_RYUKO_RANBU: 'dm',
     SDM_RYUKO_RANBU: 'sdm',
-    HSDM_RYUKO_RANBU: 'sdm',
+    HSDM_RYUKO_RANBU: 'hsdm',
   } as Partial<Record<AttackType, FeedbackTier>>,
 };
 
