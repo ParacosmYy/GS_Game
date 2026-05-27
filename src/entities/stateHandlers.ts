@@ -270,6 +270,11 @@ export function handleRun(ctx: FighterCtx, input: ResolvedInput): void {
     f.vx = 0; f.state = FighterState.IDLE; f.runStopTimer = 3; return;
   }
   f.vx = ctx.stats.runSpeed * f.facing;
+  // KOF2002: Run footstep dust every 8 frames
+  const tick = ctx.tickRef.value;
+  if (tick % 8 === 0) {
+    ctx.vfx.spawnDust(f.x - f.facing * 10, STAGE_GROUND_Y);
+  }
 }
 
 /** BACKDASH state handler */
