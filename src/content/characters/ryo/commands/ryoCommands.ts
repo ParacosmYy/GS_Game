@@ -29,7 +29,9 @@ export const RYO_MOVE_LIST: RyoMoveEntry[] = [
   { name: '虎煌拳 (Ko\'ou Ken)', input: '↓↘→ + A / C', type: 'special', attackTypeKey: 'RYO_KOOU' },
   { name: '虎咆 (Kohou)', input: '→↓↘ + A / C', type: 'special', attackTypeKey: 'RYO_KO_HOU' },
   { name: '飛燕疾風脚 (Hien Shippu Kyaku)', input: '←↙↓ + K', type: 'special', attackTypeKey: 'RYO_HIEN' },
-  { name: '霸王翔吼拳 (Haou Shoukou Ken)', input: '↓↘→ + K', type: 'special', attackTypeKey: 'RYO_HAOU' },
+  { name: '霸王翔吼拳 (Haou Shoukou Ken)', input: '↓↘→ + B', type: 'special', attackTypeKey: 'RYO_HAOU' },
+  { name: '虎煌拳D版 (Ko\'ou Ken D)', input: '↓↘→ + D', type: 'special', attackTypeKey: 'RYO_KOOUKEN_D' },
+  { name: '斩裂拳 (Zanretsu Ken)', input: '←↙↓ + P', type: 'special', attackTypeKey: 'RYO_ZANRETSU_KEN' },
   // DMs — 超必杀技
   { name: '天地霸煌拳 (Tenha Haou Ken)', input: '↓↘→↓↘→ + A / C', type: 'dm', attackTypeKey: 'DM_TEN_HA_OU' },
   { name: '龍虎乱舞 (Ryuko Ranbu)', input: '↓↘→↘↓↙← + A / C', type: 'dm', attackTypeKey: 'DM_RYUKO_RANBU' },
