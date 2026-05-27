@@ -187,10 +187,14 @@ export function drawFighters(
       leanOffsetX = 3 * f.facing + blendOffsetX;
       leanAngle = 0.04 * f.facing;
       leanOffsetY = 8; // 保持蹲姿
+      // KOF2002: 蹲攻击下压 — 前2帧身体更低
+      if (f.stateAge < 2) { leanOffsetY += 4; }
     } else if (f.state === FighterState.STAND_ATTACK) {
       // KOF2002: 站立攻击前倾 — 出拳/踢时重心前移
       leanOffsetX = 2 * f.facing + blendOffsetX;
       leanAngle = 0.03 * f.facing;
+      // KOF2002: 站攻击微蹲 — 前2帧微蹲蓄力
+      if (f.stateAge < 2) { leanOffsetY = 3; }
     } else if (f.state === FighterState.THROW) {
       // KOF2002: 投技突进前倾 — 投技发动时重心大幅前移
       leanOffsetX = 6 * f.facing + blendOffsetX;
