@@ -15,6 +15,25 @@ function kyoVFX(ctx: HitEffectContext): boolean {
   const atkName = attackType as string;
   let handled = false;
 
+  // Command Normals — flame accent, consistent with Kyo element
+  if (atkName === 'CMD_GOFU_YOU') {
+    cinematic.addHitStop(1, ctx.defIdx);
+    vfx.spawnImpactRing(hitX, hitY, 0.8);
+    vfx.spawnProjectileExplosion(hitX, hitY, '#ff6622', '#ffaa44');
+    handled = true;
+  }
+  if (atkName === 'CMD_88SHIKI') {
+    cinematic.addHitStop(1, ctx.defIdx);
+    screenShake.trigger(5, 5, attacker.facing * 3);
+    vfx.spawnProjectileExplosion(hitX, hitY, '#ff5500', '#ff8833');
+    handled = true;
+  }
+  if (atkName === 'CMD_NARAKU') {
+    cinematic.addHitStop(1, ctx.defIdx);
+    vfx.spawnImpactRing(hitX, hitY, 0.7);
+    vfx.spawnProjectileExplosion(hitX, hitY, '#ff6622', '#ffcc44');
+    handled = true;
+  }
   // Oniyaki (鬼焼き) uppercut — fire column burst
   if (atkName === 'KYO_ONIYAKI' || atkName === 'KYO_ONIYAKI_C') {
     vfx.spawnSuperBurst(hitX, hitY, '#ff4400', '#ffaa22', atkName === 'KYO_ONIYAKI_C');
@@ -162,6 +181,9 @@ function kyoSFX(ctx: HitEffectContext): boolean {
     playKyoDokugami(); if (combo > 0) playHit(0.5, combo);
     return true;
   }
+  if (atkName === 'CMD_GOFU_YOU' || atkName === 'CMD_88SHIKI' || atkName === 'CMD_NARAKU') {
+    playHit(0.6, combo); return true;
+  }
 
   return false;
 }
@@ -170,7 +192,7 @@ function kyoSFX(ctx: HitEffectContext): boolean {
 
 export const KYO_HIT_EFFECTS: CharacterHitEffects = {
   charId: 'kyo',
-  prefixes: ['KYO_', 'DM_OROCHINAGI', 'SDM_OROCHINAGI', 'HSDM_OROCHINAGI'],
+  prefixes: ['KYO_', 'CMD_', 'DM_OROCHINAGI', 'SDM_OROCHINAGI', 'HSDM_OROCHINAGI'],
   onHitVFX: kyoVFX,
   onHitSFX: kyoSFX,
 };

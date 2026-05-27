@@ -15,6 +15,25 @@ function ioriVFX(ctx: HitEffectContext): boolean {
   const atkName = attackType as string;
   let handled = false;
 
+  // Command Normals — purple accent, consistent with Iori element
+  if (atkName === 'IORI_YUMEYUMI') {
+    cinematic.addHitStop(1, ctx.defIdx);
+    vfx.spawnImpactRing(hitX, hitY, 0.8);
+    vfx.spawnProjectileExplosion(hitX, hitY, '#6622aa', '#9944cc');
+    handled = true;
+  }
+  if (atkName === 'IORI_KATANUGI') {
+    cinematic.addHitStop(2, ctx.defIdx);
+    screenShake.trigger(7, 6, attacker.facing * 3);
+    vfx.spawnImpactRing(hitX, hitY, 1.0);
+    vfx.spawnProjectileExplosion(hitX, hitY, '#5500aa', '#8833cc');
+    handled = true;
+  }
+  if (atkName === 'IORI_YUKIWARUI') {
+    cinematic.addHitStop(1, ctx.defIdx);
+    vfx.spawnImpactRing(hitX, hitY, 0.7);
+    handled = true;
+  }
   // Oniyaki (鬼焼き) dark uppercut — purple burst
   if (atkName === 'IORI_ONIYAKI' || atkName === 'IORI_ONIYAKI_C') {
     vfx.spawnSuperBurst(hitX, hitY, '#8800aa', '#cc44ff', atkName === 'IORI_ONIYAKI_C');
@@ -133,6 +152,9 @@ function ioriSFX(ctx: HitEffectContext): boolean {
   if (atkName === 'IORI_KUZUKAZE') {
     playIoriKuzukaze(); if (combo > 0) playHit(0.5, combo);
     return true;
+  }
+  if (atkName === 'IORI_YUMEYUMI' || atkName === 'IORI_KATANUGI' || atkName === 'IORI_YUKIWARUI') {
+    playHit(0.6, combo); return true;
   }
 
   return false;
