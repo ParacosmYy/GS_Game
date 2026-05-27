@@ -137,6 +137,7 @@ function createMockVFX(): VFXSystem & Record<string, ReturnType<typeof vi.fn>> {
     spawnKoHouVFX: vi.fn(),
     spawnKoHouCVFX: vi.fn(),
     spawnHienTrail: vi.fn(),
+    spawnHienLandingDust: vi.fn(),
     spawnDMTenHaOuVFX: vi.fn(),
     spawnHaouFlash: vi.fn(),
     spawnMoveNameText: vi.fn(),

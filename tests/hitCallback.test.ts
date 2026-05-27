@@ -105,6 +105,7 @@ function mockVFX() {
     spawnKooukenVFX: vi.fn(),
     spawnKoHouVFX: vi.fn(),
     spawnHienTrail: vi.fn(),
+    spawnHienLandingDust: vi.fn(),
     spawnDMTenHaOuVFX: vi.fn(),
     spawnHaouFlash: vi.fn(),
     spawnScorchMark: vi.fn(),

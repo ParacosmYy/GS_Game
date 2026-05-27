@@ -37,9 +37,10 @@ function ryoVFX(ctx: HitEffectContext): boolean {
     screenFlash.trigger('#ffaa33', 0.12, 4);
     handled = true;
   }
-  // Hien (飛燕) flying kick — speed line trail
+  // Hien (飛燕) flying kick — speed line trail + landing dust
   if (atkName === 'RYO_HIEN') {
     vfx.spawnHienTrail(attacker.x, attacker.y, attacker.facing, attacker.charId);
+    vfx.spawnHienLandingDust(hitX, hitY + 20);
     cinematic.addHitStop(2, ctx.defIdx);
     screenShake.trigger(9, 8, attacker.facing * 5);
     vfx.spawnImpactRing(hitX, hitY, 1.1);
