@@ -155,6 +155,11 @@ export class Renderer {
         const alpha = Math.min(0.35, f.superBgFlashFrames / 12 * 0.35);
         ctx.fillStyle = `rgba(0, 0, 0, ${alpha})`;
         ctx.fillRect(-10, -10, CANVAS_WIDTH + 20, CANVAS_HEIGHT + 20);
+        // KOF2002: SDM额外红色色调 — superBgFlashFrames>8(SDM)时红色叠加
+        if (f.superBgFlashFrames > 8) {
+          ctx.fillStyle = 'rgba(255, 30, 0, 0.08)';
+          ctx.fillRect(-10, -10, CANVAS_WIDTH + 20, CANVAS_HEIGHT + 20);
+        }
       }
     }
 
