@@ -261,6 +261,22 @@ export function drawFighters(
       const dimAlpha = Math.max(0.85, 1 - (f.stateAge - 15) * 0.01);
       ctx.globalAlpha = Math.min(ctx.globalAlpha || 1, dimAlpha);
     }
+    // KOF2002: 投技冲击线 — THROW前3帧水平冲击线
+    if (f.state === FighterState.THROW && f.stateAge < 3) {
+      ctx.save();
+      ctx.globalAlpha = (3 - f.stateAge) / 3 * 0.35;
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 1.5;
+      for (let l = 0; l < 3; l++) {
+        const ly = sy - f.displayHeight * (0.3 + l * 0.2);
+        const lx = sx + f.facing * (10 + l * 8);
+        ctx.beginPath();
+        ctx.moveTo(lx, ly);
+        ctx.lineTo(lx + f.facing * (15 - f.stateAge * 4), ly);
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
     // KOF2002: 滚动摩擦光 — ROLL时身体周围微弱旋转光点
     if ((f.state === FighterState.ROLL || f.state === FighterState.BACK_ROLL) && f.stateAge % 3 === 0) {
       ctx.save();
