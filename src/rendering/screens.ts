@@ -717,6 +717,15 @@ export function drawIntro(ctx: CanvasRenderingContext2D, phaseTimer: number, cur
     const fadeAlpha = fp > 0.5 ? Math.max(0, 1 - (fp - 0.5) * 2) : 1;
     ctx.globalAlpha = Math.min(1, Math.max(0, fadeAlpha));
 
+    // KOF2002: FIGHT!瞬间橙色全屏闪光
+    if (fightTimer < 4) {
+      ctx.save();
+      ctx.globalAlpha = (4 - fightTimer) / 4 * 0.25;
+      ctx.fillStyle = '#ff6600';
+      ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+      ctx.restore();
+    }
+
     // 冲击波环
     for (let r = 0; r < 3; r++) {
       const ringDelay = r * 0.1;
