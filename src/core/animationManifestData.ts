@@ -62,27 +62,36 @@ function attackSequence(
   const invincibleFrames: number[] = [];
 
   // Startup 帧 — 每帧 duration=1 (1 game frame per frame)
+  // KOF2002 offset convention: startup leans back (-X), active thrusts forward (+X), recovery retracts
+  const startupLean = startup > 5 ? -1 : 0;
+  const activeThrust = active > 2 ? 2 : 1;
   for (let i = 0; i < startup; i++) {
-    frames.push({ index: frames.length, duration: 1, offsetX: 0, offsetY: 0 });
+    const progress = startup > 1 ? i / (startup - 1) : 0;
+    const ox = Math.round(startupLean * progress);
+    frames.push({ index: frames.length, duration: 1, offsetX: ox, offsetY: 0 });
     if (i < invincibleStartup) {
       invincibleFrames.push(frames.length - 1);
     }
   }
 
-  // Active 帧 — 带 hitboxKey
+  // Active 帧 — 带 hitboxKey, peak thrust offset
   for (let i = 0; i < active; i++) {
+    const progress = active > 1 ? i / (active - 1) : 1;
+    const ox = Math.round(activeThrust * (1 - Math.abs(2 * progress - 1)));
     frames.push({
       index: frames.length,
       duration: 1,
-      offsetX: 0,
+      offsetX: ox,
       offsetY: 0,
       hitboxKey: frameDataKey,
     });
   }
 
-  // Recovery 帧
+  // Recovery 帧 — slight retract
   for (let i = 0; i < recovery; i++) {
-    frames.push({ index: frames.length, duration: 1, offsetX: 0, offsetY: 0 });
+    const progress = recovery > 1 ? i / (recovery - 1) : 1;
+    const ox = -Math.round(activeThrust * 0.5 * (1 - progress));
+    frames.push({ index: frames.length, duration: 1, offsetX: ox, offsetY: 0 });
   }
 
   // 取消帧: active 尾部 + recovery 前段

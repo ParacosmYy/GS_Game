@@ -669,7 +669,7 @@ export function drawFighters(
       ctx.scale(1 + blockSquash * 0.04, 1 - blockSquash * 0.06);
     }
     // KOF2002: 防御推回扬尘 — BLOCKSTUN前3帧脚下扬尘
-    if (f.state === FighterState.BLOCKSTUN && f.blockstunTimer > 0 && f.stateAge < 3) {
+    if (f.state === FighterState.BLOCK && f.blockstunTimer > 0 && f.stateAge < 3) {
       ctx.save();
       ctx.globalAlpha = (3 - f.stateAge) / 3 * 0.25;
       ctx.fillStyle = '#ccbb99';
