@@ -1121,3 +1121,27 @@
 ## H222: announceSequence—5项验证播报序列状态机 — 194→195
 
 **commit:** <hash> | announceSequence—5项验证播报序列状态机
+
+---
+
+## H223: Wave 1 战斗手感基础 — hitstop衰减+方向震屏+冲击环+斩击线角度+连击递减 — 195→200
+
+**commits:** a50419a + 6a9b339 + 42a22c3 + bb39b20 + fb9d8cc
+
+**变更:**
+- H223: KOF2002真实hitstop衰减曲线—全冻→ease→恢复三阶段 + 7项测试
+- H224: 按攻击轨迹方向化震屏—ScreenShake新增biasY+hitCallback高度感知
+- H225: 分层冲击环尺寸校准—FeedbackParams新增impactRingCount/Scale
+- H226: 斩击线角度按攻击部位差异化—拳60°/脚30°/升龙80°/扫腿10°
+- H227: 连击hitstop递减—combo 1-4=100%/5-8=70%/9+=50%,DM豁免
+
+**更像KOF在哪里:**
+- hitstop不再硬切,末尾2帧ease-out让画面自然恢复
+- 攻击方向感: 上方打震屏偏下,扫腿打偏上
+- 冲击环数量随档位递增: light 1环 → SDM 4环
+- 斩击线角度区分拳脚,拳陡脚浅
+
+**仍不像KOF在哪里:**
+- 音效仍是Web Audio合成,缺乏重量感
+- 角色仍是骨骼棍人+高分辨率像素帧混合
+- 舞台仍是程序化背景,缺乏位图质感
