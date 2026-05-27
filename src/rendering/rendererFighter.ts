@@ -220,6 +220,19 @@ export function drawFighters(
     if (f.state === FighterState.BACKDASH) {
       ctx.globalAlpha = Math.min(ctx.globalAlpha || 1, 0.75);
     }
+    // KOF2002: 滚动摩擦光 — ROLL时身体周围微弱旋转光点
+    if ((f.state === FighterState.ROLL || f.state === FighterState.BACK_ROLL) && f.stateAge % 3 === 0) {
+      ctx.save();
+      ctx.globalAlpha = 0.3;
+      ctx.fillStyle = '#ffffff';
+      const dotAngle = globalTick * 0.8;
+      const dotX = sx + Math.cos(dotAngle) * (hw + 5);
+      const dotY = sy - f.displayHeight / 2 + Math.sin(dotAngle) * 10;
+      ctx.beginPath();
+      ctx.arc(dotX, dotY, 2, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
 
     // GC Roll green aura
     if (f.isRolling() && f.isGCRoll) {
