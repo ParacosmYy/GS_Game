@@ -5,7 +5,7 @@
 import { GameLoop } from './core/gameLoop.js';
 import { Camera } from './core/camera.js';
 import { GameSpeedController, SLOWMO_SUPER_FLASH, SLOWMO_KO } from './core/gameSpeed.js';
-import { CANVAS_WIDTH, CANVAS_HEIGHT, STAGE_WIDTH, STAGE_GROUND_Y, KO_DISPLAY_TIME, MAX_STOCKS, METER_PER_STOCK, FRAME_DATA } from './core/constants.js';
+import { CANVAS_WIDTH, CANVAS_HEIGHT, STAGE_WIDTH, STAGE_GROUND_Y, KO_DISPLAY_TIME, MAX_STOCKS, METER_PER_STOCK, FRAME_DATA, ROUND_TIME } from './core/constants.js';
 import { GamePhase, FighterState } from './core/types.js';
 import type { PowerGauge, MaxModeState } from './core/types.js';
 import { InputManager, CommandBuffer, resolveInput, getDirectionInput } from './input/index.js';
@@ -28,7 +28,7 @@ import { SelectState } from './state/selectState.js';
 import { RoundState } from './state/roundState.js';
 import { DMManager } from './combat/dmManager.js';
 import { createHitCallback, triggerKOGroundEffect } from './combat/hitCallback.js';
-import { initAudio, initSampler, playKO, playVictoryFanfare, playMAXActivation, playPerfect, playThrowEscape, playFight, playRoll, playCancel, playQuickStand, playGuardCrush, playHit, playSpecialLight, playSpecialHeavy, playDM, playWhoosh, playHeavyWhoosh, playKoouken, playKoHou, playHien, playHaou, playCursorMove, playCursorConfirm } from './audio/sampler.js';
+import { initAudio, initSampler, playKO, playVictoryFanfare, playMAXActivation, playPerfect, playThrowEscape, playFight, playRoll, playCancel, playQuickStand, playGuardCrush, playHit, playSpecialLight, playSpecialHeavy, playDM, playWhoosh, playHeavyWhoosh, playKoouken, playKoHou, playHien, playHaou, playCursorMove, playCursorConfirm, playTimeUp } from './audio/sampler.js';
 import { tickAttackSFX, dispatchContractSFX } from './audio/attackSFX.js';
 import { getContractEventTags } from './entities/fighter.js';
 import { tickMotionSFX } from './audio/motionSFX.js';
@@ -137,6 +137,7 @@ let p1Team: TeamState | null = null;
 let p2Team: TeamState | null = null;
 let p1DelayedHealth = p1.maxHealth;
 let p2DelayedHealth = p2.maxHealth;
+let prevTimeSeconds = 99; // Track time for countdown warning bell
 
 function pickWinQuote(w: number | null): string {
   if (w === null) return '';
@@ -661,6 +662,11 @@ function update(): void {
         p2DelayedHealth = p2.maxHealth;
         p1.savePrevState();
         p2.savePrevState();
+        // KOF2002: P1 keeps gauge progress, P2 gets fresh gauge
+        gauges[1].meter = 0;
+        gauges[1].stocks = 0;
+        maxModes[0].active = false;
+        maxModes[1].active = false;
         gs.isTimeOver = false;
         gs.matchStats = { p1TotalDamage: 0, p2TotalDamage: 0, p1LongestCombo: 0, p2LongestCombo: 0 };
         gs.setPhase(GamePhase.INTRO);
@@ -715,6 +721,14 @@ function update(): void {
   const speedFactor = gameSpeed.update();
   tickRef.value++;
   tickAutoMeter(gauges);
+  // KOF2002: Timer countdown warning bell at 10s
+  if (!gs.isTrainingMode) {
+    const timeSeconds = Math.max(0, ROUND_TIME - Math.floor(tickRef.value / 60));
+    if (timeSeconds === 10 && prevTimeSeconds > 10) {
+      playTimeUp(); // Reuse time-up bell for countdown warning
+    }
+    prevTimeSeconds = timeSeconds;
+  }
   // Slow-mo frame skip: probabilistic skip based on speed factor
   if (gameSpeed.isSlowMo() && Math.random() > speedFactor) return;
 
