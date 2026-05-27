@@ -179,6 +179,25 @@ export const RYO_MOVES: MoveDefinition[] = [
   },
 
   {
+    key: 'RYO_KOOUKEN_D',
+    nameJa: '虎煌拳D版',
+    nameEn: "Ko'ou Ken D (Heavy Tiger Wave)",
+    category: 'special',
+    input: 'qcf + D (heavy projectile)',
+    versions: [
+      {
+        version: 'D',
+        attackTypeKey: 'RYO_KOOUKEN_D',
+        differences: '重版飞行道具,高伤害,击倒效果,出手慢但威力大',
+        damageMultiplier: 1.5,
+        knockdown: true,
+        invincibleStartup: 0,
+        isProjectile: true,
+      },
+    ],
+  },
+
+  {
     key: 'RYO_HIO_HACKER',
     nameJa: '猛速突進拳',
     nameEn: 'Hio Hacker (Dash Strike)',

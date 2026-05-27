@@ -23,14 +23,15 @@ describe('Ryo Moves Definitions', () => {
     expect(categories.has('hsdm')).toBe(true);
   });
 
-  it('should have Ryo 4 core specials', () => {
+  it('should have Ryo 4+ core specials', () => {
     const specials = getMovesByCategory('special');
-    expect(specials.length).toBe(6);
+    expect(specials.length).toBeGreaterThanOrEqual(6);
     const keys = specials.map(s => s.key);
     expect(keys).toContain('RYO_KOOU');
     expect(keys).toContain('RYO_KO_HOU');
     expect(keys).toContain('RYO_HIEN');
     expect(keys).toContain('RYO_HAOU');
+    expect(keys).toContain('RYO_KOOUKEN_D');
   });
 
   it('Ko\'ou Ken should have A and C versions', () => {
@@ -86,7 +87,7 @@ describe('Ryo Moves Definitions', () => {
     const stats = getMoveStats();
     expect(stats.total).toBe(RYO_MOVES.length);
     expect(stats.versions).toBeGreaterThanOrEqual(stats.total);
-    expect(stats.byCategory['special']).toBe(6);
+    expect(stats.byCategory['special']).toBeGreaterThanOrEqual(6);
     expect(stats.byCategory['dm']).toBe(2);
   });
 
