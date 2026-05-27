@@ -8,6 +8,7 @@
  * GUARD_CRUSH: 2 frames — guard break stagger
  * MAX_MODE: 3 frames — MAX activation flash
  * TAUNT: 4 frames — iconic Iori laugh gesture
+ * COUNTER_STANCE: 4 frames — counter ready crouch with crossed arms
  * 48x72 px each, same 24-color Iori palette.
  */
 
@@ -519,6 +520,56 @@ const T2: number[][] = T0.map(row => row.slice());
 const T3: number[][] = T0.map(row => row.slice());
 
 export const IORI_TAUNT_FRAMES: PixelFrame[] = [T0, T1, T2, T3].map(pixels => ({
+  width: W,
+  height: 72,
+  palette: PALETTE,
+  pixels,
+  anchor: { x: Math.floor(W / 2), y: 72 },
+}));
+
+// ===== COUNTER_STANCE — 4 frames =====
+// Deep crouch with arms crossed, ready to counter
+
+const CS0: number[][] = [
+  r(''), r(''),
+  r(''),
+  r(''),
+  r(''),
+  r('...............555'),
+  r('..............56665'),
+  r('.............5566665'),
+  r('............8555551'),
+  r('...........889955511'),
+  r('..........8899998811'),
+  r('.........88999999881'),
+  r('........8899..999981'),
+  r('.......8899....99991'),
+  r('......8899......9991'),
+  r('.....8888........991'),
+  r('....8888..........91'),
+  r('...17..88..........9'),
+  r('..17..888..........9'),
+  r('..7..8888...........'),
+  r('..7.8888............'),
+  r('....888.............'),
+  r('...1888.............'),
+  r('...1888.............'),
+  r('...1888.............'),
+  r('....888.............'),
+  r('....888.............'),
+  r('....888.............'),
+  r('....888.............'),
+  r(''),
+  r(''),
+  r(''),
+  r(''),
+];
+
+const CS1: number[][] = CS0.map(row => row.slice());
+const CS2: number[][] = CS0.map(row => row.slice());
+const CS3: number[][] = CS0.map(row => row.slice());
+
+export const IORI_COUNTER_STANCE_FRAMES: PixelFrame[] = [CS0, CS1, CS2, CS3].map(pixels => ({
   width: W,
   height: 72,
   palette: PALETTE,

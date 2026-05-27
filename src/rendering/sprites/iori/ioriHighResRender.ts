@@ -40,6 +40,7 @@ import {
   IORI_RUN_FRAMES, IORI_BACKDASH_FRAMES,
   IORI_ROLL_FRAMES, IORI_BACK_ROLL_FRAMES,
   IORI_GUARD_CRUSH_FRAMES, IORI_MAX_MODE_FRAMES, IORI_TAUNT_FRAMES,
+  IORI_COUNTER_STANCE_FRAMES,
 } from './ioriMovementFrames.js';
 import { IORI_DIZZY_FRAMES } from './ioriDizzyFrames.js';
 import { IORI_THROW_FRAMES } from './ioriThrowFrames.js';
@@ -115,6 +116,7 @@ function initIoriFrames(): void {
   registerVariableFrames('GUARD_CRUSH', IORI_GUARD_CRUSH_FRAMES, [4, 10]);
   registerVariableFrames('MAX_MODE', IORI_MAX_MODE_FRAMES, [3, 4, 8]);
   registerVariableFrames('TAUNT', IORI_TAUNT_FRAMES, [10, 14, 12, 16]);
+  registerVariableFrames('COUNTER_STANCE', IORI_COUNTER_STANCE_FRAMES, [4, 6, 10, 8]);
 }
 
 function resolveIoriFrameKey(
@@ -194,6 +196,8 @@ function resolveIoriFrameKey(
       return 'MAX_MODE';
     case FighterState.TAUNT:
       return 'TAUNT';
+    case FighterState.COUNTER_STANCE:
+      return 'COUNTER_STANCE';
     default:
       return null;
   }
