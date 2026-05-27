@@ -757,11 +757,24 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       deps.vfx.spawnProjectileExplosion(hitX, hitY, atkChar.specialColor, atkChar.specialGlow);
     }
 
-    // 空中命中只保留轻飘粒子和一个很弱的辅助环，避免层数过多
+    // 空中命中 — 按连击次数递进视觉强度
     if (!defender.isGrounded() && !isDM) {
-      const airBonus = combo >= 5 ? 2 : 0;
-      deps.vfx.spawnCharacterHitSparks(hitX, hitY - 14, 4 + airBonus, '#aaddff', 0.65, 0.75, 0.15, true, attacker.facing);
-      if (combo >= 5) deps.vfx.spawnImpactRing(hitX, hitY, 0.45);
+      const airHits = defender.airHitCount;
+      // 第一次浮空命中：强发光+冲击环
+      if (airHits <= 1) {
+        deps.vfx.spawnCharacterHitSparks(hitX, hitY - 14, 8, '#ffffff', 0.9, 1.0, 0.2, true, attacker.facing);
+        deps.vfx.spawnImpactRing(hitX, hitY - 10, 0.7);
+      } else if (airHits <= 3) {
+        // 中段连击：蓝色渐变+递增sparks
+        const sparkCount = 5 + airHits;
+        deps.vfx.spawnCharacterHitSparks(hitX, hitY - 14, sparkCount, '#88ccff', 0.75, 0.85, 0.15, true, attacker.facing);
+        if (airHits >= 3) deps.vfx.spawnImpactRing(hitX, hitY, 0.45);
+      } else {
+        // 高段连击(4+)：紫色+速度线+里程碑环
+        const sparkCount = 6 + airHits;
+        deps.vfx.spawnCharacterHitSparks(hitX, hitY - 14, sparkCount, '#cc88ff', 0.85, 0.95, 0.18, true, attacker.facing);
+        deps.vfx.spawnImpactRing(hitX, hitY, 0.6);
+      }
     }
     // KOF2002: 站立被通常技命中时脚下尘土
     if (defender.isGrounded() && !isDM && !isSpecial) {

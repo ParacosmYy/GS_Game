@@ -288,27 +288,27 @@ describe('Juggle SFX: air hit calls playJuggleHit instead of playHit', () => {
 });
 
 // ====================================================================
-// SECTION 2: Air hit produces blue sparks (#aaddff)
+// SECTION 2: Air hit produces launch sparks (first juggle: #ffffff)
 // ====================================================================
 
-describe('Juggle blue sparks: air hit spawns #aaddff particles', () => {
+describe('Juggle launch sparks: air hit spawns white particles', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it('Airborne hit spawns #aaddff colored sparks', () => {
+  it('Airborne hit spawns white launch sparks (first juggle)', () => {
     const { deps, vfx, p1, p2 } = createJuggleDeps(0);
     const cb = createHitCallback(deps);
     cb(p1, p2, AttackType.STAND_A, false, false);
 
-    // The air bonus sparks use color '#aaddff' (hitCallback.ts line 484)
-    const blueSparkCall = vfx.spawnCharacterHitSparks.mock.calls.find(
-      (call: string[]) => call[3] === '#aaddff'
+    // First juggle hit uses white (#ffffff) for dramatic launch emphasis
+    const launchSparkCall = vfx.spawnCharacterHitSparks.mock.calls.find(
+      (call: string[]) => call[3] === '#ffffff'
     );
-    expect(blueSparkCall).toBeDefined();
+    expect(launchSparkCall).toBeDefined();
   });
 
-  it('Grounded hit does NOT produce #aaddff blue air sparks', () => {
+  it('Grounded hit does NOT produce white air sparks', () => {
     // Grounded defender
     const p1 = createMockFighter(200, 'ryo');
     const p2 = createMockFighter(400, 'kyo');
@@ -327,36 +327,36 @@ describe('Juggle blue sparks: air hit spawns #aaddff particles', () => {
     const cb = createHitCallback(deps);
     cb(p1, p2, AttackType.STAND_A, false, false);
 
-    const blueSparkCall = vfx.spawnCharacterHitSparks.mock.calls.find(
-      (call: string[]) => call[3] === '#aaddff'
+    const airSparkCall = vfx.spawnCharacterHitSparks.mock.calls.find(
+      (call: string[]) => call[3] === '#ffffff'
     );
-    expect(blueSparkCall).toBeUndefined();
+    expect(airSparkCall).toBeUndefined();
   });
 
-  it('Blue air sparks have sizeScale 0.65', () => {
+  it('First juggle launch sparks have sizeScale 0.9', () => {
     const { deps, vfx, p1, p2 } = createJuggleDeps(0);
     const cb = createHitCallback(deps);
     cb(p1, p2, AttackType.STAND_A, false, false);
 
-    const blueSparkCall = vfx.spawnCharacterHitSparks.mock.calls.find(
-      (call: unknown[]) => call[3] === '#aaddff'
+    const launchSparkCall = vfx.spawnCharacterHitSparks.mock.calls.find(
+      (call: unknown[]) => call[3] === '#ffffff'
     );
-    expect(blueSparkCall).toBeDefined();
-    const sizeScale = blueSparkCall![4] as number;
-    expect(sizeScale).toBe(0.65);
+    expect(launchSparkCall).toBeDefined();
+    const sizeScale = launchSparkCall![4] as number;
+    expect(sizeScale).toBe(0.9);
   });
 
-  it('Blue air sparks have lowGravity=true (index 7)', () => {
+  it('First juggle launch sparks have lowGravity=true (index 7)', () => {
     const { deps, vfx, p1, p2 } = createJuggleDeps(0);
     const cb = createHitCallback(deps);
     cb(p1, p2, AttackType.STAND_A, false, false);
 
-    const blueSparkCall = vfx.spawnCharacterHitSparks.mock.calls.find(
-      (call: unknown[]) => call[3] === '#aaddff'
+    const launchSparkCall = vfx.spawnCharacterHitSparks.mock.calls.find(
+      (call: unknown[]) => call[3] === '#ffffff'
     );
-    expect(blueSparkCall).toBeDefined();
+    expect(launchSparkCall).toBeDefined();
     // lowGrav is at index 7
-    const lowGrav = blueSparkCall![7] as boolean;
+    const lowGrav = launchSparkCall![7] as boolean;
     expect(lowGrav).toBe(true);
   });
 });
@@ -529,41 +529,37 @@ describe('DM juggle exemption: DM air hits skip blue air bonus sparks', () => {
     vi.clearAllMocks();
   });
 
-  it('Non-DM air hit produces #aaddff blue air sparks', () => {
+  it('Non-DM air hit produces white launch sparks', () => {
     const { deps, vfx, p1, p2 } = createJuggleDeps(0);
     const cb = createHitCallback(deps);
     cb(p1, p2, AttackType.STAND_A, false, false);
 
-    const blueSparkCall = vfx.spawnCharacterHitSparks.mock.calls.find(
-      (call: unknown[]) => call[3] === '#aaddff'
+    const launchSparkCall = vfx.spawnCharacterHitSparks.mock.calls.find(
+      (call: unknown[]) => call[3] === '#ffffff'
     );
-    expect(blueSparkCall).toBeDefined();
+    expect(launchSparkCall).toBeDefined();
   });
 
-  it('DM air hit does NOT produce #aaddff blue air bonus sparks', () => {
-    // The air bonus sparks block (hitCallback.ts line 482) has condition:
-    //   if (!defender.isGrounded() && !isDM) { ... blue sparks ... }
-    // So DM hits on airborne defenders should NOT spawn the blue air sparks.
+  it('DM air hit does NOT produce white air bonus sparks', () => {
     const { deps, vfx, p1, p2 } = createJuggleDeps(0);
     const cb = createHitCallback(deps);
     cb(p1, p2, AttackType.DM_TEN_HA_OU, false, false);
 
-    // The DM-specific VFX uses specialColor/specialGlow, not #aaddff
-    const blueSparkCall = vfx.spawnCharacterHitSparks.mock.calls.find(
-      (call: unknown[]) => call[3] === '#aaddff'
+    const launchSparkCall = vfx.spawnCharacterHitSparks.mock.calls.find(
+      (call: unknown[]) => call[3] === '#ffffff'
     );
-    expect(blueSparkCall).toBeUndefined();
+    expect(launchSparkCall).toBeUndefined();
   });
 
-  it('SDM air hit also skips blue air bonus sparks', () => {
+  it('SDM air hit also skips white air bonus sparks', () => {
     const { deps, vfx, p1, p2 } = createJuggleDeps(0);
     const cb = createHitCallback(deps);
     cb(p1, p2, AttackType.SDM_TEN_HA_OU, false, false);
 
-    const blueSparkCall = vfx.spawnCharacterHitSparks.mock.calls.find(
-      (call: unknown[]) => call[3] === '#aaddff'
+    const launchSparkCall = vfx.spawnCharacterHitSparks.mock.calls.find(
+      (call: unknown[]) => call[3] === '#ffffff'
     );
-    expect(blueSparkCall).toBeUndefined();
+    expect(launchSparkCall).toBeUndefined();
   });
 });
 
@@ -572,25 +568,20 @@ describe('DM juggle exemption: DM air hits skip blue air bonus sparks', () => {
 // ====================================================================
 
 describe('Juggle spark position: air sparks offset by hitY - 14', () => {
-  it('Blue air sparks are spawned at hitY - 14', () => {
+  it('Air launch sparks are spawned at hitY - 14', () => {
     const { deps, vfx, p1, p2 } = createJuggleDeps(0);
     const cb = createHitCallback(deps);
     cb(p1, p2, AttackType.STAND_A, false, false);
 
-    // Find the blue spark call
-    const blueSparkCall = vfx.spawnCharacterHitSparks.mock.calls.find(
-      (call: unknown[]) => call[3] === '#aaddff'
+    const launchSparkCall = vfx.spawnCharacterHitSparks.mock.calls.find(
+      (call: unknown[]) => call[3] === '#ffffff'
     );
-    expect(blueSparkCall).toBeDefined();
+    expect(launchSparkCall).toBeDefined();
 
-    // The main hitY for an airborne defender is:
-    //   hitY = defender.y - defender.displayHeight * 0.6
-    //   (since isAir = true, line 181)
-    // The blue air sparks spawn at hitY - 14 (line 484)
     const hitY = p2.y - p2.displayHeight * 0.6;
     const expectedAirSparkY = hitY - 14;
 
-    const actualY = blueSparkCall![1] as number;
+    const actualY = launchSparkCall![1] as number;
     expect(actualY).toBeCloseTo(expectedAirSparkY, 3);
   });
 
@@ -599,17 +590,15 @@ describe('Juggle spark position: air sparks offset by hitY - 14', () => {
     const cb = createHitCallback(deps);
     cb(p1, p2, AttackType.STAND_A, false, false);
 
-    // The main spark (first call) and blue spark should differ by 14 in Y
     const mainSparkCall = vfx.spawnCharacterHitSparks.mock.calls[0];
     const mainSparkY = mainSparkCall[1] as number;
 
-    const blueSparkCall = vfx.spawnCharacterHitSparks.mock.calls.find(
-      (call: unknown[]) => call[3] === '#aaddff'
+    const launchSparkCall = vfx.spawnCharacterHitSparks.mock.calls.find(
+      (call: unknown[]) => call[3] === '#ffffff'
     );
-    const blueSparkY = blueSparkCall![1] as number;
+    const launchSparkY = launchSparkCall![1] as number;
 
-    // Blue sparks are 14 pixels above main hit Y
-    expect(mainSparkY - blueSparkY).toBeCloseTo(14, 3);
+    expect(mainSparkY - launchSparkY).toBeCloseTo(14, 3);
   });
 });
 
