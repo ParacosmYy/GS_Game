@@ -24,14 +24,21 @@ export const IORI_MOVE_LIST: IoriMoveEntry[] = [
   { name: '邯鄲 (Katanugi)', input: '↘ + B', type: 'command', attackTypeKey: 'IORI_KATANUGI' },
   { name: '百合折り (Yukiwarui)', input: '空中 ↓ + C', type: 'command', attackTypeKey: 'IORI_YUKIWARUI' },
   // Specials — 必杀技
-  { name: '闇払い (Yamibarai)', input: '↓↘→ + A / C', type: 'special', attackTypeKey: 'IORI_YAMIBARAI' },
-  { name: '鬼焼き (Oniyaki)', input: '→↓↘ + A / C', type: 'special', attackTypeKey: 'IORI_ONIYAKI' },
-  { name: '琴月陰 (Kototsuki In)', input: '←↙↓↘→ + B / D', type: 'special', attackTypeKey: 'IORI_KOTOTSUKI' },
+  { name: '闇払い (Yamibarai)', input: '↓↘→ + A', type: 'special', attackTypeKey: 'IORI_YAMIBARAI' },
+  { name: '闇払い (Yamibarai C)', input: '↓↘→ + C', type: 'special', attackTypeKey: 'IORI_YAMIBARAI_C' },
+  { name: '鬼焼き (Oniyaki)', input: '→↓↘ + A', type: 'special', attackTypeKey: 'IORI_ONIYAKI' },
+  { name: '鬼焼き (Oniyaki C)', input: '→↓↘ + C', type: 'special', attackTypeKey: 'IORI_ONIYAKI_C' },
+  { name: '琴月陰 (Kototsuki In)', input: '←↙↓↘→ + B', type: 'special', attackTypeKey: 'IORI_KOTOTSUKI' },
+  { name: '琴月陰 (Kototsuki In D)', input: '←↙↓↘→ + D', type: 'special', attackTypeKey: 'IORI_KOTOTSUKI_D' },
   { name: '屑風 (Kuzukaze)', input: '←↙↓↘→↗↓↙← + P', type: 'special', attackTypeKey: 'IORI_KUZUKAZE' },
-  // Rekka — 葵花 chain
-  { name: '葵花 (Aoihana)', input: '↓↙← + A / C', type: 'special', attackTypeKey: 'IORI_AOIHANA' },
+  // Rekka — 葵花 A chain
+  { name: '葵花 (Aoihana)', input: '↓↙← + A', type: 'special', attackTypeKey: 'IORI_AOIHANA' },
   { name: '葵花 追撃 弐', input: '葵花中 ↓↙← + P', type: 'special', attackTypeKey: 'IORI_AOIHANA_2' },
   { name: '葵花 追撃 参', input: '葵花弐中 ↓↙← + P', type: 'special', attackTypeKey: 'IORI_AOIHANA_3' },
+  // Rekka — 葵花 C chain
+  { name: '葵花 C (Aoihana C)', input: '↓↙← + C', type: 'special', attackTypeKey: 'IORI_AOIHANA_C' },
+  { name: '葵花 C 追撃 弐', input: '葵花C中 ↓↙← + P', type: 'special', attackTypeKey: 'IORI_AOIHANA_C_2' },
+  { name: '葵花 C 追撃 参', input: '葵花C弐中 ↓↙← + P', type: 'special', attackTypeKey: 'IORI_AOIHANA_C_3' },
   // DMs — 超必杀技
   { name: '八稚女 (Yaotome)', input: '↓↙←↙↓↘→ + A / C', type: 'dm', attackTypeKey: 'DM_YATAGARASU' },
   // SDMs — MAX超必杀技

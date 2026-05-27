@@ -51,8 +51,8 @@ export interface CancelRoute {
 const IORI_SPECIALS = [
   'IORI_YAMIBARAI', 'IORI_YAMIBARAI_C',
   'IORI_ONIYAKI', 'IORI_ONIYAKI_C',
-  'IORI_AOIHANA',
-  'IORI_KOTOTSUKI',
+  'IORI_AOIHANA', 'IORI_AOIHANA_C',
+  'IORI_KOTOTSUKI', 'IORI_KOTOTSUKI_D',
   'IORI_KUZUKAZE',
 ];
 
@@ -193,7 +193,7 @@ const IORI_NORMAL_TO_SPECIAL: CancelRoute[] = [
 // Aoihana chain: Aoihana -> Aoihana_2 -> Aoihana_3
 
 const IORI_REKKA_CHAINS: CancelRoute[] = [
-  // 葵花 chain
+  // 葵花 A chain
   {
     from: 'IORI_AOIHANA',
     to: ['IORI_AOIHANA_2'],
@@ -201,11 +201,30 @@ const IORI_REKKA_CHAINS: CancelRoute[] = [
     requiresHit: true,
     stockCost: 0,
     timerCost: 0,
-    windowFrames: 20, // REKKA_WINDOW
+    windowFrames: 20,
   },
   {
     from: 'IORI_AOIHANA_2',
     to: ['IORI_AOIHANA_3'],
+    cancelType: 'rekka',
+    requiresHit: false,
+    stockCost: 0,
+    timerCost: 0,
+    windowFrames: 20,
+  },
+  // 葵花 C chain
+  {
+    from: 'IORI_AOIHANA_C',
+    to: ['IORI_AOIHANA_C_2'],
+    cancelType: 'rekka',
+    requiresHit: true,
+    stockCost: 0,
+    timerCost: 0,
+    windowFrames: 20,
+  },
+  {
+    from: 'IORI_AOIHANA_C_2',
+    to: ['IORI_AOIHANA_C_3'],
     cancelType: 'rekka',
     requiresHit: false,
     stockCost: 0,
@@ -264,6 +283,15 @@ const IORI_SPECIAL_TO_DM: CancelRoute[] = [
     windowFrames: CANCEL_WINDOW_SUPER,
   },
   {
+    from: 'IORI_KOTOTSUKI_D',
+    to: ['DM_YATAGARASU'],
+    cancelType: 'super',
+    requiresHit: true,
+    stockCost: SUPER_CANCEL_STOCK_COST,
+    timerCost: 0,
+    windowFrames: CANCEL_WINDOW_SUPER,
+  },
+  {
     from: 'IORI_AOIHANA',
     to: ['DM_YATAGARASU'],
     cancelType: 'super',
@@ -281,6 +309,24 @@ const IORI_SPECIAL_TO_DM: CancelRoute[] = [
     timerCost: 0,
     windowFrames: CANCEL_WINDOW_SUPER,
   },
+  {
+    from: 'IORI_AOIHANA_C',
+    to: ['DM_YATAGARASU'],
+    cancelType: 'super',
+    requiresHit: true,
+    stockCost: SUPER_CANCEL_STOCK_COST,
+    timerCost: 0,
+    windowFrames: CANCEL_WINDOW_SUPER,
+  },
+  {
+    from: 'IORI_AOIHANA_C_2',
+    to: ['DM_YATAGARASU'],
+    cancelType: 'super',
+    requiresHit: true,
+    stockCost: SUPER_CANCEL_STOCK_COST,
+    timerCost: 0,
+    windowFrames: CANCEL_WINDOW_SUPER,
+  },
 ];
 
 // ===== Iori MAX Mode Free Cancel Routes =====
@@ -289,7 +335,7 @@ const IORI_SPECIAL_TO_DM: CancelRoute[] = [
 const IORI_FREE_CANCEL: CancelRoute[] = [
   {
     from: 'IORI_ONIYAKI',
-    to: ['IORI_YAMIBARAI', 'IORI_YAMIBARAI_C', 'IORI_KOTOTSUKI', 'IORI_ONIYAKI_C', 'IORI_AOIHANA'],
+    to: ['IORI_YAMIBARAI', 'IORI_YAMIBARAI_C', 'IORI_KOTOTSUKI', 'IORI_KOTOTSUKI_D', 'IORI_ONIYAKI_C', 'IORI_AOIHANA', 'IORI_AOIHANA_C'],
     cancelType: 'free',
     requiresHit: true,
     stockCost: 0,
@@ -298,7 +344,7 @@ const IORI_FREE_CANCEL: CancelRoute[] = [
   },
   {
     from: 'IORI_ONIYAKI_C',
-    to: ['IORI_YAMIBARAI', 'IORI_YAMIBARAI_C', 'IORI_KOTOTSUKI', 'IORI_ONIYAKI', 'IORI_AOIHANA'],
+    to: ['IORI_YAMIBARAI', 'IORI_YAMIBARAI_C', 'IORI_KOTOTSUKI', 'IORI_KOTOTSUKI_D', 'IORI_ONIYAKI', 'IORI_AOIHANA', 'IORI_AOIHANA_C'],
     cancelType: 'free',
     requiresHit: true,
     stockCost: 0,
@@ -307,7 +353,7 @@ const IORI_FREE_CANCEL: CancelRoute[] = [
   },
   {
     from: 'IORI_YAMIBARAI',
-    to: ['IORI_ONIYAKI', 'IORI_ONIYAKI_C', 'IORI_KOTOTSUKI', 'IORI_YAMIBARAI_C', 'IORI_AOIHANA'],
+    to: ['IORI_ONIYAKI', 'IORI_ONIYAKI_C', 'IORI_KOTOTSUKI', 'IORI_KOTOTSUKI_D', 'IORI_YAMIBARAI_C', 'IORI_AOIHANA', 'IORI_AOIHANA_C'],
     cancelType: 'free',
     requiresHit: true,
     stockCost: 0,
@@ -316,7 +362,7 @@ const IORI_FREE_CANCEL: CancelRoute[] = [
   },
   {
     from: 'IORI_YAMIBARAI_C',
-    to: ['IORI_ONIYAKI', 'IORI_ONIYAKI_C', 'IORI_KOTOTSUKI', 'IORI_YAMIBARAI', 'IORI_AOIHANA'],
+    to: ['IORI_ONIYAKI', 'IORI_ONIYAKI_C', 'IORI_KOTOTSUKI', 'IORI_KOTOTSUKI_D', 'IORI_YAMIBARAI', 'IORI_AOIHANA', 'IORI_AOIHANA_C'],
     cancelType: 'free',
     requiresHit: true,
     stockCost: 0,
@@ -325,7 +371,16 @@ const IORI_FREE_CANCEL: CancelRoute[] = [
   },
   {
     from: 'IORI_KOTOTSUKI',
-    to: ['IORI_ONIYAKI', 'IORI_ONIYAKI_C', 'IORI_YAMIBARAI', 'IORI_YAMIBARAI_C', 'IORI_AOIHANA'],
+    to: ['IORI_ONIYAKI', 'IORI_ONIYAKI_C', 'IORI_YAMIBARAI', 'IORI_YAMIBARAI_C', 'IORI_AOIHANA', 'IORI_AOIHANA_C'],
+    cancelType: 'free',
+    requiresHit: true,
+    stockCost: 0,
+    timerCost: FREE_CANCEL_TIMER_COST,
+    windowFrames: CANCEL_WINDOW_FREE,
+  },
+  {
+    from: 'IORI_KOTOTSUKI_D',
+    to: ['IORI_ONIYAKI', 'IORI_ONIYAKI_C', 'IORI_YAMIBARAI', 'IORI_YAMIBARAI_C', 'IORI_AOIHANA', 'IORI_AOIHANA_C'],
     cancelType: 'free',
     requiresHit: true,
     stockCost: 0,
@@ -334,7 +389,16 @@ const IORI_FREE_CANCEL: CancelRoute[] = [
   },
   {
     from: 'IORI_AOIHANA',
-    to: ['IORI_ONIYAKI', 'IORI_ONIYAKI_C', 'IORI_YAMIBARAI', 'IORI_YAMIBARAI_C', 'IORI_KOTOTSUKI'],
+    to: ['IORI_ONIYAKI', 'IORI_ONIYAKI_C', 'IORI_YAMIBARAI', 'IORI_YAMIBARAI_C', 'IORI_KOTOTSUKI', 'IORI_KOTOTSUKI_D'],
+    cancelType: 'free',
+    requiresHit: true,
+    stockCost: 0,
+    timerCost: FREE_CANCEL_TIMER_COST,
+    windowFrames: CANCEL_WINDOW_FREE,
+  },
+  {
+    from: 'IORI_AOIHANA_C',
+    to: ['IORI_ONIYAKI', 'IORI_ONIYAKI_C', 'IORI_YAMIBARAI', 'IORI_YAMIBARAI_C', 'IORI_KOTOTSUKI', 'IORI_KOTOTSUKI_D'],
     cancelType: 'free',
     requiresHit: true,
     stockCost: 0,

@@ -197,14 +197,14 @@ export const IoriDef: CharacterDefinition = {
       return input.buttonCPressed ? AttackType.IORI_ONIYAKI_C : AttackType.IORI_ONIYAKI;
     }
 
-    // HCB+K → 琴月陰 (dash attack)
+    // HCB+K → 琴月陰 (dash attack, B=short, D=long)
     if (input.kickPressed && cmdBuf.hasHCB(tick)) {
-      return AttackType.IORI_KOTOTSUKI;
+      return input.buttonDPressed ? AttackType.IORI_KOTOTSUKI_D : AttackType.IORI_KOTOTSUKI;
     }
 
-    // QCB+P → 葵花 (before fireball)
+    // QCB+P → 葵花 (A version or C version)
     if (input.punchPressed && cmdBuf.hasQCB(tick)) {
-      return AttackType.IORI_AOIHANA;
+      return input.buttonCPressed ? AttackType.IORI_AOIHANA_C : AttackType.IORI_AOIHANA;
     }
 
     // QCF+P → 闇払い (弱P/强P区分)
@@ -235,11 +235,19 @@ export const IoriDef: CharacterDefinition = {
   },
 
   routeRekkaFollowup(input, _cmdBuf, _tick, currentAttack) {
+    // A version rekka chain
     if (currentAttack === AttackType.IORI_AOIHANA && input.punchPressed) {
       return AttackType.IORI_AOIHANA_2;
     }
     if (currentAttack === AttackType.IORI_AOIHANA_2 && input.punchPressed) {
       return AttackType.IORI_AOIHANA_3;
+    }
+    // C version rekka chain
+    if (currentAttack === AttackType.IORI_AOIHANA_C && input.punchPressed) {
+      return AttackType.IORI_AOIHANA_C_2;
+    }
+    if (currentAttack === AttackType.IORI_AOIHANA_C_2 && input.punchPressed) {
+      return AttackType.IORI_AOIHANA_C_3;
     }
     return null;
   },
