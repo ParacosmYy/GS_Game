@@ -628,7 +628,9 @@ export type AnnouncerEventType =
   | 'max_activation'
   | 'double_ko'
   | 'draw_game'
-  | 'first_attack';
+  | 'first_attack'
+  | 'stun'
+  | 'guard_crush';
 
 /** Event-to-text mapping with display parameters */
 export interface AnnouncerEventConfig {
@@ -653,6 +655,8 @@ export const ANNOUNCER_EVENTS: Record<AnnouncerEventType, AnnouncerEventConfig> 
   double_ko:      { text: 'DOUBLE K.O.!', duration: 100, fillColor: '#ff4400', glowColor: '#ff2200', fontSize: 72, soundId: 'ko' },
   draw_game:      { text: 'DRAW GAME',   duration: 100, fillColor: '#ffaa00', glowColor: '#ff8800', fontSize: 52, soundId: 'time_over' },
   first_attack:   { text: 'FIRST ATTACK', duration: 60,  fillColor: '#ffffff', glowColor: '#ffcc00', fontSize: 32, soundId: 'fight' },
+  stun:           { text: 'STUN!',         duration: 60,  fillColor: '#ffee44', glowColor: '#ddcc00', fontSize: 48, soundId: 'counter' },
+  guard_crush:    { text: 'GUARD CRUSH!',  duration: 55,  fillColor: '#ff4444', glowColor: '#cc2200', fontSize: 36, soundId: 'counter' },
 };
 
 export const announcer = new Announcer();

@@ -672,6 +672,8 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       playDizzyHit();
       // KOF2002: 角色专属晕眩呻吟
       playCharVoice(defender.charId, 'dizzy', 0.4);
+      // KOF2002: "STUN!" 播报覆盖层
+      announcerOverlay.trigger('stun');
     }
 
     // === 浮动连击文本 ===

@@ -136,6 +136,7 @@ combatSystem.onGuardCrush = (fighter, hitX, hitY) => {
   vfx.spawnGuardCrushSparks(hitX, hitY); vfx.spawnGuardCrushText(hitX, hitY - 60); vfx.spawnHeavyDust(fighter.x, fighter.y, 14);
   vfx.spawnImpactRing(hitX, hitY, 1.5);
   screenFlash.trigger('#ff4444', 0.3, 12); screenShake.trigger(12, 15); playGuardCrush();
+  announcerOverlay.trigger('guard_crush');
 };
 
 // ===== Derived state =====

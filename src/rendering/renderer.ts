@@ -200,6 +200,24 @@ export class Renderer {
     // End zoom before HUD — HUD always renders at normal scale
     if (cameraZoom !== 1.0) ctx.restore();
 
+    // KOF2002: 眩晕濒危屏幕警告 — stunGauge>75%时屏幕边缘黄色脉冲
+    for (const f of fighters) {
+      if (f.stunGauge > 75 && f.state !== FighterState.DIZZY && f.state !== FighterState.KNOCKDOWN) {
+        const stunRatio = (f.stunGauge - 75) / 25;
+        const pulse = 0.3 + Math.sin(tick * 0.1) * 0.15;
+        const vigAlpha = stunRatio * pulse * 0.25;
+        ctx.save();
+        const stunVig = ctx.createRadialGradient(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, 120, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, 420);
+        stunVig.addColorStop(0, 'rgba(0,0,0,0)');
+        stunVig.addColorStop(0.6, `rgba(180,140,30,${vigAlpha * 0.3})`);
+        stunVig.addColorStop(1, `rgba(200,160,40,${vigAlpha})`);
+        ctx.fillStyle = stunVig;
+        ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+        ctx.restore();
+        break; // Only render once even if both fighters are at high stun
+      }
+    }
+
     drawHUD(ctx, fighters, tick, delayedHealth, p1Wins, p2Wins, p1Name, p2Name, currentRound, firstAttacker, p1MoveList ?? [], simplifiedMode);
 
     if (ko) {
