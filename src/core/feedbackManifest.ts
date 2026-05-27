@@ -302,6 +302,49 @@ export const FEEDBACK_MANIFEST: FeedbackManifest = {
     DM_RYUKO_RANBU: 'dm',
     SDM_RYUKO_RANBU: 'sdm',
     HSDM_RYUKO_RANBU: 'hsdm',
+
+    // ===== Kyo 必杀技 (special) =====
+    KYO_YAMIBARAI: 'special',
+    KYO_YAMIBARAI_C: 'special',
+    KYO_ONIYAKI: 'special',
+    KYO_ONIYAKI_C: 'special',
+    KYO_75KAI: 'special',
+    KYO_75KAI_2: 'special',
+    KYO_RED_KICK: 'special',
+    KYO_ARAGAMI: 'special',
+    KYO_ARAGAMI_KONOKIZU: 'special',
+    KYO_ARAGAMI_YANOSABI: 'special',
+    KYO_NANASE: 'special',
+    KYO_KOTO_TSUKI: 'special',
+    KYO_YAKISOGI: 'special',
+    KYO_DOKUGAMI: 'special',
+    KYO_TSUMIYOMI: 'special',
+    KYO_BATSUYOMI: 'special',
+    CMD_GOFU_YOU: 'special',
+    CMD_88SHIKI: 'special',
+    CMD_NARAKU: 'special',
+
+    // ===== Kyo DM / SDM =====
+    DM_OROCHINAGI: 'dm',
+    SDM_OROCHINAGI: 'sdm',
+
+    // ===== Iori 必杀技 (special) =====
+    IORI_YAMIBARAI: 'special',
+    IORI_YAMIBARAI_C: 'special',
+    IORI_ONIYAKI: 'special',
+    IORI_ONIYAKI_C: 'special',
+    IORI_KOTOTSUKI: 'special',
+    IORI_KUZUKAZE: 'special',
+    IORI_AOIHANA: 'special',
+    IORI_AOIHANA_2: 'special',
+    IORI_AOIHANA_3: 'special',
+    IORI_YUMEYUMI: 'special',
+    IORI_KATANUGI: 'special',
+    IORI_YUKIWARUI: 'special',
+
+    // ===== Iori DM / SDM =====
+    DM_YAOTOME: 'dm',
+    SDM_YAOTOME: 'sdm',
   } as Partial<Record<AttackType, FeedbackTier>>,
 };
 
