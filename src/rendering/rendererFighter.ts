@@ -268,6 +268,22 @@ export function drawFighters(
       ctx.fillRect(sx + leanOffsetX - hw, sy - f.displayHeight, hw * 2, f.displayHeight);
       ctx.restore();
     }
+    // KOF2002: 挑衅起手星芒 — TAUNT stateAge<3时4颗金色星点
+    if (f.state === FighterState.TAUNT && f.stateAge < 3) {
+      ctx.save();
+      ctx.globalAlpha = (3 - f.stateAge) / 3 * 0.5;
+      ctx.fillStyle = '#ffdd44';
+      for (let ts = 0; ts < 4; ts++) {
+        const tAngle = (ts / 4) * Math.PI * 2 + globalTick * 0.5;
+        const tDist = 8 + f.stateAge * 5;
+        const tx = sx + Math.cos(tAngle) * tDist;
+        const ty = sy - f.displayHeight * 0.6 + Math.sin(tAngle) * tDist * 0.5;
+        ctx.beginPath();
+        ctx.arc(tx, ty, 2 - f.stateAge * 0.5, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.restore();
+    }
     // KOF2002: 投技无敌金色轮廓 — throwInvuln期间金色边框
     if (f.throwInvulnFrames > 0 && !f.invincible) {
       ctx.save();
@@ -288,6 +304,18 @@ export function drawFighters(
       ctx.beginPath();
       ctx.ellipse(sx, sy, 10, 3, 0, 0, Math.PI * 2);
       ctx.fill();
+      ctx.restore();
+    }
+    // KOF2002: 重击地面弹坑 — hitFlashFrames>8(重击)且着地时地面圆环
+    if (f.hitFlashFrames > 8 && f.isGrounded() && f.state === FighterState.HITSTUN) {
+      ctx.save();
+      ctx.globalAlpha = Math.min(0.3, f.hitFlashFrames / 15);
+      ctx.strokeStyle = '#ffaa44';
+      ctx.lineWidth = 2;
+      const craterR = 8 + (15 - f.hitFlashFrames) * 2;
+      ctx.beginPath();
+      ctx.ellipse(sx, sy + 2, craterR, craterR * 0.3, 0, 0, Math.PI * 2);
+      ctx.stroke();
       ctx.restore();
     }
     // KOF2002: 被投技摇晃 — isBeingThrown时身体微抖
@@ -899,6 +927,16 @@ export function drawFighters(
       ctx.beginPath();
       ctx.ellipse(sx, sy, hw + 12, 6, 0, 0, Math.PI * 2);
       ctx.fill();
+    }
+    // KOF2002: 低血量身体红晕 — HP<25%时身体渐变红色叠加
+    if (f.health < f.maxHealth * 0.25 && f.health > 0) {
+      const lowHpAlpha = (1 - f.health / (f.maxHealth * 0.25)) * 0.08;
+      ctx.save();
+      ctx.globalCompositeOperation = 'screen';
+      ctx.globalAlpha = lowHpAlpha;
+      ctx.fillStyle = '#ff2200';
+      ctx.fillRect(sx + leanOffsetX - 50, sy - f.displayHeight, 100, f.displayHeight);
+      ctx.restore();
     }
     // KOF2002: 防御崩坏破碎扩散 — 碎片从角色向外飞散
     if (f.state === FighterState.GUARD_CRUSH) {
