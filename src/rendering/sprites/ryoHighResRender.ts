@@ -472,6 +472,58 @@ export function drawHighResFrame(
 }
 
 /**
+ * Draw Ryo's high-res frame as a tinted afterimage ghost.
+ * Used for RUN/BACKDASH/ROLL trails instead of skeletal fallback.
+ * Returns true if a pixel frame was available and drawn.
+ */
+export function drawHighResAfterimage(
+  ctx: CanvasRenderingContext2D,
+  charId: string,
+  state: FighterState,
+  stateAge: number,
+  x: number,
+  y: number,
+  facing: number,
+  currentAttack: AttackType | null = null,
+  vx: number = 0,
+  tint: string = '#ff8844',
+  alpha: number = 0.25,
+): boolean {
+  if (charId !== 'ryo') return false;
+  initAllFrames();
+
+  const key = resolveFrameKey(state, currentAttack, vx, facing);
+  if (key === null) return false;
+
+  const entry = RYO_FRAMES.get(key);
+  if (!entry) return false;
+
+  const { frames, ticksPerFrame } = entry;
+  if (frames.length === 0) return false;
+
+  const frameIdx = Math.floor(stateAge / ticksPerFrame) % frames.length;
+  const frame = frames[frameIdx];
+  const scale = RYO_TARGET_DISPLAY_HEIGHT / frame.height;
+
+  // Build a tinted palette: replace all non-transparent colors with the tint
+  const tintedPalette: PixelPalette = {};
+  for (const [idxStr, color] of Object.entries(entry.palette)) {
+    const idx = Number(idxStr);
+    if (idx > 0 && color !== 'transparent') {
+      tintedPalette[idx] = tint;
+    } else {
+      tintedPalette[idx] = color;
+    }
+  }
+
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  drawPixelFrame(ctx, frame, x, y, scale, facing, tintedPalette);
+  ctx.restore();
+  return true;
+}
+
+/**
  * Draw Ryo's win/victory pose. Called directly during WIN_QUOTE game phase.
  */
 export function drawRyoWinPose(

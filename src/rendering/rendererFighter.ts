@@ -11,7 +11,7 @@ import { drawSkeletalFighter } from './skeletalFighter.js';
 import { drawAttackLimb } from './attackLimb.js';
 import type { SpriteRenderer } from './spriteRenderer.js';
 import { getCharacterColors } from './manifestRenderData.js';
-import { drawHighResFrame } from './sprites/ryoHighResRender.js';
+import { drawHighResFrame, drawHighResAfterimage } from './sprites/ryoHighResRender.js';
 import { getFighterBlender } from './animationBlender.js';
 
 const fighterDebugOverlayEnabled = isFighterDebugOverlayEnabled();
@@ -1659,33 +1659,46 @@ function getAttackColorAccent(charId: string): { body: string; outline: string; 
   }
 }
 
-/** Draw afterimage trail for RUN/BACKDASH/ROLL — skeletal pose with per-ghost alpha */
+/** Draw afterimage trail for RUN/BACKDASH/ROLL — pixel frame ghosts or skeletal fallback */
 function drawAfterimageTrail(
   ctx: CanvasRenderingContext2D, f: Fighter, sx: number, leanOffsetX: number,
   globalTick: number, maxModeActive: boolean,
 ): void {
   // KOF2002: 残影色调 — RUN=橙, BACKDASH=蓝, ROLL=绿
-  const trailManifestColors = getCharacterColors(f.charId ?? '');
-  const trailColor = f.state === FighterState.RUN
-    ? shiftColor(trailManifestColors.outfit, 40)
+  const trailTint = f.state === FighterState.RUN
+    ? '#ff8844'
     : f.state === FighterState.BACKDASH
-    ? shiftColor(trailManifestColors.outfit, 60)
-    : shiftColor(trailManifestColors.outfit, 50);
-  const trailOutline = f.state === FighterState.RUN
-    ? '#ff880050'
-    : f.state === FighterState.BACKDASH
-    ? '#6699ff50'
-    : '#44ff8850';
+    ? '#6699ff'
+    : '#44ff88';
 
   const ghostCount = 3;
   for (let i = 1; i <= ghostCount; i++) {
-    ctx.save();
-    // 渐隐 alpha: 第一道最清晰, 越远越淡
-    ctx.globalAlpha = 0.32 / i;
+    const ghostAlpha = 0.32 / i;
     const trailX = sx - leanOffsetX * i * 1.5 - f.facing * 12 * i;
-    // 用完整骨骼 pose 渲染残影，角色颜色略偏残影色调
-    drawSkeletalFighter(ctx, f, trailX, f.y, trailColor, trailOutline, globalTick, maxModeActive);
-    ctx.restore();
+    // Try pixel frame afterimage first (for Ryo), fall back to skeletal
+    const pixelDrawn = drawHighResAfterimage(
+      ctx, f.charId ?? '', f.state, f.stateAge,
+      trailX, f.y, f.facing, f.currentAttack, f.vx,
+      trailTint, ghostAlpha,
+    );
+    if (!pixelDrawn) {
+      // Skeletal fallback for non-pixel-frame characters
+      const trailManifestColors = getCharacterColors(f.charId ?? '');
+      const trailColor = f.state === FighterState.RUN
+        ? shiftColor(trailManifestColors.outfit, 40)
+        : f.state === FighterState.BACKDASH
+        ? shiftColor(trailManifestColors.outfit, 60)
+        : shiftColor(trailManifestColors.outfit, 50);
+      const trailOutline = f.state === FighterState.RUN
+        ? '#ff880050'
+        : f.state === FighterState.BACKDASH
+        ? '#6699ff50'
+        : '#44ff8850';
+      ctx.save();
+      ctx.globalAlpha = ghostAlpha;
+      drawSkeletalFighter(ctx, f, trailX, f.y, trailColor, trailOutline, globalTick, maxModeActive);
+      ctx.restore();
+    }
   }
 }
 
