@@ -196,6 +196,8 @@ export function handleGetup(ctx: FighterCtx, input: ResolvedInput): void {
     f.displayHeight = 100;
     f.vx = 0;
     f.otgHitCount = 0;
+    // KOF2002: 起身烟尘 — 起身瞬间产生灰尘
+    ctx.vfx.spawnDust(f.x, f.y);
 
     // Execute buffered reversal
     if (ctx.wakeupBuffer) {
