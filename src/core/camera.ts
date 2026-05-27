@@ -113,6 +113,14 @@ export class Camera {
     this.targetZoom = ZOOM_SUPER_FLASH;
   }
 
+  /** Trigger brief zoom pulse on first hit — KOF2002 first impact emphasis */
+  triggerFirstHitZoom(): void {
+    this.targetZoom = 1.06;
+    // Quick snap back via super flash zoom mechanism (12 frames)
+    this.superFlashZoomActive = true;
+    this.superFlashZoomTimer = 12;
+  }
+
   private updateKOZoom(): void {
     this.koZoomTimer--;
     if (this.koZoomTimer <= 0) {

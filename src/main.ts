@@ -893,6 +893,9 @@ function update(): void {
     const hitter = hitterIdx === 0 ? p1 : p2;
     vfx.spawnFirstAttackText(hitter.x, hitter.y - hitter.displayHeight - 40);
     announcer.firstAttack();
+    // KOF2002: First hit dramatic flash — brief white flash + camera zoom pulse
+    screenFlash.trigger('#ffffff', 0.2, 5);
+    camera.triggerFirstHitZoom();
     if (gauges[hitterIdx]) {
       gainMeterOnHit(gauges[hitterIdx], undefined, hitter.health, hitter.maxHealth);
     }
