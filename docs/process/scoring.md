@@ -2,7 +2,7 @@
 
 ## 1. 当前分数
 
-当前总分：`108/2000`
+当前总分：`111/2000`
 
 完整历史见 [SCORE.history.md](../archive/SCORE.history.md)。
 
@@ -17,9 +17,9 @@
 | 音频品质 | 150 | 10 | 合成SFX+BGM+Kyo 7种火焰SFX+Iori 8种暗紫SFX |
 | 角色内容 | 150 | 19 | Ryo全闭环+Kyo 14文件+Iori 14文件+三角色contentLoader集成 |
 | 战斗手感 | 150 | 18 | hitstop衰减+方向震屏+冲击环+斩击线+连段hitstop递减 |
-| 帧数据精度 | 100 | 13 | Frame Contract: Ryo全攻击+Kyo 47个ActionContract对齐 |
-| 游戏流程 | 100 | 20 | 选人→对战→KO→结算+3v3+训练模式+舞台名intro+DM暗幕 |
-| UI/HUD品质 | 50 | 12 | SNK风格能量槽+计时器+连段计数器+播报+像素帧缓存 |
+| 帧数据精度 | 100 | 14 | Frame Contract: Ryo+Kyo 47+Iori 47 ActionContract, 三角色逐帧碰撞对齐 |
+| 游戏流程 | 100 | 21 | 选人→对战→KO→结算+3v3+训练模式+舞台名intro+DM暗幕+Escape暂停菜单 |
+| UI/HUD品质 | 50 | 13 | SNK风格能量槽+计时器+连段计数器+播报+像素帧缓存+暂停菜单(招式/按键) |
 
 ## 2.1 Phase 2 千分制维度（1001-2000）
 
