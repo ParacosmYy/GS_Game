@@ -810,14 +810,19 @@ export const RyoDef: CharacterDefinition = {
       return AttackType.RYO_HIEN;
     }
 
-    // QCF+K → 霸王翔吼拳 (counter)
+    // QCF+K → D版虎煌(重飞行道具) / B版霸王翔吼拳
     if (input.kickPressed && cmdBuf.hasQCF(tick)) {
-      return AttackType.RYO_HAOU;
+      return input.buttonDPressed ? AttackType.RYO_KOOUKEN_D : AttackType.RYO_HAOU;
     }
 
     // QCF+P → 虎煌 (弱P/强P区分)
     if (special === AttackType.SPECIAL_PROJECTILE) {
       return input.buttonCPressed ? AttackType.RYO_KOOU_C : AttackType.RYO_KOOU;
+    }
+
+    // QCB+P → 斩裂拳 (多段连打)
+    if (input.punchPressed && cmdBuf.hasQCB(tick)) {
+      return AttackType.RYO_ZANRETSU_KEN;
     }
 
     return null;
@@ -829,8 +834,10 @@ export const RyoDef: CharacterDefinition = {
       || state === FighterState.HOP
       || state === FighterState.HYPER_JUMP;
     if (isAir) return null;
-    // →+A 冰柱割り (overhead)
-    if (input.buttonAPressed && input.forward && !input.down) return AttackType.RYO_TSURIZAO;
+    // →+A: 近距离→猛速突進拳 / 远距离→冰柱割り(overhead)
+    if (input.buttonAPressed && input.forward && !input.down) {
+      return _isCloseRange ? AttackType.RYO_HIO_HACKER : AttackType.RYO_TSURIZAO;
+    }
     // ↘+B 落蹴 (low)
     if (input.buttonBPressed && input.forward && input.down) return AttackType.RYO_ORISHI;
     return null;
