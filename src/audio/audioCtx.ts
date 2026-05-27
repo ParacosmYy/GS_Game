@@ -6,7 +6,12 @@
 let audioCtx: AudioContext | null = null;
 
 export function getCtx(): AudioContext {
-  if (!audioCtx) audioCtx = new AudioContext();
+  if (!audioCtx) {
+    if (typeof AudioContext === 'undefined') {
+      throw new Error('AudioContext not available — running in non-browser environment');
+    }
+    audioCtx = new AudioContext();
+  }
   return audioCtx;
 }
 

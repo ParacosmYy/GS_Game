@@ -105,6 +105,8 @@ function mockVFX() {
     spawnHienTrail: vi.fn(),
     spawnDMTenHaOuVFX: vi.fn(),
     spawnHaouFlash: vi.fn(),
+    spawnScorchMark: vi.fn(),
+    spawnKOSuperBurst: vi.fn(),
   };
 }
 

@@ -13,9 +13,9 @@
  * - Air attack type resolution (AIR_A vs AIR_C vs AIR_D from currentAttack)
  * - Cycle timing for animation frames
  *
- * Currently supports: IDLE, WALK (fwd/back), STAND_ATTACK (A/C),
- *   CROUCH, BLOCK, JUMP (all jump types), HITSTUN, KNOCKDOWN
- * Fallback states (crouch_attack, air_attack, block, etc.) will follow.
+ * Currently supports: IDLE, WALK (fwd/back), STAND_ATTACK (A/B/C/D + close variants),
+ *   CROUCH, CROUCH_ATTACK (A/B/C/D), AIR_ATTACK (A/C/D), BLOCK,
+ *   JUMP (all jump types), HITSTUN, KNOCKDOWN
  */
 
 import { FighterState, AttackType } from '../../core/types.js';
@@ -27,6 +27,9 @@ import { KYO_CROUCH_FRAMES } from './kyoCrouchFrames.js';
 import { KYO_JUMP_FRAMES } from './kyoJumpFrames.js';
 import { KYO_HURT_FRAMES, KYO_KNOCKDOWN_FRAMES, KYO_BLOCK_FRAMES } from './kyoDamageFrames.js';
 import { KYO_STAND_B_FRAMES, KYO_STAND_D_FRAMES } from './kyoKickFrames.js';
+import { KYO_CROUCH_A_FRAMES, KYO_CROUCH_C_FRAMES, KYO_CROUCH_B_FRAMES, KYO_CROUCH_D_FRAMES } from './kyoCrouchAttackFrames.js';
+import { KYO_AIR_A_FRAMES, KYO_AIR_C_FRAMES, KYO_AIR_D_FRAMES } from './kyoAirAttackFrames.js';
+import { KYO_CLOSE_A_FRAMES, KYO_CLOSE_C_FRAMES, KYO_CLOSE_B_FRAMES, KYO_CLOSE_D_FRAMES } from './kyoCloseAttackFrames.js';
 
 // ===== Internal Frame Registry =====
 
@@ -158,6 +161,23 @@ function initAllFrames(): void {
   // KICK ATTACKS
   registerVariableFrames('STAND_B', KYO_STAND_B_FRAMES, [7, 3, 2, 12]);
   registerVariableFrames('STAND_D', KYO_STAND_D_FRAMES, [10, 4, 4, 8, 12]);
+
+  // CLOSE ATTACKS — close-range variants
+  registerVariableFrames('CLOSE_A', KYO_CLOSE_A_FRAMES, [4, 2, 5, 5]);
+  registerVariableFrames('CLOSE_C', KYO_CLOSE_C_FRAMES, [2, 5, 6, 5]);
+  registerVariableFrames('CLOSE_B', KYO_CLOSE_B_FRAMES, [5, 2, 8]);
+  registerVariableFrames('CLOSE_D', KYO_CLOSE_D_FRAMES, [6, 4, 6, 8]);
+
+  // CROUCH ATTACKS
+  registerVariableFrames('CROUCH_A', KYO_CROUCH_A_FRAMES, [3, 2, 5]);
+  registerVariableFrames('CROUCH_C', KYO_CROUCH_C_FRAMES, [5, 3, 5, 10]);
+  registerVariableFrames('CROUCH_B', KYO_CROUCH_B_FRAMES, [4, 2, 7]);
+  registerVariableFrames('CROUCH_D', KYO_CROUCH_D_FRAMES, [6, 3, 3, 3, 12]);
+
+  // AIR ATTACKS
+  registerVariableFrames('AIR_A', KYO_AIR_A_FRAMES, [3, 3, 5]);
+  registerVariableFrames('AIR_C', KYO_AIR_C_FRAMES, [5, 3, 3, 5]);
+  registerVariableFrames('AIR_D', KYO_AIR_D_FRAMES, [4, 3, 3, 5]);
 }
 
 // ===== State Resolution =====
@@ -184,14 +204,26 @@ function resolveFrameKey(
 
     case FighterState.STAND_ATTACK:
       // Resolve punch vs kick attack types
-      if (currentAttack === AttackType.STAND_C || currentAttack === AttackType.CLOSE_C) {
+      if (currentAttack === AttackType.STAND_C) {
         return 'STAND_C';
       }
-      if (currentAttack === AttackType.STAND_D || currentAttack === AttackType.CLOSE_D) {
+      if (currentAttack === AttackType.CLOSE_C) {
+        return 'CLOSE_C';
+      }
+      if (currentAttack === AttackType.STAND_D) {
         return 'STAND_D';
       }
-      if (currentAttack === AttackType.STAND_B || currentAttack === AttackType.CLOSE_B) {
+      if (currentAttack === AttackType.CLOSE_D) {
+        return 'CLOSE_D';
+      }
+      if (currentAttack === AttackType.STAND_B) {
         return 'STAND_B';
+      }
+      if (currentAttack === AttackType.CLOSE_B) {
+        return 'CLOSE_B';
+      }
+      if (currentAttack === AttackType.CLOSE_A) {
+        return 'CLOSE_A';
       }
       return 'STAND_A';
 
@@ -199,11 +231,16 @@ function resolveFrameKey(
       return 'CROUCH';
 
     case FighterState.CROUCH_ATTACK:
-      // Crouch attacks reuse crouch frames (no dedicated crouch attack frames yet)
-      if (currentAttack === AttackType.CROUCH_D) {
-        return 'CROUCH';
+      if (currentAttack === AttackType.CROUCH_C) {
+        return 'CROUCH_C';
       }
-      return 'CROUCH';
+      if (currentAttack === AttackType.CROUCH_D) {
+        return 'CROUCH_D';
+      }
+      if (currentAttack === AttackType.CROUCH_B) {
+        return 'CROUCH_B';
+      }
+      return 'CROUCH_A';
 
     case FighterState.BLOCK:
       return 'BLOCK';
@@ -215,8 +252,13 @@ function resolveFrameKey(
       return 'JUMP';
 
     case FighterState.AIR_ATTACK:
-      // Air attacks reuse jump frames (no dedicated air attack frames yet)
-      return 'JUMP';
+      if (currentAttack === AttackType.JUMP_C) {
+        return 'AIR_C';
+      }
+      if (currentAttack === AttackType.JUMP_D) {
+        return 'AIR_D';
+      }
+      return 'AIR_A';
 
     case FighterState.HITSTUN:
       return 'HURT';

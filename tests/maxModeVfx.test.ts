@@ -6,21 +6,9 @@ import { drawMAXModeAura, drawMAXActivationFlash, resetMAXWisps } from '../src/r
 import type { MaxModeState } from '../src/core/types.js';
 
 /** Create a mock 2D canvas context that records fillRect calls */
-function createMockCtx(): {
-  fillRect: () => void;
-  arc: () => void;
-  fill: () => void;
-  stroke: () => void;
-  save: () => void;
-  restore: () => void;
-  beginPath: () => void;
-  ellipse: () => void;
-  strokeRect: () => void;
-  calls: string[];
-  createRadialGradient: () => { addColorStop: () => void };
-  createLinearGradient: () => { addColorStop: () => void };
-} {
+function createMockCtx(): Record<string, () => void> & { calls: string[] } {
   const calls: string[] = [];
+  const noop = () => {};
   return {
     fillRect: () => { calls.push('fillRect'); },
     arc: () => { calls.push('arc'); },
@@ -29,8 +17,20 @@ function createMockCtx(): {
     save: () => { calls.push('save'); },
     restore: () => { calls.push('restore'); },
     beginPath: () => { calls.push('beginPath'); },
+    closePath: noop,
     ellipse: () => { calls.push('ellipse'); },
     strokeRect: () => { calls.push('strokeRect'); },
+    moveTo: noop,
+    lineTo: noop,
+    quadraticCurveTo: noop,
+    bezierCurveTo: noop,
+    globalAlpha: 1 as number,
+    fillStyle: '' as string,
+    strokeStyle: '' as string,
+    lineWidth: 1 as number,
+    shadowBlur: 0 as number,
+    shadowColor: '' as string,
+    globalCompositeOperation: 'source-over' as string,
     calls,
     createRadialGradient: () => ({
       addColorStop: () => { calls.push('addColorStop'); },
