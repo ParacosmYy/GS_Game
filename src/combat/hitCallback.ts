@@ -723,6 +723,25 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       deps.vfx.spawnImpactRing(hitX, hitY, 1.0);
     }
 
+    // === Kim 角色专属必杀技VFX — 跆拳道主题 ===
+    // Hienzan (飛燕斬) — flash kick uppercut
+    if (atkName === 'KIM_HIENZAN') {
+      deps.cinematic.addHitStop(1, defIdx);
+      deps.screenShake.trigger(7, 6, attacker.facing * 4);
+      deps.vfx.spawnImpactRing(hitX, hitY, 1.0);
+    }
+    // Hishou (飛翔脚) — flying kick
+    if (atkName === 'KIM_HISHOU') {
+      deps.cinematic.addHitStop(1, defIdx);
+      deps.screenShake.trigger(6, 5, attacker.facing * 3);
+    }
+    // Hangetsu (半月斬) — crescent kick
+    if (atkName === 'KIM_HANGETSU') {
+      deps.cinematic.addHitStop(1, defIdx);
+      deps.screenShake.trigger(7, 7, attacker.facing * 4);
+      deps.vfx.spawnImpactRing(hitX, hitY, 0.9);
+    }
+
     // SFX
     if (isDM) {
       const isHSDM = (attackType as string).startsWith('HSDM_');
