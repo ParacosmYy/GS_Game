@@ -4,7 +4,7 @@
 
 
 
-当前总分：`162/2000`
+当前总分：`168/2000`
 b5b42fb (docs(scoring): 144->145/2000 special move variable frames)
 6b7b47c (docs(scoring): 149->150/2000 pulsing win diamonds)
 
