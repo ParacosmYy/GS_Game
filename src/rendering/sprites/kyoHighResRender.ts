@@ -13,8 +13,9 @@
  * - Air attack type resolution (AIR_A vs AIR_C vs AIR_D from currentAttack)
  * - Cycle timing for animation frames
  *
- * Currently supports: IDLE, WALK (forward/backward), STAND_ATTACK (A/C)
- * Fallback states (crouch, jump, kick, etc.) will be added in subsequent iterations.
+ * Currently supports: IDLE, WALK (fwd/back), STAND_ATTACK (A/C),
+ *   CROUCH, JUMP (all jump types), HITSTUN, KNOCKDOWN
+ * Fallback states (crouch_attack, air_attack, block, etc.) will follow.
  */
 
 import { FighterState, AttackType } from '../../core/types.js';
@@ -22,6 +23,9 @@ import { drawPixelFrame, prerenderFrame, drawPrerenderedFrame, type PixelFrame, 
 import { KYO_IDLE_FRAMES } from './kyoIdleFrames.js';
 import { KYO_WALK_FORWARD_FRAMES, KYO_WALK_BACKWARD_FRAMES } from './kyoWalkFrames.js';
 import { KYO_STAND_A_FRAMES, KYO_STAND_C_FRAMES } from './kyoAttackFrames.js';
+import { KYO_CROUCH_FRAMES } from './kyoCrouchFrames.js';
+import { KYO_JUMP_FRAMES } from './kyoJumpFrames.js';
+import { KYO_HURT_FRAMES, KYO_KNOCKDOWN_FRAMES } from './kyoDamageFrames.js';
 
 // ===== Internal Frame Registry =====
 
@@ -133,6 +137,19 @@ function initAllFrames(): void {
   // STAND_C (heavy punch) — 5 frames: windup-snap-hold-retract1-retract2
   // startup=7, active=3, recovery=20
   registerVariableFrames('STAND_C', KYO_STAND_C_FRAMES, [7, 3, 2, 8, 12]);
+
+  // CROUCH — 4-frame crouch idle breathing loop
+  registerVariableFrames('CROUCH', KYO_CROUCH_FRAMES, [8, 10, 8, 10]);
+
+  // JUMP — 6-frame jump arc with variable timing
+  // pre-jump, rise, peak_up, peak_fwd, descend, land
+  registerVariableFrames('JUMP', KYO_JUMP_FRAMES, [4, 3, 5, 6, 5, 4]);
+
+  // DAMAGE — hurt flinch and knockdown
+  // HURT: quick recoil then settle [3, 5, 6, 4]
+  registerVariableFrames('HURT', KYO_HURT_FRAMES, [3, 5, 6, 4]);
+  // KNOCKDOWN: fly up slow, slam fast, ground settle
+  registerVariableFrames('KNOCKDOWN', KYO_KNOCKDOWN_FRAMES, [4, 5, 6, 8, 10, 12]);
 }
 
 // ===== State Resolution =====
@@ -163,6 +180,21 @@ function resolveFrameKey(
         return 'STAND_C';
       }
       return 'STAND_A';
+
+    case FighterState.CROUCH:
+      return 'CROUCH';
+
+    case FighterState.JUMP:
+    case FighterState.RUN_JUMP:
+    case FighterState.HOP:
+    case FighterState.HYPER_JUMP:
+      return 'JUMP';
+
+    case FighterState.HITSTUN:
+      return 'HURT';
+
+    case FighterState.KNOCKDOWN:
+      return 'KNOCKDOWN';
 
     default:
       return null;

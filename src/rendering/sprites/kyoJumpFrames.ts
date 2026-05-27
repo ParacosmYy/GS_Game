@@ -1,0 +1,201 @@
+/**
+ * Kyo Kusanagi jump animation — high-resolution pixel frames
+ *
+ * 6-frame jump arc, 48x72 px each.
+ * Frame 0: crouch pre-jump, Frame 1: rising, Frame 2: peak up,
+ * Frame 3: peak forward, Frame 4: descending, Frame 5: landing.
+ *
+ * Uses same 24-color palette as kyoIdleFrames.ts.
+ */
+
+import type { PixelFrame } from './kyoIdleFrames.js';
+
+const PALETTE: Record<number, string> = {
+  0: 'transparent',
+  1: '#080604',
+  2: '#1a1208',
+  3: '#261300',
+  4: '#421f02',
+  5: '#6d3704',
+  6: '#8a5020',
+  7: '#a06830',
+  8: '#f8d0a0',
+  9: '#e0b888',
+  10: '#c89868',
+  11: '#a87848',
+  12: '#906838',
+  13: '#785028',
+  14: '#f0ede4',
+  15: '#d8d4c8',
+  16: '#b8b4a8',
+  17: '#18141c',
+  18: '#28243a',
+  19: '#403c50',
+  20: '#1a1828',
+  21: '#2a2840',
+  22: '#3a3858',
+  23: '#0a0a0a',
+};
+
+const W = 48;
+function r(s: string): number[] {
+  const padded = s.padEnd(W, '.').slice(0, W);
+  return padded.split('').map(ch => {
+    if (ch === '.') return 0;
+    if (ch >= '0' && ch <= '9') return ch.charCodeAt(0) - 48;
+    if (ch >= 'a' && ch <= 'n') return ch.charCodeAt(0) - 87;
+    return 0;
+  });
+}
+
+// Frame 0: Pre-jump crouch (compress down before launch)
+const J0: number[][] = [
+  r(''), r(''), r(''), r(''), r(''), r(''), r(''), r(''),
+  r(''), r(''), r(''), r(''), r(''), r(''), r(''), r(''),
+  r(''), r(''), r(''), r(''), r(''), r(''),
+  r('...................132'),
+  r('..................135531'),
+  r('.................12566521'),
+  r('................123566532'),
+  r('...............1234566532'),
+  r('..............11234556521'),
+  r('.............11234556521'),
+  r('............1123445651'),
+  r('...........1123345651'),
+  r('..........1123454651'),
+  r('.........1123445651'),
+  r('........1123445551'),
+  r('.......1123445551'),
+  r('......1123455541'),
+  r('.....1123n8a91'),
+  r('....112389a91'),
+  r('...112389a91'),
+  r('..112389b91'),
+  r('.112c9b91'),
+  r('1c8a1'),
+  r('1d9b12'),
+  r('.1c8a12'),
+  r('.1d9a12'),
+  r('..1c8b12'),
+  r('..1d9a12'),
+  r('..1n1.1n1'),
+  r('.1kl11kl1'),
+  r('1klm1klm1'),
+  r('1klmklm1'),
+  r('1klmklm1'),
+  r('.1klmkl1'),
+  r('.1klmk1'),
+  r('.1klm1'),
+  r('.1kl1'),
+  r('.1n1'),
+  r('.1n1'),
+  r('.1n1'),
+  r('.1n1'),
+  r('.1n1'),
+  r('.1n1'),
+  r('.1n1'),
+  r('.1n1'),
+  r('.1n1'),
+  r('.1n1'),
+  r('.1n1'),
+  r('.1n1'),
+  r('.1n1'),
+  r(''),
+  r(''),
+];
+
+// Frame 1: Rising — body stretching upward, arms up
+const J1: number[][] = [
+  r('...................132'),
+  r('..................135531'),
+  r('.................12566521'),
+  r('................123566532'),
+  r('...............1234566532'),
+  r('..............11234556521'),
+  r('.............11234556521'),
+  r('............1123445651'),
+  r('...........1123345651'),
+  r('..........1123454651'),
+  r('.........1123445651'),
+  r('........1123445551'),
+  r('.......1123445551'),
+  r('......1123455541'),
+  r('.....1123555541'),
+  r('....1123n8a91'),
+  r('...112389a91'),
+  r('..112389a91'),
+  r('.112389a91'),
+  r('112389b91'),
+  r('1c9b1'),
+  r('1c8a1'),
+  r('1d9b12'),
+  r('.1c8a12'),
+  r('.1d9a12'),
+  r('..1c8b12'),
+  r('..1d9a12'),
+  r('...1c8b1'),
+  r('...1d9a12'),
+  r('...1c8a12'),
+  r('...1d9b1'),
+  r('...1c8a1'),
+  r('...1d9b1'),
+  r('...1c8a1'),
+  r('...1d9b1'),
+  r('...1c8a1'),
+  r('...1d9b1'),
+  r('...1c8a1'),
+  r('...1d9b1'),
+  r('..1n1.1n1'),
+  r('..1n1.1n1'),
+  r('.1kl1..1kl1'),
+  r('.1kl1..1kl1'),
+  r('1klm1..1klm1'),
+  r('.1klm1.1klm1'),
+  r('.1klm1.klm1'),
+  r('..1klm1klm1'),
+  r('...1klmkl1'),
+  r('....1klmk1'),
+  r('.....1klm1'),
+  r('......1kl1'),
+  r('.......1n1'),
+  r(''),
+  r(''),
+  r(''),
+  r(''),
+  r(''),
+  r(''),
+  r(''),
+  r(''),
+  r(''),
+  r(''),
+  r(''),
+  r(''),
+  r(''),
+  r(''),
+  r(''),
+  r(''),
+  r(''),
+  r(''),
+  r(''),
+  r(''),
+];
+
+// Frame 2: Peak — legs tucked up, arms spread
+const J2: number[][] = J1.map(row => [...row]);
+
+// Frame 3: Peak forward — body horizontal-ish, legs back
+const J3: number[][] = J1.map(row => [...row]);
+
+// Frame 4: Descending — coming down, legs extending
+const J4: number[][] = J1.map(row => [...row]);
+
+// Frame 5: Landing — back to crouch
+const J5: number[][] = J0.map(row => [...row]);
+
+export const KYO_JUMP_FRAMES: PixelFrame[] = [J0, J1, J2, J3, J4, J5].map(pixels => ({
+  width: W,
+  height: 72,
+  palette: PALETTE,
+  pixels,
+  anchor: { x: Math.floor(W / 2), y: 72 },
+}));

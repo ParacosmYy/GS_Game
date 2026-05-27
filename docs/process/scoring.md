@@ -2,7 +2,7 @@
 
 ## 1. 当前分数
 
-当前总分：`211/2000`
+当前总分：`214/2000`
 
 完整历史见 [SCORE.history.md](../archive/SCORE.history.md)。
 
