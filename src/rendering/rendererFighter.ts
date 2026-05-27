@@ -214,6 +214,10 @@ export function drawFighters(
     if (f.invincible || f.throwInvulnFrames > 0) {
       ctx.globalAlpha = 0.6 + Math.sin(globalTick * 0.5) * 0.15;
     }
+    // KOF2002: 后撤步渐隐 — 后dash期间身体更透明(幻影感)
+    if (f.state === FighterState.BACKDASH) {
+      ctx.globalAlpha = Math.min(ctx.globalAlpha || 1, 0.75);
+    }
 
     // GC Roll green aura
     if (f.isRolling() && f.isGCRoll) {
