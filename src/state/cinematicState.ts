@@ -46,6 +46,10 @@ export const KO_TRANSITION_PAUSE = 60;
 
 export class CinematicState {
   hitStop = 0;
+  /** Total hitstop frames requested — used to calculate decay phase */
+  private hitStopTotal = 0;
+  /** Decay phase: 'full' = complete freeze, 'ease' = partial slowdown, 'none' = normal */
+  private hitStopPhase: 'full' | 'ease' | 'none' = 'none';
   superFlashTimer = 0;
   superFlashX = 0;
   superFlashY = 0;
@@ -90,10 +94,37 @@ export class CinematicState {
     if (this.superFlashTimer > 0) this.superFlashTimer--;
   }
 
-  /** Returns true if hit-stop is active (freezes game logic). Decrements hitStop each call. */
+  /** Returns true if hit-stop is active (freezes game logic).
+   *  KOF2002-style decay: full freeze → 2-frame ease-out (partial) → resume.
+   *  - First (total - 2) frames: complete freeze (hitStop--)
+   *  - Last 2 frames: ease-out phase — still frozen but marked for rendering interpolation
+   */
   isFrozen(): boolean {
-    if (this.hitStop > 0) { this.hitStop--; return true; }
+    if (this.hitStop > 0) {
+      this.hitStop--;
+      // Determine decay phase based on remaining frames vs total
+      const remaining = this.hitStop;
+      if (remaining >= 2) {
+        this.hitStopPhase = 'full';
+      } else {
+        this.hitStopPhase = 'ease';
+      }
+      return true;
+    }
+    this.hitStopPhase = 'none';
+    this.hitStopTotal = 0;
     return false;
+  }
+
+  /** Get current hitstop decay phase — rendering layer uses this for interpolation */
+  getHitStopPhase(): 'full' | 'ease' | 'none' {
+    return this.hitStopPhase;
+  }
+
+  /** Get hitstop progress 0..1 (0 = just started, 1 = about to end) — for rendering interpolation */
+  getHitStopProgress(): number {
+    if (this.hitStopTotal <= 0) return 1;
+    return 1 - (this.hitStop / this.hitStopTotal);
   }
 
   /** Called during hit-stop freeze: ticks MAX mode + super flash */
@@ -105,13 +136,16 @@ export class CinematicState {
   /** Set hit-stop freeze for N frames, with defender info for jitter rendering */
   triggerHitStop(frames: number, defenderIdx: number = -1, bias: number = 0): void {
     this.hitStop = frames;
+    this.hitStopTotal = frames;
     this.hitStopDefender = defenderIdx;
     this.hitStopBias = bias;
+    this.hitStopPhase = frames > 0 ? 'full' : 'none';
   }
 
   /** Add frames to existing hit-stop (stack, not replace) */
   addHitStop(frames: number, defenderIdx: number = -1): void {
     this.hitStop += frames;
+    this.hitStopTotal += frames;
     if (defenderIdx >= 0) this.hitStopDefender = defenderIdx;
   }
 
@@ -276,6 +310,8 @@ export class CinematicState {
   /** Full reset: back to match-select / character-select state */
   reset(): void {
     this.hitStop = 0;
+    this.hitStopTotal = 0;
+    this.hitStopPhase = 'none';
     this.hitStopDefender = -1;
     this.hitStopBias = 0;
     this.superFlashTimer = 0;
@@ -299,6 +335,8 @@ export class CinematicState {
   /** Reset between rounds: slow-mo + hit-stop + superFlash + damage, keep victory fanfare */
   resetForNewRound(): void {
     this.hitStop = 0;
+    this.hitStopTotal = 0;
+    this.hitStopPhase = 'none';
     this.hitStopDefender = -1;
     this.hitStopBias = 0;
     this.superFlashTimer = 0;
