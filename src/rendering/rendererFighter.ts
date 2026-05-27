@@ -508,6 +508,22 @@ export function drawFighters(
 
     drawAttackLimb(ctx, f, sx, sy);
 
+    // KOF2002: 攻击发动闪光 — 出手前3帧拳头/脚尖位置白色小光点
+    if (f.state === FighterState.STAND_ATTACK || f.state === FighterState.CROUCH_ATTACK || f.state === FighterState.AIR_ATTACK) {
+      if (f.stateAge < 3) {
+        ctx.save();
+        const glowAlpha = (3 - f.stateAge) / 3 * 0.6;
+        ctx.globalAlpha = glowAlpha;
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        const limbX = sx + f.facing * (hw + 15);
+        const limbY = sy - f.displayHeight / 2;
+        ctx.arc(limbX, limbY, 5 - f.stateAge, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+
     // KOF2002: 防御护盾效果 — 站防/蹲防时可见的半透明护盾
     if (f.state === FighterState.BLOCK || f.state === FighterState.AIR_BLOCK) {
       ctx.save();
