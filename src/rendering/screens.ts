@@ -675,6 +675,18 @@ export function drawIntro(ctx: CanvasRenderingContext2D, phaseTimer: number, cur
 
   // Phase 1: "ROUND X" (0 ~ INTRO_ROUND_FRAMES)
   if (phaseTimer < INTRO_ROUND_FRAMES) {
+    // KOF2002: 回合开始能量爆发 — 前5帧中心放射状扩散环
+    if (phaseTimer < 5) {
+      ctx.save();
+      ctx.globalAlpha = (5 - phaseTimer) / 5 * 0.2;
+      ctx.strokeStyle = '#ffcc44';
+      ctx.lineWidth = 2;
+      const burstR = 20 + phaseTimer * 40;
+      ctx.beginPath();
+      ctx.ellipse(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, burstR, burstR * 0.5, 0, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.restore();
+    }
     const progress = phaseTimer / INTRO_ROUND_FRAMES;
     const fadeIn = Math.min(1, phaseTimer / 20);
     const fadeOut = phaseTimer > INTRO_ROUND_FRAMES - 20 ? (INTRO_ROUND_FRAMES - phaseTimer) / 20 : 1;

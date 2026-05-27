@@ -355,6 +355,14 @@ export function drawFighters(
     // KOF2002: 后撤步渐隐 — 后dash期间身体更透明(幻影感)
     if (f.state === FighterState.BACKDASH) {
       ctx.globalAlpha = Math.min(ctx.globalAlpha || 1, 0.75);
+      // KOF2002: 后撤幻影 — BACKDASH前6帧身后半透明幻影
+      if (f.stateAge < 6) {
+        ctx.save();
+        ctx.globalAlpha = (6 - f.stateAge) / 6 * 0.15;
+        ctx.fillStyle = playerIdx === 0 ? '#44ff88' : '#4488ff';
+        ctx.fillRect(sx - f.facing * 15 + leanOffsetX - 30, sy - f.displayHeight, 60, f.displayHeight);
+        ctx.restore();
+      }
     }
     // KOF2002: 攻击恢复期变暗 — 攻击动作后半段身体微暗(显示破绽)
     if ((f.state === FighterState.STAND_ATTACK || f.state === FighterState.CROUCH_ATTACK) && f.stateAge > 15) {
@@ -1002,6 +1010,24 @@ export function drawFighters(
       ctx.fillStyle = '#ffaa44';
       ctx.fillRect(sx + leanOffsetX - hw, sy - f.displayHeight, hw * 2, f.displayHeight);
       ctx.restore();
+      // KOF2002: 眩晕濒危头部电弧 — stunGauge>85%时头顶小电弧
+      if (f.stunGauge > 85) {
+        ctx.save();
+        ctx.globalAlpha = (f.stunGauge - 85) / 15 * 0.4;
+        ctx.strokeStyle = '#ffee44';
+        ctx.lineWidth = 1;
+        const arcBaseY = sy - f.displayHeight - 5;
+        for (let a = 0; a < 2; a++) {
+          const ax = sx + Math.sin(globalTick * 0.4 + a * 3) * 15;
+          const ay = arcBaseY + Math.cos(globalTick * 0.5 + a * 2) * 8;
+          ctx.beginPath();
+          ctx.moveTo(ax - 4, ay);
+          ctx.lineTo(ax + 4, ay + 3);
+          ctx.lineTo(ax, ay - 2);
+          ctx.stroke();
+        }
+        ctx.restore();
+      }
       // KOF2002: 空中攻击冲击环
       if (f.hitFlashFrames > 0) {
         ctx.save();
