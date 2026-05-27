@@ -21,6 +21,7 @@ import {
   drawAfterimageFromRegistry,
   type FrameEntry,
 } from '../shared/baseHighResRenderer.js';
+import { drawPixelFrame } from '../shared/pixelFrameRenderer.js';
 import { KYO_IDLE_FRAMES } from './kyoIdleFrames.js';
 import { KYO_WALK_FORWARD_FRAMES, KYO_WALK_BACKWARD_FRAMES } from './kyoWalkFrames.js';
 import { KYO_STAND_A_FRAMES, KYO_STAND_C_FRAMES } from './kyoAttackFrames.js';
@@ -257,4 +258,23 @@ export function drawKyoHighResAfterimage(
   const key = resolveKyoFrameKey(state, currentAttack, vx, facing);
   if (key === null) return false;
   return drawAfterimageFromRegistry(ctx, KYO_FRAMES, key, stateAge, x, y, facing, KYO_TARGET_DISPLAY_HEIGHT, tint, alpha);
+}
+
+export function drawKyoWinPose(
+  ctx: CanvasRenderingContext2D,
+  stateAge: number,
+  x: number,
+  y: number,
+  facing: number,
+): boolean {
+  initKyoFrames();
+  const entry = KYO_FRAMES.get('WIN');
+  if (!entry) return false;
+  const { frames, palette, ticksPerFrame } = entry;
+  if (frames.length === 0) return false;
+  const frameIdx = Math.floor(stateAge / ticksPerFrame) % frames.length;
+  const frame = frames[frameIdx];
+  const scale = KYO_TARGET_DISPLAY_HEIGHT / frame.height;
+  drawPixelFrame(ctx, frame, x, y, scale, facing, palette);
+  return true;
 }

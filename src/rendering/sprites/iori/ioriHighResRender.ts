@@ -16,6 +16,7 @@ import {
   drawAfterimageFromRegistry,
   type FrameEntry,
 } from '../shared/baseHighResRenderer.js';
+import { drawPixelFrame } from '../shared/pixelFrameRenderer.js';
 import { IORI_IDLE_FRAMES } from './ioriIdleFrames.js';
 import { IORI_WALK_FORWARD_FRAMES, IORI_WALK_BACKWARD_FRAMES } from './ioriWalkFrames.js';
 import { IORI_CROUCH_FRAMES } from './ioriCrouchFrames.js';
@@ -25,6 +26,7 @@ import { IORI_HURT_FRAMES, IORI_KNOCKDOWN_FRAMES, IORI_BLOCK_FRAMES } from './io
 import { IORI_STAND_B_FRAMES, IORI_STAND_D_FRAMES } from './ioriKickFrames.js';
 import { IORI_CROUCH_A_FRAMES, IORI_CROUCH_C_FRAMES, IORI_CROUCH_B_FRAMES, IORI_CROUCH_D_FRAMES } from './ioriCrouchAttackFrames.js';
 import { IORI_AIR_A_FRAMES, IORI_AIR_C_FRAMES, IORI_AIR_D_FRAMES } from './ioriAirAttackFrames.js';
+import { IORI_WIN_POSE, IORI_WIN_LAUGH } from './ioriWinFrames.js';
 
 const IORI_FRAMES = new Map<string, FrameEntry>();
 const FRAME_CACHE = new Map<string, HTMLCanvasElement>();
@@ -65,6 +67,9 @@ function initIoriFrames(): void {
   registerVariableFrames('AIR_A', IORI_AIR_A_FRAMES, [3, 3, 5]);
   registerVariableFrames('AIR_C', IORI_AIR_C_FRAMES, [5, 3, 3, 5]);
   registerVariableFrames('AIR_D', IORI_AIR_D_FRAMES, [4, 3, 3, 5]);
+
+  // WIN pose
+  registerVariableFrames('WIN', [IORI_WIN_POSE, IORI_WIN_LAUGH], [6, 30]);
 }
 
 function resolveIoriFrameKey(
@@ -157,4 +162,23 @@ export function drawIoriHighResAfterimage(
   const key = resolveIoriFrameKey(state, currentAttack, vx, facing);
   if (key === null) return false;
   return drawAfterimageFromRegistry(ctx, IORI_FRAMES, key, stateAge, x, y, facing, IORI_TARGET_DISPLAY_HEIGHT, tint, alpha);
+}
+
+export function drawIoriWinPose(
+  ctx: CanvasRenderingContext2D,
+  stateAge: number,
+  x: number,
+  y: number,
+  facing: number,
+): boolean {
+  initIoriFrames();
+  const entry = IORI_FRAMES.get('WIN');
+  if (!entry) return false;
+  const { frames, palette, ticksPerFrame } = entry;
+  if (frames.length === 0) return false;
+  const frameIdx = Math.floor(stateAge / ticksPerFrame) % frames.length;
+  const frame = frames[frameIdx];
+  const scale = IORI_TARGET_DISPLAY_HEIGHT / frame.height;
+  drawPixelFrame(ctx, frame, x, y, scale, facing, palette);
+  return true;
 }

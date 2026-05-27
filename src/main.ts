@@ -19,6 +19,8 @@ import { VFXSystem, ScreenShake, ScreenFlash } from './rendering/vfx.js';
 import { cycleStage, setStage, getStage, getAllStages, type StageId } from './rendering/stage.js';
 import { drawVictoryPose } from './rendering/skeletalFighter.js';
 import { drawRyoWinPose } from './rendering/sprites/ryo/ryoHighResRender.js';
+import { drawKyoWinPose } from './rendering/sprites/kyo/kyoHighResRender.js';
+import { drawIoriWinPose } from './rendering/sprites/iori/ioriHighResRender.js';
 import type { TeamDisplayInfo } from './rendering/hud.js';
 import { addArcadeScore, resetArcadeScore, addArcadePerfect, addArcadeMatchWin, getArcadeStats, addArcadeCumulativeStats } from './rendering/hud.js';
 import { ROSTER } from './characters/index.js';
@@ -29,7 +31,7 @@ import { SelectState } from './state/selectState.js';
 import { RoundState } from './state/roundState.js';
 import { DMManager } from './combat/dmManager.js';
 import { createHitCallback, triggerKOGroundEffect } from './combat/hitCallback.js';
-import { initAudio, initSampler, playKO, playVictoryFanfare, playMAXActivation, playPerfect, playThrowEscape, playFight, playRoll, playCancel, playQuickStand, playGuardCrush, playHit, playSpecialLight, playSpecialHeavy, playDM, playWhoosh, playHeavyWhoosh, playKoouken, playKoHou, playHien, playHaou, playCursorMove, playCursorConfirm, playTimeUp } from './audio/sampler.js';
+import { initAudio, initSampler, playKO, playVictoryFanfare, playMAXActivation, playPerfect, playThrowEscape, playFight, playRoll, playCancel, playQuickStand, playGuardCrush, playHit, playSpecialLight, playSpecialHeavy, playDM, playWhoosh, playHeavyWhoosh, playKoouken, playKoHou, playHien, playHaou, playCursorMove, playCursorConfirm, playTimeUp, playFootstep } from './audio/sampler.js';
 import { tickAttackSFX, dispatchContractSFX } from './audio/attackSFX.js';
 import { getContractEventTags } from './entities/fighter.js';
 import { tickMotionSFX } from './audio/motionSFX.js';
@@ -428,6 +430,38 @@ function update(): void {
 
   if (gs.phase === GamePhase.INTRO) {
     gs.phaseTimer++;
+
+    // KOF2002: Character entrance — fighters walk in from stage edges
+    const ENTRANCE_DURATION = 40;
+    if (gs.phaseTimer <= ENTRANCE_DURATION) {
+      const t = gs.phaseTimer / ENTRANCE_DURATION;
+      const eased = t * t * (3 - 2 * t); // smoothstep
+      const p1Home = STAGE_WIDTH * 0.30;
+      const p2Home = STAGE_WIDTH * 0.70;
+      p1.x = -80 + (p1Home + 80) * eased;
+      p2.x = (STAGE_WIDTH + 80) + (p2Home - STAGE_WIDTH - 80) * eased;
+      p1.state = FighterState.WALK;
+      p2.state = FighterState.WALK;
+      // Set vx matching facing direction so walk-forward frame is resolved
+      p1.vx = p1.facing;
+      p2.vx = p2.facing;
+      // Advance animation age since fighterController isn't ticking during INTRO
+      p1.stateAge = gs.phaseTimer;
+      p2.stateAge = gs.phaseTimer;
+      // Footstep SFX every 10 frames during entrance
+      if (gs.phaseTimer % 10 === 1) playFootstep();
+    } else if (gs.phaseTimer === ENTRANCE_DURATION + 1) {
+      p1.state = FighterState.IDLE;
+      p2.state = FighterState.IDLE;
+      p1.stateAge = 0;
+      p2.stateAge = 0;
+      p1.vx = 0;
+      p2.vx = 0;
+      // Arrival dust puff
+      vfx.spawnDust(p1.x, p1.y);
+      vfx.spawnDust(p2.x, p2.y);
+    }
+
     // Tick announce sequence, play SFX on trigger frames
     if (gs.announceSequence.isRunning()) {
       const sfxId = gs.announceSequence.tick();
@@ -1275,7 +1309,12 @@ function render(): void {
     // KOF2002: 胜利姿势动画显示在胜利台词背景
     const wx = winner.x - camera.x;
     const wy = winner.y;
-    if (!drawRyoWinPose(ctx, gs.winQuoteTimer, wx, wy, winner.facing)) {
+    const wCharId = winner.charId ?? '';
+    let winPoseDrawn = false;
+    if (wCharId === 'ryo') winPoseDrawn = drawRyoWinPose(ctx, gs.winQuoteTimer, wx, wy, winner.facing);
+    else if (wCharId === 'kyo') winPoseDrawn = drawKyoWinPose(ctx, gs.winQuoteTimer, wx, wy, winner.facing);
+    else if (wCharId === 'iori') winPoseDrawn = drawIoriWinPose(ctx, gs.winQuoteTimer, wx, wy, winner.facing);
+    if (!winPoseDrawn) {
       drawVictoryPose(ctx, wx, wy, winner.facing, winner.color, '#ffffff30', tickRef.value, winner.charId);
     }
     // Victory sparkle — occasional character-colored sparkles around winner
@@ -1302,7 +1341,12 @@ function render(): void {
     if (gs.winner !== null) {
       const w = gs.winner === 0 ? p1 : p2;
       const wx = w.x - camera.x;
-      if (!drawRyoWinPose(ctx, gs.phaseTimer, wx, w.y, w.facing)) {
+      const mCharId = w.charId ?? '';
+      let matchEndPoseDrawn = false;
+      if (mCharId === 'ryo') matchEndPoseDrawn = drawRyoWinPose(ctx, gs.phaseTimer, wx, w.y, w.facing);
+      else if (mCharId === 'kyo') matchEndPoseDrawn = drawKyoWinPose(ctx, gs.phaseTimer, wx, w.y, w.facing);
+      else if (mCharId === 'iori') matchEndPoseDrawn = drawIoriWinPose(ctx, gs.phaseTimer, wx, w.y, w.facing);
+      if (!matchEndPoseDrawn) {
         drawVictoryPose(ctx, wx, w.y, w.facing, w.color, '#ffffff30', tickRef.value, w.charId);
       }
     }
