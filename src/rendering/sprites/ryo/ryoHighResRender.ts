@@ -44,6 +44,7 @@ import { RYO_BLOCK_FRAMES } from './ryoBlockFrames.js';
 import { RYO_WIN_FRAMES } from './ryoWinFrames.js';
 import { RYO_DIZZY_FRAMES } from './ryoDizzyFrames.js';
 import { RYO_THROW_FRAMES } from './ryoThrowFrames.js';
+import { RYO_TSURIZAO_FRAMES, RYO_ORISHI_FRAMES } from './ryoCommandNormalFrames.js';
 
 const RYO_FRAMES = new Map<string, FrameEntry>();
 const FRAME_CACHE = new Map<string, HTMLCanvasElement>();
@@ -107,6 +108,10 @@ function initRyoFrames(): void {
   registerVariableFrames('BLOCK', RYO_BLOCK_FRAMES, [3, 8]);
   registerVariableFrames('DIZZY', RYO_DIZZY_FRAMES, [8, 10, 8, 12, 8, 10, 8, 14]);
   registerVariableFrames('THROW', RYO_THROW_FRAMES, [3, 4, 5, 6, 8, 10]);
+
+  // Command normals
+  registerVariableFrames('CMD_TSURIZAO', RYO_TSURIZAO_FRAMES, [12, 3, 4, 18]);
+  registerVariableFrames('CMD_ORISHI', RYO_ORISHI_FRAMES, [6, 3, 4, 20]);
   registerVariableFrames('GUARD_CRUSH', RYO_GUARD_CRUSH_FRAMES, [4, 10]);
   registerVariableFrames('MAX_MODE', RYO_MAX_MODE_FRAMES, [3, 4, 8]);
   registerVariableFrames('TAUNT', RYO_TAUNT_FRAMES, [10, 14, 12, 16]);
@@ -150,14 +155,14 @@ function resolveRyoFrameKey(
       if (currentAttack === AttackType.STAND_D) return 'STAND_D';
       if (currentAttack === AttackType.CLOSE_B) return 'CLOSE_B';
       if (currentAttack === AttackType.CLOSE_D) return 'CLOSE_D';
-      if (currentAttack === AttackType.RYO_TSURIZAO) return 'STAND_C';
+      if (currentAttack === AttackType.RYO_TSURIZAO) return 'CMD_TSURIZAO';
       return 'STAND_A';
     case FighterState.CROUCH: return 'CROUCH';
     case FighterState.CROUCH_ATTACK:
       if (currentAttack === AttackType.CROUCH_B) return 'CROUCH_B';
       if (currentAttack === AttackType.CROUCH_C) return 'CROUCH_C';
       if (currentAttack === AttackType.CROUCH_D) return 'CROUCH_D';
-      if (currentAttack === AttackType.RYO_ORISHI) return 'CROUCH_B';
+      if (currentAttack === AttackType.RYO_ORISHI) return 'CMD_ORISHI';
       return 'CROUCH_A';
     case FighterState.AIR_ATTACK:
       if (currentAttack === AttackType.JUMP_C || currentAttack === AttackType.JUMP_CD) return 'AIR_C';
