@@ -30,6 +30,8 @@ npm run test:smoke
 
 如果本轮只改文档，可用 `npx tsc --noEmit`、`npx vite build` 和链接/规则一致性检查替代领域测试；但涉及测试策略或脚本时必须至少运行 `npm run test:smoke`。
 
+任何验证通过都必须能回到 [KOF 差距矩阵](../product/kof-gap-matrix.md) 的某一项差距：如果验证只能说明“没坏”，却不能说明“补了什么差距”，就不算高价值推进。
+
 ## 3. Ryo 样板专属门禁
 
 涉及 Ryo 主线时必须回答：

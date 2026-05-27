@@ -36,6 +36,7 @@ src/
 - `combat/` 和 frame data 已有基础，但 hit feedback 还未形成统一矩阵。
 - 文件体积偏大，后续只在服务 Ryo 样板时拆分。
 - `src/` 仍按技术层粗分，没有形成大型项目中常见的 `app/engine/simulation/content/tools` 边界。
+- `src/content/characters/index.ts` 已经作为角色内容包的总 barrel 出现，说明角色内容层正在从分散入口向统一入口收口。
 - `src/content/characters/ryo/` 已开始建立内容包骨架，当前既有兼容入口，也有按职责拆分的迁移入口；还需要继续把 commands / moves / attacks / animations / hitboxes / feedback / portraits / reports 落到真实数据里。
 - `src/rendering/sprites/` 已开始拆出 Ryo 的高分辨率帧分组，`src/tools/validateManifest.ts` 也已经承担内容校验职责。
 
@@ -49,6 +50,7 @@ src/
 - 把 Ryo 判定接入 hitbox manifest。
 - 把 Ryo 命中事件接入 feedback manifest。
 - 把 Ryo 内容包从单一入口进一步拆成子目录，确保 commands / moves / attacks / animations / hitboxes / feedback / portraits / reports 有固定归属。
+- 让 `src/content/characters/index.ts` 成为角色内容包的统一导出入口，减少上层对分散文件的直接依赖。
 - 用 Frame Contract 连接 rendering/combat/audio/vfx。
 - 逐步迁移到 `content/characters/ryo` 和 `simulation/`，但每轮只迁一个领域。
 

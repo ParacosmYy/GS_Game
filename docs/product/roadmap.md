@@ -20,6 +20,13 @@
 - 定义 feedback manifest。
 - 定义 Frame Contract。
 
+## P1.1 KOF 差距闭合
+
+- 先闭合 [KOF 差距矩阵](kof-gap-matrix.md) 里的最高优先级差距。
+- 先补肖像气质、动作节奏、打击反馈、输入可见性。
+- 再补技能与资源规则、内容包稳定化、回归保护。
+- 所有新功能必须明确自己关闭的是哪一项差距。
+
 ## P1.5 Ryo 内容包细分
 
 - 把 Ryo 内容包拆成 `commands/`、`moves/`、`attacks/`、`animations/`、`hitboxes/`、`feedback/`、`portraits/`、`reports/`。

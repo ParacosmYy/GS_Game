@@ -24,6 +24,10 @@
 
 > 以 Ryo 为唯一样板角色，建立角色美术、逐帧动作、帧数据、碰撞盒、命中反馈、肖像与资产管线的完整闭环。
 
+当前最高优先级不是“继续加功能”，而是按 [KOF 差距矩阵](docs/product/kof-gap-matrix.md) 逐项闭合最显眼的差距。所有新增功能都必须先说明它正在关闭矩阵里的哪一项差距。
+
+如果项目已经进入 Phase 2 或多角色阶段，也必须先服从这份差距矩阵，再决定是继续补 Ryo、补 Kyo/Iori，还是补通用管线。
+
 这条主线还要求“先收口，再扩张”：
 
 - 先把一个人物做精，再做其他人物。
@@ -149,6 +153,7 @@ npx vite build
 - [README.md](README.md)：项目入口。
 - [Ryo Vertical Slice](docs/product/ryo-vertical-slice-plan.md)：当前唯一产品主线。
 - [真实性标准](docs/product/authenticity-standard.md)：接近 KOF 的验收标准。
+- [KOF 差距矩阵](docs/product/kof-gap-matrix.md)：当前最高优先级差距清单。
 - [路线图](docs/product/roadmap.md)：阶段路线。
 - [迭代工作区](docs/iteration/README.md)：所有后续迭代文件的统一收纳区。
 - [当前架构](docs/architecture/current-architecture.md)：真实结构。
