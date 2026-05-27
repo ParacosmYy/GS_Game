@@ -38,6 +38,7 @@ import {
   spawnCancelFlash,
   spawnDizzyStars,
   spawnFloatingComboText,
+  spawnComboSpeedLines,
   spawnKooukenVFX,
   spawnKoHouVFX,
   spawnHienTrail,
@@ -250,6 +251,11 @@ export class VFXSystem {
   /** 浮动连击文本 — "N HIT (totalDmg)" 格式, 2-4白色/5-9黄色/10+红色 */
   spawnFloatingComboText(worldX: number, worldY: number, combo: number, totalDamage: number): void {
     spawnFloatingComboText(this.particles, worldX, worldY, combo, totalDamage);
+  }
+
+  /** KOF2002: Combo speed lines for high-hit combos */
+  spawnComboSpeedLines(centerX: number, centerY: number, comboCount: number): void {
+    spawnComboSpeedLines(this.particles, centerX, centerY, comboCount);
   }
 
   /** Ryo: Ko'ou Ken (虎煌拳) projectile ki blast VFX */

@@ -647,6 +647,10 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
         combo, comboDmg,
       );
     }
+    // KOF2002: 高连击速度线 — combo>=6时出现背景速度线
+    if (combo >= 6) {
+      deps.vfx.spawnComboSpeedLines(hitX, hitY, combo);
+    }
     // 连击只轻微补一层，不再额外叠满屏中环
     if (combo >= 5 && combo < 10) {
       deps.vfx.spawnImpactRing(hitX, hitY, 1.1);

@@ -1288,3 +1288,25 @@ export function spawnFloatingComboText(particles: Particle[], worldX: number, wo
     text,
   });
 }
+
+/** KOF2002: 连击速度线 — 高连击时背景出现速度线增强紧迫感 */
+export function spawnComboSpeedLines(particles: Particle[], centerX: number, centerY: number, comboCount: number): void {
+  const lineCount = Math.min(8, Math.floor(comboCount / 3));
+  for (let i = 0; i < lineCount; i++) {
+    const angle = -Math.PI * 0.4 + (i / lineCount) * Math.PI * 0.8;
+    const speed = 3 + Math.random() * 4;
+    particles.push({
+      x: centerX + (Math.random() - 0.5) * 60,
+      y: centerY + (Math.random() - 0.5) * 40,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed * 0.5,
+      life: 8 + Math.floor(Math.random() * 6),
+      maxLife: 14,
+      size: 1 + Math.random(),
+      color: '#ffffff',
+      type: 'spark',
+      gravity: 0,
+      friction: 0.95,
+    });
+  }
+}
