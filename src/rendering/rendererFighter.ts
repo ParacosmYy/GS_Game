@@ -828,8 +828,24 @@ export function drawFighters(
     if (f.guardGauge < 30 && f.state !== FighterState.KNOCKDOWN && f.state !== FighterState.DIZZY) {
       const gaugeRatio = f.guardGauge / 30;
       const yellowPulse = Math.sin(globalTick * 0.4) * 0.5 + 0.5;
-      ctx.fillStyle = 'rgba(255, 200, 0, ' + ((1 - gaugeRatio) * 0.08 * yellowPulse) + ')';
+      ctx.save();
+      ctx.globalCompositeOperation = 'screen';
+      ctx.globalAlpha = (1 - gaugeRatio) * 0.06 * yellowPulse;
+      ctx.fillStyle = '#ffaa00';
       ctx.fillRect(sx + leanOffsetX - hw - 3, sy - f.displayHeight - 3, (hw + 3) * 2, f.displayHeight + 6);
+      ctx.restore();
+    }
+    // KOF2002: 角落压力红色脉动 — 靠近墙壁+低血量时红色脉动
+    if (f.health < f.maxHealth * 0.5) {
+      const nearWall = f.x - STAGE_LEFT < 60 || STAGE_RIGHT - f.x < 60;
+      if (nearWall && f.state !== FighterState.KNOCKDOWN) {
+        ctx.save();
+        ctx.globalCompositeOperation = 'screen';
+        ctx.globalAlpha = 0.04 + Math.sin(globalTick * 0.3) * 0.02;
+        ctx.fillStyle = '#ff3300';
+        ctx.fillRect(sx + leanOffsetX - hw - 5, sy - f.displayHeight - 5, (hw + 5) * 2, f.displayHeight + 10);
+        ctx.restore();
+      }
     }
 
     // KOF2002: 待机战斗姿态光 — IDLE时对手近距离时身体微亮(紧张感)
