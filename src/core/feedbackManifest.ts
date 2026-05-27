@@ -53,6 +53,10 @@ export interface FeedbackParams {
   hitPushbackScale: number;
   /** 防御推退力度乘数 */
   blockPushbackScale: number;
+  /** 冲击环数量: light=1, heavy=1, special=2, DM=3, SDM=4 */
+  impactRingCount: number;
+  /** 冲击环基础尺寸缩放 */
+  impactRingScale: number;
 }
 
 /** 反馈 manifest */
@@ -84,6 +88,8 @@ export const FEEDBACK_TIERS: Record<FeedbackTier, FeedbackParams> = {
     sparkSpeed: 1.0,
     hitPushbackScale: 1.0,
     blockPushbackScale: 0.8,
+    impactRingCount: 1,
+    impactRingScale: 0.6,
   },
   heavy: {
     tier: 'heavy',
@@ -104,6 +110,8 @@ export const FEEDBACK_TIERS: Record<FeedbackTier, FeedbackParams> = {
     sparkSpeed: 1.3,
     hitPushbackScale: 1.5,
     blockPushbackScale: 1.2,
+    impactRingCount: 1,
+    impactRingScale: 1.0,
   },
   special: {
     tier: 'special',
@@ -124,6 +132,8 @@ export const FEEDBACK_TIERS: Record<FeedbackTier, FeedbackParams> = {
     sparkSpeed: 1.6,
     hitPushbackScale: 2.0,
     blockPushbackScale: 1.5,
+    impactRingCount: 2,
+    impactRingScale: 1.2,
   },
   dm: {
     tier: 'dm',
@@ -144,6 +154,8 @@ export const FEEDBACK_TIERS: Record<FeedbackTier, FeedbackParams> = {
     sparkSpeed: 2.0,
     hitPushbackScale: 3.0,
     blockPushbackScale: 2.0,
+    impactRingCount: 3,
+    impactRingScale: 1.6,
   },
   sdm: {
     tier: 'sdm',
@@ -164,6 +176,8 @@ export const FEEDBACK_TIERS: Record<FeedbackTier, FeedbackParams> = {
     sparkSpeed: 2.5,
     hitPushbackScale: 3.5,
     blockPushbackScale: 2.5,
+    impactRingCount: 4,
+    impactRingScale: 2.0,
   },
 };
 

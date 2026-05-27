@@ -392,17 +392,33 @@ export function spawnThrowEscapeSparks(particles: Particle[], worldX: number, wo
   }
 }
 
-export function spawnImpactRing(particles: Particle[], worldX: number, worldY: number, scale: number = 1.0): void {
-  particles.push({
-    x: worldX, y: worldY, vx: 0, vy: 0,
-    life: 12, maxLife: 12, size: 6 * scale,
-    color: '#ffffff', type: 'ring',
-  });
-  particles.push({
-    x: worldX, y: worldY, vx: 0, vy: 0,
-    life: 8, maxLife: 8, size: 4 * scale,
-    color: '#ffcc44', type: 'ring',
-  });
+/**
+ * 冲击环 — KOF2002分层校准:
+ * - light: 1 thin ring, fast fade
+ * - heavy: 1 medium ring
+ * - special: 2 rings (inner bright + outer glow)
+ * - DM: 3 expanding rings with staggered timing
+ * - SDM: 4 rings, largest spread
+ */
+export function spawnImpactRing(particles: Particle[], worldX: number, worldY: number, scale: number = 1.0, count: number = 1): void {
+  const colors = ['#ffffff', '#ffcc44', '#ff8844', '#ffaa22'];
+  for (let i = 0; i < count; i++) {
+    const staggerLife = 12 + i * 3;
+    const staggerSize = (6 + i * 2.5) * scale;
+    particles.push({
+      x: worldX, y: worldY, vx: 0, vy: 0,
+      life: staggerLife, maxLife: staggerLife, size: staggerSize,
+      color: colors[i % colors.length], type: 'ring',
+    });
+  }
+  // Always include the secondary warm ring for count >= 2
+  if (count >= 2) {
+    particles.push({
+      x: worldX, y: worldY, vx: 0, vy: 0,
+      life: 8, maxLife: 8, size: 4 * scale,
+      color: '#ffcc44', type: 'ring',
+    });
+  }
 }
 
 /** 打击斩击线 — 重攻击命中时的横向闪光. scale: 重1.0, 必杀1.4, DM2.0 */

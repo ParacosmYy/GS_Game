@@ -130,8 +130,8 @@ export class VFXSystem {
     spawnThrowEscapeSparks(this.particles, worldX, worldY);
   }
 
-  spawnImpactRing(worldX: number, worldY: number, scale?: number): void {
-    spawnImpactRing(this.particles, worldX, worldY, scale);
+  spawnImpactRing(worldX: number, worldY: number, scale?: number, count?: number): void {
+    spawnImpactRing(this.particles, worldX, worldY, scale, count);
   }
 
   /** 打击斩击线 — 重攻击命中时的横向闪光 */

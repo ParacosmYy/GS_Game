@@ -333,9 +333,9 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       }
     }
 
-    // 冲击环只保留主环，连击只轻微放大，不再堆双环
-    const ringScale = sparkSize + (combo >= 5 ? 0.2 : 0);
-    deps.vfx.spawnImpactRing(hitX, hitY, ringScale);
+    // 冲击环 — manifest驱动数量和尺寸
+    const ringScale = fb.impactRingScale + (combo >= 5 ? 0.2 : 0);
+    deps.vfx.spawnImpactRing(hitX, hitY, ringScale, fb.impactRingCount);
 
     // 重攻击斩击线
     if (isHeavyAttack(attackType) || isSpecial) {
