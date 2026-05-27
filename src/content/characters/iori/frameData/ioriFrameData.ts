@@ -155,7 +155,7 @@ export const IORI_FRAME_DATA = {
   // 逆剥ぎ hcb,f+P (指令投, 换边)
   IORI_KUZUKAZE: {
     startup: 8,
-    active: 3,
+    active: 4,
     recovery: 20,
     damage: 70,
     hitstun: 22,
