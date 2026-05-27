@@ -157,20 +157,22 @@ function initAllFrames(): void {
   registerVariableFrames('STAND_C', RYO_STAND_C_FRAMES, [7, 3, 2, 8, 12]);
 
   // CLOSE PUNCHES — close_a (elbow), close_c (uppercut)
-  registerFrames('CLOSE_A', RYO_CLOSE_A_FRAMES, 4);
-  registerFrames('CLOSE_C', RYO_CLOSE_C_FRAMES, 5);
+  // CLOSE_A: startup=4, active=2, recovery=8 → [4, 2, 5, 5]
+  registerVariableFrames('CLOSE_A', RYO_CLOSE_A_FRAMES, [4, 2, 5, 5]);
+  // CLOSE_C: startup=2, active=5, recovery=11 → [2, 5, 6, 5]
+  registerVariableFrames('CLOSE_C', RYO_CLOSE_C_FRAMES, [2, 5, 6, 5]);
 
-  // KICK ATTACKS — stand_b (light kick), stand_d (heavy kick)
-  // STAND_B: startup=7, active=3, recovery=14 = 24 total; 4 frames × 6 tpf = 24
-  registerFrames('STAND_B', RYO_STAND_B_FRAMES, 6);
-  // STAND_D: startup=10, active=8, recovery=20 = 38 total; 5 frames × 8 tpf = 40
-  registerFrames('STAND_D', RYO_STAND_D_FRAMES, 8);
+  // KICK ATTACKS — variable frames matching combat phases
+  // STAND_B: startup=7, active=3, recovery=14 → [7, 3, 2, 12]
+  registerVariableFrames('STAND_B', RYO_STAND_B_FRAMES, [7, 3, 2, 12]);
+  // STAND_D: startup=10, active=8, recovery=20 → [10, 4, 4, 8, 12]
+  registerVariableFrames('STAND_D', RYO_STAND_D_FRAMES, [10, 4, 4, 8, 12]);
 
   // CLOSE KICKS — close_b (light knee), close_d (heavy knee/kick)
-  // CLOSE_B: startup=5, active=2, recovery=8 = 15 total; 3 frames × 5 tpf = 15
-  registerFrames('CLOSE_B', RYO_CLOSE_B_FRAMES, 5);
-  // CLOSE_D: startup=6, active=4, recovery=12 = 22 total; 4 frames × 6 tpf = 24
-  registerFrames('CLOSE_D', RYO_CLOSE_D_FRAMES, 6);
+  // CLOSE_B: startup=5, active=2, recovery=8 → [5, 2, 8]
+  registerVariableFrames('CLOSE_B', RYO_CLOSE_B_FRAMES, [5, 2, 8]);
+  // CLOSE_D: startup=6, active=4, recovery=12 → [6, 4, 6, 8]
+  registerVariableFrames('CLOSE_D', RYO_CLOSE_D_FRAMES, [6, 4, 6, 8]);
 
   // DAMAGE — hurt (5f) and knockdown (6f)
   registerFrames('HURT', RYO_HURT_FRAMES, 4);
