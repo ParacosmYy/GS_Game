@@ -1608,9 +1608,10 @@ export function resolveFighterColors(f: Fighter, globalTick: number): { bodyColo
       glowColor = accent.glow;
       // KOF2002: 攻击命中角色属性色增强 — hitstop时攻击色偏属性色(力量感)
       if (f.hitFlashFrames > 0) {
+        const hitAura = getMaxAuraColor(f.charId ?? '');
         bodyColor = '#ffffff';
-        outlineColor = `${maxAura.css}60`;
-        glowColor = `${maxAura.css}30`;
+        outlineColor = `${hitAura.css}60`;
+        glowColor = `${hitAura.css}30`;
       }
       break;
     }
