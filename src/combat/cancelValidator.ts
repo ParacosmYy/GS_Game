@@ -17,8 +17,16 @@ import {
   findCancelRoute as findIoriCancelRoute,
   validateCancel as validateIoriCancel,
 } from '../content/characters/iori/cancelPaths.js';
+import {
+  findCancelRoute as findTerryCancelRoute,
+  validateCancel as validateTerryCancel,
+} from '../content/characters/terry/cancelPaths.js';
+import {
+  findCancelRoute as findKimCancelRoute,
+  validateCancel as validateKimCancel,
+} from '../content/characters/kim/cancelPaths.js';
 
-type CharId = 'ryo' | 'kyo' | 'iori';
+type CharId = 'ryo' | 'kyo' | 'iori' | 'terry' | 'kim';
 
 const VALIDATORS: Record<CharId, {
   find: (source: string, target: string) => unknown;
@@ -27,6 +35,8 @@ const VALIDATORS: Record<CharId, {
   ryo: { find: findRyoCancelRoute, validate: validateRyoCancel },
   kyo: { find: findKyoCancelRoute, validate: validateKyoCancel },
   iori: { find: findIoriCancelRoute, validate: validateIoriCancel },
+  terry: { find: findTerryCancelRoute, validate: validateTerryCancel },
+  kim: { find: findKimCancelRoute, validate: validateKimCancel },
 };
 
 /** Detect character from attack type prefix. */
@@ -34,6 +44,8 @@ function charFromAttack(atk: string): CharId | null {
   if (atk.startsWith('RYO_')) return 'ryo';
   if (atk.startsWith('KYO_')) return 'kyo';
   if (atk.startsWith('IORI_')) return 'iori';
+  if (atk.startsWith('TERRY_')) return 'terry';
+  if (atk.startsWith('KIM_')) return 'kim';
   return null;
 }
 

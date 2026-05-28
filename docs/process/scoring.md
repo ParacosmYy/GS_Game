@@ -2,7 +2,7 @@
 
 ## 1. 当前分数
 
-当前总分：`235/2000`
+当前总分：`236/2000`
 
 完整历史见 [SCORE.history.md](../archive/SCORE.history.md)。
 
@@ -17,7 +17,7 @@ Phase 1 的 Ryo 基线已经闭合，当前评分更关心 Phase 2 的多角色�
 | 角色美术 | 200 | 26 | Ryo像素帧42/42状态覆盖+Kyo/Iori全攻击态(stand/crouch/air/close ABCD)+crouch+jump+hurt+knockdown+block高分辨率像素帧(48x72 SNK风格)+Iori 64x80 WIN pose双帧+共享baseHighResRenderer消除三角色重复代码+Kyo/Iori 64x80 win+48x48 HUD肖像+Ryo四尺寸肖像完整闭环 |
 | 舞台美术 | 100 | 9 | 5场景视差+动态元素+CRT扫描线后处理+暗角+场景飘浮微粒+5舞台专属色彩分级+光柱+氛围雾气+场景专属尘土色+地面冲击波使用场景专属尘土色(木屑/水泥/紫能量) |
 | 音频品质 | 150 | 18 | 合成SFX+BGM+Kyo 7种火焰SFX+Iori 8种暗紫SFX+Kyo/Iori专属attackSFX接入+连段递增音效+里程碑音效+菜单光标/确认SFX+DoubleKO/DrawGame播报+倒计时10秒警告铃声+角色专属攻击发声(kiai)+受击发声(hurt voice)+胜利专属发声(victory voice)+晕眩专属发声(dizzy groan) |
-| 角色内容 | 150 | 19 | Ryo全闭环+Kyo 14文件+Iori 14文件+三角色contentLoader集成 |
+| 角色内容 | 150 | 20 | Ryo全闭环+Kyo 14文件+Iori 14文件+三角色contentLoader集成+Terry/Kim取消验证器接入(5角色统一cancelValidator) |
 | 战斗手感 | 150 | 34 | 全反馈矩阵(6档)+MAX角色专属能量色(Ryo蓝/Kyo炎橙/Iori紫)+HSDM专属+SDM修正+绝境红闪+MAX移动残影(角色色)+GC Roll/CD激活火花+重攻击swoosh+连击里程碑音效(5/10/15+)+DM发动名称横幅(SDM/HSDM分色)+跑步速度线(角色色)+击倒落地冲击波+首次命中闪光+镜头脉冲缩放+MAX模式回合间正确停用(保留gauge stocks) |
 | 帧数据精度 | 100 | 27 | 全部42种动画状态变量帧节奏完成(idle/walk/attack/crouch/jump/air/special/DM/SDM/HSDM/movement/sub-state/win)+Iori葵花C版3段+琴月陰D版+Kyo SDM大蛇薙+Iori SDM八稚女ATTACK_FRAMES闭合 |
 | 游戏流程 | 100 | 35 | 完整街机流程+3v3+训练模式+MATCH POINT+暂停菜单+OPTIONS+回合开始持续提示+KO结果HP对比+街机模式对手递进(难度渐进)+舞台轮换+街机得分系统+MATCH POINT回合开始提示+NEXT STAGE对手肖像预览+宿敌对决特殊对话(Kyo↔Iori等13组)+FINAL ROUND决胜局播报+街机完成成绩总结(得分/连段/完美/伤害+段位评级)+回合间KOF风格wipe过渡(金色边缘光)+角色入场动画(边缘步入+脚步声+落地尘土)+胜利台词场景专属氛围色调 |
@@ -169,3 +169,12 @@ Phase 2 总计：1000 分。
 - 仍不像 KOF 在哪里：缺少角色出场特写、boss战、制作人名单、吸引模式
 - 下一轮最小任务：继续闭合差距矩阵§3.1(角色出场特写)或§2.1(技能资源规则强化)
 - 下一轮闭合：差距矩阵§3.1流程仪式感 或 §2.1技能资源规则
+
+## 16. 第236分复盘
+
+- 本轮提升：角色内容 +1
+- 为什么只加 1 分：cancelValidator从3角色扩展到5角色(Ryo/Kyo/Iori/Terry/Kim)，统一取消路径验证入口，10项测试覆盖Terry/Kim取消路径+跨角色一致性
+- 更像 KOF 在哪里：Terry和Kim的取消链(normal→special→DM→FreeCancel)现在能正确验证，与Ryo/Kyo/Iori一致的取消规则引擎
+- 仍不像 KOF 在哪里：其他22角色无内容包，FrameContract未统一为数据驱动生成器
+- 下一轮最小任务：继续闭合差距矩阵§0.1(FrameContract统一)或§2.1(强化技能升级规则)
+- 下一轮闭合：差距矩阵§0.1公共组件复用 或 §2.1技能资源规则
