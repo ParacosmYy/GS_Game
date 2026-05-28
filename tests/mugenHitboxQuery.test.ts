@@ -31,6 +31,18 @@ import {
   getRyoAttackTiming,
   RYO_MUGEN_ACTION_MAP,
 } from '../src/content/characters/ryo/hitboxes/ryoHitboxes.js';
+import {
+  hasTerryMugenData,
+  getTerryMugenTiming,
+  getTerryAttackTiming,
+  TERRY_MUGEN_ACTION_MAP,
+} from '../src/content/characters/terry/hitboxes/terryHitboxes.js';
+import {
+  hasKimMugenData,
+  getKimMugenTiming,
+  getKimAttackTiming,
+  KIM_MUGEN_ACTION_MAP,
+} from '../src/content/characters/kim/hitboxes/kimHitboxes.js';
 
 const SPRITES_DIR = path.resolve(__dirname, '../public/sprites');
 
@@ -45,6 +57,8 @@ describe('mugenHitboxQuery', () => {
   beforeAll(() => {
     loadAndRegisterHitboxes('cvskyo');
     loadAndRegisterHitboxes('cvsryo');
+    loadAndRegisterHitboxes('cvsterry');
+    loadAndRegisterHitboxes('cvskim');
   });
 
   describe('query functions', () => {
@@ -196,6 +210,64 @@ describe('mugenHitboxQuery', () => {
       if (normalTiming && specialTiming) {
         expect(specialTiming.total).toBeGreaterThan(normalTiming.total);
       }
+    });
+  });
+
+  describe('Terry content package integration', () => {
+    it('has valid MUGEN action map', () => {
+      expect(Object.keys(TERRY_MUGEN_ACTION_MAP).length).toBeGreaterThan(15);
+    });
+
+    it('maps POWER_WAVE to action 1000', () => {
+      expect(TERRY_MUGEN_ACTION_MAP.TERRY_POWER_WAVE).toBe('1000');
+    });
+
+    it('hasTerryMugenData returns correct state', () => {
+      expect(hasTerryMugenData()).toBe(true);
+    });
+
+    it('getTerryAttackTiming returns timing for specials', () => {
+      const timing = getTerryAttackTiming('TERRY_POWER_WAVE');
+      expect(timing).not.toBeNull();
+      expect(timing!.total).toBeGreaterThan(0);
+    });
+
+    it('getTerryAttackTiming returns null for unknown attack', () => {
+      expect(getTerryAttackTiming('UNKNOWN_ATTACK')).toBeNull();
+    });
+
+    it('getTerryMugenActions returns action list', () => {
+      const actions = getCharacterMugenActions('cvsterry');
+      expect(actions.length).toBeGreaterThan(30);
+    });
+  });
+
+  describe('Kim content package integration', () => {
+    it('has valid MUGEN action map', () => {
+      expect(Object.keys(KIM_MUGEN_ACTION_MAP).length).toBeGreaterThan(15);
+    });
+
+    it('maps HIENZAN to action 1000', () => {
+      expect(KIM_MUGEN_ACTION_MAP.KIM_HIENZAN).toBe('1000');
+    });
+
+    it('hasKimMugenData returns correct state', () => {
+      expect(hasKimMugenData()).toBe(true);
+    });
+
+    it('getKimAttackTiming returns timing for specials', () => {
+      const timing = getKimAttackTiming('KIM_HIENZAN');
+      expect(timing).not.toBeNull();
+      expect(timing!.total).toBeGreaterThan(0);
+    });
+
+    it('getKimAttackTiming returns null for unknown attack', () => {
+      expect(getKimAttackTiming('UNKNOWN_ATTACK')).toBeNull();
+    });
+
+    it('getKimMugenActions returns action list', () => {
+      const actions = getCharacterMugenActions('cvskim');
+      expect(actions.length).toBeGreaterThan(30);
     });
   });
 });

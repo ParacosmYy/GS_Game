@@ -52,21 +52,25 @@ SFF 提取 PNG -> manifest 生成 -> AIR 解析动画 -> AIR Clsn 提取判定 -
   - Roster 内但无 PNG：Iori、Leona、Kula、K'、Robert、Mai、Andy、Joe、Billy、Chang、Choi、Mature、Yashiro、Chris、Mary、Xiangfei、Kasumi、Clark、Ralf
   - 非 Roster 但已有 PNG：cvsg_rugal(2,191)、cvsgeese(1,475)、cvsgouki(1,578)、cvsrock(1,593)、cvsking(1,203)、cvsrugal(2,309)、cvsbenimaru(1,386)、cvschunli(1,580)、kfm(281)
 - 所有已提取角色都有 `manifest.json`（kfm 除外）。
-- **没有任何角色有 `animations.json` 或 `hitboxes.json`**。AIR 数据尚未被解析并输出为运行时可消费的 JSON。
+- **17个角色有 `hitboxes.json`（MUGEN AIR Clsn 判定数据），共995个攻击动作、2415个活跃帧。**
+- **8个ROSTER角色有 MUGEN hurtbox数据（manifest.json hurtbox字段）。**
+- 动画帧时长通过 `animStateSync` 模块注册并查询，支持MUGEN -1归一化。
+- 渲染管线已统一：通用MUGEN sprite路径优先 → 角色procedural fallback → 骨骼渲染。
+- 训练模式 F2 开启hitbox显示，F7 循环 game/both/mugen 三种显示模式。
 
 差距矩阵（KOF2002 Roster 角色，28 个）：
 
-| 角色 | PNG 提取 | Manifest | 运行时注册 | AIR 动画 | AIR 判定 |
-|------|----------|----------|------------|----------|----------|
-| Kyo | Y (1,808) | Y | Y | N | N |
+| 角色 | PNG 提取 | Manifest | 运行时注册 | Hitbox | 内容包MUGEN |
+|------|----------|----------|------------|--------|------------|
+| Kyo | Y (1,808) | Y | Y | Y (77 actions) | Y |
 | Iori | N | N | N | N | N |
-| Terry | Y (1,407) | Y | Y | N | N |
-| Kim | Y (1,247) | Y | Y | N | N |
-| Ryo | Y (1,230) | Y | Y | N | N |
-| Athena | Y (1,456) | Y | Y | N | N |
-| Vice | Y (1,950) | Y | Y | N | N |
-| Yamazaki | Y (1,955) | Y | Y | N | N |
-| Shermie | Y (1,132) | Y | Y | N | N |
+| Terry | Y (1,407) | Y | Y | Y (55 actions) | N |
+| Kim | Y (1,247) | Y | Y | Y (62 actions) | N |
+| Ryo | Y (1,230) | Y | Y | Y (54 actions) | Y |
+| Athena | Y (1,456) | Y | Y | Y (48 actions) | N |
+| Vice | Y (1,950) | Y | Y | Y (49 actions) | N |
+| Yamazaki | Y (1,955) | Y | Y | Y (69 actions) | N |
+| Shermie | Y (1,132) | Y | Y | Y (43 actions) | N |
 | Leona | N | N | N | N | N |
 | Kula | N | N | N | N | N |
 | K' | N | N | N | N | N |
@@ -85,7 +89,7 @@ SFF 提取 PNG -> manifest 生成 -> AIR 解析动画 -> AIR Clsn 提取判定 -
 | Mary | N | N | N | N | N |
 | Xiangfei | N | N | N | N | N |
 | Kasumi | N | N | N | N | N |
-| Heidern | Y (2,663) | Y | Y | N | N |
+| Heidern | Y (2,663) | Y | Y | Y | N |
 
 新功能添加点：
 
@@ -99,63 +103,49 @@ SFF 提取 PNG -> manifest 生成 -> AIR 解析动画 -> AIR Clsn 提取判定 -
 
 - `characterSpriteRegistry.ts` + `characterSpriteConfigs.ts` 提供通用 PNG sprite 加载机制。
 - 17 个角色已注册运行时 sprite 配置（kyo/ryo/athena/terry/kim/vice/yamazaki/shermie/benimaru/chunli/geese/gouki/rock/king/rugal/g_rugal/heidern）。
-- 但其中部分角色（chunli/geese/gouki/rock/king/rugal/g_rugal/benimaru）不在 KOF2002 正式 Roster 中。
-- KOF2002 Roster 内有 20 个角色未注册运行时 sprite 配置（见上表）。
-- 当前 `specialMap` 只映射了少量必杀技到 MUGEN action number，绝大多数通常技和必杀技仍依赖程序化 fallback。
+- 8 个 ROSTER 角色有完整 specialMap（kyo/ryo/terry/kim/athena/vice/yamazaki/shermie）。
+- 通常技 action number 通过 `resolveGenericMugenAction` 标准化映射（MUGEN 标准编号）。
+- 渲染管线统一：`rendererFighter.ts` 先尝试通用 MUGEN sprite → 角色 procedural → 骨骼 fallback。
+- 训练模式 hitbox 调试支持 F2(开关) + F7(game/both/mugen 三模式循环)。
 
 差距：
 
-- specialMap 覆盖率低。Kyo/Ryo 各映射约 20 个，Athena/Terry/Kim/Vice/Yamazaki/Shermie 各仅映射 1-4 个 DM/SDM。其余 10 个注册角色 specialMap 为空 `{}`。
-- 通常技（stand_a/b/c/d、crouch_a/b/c/d、jump_a/b/c/d）的 MUGEN action number 映射尚未系统化。
-- AIR 文件中的动画名和帧序列未被自动映射到运行时的 FighterState/AttackType。
-
-新功能添加点：
-
-- 自动化 AIR action number -> AttackType 映射生成。
-- 通常技 action number 标准化映射表（per-character basis）。
-- 运行时双路径确认：PNG sprite（优先）-> 程序化像素帧（fallback）。
+- specialMap 覆盖率不均匀。Kyo/Ryo 映射~25个必杀技，其他角色仅映射1-4个 DM/SDM。
+- 非 ROSTER 角色（chunli/geese/gouki/rock/king/rugal/g_rugal/benimaru）的 specialMap 仍为空。
+- 20 个 KOF2002 Roster 角色未注册运行时 sprite 配置。
 
 ### 0.3 MUGEN 动画数据接入
 
 当前状态：
 
-- 工具层 `parseAir.ts` 已能解析 AIR 文件，提取动画名、帧序列、帧 duration、Clsn 判定框。
-- `convertAirHitboxes.ts` 已能将 AIR Clsn 数据转换为运行时判定格式。
-- `buildSpriteManifest.ts` 已能从 AIR 生成 manifest。
-- **但以上工具的输出尚未持久化为 `animations.json` / `hitboxes.json` 并被运行时消费**。
+- `animStateSync.ts` 同步动画帧状态，支持 MUGEN -1 帧时长归一化。
+- `realSpriteLoader.ts` 在 sprite 加载时自动注册帧时长到 animStateSync 缓存。
+- `baseHighResRenderer.ts` 使用 `getVariableFrameIndex` 按 stateAge + frameDurations 正确计算帧索引。
+- manifest.json 的 `animations` 字段包含完整的帧序列和 duration 数据。
+- 8 ROSTER 角色总注册动作>=3000，总帧>=15000，总时长>=30000 ticks。
 
 差距：
 
-- AIR 动画数据（帧序列、duration、loopStart）未被写入 `public/sprites/<char>/animations.json`。
-- AIR Clsn 判定数据（hurtbox/hitbox 坐标）未被写入 `public/sprites/<char>/hitboxes.json`。
-- 运行时 `realSpriteLoader.ts` 的 `SpriteManifest` 接口已预留 `animations` 字段，但实际数据为空。
-- 当前动画帧序列、帧 duration、判定框全部是手写/程序化的，不是从 MUGEN AIR 源数据驱动。
-
-新功能添加点：
-
-- 将 `extractCharacterSprites` 管线扩展为端到端流水线：SFF -> PNG + AIR -> animations.json + hitboxes.json + manifest.json。
-- 运行时消费 `animations.json` 替换手写动画帧数据。
-- 运行时消费 `hitboxes.json` 替换手写判定框数据。
-- `animations.json` / `hitboxes.json` 的 schema 版本化与校验工具。
+- 攻击状态帧索引使用 attackFrame 而非 animStateSync 的 stateAge 映射。
+- animStateSync 的 `resolveFrameIndex` 未被 `baseHighResRenderer` 直接消费（两者各自计算帧索引）。
 
 ### 0.4 MUGEN 判定数据接入
 
 当前状态：
 
-- `hitboxConstants.ts` 和各角色的 attackFrames 文件中的判定框全部是手工调参，不是从 MUGEN AIR Clsn 数据自动提取。
-- `convertAirHitboxes.ts` 工具已存在但输出未被任何运行时系统消费。
-- 3 个角色（Ryo/Kyo/Iori）有 Frame Contract，但判定数据来源是手动录入而非 MUGEN 自动提取。
+- `mugenHitboxLoader.ts` 运行时加载 MUGEN AIR Clsn 判定数据（hitboxes.json）。
+- `mugenHurtboxLoader.ts` 运行时加载 MUGEN hurtbox 数据（manifest.json hurtbox 字段）。
+- `mugenHitboxQuery.ts` 内容包面向查询层，Kyo/Ryo 已接入。
+- `fighter.ts:getActiveHitboxes()` 四级 fallback：Frame Contract → ATTACK_FRAMES → MUGEN Clsn → HITBOX_OFFSETS。
+- `fighter.ts:getEffectiveHurtbox()` 三级 fallback：bodyOverride → MUGEN hurtbox → legacy hurtbox。
+- `hitboxDebugMugen.ts` 已接入主循环，支持 game/both/mugen 三种显示模式。
+- 17 角色共 995 个攻击动作、2415 个活跃帧的 hitbox 数据。
 
 差距：
 
-- 没有任何角色在使用 MUGEN 源 Clsn 判定数据。
-- 判定框坐标无法与 MUGEN 原版精确对齐，导致打击感偏差。
-
-新功能添加点：
-
-- 将 `convertAirHitboxes` 输出接入运行时判定系统。
-- per-action 的 Clsn 数据映射到 Frame Contract 的 hurtbox/hitbox 字段。
-- 校验工具：对比 MUGEN 源 Clsn 与运行时实际使用值的偏差。
+- 内容包层面仅 Kyo/Ryo 接入了 MUGEN 查询层，Terry/Kim/Athena/Vice/Yamazaki/Shermie 尚未。
+- MUGEN hitbox 数据作为第三级 fallback，仅在 Frame Contract 和 ATTACK_FRAMES 都无数据时生效。
+- 非 ROSTER 角色的内容包未接入 MUGEN 数据。
 
 ---
 
