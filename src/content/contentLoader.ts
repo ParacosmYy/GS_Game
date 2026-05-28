@@ -43,6 +43,8 @@ import {
   getIoriAttackFrames,
   getIoriFeedbackTiers,
 } from './characters/iori/index.js';
+import { generateKyoDimensionReport } from '../tools/kyoCompletenessReport.js';
+import { generateIoriDimensionReport } from '../tools/ioriCompletenessReport.js';
 
 /** Unified character content interface */
 export interface CharacterContent {
@@ -122,7 +124,7 @@ function loadKyoContent(): CharacterContent {
     hitboxes: getKyoHitboxOffsets(),
     attackFrames: getKyoAttackFrames(),
     feedback: getKyoFeedbackTiers(),
-    report: { total: 0, completed: 0, score: 0, subdomains: {} } as any,
+    report: generateKyoDimensionReport(),
   };
 }
 
@@ -138,6 +140,6 @@ function loadIoriContent(): CharacterContent {
     hitboxes: getIoriHitboxOffsets(),
     attackFrames: getIoriAttackFrames(),
     feedback: getIoriFeedbackTiers(),
-    report: { total: 0, completed: 0, score: 0, subdomains: {} } as any,
+    report: generateIoriDimensionReport(),
   };
 }
