@@ -152,7 +152,8 @@
   - Iori 完整度校验工具 (8维报告: 同Kyo结构)
   - Kyo/Iori完整度回归测试 (33 tests: 维度有效性+覆盖率+最低阈值)
   - 3角色内容包结构一致性回归测试 (13 tests: barrel export完整性校验)
-  - 测试总数 4647
+  - rendererFighter.ts拆分 (1852→1573行: 工具函数提取到rendererFighterUtils.ts)
+  - 测试总数 4768
 - 当前差距：角色内容已开始分层，但真实数据、兼容入口、校验工具之间还需继续收口。
 - 新功能添加点：
   - `src/content/characters/index.ts` barrel export
@@ -179,6 +180,9 @@
   - 多角色统一校验入口 (multiCharValidation.ts)
   - Kyo/Iori完整度+命中特效前缀覆盖率回归测试 (45 tests)
   - HSDM招式表分类+CN_MOVE_NAMES覆盖回归测试 (11 tests)
+  - Kyo/Iori攻击帧数据完整性+命中判定框回归测试 (116 tests: 全键存在/结构/帧数/递进/hitbox维度/跨角色)
+  - 3角色视觉输入图标招式兼容性回归测试 (5 tests)
+  - sampler.ts拆分 (1880→470行: 渲染函数提取到samplerRenderers.ts)
 - 新功能添加点：
   - smoke / ryo / combat / content 分层测试
   - frame contract 回归测试
