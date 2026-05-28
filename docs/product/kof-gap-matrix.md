@@ -151,7 +151,8 @@
   - Kyo 完整度校验工具 (8维报告: animationMeta/frameData/attackFrames/feedback/portrait/moveList/cancelPaths/hitEffects)
   - Iori 完整度校验工具 (8维报告: 同Kyo结构)
   - Kyo/Iori完整度回归测试 (33 tests: 维度有效性+覆盖率+最低阈值)
-  - 测试总数 4634
+  - 3角色内容包结构一致性回归测试 (13 tests: barrel export完整性校验)
+  - 测试总数 4647
 - 当前差距：角色内容已开始分层，但真实数据、兼容入口、校验工具之间还需继续收口。
 - 新功能添加点：
   - `src/content/characters/index.ts` barrel export
@@ -204,6 +205,7 @@
   - Ryo胜利4帧动画完整播放(起手→交叉→完成→持定)
   - 全项目文件2000行上限合规(5大文件拆分: frameData/overlays/screens/attackFrames/skeletal)
   - 眩晕星星VFX增强(4色十字星旋转替代简单黄色圆点)
+  - 胜利姿态角色属性色闪光+光效爆发+落地扬尘(WIN_QUOTE入场仪式感)
 - 新功能添加点：
   - 胜利姿态动画细化
   - 角色专属胜利语音
