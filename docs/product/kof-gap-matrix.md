@@ -1,331 +1,394 @@
-# KOF 差距矩阵
+# KOF 差距矩阵 (MUGEN-First)
 
-本文是当前项目相对正版 KOF2002 风云再起、KOF2002UM 风格体验的差距清单与优先级指南。
+本文是当前项目相对正版 KOF2002 风云再起体验的差距清单与优先级指南。
+
+项目已转向 MUGEN-First 策略：所有视觉、动画、判定数据优先从 MUGEN SFF/AIR/ACT 文件提取。提取工具链已存在（parseAir / buildSpriteManifest / convertAirHitboxes / extractCharacterSprites）。差距矩阵现在以 MUGEN 管线完整度为核心衡量标准。
 
 原则：
 
-- 这里只描述工程和体验上的可观察差距，不复制商业素材或受保护实现。
-- 所有“新功能添加点”必须先映射到本矩阵里的某一项差距。
-- 先闭合最高感知差距，再做低感知扩展。
-- 在 Phase 2 中，公共骨架复用差距与单角色样板差距优先级不低于美术本身。
-- 当前主线是“公共骨架 + 单角色样板”；Ryo 继续承担基线与合同参照，当前门面样板优先推进 Kyo。
-- 如果项目已经进入 Phase 2，也仍然优先用同一套矩阵判断公共管线、Kyo 样板或后续角色是否值得做。
+- 所有"新功能添加点"必须先映射到本矩阵里的某一项差距。
+- 先闭合最高层级差距，再做低层级扩展。
+- 以 MUGEN 数据替换程序化/骨架假人的进度，是衡量项目真实进展的首要指标。
+- 只有 MUGEN 管线数据到位后，才认为该项差距被闭合；纯程序化/fallback 方案不构成闭合。
+- 公共骨架复用优先于角色私有实现。
 
-## 0. 公共骨架差距
+---
 
-### 0.1 公共组件复用差距
+## Tier 0 -- MUGEN 管线完整度 (最高优先级)
 
-- 当前差距：输入、反馈、肖像、帧注册、招式表、校验报告还在不同角色/不同界面中重复长出同构实现。
-- 新功能添加点：
-  - `Frame Contract`
-  - `portrait manifest + size resolver`
-  - `high-res frame registry`
-  - `feedback tier manifest`
-  - `move list schema`
-  - `input hint component`
-  - `completeness report`
-- 期望结果：
-  - 一个角色做精后，后续角色只换数据，不重复写骨架。
+本层衡量 MUGEN 数据从源文件到运行时的完整链路。链条为：
 
-## 1. 最高优先级差距
+```
+SFF 提取 PNG -> manifest 生成 -> AIR 解析动画 -> AIR Clsn 提取判定 -> 运行时接入
+```
 
-### 1.1 肖像气质差距
+### 0.0 MUGEN 源资产可用性
 
-- 已闭合项：
-  - portrait manifest 四尺寸规范 (select 120x120 / vs 160x160 / hud 48x48 / win 200x200)
-  - Ryo/Kyo/Iori 全4尺寸像素肖像数据
-  - 27角色 CHARACTER_PORTRAIT_COLORS fallback 色板
-  - 肖像渲染三级链 (sizedPortraits → pixelPortrait → 渐变+字母)
-- 当前差距：选人、HUD、胜利肖像还没有形成统一的正式角色气质。
-- 新功能添加点：
-  - `portrait manifest`
-  - select/HUD/win 三套尺寸规范
-  - portrait fallback 与替换路径
-  - 角色肖像一致性校验
-  - 统一 portrait 裁切/缩放/回退解析器
-  - 统一头像尺寸的展示组件
-  - 期望结果：
-  - 第一眼看起来像正式街机角色，而不是临时占位图。
+当前状态：
 
-### 1.2 动作节奏差距
+- `references/mugen/chars-extracted/warusaki3/characters/` 包含 58 个 AIR 文件、73 个 SFF 文件。
+- `references/mugen/chars-extracted/shermie/` 和 `heidern/` 为额外 KOF 角色。
+- 部分角色（Iori、Leona、Kula、K'、Robert、Mai、Andy、Joe 等）在 Warusaki3 源中不存在。
+- 非 KOF2002 角色存在于源中（Cammy、Chun-Li、Dan、Guile 等）但不在当前 Roster 中。
 
-- 当前差距：idle / walk / jump / attack / hurt / knockdown 的重心、停顿和姿态统一性还不够。
-- 已闭合项：
-  - Ryo/Kyo/Iori 所有指令通常技(命令通常技)已有专用高分辨率像素帧(v2.14)
-  - 不再 fallback 到程序化渲染
-  - 8个校验点 + 11个回归测试保护
-  - Iori动画元数据补全 (crouch/block/dizzy)
-  - 3角色动画节奏一致性回归测试 (63 tests: 轻重攻击递增/hitstun<knockdown/loop属性)
-  - 3角色必杀技像素帧覆盖 (134 tests: 基本+通常+必杀+DM/SDM/HSDM+命令技)
-  - Kyo行走动画6帧像素帧+程序化腿部交替变异+元数据帧数修正(4→6)
-  - 3角色空中轻踢(AIR_B)专属像素帧 (3帧: 蓄力/斜踢/收腿) + 渲染集成
-  - 3角色空中攻击全覆盖回归测试 (14 tests: AIR_A/B/C/D帧数据完整性)
-  - ioriSpecialFrames.ts 拆分为 basic specials (1670行) + super frames (480行)
-  - FighterState.WIN接入—3角色胜利姿态动画实际播放 (v2.39)
-  - Ryo胜利动画4帧durations修正 [6,30]→[6,8,10,30]
-  - frameDataChars.ts 拆分为5角色组文件 (4611→40行聚合器)
-  - overlayScreens.ts 拆分为7子文件 (2472→55行聚合器)
-  - screens.ts 拆分为6子文件 (2256→58行聚合器)
-  - attackFramesSpecials.ts 拆分为7子文件 (2209→10行聚合器)
-  - skeletalParts.ts 拆分为3子文件 (2058→7行聚合器)
-  - Iori近距离攻击专属像素帧 CLOSE_A/B/C/D (25 tests: 3角色近战动画对齐)
-  - 眩晕星星KOF2002风格4色十字星旋转 (替代简单黄色圆点)
-  - TypeScript编译错误清零 (51→0: 文件拆分后导入/导出补全)
-  - 3角色DIZZY动画帧注册回归测试 (9 tests)
-- 新功能添加点：
-  - animation manifest
-  - pose bank
-  - 动作帧节奏校验
-  - 空中、地面、受击姿态的统一节奏约束
-  - 公共动作姿态底座
-- 期望结果：
-  - 角色动起来不像骨骼假人，而像有重心、有气质的格斗角色。
+差距：
 
-### 1.3 打击反馈差距
+- **Iori 是核心样板角色，但在 MUGEN 源中完全没有 Warusaki3 版本**。需要找到替代 MUGEN 源或从其他 KOF2002 角色包中提取。
+- 多个 Roster 角色（Leona、Kula、K'、Robert、Mai、Andy、Joe、Billy、Chang、Choi、Mature、Yashiro、Chris、Mary、Xiangfei、Kasumi、Clark、Ralf）缺少可确认的 MUGEN 源文件。
+- 非 KOF2002 角色（Chun-Li、Rock、Benimaru 为 CVS 系列角色，Geese、Gouki 为跨界角色）已有 PNG 但不在 KOF2002 正式 Roster 中。
 
-- 已闭合项：
-  - 6档反馈矩阵 light/heavy/special/dm/sdm/hsdm 全部参数化 (hitstop/shake/spark/pushback/impactRing/bodyShake)
-  - feedbackManifest.ts 数据驱动 manifest，attackTierMap 覆盖 Ryo/Kyo/Iori 全部招式
-  - 命中事件统一触发链 (hitCallback → feedbackManifest → cinematicState)
-  - 受击反馈与攻击重量绑定 (inferTier 自动分类 + 显式映射)
-  - 角色专属 DM/SDM/HSDM 火花色板 (Kyo 火/Iori 紫/Ryo 雷)
-  - Kyo大蛇薙专属火焰柱VFX、Iori闇払い专属暗能量发射VFX
-  - Iori八咫烏DM专属暗能量螺旋启动VFX (取代通用DM爆发)
-  - MAX mode角色属性光效: Kyo火橙/Iori暗紫/Ryo蓝雷
-  - 命中闪光角色属性色: hitstop发光/残影/DM十字星按角色元素染色
-  - Kyo毒咬み火焰拖尾+Iori葵花暗能量拖尾递增VFX
-  - Kyo75式改二次命中递进强化、Iori琴月暗能量拖尾
-  - Kyo紅丸脚专属火焰弧线拖尾VFX
-  - Ryo飛燕着地扇形扬尘VFX
-  - Ryo斩裂拳多段递进3层VFX (小火花→蓝能爆发→闪光+强震)
-  - Kyo毒咬み收尾(節見)screenFlash强化终结感
-  - Iori屑風暗能量漩涡专属VFX (暗紫螺旋+爪痕斩击+暗影wisp)
-  - Ryo霸王翔吼拳属性色VFX (蓝雷替代通用金色)
-  - Ryo強虎煌拳D版增强 (impactRing+screenFlash+shake升级)
-  - Kyo荒咬み連撃鏈遞進火焰VFX (opener→followup→finisher遞增)
-  - Ryo卸しimpactRing+Iori雪割暗能量爆裂
-  - 3角色57必殺技VFX+SFX全覆蓋回歸測試 (118 tests)
-  - MAX爆氣激活角色屬性色閃光 (取代通用綠色)
-  - DM終結KO屬性色閃光 (DM/SDM/HSDM擊殺按殺手元素色)
-  - Desperation gauge visual: HP<25%红脉冲光圈+MAX+Desperation="HSDM"闪烁文字
-  - Desperation screen edge: HP<25%时屏幕边缘暗红光晕增加紧迫感
-  - KOF2002幕帘转场动画: 上下滑入黑色幕帘+金色边缘光 (curtain transition)
-  - Hitstop attacker glow: 攻击者hitstop期间元素色轮廓微光增强打击感
-  - Announcer burst扩散环: KO/FIGHT爆发文字背后能量环扩展效果
-  - Stun gauge警告光效: >85%红色脉冲光晕预警眩晕
-  - HSDM招式名扫描线: HSDM banner紫粉色光线扫过增加终极感
-  - 4616→4634 回归测试保护反馈矩阵完整性和层级递进
-- 当前差距：hitstop、spark、shake、pushback、SFX 还没有按轻重/特殊/爆气状态形成稳定矩阵。
-- 新功能添加点：
-  - feedback manifest
-  - light/heavy/special/DM/MAX 反馈分层
-  - 命中事件统一触发链
-  - 受击反馈与攻击重量绑定
-  - 公共 VFX 预设
-- 期望结果：
-  - 每次打中都能感觉到重量，而不是只看到一个通用闪光。
+新功能添加点：
 
-### 1.4 输入可见性差距
+- 确认每个 KOF2002 Roster 角色的 MUGEN 源可用性。
+- 为缺失源文件的角色寻找替代 MUGEN 角色包。
+- 建立源文件可用性报告（per-character source availability report）。
 
-- 当前差距：招式、快捷键、标准按键、爆气说明在界面上必须更一致、更显眼。
-- 已闭合项：
-  - 训练模式 move list HUD (F5 切换, SNK 分组风格)
-  - 训练模式 frame data 面板 (F4 切换)
-  - 训练模式 input history (F3 切换, 方向+按钮)
-  - 训练模式检测招式名称显示 (输入历史面板实时显示中文招式名)
-  - 训练模式指令进度可视化 (QCF/QCB/DP/HCF/HCB 部分匹配进度条)
-  - HSDM 分类补全 (招式表 + 训练模式面板均显示 HIDDEN SUPER DM)
-  - 街机模式 Tab 招式表面板
-  - 训练模式 MAX/Burst 系统说明面板 (右侧面板显示激活条件、消耗、升级规则)
-  - KOF2002视觉输入图标系统 (训练模式+街机Tab招式表箭头+按钮圆圈替代纯文本, 7 tests)
-  - DM/SDM/HSDM终结KO差异化视觉 (分层暗角+专属冲击波+HSDM彩虹边缘, 6 tests)
-  - 首局控制提示(FIGHTING前5秒显示F1/F3/F5/Esc快捷键)
-  - 暂停菜单显示回合数+比分+角色名
-- 新功能添加点：
-  - 训练模式招式卡片(视觉图标输入)
-  - 统一输入提示组件
-- 期望结果：
-  - 用户一眼知道怎么出招，怎么爆气，怎么理解角色。
+### 0.1 PNG Sprite 提取与 Manifest
 
-## 2. 中优先级差距
+当前状态：
 
-### 2.1 技能与资源规则差距
+- 已提取 PNG sprite 的角色（17 个目录）：
+  - KOF2002 Roster 内且已有 PNG：cvskyo(1,808)、cvsryo(1,230)、cvsathena(1,456)、cvsterry(1,407)、cvskim(1,247)、cvsvice(1,950)、cvsyamazaki(1,955)、shermie(1,132)、heidern(2,663)
+  - Roster 内但无 PNG：Iori、Leona、Kula、K'、Robert、Mai、Andy、Joe、Billy、Chang、Choi、Mature、Yashiro、Chris、Mary、Xiangfei、Kasumi、Clark、Ralf
+  - 非 Roster 但已有 PNG：cvsg_rugal(2,191)、cvsgeese(1,475)、cvsgouki(1,578)、cvsrock(1,593)、cvsking(1,203)、cvsrugal(2,309)、cvsbenimaru(1,386)、cvschunli(1,580)、kfm(281)
+- 所有已提取角色都有 `manifest.json`（kfm 除外）。
+- **没有任何角色有 `animations.json` 或 `hitboxes.json`**。AIR 数据尚未被解析并输出为运行时可消费的 JSON。
 
-- 已闭合项：
-  - 6层反馈矩阵+MAX mode damage/defense bonus (1.2x/0.75x)
-  - DM→SDM免费升级(MAX mode内)、DM→HSDM升级(MAX+desperation)
-  - 3 Stock MAX mode activation, 1 Stock DM, Super Cancel extra stock
-  - Free Cancel drains 20% MAX timer, Desperation DM damage bonus (1.3x)
-  - 命中时气槽闪光反馈 (meterFlash + stockFlash)
-  - DM→SDM→HSDM升级链回归测试 (8 tests, 3角色HSDM映射)
-  - Kyo/Iori取消路径回归测试 (22 tests)
-- 当前差距：普通气、MAX 气、强化版技能、DM/HSDM 的消耗与强化关系还需要更稳定。
-- 新功能添加点：
-  - MAX mode resource split
-  - 强化版技能升级规则
-  - 资源优先级与消耗链
-  - 命中时的气槽反馈
-  - 资源规则公共化
-- 期望结果：
-  - 爆气后技能明显更强，且资源消耗逻辑清晰。
+差距矩阵（KOF2002 Roster 角色，28 个）：
 
-### 2.2 内容包与 manifest 差距
+| 角色 | PNG 提取 | Manifest | 运行时注册 | AIR 动画 | AIR 判定 |
+|------|----------|----------|------------|----------|----------|
+| Kyo | Y (1,808) | Y | Y | N | N |
+| Iori | N | N | N | N | N |
+| Terry | Y (1,407) | Y | Y | N | N |
+| Kim | Y (1,247) | Y | Y | N | N |
+| Ryo | Y (1,230) | Y | Y | N | N |
+| Athena | Y (1,456) | Y | Y | N | N |
+| Vice | Y (1,950) | Y | Y | N | N |
+| Yamazaki | Y (1,955) | Y | Y | N | N |
+| Shermie | Y (1,132) | Y | Y | N | N |
+| Leona | N | N | N | N | N |
+| Kula | N | N | N | N | N |
+| K' | N | N | N | N | N |
+| Robert | N | N | N | N | N |
+| Mai | N | N | N | N | N |
+| Ralf | N | N | N | N | N |
+| Andy | N | N | N | N | N |
+| Clark | N | N | N | N | N |
+| Joe | N | N | N | N | N |
+| Billy | N | N | N | N | N |
+| Chang | N | N | N | N | N |
+| Choi | N | N | N | N | N |
+| Mature | N | N | N | N | N |
+| Yashiro | N | N | N | N | N |
+| Chris | N | N | N | N | N |
+| Mary | N | N | N | N | N |
+| Xiangfei | N | N | N | N | N |
+| Kasumi | N | N | N | N | N |
+| Heidern | Y (2,663) | Y | Y | N | N |
 
-- 已闭合项：
-  - Ryo 完整度校验工具 (8维报告: animationFrames/attackFrames/feedback/hurtbox/portrait/moveList/visualFrames + 加权总分)
-  - Kyo 完整度校验工具 (8维报告: animationMeta/frameData/attackFrames/feedback/portrait/moveList/cancelPaths/hitEffects)
-  - Iori 完整度校验工具 (8维报告: 同Kyo结构)
-  - Kyo/Iori完整度回归测试 (33 tests: 维度有效性+覆盖率+最低阈值)
-  - 3角色内容包结构一致性回归测试 (13 tests: barrel export完整性校验)
-  - rendererFighter.ts拆分 (1852→1573行: 工具函数提取到rendererFighterUtils.ts)
-  - sampler.ts拆分 (1880→470行: 渲染函数提取到samplerRenderers.ts)
-  - 3角色动画元数据补全10类缺失状态 (backdash/hop/hyper_jump/run_jump/roll/back_roll/air_block/throw_anim/jump_a~d)
-  - bgm.ts拆分 (1800→1555行: 合成原语提取到bgmSynthesis.ts)
-  - main.ts拆分 (1739→1664行: 街机工具提取到arcadeUtils.ts)
-  - advancedAI.ts拆分 (1703→1555行: 配置/间距/哈希提取到aiConfig.ts)
-  - hud.ts拆分 (1623→1249行: drawPowerGauges提取到hudPowerGauges.ts)
-  - characters/index.ts补全 Kyo/Iori FrameContract/HitEffects/Audio导出
-  - 多角色barrel导出完整性回归测试 (10 tests)
-  - 测试总数 4869
-- 当前差距：角色内容已开始分层，但真实数据、兼容入口、校验工具之间还需继续收口。
-- 新功能添加点：
-  - `src/content/characters/index.ts` barrel export
-  - Ryo content package 子域数据文件
-  - frame contract / animation / hitbox / feedback 校验工具
-  - completeness report
-  - 角色数据 schema 公共化
-- 期望结果：
-  - 新内容有固定归属，不再散落在多个平面入口。
+新功能添加点：
 
-### 2.3 稳定性与回归差距
+- 对已有 SFF 源但未提取的角色，运行 `extractCharacterSprites` 管线。
+- **最高优先级：完成 AIR 解析管线，生成 `animations.json`（帧序列+duration）和 `hitboxes.json`（Clsn 判定框）**。
+- 为 Iori 和其他缺失源的角色寻找替代 MUGEN 角色包。
 
-- 当前差距：部分输入、镜头、特效、命中边界虽然已改善，但仍需要更强回归保护。
-- 已闭合项：
-  - 4616 tests 全部通过 (vitest)
-  - 6档反馈矩阵回归测试 (23 tests, 层级递进+参数完整性+3角色映射)
-  - DM→SDM→HSDM升级链回归测试 (8 tests, Kyo/Iori/HSDM一致性)
-  - 3角色必杀技像素帧覆盖 (134 tests, 基本+通常+必杀+DM/SDM/HSDM+命令技)
-  - Kyo/Iori反馈层+帧映射回归测试 (4 tests, 27+25攻击类型全映射)
-  - 3角色取消路径结构回归测试 (22 tests, 通常技→必杀技→DM超必→Free Cancel)
-  - 3角色四尺寸肖像一致性回归测试 (28 tests, select/vs/hud/win全尺寸)
-  - 3角色动画节奏一致性回归测试 (63 tests, 轻重攻击递增+loop属性+参数正值)
-  - 3角色 manifest 校验工具 全绿 (82+89+89 checks)
-  - 3角色8维完整度校验工具 (Ryo/Kyo/Iori各8维度+加权总分，3角色均100%)
-  - 多角色统一校验入口 (multiCharValidation.ts)
-  - Kyo/Iori完整度+命中特效前缀覆盖率回归测试 (45 tests)
-  - HSDM招式表分类+CN_MOVE_NAMES覆盖回归测试 (11 tests)
-  - Kyo/Iori攻击帧数据完整性+命中判定框回归测试 (116 tests: 全键存在/结构/帧数/递进/hitbox维度/跨角色)
-  - 3角色视觉输入图标招式兼容性回归测试 (5 tests)
-  - ScreenFlash/ScreenShake/VFXSystem核心VFX回归测试 (30 tests)
-  - 3角色动画元数据完整性回归测试 (29 tests: 必需状态/帧数正值/类型一致/跨角色)
-  - sampler.ts拆分 (1880→470行: 渲染函数提取到samplerRenderers.ts)
-  - 街机工具回归测试 (17 tests: RIVAL_MAP/arcadeDifficulty/generateArcadeOpponents/pickWinQuote)
-  - inferTier分类+attackTierMap回归测试 (15 tests: 模式分类/3角色DM/SDM/HSDM映射)
-  - AI配置回归测试 (21 tests: 难度预设/间距/哈希/常量)
-  - rendererFighter.ts拆分 (1852→1573行: 工具函数提取到rendererFighterUtils.ts)
-  - 3角色取消路径结构一致性回归测试 (33 tests: cancelType/stockCost/timerCost/window)
-  - sampler渲染器音频缓冲区回归测试 (7 tests: combat/UI/accent有效性+DM>special递进)
-  - 3角色命中特效插件结构回归测试 (18 tests: charId/prefixes/VFX/SFX/DM前缀)
-  - 仪式感流程回归测试 (14 tests: 三节拍序列/KO/Perfect/结构完整性/曲线范围)
-  - announcer事件类型校验扩展 (ready/stun/guard_crush)
-  - skeletalFighter拆分 (1594→1419行: 胜利姿态+攻击光效提取到skeletalVictory.ts)
-  - 27角色攻击光效回归测试 (8 tests: 数值范围+角色特性校验)
-  - VFX粒子预设全量回归测试 (45 tests: 38个spawn函数+粒子类型校验)
-  - 角色专属VFX预设回归测试 (31 tests: Ryo/Kyo/Iori+通用战斗特效+层级递进)
-  - 27角色服装/发型/瞳色回归测试 (18 tests: 4色域+Ryo调色板+外观系统)
-  - 6-tier反馈manifest回归约束 (18 tests: 结构+单调递增+边界)
-  - 眩晕槽+防御槽常量回归测试 (25 tests: stun fill递增+guard drain递增+dizzy/mash合理)
-  - 攻击分类集合回归测试 (25 tests: LIGHT/NORMAL/COMMAND一致性+enum对齐)
-  - 战斗系统常量全量回归测试 (37 tests: 伤害缩放/取消窗口/气槽/MAX/绝望/浮空/弹墙)
-  - 眩晕恢复专属音效 stun recovery (C5→E5双音阶)
-  - Kyo/Iori内容包接入真实完整度报告 (消除placeholder)
-  - 内容包报告集成回归测试 (10 tests: 3角色真实报告+数据结构完整性)
-  - 6舞台氛围系统回归测试 (14 tests)
-  - 视觉输入图标系统回归测试 (18 tests: KOF2002符号渲染+度量+健壮性)
-  - 眩晕预警音效 stun warning (1200Hz短促警报音, stunGauge>85%触发)
-  - 战斗回调接口回归测试 (4 tests: throwEscape/guardCrush/stunWarning)
-  - FighterState枚举覆盖回归测试 (9 tests: 26状态完整+分组校验)
-  - 暂停菜单渲染回归测试 (8 tests: 3个tab+canvas操作+边界条件)
-  - VS对战画面渲染回归测试 (7 tests: 斜线擦除+文字+背景+6舞台)
-  - Continue/GameOver画面渲染回归测试 (11 tests: 倒计时+光标+角色肖像)
-  - SuperFlash超必杀闪光渲染回归测试 (11 tests: DM/SDM/HSDM+zoom)
-  - 回合分数明细弹窗渲染回归测试 (8 tests: normal+perfect+fade+边界)
-  - 4种屏幕转场动画回归测试 (15 tests: curtain/wipe/zoom/fade)
-  - 测试总数 5293
-- 新功能添加点：
-  - smoke / ryo / combat / content 分层测试
-  - frame contract 回归测试
-  - 选择界面、爆气、双击冲刺、命中 VFX 的专门测试
-- 期望结果：
-  - 体验优化不再轻易把基础手感打坏。
+### 0.2 运行时 Sprite 接入
 
-## 3. 低优先级但必须保留的差距
+当前状态：
 
-### 3.1 流程与场景仪式感差距
+- `characterSpriteRegistry.ts` + `characterSpriteConfigs.ts` 提供通用 PNG sprite 加载机制。
+- 17 个角色已注册运行时 sprite 配置（kyo/ryo/athena/terry/kim/vice/yamazaki/shermie/benimaru/chunli/geese/gouki/rock/king/rugal/g_rugal/heidern）。
+- 但其中部分角色（chunli/geese/gouki/rock/king/rugal/g_rugal/benimaru）不在 KOF2002 正式 Roster 中。
+- KOF2002 Roster 内有 20 个角色未注册运行时 sprite 配置（见上表）。
+- 当前 `specialMap` 只映射了少量必杀技到 MUGEN action number，绝大多数通常技和必杀技仍依赖程序化 fallback。
 
-- 当前差距：选人、进场、KO、胜负、重开等流程还有进一步街机化空间。
-- 已闭合项：
-  - 街机对手递进 + 宿敌系统(RIVAL_MAP)
-  - NEXT_MATCH 对手预览 + 宿敌决战标识
-  - VS 画面 + 肖像 + 调色板
-  - 角色入场 INTRO 粒子特效 + 入场台词
-  - KO 视觉序列 + DM/SDM/HSDM 终结画面
-  - CONGRATULATIONS 通关统计面板
-  - CONTINUE 倒计时画面
-  - 回合结束分数明细弹窗(Win+HP Bonus+Perfect+计数动画)
-  - VS画面冲击音效 + P2开场语音
-  - FighterState.WIN胜利姿态接入 + 3角色专属像素帧实际播放 (v2.39)
-  - Ryo胜利4帧动画完整播放(起手→交叉→完成→持定)
-  - 全项目文件2000行上限合规(5大文件拆分: frameData/overlays/screens/attackFrames/skeletal)
-  - 眩晕星星VFX增强(4色十字星旋转替代简单黄色圆点)
-  - 胜利姿态角色属性色闪光+光效爆发+落地扬尘(WIN_QUOTE入场仪式感)
-  - READY?三节拍回合开始序列(ROUND→READY→FIGHT) (v2.19)
-  - announceSequence期间恢复仪式感背景(MATCH_POINT/舞台名/角色名/电影遮幅) (v2.19)
-  - Continue?/Game Over语音播报(formant合成) (v2.20)
-  - DM终结KO使用zoom转场(超必杀击杀专属过渡) (v2.20)
-  - Continue倒计时滴答音效+归零蜂鸣+最后3秒加速 (v2.20)
-  - 通关画面播放胜利音乐 (v2.20)
-  - 通关CONGRATULATIONS进入时胜利音效 (v2.20)
-  - GAME_OVER进入时暗红flash+强震 (v2.20)
-  - 角色专属胜利语音(3角色victory formant profile) (v2.20)
-- 新功能添加点：
-  - 胜利姿态动画细化
+差距：
 
-### 3.2 长期架构差距
+- specialMap 覆盖率低。Kyo/Ryo 各映射约 20 个，Athena/Terry/Kim/Vice/Yamazaki/Shermie 各仅映射 1-4 个 DM/SDM。其余 10 个注册角色 specialMap 为空 `{}`。
+- 通常技（stand_a/b/c/d、crouch_a/b/c/d、jump_a/b/c/d）的 MUGEN action number 映射尚未系统化。
+- AIR 文件中的动画名和帧序列未被自动映射到运行时的 FighterState/AttackType。
 
-- 当前差距：仓库还在从单体结构向大型项目结构过渡。
-- 新功能添加点：
-  - `app/engine/simulation/content/tools` 目标分层
-  - 资源工具链离线化
-  - 更清晰的角色包、舞台包、UI 包边界
+新功能添加点：
 
-## 4. 当前最该先做什么
+- 自动化 AIR action number -> AttackType 映射生成。
+- 通常技 action number 标准化映射表（per-character basis）。
+- 运行时双路径确认：PNG sprite（优先）-> 程序化像素帧（fallback）。
 
-按当前优先级，建议先闭合以下顺序：
+### 0.3 MUGEN 动画数据接入
 
-1. 公共骨架复用。
-2. 单角色样板闭环。
-3. 流程与场景仪式感。
-4. 多角色内容包与 content loader 稳定化。
-5. 输入可见性与 UI/HUD 一致性。
-6. 打击反馈与资源规则。
-7. 肖像气质与动作节奏的进一步精修。
-8. 回归保护与工具链强化。
-9. 长期架构分层与目录收口。
+当前状态：
 
-## 4.1 Phase 2 当前执行清单
+- 工具层 `parseAir.ts` 已能解析 AIR 文件，提取动画名、帧序列、帧 duration、Clsn 判定框。
+- `convertAirHitboxes.ts` 已能将 AIR Clsn 数据转换为运行时判定格式。
+- `buildSpriteManifest.ts` 已能从 AIR 生成 manifest。
+- **但以上工具的输出尚未持久化为 `animations.json` / `hitboxes.json` 并被运行时消费**。
 
-如果任务发生在当前 Phase 2，优先按下列方向排期：
+差距：
 
-- 街机模式对手递进、NEXT_MATCH、NEXT STAGE、CONGRATULATIONS 这类流程仪式感。
-- Kyo / Iori 内容包接入、move list、frame contract、portrait / feedback / hitbox 的多角色验证。
-- 菜单、选人、VS、胜负画面、训练模式招式表的 UI/HUD 一致性。
-- 现有测试分层、内容校验、manifest 校验和回归保护。
-- 在不破坏前四项的前提下，再继续细化肖像、动作和特效。
+- AIR 动画数据（帧序列、duration、loopStart）未被写入 `public/sprites/<char>/animations.json`。
+- AIR Clsn 判定数据（hurtbox/hitbox 坐标）未被写入 `public/sprites/<char>/hitboxes.json`。
+- 运行时 `realSpriteLoader.ts` 的 `SpriteManifest` 接口已预留 `animations` 字段，但实际数据为空。
+- 当前动画帧序列、帧 duration、判定框全部是手写/程序化的，不是从 MUGEN AIR 源数据驱动。
 
-## 5. 不要做什么
+新功能添加点：
 
-- 不要为了“更多功能”横向扩角色。
-- 不要为了“更高级”直接换技术栈。
-- 不要把 placeholder 包装成正式方向。
+- 将 `extractCharacterSprites` 管线扩展为端到端流水线：SFF -> PNG + AIR -> animations.json + hitboxes.json + manifest.json。
+- 运行时消费 `animations.json` 替换手写动画帧数据。
+- 运行时消费 `hitboxes.json` 替换手写判定框数据。
+- `animations.json` / `hitboxes.json` 的 schema 版本化与校验工具。
+
+### 0.4 MUGEN 判定数据接入
+
+当前状态：
+
+- `hitboxConstants.ts` 和各角色的 attackFrames 文件中的判定框全部是手工调参，不是从 MUGEN AIR Clsn 数据自动提取。
+- `convertAirHitboxes.ts` 工具已存在但输出未被任何运行时系统消费。
+- 3 个角色（Ryo/Kyo/Iori）有 Frame Contract，但判定数据来源是手动录入而非 MUGEN 自动提取。
+
+差距：
+
+- 没有任何角色在使用 MUGEN 源 Clsn 判定数据。
+- 判定框坐标无法与 MUGEN 原版精确对齐，导致打击感偏差。
+
+新功能添加点：
+
+- 将 `convertAirHitboxes` 输出接入运行时判定系统。
+- per-action 的 Clsn 数据映射到 Frame Contract 的 hurtbox/hitbox 字段。
+- 校验工具：对比 MUGEN 源 Clsn 与运行时实际使用值的偏差。
+
+---
+
+## Tier 1 -- 内容包集成 (高优先级)
+
+本层衡量角色内容包从数据定义到运行时消费的完整度。
+
+### 1.0 内容包结构
+
+当前状态：
+
+- 5 个角色有内容包（`src/content/characters/<name>/index.ts`）：ryo、kyo、iori、terry、kim。
+- 3 个角色有 Frame Contract（ryo/kyo/iori）。
+- 3 个角色有完整度校验工具（ryo/kyo/iori）。
+- 28 个角色有 Roster 定义（`src/characters/*.ts` + `src/characters/index.ts`）。
+- 测试总数 10,162（364 个测试文件，全部通过）。
+
+差距：
+
+- 23 个 Roster 角色没有内容包。
+- 25 个 Roster 角色没有 Frame Contract。
+- 内容包中的动画帧数据、判定数据不是 MUGEN 源数据驱动。
+- 内容包之间的数据格式一致性尚无自动化校验。
+
+新功能添加点：
+
+- 内容包 schema 标准化（每个角色包必须包含的文件和导出）。
+- 跨角色内容包一致性校验工具。
+- 将 MUGEN 源数据注入内容包的自动化流程。
+
+### 1.1 角色完整度矩阵
+
+内容包维度衡量（仅列出有内容包的 5 个角色）：
+
+| 维度 | Ryo | Kyo | Iori | Terry | Kim |
+|------|-----|-----|------|-------|-----|
+| CharDef | Y | Y | Y | Y | Y |
+| Frame Contract | Y | Y | Y | N | N |
+| PNG Sprite | Y | Y | N | Y | Y |
+| Runtime Sprite Config | Y | Y | N | Y | Y |
+| MUGEN AIR 动画 | N | N | N | N | N |
+| MUGEN Clsn 判定 | N | N | N | N | N |
+| 完整度校验工具 | Y | Y | Y | N | N |
+| 反馈矩阵 | Y | Y | Y | N | N |
+| 取消路径 | Y | Y | Y | N | N |
+| 音效映射 | Y | Y | Y | N | N |
+| 命中特效 | Y | Y | Y | N | N |
+| 肖像数据 | Y | Y | Y | N | N |
+
+Iori 特殊问题：
+
+- Iori 是核心样板角色但缺少 PNG sprite 提取（MUGEN 源缺失）。
+- Iori 的运行时渲染仍完全依赖程序化像素帧。
+- 需要优先为 Iori 找到 MUGEN 源或确认替代方案。
+
+### 1.2 技能与资源规则
+
+已闭合项：
+
+- 6 层反馈矩阵 + MAX mode damage/defense bonus。
+- DM -> SDM -> HSDM 升级链。
+- 3 Stock MAX mode activation，1 Stock DM，Super Cancel extra stock。
+- Free Cancel drains 20% MAX timer，Desperation DM damage bonus。
+- Kyo/Iori 取消路径回归测试（22 tests）。
+
+差距：
+
+- 资源规则数据不是从 MUGEN CMD/CNS 文件提取，而是手工定义。
+- 多数角色（25/28）没有取消路径数据。
+
+---
+
+## Tier 2 -- 游戏系统 (中优先级)
+
+本层是框架级系统，不来源于 MUGEN 数据，需要自行设计和实现。
+
+### 2.0 输入系统
+
+已闭合项：
+
+- 训练模式 move list HUD (F5 切换)。
+- 训练模式 frame data 面板 (F4 切换)。
+- 训练模式 input history (F3 切换)。
+- 指令进度可视化 (QCF/QCB/DP/HCF/HCB 部分匹配进度条)。
+- KOF2002 视觉输入图标系统。
+
+差距：
+
+- 输入缓冲和指令识别精度仍需打磨。
+- 多按键同时输入的边缘情况处理。
+
+### 2.1 组合与取消系统
+
+已闭合项：
+
+- 通常技 -> 必杀技 -> DM 超必 -> Free Cancel 的取消路径框架。
+- Super Cancel / Dream Cancel 机制。
+
+差距：
+
+- 取消窗口的帧精确度与原版对齐。
+- 空中取消、受击取消等高级机制。
+
+### 2.2 投技系统
+
+差距：
+
+- 投技判定与 MUGEN 源数据对齐。
+- 投技失败动画、投技挣脱机制。
+
+---
+
+## Tier 3 -- 视觉打磨 (中低优先级)
+
+本层增强 MUGEN sprite 的表现力，但不来源于 MUGEN 数据。
+
+### 3.0 打击反馈
+
+已闭合项：
+
+- 6 档反馈矩阵 light/heavy/special/dm/sdm/hsdm。
+- feedbackManifest.ts 数据驱动 manifest。
+- 角色专属 DM/SDM/HSDM 火花色板。
+- Kyo/Iori/Ryo 大量专属 VFX。
+- hitstop attacker glow、MAX 爆气角色属性色闪光。
+- 118 tests 覆盖 3 角色 57 必杀技 VFX+SFX。
+
+差距：
+
+- 反馈参数需要与真实 MUGEN sprite 的帧数据对齐。
+- 当 MUGEN sprite 替换程序化帧后，VFX 触发时机和位置可能需要调整。
+
+### 3.1 视觉特效
+
+已闭合项：
+
+- Hit sparks、screen shake、afterimage 框架。
+- 4 种屏幕转场动画（curtain/wipe/zoom/fade）。
+- 眩晕星星 VFX、SuperFlash、KO 终结特效。
+- VFX 粒子预设全量回归测试（45 tests）。
+
+差距：
+
+- 当 MUGEN sprite 以真实比例和 anchor 点显示时，特效位置需要重新校准。
+
+---
+
+## Tier 4 -- 流程与 UI (低优先级)
+
+### 4.0 街机流程
+
+已闭合项：
+
+- 街机对手递进 + 宿敌系统。
+- VS 画面 + 肖像 + 调色板。
+- KO 视觉序列 + DM/SDM/HSDM 终结画面。
+- Continue/Game Over/Congratulations 画面。
+- READY? 三节拍回合开始序列。
+- 角色专属胜利语音。
+
+差距：
+
+- 角色肖像应从 MUGEN 源 9000,0 sprite 提取，而非程序化 fallback。
+- 选人界面肖像需要真实 MUGEN sprite 支持。
+
+### 4.1 UI 一致性
+
+已闭合项：
+
+- 暂停菜单显示回合数 + 比分 + 角色名。
+- 首局控制提示 (F1/F3/F5/Esc 快捷键)。
+- DM/SDM/HSDM 终结 KO 差异化视觉。
+
+差距：
+
+- 选人界面、HUD 肖像在无真实 MUGEN sprite 时仍使用 fallback。
+
+---
+
+## 执行优先级
+
+按 MUGEN-First 策略，当前应按以下顺序推进：
+
+### 第一优先：闭合 Tier 0 管线缺口
+
+1. **AIR 解析管线端到端**：将 `parseAir` + `convertAirHitboxes` + `buildSpriteManifest` 的输出持久化为 `animations.json` / `hitboxes.json`。
+2. **运行时消费 MUGEN 动画和判定数据**：替换手写帧序列和判定框。
+3. **Iori MUGEN 源确认**：为核心样板角色找到可用的 MUGEN 角色包。
+4. **通常技 action number 映射**：系统化每个角色的 MUGEN action -> AttackType 对应关系。
+
+### 第二优先：扩展 Tier 0 覆盖范围
+
+5. 为已有 SFF 源但未提取的角色运行管线。
+6. 为缺失源文件的角色寻找替代 MUGEN 角色包。
+7. 运行时 sprite 接入从 9 个 KOF2002 角色扩展到全部 28 个。
+
+### 第三优先：内容包与系统
+
+8. 基于 MUGEN 数据重建内容包。
+9. 取消路径、资源规则与 MUGEN 源对齐。
+10. 输入系统和组合系统打磨。
+
+### 第四优先：视觉与流程
+
+11. MUGEN sprite 下的特效位置校准。
+12. 从 MUGEN 9000,0 提取肖像。
+13. 流程仪式感最终打磨。
+
+---
+
+## 当前统计数据
+
+| 指标 | 数值 |
+|------|------|
+| Roster 角色总数 | 28 |
+| 有内容包的角色 | 5 (Ryo/Kyo/Iori/Terry/Kim) |
+| 有 Frame Contract 的角色 | 3 (Ryo/Kyo/Iori) |
+| 有 PNG sprite 的 KOF2002 角色 | 9 (Kyo/Ryo/Athena/Terry/Kim/Vice/Yamazaki/Shermie/Heidern) |
+| 有运行时 sprite 配置的 KOF2002 角色 | 9 |
+| 有 MUGEN AIR 动画数据的角色 | 0 |
+| 有 MUGEN Clsn 判定数据的角色 | 0 |
+| Warusaki3 源角色总数 | 58 (AIR) / 73 (SFF) |
+| 已提取 PNG 的角色目录 | 17 |
+| 测试总数 | 10,162 (364 files, all passing) |
+| MUGEN 提取工具 | 4 (parseAir/buildSpriteManifest/convertAirHitboxes/extractCharacterSprites) |
+| 完整度校验工具 | 5 (ryo/kyo/iori/multiChar/multiCharValidation) |
+
+---
+
+## 不要做什么
+
+- 不要为了"更多功能"横向扩角色，除非该角色已完成 MUGEN 管线闭环。
+- 不要把程序化/fallback 方案视为差距闭合。只有 MUGEN 数据替换后才算闭合。
 - 不要在没有 gap 对应关系时添加新系统。
+- 不要跳过 AIR 解析管线的端到端验证就继续打磨视觉特效。
+- 不要在缺少 MUGEN 源的角色上花时间精修程序化像素帧。

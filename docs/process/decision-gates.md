@@ -13,6 +13,7 @@
 - 它如何验证？
 - 它如何回退？
 - 它是否应该先沉淀为公共基础组件，再允许角色复用？
+- 它是否应该先作为真实资产导入/解析流程，而不是先做运行时表面修饰？
 
 如果回答不清楚，不实施。
 
@@ -73,7 +74,9 @@
 
 - 定义了 manifest schema。
 - 有 validator 或测试。
-- 当前样板角色至少接入一个资源或动作。
+- 目标资源合法、可用、来源清楚。
+- 当前样板角色至少接入一个真实资源或动作。
+- 可以先推进真实 sprite / portrait / palette 导入，而不是继续抠骨架占位。
 - fallback 仍可用。
 
 拒绝条件：
@@ -81,22 +84,42 @@
 - 未确认许可。
 - 直接把研究资源放进运行时。
 - 只加图片，没有 manifest。
+- 为了“看起来更像 KOF”而跳过资产来源确认。
+
+## 4.1 资产优先决策门
+
+如果本轮存在“可用的真实 sprite / portrait / palette 资源”与“继续修骨架 / placeholder”两种路径，默认必须优先前者。
+
+允许条件：
+
+- 资源来源说明清楚。
+- 解析器或导入器可落在 `tools/`。
+- 运行时消费的是 manifest，不是直接吃原始包。
+- 不需要为了资产导入去换语言、换引擎或扩大运行时职责。
+
+拒绝条件：
+
+- 只是想先把 placeholder 修得更像。
+- 只有截图或零散参考，没有可用资源来源。
+- 解析逻辑打算写进运行时主循环。
+- 把一轮工作做成“导入资源 + 顺手重写渲染层”。
 
 ## 5. 角色扩展决策门
 
-在 Phase 2 的角色内容包和共享 contract 不稳定前，默认拒绝新增“无契约”的角色。
+当前主线为 MUGEN-first，角色扩展通过 MUGEN 管线（DEF/AIR/SFF → PNG + manifest → 运行时）统一推进。
 
-Phase 1 基线条件见 [Ryo Vertical Slice](../product/ryo-vertical-slice-plan.md)，但当前样板优先级由公共骨架 + Kyo 门面样板决定。
+Phase 1 基线条件见 [Ryo Vertical Slice](../product/ryo-vertical-slice-plan.md)，但当前样板优先级由公共骨架 + Kyo 门面样板 + MUGEN 资产管线决定。
 
-允许 Kyo/Iori 的条件：
+允许新增/扩展 KOF2002 roster 角色的条件：
 
 - 当前样板角色 8 个基础动作完成。
 - 当前样板角色 select/HUD 肖像完成。
 - 当前样板角色 light/heavy feedback 完成。
 - 当前样板角色完整度报告可运行。
 - 公共基础组件已能承载至少一个角色的完整链路。
-- Kyo/Iori 角色内容包和 content loader 已接入统一入口。
-- Kyo/Iori 的新增内容不破坏现有 shared contract / Frame Contract。
+- 新角色必须通过 MUGEN 管线提取：有 DEF/AIR/SFF 来源，管线自动产出 PNG + manifest。
+- 新角色的内容包和 content loader 已接入统一入口，不破坏现有 shared contract / Frame Contract。
+- 角色必须属于 KOF2002 原版阵容，不引入非 KOF2002 角色。
 - 构建和测试通过。
 
 ## 6. 打击感决策门

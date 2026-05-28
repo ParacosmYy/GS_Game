@@ -11,6 +11,7 @@ Phase 1 基线由 [Ryo Vertical Slice](../product/ryo-vertical-slice-plan.md) �
 当前阶段的执行口径是：
 
 - 先闭合最显眼的 KOF 差距，再做低感知扩展。
+- 如果本轮能推进真实 sprite / portrait / palette 导入，就优先于继续修骨架假人或 placeholder。
 - 先把内容包、流程和 UI 做成可复制模板，再做更多角色或更多模式。
 - 任何不服务当前 Phase 2 闭环的收口动作，都必须先说明为什么现在做。
 - 任何新功能都必须先说明它对应 [KOF 差距矩阵](../product/kof-gap-matrix.md) 的哪一项差距。
@@ -93,6 +94,7 @@ Phase 1 基线由 [Ryo Vertical Slice](../product/ryo-vertical-slice-plan.md) �
 
 - 先查 `references/mugen/` 和本地代码。
 - 可以查公开资料，但只能学习工程结构、数据组织、验收标准。
+- 如果存在可用的真实资产来源，优先评估是否能先做 SFF / ACT / palette 导入器。
 - 不复制商业素材、音频、角色实现。
 - 优先确认当前改动是否应先沉淀为公共基础组件，而不是先写角色私有逻辑。
 
@@ -173,11 +175,17 @@ npx vite build
 
 按 [Git 规则](git-rules.md) 提交。每轮一个 commit。
 
+提交前先确认两件事：
+
+- 本轮是否真的修改了文件；如果只是验证通过，没有文件变化，禁止提交。
+- 本轮用于提交的有效改动是否达到至少 `200` 行变更，以 `git diff --shortstat` 的新增+删除总和为准。
+
 补充节奏：
 
 - 每累计 5 个 commit，尝试 push 一次。
 - 若首次 push 失败，继续正常 commit，不要停在推送错误上。
 - push 失败要记录原因，后续再补推。
+- 只有“有效 commit”才计入 5 次节拍；有效 commit 指本轮实际改动达到至少 `200` 行变更且确实有文件修改。
 
 ## 3. 停止条件
 
