@@ -229,7 +229,7 @@ function resolveKyoFrameKey(
 
 // ===== Public API =====
 
-const KYO_TARGET_DISPLAY_HEIGHT = 144;
+const KYO_TARGET_DISPLAY_HEIGHT = 72;
 
 export function hasKyoHighResFrame(
   state: FighterState,

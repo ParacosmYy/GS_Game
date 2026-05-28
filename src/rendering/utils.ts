@@ -2,9 +2,7 @@
  * Shared drawing utilities — pure functions used across rendering modules
  */
 
-const CANVAS_WIDTH = 800;
-const CANVAS_HEIGHT = 600;
-const STAGE_GROUND_Y = 510;
+import { CANVAS_WIDTH, CANVAS_HEIGHT, STAGE_GROUND_Y } from '../core/constants.js';
 
 /** Vertical linear gradient with two color stops (0 → topColor, 1 → bottomColor) */
 export function verticalGrad(
@@ -42,6 +40,41 @@ export function drawBar(
   }
   ctx.fillStyle = fillColor;
   ctx.fillRect(x, y, w * Math.max(0, Math.min(1, fillRatio)), h);
+  ctx.restore();
+}
+
+/** Draw a screen-space radial vignette overlay (transparent center → tinted edge) */
+export function drawScreenVignette(
+  ctx: CanvasRenderingContext2D,
+  innerRatio: number, outerRatio: number,
+  tintColor: string, maxAlpha: number = 1,
+): void {
+  const cx = CANVAS_WIDTH / 2;
+  const cy = CANVAS_HEIGHT / 2;
+  const maxR = Math.sqrt(cx * cx + cy * cy);
+  const g = ctx.createRadialGradient(cx, cy, innerRatio * maxR, cx, cy, outerRatio * maxR);
+  g.addColorStop(0, 'rgba(0,0,0,0)');
+  g.addColorStop(1, tintColor);
+  ctx.save();
+  ctx.globalAlpha = maxAlpha;
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+  ctx.restore();
+}
+
+/** Draw a rounded rectangle with glow effect (stroke + shadow blur) */
+export function drawGlowingRect(
+  ctx: CanvasRenderingContext2D,
+  x: number, y: number, w: number, h: number, r: number,
+  color: string, glowColor: string, glowBlur: number, lineWidth: number = 2,
+): void {
+  ctx.save();
+  ctx.shadowColor = glowColor;
+  ctx.shadowBlur = glowBlur;
+  ctx.strokeStyle = color;
+  ctx.lineWidth = lineWidth;
+  roundRect(ctx, x, y, w, h, r);
+  ctx.stroke();
   ctx.restore();
 }
 

@@ -219,7 +219,7 @@ export function drawComboCounters(
     const topGrad = verticalGrad(ctx, 0, 0, 40, edgeColor, edgeColor + '00');
     ctx.fillStyle = topGrad;
     ctx.fillRect(0, 0, CANVAS_WIDTH, 40);
-    const botGrad = verticalGrad(ctx, 0, CANVAS_HEIGHT, 0, CANVAS_HEIGHT - 40, edgeColor, edgeColor + '00');
+    const botGrad = verticalGrad(ctx, 0, CANVAS_HEIGHT, CANVAS_HEIGHT - 40, edgeColor, edgeColor + '00');
     ctx.fillStyle = botGrad;
     ctx.fillRect(0, CANVAS_HEIGHT - 40, CANVAS_WIDTH, 40);
     const leftGrad = horizontalGrad(ctx, 0, 0, 30, edgeColor, edgeColor + '00');

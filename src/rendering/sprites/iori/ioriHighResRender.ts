@@ -228,7 +228,7 @@ function resolveIoriFrameKey(
   }
 }
 
-const IORI_TARGET_DISPLAY_HEIGHT = 144;
+const IORI_TARGET_DISPLAY_HEIGHT = 72;
 
 export function hasIoriHighResFrame(
   state: FighterState,
