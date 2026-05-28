@@ -1438,6 +1438,10 @@ function render(): void {
       gs.koTimer,
     );
   }
+  // Round score breakdown popup — show on every KO, not just MATCH_END
+  if (gs.phase === GamePhase.KO && gs.lastRoundScoreBreakdown) {
+    renderer.drawRoundScoreBreakdown(gs.koTimer, gs.lastRoundScoreBreakdown);
+  }
   renderer.drawComboCounters([p1, p2], [combatSystem.getComboCount(0), combatSystem.getComboCount(1)], [0, 0], camera, [combatSystem.getComboDamage(0), combatSystem.getComboDamage(1)]);
   if (gs.teamMode && p1Team && p2Team) {
     const toDisp = (t: TeamState): TeamDisplayInfo => ({
