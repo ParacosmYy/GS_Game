@@ -22,6 +22,7 @@ export { drawPowerGauges } from './hudPowerGauges.js';
 import { ROSTER } from '../characters/index.js';
 import { drawPixelPortrait } from './pixelPortraits.js';
 import { getPortraitForSize } from './manifestRenderData.js';
+import { drawVisualInput } from './overlays/overlayInputIcons.js';
 
 const charById = new Map(ROSTER.map(c => [c.id, c]));
 
@@ -381,12 +382,8 @@ function drawMoveListPanel(
     ctx.fillStyle = color;
     const nameX = panelX + 36;
     const name = move.name.length > 22 ? move.name.slice(0, 21) + '…' : move.name;
-    const input = move.input.length > 18 ? move.input.slice(0, 17) + '…' : move.input;
     ctx.fillText(name, nameX, y);
-    ctx.fillStyle = 'rgba(180, 180, 180, 0.7)';
-    ctx.textAlign = 'right';
-    ctx.fillText(input, panelX + panelW - 8, y);
-    ctx.textAlign = 'left';
+    drawVisualInput(ctx, move.input, panelX + panelW - 8, y - 5, color);
   }
 
   const burstHint = simplifiedMode
