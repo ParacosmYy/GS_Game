@@ -38,6 +38,17 @@ const defaultOptions = {
   trainingMode: false,
 };
 
+function createBundle(overrides: Record<string, unknown> = {}) {
+  const log = new InputLogger();
+  const session = new ReplaySession(log);
+  session.beginLiveMatch(defaultOptions);
+  log.record(0, createInput(), createInput());
+  log.record(1, createInput({ buttonA: true }), createInput());
+  const json = session.exportBundle();
+  const bundle = JSON.parse(json);
+  return { ...bundle, ...overrides };
+}
+
 // ── 1. Recording Lifecycle ──────────────────────────────────
 describe('Recording Lifecycle', () => {
   it('beginLiveMatch clears input log', () => {
@@ -116,5 +127,168 @@ describe('InputLog Dump/Load', () => {
     const log2 = new InputLogger();
     log2.load(json);
     expect(log2.length).toBe(2);
+  });
+});
+
+// ── 5. ReplaySession Validation ──────────────────────────────
+describe('ReplaySession Import Validation', () => {
+  it('rejects non-object JSON', () => {
+    const session = createSession();
+    const result = session.importBundle('"hello"');
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error).toContain('JSON object');
+  });
+
+  it('rejects wrong version', () => {
+    const session = createSession();
+    const result = session.importBundle(JSON.stringify({ version: 99 }));
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error).toContain('version');
+  });
+
+  it('rejects missing match envelope', () => {
+    const session = createSession();
+    const bundle = createBundle();
+    delete bundle.match;
+    const result = session.importBundle(JSON.stringify(bundle));
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error).toContain('match');
+  });
+
+  it('rejects match with invalid seed', () => {
+    const session = createSession();
+    const bundle = createBundle({ match: { ...defaultOptions, source: 'live', seed: 'not-a-number' } });
+    const result = session.importBundle(JSON.stringify(bundle));
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error).toContain('seed');
+  });
+
+  it('rejects match with missing label', () => {
+    const session = createSession();
+    const match = { ...defaultOptions, source: 'live' };
+    delete (match as any).label;
+    const bundle = createBundle({ match });
+    const result = session.importBundle(JSON.stringify(bundle));
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error).toContain('label');
+  });
+
+  it('rejects match with invalid source', () => {
+    const session = createSession();
+    const match = { ...defaultOptions, source: 'invalid' };
+    const bundle = createBundle({ match });
+    const result = session.importBundle(JSON.stringify(bundle));
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error).toContain('source');
+  });
+
+  it('rejects match with non-boolean teamMode', () => {
+    const session = createSession();
+    const match = { ...defaultOptions, source: 'live', teamMode: 'yes' };
+    const bundle = createBundle({ match });
+    const result = session.importBundle(JSON.stringify(bundle));
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error).toContain('teamMode');
+  });
+
+  it('rejects missing RNG snapshot', () => {
+    const session = createSession();
+    const bundle = createBundle();
+    delete bundle.rngSnapshot;
+    const result = session.importBundle(JSON.stringify(bundle));
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error).toContain('RNG');
+  });
+
+  it('rejects RNG snapshot with non-number state', () => {
+    const session = createSession();
+    const bundle = createBundle({ rngSnapshot: { state: 'bad' } });
+    const result = session.importBundle(JSON.stringify(bundle));
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error).toContain('RNG');
+  });
+
+  it('rejects missing input log', () => {
+    const session = createSession();
+    const bundle = createBundle();
+    delete bundle.inputLog;
+    const result = session.importBundle(JSON.stringify(bundle));
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error).toContain('input log');
+  });
+
+  it('rejects input log with invalid version', () => {
+    const session = createSession();
+    const bundle = createBundle();
+    bundle.inputLog.version = 99;
+    const result = session.importBundle(JSON.stringify(bundle));
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error).toContain('version');
+  });
+
+  it('rejects input log without frames array', () => {
+    const session = createSession();
+    const bundle = createBundle();
+    bundle.inputLog.frames = 'not-array';
+    const result = session.importBundle(JSON.stringify(bundle));
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error).toContain('frames');
+  });
+
+  it('accepts valid bundle', () => {
+    const session = createSession();
+    const bundle = createBundle();
+    const result = session.importBundle(JSON.stringify(bundle));
+    expect(result.ok).toBe(true);
+  });
+
+  it('roundtrip preserves match envelope', () => {
+    const log = new InputLogger();
+    const session = new ReplaySession(log);
+    session.beginLiveMatch({ ...defaultOptions, label: 'roundtrip-test' });
+    log.record(0, createInput(), createInput());
+    const json = session.exportBundle();
+    const session2 = createSession();
+    session2.importBundle(json);
+    const env = session2.getMatchEnvelope();
+    expect(env).not.toBeNull();
+    expect(env!.label).toBe('roundtrip-test');
+    expect(env!.p1CharId).toBe('kyo');
+    expect(env!.p2CharId).toBe('iori');
+    expect(env!.source).toBe('live');
+  });
+
+  it('roundtrip preserves RNG snapshot', () => {
+    const log = new InputLogger();
+    const session = new ReplaySession(log);
+    session.beginLiveMatch(defaultOptions);
+    log.record(0, createInput(), createInput());
+    const json = session.exportBundle();
+    const session2 = createSession();
+    session2.importBundle(json);
+    const rng = session2.getRngSnapshot();
+    expect(rng).not.toBeNull();
+    expect(typeof rng!.state).toBe('number');
+  });
+
+  it('getMatchEnvelope returns null before match starts', () => {
+    const session = createSession();
+    expect(session.getMatchEnvelope()).toBeNull();
+  });
+
+  it('getRngSnapshot returns null before match starts', () => {
+    const session = createSession();
+    expect(session.getRngSnapshot()).toBeNull();
+  });
+
+  it('exportBundle before match throws', () => {
+    const session = createSession();
+    expect(() => session.exportBundle()).toThrow();
+  });
+
+  it('importBundle handles null JSON gracefully', () => {
+    const session = createSession();
+    const result = session.importBundle('null');
+    expect(result.ok).toBe(false);
   });
 });
