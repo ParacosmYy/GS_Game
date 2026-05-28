@@ -7,6 +7,7 @@ import { roundRect, drawSNKText } from '../utils.js';
 import type { TrainingModeState, FrameDataDisplay, InputHistoryEntry } from '../../state/trainingMode.js';
 import type { MoveListEntry } from '../../core/types.js';
 import { CN_MOVE_NAMES } from '../moveNameDisplay.js';
+import { drawVisualInput } from './overlayInputIcons.js';
 
 // ===== Training Mode HUD =====
 
@@ -271,11 +272,8 @@ function drawMoveListPanel(ctx: CanvasRenderingContext2D, moveList: MoveListEntr
       const nameX = panelX + 10;
       ctx.fillText(move.name, nameX, curY + 1);
 
-      // Input notation — right-aligned
-      ctx.textAlign = 'right';
-      ctx.fillStyle = style.color;
-      ctx.fillText(move.input, panelX + panelW - 8, curY + 1);
-      ctx.textAlign = 'left';
+      // Input notation — visual icons right-aligned
+      drawVisualInput(ctx, move.input, panelX + panelW - 8, curY + 6, style.color);
       curY += lineH;
     }
     curY += 2;

@@ -5,6 +5,7 @@
  * 半透明暗色覆盖层,冻结战斗画面
  */
 import type { CharacterDefinition } from '../characters/types.js';
+import { drawVisualInput } from './overlays/overlayInputIcons.js';
 
 const MENU_ITEMS = ['MOVE LIST', 'CONTROLS', 'RESUME'] as const;
 const TAB_ITEMS: Array<'moves' | 'controls' | 'settings'> = ['moves', 'controls', 'settings'];
@@ -171,11 +172,8 @@ function drawMoveList(
     ctx.fillStyle = COLORS.moveName;
     ctx.fillText(move.name, x + 8, cy);
 
-    // Command notation
-    ctx.font = '12px "Courier New", monospace';
-    ctx.textAlign = 'right';
-    ctx.fillStyle = COLORS.moveCmd;
-    ctx.fillText(move.input, x + w * 0.7, cy);
+    // Command notation — visual icons
+    drawVisualInput(ctx, move.input, x + w * 0.7, cy, catColor);
 
     // Category tag
     ctx.font = '10px "Courier New", monospace';
