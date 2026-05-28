@@ -15,7 +15,7 @@ import {
   HUD_TIMER_SIZE, HUD_GAUGE_Y, HUD_GAUGE_WIDTH, HUD_GAUGE_HEIGHT,
   HUD_GAUGE_SEGMENT_GAP, HUD_WIN_MARKER_SIZE,
 } from '../core/constants.js';
-import { shiftColor, roundRect, drawSNKText, horizontalGrad } from './utils.js';
+import { shiftColor, roundRect, drawSNKText, horizontalGrad, parseColor } from './utils.js';
 import { drawComboCounters } from './hudComboCounter.js';
 import { drawPowerGauges } from './hudPowerGauges.js';
 export { drawPowerGauges } from './hudPowerGauges.js';
@@ -94,26 +94,11 @@ function drawPixelText(
 }
 
 function parseFillColor(color: string): { fill: string; highlight: string } {
-  const { r, g, b } = parseColorRGB(color);
+  const { r, g, b } = parseColor(color);
   return {
     fill: color,
     highlight: `rgba(${Math.min(255, r + 60)}, ${Math.min(255, g + 60)}, ${Math.min(255, b + 60)}, 0.6)`,
   };
-}
-
-function parseColorRGB(color: string): { r: number; g: number; b: number } {
-  if (color.startsWith('#')) {
-    return {
-      r: parseInt(color.slice(1, 3), 16),
-      g: parseInt(color.slice(3, 5), 16),
-      b: parseInt(color.slice(5, 7), 16),
-    };
-  }
-  if (color.startsWith('rgba(') || color.startsWith('rgb(')) {
-    const m = color.match(/(\d+)/g);
-    return m ? { r: +m[0], g: +m[1], b: +m[2] } : { r: 128, g: 128, b: 128 };
-  }
-  return { r: 128, g: 128, b: 128 };
 }
 
 // ===== Damage flash state per player =====

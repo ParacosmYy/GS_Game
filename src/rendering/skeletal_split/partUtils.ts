@@ -2,7 +2,7 @@
  * Shoe rendering, attack trail, and color parsing utilities
  * Split from skeletalParts.ts
  */
-import { shiftColor, roundRect } from '../utils.js';
+import { shiftColor, roundRect, parseColor } from '../utils.js';
 
 export function drawShoe(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, rot: number, color: string, facing: number): void {
   ctx.save();
@@ -41,7 +41,7 @@ export function drawAttackTrail(
 ): void {
   if (attackPhase !== 'active') return;
 
-  const { r, g, b } = parseColorRGB(color);
+  const { r, g, b } = parseColor(color);
   const trailCount = 3;
   const trailSpacing = limbLength * 0.12;
   const baseTrailLen = limbLength * 0.35;
@@ -77,20 +77,4 @@ export function drawAttackTrail(
   }
 
   ctx.restore();
-}
-
-/** Parse a color string to RGB components (utility for drawAttackTrail) */
-function parseColorRGB(color: string): { r: number; g: number; b: number } {
-  if (color.startsWith('#')) {
-    return {
-      r: parseInt(color.slice(1, 3), 16),
-      g: parseInt(color.slice(3, 5), 16),
-      b: parseInt(color.slice(5, 7), 16),
-    };
-  }
-  if (color.startsWith('rgba(') || color.startsWith('rgb(')) {
-    const m = color.match(/(\d+)/g);
-    return m ? { r: +m[0], g: +m[1], b: +m[2] } : { r: 255, g: 160, b: 0 };
-  }
-  return { r: 255, g: 160, b: 0 };
 }
