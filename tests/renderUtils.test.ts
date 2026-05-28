@@ -1,9 +1,26 @@
 /**
  * Rendering Utils Regression Test
- * Verifies shiftColor, parseColor handle hex and rgba formats correctly.
+ * Verifies shiftColor, parseColor, verticalGrad, horizontalGrad, drawBar.
  */
 import { describe, it, expect } from 'vitest';
-import { parseColor, shiftColor } from '../src/rendering/utils.js';
+import { parseColor, shiftColor, verticalGrad, horizontalGrad, drawBar } from '../src/rendering/utils.js';
+
+function mockCtx() {
+  const stops: { offset: number; color: string }[] = [];
+  const rects: { x: number; y: number; w: number; h: number }[] = [];
+  let fillStyle = '';
+  return {
+    stops, rects, fillStyle,
+    createLinearGradient(x0: number, y0: number, x1: number, y1: number) {
+      return {
+        addColorStop(offset: number, color: string) { stops.push({ offset, color }); },
+      };
+    },
+    fillRect(x: number, y: number, w: number, h: number) { rects.push({ x, y, w, h }); },
+    save() {},
+    restore() {},
+  } as unknown as CanvasRenderingContext2D;
+}
 
 describe('parseColor', () => {
   it('parses #rrggbb', () => {
@@ -105,5 +122,56 @@ describe('shiftColor', () => {
   it('darkens white by -100', () => {
     const result = shiftColor('#ffffff', -100);
     expect(result).toBe('#9b9b9b');
+  });
+});
+
+// ── verticalGrad ──────────────────────────────────────────────
+describe('verticalGrad', () => {
+  it('creates gradient with two stops', () => {
+    const ctx = mockCtx();
+    const g = verticalGrad(ctx as any, 10, 0, 100, '#ff0000', '#0000ff');
+    expect((ctx as any).stops).toEqual([
+      { offset: 0, color: '#ff0000' },
+      { offset: 1, color: '#0000ff' },
+    ]);
+  });
+});
+
+// ── horizontalGrad ────────────────────────────────────────────
+describe('horizontalGrad', () => {
+  it('creates gradient with two stops', () => {
+    const ctx = mockCtx();
+    const g = horizontalGrad(ctx as any, 0, 50, 200, '#00ff00', '#000000');
+    expect((ctx as any).stops).toEqual([
+      { offset: 0, color: '#00ff00' },
+      { offset: 1, color: '#000000' },
+    ]);
+  });
+});
+
+// ── drawBar ───────────────────────────────────────────────────
+describe('drawBar', () => {
+  it('draws border and fill rects', () => {
+    const ctx = mockCtx();
+    drawBar(ctx, 10, 20, 100, 8, 0.5, '#ff0000', '#ffffff', 1);
+    // border rect (x-1, y-1, w+2, h+2) then fill rect (x, y, w*0.5, h)
+    expect((ctx as any).rects.length).toBe(2);
+    expect((ctx as any).rects[0]).toEqual({ x: 9, y: 19, w: 102, h: 10 });
+    expect((ctx as any).rects[1]).toEqual({ x: 10, y: 20, w: 50, h: 8 });
+  });
+
+  it('clamps fillRatio to [0,1]', () => {
+    const ctx = mockCtx();
+    drawBar(ctx, 0, 0, 100, 10, 2.0, '#fff', '#000', 0);
+    expect((ctx as any).rects[0].w).toBe(100);
+    const ctx2 = mockCtx();
+    drawBar(ctx2, 0, 0, 100, 10, -0.5, '#fff', '#000', 0);
+    expect((ctx2 as any).rects[0].w).toBe(0);
+  });
+
+  it('skips border when borderWidth is 0', () => {
+    const ctx = mockCtx();
+    drawBar(ctx, 0, 0, 100, 10, 0.5, '#fff', '#000', 0);
+    expect((ctx as any).rects.length).toBe(1);
   });
 });

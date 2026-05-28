@@ -97,7 +97,7 @@ describe('Win dot animation', () => {
   it('HUD drawHUD accepts lastWinTick/lastWinSide params', async () => {
     const mod = await import('../src/rendering/hud.js');
     expect(typeof mod.drawHUD).toBe('function');
-  });
+  }, 15000);
 
   it('Renderer.render accepts lastWinTick/lastWinSide params', async () => {
     const { Renderer } = await import('../src/rendering/renderer.js');

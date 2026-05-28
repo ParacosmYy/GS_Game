@@ -6,6 +6,45 @@ const CANVAS_WIDTH = 800;
 const CANVAS_HEIGHT = 600;
 const STAGE_GROUND_Y = 510;
 
+/** Vertical linear gradient with two color stops (0 → topColor, 1 → bottomColor) */
+export function verticalGrad(
+  ctx: CanvasRenderingContext2D, x: number, y1: number, y2: number,
+  topColor: string, bottomColor: string,
+): CanvasGradient {
+  const g = ctx.createLinearGradient(x, y1, x, y2);
+  g.addColorStop(0, topColor);
+  g.addColorStop(1, bottomColor);
+  return g;
+}
+
+/** Horizontal linear gradient with two color stops (0 → leftColor, 1 → rightColor) */
+export function horizontalGrad(
+  ctx: CanvasRenderingContext2D, x1: number, y: number, x2: number,
+  leftColor: string, rightColor: string,
+): CanvasGradient {
+  const g = ctx.createLinearGradient(x1, y, x2, y);
+  g.addColorStop(0, leftColor);
+  g.addColorStop(1, rightColor);
+  return g;
+}
+
+/** Draw a filled bar with an optional border (common pattern for health/meter/timer bars) */
+export function drawBar(
+  ctx: CanvasRenderingContext2D,
+  x: number, y: number, w: number, h: number,
+  fillRatio: number, fillColor: string, borderColor: string = '#ffffff',
+  borderWidth: number = 1,
+): void {
+  ctx.save();
+  if (borderWidth > 0) {
+    ctx.fillStyle = borderColor;
+    ctx.fillRect(x - borderWidth, y - borderWidth, w + borderWidth * 2, h + borderWidth * 2);
+  }
+  ctx.fillStyle = fillColor;
+  ctx.fillRect(x, y, w * Math.max(0, Math.min(1, fillRatio)), h);
+  ctx.restore();
+}
+
 /** Draw a rounded rectangle path (does NOT fill/stroke — caller must ctx.fill() or ctx.stroke()) */
 export function roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number): void {
   ctx.beginPath();
