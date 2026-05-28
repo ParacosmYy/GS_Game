@@ -15,21 +15,18 @@ describe('Ryo Variable Frame Completeness', () => {
   const source = fs.readFileSync(RENDER_FILE, 'utf8');
 
   it('has no remaining uniform registerFrames calls for animations', () => {
-    // Find all direct registerFrames(' calls (not via baseHighResRenderer alias)
-    const registerFramesCalls = source.match(/registerFrames\(['"]/g);
-    const registerFramesDef = source.match(/function registerFrames\(/g);
-    const baseImport = source.match(/registerFrames as reg/g);
+    // Factory pattern: regV(...) or registerVariableFrames(...) are valid
+    // Only direct registerFrames(' calls (not via base alias or factory) should be absent
+    const directRegisterFrames = source.match(/(?<!\w)registerFrames\(['"]/g);
+    const factoryRegV = source.match(/regV\(['"]/g);
+    const defCount = source.match(/function registerFrames\(/g)?.length ?? 0;
 
-    const callCount = registerFramesCalls ? registerFramesCalls.length : 0;
-    const defCount = registerFramesDef ? registerFramesDef.length : 0;
-    const usesBase = baseImport ? baseImport.length : 0;
-
-    // With shared base: no local definition, no direct calls, uses base import
-    if (usesBase > 0) {
-      expect(callCount, 'No uniform registerFrames calls should remain').toBe(0);
+    if (factoryRegV && factoryRegV.length > 0) {
+      // Factory pattern: all registrations via regV(), no legacy registerFrames
+      expect(directRegisterFrames?.length ?? 0, 'No uniform registerFrames calls should remain').toBe(0);
     } else {
-      // Legacy: function definition should exist, no direct calls
-      expect(callCount, 'No uniform registerFrames calls should remain').toBe(0);
+      // Legacy pattern: no direct calls
+      expect(directRegisterFrames?.length ?? 0, 'No uniform registerFrames calls should remain').toBe(0);
       expect(defCount, 'Function definition should exist').toBe(1);
     }
   });
@@ -50,15 +47,17 @@ describe('Ryo Variable Frame Completeness', () => {
     ];
 
     for (const anim of requiredAnimations) {
-      const pattern = `registerVariableFrames('${anim}'`;
-      const found = source.includes(pattern);
-      expect(found, `Animation ${anim} should be registered with variable frames`).toBe(true);
+      // Accept both registerVariableFrames(' and regV(' patterns
+      const legacy = source.includes(`registerVariableFrames('${anim}'`);
+      const factory = source.includes(`regV('${anim}'`);
+      expect(legacy || factory, `Animation ${anim} should be registered with variable frames`).toBe(true);
     }
   });
 
   it('has correct number of variable frame registrations', () => {
-    const matches = source.match(/registerVariableFrames\('/g);
-    const count = matches ? matches.length : 0;
+    const legacyMatches = source.match(/registerVariableFrames\('/g);
+    const factoryMatches = source.match(/regV\('/g);
+    const count = (legacyMatches?.length ?? 0) + (factoryMatches?.length ?? 0);
     // Should have 46+ registrations (all animation states)
     expect(count, 'Should have 45+ variable frame registrations').toBeGreaterThanOrEqual(45);
   });

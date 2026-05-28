@@ -19,6 +19,7 @@ import {
   type PixelFrame,
   type PixelPalette,
 } from './pixelFrameRenderer.js';
+import type { FighterState, AttackType } from '../../../core/types.js';
 
 // ===== Types =====
 
@@ -102,6 +103,82 @@ export function getVariableFrameIndex(stateAge: number, frameDurations: number[]
     if (cycleAge < tickAccum) return i;
   }
   return frameDurations.length - 1;
+}
+
+// ===== Factory =====
+
+export interface HighResRenderer {
+  has(state: FighterState, attack: AttackType | null, vx: number, facing: number): boolean;
+  resolveKey(state: FighterState, attack: AttackType | null, vx: number, facing: number): string | null;
+  draw(ctx: CanvasRenderingContext2D, state: FighterState, stateAge: number, x: number, y: number, facing: number, attack: AttackType | null, vx: number): boolean;
+  drawAfterimage(ctx: CanvasRenderingContext2D, state: FighterState, stateAge: number, x: number, y: number, facing: number, attack: AttackType | null, vx: number, tint?: string, alpha?: number): boolean;
+  drawWinPose(ctx: CanvasRenderingContext2D, stateAge: number, x: number, y: number, facing: number): boolean;
+}
+
+export interface HighResRendererConfig {
+  targetDisplayHeight: number;
+  defaultTint: string;
+  defaultAlpha?: number;
+  setup: (
+    reg: (key: string, frames: SourcePixelFrame[], tpf: number) => void,
+    regV: (key: string, frames: SourcePixelFrame[], durations: number[]) => void,
+  ) => void;
+  resolveKey: (state: FighterState, attack: AttackType | null, vx: number, facing: number) => string | null;
+}
+
+export function createHighResRenderer(config: HighResRendererConfig): HighResRenderer {
+  const registry = new Map<string, FrameEntry>();
+  const cache = new Map<string, HTMLCanvasElement>();
+  let initialized = false;
+
+  function ensureInit() {
+    if (initialized) return;
+    initialized = true;
+    const boundReg = (key: string, frames: SourcePixelFrame[], tpf: number) =>
+      registerFrames(registry, key, frames, tpf);
+    const boundRegV = (key: string, frames: SourcePixelFrame[], durations: number[]) =>
+      registerVariableFrames(registry, key, frames, durations);
+    config.setup(boundReg, boundRegV);
+  }
+
+  return {
+    has(state, attack, vx, facing) {
+      ensureInit();
+      const key = config.resolveKey(state, attack, vx, facing);
+      return key !== null && registry.has(key);
+    },
+    resolveKey(state, attack, vx, facing) {
+      ensureInit();
+      return config.resolveKey(state, attack, vx, facing);
+    },
+    draw(ctx, state, stateAge, x, y, facing, attack, vx) {
+      ensureInit();
+      const key = config.resolveKey(state, attack, vx, facing);
+      if (key === null) return false;
+      return drawFromRegistry(ctx, registry, cache, key, stateAge, x, y, facing, config.targetDisplayHeight);
+    },
+    drawAfterimage(ctx, state, stateAge, x, y, facing, attack, vx, tint, alpha) {
+      ensureInit();
+      const key = config.resolveKey(state, attack, vx, facing);
+      if (key === null) return false;
+      return drawAfterimageFromRegistry(
+        ctx, registry, key, stateAge, x, y, facing, config.targetDisplayHeight,
+        tint ?? config.defaultTint, alpha ?? config.defaultAlpha ?? 0.25,
+      );
+    },
+    drawWinPose(ctx, stateAge, x, y, facing) {
+      ensureInit();
+      const entry = registry.get('WIN');
+      if (!entry) return false;
+      const { frames, palette, ticksPerFrame } = entry;
+      if (frames.length === 0) return false;
+      const frameIdx = Math.floor(stateAge / ticksPerFrame) % frames.length;
+      const frame = frames[frameIdx];
+      const scale = config.targetDisplayHeight / frame.height;
+      drawPixelFrame(ctx, frame, x, y, scale, facing, palette);
+      return true;
+    },
+  };
 }
 
 // ===== Drawing =====
