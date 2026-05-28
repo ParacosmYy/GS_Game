@@ -118,6 +118,8 @@
   - 训练模式 MAX/Burst 系统说明面板 (右侧面板显示激活条件、消耗、升级规则)
   - KOF2002视觉输入图标系统 (训练模式+街机Tab招式表箭头+按钮圆圈替代纯文本, 7 tests)
   - DM/SDM/HSDM终结KO差异化视觉 (分层暗角+专属冲击波+HSDM彩虹边缘, 6 tests)
+  - 首局控制提示(FIGHTING前5秒显示F1/F3/F5/Esc快捷键)
+  - 暂停菜单显示回合数+比分+角色名
 - 新功能添加点：
   - 训练模式招式卡片(视觉图标输入)
 - 期望结果：
@@ -200,7 +202,9 @@
   - 3角色取消路径结构一致性回归测试 (33 tests: cancelType/stockCost/timerCost/window)
   - sampler渲染器音频缓冲区回归测试 (7 tests: combat/UI/accent有效性+DM>special递进)
   - 3角色命中特效插件结构回归测试 (18 tests: charId/prefixes/VFX/SFX/DM前缀)
-  - 测试总数 4944
+  - 测试总数 4959
+  - 仪式感流程回归测试 (14 tests: 三节拍序列/KO/Perfect/结构完整性/曲线范围)
+  - announcer事件类型校验扩展 (ready/stun/guard_crush)
 - 新功能添加点：
   - smoke / ryo / combat / content 分层测试
   - frame contract 回归测试
@@ -228,9 +232,17 @@
   - 全项目文件2000行上限合规(5大文件拆分: frameData/overlays/screens/attackFrames/skeletal)
   - 眩晕星星VFX增强(4色十字星旋转替代简单黄色圆点)
   - 胜利姿态角色属性色闪光+光效爆发+落地扬尘(WIN_QUOTE入场仪式感)
+  - READY?三节拍回合开始序列(ROUND→READY→FIGHT) (v2.19)
+  - announceSequence期间恢复仪式感背景(MATCH_POINT/舞台名/角色名/电影遮幅) (v2.19)
+  - Continue?/Game Over语音播报(formant合成) (v2.20)
+  - DM终结KO使用zoom转场(超必杀击杀专属过渡) (v2.20)
+  - Continue倒计时滴答音效+归零蜂鸣+最后3秒加速 (v2.20)
+  - 通关画面播放胜利音乐 (v2.20)
+  - 通关CONGRATULATIONS进入时胜利音效 (v2.20)
+  - GAME_OVER进入时暗红flash+强震 (v2.20)
+  - 角色专属胜利语音(3角色victory formant profile) (v2.20)
 - 新功能添加点：
   - 胜利姿态动画细化
-  - 角色专属胜利语音
 
 ### 3.2 长期架构差距
 
