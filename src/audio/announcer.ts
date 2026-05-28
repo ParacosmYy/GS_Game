@@ -64,6 +64,12 @@ const FIGHT_SYLLABLES: Syllable[] = [
   { vowels: VOWEL_AI, freq: 340, duration: 350, gap: 0,  pitchEnd: 440, vibrato: true },
 ];
 
+// "Ready" -- crisp ascending "reh-dee"
+const READY_SYLLABLES: Syllable[] = [
+  { vowels: VOWEL_ER, freq: 180, duration: 120, gap: 60, pitchEnd: 240 },
+  { vowels: VOWEL_EE, freq: 260, duration: 200, gap: 0,  pitchEnd: 340 },
+];
+
 // "KO" -- low heavy, "oh" vowel
 const KO_SYLLABLES: Syllable[] = [
   { vowels: VOWEL_OH, freq: 300, duration: 150, gap: 100, pitchEnd: 220 },
@@ -517,6 +523,10 @@ export class Announcer {
     this.playPhrase(FIGHT_SYLLABLES, 0.20);
   }
 
+  ready(): void {
+    this.playPhrase(READY_SYLLABLES, 0.18);
+  }
+
   knockOut(): void {
     if (this.playSample('ko', 0.5)) return;
     this.playPhrase(KO_SYLLABLES, 0.22);
@@ -619,6 +629,7 @@ const MAX_ACTIVATION_SYLLABLES: Syllable[] = [
 
 export type AnnouncerEventType =
   | 'round_start'
+  | 'ready'
   | 'fight'
   | 'ko'
   | 'perfect'
@@ -657,6 +668,7 @@ export const ANNOUNCER_EVENTS: Record<AnnouncerEventType, AnnouncerEventConfig> 
   first_attack:   { text: 'FIRST ATTACK', duration: 60,  fillColor: '#ffffff', glowColor: '#ffcc00', fontSize: 32, soundId: 'fight' },
   stun:           { text: 'STUN!',         duration: 60,  fillColor: '#ffee44', glowColor: '#ddcc00', fontSize: 48, soundId: 'counter' },
   guard_crush:    { text: 'GUARD CRUSH!',  duration: 55,  fillColor: '#ff4444', glowColor: '#cc2200', fontSize: 36, soundId: 'counter' },
+  ready:          { text: 'READY?',        duration: 40,  fillColor: '#ffffff', glowColor: '#4488ff', fontSize: 48, soundId: 'ready' },
 };
 
 export const announcer = new Announcer();

@@ -561,6 +561,8 @@ function update(): void {
         screenFlash.trigger('#ffffff', 0.2, 6);
       } else if (sfxId === 'round_call') {
         announcer.roundStart(rounds.currentRound);
+      } else if (sfxId === 'ready') {
+        announcer.ready();
       }
     }
     // Transition to FIGHTING when announce sequence completes (or fallback timer)
