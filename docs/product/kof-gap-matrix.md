@@ -222,7 +222,10 @@
   - 战斗回调接口回归测试 (4 tests: throwEscape/guardCrush/stunWarning)
   - FighterState枚举覆盖回归测试 (9 tests: 26状态完整+分组校验)
   - 暂停菜单渲染回归测试 (8 tests: 3个tab+canvas操作+边界条件)
-  - 测试总数 5241
+  - VS对战画面渲染回归测试 (7 tests: 斜线擦除+文字+背景+6舞台)
+  - Continue/GameOver画面渲染回归测试 (11 tests: 倒计时+光标+角色肖像)
+  - SuperFlash超必杀闪光渲染回归测试 (11 tests: DM/SDM/HSDM+zoom)
+  - 测试总数 5270
 - 新功能添加点：
   - smoke / ryo / combat / content 分层测试
   - frame contract 回归测试
