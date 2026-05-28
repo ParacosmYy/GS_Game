@@ -130,6 +130,14 @@ export function drawStageSelect(
         ctx.fillRect(px + 40, previewY + 25, 15, 35);
         ctx.fillRect(px + 70, previewY + 20, 25, 40);
         ctx.fillRect(px + 100, previewY + 30, 15, 30);
+      } else if (stageId === 'rooftop') {
+        // Rooftop railing + antenna silhouette
+        ctx.fillRect(px + 5, previewY + 40, 110, 3);
+        ctx.fillRect(px + 15, previewY + 10, 2, 30);
+        ctx.fillRect(px + 55, previewY + 5, 2, 35);
+        ctx.fillRect(px + 95, previewY + 12, 2, 28);
+        // Antenna crossbar
+        ctx.fillRect(px + 50, previewY + 8, 12, 2);
       }
     } else {
       const pulse = 0.7 + Math.sin(tick * 0.08) * 0.3;
