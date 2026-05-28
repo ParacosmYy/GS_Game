@@ -36,7 +36,7 @@ npm run test:smoke
 
 涉及 Phase 2 主线时必须回答：
 
-- 是否推进 [Ryo Vertical Slice](../product/ryo-vertical-slice-plan.md) 这条基线？
+- 是否推进 [Ryo Vertical Slice](../product/ryo-vertical-slice-plan.md) 这条基线，并服务当前样板角色闭环？
 - 是否推进 [KOF 差距矩阵](../product/kof-gap-matrix.md) 中的一项高优先级差距？
 - 是否使用或完善 [资产管线架构](../architecture/asset-pipeline.md)？
 - 是否符合 [工作区目标架构](../architecture/workspace-architecture-target.md)？

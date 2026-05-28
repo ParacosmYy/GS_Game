@@ -6,7 +6,7 @@
 
 默认主线是 [KOF 差距矩阵](../product/kof-gap-matrix.md)。
 
-Phase 1 基线由 [Ryo Vertical Slice](../product/ryo-vertical-slice-plan.md) 定义，Phase 2 在此基础上推进多角色内容包、街机流程、UI/HUD 和稳定性收口。
+Phase 1 基线由 [Ryo Vertical Slice](../product/ryo-vertical-slice-plan.md) 定义，Phase 2 在此基础上推进公共骨架、Kyo 门面样板、多角色内容包、街机流程、UI/HUD 和稳定性收口。
 
 当前阶段的执行口径是：
 
@@ -15,6 +15,8 @@ Phase 1 基线由 [Ryo Vertical Slice](../product/ryo-vertical-slice-plan.md) �
 - 任何不服务当前 Phase 2 闭环的收口动作，都必须先说明为什么现在做。
 - 任何新功能都必须先说明它对应 [KOF 差距矩阵](../product/kof-gap-matrix.md) 的哪一项差距。
 - 任何“文件池”整理都必须说明它是在把职责拆开，而不是单纯增加文件数。
+- 任何看起来会被第二个角色复用的能力，必须优先考虑抽成公共基础组件，再决定是否进入角色目录。
+- 当前样板角色优先是 Kyo；Ryo 继续作为 baseline 与合同参照。
 
 每轮必须先判断是否服务以下目标之一：
 
@@ -23,6 +25,7 @@ Phase 1 基线由 [Ryo Vertical Slice](../product/ryo-vertical-slice-plan.md) �
 - 输入可见性与 UI/HUD 一致性。
 - 打击反馈与资源规则统一。
 - 角色内容、动作、判定、反馈、肖像的 manifest 一致性。
+- 公共基础组件复用与单角色样板闭环。
 - 支撑 Phase 2 主线的架构/文档/稳定性工作。
 
 不服务这些目标的任务默认不做，除非用户当前明确要求。
@@ -91,6 +94,7 @@ Phase 1 基线由 [Ryo Vertical Slice](../product/ryo-vertical-slice-plan.md) �
 - 先查 `references/mugen/` 和本地代码。
 - 可以查公开资料，但只能学习工程结构、数据组织、验收标准。
 - 不复制商业素材、音频、角色实现。
+- 优先确认当前改动是否应先沉淀为公共基础组件，而不是先写角色私有逻辑。
 
 研究必须输出：
 
@@ -134,6 +138,7 @@ Phase 1 基线由 [Ryo Vertical Slice](../product/ryo-vertical-slice-plan.md) �
 - 保留 fallback。
 - 不做无关重构。
 - 不把角色专属逻辑放入通用模块。
+- 不把本应公共化的输入、反馈、肖像、帧注册、招式表逻辑写回角色私有文件。
 - 涉及战斗界面或训练界面时，必须同步当前角色的真实 `moveList`、爆气说明和标准/快捷键位显示，禁止继续使用示例文本。
 - 每次涉及文件收口或目录整理时，必须明确本轮是否在推进 Phase 2 的闭环；如果不能明确，就先停。
 - 当前多角色内容包已经进入“兼容入口 + 分层迁移”的状态，目录整理必须优先让子域落地真实数据，而不是只改文档措辞。

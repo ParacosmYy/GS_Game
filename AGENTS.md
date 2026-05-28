@@ -18,20 +18,20 @@
 
 ## 1. 当前总方向
 
-项目已经从“Ryo 单线收口”进入 Phase 2。
+项目已经从“Ryo 单线收口”进入 Phase 2，但当前真正的优先级已经升级为“先公共骨架，再单角色样板，再多角色复制”。
 
 Phase 2 的主线不是继续横向堆功能，而是：
 
-> 以 Ryo 为基线，完成 Kyo/Iori 内容包接入、街机流程与场景仪式感、UI/HUD 可见性、稳定性与工具链收口。
+> 先沉淀公共基础组件，再以 Ryo 为 baseline 完成单角色样板闭环；当前最适合承担门面样板的是 Kyo，Kyo/Iori 只在不会破坏公共骨架的前提下继续接入。
 
-当前最高优先级仍然是按 [KOF 差距矩阵](docs/product/kof-gap-matrix.md) 逐项闭合最显眼的差距。所有新增功能都必须先说明它正在关闭矩阵里的哪一项差距。
+当前最高优先级仍然是按 [KOF 差距矩阵](docs/product/kof-gap-matrix.md) 逐项闭合最显眼的差距，但差距闭合的第一步已经变成：先公共化输入、帧、反馈、肖像、招式表，再让角色数据进入这些骨架。
 
 Phase 2 的执行要求：
 
-- 先把现有内容包、流程、UI 和稳定性做成可复制模板，再扩更多角色。
-- Ryo 仍是 baseline 和质量基准，但不再是唯一迭代对象。
-- Kyo/Iori 已进入内容包与运行时接入阶段，后续新增内容优先落到对应内容包与 manifest。
-- 任何文件重排都必须服务 Phase 2 闭环，不得趁机横向扩目录。
+- 先把公共组件做成可复制模板，再扩更多角色数据。
+- Ryo 仍是 baseline 和质量基准，但样板目标已经升级为“角色 + 公共骨架 + 可复制模板”；当前最值得做成门面样板的角色优先是 Kyo，Ryo 继续承担合同和数据基线角色。
+- Kyo/Iori 只允许在已有公共骨架上继续接入，不允许各自长出新私有引擎。
+- 任何文件重排都必须服务“公共骨架 + 单角色样板”闭环，不得趁机横向扩目录。
 
 当前真实代码状态已经不是单体堆叠，而是已经形成多角色内容包与统一入口：
 
@@ -46,8 +46,8 @@ Phase 2 的执行要求：
 
 - 新增角色。
 - 新增玩法模式。
-- 大规模美化骨骼假人。
 - 给 placeholder 继续叠特效。
+- 每个角色都复制一套自己的输入提示、头像裁切、反馈流程或高分辨率渲染入口。
 - 因为观感不佳而直接换技术栈。
 
 ## 2. 产品目标
@@ -56,13 +56,14 @@ Phase 2 的执行要求：
 
 优先级固定为：
 
-1. 角色气质与肖像可信。
-2. 逐帧动作节奏可信。
-3. 动作帧、判定帧、命中反馈同源。
-4. 输入响应和取消窗口稳定。
-5. 打击反馈有重量。
-6. 流程与 UI 有街机仪式感。
-7. 角色数量扩展。
+1. 公共骨架可信。
+2. 角色气质与肖像可信。
+3. 逐帧动作节奏可信。
+4. 动作帧、判定帧、命中反馈同源。
+5. 输入响应和取消窗口稳定。
+6. 打击反馈有重量。
+7. 流程与 UI 有街机仪式感。
+8. 角色数量扩展。
 
 ## 3. 当前技术栈策略
 
@@ -72,7 +73,7 @@ Phase 2 的执行要求：
 
 当前瓶颈判断：
 
-- 已证实的问题：资产管线、动作闭环、placeholder 视觉、打击反馈矩阵不足。
+- 已证实的问题：资产管线、动作闭环、placeholder 视觉、打击反馈矩阵不足，以及公共组件复用还不够彻底。
 - 未证实的问题：Canvas 2D 已经无法承载目标效果。
 
 因此下一阶段先做数据和资产边界，不用框架名逃避生产线问题。
@@ -86,7 +87,7 @@ Phase 2 的执行要求：
 3. `自侦测前置`：按 [自侦测前置](docs/process/self-detection.md) 并行调用 3 个自侦测角色，先判定 `green / yellow / red`。
 4. `决策门`：按 [决策门](docs/process/decision-gates.md) 判断本轮是否允许实施。自侦测若出现 `yellow` 或 `red`，必须先收敛范围或升级深审。
 5. `研究参考`：查 `references/mugen/` 或公开资料，只学习数据组织和工具链，不复制受保护素材。
-6. `深审协作`：仅当任务属于高风险、跨层、资产管线、角色扩展、打击感、换栈或自侦测非绿时，按 [角色协同模板](docs/process/role-prompts.md) 默认调用 8 个子 agent，允许 6-9 个；最少覆盖 2 架构、4 研发、1 产品、1 测试。
+6. `深审协作`：仅当任务属于高风险、跨层、资产管线、角色扩展、打击感、换栈、公共骨架抽象或自侦测非绿时，按 [角色协同模板](docs/process/role-prompts.md) 默认调用 8 个子 agent，允许 6-9 个；最少覆盖 2 架构、4 研发、1 产品、1 测试。
 7. `方案`：写清本轮目标、范围、非目标、文件归属、自侦测结论、深审结论（如有）、验收、回退。
 8. `实施`：只做本轮闭环，不扩张。
 9. `验证`：按 [质量门禁](docs/process/quality-gates.md) 执行。
@@ -119,8 +120,10 @@ Phase 2 的执行要求：
 - 资产解析、atlas 生成、SFF/ACT/PNG 处理必须放在工具层或离线流程，不进入浏览器主循环。
 - 视觉帧、判定帧、命中反馈必须通过同一个 `Frame Contract` 对齐。
 - 骨骼/像素块/placeholder 只能作为 fallback，不得继续冒充正式美术方向。
+- 通用能力必须先沉淀成公共组件，再允许角色复用；禁止每个角色各写一套“差不多”的私有流程。
 - 新状态必须声明归属、生命周期、reset、snapshot/replay 影响。
 - 任何状态机如果开始接近单文件 2000 行上限，必须优先拆成 state / transitions / effects / selectors / tests。
+- 任何新角色内容都必须优先复用公共基础组件；如果发现要重复写第二遍，先停下来抽公共层。
 
 模块细则见 [模块边界](docs/architecture/module-boundaries.md)，资产细则见 [资产管线架构](docs/architecture/asset-pipeline.md)。
 
@@ -131,7 +134,7 @@ Phase 2 的执行要求：
 在 Phase 2 收口前：
 
 - 所有角色内容必须先进入对应内容包，再考虑运行时接入。
-- Ryo 仍是 baseline，所有新角色都必须以 Ryo 的合同与验收标准为参照。
+- Ryo 仍是 baseline，所有新角色都必须以 Ryo 的合同与验收标准为参照；但当前的对外样板优先跟着 Kyo 的视觉与体验闭环推进。
 - Kyo/Iori 已允许作为主线的一部分推进，但新增角色仍需用户明确覆盖。
 - 任何角色相关新增文件，必须写清楚它属于哪一个内容包、哪一个子域、对应哪项 KOF 差距。
 - 默认只允许改角色内容包、通用资产管线、通用打击反馈矩阵、流程/UI 收口和验证工具。
@@ -154,7 +157,7 @@ npx vite build
 
 - [CLAUDE.md](CLAUDE.md)：长期 AI 执行手册。
 - [README.md](README.md)：项目入口。
-- [Ryo Vertical Slice](docs/product/ryo-vertical-slice-plan.md)：当前唯一产品主线。
+- [Ryo Vertical Slice](docs/product/ryo-vertical-slice-plan.md)：基线合同与验收标准。
 - [真实性标准](docs/product/authenticity-standard.md)：接近 KOF 的验收标准。
 - [KOF 差距矩阵](docs/product/kof-gap-matrix.md)：当前最高优先级差距清单。
 - [路线图](docs/product/roadmap.md)：阶段路线。
@@ -162,6 +165,7 @@ npx vite build
 - [当前架构](docs/architecture/current-architecture.md)：真实结构。
 - [模块边界](docs/architecture/module-boundaries.md)：依赖和职责。
 - [工作区目标架构](docs/architecture/workspace-architecture-target.md)：大型项目目录目标和迁移阶段。
+- [公共基础组件总说明](docs/architecture/public-base-components.md)：帧、反馈、头像、输入、招式表的公共骨架。
 - [文件池与状态机拆分约束](docs/architecture/file-pool-and-state-machine.md)：单文件职责、状态机拆分和文件池边界。
 - [资产管线架构](docs/architecture/asset-pipeline.md)：sprite/portrait/frame/hitbox 管线。
 - [未来引擎架构](docs/architecture/future-engine-architecture.md)：换栈决策。

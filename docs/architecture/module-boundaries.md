@@ -25,6 +25,7 @@ tools -> assets/core schema
 - `core` 导入业务模块。
 - `input` 认识具体角色。
 - 通用模块通过角色名分支实现角色行为。
+- 角色专属逻辑不得绕过公共骨架，直接在渲染、输入或反馈文件里自建一套私有流程。
 
 ## 2. 内容包归属
 
@@ -43,6 +44,7 @@ tools -> assets/core schema
 - 如果某个角色专属数据还留在旧目录，必须说明它是过渡层而不是新来源。
 - 通用模块只负责消费数据，不负责替任何角色生成新的数据来源。
 - 角色内容池内部也要继续拆分：不要把 commands / moves / attacks / animations / hitboxes / feedback / portraits / reports 再塞进同一个大文件。
+- 公共基础组件优先落在 [公共基础组件总说明](public-base-components.md) 所定义的骨架上，角色内容只提供数据和少量映射。
 
 ## 2.1 文件池约束
 
@@ -61,6 +63,7 @@ tools -> assets/core schema
 - 让大文件继续吸纳新逻辑。
 
 如果某个文件开始同时解释“数据是什么”和“数据怎么流转”，就应该拆。
+如果某项能力会被第二个角色复用，就应该优先抽进公共基础组件，而不是先复制到角色私有目录。
 
 ## 3. Frame Contract 边界
 
@@ -86,6 +89,7 @@ Frame Contract 是多个模块的共享协议：
 | 通用运行时 | `src/engine/` |
 | 浏览器组装 | `src/app/` |
 | Canvas 绘制 | `src/rendering/canvas2d/` |
+| 公共 UI / 输入提示 / 招式卡 / 头像裁切 / 反馈档位 / 高分辨率帧注册 | `src/rendering/shared/` 或 `src/rendering/ui/` |
 | Debug overlay | `src/rendering/debug/` |
 | 离线工具 | `tools/` |
 | 原始资产 | `assets/source/` |

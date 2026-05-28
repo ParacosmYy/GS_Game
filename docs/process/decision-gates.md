@@ -6,12 +6,13 @@
 
 每个决策必须回答：
 
-- 它服务 Ryo Vertical Slice 吗？
+- 它服务当前样板角色闭环或公共骨架吗？
 - 它让 Frame Contract 更完整吗？
 - 它降低了资产、动作、判定、反馈或稳定性风险吗？
 - 它是否会扩大 scope？
 - 它如何验证？
 - 它如何回退？
+- 它是否应该先沉淀为公共基础组件，再允许角色复用？
 
 如果回答不清楚，不实施。
 
@@ -46,6 +47,7 @@
 - 只是“看起来更丰富”。
 - 只是新增系统名词。
 - 不能解释更像 KOF 在哪里。
+- 看起来会被第二个角色复用，但却直接写进了角色私有文件。
 
 ## 3. 架构迁移决策门
 
@@ -71,7 +73,7 @@
 
 - 定义了 manifest schema。
 - 有 validator 或测试。
-- Ryo 至少接入一个资源或动作。
+- 当前样板角色至少接入一个资源或动作。
 - fallback 仍可用。
 
 拒绝条件：
@@ -84,14 +86,15 @@
 
 在 Phase 2 的角色内容包和共享 contract 不稳定前，默认拒绝新增“无契约”的角色。
 
-Phase 1 基线条件见 [Ryo Vertical Slice](../product/ryo-vertical-slice-plan.md)。
+Phase 1 基线条件见 [Ryo Vertical Slice](../product/ryo-vertical-slice-plan.md)，但当前样板优先级由公共骨架 + Kyo 门面样板决定。
 
 允许 Kyo/Iori 的条件：
 
-- Ryo 8 个基础动作完成。
-- Ryo select/HUD 肖像完成。
-- Ryo light/heavy feedback 完成。
-- Ryo 完整度报告可运行。
+- 当前样板角色 8 个基础动作完成。
+- 当前样板角色 select/HUD 肖像完成。
+- 当前样板角色 light/heavy feedback 完成。
+- 当前样板角色完整度报告可运行。
+- 公共基础组件已能承载至少一个角色的完整链路。
 - Kyo/Iori 角色内容包和 content loader 已接入统一入口。
 - Kyo/Iori 的新增内容不破坏现有 shared contract / Frame Contract。
 - 构建和测试通过。
@@ -111,6 +114,7 @@ Phase 1 基线条件见 [Ryo Vertical Slice](../product/ryo-vertical-slice-plan.
 - 只改颜色。
 - 不区分命中和防御。
 - 不区分轻重攻击。
+- 把本应公共化的反馈又写回角色私有逻辑里。
 
 ## 7. 技术栈决策门
 
@@ -148,7 +152,7 @@ Phase 1 基线条件见 [Ryo Vertical Slice](../product/ryo-vertical-slice-plan.
 
 允许条件：
 
-- 本轮修改能让 Ryo 内容更集中。
+- 本轮修改能让当前样板角色内容更集中。
 - 本轮修改能减少散落的角色专属文件来源。
 - 本轮修改能把“一个人物先做精”的执行顺序写清楚。
 - 有明确的旧路径、目标路径和回退路径。
@@ -158,7 +162,8 @@ Phase 1 基线条件见 [Ryo Vertical Slice](../product/ryo-vertical-slice-plan.
 - 只是为了“看起来更整齐”而搬目录。
 - 一次性大范围重排所有角色文件。
 - 把收口动作变成新的散点迁移。
-- 不能说明为什么这一步服务 Ryo 闭环。
+- 不能说明为什么这一步服务当前样板闭环。
+- 不能说明为什么这一步服务公共骨架复用。
 
 ## 10. 文件池决策门
 
