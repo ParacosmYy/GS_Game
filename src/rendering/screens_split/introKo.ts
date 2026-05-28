@@ -222,25 +222,72 @@ export function drawKO(
 ): void {
   ctx.save();
 
-  // Dark overlay with red pulsing vignette
+  // Determine finishing tier for tier-specific KO visuals
+  const finishTier = finishingAttackType.startsWith('HSDM_') ? 'hsdm'
+    : finishingAttackType.startsWith('SDM_') ? 'sdm'
+    : finishingAttackType.startsWith('DM_') ? 'dm'
+    : isTimeOver ? 'timeover' : 'normal';
+
+  // Tier-specific vignette colors and intensity
+  const vigColors = finishTier === 'hsdm' ? { r: 160, g: 0, b: 120, intensity: 0.65 }
+    : finishTier === 'sdm' ? { r: 100, g: 0, b: 120, intensity: 0.58 }
+    : finishTier === 'dm' ? { r: 120, g: 20, b: 0, intensity: 0.52 }
+    : { r: 160, g: 0, b: 0, intensity: 0.45 };
+
+  // Dark overlay with tier-colored pulsing vignette
   const pulseSpeed = 0.04;
-  const vignettePulse = 0.6 + Math.sin(koTimer * pulseSpeed) * 0.15;
-  ctx.fillStyle = `rgba(0, 0, 0, ${0.55 * vignettePulse})`;
+  const vignettePulse = vigColors.intensity + Math.sin(koTimer * pulseSpeed) * 0.15;
+  ctx.fillStyle = `rgba(0, 0, 0, ${vignettePulse})`;
   ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
   const vigGrad = ctx.createRadialGradient(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, 80, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, 420);
   vigGrad.addColorStop(0, 'rgba(0,0,0,0)');
-  vigGrad.addColorStop(0.5, `rgba(80,0,0,${0.12 * vignettePulse})`);
-  vigGrad.addColorStop(0.75, `rgba(120,0,0,${0.25 * vignettePulse})`);
-  vigGrad.addColorStop(1, `rgba(160,0,0,${0.4 * vignettePulse})`);
+  vigGrad.addColorStop(0.5, `rgba(${vigColors.r * 0.5},${vigColors.g},${vigColors.b * 0.5},${0.12 * vignettePulse})`);
+  vigGrad.addColorStop(0.75, `rgba(${vigColors.r * 0.75},${vigColors.g},${vigColors.b * 0.75},${0.25 * vignettePulse})`);
+  vigGrad.addColorStop(1, `rgba(${vigColors.r},${vigColors.g},${vigColors.b},${0.4 * vignettePulse})`);
   ctx.fillStyle = vigGrad;
   ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+  // HSDM prismatic edge flash — rainbow color cycling on screen edges
+  if (finishTier === 'hsdm' && koTimer < 30) {
+    const flashAlpha = (1 - koTimer / 30) * 0.2;
+    const hue = (koTimer * 12) % 360;
+    const pr = Math.round(128 + 127 * Math.sin(hue * Math.PI / 180));
+    const pg = Math.round(128 + 127 * Math.sin((hue + 120) * Math.PI / 180));
+    const pb = Math.round(128 + 127 * Math.sin((hue + 240) * Math.PI / 180));
+    ctx.fillStyle = `rgba(${pr},${pg},${pb},${flashAlpha})`;
+    ctx.fillRect(0, 0, CANVAS_WIDTH, 35);
+    ctx.fillRect(0, CANVAS_HEIGHT - 35, CANVAS_WIDTH, 35);
+    ctx.fillRect(0, 0, 25, CANVAS_HEIGHT);
+    ctx.fillRect(CANVAS_WIDTH - 25, 0, 25, CANVAS_HEIGHT);
+  }
+
+  // SDM purple energy pulse — brief center burst
+  if (finishTier === 'sdm' && koTimer < 20) {
+    const burstAlpha = (1 - koTimer / 20) * 0.3;
+    const burstR = 50 + koTimer * 15;
+    const burstGrad = ctx.createRadialGradient(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, 0, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, burstR);
+    burstGrad.addColorStop(0, `rgba(200, 50, 255, ${burstAlpha})`);
+    burstGrad.addColorStop(0.6, `rgba(150, 0, 200, ${burstAlpha * 0.4})`);
+    burstGrad.addColorStop(1, 'rgba(100, 0, 150, 0)');
+    ctx.fillStyle = burstGrad;
+    ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+  }
 
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
 
+  // Tier-specific title text colors
   const titleText = isTimeOver ? 'TIME OVER' : 'K.O.!';
-  const titleColor = isTimeOver ? '#ffaa00' : '#ff2200';
-  const glowColor = isTimeOver ? '#ff8800' : '#ff0000';
+  const titleColor = isTimeOver ? '#ffaa00'
+    : finishTier === 'hsdm' ? '#ff88ff'
+    : finishTier === 'sdm' ? '#dd66ff'
+    : finishTier === 'dm' ? '#ff6622'
+    : '#ff2200';
+  const glowColor = isTimeOver ? '#ff8800'
+    : finishTier === 'hsdm' ? '#ff44ff'
+    : finishTier === 'sdm' ? '#aa00ff'
+    : finishTier === 'dm' ? '#ff4400'
+    : '#ff0000';
 
   // KO impact dust particles
   for (const p of koDustParticles) {
@@ -252,17 +299,23 @@ export function drawKO(
     ctx.fill();
   }
 
-  // KO shockwave rings — expanding outward over time
+  // KO shockwave rings — tier-specific count and color
+  const ringCount = finishTier === 'hsdm' ? 8 : finishTier === 'sdm' ? 7 : 5;
+  const ringColor = isTimeOver ? '#ffaa00'
+    : finishTier === 'hsdm' ? '#ff66ff'
+    : finishTier === 'sdm' ? '#cc44ff'
+    : finishTier === 'dm' ? '#ff6622'
+    : '#ff4400';
   const ringExpandProgress = Math.min(1, koTimer / 60);
-  for (let r = 0; r < 5; r++) {
-    const ringDelay = r * 0.12;
+  for (let r = 0; r < ringCount; r++) {
+    const ringDelay = r * 0.10;
     const ringProgress = Math.min(1, Math.max(0, ringExpandProgress * 2 - ringDelay));
     if (ringProgress <= 0) continue;
-    const ringR = 30 + ringProgress * (200 - r * 25);
-    const ringAlpha = Math.max(0, 1 - ringProgress) * (1 - r * 0.15);
+    const ringR = 30 + ringProgress * (220 - r * 20);
+    const ringAlpha = Math.max(0, 1 - ringProgress) * (1 - r * 0.12);
     if (ringAlpha > 0) {
       ctx.globalAlpha = ringAlpha * 0.4;
-      ctx.strokeStyle = isTimeOver ? '#ffaa00' : '#ff4400';
+      ctx.strokeStyle = ringColor;
       ctx.lineWidth = (4 - Math.min(r, 3)) * (1 - ringProgress) + 1;
       ctx.beginPath();
       ctx.arc(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 20, ringR, 0, Math.PI * 2);
@@ -271,9 +324,14 @@ export function drawKO(
   }
   ctx.globalAlpha = 1;
 
-  // KO radial impact lines
+  // KO radial impact lines — tier-colored
   ctx.save();
-  ctx.strokeStyle = isTimeOver ? 'rgba(255, 170, 0, 0.12)' : 'rgba(255, 34, 0, 0.15)';
+  const lineColor = isTimeOver ? 'rgba(255, 170, 0, 0.12)'
+    : finishTier === 'hsdm' ? 'rgba(255, 100, 255, 0.15)'
+    : finishTier === 'sdm' ? 'rgba(200, 70, 255, 0.14)'
+    : finishTier === 'dm' ? 'rgba(255, 100, 34, 0.14)'
+    : 'rgba(255, 34, 0, 0.15)';
+  ctx.strokeStyle = lineColor;
   ctx.lineWidth = 2;
   const lineCount = 32;
   const lineProgress = Math.min(1, koTimer / 30);
