@@ -234,7 +234,8 @@ function isSpecial(at: string): boolean {
     || at.includes('CHRIS_') || at.includes('YASHIRO_') || at.includes('MARY_')
     || at.includes('YAMAZAKI_') || at.includes('KASUMI_') || at.includes('XIANGFEI_')
     || at.includes('KULA_') || at === 'SPECIAL_PROJECTILE'
-    || at.startsWith('ROBERT_') || at.startsWith('KDASH_');
+    || at.startsWith('ROBERT_') || at.startsWith('KDASH_')
+    || at.startsWith('SPECIAL_');
 }
 function isHeavy(at: string): boolean {
   return at.endsWith('_C') || at.endsWith('_D') || at === 'STAND_CD'
