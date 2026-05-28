@@ -38,6 +38,7 @@
   - Iori动画元数据补全 (crouch/block/dizzy)
   - 3角色动画节奏一致性回归测试 (63 tests: 轻重攻击递增/hitstun<knockdown/loop属性)
   - 3角色必杀技像素帧覆盖 (134 tests: 基本+通常+必杀+DM/SDM/HSDM+命令技)
+  - Kyo行走动画6帧像素帧+程序化腿部交替变异+元数据帧数修正(4→6)
 - 新功能添加点：
   - animation manifest
   - pose bank
