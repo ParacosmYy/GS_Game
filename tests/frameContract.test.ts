@@ -1,9 +1,9 @@
 import { describe, it, expect } from 'vitest';
 import {
   getActionContract, getActionIds, isCancelPoint,
-  getFrameEvents, getFrameCollision,
+  getFrameEvents, getFrameCollision, validateActionAlignment,
 } from '../src/core/frameContract.js';
-import type { ActionContract, FrameContractManifest } from '../src/core/frameContract.js';
+import type { ActionContract, FrameContractManifest, FrameContract } from '../src/core/frameContract.js';
 
 describe('frameContract', () => {
   const mockContract: ActionContract = {
@@ -82,6 +82,87 @@ describe('frameContract', () => {
     it('returns undefined for frame without collision', () => {
       const result = getFrameCollision(mockContract, 0);
       expect(result).toBeUndefined();
+    });
+  });
+
+  // ===== validateActionAlignment =====
+
+  describe('validateActionAlignment', () => {
+    it('returns valid for matching startup/active/recovery', () => {
+      // Create frames array with correct length
+      const frames: FrameContract[] = Array.from({ length: 9 }, (_, i) => ({
+        frameIndex: i, duration: 1, spriteRef: `f${i}`, anchor: { x: 24, y: 72 },
+        offset: { x: 0, y: 0 }, collision: null, eventTags: [],
+      }));
+      const contract: ActionContract = {
+        characterId: 'test', actionId: 'test', state: 'STAND_ATTACK' as any,
+        attackType: 'STAND_A' as any, hitLevel: 'MID' as any, knockdown: false,
+        startup: 2, active: 3, recovery: 4, totalFrames: 9,
+        frames, cancelWindows: [], feedbackTierOverride: null,
+      };
+      const result = validateActionAlignment(contract, 2, 3, 4);
+      expect(result.valid).toBe(true);
+      expect(result.issues).toEqual([]);
+    });
+
+    it('detects startup mismatch', () => {
+      const contract: ActionContract = {
+        characterId: 'test', actionId: 'test', state: 'STAND_ATTACK' as any,
+        attackType: 'STAND_A' as any, hitLevel: 'MID' as any, knockdown: false,
+        startup: 3, active: 3, recovery: 4, totalFrames: 10,
+        frames: [] as FrameContract[], cancelWindows: [], feedbackTierOverride: null,
+      };
+      const result = validateActionAlignment(contract, 2, 3, 4);
+      expect(result.valid).toBe(false);
+      expect(result.issues.some(i => i.includes('startup'))).toBe(true);
+    });
+
+    it('detects active mismatch', () => {
+      const contract: ActionContract = {
+        characterId: 'test', actionId: 'test', state: 'STAND_ATTACK' as any,
+        attackType: 'STAND_A' as any, hitLevel: 'MID' as any, knockdown: false,
+        startup: 2, active: 2, recovery: 4, totalFrames: 8,
+        frames: [] as FrameContract[], cancelWindows: [], feedbackTierOverride: null,
+      };
+      const result = validateActionAlignment(contract, 2, 3, 4);
+      expect(result.valid).toBe(false);
+      expect(result.issues.some(i => i.includes('active'))).toBe(true);
+    });
+
+    it('detects recovery mismatch', () => {
+      const contract: ActionContract = {
+        characterId: 'test', actionId: 'test', state: 'STAND_ATTACK' as any,
+        attackType: 'STAND_A' as any, hitLevel: 'MID' as any, knockdown: false,
+        startup: 2, active: 3, recovery: 5, totalFrames: 10,
+        frames: [] as FrameContract[], cancelWindows: [], feedbackTierOverride: null,
+      };
+      const result = validateActionAlignment(contract, 2, 3, 4);
+      expect(result.valid).toBe(false);
+      expect(result.issues.some(i => i.includes('recovery'))).toBe(true);
+    });
+
+    it('detects totalFrames mismatch', () => {
+      const contract: ActionContract = {
+        characterId: 'test', actionId: 'test', state: 'STAND_ATTACK' as any,
+        attackType: 'STAND_A' as any, hitLevel: 'MID' as any, knockdown: false,
+        startup: 2, active: 3, recovery: 4, totalFrames: 8,
+        frames: [] as FrameContract[], cancelWindows: [], feedbackTierOverride: null,
+      };
+      const result = validateActionAlignment(contract, 2, 3, 4);
+      expect(result.valid).toBe(false);
+      expect(result.issues.some(i => i.includes('totalFrames'))).toBe(true);
+    });
+
+    it('detects multiple issues simultaneously', () => {
+      const contract: ActionContract = {
+        characterId: 'test', actionId: 'test', state: 'STAND_ATTACK' as any,
+        attackType: 'STAND_A' as any, hitLevel: 'MID' as any, knockdown: false,
+        startup: 5, active: 5, recovery: 5, totalFrames: 20,
+        frames: [] as FrameContract[], cancelWindows: [], feedbackTierOverride: null,
+      };
+      const result = validateActionAlignment(contract, 2, 3, 4);
+      expect(result.valid).toBe(false);
+      expect(result.issues.length).toBeGreaterThanOrEqual(3);
     });
   });
 });
