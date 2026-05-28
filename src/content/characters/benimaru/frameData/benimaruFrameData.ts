@@ -1,0 +1,270 @@
+/**
+ * Benimaru Nikaido frame data — KOF2002 校准数据
+ *
+ * 二階堂紅丸 — Japan Team, electric/lightning fighter
+ * Known for: excellent normals, anti-air Raijinken, mobility, lightning combos
+ */
+export const BENIMARU_FRAME_DATA = {
+  // ── 二階堂紅丸 专属必杀技 (Benimaru Nikaido) ── KOF2002 校准数据
+
+  // Raijinken qcf+A (雷韧拳 — lightning anti-air punch)
+  BENIMARU_RAIJINKEN: {
+    startup: 6,
+    active: 10,
+    recovery: 28,
+    damage: 70,
+    hitstun: 22,
+    blockstun: 20,
+    pushback: 5,
+    hitLevel: "MID" as const,
+    knockdown: false,
+    chipDamage: 8,
+  },
+  // Raijinken qcf+C (強版 — stronger, more damage, slower)
+  BENIMARU_RAIJINKEN_C: {
+    startup: 9,
+    active: 14,
+    recovery: 32,
+    damage: 100,
+    hitstun: 25,
+    blockstun: 22,
+    pushback: 7,
+    hitLevel: "MID" as const,
+    knockdown: true,
+    chipDamage: 10,
+  },
+  // Iai Geri qcb+B (居合蹴り — lightning kick)
+  BENIMARU_IAI_GERI: {
+    startup: 8,
+    active: 6,
+    recovery: 20,
+    damage: 55,
+    hitstun: 18,
+    blockstun: 16,
+    pushback: 4,
+    hitLevel: "MID" as const,
+    knockdown: false,
+  },
+  // Iai Geri qcb+D (強版)
+  BENIMARU_IAI_GERI_D: {
+    startup: 10,
+    active: 8,
+    recovery: 22,
+    damage: 70,
+    hitstun: 20,
+    blockstun: 18,
+    pushback: 5,
+    hitLevel: "MID" as const,
+    knockdown: false,
+  },
+  // Handou Sandan Geri (反動三段蹴り — 3-stage follow-up kick from Iai Geri)
+  BENIMARU_HANDOU_SANDAN_GERI: {
+    startup: 5,
+    active: 12,
+    recovery: 24,
+    damage: 80,
+    hitstun: 22,
+    blockstun: 20,
+    pushback: 6,
+    hitLevel: "MID" as const,
+    knockdown: true,
+    chipDamage: 8,
+  },
+  // Shinkuu Katategoma dp+A (真空片手駒 — vacuum palm spin, multi-hit)
+  BENIMARU_SHINKUU_KATATEGOMA: {
+    startup: 7,
+    active: 14,
+    recovery: 30,
+    damage: 85,
+    hitstun: 24,
+    blockstun: 20,
+    pushback: 7,
+    hitLevel: "MID" as const,
+    knockdown: true,
+    chipDamage: 10,
+  },
+  // Shinkuu Katategoma dp+C (強版)
+  BENIMARU_SHINKUU_KATATEGOMA_C: {
+    startup: 9,
+    active: 18,
+    recovery: 34,
+    damage: 120,
+    hitstun: 26,
+    blockstun: 22,
+    pushback: 9,
+    hitLevel: "MID" as const,
+    knockdown: true,
+    chipDamage: 12,
+  },
+  // Benimaru Collider hcf,f+A/C (紅丸コレダー — command grab)
+  BENIMARU_COLLIDER: {
+    startup: 5,
+    active: 4,
+    recovery: 32,
+    damage: 100,
+    hitstun: 0,
+    blockstun: 0,
+    pushback: 0,
+    hitLevel: "GRAB" as const,
+    knockdown: true,
+  },
+  // Super Inazuma Kick charge d,u+B (スーパー稲妻キック — rising lightning kick)
+  BENIMARU_SUPER_INAZUMA_KICK: {
+    startup: 6,
+    active: 10,
+    recovery: 30,
+    damage: 75,
+    hitstun: 22,
+    blockstun: 20,
+    pushback: 6,
+    hitLevel: "MID" as const,
+    knockdown: true,
+    chipDamage: 10,
+    invincibleStartup: 2,
+  },
+  // Super Inazuma Kick charge d,u+D (強版)
+  BENIMARU_SUPER_INAZUMA_KICK_D: {
+    startup: 8,
+    active: 12,
+    recovery: 34,
+    damage: 110,
+    hitstun: 25,
+    blockstun: 22,
+    pushback: 8,
+    hitLevel: "MID" as const,
+    knockdown: true,
+    chipDamage: 12,
+    invincibleStartup: 3,
+  },
+  // Jackknife Kick f+B (ジャックナイフキック — command normal, overhead)
+  BENIMARU_JACKKNIFE_KICK: {
+    startup: 10,
+    active: 5,
+    recovery: 18,
+    damage: 50,
+    hitstun: 16,
+    blockstun: 14,
+    pushback: 4,
+    hitLevel: "HIGH" as const,
+    knockdown: false,
+  },
+  // Flying Drill air d+D (フライングドリル — air multi-hit drill kick)
+  BENIMARU_FLYING_DRILL: {
+    startup: 4,
+    active: 16,
+    recovery: 8,
+    damage: 60,
+    hitstun: 14,
+    blockstun: 12,
+    pushback: 3,
+    hitLevel: "HIGH" as const,
+    knockdown: false,
+  },
+
+  // ── 紅丸DM ── KOF2002 校准数据
+
+  // Raikouken DM A (雷光拳 — lightning fist DM, A version)
+  DM_RAIKOUKEN_A: {
+    startup: 14,
+    active: 16,
+    recovery: 42,
+    damage: 200,
+    hitstun: 0,
+    blockstun: 21,
+    pushback: 10,
+    hitLevel: "MID" as const,
+    knockdown: true,
+    chipDamage: 22,
+  },
+  // Raikouken DM C (C version)
+  DM_RAIKOUKEN_C: {
+    startup: 16,
+    active: 18,
+    recovery: 46,
+    damage: 200,
+    hitstun: 0,
+    blockstun: 21,
+    pushback: 10,
+    hitLevel: "MID" as const,
+    knockdown: true,
+    chipDamage: 22,
+  },
+  // Raikouken DM default
+  DM_RAIKOUKEN: {
+    startup: 15,
+    active: 18,
+    recovery: 44,
+    damage: 220,
+    hitstun: 0,
+    blockstun: 22,
+    pushback: 11,
+    hitLevel: "MID" as const,
+    knockdown: true,
+    chipDamage: 24,
+  },
+  // Genei Hurricane DM B (幻影ハリケーン — phantom hurricane DM)
+  DM_GENEI_HURRICANE_B: {
+    startup: 8,
+    active: 20,
+    recovery: 36,
+    damage: 180,
+    hitstun: 0,
+    blockstun: 20,
+    pushback: 9,
+    hitLevel: "MID" as const,
+    knockdown: true,
+    chipDamage: 18,
+  },
+  // Genei Hurricane DM D
+  DM_GENEI_HURRICANE_D: {
+    startup: 10,
+    active: 22,
+    recovery: 38,
+    damage: 180,
+    hitstun: 0,
+    blockstun: 20,
+    pushback: 9,
+    hitLevel: "MID" as const,
+    knockdown: true,
+    chipDamage: 18,
+  },
+  // Genei Hurricane DM default
+  DM_GENEI_HURRICANE: {
+    startup: 9,
+    active: 22,
+    recovery: 38,
+    damage: 200,
+    hitstun: 0,
+    blockstun: 22,
+    pushback: 10,
+    hitLevel: "MID" as const,
+    knockdown: true,
+    chipDamage: 20,
+  },
+  // Raikouken SDM (MAX版强化雷光拳)
+  SDM_RAIKOUKEN: {
+    startup: 12,
+    active: 24,
+    recovery: 40,
+    damage: 320,
+    hitstun: 0,
+    blockstun: 24,
+    pushback: 14,
+    hitLevel: "MID" as const,
+    knockdown: true,
+    chipDamage: 32,
+  },
+  // Raikouken HSDM (隱藏超必殺)
+  HSDM_RAIKOUKEN: {
+    startup: 10,
+    active: 28,
+    recovery: 38,
+    damage: 350,
+    hitstun: 0,
+    blockstun: 26,
+    pushback: 16,
+    hitLevel: "MID" as const,
+    knockdown: true,
+    chipDamage: 38,
+  },
+} as const;

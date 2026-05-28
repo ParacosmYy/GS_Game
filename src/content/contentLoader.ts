@@ -2,7 +2,7 @@
  * Content Loader — Unified character content access
  *
  * Provides a single function to load all content for a given character.
- * Supports: ryo, kyo, iori, terry, kim, athena, vice, yamazaki, shermie
+ * Supports: ryo, kyo, iori, terry, kim, athena, vice, yamazaki, shermie, benimaru
  */
 import type { FeedbackTier } from '../core/feedbackManifest.js';
 import {
@@ -109,6 +109,17 @@ import {
   getShermieAttackFrames,
   getShermieFeedbackTiers,
 } from './characters/shermie/index.js';
+import {
+  getBenimaruFrameData,
+  BENIMARU_ATTACK_KEYS,
+  BENIMARU_MOVE_LIST,
+  BENIMARU_AVAILABLE_ACTIONS,
+  BENIMARU_ANIMATION_META,
+  getBenimaruAnimationNames,
+  getBenimaruHitboxOffsets,
+  getBenimaruAttackFrames,
+  getBenimaruFeedbackTiers,
+} from './characters/benimaru/index.js';
 import { generateKyoDimensionReport } from '../tools/kyoCompletenessReport.js';
 import { generateIoriDimensionReport } from '../tools/ioriCompletenessReport.js';
 import { generateTerryDimensionReport } from '../tools/terryCompletenessReport.js';
@@ -161,6 +172,8 @@ export function loadCharacterContent(charId: string): CharacterContent {
       return loadYamazakiContent();
     case 'shermie':
       return loadShermieContent();
+    case 'benimaru':
+      return loadBenimaruContent();
     default:
       throw new Error(`Unknown character: ${charId}`);
   }
@@ -168,12 +181,12 @@ export function loadCharacterContent(charId: string): CharacterContent {
 
 /** Check if a character has a content package */
 export function hasCharacterContent(charId: string): boolean {
-  return ['ryo', 'kyo', 'iori', 'terry', 'kim', 'athena', 'vice', 'yamazaki', 'shermie'].includes(charId);
+  return ['ryo', 'kyo', 'iori', 'terry', 'kim', 'athena', 'vice', 'yamazaki', 'shermie', 'benimaru'].includes(charId);
 }
 
 /** List all characters with content packages */
 export function getAvailableCharacterIds(): string[] {
-  return ['ryo', 'kyo', 'iori', 'terry', 'kim', 'athena', 'vice', 'yamazaki', 'shermie'];
+  return ['ryo', 'kyo', 'iori', 'terry', 'kim', 'athena', 'vice', 'yamazaki', 'shermie', 'benimaru'];
 }
 
 function loadRyoContent(): CharacterContent {
@@ -316,6 +329,22 @@ function loadShermieContent(): CharacterContent {
     hitboxes: getShermieHitboxOffsets(),
     attackFrames: getShermieAttackFrames(),
     feedback: getShermieFeedbackTiers(),
+    report: null,
+  };
+}
+
+function loadBenimaruContent(): CharacterContent {
+  return {
+    data: { id: 'benimaru', name: 'Benimaru Nikaido', nameCn: '二階堂紅丸', color: '#FFD700' },
+    attacks: getBenimaruFrameData(),
+    attackKeys: BENIMARU_ATTACK_KEYS,
+    commands: BENIMARU_MOVE_LIST,
+    availableActions: BENIMARU_AVAILABLE_ACTIONS,
+    animations: BENIMARU_ANIMATION_META,
+    animSequenceNames: getBenimaruAnimationNames(),
+    hitboxes: getBenimaruHitboxOffsets(),
+    attackFrames: getBenimaruAttackFrames(),
+    feedback: getBenimaruFeedbackTiers(),
     report: null,
   };
 }

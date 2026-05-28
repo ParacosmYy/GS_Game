@@ -425,3 +425,73 @@ export {
 
 export { YAMAZAKI_HIT_EFFECTS } from './yamazaki/hitEffects/yamazakiHitEffects.js';
 export { registerYamazakiAudio } from './yamazaki/audio/yamazakiSampler.js';
+
+// Benimaru content package — prefixed to avoid type name collisions
+export {
+  BENIMARU_MOVE_LIST,
+  BENIMARU_WIN_QUOTES,
+  BENIMARU_AVAILABLE_ACTIONS,
+  type BenimaruMoveEntry,
+} from './benimaru/commands/benimaruCommands.js';
+
+export {
+  BENIMARU_MOVES,
+  getMoveByKey as getBenimaruMoveByKey,
+  getMoveByAttackType as getBenimaruMoveByAttackType,
+  getMovesByCategory as getBenimaruMovesByCategory,
+  getProjectileMoves as getBenimaruProjectileMoves,
+  getInvincibleMoves as getBenimaruInvincibleMoves,
+  getMoveStats as getBenimaruMoveStats,
+} from './benimaru/moves/benimaruMoves.js';
+
+export {
+  BENIMARU_CANCEL_PATHS,
+  findCancelRoute as findBenimaruCancelRoute,
+  getCancelTargets as getBenimaruCancelTargets,
+  validateCancel as validateBenimaruCancel,
+  getCancelRoutesByType as getBenimaruCancelRoutesByType,
+  isCancelSource as isBenimaruCancelSource,
+  getBestCancelRoute as getBenimaruBestCancelRoute,
+  type CancelType as BenimaruCancelType,
+  type CancelRoute as BenimaruCancelRoute,
+} from './benimaru/cancelPaths.js';
+
+export {
+  BENIMARU_ATTACK_KEYS,
+  getBenimaruFrameData,
+  getBenimaruAttackFrameData,
+} from './benimaru/attacks/benimaruAttacks.js';
+
+export { BENIMARU_FRAME_DATA } from './benimaru/frameData/benimaruFrameData.js';
+
+export {
+  getBenimaruFeedbackTiers,
+  getBenimaruFeedback,
+  BENIMARU_FEEDBACK_SUMMARY,
+} from './benimaru/feedback/benimaruFeedback.js';
+
+export {
+  BENIMARU_HITBOX_KEYS,
+  getBenimaruHitboxOffsets,
+  BENIMARU_ATTACK_FRAME_KEYS,
+  getBenimaruAttackFrames,
+} from './benimaru/hitboxes/benimaruHitboxes.js';
+
+export {
+  BENIMARU_ANIMATION_META,
+  getBenimaruAnimationNames,
+  getBenimaruAnimMeta,
+  getBenimaruAttackAnimations,
+  getBenimaruLoopAnimations,
+  type AnimationMeta as BenimaruAnimationMeta,
+} from './benimaru/animations/benimaruAnimations.js';
+
+export {
+  BENIMARU_PORTRAIT_META,
+  getBenimaruPortraitMeta,
+  getBenimaruAvailablePortraitSizes,
+  type PortraitMeta as BenimaruPortraitMeta,
+} from './benimaru/portraits/benimaruPortraits.js';
+
+export { BENIMARU_HIT_EFFECTS } from './benimaru/hitEffects/benimaruHitEffects.js';
+export { registerBenimaruAudio } from './benimaru/audio/benimaruSampler.js';
