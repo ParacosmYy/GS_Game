@@ -7,6 +7,7 @@
 import { Fighter } from '../entities/fighter.js';
 import { Camera } from '../core/camera.js';
 import type { PowerGauge, MaxModeState, MoveListEntry, MoveCategory } from '../core/types.js';
+import { FighterState } from '../core/types.js';
 import { meterFlashTimers, meterStockFlashes } from './meterFlash.js';
 import {
   CANVAS_WIDTH, CANVAS_HEIGHT, MAX_HEALTH, MAX_STOCKS, ROUND_TIME,
@@ -772,6 +773,28 @@ export function drawHUD(
   // ===== Character name plates below health bars =====
   drawNamePlate(ctx, HUD_MARGIN, HUD_BAR_Y + HUD_BAR_HEIGHT + 26, p1Name, '#ff6644', 'left');
   drawNamePlate(ctx, CANVAS_WIDTH - HUD_MARGIN, HUD_BAR_Y + HUD_BAR_HEIGHT + 26, p2Name, '#4488ff', 'right');
+
+  // ===== Dizzy warning indicator near name plates =====
+  if (fighters[0].state === FighterState.DIZZY) {
+    const dzPulse = Math.sin(tick * 0.3) * 0.4 + 0.6;
+    ctx.save();
+    ctx.globalAlpha = dzPulse;
+    ctx.shadowColor = '#ffcc00';
+    ctx.shadowBlur = 6;
+    drawSNKText(ctx, 'DIZZY!', HUD_MARGIN + 50, HUD_BAR_Y + HUD_BAR_HEIGHT + 38, 8, '#ffcc00');
+    ctx.shadowBlur = 0;
+    ctx.restore();
+  }
+  if (fighters[1].state === FighterState.DIZZY) {
+    const dzPulse = Math.sin(tick * 0.3) * 0.4 + 0.6;
+    ctx.save();
+    ctx.globalAlpha = dzPulse;
+    ctx.shadowColor = '#ffcc00';
+    ctx.shadowBlur = 6;
+    drawSNKText(ctx, 'DIZZY!', CANVAS_WIDTH - HUD_MARGIN - 50, HUD_BAR_Y + HUD_BAR_HEIGHT + 38, 8, '#ffcc00', '#000000', 'right');
+    ctx.shadowBlur = 0;
+    ctx.restore();
+  }
 
   // ===== P1 move list panel (only in simplified mode for non-training gameplay) =====
   if (p1MoveList.length > 0 && simplifiedMode) {
