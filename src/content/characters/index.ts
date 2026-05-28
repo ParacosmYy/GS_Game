@@ -355,3 +355,73 @@ export {
 
 export { VICE_HIT_EFFECTS } from './vice/hitEffects/viceHitEffects.js';
 export { registerViceAudio } from './vice/audio/viceSampler.js';
+
+// Yamazaki content package — prefixed to avoid type name collisions
+export {
+  YAMAZAKI_MOVE_LIST,
+  YAMAZAKI_WIN_QUOTES,
+  YAMAZAKI_AVAILABLE_ACTIONS,
+  type YamazakiMoveEntry,
+} from './yamazaki/commands/yamazakiCommands.js';
+
+export {
+  YAMAZAKI_MOVES,
+  getMoveByKey as getYamazakiMoveByKey,
+  getMoveByAttackType as getYamazakiMoveByAttackType,
+  getMovesByCategory as getYamazakiMovesByCategory,
+  getProjectileMoves as getYamazakiProjectileMoves,
+  getInvincibleMoves as getYamazakiInvincibleMoves,
+  getMoveStats as getYamazakiMoveStats,
+} from './yamazaki/moves/yamazakiMoves.js';
+
+export {
+  YAMAZAKI_CANCEL_PATHS,
+  findCancelRoute as findYamazakiCancelRoute,
+  getCancelTargets as getYamazakiCancelTargets,
+  validateCancel as validateYamazakiCancel,
+  getCancelRoutesByType as getYamazakiCancelRoutesByType,
+  isCancelSource as isYamazakiCancelSource,
+  getBestCancelRoute as getYamazakiBestCancelRoute,
+  type CancelType as YamazakiCancelType,
+  type CancelRoute as YamazakiCancelRoute,
+} from './yamazaki/cancelPaths.js';
+
+export {
+  YAMAZAKI_ATTACK_KEYS,
+  getYamazakiFrameData,
+  getYamazakiAttackFrameData,
+} from './yamazaki/attacks/yamazakiAttacks.js';
+
+export { YAMAZAKI_FRAME_DATA } from './yamazaki/frameData/yamazakiFrameData.js';
+
+export {
+  getYamazakiFeedbackTiers,
+  getYamazakiFeedback,
+  YAMAZAKI_FEEDBACK_SUMMARY,
+} from './yamazaki/feedback/yamazakiFeedback.js';
+
+export {
+  YAMAZAKI_HITBOX_KEYS,
+  getYamazakiHitboxOffsets,
+  YAMAZAKI_ATTACK_FRAME_KEYS,
+  getYamazakiAttackFrames,
+} from './yamazaki/hitboxes/yamazakiHitboxes.js';
+
+export {
+  YAMAZAKI_ANIMATION_META,
+  getYamazakiAnimationNames,
+  getYamazakiAnimMeta,
+  getYamazakiAttackAnimations,
+  getYamazakiLoopAnimations,
+  type AnimationMeta as YamazakiAnimationMeta,
+} from './yamazaki/animations/yamazakiAnimations.js';
+
+export {
+  YAMAZAKI_PORTRAIT_META,
+  getYamazakiPortraitMeta,
+  getYamazakiAvailablePortraitSizes,
+  type PortraitMeta as YamazakiPortraitMeta,
+} from './yamazaki/portraits/yamazakiPortraits.js';
+
+export { YAMAZAKI_HIT_EFFECTS } from './yamazaki/hitEffects/yamazakiHitEffects.js';
+export { registerYamazakiAudio } from './yamazaki/audio/yamazakiSampler.js';
