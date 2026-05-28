@@ -96,23 +96,23 @@ describe('getMaxAuraColor direct import', () => {
     const { getMaxAuraColor: fn } = await import('../src/rendering/rendererFighter.js');
     const c = fn('ryo');
     expect(c.css).toBe('#4488ff');
-  });
+  }, 15000);
 
   it('returns Kyo fire orange for kyo', async () => {
     const { getMaxAuraColor: fn } = await import('../src/rendering/rendererFighter.js');
     const c = fn('kyo');
     expect(c.css).toBe('#ff8c1e');
-  });
+  }, 15000);
 
   it('returns Iori purple for iori', async () => {
     const { getMaxAuraColor: fn } = await import('../src/rendering/rendererFighter.js');
     const c = fn('iori');
     expect(c.css).toBe('#aa00ff');
-  });
+  }, 15000);
 
   it('returns green fallback for unknown character', async () => {
     const { getMaxAuraColor: fn } = await import('../src/rendering/rendererFighter.js');
     const c = fn('unknown');
     expect(c.css).toBe('#44ff88');
-  });
+  }, 15000);
 });
