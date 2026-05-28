@@ -155,7 +155,13 @@
   - rendererFighter.ts拆分 (1852→1573行: 工具函数提取到rendererFighterUtils.ts)
   - sampler.ts拆分 (1880→470行: 渲染函数提取到samplerRenderers.ts)
   - 3角色动画元数据补全10类缺失状态 (backdash/hop/hyper_jump/run_jump/roll/back_roll/air_block/throw_anim/jump_a~d)
-  - 测试总数 4827
+  - bgm.ts拆分 (1800→1555行: 合成原语提取到bgmSynthesis.ts)
+  - main.ts拆分 (1739→1664行: 街机工具提取到arcadeUtils.ts)
+  - advancedAI.ts拆分 (1703→1555行: 配置/间距/哈希提取到aiConfig.ts)
+  - hud.ts拆分 (1623→1249行: drawPowerGauges提取到hudPowerGauges.ts)
+  - characters/index.ts补全 Kyo/Iori FrameContract/HitEffects/Audio导出
+  - 多角色barrel导出完整性回归测试 (10 tests)
+  - 测试总数 4869
 - 当前差距：角色内容已开始分层，但真实数据、兼容入口、校验工具之间还需继续收口。
 - 新功能添加点：
   - `src/content/characters/index.ts` barrel export
@@ -187,6 +193,10 @@
   - ScreenFlash/ScreenShake/VFXSystem核心VFX回归测试 (30 tests)
   - 3角色动画元数据完整性回归测试 (29 tests: 必需状态/帧数正值/类型一致/跨角色)
   - sampler.ts拆分 (1880→470行: 渲染函数提取到samplerRenderers.ts)
+  - 街机工具回归测试 (17 tests: RIVAL_MAP/arcadeDifficulty/generateArcadeOpponents/pickWinQuote)
+  - inferTier分类+attackTierMap回归测试 (15 tests: 模式分类/3角色DM/SDM/HSDM映射)
+  - AI配置回归测试 (21 tests: 难度预设/间距/哈希/常量)
+  - rendererFighter.ts拆分 (1852→1573行: 工具函数提取到rendererFighterUtils.ts)
 - 新功能添加点：
   - smoke / ryo / combat / content 分层测试
   - frame contract 回归测试
