@@ -194,6 +194,100 @@ export function drawIntro(ctx: CanvasRenderingContext2D, phaseTimer: number, cur
   ctx.restore();
 }
 
+/**
+ * Draw ceremony background elements underneath announce sequence text.
+ * Shows: cinematic letterbox bars, character names, MATCH POINT, stage name card.
+ * Called before drawAnnounceSequence() during INTRO phase.
+ */
+export function drawIntroCeremonyBackground(
+  ctx: CanvasRenderingContext2D,
+  phaseTimer: number,
+  p1Name: string,
+  p2Name: string,
+  stageId: StageId | undefined,
+  p1Wins: number,
+  p2Wins: number,
+  winsNeeded: number,
+): void {
+  ctx.save();
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+
+  // Fade envelope: appear 0-20, hold 20-100, disappear 100-130
+  const fadeAlpha = phaseTimer < 20 ? phaseTimer / 20
+    : phaseTimer > 100 ? Math.max(0, (130 - phaseTimer) / 30)
+    : 1;
+
+  // Cinematic letterbox bars
+  ctx.fillStyle = `rgba(0,0,0,${fadeAlpha * 0.7})`;
+  ctx.fillRect(0, 0, CANVAS_WIDTH, 100);
+  ctx.fillRect(0, CANVAS_HEIGHT - 100, CANVAS_WIDTH, 100);
+
+  // Character names with VS
+  if (p1Name && p2Name) {
+    const nameAlpha = Math.min(1, Math.max(0, (phaseTimer - 10) / 20));
+    ctx.globalAlpha = nameAlpha * fadeAlpha;
+    drawSNKText(ctx, p1Name, CANVAS_WIDTH / 2 - 30, CANVAS_HEIGHT / 2 + 35, 16, '#ff6644', '#000000', 'right');
+    drawSNKText(ctx, p2Name, CANVAS_WIDTH / 2 + 30, CANVAS_HEIGHT / 2 + 35, 16, '#4488ff', '#000000', 'left');
+    drawSNKText(ctx, 'VS', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 35, 14, '#ffcc00');
+  }
+
+  // MATCH POINT — 任一方只差一胜时显示
+  const p1MatchPoint = p1Wins >= winsNeeded - 1 && p2Wins < winsNeeded;
+  const p2MatchPoint = p2Wins >= winsNeeded - 1 && p1Wins < winsNeeded;
+  if (p1MatchPoint || p2MatchPoint) {
+    const mpAlpha = Math.min(1, Math.max(0, (phaseTimer - 40) / 15));
+    ctx.globalAlpha = mpAlpha * fadeAlpha * 0.9;
+    const mpColor = p1MatchPoint ? '#ff6644' : '#4488ff';
+    const mpName = p1MatchPoint ? p1Name : p2Name;
+    ctx.shadowColor = mpColor;
+    ctx.shadowBlur = 10;
+    drawSNKText(ctx, 'MATCH POINT', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 55, 16, mpColor);
+    if (mpName) {
+      drawSNKText(ctx, mpName, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 72, 11, 'rgba(200,200,200,0.7)');
+    }
+    ctx.shadowBlur = 0;
+  }
+
+  // Stage name card — gold divider line + stage name
+  if (stageId && STAGE_NAMES[stageId]) {
+    const stageAlpha = Math.min(1, Math.max(0, (phaseTimer - 25) / 15));
+    ctx.globalAlpha = stageAlpha * fadeAlpha;
+    const locY = CANVAS_HEIGHT - 120;
+    const locW = 280;
+    const locX = CANVAS_WIDTH / 2 - locW / 2;
+
+    const divGrad = ctx.createLinearGradient(locX, 0, locX + locW, 0);
+    divGrad.addColorStop(0, 'rgba(200,160,50,0)');
+    divGrad.addColorStop(0.15, 'rgba(200,160,50,0.6)');
+    divGrad.addColorStop(0.5, 'rgba(255,200,80,0.9)');
+    divGrad.addColorStop(0.85, 'rgba(200,160,50,0.6)');
+    divGrad.addColorStop(1, 'rgba(200,160,50,0)');
+    ctx.strokeStyle = divGrad;
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(locX, locY);
+    ctx.lineTo(locX + locW, locY);
+    ctx.stroke();
+
+    ctx.fillStyle = 'rgba(255,200,80,0.7)';
+    ctx.beginPath();
+    ctx.moveTo(CANVAS_WIDTH / 2, locY - 3);
+    ctx.lineTo(CANVAS_WIDTH / 2 + 3, locY);
+    ctx.lineTo(CANVAS_WIDTH / 2, locY + 3);
+    ctx.lineTo(CANVAS_WIDTH / 2 - 3, locY);
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.shadowColor = '#cc8800';
+    ctx.shadowBlur = 8;
+    drawSNKText(ctx, STAGE_NAMES[stageId], CANVAS_WIDTH / 2, locY + 16, 14, '#ddb844');
+    ctx.shadowBlur = 0;
+  }
+
+  ctx.restore();
+}
+
 // ===== KO Screen =====
 
 /**

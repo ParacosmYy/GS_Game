@@ -15,6 +15,7 @@ export {
 // Intro overlay + KO screen
 export {
   drawIntro,
+  drawIntroCeremonyBackground,
   drawKO,
 } from './screens_split/introKo.js';
 

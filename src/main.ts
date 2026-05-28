@@ -45,7 +45,7 @@ import { announcer } from './audio/announcer.js';
 import { announcerOverlay } from './rendering/announcerOverlay.js';
 import { AdvancedAI } from './ai/advancedAI.js';
 import { updateMovementVfx } from './state/movementVfx.js';
-import { WIN_QUOTE_DURATION, drawAnnounceSequence } from './rendering/screens.js';
+import { WIN_QUOTE_DURATION, drawAnnounceSequence, drawIntroCeremonyBackground } from './rendering/screens.js';
 import { getPortraitForSize } from './rendering/manifestRenderData.js';
 import { GameStateManager } from './state/gameStateManager.js';
 import { gameRandom, gameRandomInt } from './core/prng.js';
@@ -1428,6 +1428,7 @@ function render(): void {
   renderer.drawPowerGauges(gauges, maxModes, [p1.health / p1.maxHealth < 0.25 && p1.health > 0, p2.health / p2.maxHealth < 0.25 && p2.health > 0]);
   if (gs.phase === GamePhase.INTRO) {
     if (gs.announceSequence.isRunning()) {
+      drawIntroCeremonyBackground(ctx, gs.phaseTimer, p1Char.nameCn, p2Char.nameCn, getStage(), rounds.p1Wins, rounds.p2Wins, rounds.winsNeeded);
       drawAnnounceSequence(ctx, gs.announceSequence, canvas.width, canvas.height);
     } else {
       renderer.drawIntro(gs.phaseTimer, rounds.currentRound, p1Char.nameCn, p2Char.nameCn, getStage(), rounds.p1Wins, rounds.p2Wins, rounds.winsNeeded);
