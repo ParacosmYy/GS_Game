@@ -49,6 +49,7 @@
   - screens.ts 拆分为6子文件 (2256→58行聚合器)
   - attackFramesSpecials.ts 拆分为7子文件 (2209→10行聚合器)
   - skeletalParts.ts 拆分为3子文件 (2058→7行聚合器)
+  - Iori近距离攻击专属像素帧 CLOSE_A/B/C/D (25 tests: 3角色近战动画对齐)
 - 新功能添加点：
   - animation manifest
   - pose bank
