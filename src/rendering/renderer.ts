@@ -47,6 +47,7 @@ import {
   isDebugOverlayVisible as _isDebugOverlayVisible,
   isInputDisplayVisible as _isInputDisplayVisible,
   collectDebugFighterInfo as _collectDebugFighterInfo,
+  drawControlHints as _drawControlHints,
 } from './hudInfo.js';
 import type { MatchInfoConfig, TrainingAttackInfo } from './hudInfo.js';
 
@@ -693,5 +694,9 @@ export class Renderer {
 
   updateHUDFps(): void {
     _updateFPSTracker();
+  }
+
+  drawControlHints(matchTimer: number): void {
+    _drawControlHints(this.ctx, matchTimer);
   }
 }

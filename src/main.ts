@@ -1613,6 +1613,11 @@ function render(): void {
   // KOF2002: Move name flash overlay
   drawMoveNameDisplay(ctx);
 
+  // Control hints — brief first-match display
+  if (gs.phase === GamePhase.FIGHTING) {
+    renderer.drawControlHints(tickRef.value);
+  }
+
   // KOF2002: Time critical screen edge glow — red vignette when ≤5 seconds
   if (!gs.isTrainingMode && gs.phase === GamePhase.FIGHTING && tickRef.value >= 3300 && tickRef.value < 3600) {
     const urgency = (tickRef.value - 3300) / 300; // 0→1 over last 5 seconds

@@ -502,6 +502,28 @@ export function drawInputDisplay(
   ctx.restore();
 }
 
+/**
+ * Draw first-match control hints at screen bottom.
+ * Shows briefly for new players, fades out after ~5 seconds.
+ */
+export function drawControlHints(ctx: CanvasRenderingContext2D, matchTimer: number): void {
+  if (matchTimer > 300) return;
+  const alpha = matchTimer < 240 ? 0.6 : (300 - matchTimer) / 60 * 0.6;
+  if (alpha <= 0) return;
+
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'bottom';
+
+  const y = CANVAS_HEIGHT - 12;
+  ctx.font = '11px "Courier New", monospace';
+  ctx.fillStyle = '#aaaacc';
+  ctx.fillText('F1: Pause  |  F3: Input Display  |  F5: Move List  |  Esc: Menu', CANVAS_WIDTH / 2, y);
+
+  ctx.restore();
+}
+
 // ===== 5. Training Connection Info =====
 
 export interface TrainingAttackInfo {
