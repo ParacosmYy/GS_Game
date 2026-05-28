@@ -79,3 +79,41 @@ describe('Sampler renderers', () => {
     isValidAudio(renderers.renderSuperFlash(SR, true), 'renderSuperFlash(SDM)');
   });
 });
+
+// ===== Extended coverage: previously untested renderers =====
+
+const EXTENDED = [
+  'renderChip', 'renderWallBounce', 'renderGroundBounce', 'renderCancel',
+  'renderWire', 'renderJuggle', 'renderThrowEscape', 'renderProjectile',
+  'renderRoundCall', 'renderTimeOver', 'renderPerfect', 'renderQuickStand',
+  'renderStep', 'renderDust', 'renderWallBounceHeavy', 'renderGuardBreak',
+  'renderChargeUp', 'renderBlockSpecial', 'renderBlockDM',
+  'renderSpecialLight', 'renderSpecialHeavy', 'renderLandingHeavy',
+  'renderDizzyHit', 'renderRoundStart', 'renderTimeUp', 'renderWhooshHeavy',
+];
+
+describe('Extended sampler renderers', () => {
+  it('all extended renderers produce valid buffers', { timeout: 60000 }, () => {
+    for (const name of EXTENDED) {
+      const fn = (renderers as any)[name];
+      expect(fn, `${name} exists`).toBeDefined();
+      isValidAudio(fn(SR), name);
+    }
+  });
+});
+
+// ===== Sample rate independence =====
+
+describe('Sample rate independence', () => {
+  it('renderHitLight works at 22050 Hz', { timeout: 10000 }, () => {
+    const buf = renderers.renderHitLight(22050);
+    isValidAudio(buf, 'hitLight@22050');
+    expect(buf.length).toBeLessThan(renderers.renderHitLight(SR).length);
+  });
+
+  it('renderDM works at 48000 Hz', { timeout: 10000 }, () => {
+    const buf = renderers.renderDM(48000);
+    isValidAudio(buf, 'DM@48000');
+    expect(buf.length).toBeGreaterThan(renderers.renderDM(SR).length);
+  });
+});
