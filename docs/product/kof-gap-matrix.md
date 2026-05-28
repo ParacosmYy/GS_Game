@@ -94,7 +94,7 @@
   - Announcer burst扩散环: KO/FIGHT爆发文字背后能量环扩展效果
   - Stun gauge警告光效: >85%红色脉冲光晕预警眩晕
   - HSDM招式名扫描线: HSDM banner紫粉色光线扫过增加终极感
-  - 4616→4621 回归测试保护反馈矩阵完整性和层级递进
+  - 4616→4634 回归测试保护反馈矩阵完整性和层级递进
 - 当前差距：hitstop、spark、shake、pushback、SFX 还没有按轻重/特殊/爆气状态形成稳定矩阵。
 - 新功能添加点：
   - feedback manifest
@@ -116,6 +116,8 @@
   - HSDM 分类补全 (招式表 + 训练模式面板均显示 HIDDEN SUPER DM)
   - 街机模式 Tab 招式表面板
   - 训练模式 MAX/Burst 系统说明面板 (右侧面板显示激活条件、消耗、升级规则)
+  - KOF2002视觉输入图标系统 (训练模式+街机Tab招式表箭头+按钮圆圈替代纯文本, 7 tests)
+  - DM/SDM/HSDM终结KO差异化视觉 (分层暗角+专属冲击波+HSDM彩虹边缘, 6 tests)
 - 新功能添加点：
   - 训练模式招式卡片(视觉图标输入)
 - 期望结果：
@@ -149,7 +151,7 @@
   - Kyo 完整度校验工具 (8维报告: animationMeta/frameData/attackFrames/feedback/portrait/moveList/cancelPaths/hitEffects)
   - Iori 完整度校验工具 (8维报告: 同Kyo结构)
   - Kyo/Iori完整度回归测试 (33 tests: 维度有效性+覆盖率+最低阈值)
-  - 测试总数 4621
+  - 测试总数 4634
 - 当前差距：角色内容已开始分层，但真实数据、兼容入口、校验工具之间还需继续收口。
 - 新功能添加点：
   - `src/content/characters/index.ts` barrel export
