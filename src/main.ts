@@ -637,6 +637,12 @@ function update(): void {
       }
       gs.setPhase(GamePhase.WIN_QUOTE);
       gs.winQuoteTimer = 0;
+      // KOF2002: Victory flash — element-coded flash at victory pose start
+      if (gs.winner !== null) {
+        const vChar = gs.winner === 0 ? p1 : p2;
+        const vEl = getMaxAuraColor(vChar.charId);
+        screenFlash.trigger(vEl.css, 0.25, 8);
+      }
     }
     if (gs.koTimer <= KO_DISPLAY_TIME && inputManager.isKeyDown('KeyR')) restartGame();
     return;
