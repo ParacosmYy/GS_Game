@@ -30,7 +30,7 @@ import { KYO_JUMP_FRAMES } from './kyoJumpFrames.js';
 import { KYO_HURT_FRAMES, KYO_KNOCKDOWN_FRAMES, KYO_BLOCK_FRAMES } from './kyoDamageFrames.js';
 import { KYO_STAND_B_FRAMES, KYO_STAND_D_FRAMES } from './kyoKickFrames.js';
 import { KYO_CROUCH_A_FRAMES, KYO_CROUCH_C_FRAMES, KYO_CROUCH_B_FRAMES, KYO_CROUCH_D_FRAMES } from './kyoCrouchAttackFrames.js';
-import { KYO_AIR_A_FRAMES, KYO_AIR_C_FRAMES, KYO_AIR_D_FRAMES } from './kyoAirAttackFrames.js';
+import { KYO_AIR_A_FRAMES, KYO_AIR_B_FRAMES, KYO_AIR_C_FRAMES, KYO_AIR_D_FRAMES } from './kyoAirAttackFrames.js';
 import { KYO_CLOSE_A_FRAMES, KYO_CLOSE_C_FRAMES, KYO_CLOSE_B_FRAMES, KYO_CLOSE_D_FRAMES } from './kyoCloseAttackFrames.js';
 import { KYO_ONIYAKI_FRAMES, KYO_ONIYAKI_C_FRAMES, KYO_YAMIBARAI_FRAMES, KYO_RED_KICK_FRAMES, KYO_75KAI_FRAMES, KYO_ARAGAMI_FRAMES, KYO_DOKUGAMI_FRAMES, KYO_OROCHINAGI_DM_FRAMES, KYO_OROCHINAGI_SDM_FRAMES } from './kyoSpecialFrames.js';
 import { KYO_CMD_GOFU_YOU_FRAMES, KYO_CMD_88SHIKI_FRAMES, KYO_CMD_NARAKU_FRAMES } from './kyoCommandNormalFrames.js';
@@ -85,6 +85,7 @@ function initKyoFrames(): void {
 
   // Air attacks
   registerVariableFrames('AIR_A', KYO_AIR_A_FRAMES, [3, 3, 5]);
+  registerVariableFrames('AIR_B', KYO_AIR_B_FRAMES, [3, 2, 4]);
   registerVariableFrames('AIR_C', KYO_AIR_C_FRAMES, [5, 3, 3, 5]);
   registerVariableFrames('AIR_D', KYO_AIR_D_FRAMES, [4, 3, 3, 5]);
 
@@ -196,6 +197,7 @@ function resolveKyoFrameKey(
       if (currentAttack === AttackType.CMD_NARAKU) return 'CMD_NARAKU';
       if (currentAttack === AttackType.JUMP_C) return 'AIR_C';
       if (currentAttack === AttackType.JUMP_D) return 'AIR_D';
+      if (currentAttack === AttackType.JUMP_B) return 'AIR_B';
       return 'AIR_A';
     case FighterState.HITSTUN:
       return 'HURT';

@@ -232,6 +232,67 @@ export const KYO_AIR_C_FRAMES: PixelFrame[] = [AIC0, AIC1, AIC2, AIC3].map(pixel
   anchor: { x: Math.floor(W / 2), y: 72 },
 }));
 
+// ===== AIR_B (air light kick) — 3 frames: extend, active, retract =====
+const AIB0: number[][] = AIR_BODY.map(row => [...row]);
+
+const AIB1: number[][] = [
+  r(''), r(''), r(''), r(''), r(''), r(''), r(''), r(''),
+  r(''), r(''), r(''), r(''), r(''), r(''),
+  r('..............132'),
+  r('.............135531'),
+  r('............12566521'),
+  r('...........123566532'),
+  r('..........1234566532'),
+  r('.........11234556521'),
+  r('........11234556521'),
+  r('.......1123445651'),
+  r('......1123345651'),
+  r('.....1123454651'),
+  r('....112389a91'),
+  r('...112389b91'),
+  r('..112389a91'),
+  r('.1123n8a91'),
+  r('112389a91'),
+  r('1c9b12'),
+  r('1c8a12'),
+  r('1d9b12'),
+  r('.1c8a12'),
+  r('.1d9a12'),
+  r('..1c8b12'),
+  r('..1d9a12'),
+  r('...1c8b1'),
+  r('...1d9a12'),
+  r('...1c8a12'),
+  r('..1d9b1'),
+  r('..1c8a1'),
+  r('..1d9b1'),
+  // Kick leg extended forward-down (light kick: knee tucked, shin extended)
+  r('.1n1..1n1'),
+  r('1n1..1kl1'),
+  r('kl1..1klm'),
+  r('klm1.1klm'),
+  r('klm1.1klm'),
+  r('klm.1kl1'),
+  r('1n1.1n1'),
+  r('.1n1n1'),
+  r('..1n1'),
+  r(''),
+  r(''), r(''), r(''), r(''), r(''),
+  r(''), r(''), r(''), r(''), r(''),
+  r(''), r(''), r(''), r(''), r(''),
+  r(''), r(''), r(''), r(''), r(''),
+];
+
+const AIB2: number[][] = AIB0.map(row => [...row]); // retract
+
+export const KYO_AIR_B_FRAMES: PixelFrame[] = [AIB0, AIB1, AIB2].map(pixels => ({
+  width: W,
+  height: 72,
+  palette: PALETTE,
+  pixels,
+  anchor: { x: Math.floor(W / 2), y: 72 },
+}));
+
 // ===== AIR_D (air kick) — 4 frames =====
 const AID0: number[][] = AIR_BODY.map(row => [...row]);
 
