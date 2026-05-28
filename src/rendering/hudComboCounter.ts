@@ -7,7 +7,7 @@ import { Camera } from '../core/camera.js';
 import {
   CANVAS_WIDTH, CANVAS_HEIGHT,
 } from '../core/constants.js';
-import { shiftColor } from './utils.js';
+import { shiftColor, verticalGrad, horizontalGrad } from './utils.js';
 
 const COMBO_FADE_FRAMES = 60;
 
@@ -216,24 +216,16 @@ export function drawComboCounters(
     const pulse = Math.sin(Date.now() * 0.005) * 0.3 + 0.7;
     ctx.save();
     ctx.globalAlpha = edgeAlpha * pulse;
-    const topGrad = ctx.createLinearGradient(0, 0, 0, 40);
-    topGrad.addColorStop(0, edgeColor);
-    topGrad.addColorStop(1, edgeColor + '00');
+    const topGrad = verticalGrad(ctx, 0, 0, 40, edgeColor, edgeColor + '00');
     ctx.fillStyle = topGrad;
     ctx.fillRect(0, 0, CANVAS_WIDTH, 40);
-    const botGrad = ctx.createLinearGradient(0, CANVAS_HEIGHT, 0, CANVAS_HEIGHT - 40);
-    botGrad.addColorStop(0, edgeColor);
-    botGrad.addColorStop(1, edgeColor + '00');
+    const botGrad = verticalGrad(ctx, 0, CANVAS_HEIGHT, 0, CANVAS_HEIGHT - 40, edgeColor, edgeColor + '00');
     ctx.fillStyle = botGrad;
     ctx.fillRect(0, CANVAS_HEIGHT - 40, CANVAS_WIDTH, 40);
-    const leftGrad = ctx.createLinearGradient(0, 0, 30, 0);
-    leftGrad.addColorStop(0, edgeColor);
-    leftGrad.addColorStop(1, edgeColor + '00');
+    const leftGrad = horizontalGrad(ctx, 0, 0, 30, edgeColor, edgeColor + '00');
     ctx.fillStyle = leftGrad;
     ctx.fillRect(0, 0, 30, CANVAS_HEIGHT);
-    const rightGrad = ctx.createLinearGradient(CANVAS_WIDTH, 0, CANVAS_WIDTH - 30, 0);
-    rightGrad.addColorStop(0, edgeColor);
-    rightGrad.addColorStop(1, edgeColor + '00');
+    const rightGrad = horizontalGrad(ctx, CANVAS_WIDTH, 0, CANVAS_WIDTH - 30, edgeColor, edgeColor + '00');
     ctx.fillStyle = rightGrad;
     ctx.fillRect(CANVAS_WIDTH - 30, 0, 30, CANVAS_HEIGHT);
     ctx.restore();

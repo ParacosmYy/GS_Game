@@ -15,7 +15,7 @@ import {
   HUD_TIMER_SIZE, HUD_GAUGE_Y, HUD_GAUGE_WIDTH, HUD_GAUGE_HEIGHT,
   HUD_GAUGE_SEGMENT_GAP, HUD_WIN_MARKER_SIZE,
 } from '../core/constants.js';
-import { shiftColor, roundRect, drawSNKText } from './utils.js';
+import { shiftColor, roundRect, drawSNKText, horizontalGrad } from './utils.js';
 import { drawComboCounters } from './hudComboCounter.js';
 import { drawPowerGauges } from './hudPowerGauges.js';
 export { drawPowerGauges } from './hudPowerGauges.js';
@@ -781,16 +781,12 @@ export function drawHUD(
     const edgeAlpha = 0.06 + Math.sin(tick * 0.08) * 0.04;
     const edgeColor = p1Wins === winsNeeded - 1 ? '#ff4400' : '#4488ff';
     // Left edge glow
-    const leftGrad = ctx.createLinearGradient(0, 0, 30, 0);
-    leftGrad.addColorStop(0, edgeColor);
-    leftGrad.addColorStop(1, 'rgba(0,0,0,0)');
+    const leftGrad = horizontalGrad(ctx, 0, 0, 30, edgeColor, 'rgba(0,0,0,0)');
     ctx.globalAlpha = edgeAlpha;
     ctx.fillStyle = leftGrad;
     ctx.fillRect(0, 0, 30, CANVAS_HEIGHT);
     // Right edge glow
-    const rightGrad = ctx.createLinearGradient(CANVAS_WIDTH, 0, CANVAS_WIDTH - 30, 0);
-    rightGrad.addColorStop(0, edgeColor);
-    rightGrad.addColorStop(1, 'rgba(0,0,0,0)');
+    const rightGrad = horizontalGrad(ctx, CANVAS_WIDTH, 0, CANVAS_WIDTH - 30, edgeColor, 'rgba(0,0,0,0)');
     ctx.fillStyle = rightGrad;
     ctx.fillRect(CANVAS_WIDTH - 30, 0, 30, CANVAS_HEIGHT);
     ctx.globalAlpha = 1;

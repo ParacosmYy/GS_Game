@@ -2,7 +2,7 @@
  * Ryo portrait rendering for HUD and select screen
  * Split from skeletalParts.ts
  */
-import { shiftColor, roundRect } from '../utils.js';
+import { shiftColor, roundRect, verticalGrad } from '../utils.js';
 
 // ===== Ryo portrait rendering — HUD & select screen =====
 
@@ -50,10 +50,7 @@ export function drawRyoPortrait(
   ctx.clip();
 
   // Background
-  const bgGrad = ctx.createLinearGradient(0, 0, 0, height);
-  bgGrad.addColorStop(0, '#0a0a18');
-  bgGrad.addColorStop(1, '#151520');
-  ctx.fillStyle = bgGrad;
+  ctx.fillStyle = verticalGrad(ctx, 0, 0, height, '#0a0a18', '#151520');
   ctx.fillRect(0, 0, width, height);
 
   // Center the head within the portrait box
