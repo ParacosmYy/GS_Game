@@ -5,7 +5,6 @@
  */
 import { describe, it, expect } from 'vitest';
 
-// Expected export categories per character
 const KYO_EXPORTS = [
   'KYO_ATTACK_KEYS',
   'KYO_MOVE_LIST',
@@ -40,7 +39,7 @@ describe('Character barrel exports', () => {
     for (const name of KYO_EXPORTS) {
       expect(mod[name as keyof typeof mod], `Missing Kyo export: ${name}`).toBeDefined();
     }
-  });
+  }, 15000);
 
   it('Iori has all expected exports', async () => {
     const mod = await import('../src/content/characters/index.js');

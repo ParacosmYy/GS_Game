@@ -26,7 +26,7 @@ import { drawComboCounters } from './hudComboCounter.js';
 import { subscribeMeterFlash, tickMeterFlash } from './meterFlash.js';
 import { drawCharacterSelect, drawIntro, drawKO, drawWinQuote, drawVSSplash, drawStageSelect, drawTeamOrderSelect, drawTransition, WIN_QUOTE_DURATION } from './screens.js';
 import type { KODustParticle, KOPhase } from '../state/cinematicState.js';
-import { drawSuperFlash, drawMatchEnd, drawModeIndicator, drawStageIndicator, drawTitle, drawContinue, drawModeSelect, drawTrainingHUD, drawGameOver, drawOptionsScreen, drawArcadeComplete, drawNextMatch, drawRoundScoreBreakdown, getSuperFlashZoom, updateSuperFlashZoom } from './overlayScreens.js';
+import { drawSuperFlash, drawMatchEnd, drawModeIndicator, drawStageIndicator, drawTitle, drawContinue, drawModeSelect, drawTrainingHUD, drawGameOver, drawOptionsScreen, drawArcadeComplete, drawNextMatch, drawRoundScoreBreakdown, getSuperFlashZoom, updateSuperFlashZoom, drawStageIntro } from './overlayScreens.js';
 import type { GameOptions, ArcadeStats, RoundScoreBreakdown } from './overlayScreens.js';
 import { drawProjectiles as drawProjectilesImpl } from './projectileRenderer.js';
 import type { SpriteRenderer } from './spriteRenderer.js';
@@ -447,6 +447,10 @@ export class Renderer {
 
   drawNextMatch(timer: number, nextChar: CharacterDefinition | undefined, stageNumber: number, totalStages: number, isRivalStage: boolean = false, upcomingChars: CharacterDefinition[] = []): void {
     drawNextMatch(this.ctx, timer, nextChar, stageNumber, totalStages, isRivalStage, upcomingChars);
+  }
+
+  drawStageIntroOverlay(timer: number, stageName: string, stageId: string): void {
+    drawStageIntro(this.ctx, timer, stageName, stageId);
   }
 
   drawWinQuote(timer: number, charName: string, winQuote: string, charColor: string, pixelPortrait: import('./pixelPortraits.js').PixelPortraitData | undefined): void {

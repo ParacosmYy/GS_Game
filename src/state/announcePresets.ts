@@ -207,3 +207,23 @@ export function createWinnerSequence(winnerName: string): AnnounceStep[] {
     },
   ];
 }
+
+/** 创建舞台开场仪式序列：舞台名称展示 */
+export function createStageIntroSequence(stageName: string, accentColor: string = '#ffcc44'): AnnounceStep[] {
+  return [
+    {
+      id: 'stage_intro_name',
+      text: stageName,
+      duration: 100,
+      fillColor: accentColor,
+      glowColor: '#ffffff',
+      fontSize: 36,
+      scaleCurve: popIn,
+      alphaCurve: fadeInHoldOut,
+      sfxTriggerFrame: 8,
+      sfxId: 'round_call',
+      flash: { color: accentColor, alpha: 0.12, frames: 10 },
+      shockwaveRings: 2,
+    },
+  ];
+}

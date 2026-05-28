@@ -40,6 +40,13 @@ export {
 } from './overlays/overlayArcadeFlow.js';
 export type { ArcadeStats, RoundScoreBreakdown } from './overlays/overlayArcadeFlow.js';
 
+// Stage intro ceremony
+export {
+  drawStageIntro,
+  STAGE_INTRO_DURATION,
+  getStageAccent,
+} from './overlays/overlayStageIntro.js';
+
 // KO overlay + screen transitions (fade/wipe)
 export {
   drawCharacterKOOverlay,

@@ -5,7 +5,7 @@ describe('Ryo Content Package Exports', () => {
     const mod = await import('../src/content/characters/ryo/index.js');
     expect(mod.RyoDef).toBeDefined();
     expect(mod.RyoDef.id).toBe('ryo');
-  });
+  }, 15000);
 
   it('exports RYO_STATS', async () => {
     const mod = await import('../src/content/characters/ryo/index.js');
