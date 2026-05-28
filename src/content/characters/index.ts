@@ -72,6 +72,18 @@ export {
   type CancelRoute as KyoCancelRoute,
 } from './kyo/cancelPaths.js';
 
+// Kyo Frame Contract
+export {
+  KYO_ACTION_CONTRACTS,
+  getKyoFrameContractManifest,
+} from '../../core/kyoFrameContract.js';
+
+// Kyo Hit Effects
+export { KYO_HIT_EFFECTS } from './kyo/hitEffects/kyoHitEffects.js';
+
+// Kyo Audio
+export { registerKyoAudio } from './kyo/audio/kyoSampler.js';
+
 // Iori content package — prefixed to avoid type name collisions
 export {
   IORI_ATTACK_KEYS,
@@ -124,3 +136,15 @@ export {
   type CancelType as IoriCancelType,
   type CancelRoute as IoriCancelRoute,
 } from './iori/cancelPaths.js';
+
+// Iori Frame Contract
+export {
+  IORI_ACTION_CONTRACTS,
+  getIoriFrameContractManifest,
+} from '../../core/ioriFrameContract.js';
+
+// Iori Hit Effects
+export { IORI_HIT_EFFECTS } from './iori/hitEffects/ioriHitEffects.js';
+
+// Iori Audio
+export { registerIoriAudio } from './iori/audio/ioriSampler.js';
