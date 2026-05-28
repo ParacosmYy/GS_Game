@@ -174,7 +174,9 @@ export function createHighResRenderer(config: HighResRendererConfig): HighResRen
       if (!entry) return false;
       const { frames, palette, ticksPerFrame } = entry;
       if (frames.length === 0) return false;
-      const frameIdx = Math.floor(stateAge / ticksPerFrame) % frames.length;
+      const frameIdx = entry.frameDurations
+        ? getVariableFrameIndex(stateAge, entry.frameDurations)
+        : Math.floor(stateAge / ticksPerFrame) % frames.length;
       const frame = frames[frameIdx];
       const scale = config.targetDisplayHeight / frame.height;
       drawPixelFrame(ctx, frame, x, y, scale, facing, palette);
@@ -237,7 +239,9 @@ export function drawAfterimageFromRegistry(
   const { frames, ticksPerFrame } = entry;
   if (frames.length === 0) return false;
 
-  const frameIdx = Math.floor(stateAge / ticksPerFrame) % frames.length;
+  const frameIdx = entry.frameDurations
+    ? getVariableFrameIndex(stateAge, entry.frameDurations)
+    : Math.floor(stateAge / ticksPerFrame) % frames.length;
   const frame = frames[frameIdx];
   const scale = targetHeight / frame.height;
 
