@@ -225,7 +225,9 @@
   - VS对战画面渲染回归测试 (7 tests: 斜线擦除+文字+背景+6舞台)
   - Continue/GameOver画面渲染回归测试 (11 tests: 倒计时+光标+角色肖像)
   - SuperFlash超必杀闪光渲染回归测试 (11 tests: DM/SDM/HSDM+zoom)
-  - 测试总数 5270
+  - 回合分数明细弹窗渲染回归测试 (8 tests: normal+perfect+fade+边界)
+  - 4种屏幕转场动画回归测试 (15 tests: curtain/wipe/zoom/fade)
+  - 测试总数 5293
 - 新功能添加点：
   - smoke / ryo / combat / content 分层测试
   - frame contract 回归测试
