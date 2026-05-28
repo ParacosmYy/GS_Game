@@ -12,7 +12,7 @@
  *   - Blue: Pushbox
  *   - Yellow: Throw box
  *
- * Toggle: F5 = game only, F6 = game + MUGEN, F7 = MUGEN only
+ * Toggle: F2 cycles: off → game → both → mugen → off
  */
 
 import type { Fighter } from '../entities/fighter.js';
@@ -27,6 +27,7 @@ import {
   type MugenAttackBox,
 } from './sprites/shared/mugenHurtboxLoader.js';
 import { getCharacterConfig, resolveGenericMugenAction } from './sprites/shared/characterSpriteRegistry.js';
+import { calculateScaleFactor } from './sprites/shared/mugenHitboxLoader.js';
 
 // ===== Display modes =====
 
@@ -103,7 +104,6 @@ function drawMugenBoxes(
   ctx: CanvasRenderingContext2D,
   fighter: Fighter,
   camX: number,
-  scale: number,
 ): void {
   const config = getCharacterConfig(fighter.charId);
   if (!config || !hasManifestHurtboxes(config.mugenDir)) return;
@@ -114,6 +114,7 @@ function drawMugenBoxes(
   if (!actionNumber) return;
 
   const frameIndex = getFighterAnimFrameIndex(fighter);
+  const scale = calculateScaleFactor(config.targetDisplayHeight, 200);
 
   // Draw MUGEN hurtboxes
   const hurtboxes = getHurtboxesAtFrame(config.mugenDir, actionNumber, frameIndex);
@@ -149,7 +150,6 @@ export function drawHitboxOverlayEnhanced(
   ctx.save();
 
   const camX = camera.x;
-  const scale = 1.5; // MUGEN→game scale factor
 
   for (const f of fighters) {
     // Game hurtbox
@@ -186,7 +186,7 @@ export function drawHitboxOverlayEnhanced(
 
     // MUGEN overlay
     if (displayMode !== 'game') {
-      drawMugenBoxes(ctx, f, camX, scale);
+      drawMugenBoxes(ctx, f, camX);
     }
   }
 

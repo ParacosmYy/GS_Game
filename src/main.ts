@@ -68,6 +68,7 @@ import { triggerMoveName, tickMoveNameDisplay, drawMoveNameDisplay, resetMoveNam
 import { startCharIntro, tickCharIntro, drawCharIntro, resetCharIntro, isIntroActive } from './rendering/charIntro.js';
 import { triggerIntroQuotes, tickIntroQuotes, drawIntroQuotes, resetIntroQuotes } from './rendering/charIntroQuotes.js';
 import { drawHitboxOverlay } from './rendering/hitboxDebug.js';
+import { drawHitboxOverlayEnhanced, cycleHitboxDisplayMode, getHitboxDisplayMode, setHitboxDisplayMode, type HitboxDisplayMode } from './rendering/hitboxDebugMugen.js';
 import { initCharacterHitEffects } from './content/registerHitEffects.js';
 import { arcadeDifficulty, pickWinQuote as _pickWinQuote, generateArcadeOpponents, RIVAL_MAP } from './state/arcadeUtils.js';
 
@@ -1600,9 +1601,9 @@ function render(): void {
   }
   if (gs.isTrainingMode && (gs.phase === GamePhase.FIGHTING || gs.phase === GamePhase.KO)) {
     renderer.drawTrainingHUD(training, combatSystem.getComboCount(0), combatSystem.getComboDamage(0), tickRef.value, p1Char.moveList, p1.currentAttack as string ?? null, p1Cmd.getMotionProgress(tickRef.value));
-    // Hitbox/hurtbox debug visualization (F5 toggle)
+    // Hitbox/hurtbox debug visualization (F2 toggle, cycles game→both→mugen)
     if (training.showHitboxes) {
-      drawHitboxOverlay(ctx, [p1, p2], projectiles, camera);
+      drawHitboxOverlayEnhanced(ctx, [p1, p2], projectiles, camera);
     }
   }
 

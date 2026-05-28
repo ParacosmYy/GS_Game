@@ -14,6 +14,7 @@ import {
 } from '../src/state/trainingMode.js';
 import { Fighter } from '../src/entities/fighter.js';
 import { MAX_HEALTH } from '../src/core/constants.js';
+import { getHitboxDisplayMode, setHitboxDisplayMode } from '../src/rendering/hitboxDebugMugen.js';
 
 function createFighter(x = 400, facing = 1): Fighter {
   return new Fighter(x, '#ff6600', facing as 1 | -1);
@@ -221,6 +222,29 @@ describe('F-key shortcuts', () => {
     t.handleKeyShortcuts('F2', false, p1, p2);
     t.handleKeyShortcuts('F2', true, p1, p2);
     expect(t.showHitboxes).toBe(false);
+  });
+
+  it('F7 cycles hitbox display mode when hitboxes are shown', () => {
+    setHitboxDisplayMode('game');
+    // First enable hitboxes
+    t.handleKeyShortcuts('F2', true, p1, p2);
+    expect(t.showHitboxes).toBe(true);
+    expect(getHitboxDisplayMode()).toBe('game');
+    // Release debounce
+    t.handleKeyShortcuts('F7', false, p1, p2);
+    // Cycle to 'both'
+    t.handleKeyShortcuts('F7', true, p1, p2);
+    expect(getHitboxDisplayMode()).toBe('both');
+    // Release debounce
+    t.handleKeyShortcuts('F7', false, p1, p2);
+    // Cycle to 'mugen'
+    t.handleKeyShortcuts('F7', true, p1, p2);
+    expect(getHitboxDisplayMode()).toBe('mugen');
+    // Release debounce
+    t.handleKeyShortcuts('F7', false, p1, p2);
+    // Cycle back to 'game'
+    t.handleKeyShortcuts('F7', true, p1, p2);
+    expect(getHitboxDisplayMode()).toBe('game');
   });
 
   it('F3 toggles input history display', () => {

@@ -44,6 +44,10 @@ import {
   resolveGenericMugenAction,
 } from '../rendering/sprites/shared/characterSpriteRegistry.js';
 import {
+  resolveAndGetHurtboxes,
+  hurtboxToGameRect,
+} from '../rendering/sprites/shared/mugenHurtboxLoader.js';
+import {
   getCollisionAtFrame,
   phaseFrameToAbsolute,
   getActiveEvents,
@@ -481,6 +485,7 @@ export class Fighter {
   getBodyOverride(): { x: number; y: number; width: number; height: number } | null {
     if (this.attackPhase !== 'active' || !this.currentAttack) return null;
 
+    // 1. Legacy ATTACK_FRAMES body override
     const perFrame = ATTACK_FRAMES[this.currentAttack];
     if (perFrame && this.attackFrame < perFrame.length) {
       const frame = perFrame[this.attackFrame];
@@ -495,13 +500,67 @@ export class Fighter {
         };
       }
     }
+
+    // 2. MUGEN hitbox body override (from Clsn2 data during attacks)
+    const mugenBody = this.getMugenBodyOverride();
+    if (mugenBody) return mugenBody;
+
     return null;
+  }
+
+  /** Get MUGEN Clsn2 body override for current attack frame */
+  private getMugenBodyOverride(): { x: number; y: number; width: number; height: number } | null {
+    const config = getCharacterConfig(this.charId);
+    if (!config || !hasMugenHitboxes(config.mugenDir)) return null;
+
+    const actionNumber = resolveGenericMugenAction(
+      config, this.state, this.currentAttack, 0, this.facing,
+    );
+    if (!actionNumber) return null;
+
+    const bodyOverride = getMugenBodyOverride(config.mugenDir, actionNumber, this.attackFrame);
+    if (!bodyOverride) return null;
+
+    const scale = this.getMugenScaleFactor();
+    const base = this.getHurtbox();
+    return {
+      x: base.x + bodyOverride.ox * scale * this.facing,
+      y: base.y + bodyOverride.oy * scale,
+      width: base.width + bodyOverride.w * scale,
+      height: base.height + bodyOverride.h * scale,
+    };
   }
 
   /** Get the effective hurtbox (with body override if applicable, null if invincible) */
   getEffectiveHurtbox(): { x: number; y: number; width: number; height: number } | null {
     if (this.invincible) return null;
-    return this.getBodyOverride() ?? this.getHurtbox();
+    const override = this.getBodyOverride();
+    if (override) return override;
+    // MUGEN hurtbox fallback for display
+    const mugenHurt = this.getMugenHurtbox();
+    if (mugenHurt) return mugenHurt;
+    return this.getHurtbox();
+  }
+
+  /** Get MUGEN manifest hurtbox for current state (single merged rect) */
+  private getMugenHurtbox(): { x: number; y: number; width: number; height: number } | null {
+    const config = getCharacterConfig(this.charId);
+    if (!config) return null;
+    const scale = this.getMugenScaleFactor();
+    const hurtboxes = resolveAndGetHurtboxes(
+      this.charId, this.state, this.currentAttack, 0, this.facing,
+      this.stateAge,
+    );
+    if (!hurtboxes || hurtboxes.length === 0) return null;
+    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+    for (const hb of hurtboxes) {
+      const rect = hurtboxToGameRect(hb, this.x, this.y, this.facing, scale);
+      minX = Math.min(minX, rect.x);
+      minY = Math.min(minY, rect.y);
+      maxX = Math.max(maxX, rect.x + rect.width);
+      maxY = Math.max(maxY, rect.y + rect.height);
+    }
+    return { x: minX, y: minY, width: maxX - minX, height: maxY - minY };
   }
 
   /** Reset cancel flags — called from multiple state transitions */

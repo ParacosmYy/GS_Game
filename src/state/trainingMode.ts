@@ -8,6 +8,7 @@ import { FRAME_DATA, STAGE_WIDTH, STAGE_GROUND_Y, MAX_HEALTH } from '../core/con
 import type { AttackType, PlayerInput } from '../core/types.js';
 import { Fighter } from '../entities/fighter.js';
 import type { ResolvedInput } from '../input/inputResolver.js';
+import { cycleHitboxDisplayMode, setHitboxDisplayMode } from '../rendering/hitboxDebugMugen.js';
 
 // ===== Dummy Behavior =====
 export enum DummyBehavior {
@@ -626,6 +627,9 @@ export class TrainingModeState {
       case 'F2':
         this.fKeyDebounce[code] = true;
         this.showHitboxes = !this.showHitboxes;
+        if (this.showHitboxes) {
+          setHitboxDisplayMode('game');
+        }
         return true;
 
       case 'F3':
@@ -641,6 +645,13 @@ export class TrainingModeState {
       case 'F5':
         this.fKeyDebounce[code] = true;
         this.showMoveList = !this.showMoveList;
+        return true;
+
+      case 'F7':
+        this.fKeyDebounce[code] = true;
+        if (this.showHitboxes) {
+          cycleHitboxDisplayMode();
+        }
         return true;
 
       default:
