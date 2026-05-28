@@ -2,7 +2,7 @@
  * Content Loader — Unified character content access
  *
  * Provides a single function to load all content for a given character.
- * Currently supports 'ryo' and 'kyo'; will expand as more characters get content packages.
+ * Supports: ryo, kyo, iori, terry, kim
  */
 import type { FeedbackTier } from '../core/feedbackManifest.js';
 import {
@@ -43,6 +43,28 @@ import {
   getIoriAttackFrames,
   getIoriFeedbackTiers,
 } from './characters/iori/index.js';
+import {
+  getTerryFrameData,
+  TERRY_ATTACK_KEYS,
+  TERRY_MOVE_LIST,
+  TERRY_AVAILABLE_ACTIONS,
+  TERRY_ANIMATION_META,
+  getTerryAnimationNames,
+  getTerryHitboxOffsets,
+  getTerryAttackFrames,
+  getTerryFeedbackTiers,
+} from './characters/terry/index.js';
+import {
+  getKimFrameData,
+  KIM_ATTACK_KEYS,
+  KIM_MOVE_LIST,
+  KIM_AVAILABLE_ACTIONS,
+  KIM_ANIMATION_META,
+  getKimAnimationNames,
+  getKimHitboxOffsets,
+  getKimAttackFrames,
+  getKimFeedbackTiers,
+} from './characters/kim/index.js';
 import { generateKyoDimensionReport } from '../tools/kyoCompletenessReport.js';
 import { generateIoriDimensionReport } from '../tools/ioriCompletenessReport.js';
 
@@ -81,6 +103,10 @@ export function loadCharacterContent(charId: string): CharacterContent {
       return loadKyoContent();
     case 'iori':
       return loadIoriContent();
+    case 'terry':
+      return loadTerryContent();
+    case 'kim':
+      return loadKimContent();
     default:
       throw new Error(`Unknown character: ${charId}`);
   }
@@ -88,12 +114,12 @@ export function loadCharacterContent(charId: string): CharacterContent {
 
 /** Check if a character has a content package */
 export function hasCharacterContent(charId: string): boolean {
-  return charId === 'ryo' || charId === 'kyo' || charId === 'iori';
+  return ['ryo', 'kyo', 'iori', 'terry', 'kim'].includes(charId);
 }
 
 /** List all characters with content packages */
 export function getAvailableCharacterIds(): string[] {
-  return ['ryo', 'kyo', 'iori'];
+  return ['ryo', 'kyo', 'iori', 'terry', 'kim'];
 }
 
 function loadRyoContent(): CharacterContent {
@@ -141,5 +167,37 @@ function loadIoriContent(): CharacterContent {
     attackFrames: getIoriAttackFrames(),
     feedback: getIoriFeedbackTiers(),
     report: generateIoriDimensionReport(),
+  };
+}
+
+function loadTerryContent(): CharacterContent {
+  return {
+    data: { id: 'terry', name: 'Terry Bogard', nameCn: '泰利·博加德', color: '#E03020' },
+    attacks: getTerryFrameData(),
+    attackKeys: TERRY_ATTACK_KEYS,
+    commands: TERRY_MOVE_LIST,
+    availableActions: TERRY_AVAILABLE_ACTIONS,
+    animations: TERRY_ANIMATION_META,
+    animSequenceNames: getTerryAnimationNames(),
+    hitboxes: getTerryHitboxOffsets(),
+    attackFrames: getTerryAttackFrames(),
+    feedback: getTerryFeedbackTiers(),
+    report: null,
+  };
+}
+
+function loadKimContent(): CharacterContent {
+  return {
+    data: { id: 'kim', name: 'Kim Kaphwan', nameCn: '金甲唤', color: '#FFFFFF' },
+    attacks: getKimFrameData(),
+    attackKeys: KIM_ATTACK_KEYS,
+    commands: KIM_MOVE_LIST,
+    availableActions: KIM_AVAILABLE_ACTIONS,
+    animations: KIM_ANIMATION_META,
+    animSequenceNames: getKimAnimationNames(),
+    hitboxes: getKimHitboxOffsets(),
+    attackFrames: getKimAttackFrames(),
+    feedback: getKimFeedbackTiers(),
+    report: null,
   };
 }
