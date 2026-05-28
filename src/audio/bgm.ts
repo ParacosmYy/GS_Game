@@ -1,18 +1,7 @@
 /**
  * BGM — KOF2002-style chiptune battle music
  * Stage-aware tracks with rock/metal energy
- * v4: Improved melody composition, rhythmic variation, crossfade, title lead
- *
- * Improvements over v3:
- *   - Shamisen-like plucked timbre for Temple (short attack, quick decay, koto arpeggios)
- *   - Erhu-like sustained melody for China (vibrato via pitch modulation)
- *   - Industrial percussion layer for Factory (metallic clanks, darker atmosphere)
- *   - Blues bent notes + walking bass for Street
- *   - Ominous choir-like pad for Orochi (detuned oscillators, diminished runs)
- *   - Fill patterns at phrase boundaries (every 8 bars)
- *   - Dynamic hi-hat open/closed variation + snare ghost notes
- *   - Memorable title lead phrase (4-bar repeating) with chord progression + dynamic range
- *   - Crossfade between stages (2-second fade)
+ * v5: Synthesis primitives extracted to bgmSynthesis.ts
  *
  * Stage scales:
  *   temple  — C major pentatonic (C-D-E-G-A), square lead, bell accents, shamisen/koto
@@ -21,6 +10,27 @@
  *   street  — A blues (A-C-D-Eb-E-G), distorted saw lead, blues bends, walking bass
  *   orochi  — diminished scale (C-D-Eb-F#-G-A-Bb-B), square+lowpass, choir pad, dark
  */
+
+import {
+  type SynthCtx,
+  playKick as _playKick,
+  playSnare as _playSnare,
+  playHihat as _playHihat,
+  playCrash as _playCrash,
+  playBass as _playBass,
+  playGuitarLead as _playGuitarLead,
+  playSoftLead as _playSoftLead,
+  playPowerChord as _playPowerChord,
+  playPad as _playPad,
+  playSubPad as _playSubPad,
+  playTom as _playTom,
+  playArpFill as _playArpFill,
+  playTransitionFill as _playTransitionFill,
+  playMetalHit as _playMetalHit,
+  playGongAccent as _playGongAccent,
+  playBellAccent as _playBellAccent,
+  playRim as _playRim,
+} from './bgmSynthesis.js';
 
 export class BGMPlayer {
   private ctx: AudioContext | null = null;
@@ -38,6 +48,8 @@ export class BGMPlayer {
   private crossfadeGain: GainNode | null = null;
   private crossfadeTarget: string = '';
   private crossfadeActive = false;
+
+  private synth(): SynthCtx { return { ctx: this.ctx!, masterGain: this.masterGain! }; }
 
   /** Create a procedurally generated impulse response for reverb. */
   private createReverbIR(duration: number = 1.5, decay: number = 2.0): AudioBuffer {
@@ -1451,349 +1463,92 @@ export class BGMPlayer {
     harm.start(time); harm.stop(time + 0.22);
   }
 
-  // ─── Core Synthesis Primitives ──
+  // ─── Core Synthesis Primitives (delegated to bgmSynthesis.ts) ──
 
   private playKick(time: number, vol: number): void {
     if (!this.ctx || !this.masterGain) return;
-    const osc = this.ctx.createOscillator();
-    const gain = this.ctx.createGain();
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(180, time);
-    osc.frequency.exponentialRampToValueAtTime(25, time + 0.1);
-    gain.gain.setValueAtTime(vol, time);
-    gain.gain.exponentialRampToValueAtTime(0.001, time + 0.2);
-    osc.connect(gain).connect(this.masterGain);
-    osc.start(time); osc.stop(time + 0.22);
-    const click = this.ctx.createOscillator();
-    const cg = this.ctx.createGain();
-    click.type = 'square';
-    click.frequency.setValueAtTime(800, time);
-    click.frequency.exponentialRampToValueAtTime(100, time + 0.02);
-    cg.gain.setValueAtTime(vol * 0.3, time);
-    cg.gain.exponentialRampToValueAtTime(0.001, time + 0.03);
-    click.connect(cg).connect(this.masterGain);
-    click.start(time); click.stop(time + 0.05);
-    const sub = this.ctx.createOscillator();
-    const sg = this.ctx.createGain();
-    sub.type = 'sine';
-    sub.frequency.setValueAtTime(60, time);
-    sub.frequency.exponentialRampToValueAtTime(15, time + 0.15);
-    sg.gain.setValueAtTime(vol * 0.4, time);
-    sg.gain.exponentialRampToValueAtTime(0.001, time + 0.15);
-    sub.connect(sg).connect(this.masterGain);
-    sub.start(time); sub.stop(time + 0.18);
+    _playKick(this.synth(), time, vol);
   }
 
   private playSnare(time: number, vol: number): void {
     if (!this.ctx || !this.masterGain) return;
-    const size = Math.floor(this.ctx.sampleRate * 0.08);
-    const buf = this.ctx.createBuffer(1, size, this.ctx.sampleRate);
-    const data = buf.getChannelData(0);
-    for (let i = 0; i < size; i++) data[i] = Math.random() * 2 - 1;
-    const noise = this.ctx.createBufferSource();
-    noise.buffer = buf;
-    const ng = this.ctx.createGain();
-    ng.gain.setValueAtTime(vol, time);
-    ng.gain.exponentialRampToValueAtTime(0.001, time + 0.12);
-    const bp = this.ctx.createBiquadFilter();
-    bp.type = 'bandpass';
-    bp.frequency.value = 3500;
-    bp.Q.value = 0.7;
-    noise.connect(bp).connect(ng).connect(this.masterGain);
-    noise.start(time); noise.stop(time + 0.15);
-    const osc = this.ctx.createOscillator();
-    const og = this.ctx.createGain();
-    osc.type = 'triangle';
-    osc.frequency.setValueAtTime(200, time);
-    osc.frequency.exponentialRampToValueAtTime(80, time + 0.04);
-    og.gain.setValueAtTime(vol * 0.6, time);
-    og.gain.exponentialRampToValueAtTime(0.001, time + 0.06);
-    osc.connect(og).connect(this.masterGain);
-    osc.start(time); osc.stop(time + 0.08);
+    _playSnare(this.synth(), time, vol);
   }
 
   private playHihat(time: number, vol: number, open: boolean): void {
     if (!this.ctx || !this.masterGain) return;
-    const dur = open ? 0.12 : 0.035;
-    const size = Math.floor(this.ctx.sampleRate * dur);
-    const buf = this.ctx.createBuffer(1, size, this.ctx.sampleRate);
-    const data = buf.getChannelData(0);
-    for (let i = 0; i < size; i++) data[i] = Math.random() * 2 - 1;
-    const noise = this.ctx.createBufferSource();
-    noise.buffer = buf;
-    const gain = this.ctx.createGain();
-    gain.gain.setValueAtTime(vol, time);
-    gain.gain.exponentialRampToValueAtTime(0.001, time + dur);
-    const hp = this.ctx.createBiquadFilter();
-    hp.type = 'highpass';
-    hp.frequency.value = open ? 7000 : 9500;
-    noise.connect(hp).connect(gain).connect(this.masterGain);
-    noise.start(time); noise.stop(time + dur + 0.01);
+    _playHihat(this.synth(), time, vol, open);
   }
 
   private playCrash(time: number, vol: number = 0.12): void {
     if (!this.ctx || !this.masterGain) return;
-    const size = Math.floor(this.ctx.sampleRate * 0.4);
-    const buf = this.ctx.createBuffer(1, size, this.ctx.sampleRate);
-    const data = buf.getChannelData(0);
-    for (let i = 0; i < size; i++) data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (size * 0.3));
-    const noise = this.ctx.createBufferSource();
-    noise.buffer = buf;
-    const gain = this.ctx.createGain();
-    gain.gain.setValueAtTime(vol, time);
-    gain.gain.exponentialRampToValueAtTime(0.001, time + 0.35);
-    const hp = this.ctx.createBiquadFilter();
-    hp.type = 'highpass';
-    hp.frequency.value = 5000;
-    noise.connect(hp).connect(gain).connect(this.masterGain);
-    noise.start(time); noise.stop(time + 0.4);
+    _playCrash(this.synth(), time, vol);
   }
 
   private playBass(time: number, freq: number, vol: number): void {
-    if (!this.ctx || !this.masterGain || freq === 0) return;
-    const osc = this.ctx.createOscillator();
-    const gain = this.ctx.createGain();
-    osc.type = 'sawtooth';
-    osc.frequency.value = freq;
-    gain.gain.setValueAtTime(0, time);
-    gain.gain.linearRampToValueAtTime(vol, time + 0.005);
-    gain.gain.setValueAtTime(vol * 0.85, time + 0.08);
-    gain.gain.exponentialRampToValueAtTime(0.001, time + 0.22);
-    const lp = this.ctx.createBiquadFilter();
-    lp.type = 'lowpass';
-    lp.frequency.value = 400;
-    lp.Q.value = 2;
-    osc.connect(lp).connect(gain).connect(this.masterGain);
-    osc.start(time); osc.stop(time + 0.25);
-    const sub = this.ctx.createOscillator();
-    const sg = this.ctx.createGain();
-    sub.type = 'sine';
-    sub.frequency.value = freq / 2;
-    sg.gain.setValueAtTime(0, time);
-    sg.gain.linearRampToValueAtTime(vol * 0.3, time + 0.008);
-    sg.gain.exponentialRampToValueAtTime(0.001, time + 0.2);
-    sub.connect(sg).connect(this.masterGain);
-    sub.start(time); sub.stop(time + 0.22);
+    if (!this.ctx || !this.masterGain) return;
+    _playBass(this.synth(), time, freq, vol);
   }
 
   private playGuitarLead(time: number, freq: number, vol: number = 0.06): void {
     if (!this.ctx || !this.masterGain) return;
-    const saw = this.ctx.createOscillator();
-    const sqr = this.ctx.createOscillator();
-    const gain = this.ctx.createGain();
-    saw.type = 'sawtooth';
-    saw.frequency.value = freq;
-    sqr.type = 'square';
-    sqr.frequency.value = freq;
-    const lfo = this.ctx.createOscillator();
-    const lfoG = this.ctx.createGain();
-    lfo.type = 'sine';
-    lfo.frequency.value = 5.5;
-    lfoG.gain.value = 4;
-    lfo.connect(lfoG);
-    lfoG.connect(saw.frequency);
-    lfoG.connect(sqr.frequency);
-    lfo.start(time); lfo.stop(time + 0.2);
-    gain.gain.setValueAtTime(0, time);
-    gain.gain.linearRampToValueAtTime(vol, time + 0.008);
-    gain.gain.setValueAtTime(vol * 0.75, time + 0.04);
-    gain.gain.exponentialRampToValueAtTime(0.001, time + 0.17);
-    const lp = this.ctx.createBiquadFilter();
-    lp.type = 'lowpass';
-    lp.frequency.value = 2500;
-    lp.Q.value = 1;
-    const gGain = this.ctx.createGain();
-    gGain.gain.value = 0.6;
-    saw.connect(gGain);
-    sqr.connect(gGain);
-    gGain.connect(lp).connect(gain).connect(this.masterGain);
-    saw.start(time); saw.stop(time + 0.2);
-    sqr.start(time); sqr.stop(time + 0.2);
+    _playGuitarLead(this.synth(), time, freq, vol);
   }
 
   private playSoftLead(time: number, freq: number, vol: number): void {
     if (!this.ctx || !this.masterGain) return;
-    const osc = this.ctx.createOscillator();
-    const gain = this.ctx.createGain();
-    osc.type = 'sine';
-    osc.frequency.value = freq;
-    gain.gain.setValueAtTime(0, time);
-    gain.gain.linearRampToValueAtTime(vol, time + 0.05);
-    gain.gain.setValueAtTime(vol * 0.8, time + 0.15);
-    gain.gain.exponentialRampToValueAtTime(0.001, time + 0.35);
-    osc.connect(gain).connect(this.masterGain);
-    osc.start(time); osc.stop(time + 0.38);
-    const harm = this.ctx.createOscillator();
-    const hg = this.ctx.createGain();
-    harm.type = 'triangle';
-    harm.frequency.value = freq * 2;
-    hg.gain.setValueAtTime(0, time);
-    hg.gain.linearRampToValueAtTime(vol * 0.15, time + 0.08);
-    hg.gain.exponentialRampToValueAtTime(0.001, time + 0.25);
-    harm.connect(hg).connect(this.masterGain);
-    harm.start(time); harm.stop(time + 0.28);
+    _playSoftLead(this.synth(), time, freq, vol);
   }
 
   private playPowerChord(time: number, freqs: number[], vol: number = 0.03): void {
     if (!this.ctx || !this.masterGain) return;
-    for (const freq of freqs) {
-      const osc = this.ctx.createOscillator();
-      const gain = this.ctx.createGain();
-      osc.type = 'sawtooth';
-      osc.frequency.value = freq;
-      gain.gain.setValueAtTime(0, time);
-      gain.gain.linearRampToValueAtTime(vol, time + 0.01);
-      gain.gain.setValueAtTime(vol * 0.85, time + 0.1);
-      gain.gain.exponentialRampToValueAtTime(0.001, time + 0.25);
-      const lp = this.ctx.createBiquadFilter();
-      lp.type = 'lowpass';
-      lp.frequency.value = 600;
-      osc.connect(lp).connect(gain).connect(this.masterGain);
-      osc.start(time); osc.stop(time + 0.28);
-    }
+    _playPowerChord(this.synth(), time, freqs, vol);
   }
 
   private playPad(time: number, freqs: number[], duration: number = 0.6): void {
     if (!this.ctx || !this.masterGain) return;
-    for (const freq of freqs) {
-      const osc = this.ctx.createOscillator();
-      const gain = this.ctx.createGain();
-      osc.type = 'sine';
-      osc.frequency.value = freq;
-      gain.gain.setValueAtTime(0, time);
-      gain.gain.linearRampToValueAtTime(0.03, time + duration * 0.25);
-      gain.gain.setValueAtTime(0.03, time + duration * 0.6);
-      gain.gain.linearRampToValueAtTime(0, time + duration);
-      osc.connect(gain).connect(this.masterGain);
-      osc.start(time); osc.stop(time + duration + 0.05);
-    }
+    _playPad(this.synth(), time, freqs, duration);
   }
 
   private playSubPad(time: number, freq: number, duration: number): void {
     if (!this.ctx || !this.masterGain) return;
-    const osc = this.ctx.createOscillator();
-    const gain = this.ctx.createGain();
-    osc.type = 'sine';
-    osc.frequency.value = freq;
-    gain.gain.setValueAtTime(0, time);
-    gain.gain.linearRampToValueAtTime(0.04, time + duration * 0.2);
-    gain.gain.setValueAtTime(0.04, time + duration * 0.7);
-    gain.gain.linearRampToValueAtTime(0, time + duration);
-    osc.connect(gain).connect(this.masterGain);
-    osc.start(time); osc.stop(time + duration + 0.1);
+    _playSubPad(this.synth(), time, freq, duration);
   }
 
   private playTom(time: number, freq: number): void {
     if (!this.ctx || !this.masterGain) return;
-    const osc = this.ctx.createOscillator();
-    const gain = this.ctx.createGain();
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(freq, time);
-    osc.frequency.exponentialRampToValueAtTime(freq * 0.4, time + 0.12);
-    gain.gain.setValueAtTime(0.2, time);
-    gain.gain.exponentialRampToValueAtTime(0.001, time + 0.15);
-    osc.connect(gain).connect(this.masterGain);
-    osc.start(time); osc.stop(time + 0.18);
+    _playTom(this.synth(), time, freq);
   }
 
   private playArpFill(time: number, vol: number = 0.05): void {
     if (!this.ctx || !this.masterGain) return;
-    const notes = [659.3, 784, 880, 1046.5, 1174.7];
-    notes.forEach((freq, i) => {
-      const osc = this.ctx!.createOscillator();
-      const gain = this.ctx!.createGain();
-      osc.type = 'square';
-      osc.frequency.value = freq;
-      const t = time + i * 0.035;
-      gain.gain.setValueAtTime(vol, t);
-      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.08);
-      osc.connect(gain).connect(this.masterGain!);
-      osc.start(t); osc.stop(t + 0.1);
-    });
+    _playArpFill(this.synth(), time, vol);
   }
 
   /** Section-transition fill: ascending arp (triangle wave, quick notes). */
   private playTransitionFill(time: number): void {
     if (!this.ctx || !this.masterGain) return;
-    const notes = [523.3, 659.3, 784, 1046.5];
-    const vol = 0.04;
-    notes.forEach((freq, i) => {
-      const osc = this.ctx!.createOscillator();
-      const gain = this.ctx!.createGain();
-      osc.type = 'triangle';
-      osc.frequency.value = freq;
-      const t = time + i * 0.05;
-      gain.gain.setValueAtTime(0, t);
-      gain.gain.linearRampToValueAtTime(vol, t + 0.005);
-      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.06);
-      osc.connect(gain).connect(this.masterGain!);
-      osc.start(t); osc.stop(t + 0.07);
-    });
+    _playTransitionFill(this.synth(), time);
   }
 
   private playMetalHit(time: number): void {
     if (!this.ctx || !this.masterGain) return;
-    const osc = this.ctx.createOscillator();
-    const gain = this.ctx.createGain();
-    osc.type = 'square';
-    osc.frequency.setValueAtTime(120, time);
-    osc.frequency.exponentialRampToValueAtTime(40, time + 0.15);
-    gain.gain.setValueAtTime(0.06, time);
-    gain.gain.exponentialRampToValueAtTime(0.001, time + 0.2);
-    osc.connect(gain).connect(this.masterGain);
-    osc.start(time); osc.stop(time + 0.22);
+    _playMetalHit(this.synth(), time);
   }
 
   private playGongAccent(time: number): void {
     if (!this.ctx || !this.masterGain) return;
-    const osc = this.ctx.createOscillator();
-    const gain = this.ctx.createGain();
-    osc.type = 'sine';
-    osc.frequency.value = 180;
-    gain.gain.setValueAtTime(0.08, time);
-    gain.gain.exponentialRampToValueAtTime(0.001, time + 0.6);
-    const bp = this.ctx.createBiquadFilter();
-    bp.type = 'bandpass';
-    bp.frequency.value = 200;
-    bp.Q.value = 5;
-    osc.connect(bp).connect(gain).connect(this.masterGain);
-    osc.start(time); osc.stop(time + 0.65);
+    _playGongAccent(this.synth(), time);
   }
 
   private playBellAccent(time: number, vol: number = 0.04): void {
     if (!this.ctx || !this.masterGain) return;
-    const osc = this.ctx.createOscillator();
-    const gain = this.ctx.createGain();
-    osc.type = 'sine';
-    osc.frequency.value = 880;
-    gain.gain.setValueAtTime(vol, time);
-    gain.gain.exponentialRampToValueAtTime(0.001, time + 0.5);
-    const osc2 = this.ctx.createOscillator();
-    const gain2 = this.ctx.createGain();
-    osc2.type = 'sine';
-    osc2.frequency.value = 1760;
-    gain2.gain.setValueAtTime(vol * 0.38, time);
-    gain2.gain.exponentialRampToValueAtTime(0.001, time + 0.3);
-    osc.connect(gain).connect(this.masterGain);
-    osc2.connect(gain2).connect(this.masterGain);
-    osc.start(time); osc.stop(time + 0.55);
-    osc2.start(time); osc2.stop(time + 0.35);
+    _playBellAccent(this.synth(), time, vol);
   }
 
   private playRim(time: number, vol: number): void {
     if (!this.ctx || !this.masterGain) return;
-    const osc = this.ctx.createOscillator();
-    const gain = this.ctx.createGain();
-    osc.type = 'triangle';
-    osc.frequency.setValueAtTime(800, time);
-    osc.frequency.exponentialRampToValueAtTime(300, time + 0.02);
-    gain.gain.setValueAtTime(vol, time);
-    gain.gain.exponentialRampToValueAtTime(0.001, time + 0.03);
-    const hp = this.ctx.createBiquadFilter();
-    hp.type = 'highpass';
-    hp.frequency.value = 1500;
-    osc.connect(hp).connect(gain).connect(this.masterGain);
-    osc.start(time); osc.stop(time + 0.05);
+    _playRim(this.synth(), time, vol);
   }
 }
 
