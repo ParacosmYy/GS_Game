@@ -277,6 +277,39 @@ const WF3: number[][] = WF0.map(row => [...row]);
 const WF4: number[][] = WF1.map(row => [...row]);
 const WF5: number[][] = WF2.map(row => [...row]);
 
+// WF3: opposite leg forward — shift right leg 1px outward, left leg 1px inward
+for (let y = 44; y < 56; y++) {
+  // Right leg: shift outward (right)
+  for (let x = 42; x >= 36; x--) {
+    if (WF3[y][x] !== 0) {
+      if (x + 1 < W) WF3[y][x + 1] = WF3[y][x];
+    }
+  }
+}
+// WF4: passing phase — narrow stance, shift both legs inward 1px
+for (let y = 44; y < 56; y++) {
+  for (let x = W - 2; x >= 0; x--) {
+    if (WF4[y][x] !== 0 && x > 4 && x < W - 4) {
+      // Only shift leg pixels (shoe colors k/l/m/n = indices 20-23 and 13)
+      const c = WF4[y][x];
+      if (c === 20 || c === 21 || c === 22 || c === 23 || c === 13) {
+        if (x > 24) {
+          // Right-side leg: shift left
+          WF4[y][x - 1] = WF4[y][x];
+        }
+      }
+    }
+  }
+}
+// WF5: right leg extended — shift right leg 1px outward
+for (let y = 44; y < 56; y++) {
+  for (let x = 42; x >= 36; x--) {
+    if (WF5[y][x] !== 0) {
+      if (x + 1 < W) WF5[y][x + 1] = WF5[y][x];
+    }
+  }
+}
+
 export const KYO_WALK_FORWARD_FRAMES: PixelFrame[] = [WF0, WF1, WF2, WF3, WF4, WF5].map(pixels => ({
   width: W,
   height: 72,
@@ -433,6 +466,42 @@ const WB2: number[][] = WB0.map(row => [...row]);
 const WB3: number[][] = WB1.map(row => [...row]);
 const WB4: number[][] = WB0.map(row => [...row]);
 const WB5: number[][] = WB1.map(row => [...row]);
+
+// WB2: opposite leg retreat — shift right leg 1px inward (pulling back)
+for (let y = 44; y < 56; y++) {
+  for (let x = 42; x >= 36; x--) {
+    if (WB2[y][x] !== 0 && x + 1 < W) {
+      WB2[y][x + 1] = WB2[y][x];
+    }
+  }
+}
+// WB3: passing phase — narrow stance
+for (let y = 44; y < 56; y++) {
+  for (let x = W - 2; x >= 4; x--) {
+    if (WB3[y][x] !== 0) {
+      const c = WB3[y][x];
+      if (c === 20 || c === 21 || c === 22 || c === 23 || c === 13) {
+        if (x > 24 && x - 1 >= 0) WB3[y][x - 1] = WB3[y][x];
+      }
+    }
+  }
+}
+// WB4: left leg pulling back — shift left side outward
+for (let y = 44; y < 56; y++) {
+  for (let x = 42; x >= 36; x--) {
+    if (WB4[y][x] !== 0 && x + 1 < W) {
+      WB4[y][x + 1] = WB4[y][x];
+    }
+  }
+}
+// WB5: wider retreat stance
+for (let y = 44; y < 56; y++) {
+  for (let x = 36; x < 42; x++) {
+    if (WB5[y][x] !== 0 && x + 1 < W) {
+      WB5[y][x + 1] = WB5[y][x];
+    }
+  }
+}
 
 export const KYO_WALK_BACKWARD_FRAMES: PixelFrame[] = [WB0, WB1, WB2, WB3, WB4, WB5].map(pixels => ({
   width: W,
