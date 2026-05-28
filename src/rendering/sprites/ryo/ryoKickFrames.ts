@@ -9,13 +9,9 @@
  */
 
 import { RYO_IDLE_FRAMES } from './ryoIdleFrames.js';
+import { type SourcePixelFrame as PixelFrame } from "../shared/baseHighResRenderer.js";
+export type { PixelFrame };
 
-export interface PixelFrame {
-  width: number;
-  height: number;
-  palette: Record<number, string>;
-  pixels: number[][];
-}
 
 const PALETTE: Record<number, string> = {
   0: 'transparent',

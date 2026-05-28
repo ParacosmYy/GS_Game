@@ -15,14 +15,9 @@
  */
 
 import { RYO_CROUCH_FRAMES } from './ryoCrouchFrames.js';
+import { type SourcePixelFrame as PixelFrame } from "../shared/baseHighResRenderer.js";
+export type { PixelFrame };
 
-export interface PixelFrame {
-  width: number;
-  height: number;
-  palette: Record<number, string>;
-  pixels: number[][];
-  anchor: { x: number; y: number };
-}
 
 /* ---------- shared palette ---------- */
 const PALETTE: Record<number, string> = {

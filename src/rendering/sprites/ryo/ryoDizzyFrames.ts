@@ -1,3 +1,5 @@
+import { type SourcePixelFrame as PixelFrame } from "../shared/baseHighResRenderer.js";
+export type { PixelFrame };
 /**
  * Ryo Sakazaki dizzy/stunned animation — KOF2002-style pixel frames
  *
@@ -47,13 +49,6 @@
  *   DZ_F3: Center recovery — almost recovering, then back to F0
  */
 
-export interface PixelFrame {
-  width: number;
-  height: number;
-  palette: Record<number, string>;
-  pixels: number[][]; // height rows x width cols, 0 = transparent
-  anchor: { x: number; y: number };
-}
 
 /* ---------- shared palette ---------- */
 const PALETTE: Record<number, string> = {

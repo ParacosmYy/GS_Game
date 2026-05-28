@@ -1,3 +1,5 @@
+import { type SourcePixelFrame as PixelFrame } from "../shared/baseHighResRenderer.js";
+export type { PixelFrame };
 /**
  * Ryo Sakazaki win/victory pose animation — KOF2002-quality pixel frames
  *
@@ -47,13 +49,6 @@
  *   WN_F3: Hold + subtle breathing — slight shoulder shift (1px)
  */
 
-export interface PixelFrame {
-  width: number;
-  height: number;
-  palette: Record<number, string>;
-  pixels: number[][]; // height rows x width cols, 0 = transparent
-  anchor: { x: number; y: number };
-}
 
 /* ---------- shared palette ---------- */
 const PALETTE: Record<number, string> = {

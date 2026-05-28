@@ -1,3 +1,5 @@
+import { type SourcePixelFrame as PixelFrame } from "../shared/baseHighResRenderer.js";
+export type { PixelFrame };
 /**
  * Ryo Sakazaki damage animation — SNK-style pixel frames (96x144)
  *
@@ -35,13 +37,6 @@
  * 23  #a02020  headband dark red
  */
 
-export interface PixelFrame {
-  width: number;
-  height: number;
-  palette: Record<number, string>;
-  pixels: number[][]; // height rows × width cols, 0 = transparent
-  anchor: { x: number; y: number };
-}
 
 /* ---------- shared palette ---------- */
 const PALETTE: Record<number, string> = {

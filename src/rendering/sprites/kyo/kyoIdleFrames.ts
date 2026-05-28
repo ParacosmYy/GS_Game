@@ -1,3 +1,5 @@
+import { type SourcePixelFrame as PixelFrame } from "../shared/baseHighResRenderer.js";
+export type { PixelFrame };
 /**
  * Kyo Kusanagi idle animation — KOF2002-quality pixel frames
  *
@@ -52,13 +54,6 @@
  *   Frame 5: return to neutral
  */
 
-export interface PixelFrame {
-  width: number;
-  height: number;
-  palette: Record<number, string>;
-  pixels: number[][];
-  anchor: { x: number; y: number };
-}
 
 /* ---------- shared palette ---------- */
 export const KYO_PALETTE: Record<number, string> = {

@@ -1,3 +1,5 @@
+import { type SourcePixelFrame as PixelFrame } from "../shared/baseHighResRenderer.js";
+export type { PixelFrame };
 /**
  * Ryo Sakazaki throw animation — SNK-style pixel frames (96x144)
  *
@@ -14,13 +16,6 @@
  * Light source: upper-left. Outlines: 1=deep, 2=standard.
  */
 
-export interface PixelFrame {
-  width: number;
-  height: number;
-  palette: Record<number, string>;
-  pixels: number[][];
-  anchor: { x: number; y: number };
-}
 
 const PALETTE: Record<number, string> = {
   0: 'transparent',

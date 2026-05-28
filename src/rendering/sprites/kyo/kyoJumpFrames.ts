@@ -1,3 +1,5 @@
+import { type SourcePixelFrame as PixelFrame } from "../shared/baseHighResRenderer.js";
+export type { PixelFrame };
 /**
  * Kyo Kusanagi jump animation — KOF2002-quality pixel frames
  *
@@ -17,13 +19,6 @@
  *   l=#2a2840  m=#3a3858  n=#0a0a0a
  */
 
-export interface PixelFrame {
-  width: number;
-  height: number;
-  palette: Record<number, string>;
-  pixels: number[][];
-  anchor: { x: number; y: number };
-}
 
 /* ---------- shared palette ---------- */
 const PALETTE: Record<number, string> = {

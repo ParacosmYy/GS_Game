@@ -35,6 +35,8 @@ export interface SourcePixelFrame {
   height: number;
   palette: Record<number, string>;
   pixels: number[][];
+  /** Optional custom anchor; defaults to { x: width/2, y: height } */
+  anchor?: { x: number; y: number };
 }
 
 // ===== Conversion =====
@@ -52,7 +54,7 @@ export function convertFrame(frame: SourcePixelFrame): { frame: PixelFrame; pale
     width,
     height,
     pixels,
-    anchor: { x: Math.floor(width / 2), y: height },
+    anchor: frame.anchor ?? { x: Math.floor(width / 2), y: height },
   };
   return { frame: pixelFrame, palette: cleanPalette };
 }

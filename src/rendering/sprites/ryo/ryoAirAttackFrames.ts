@@ -1,3 +1,5 @@
+import { type SourcePixelFrame as PixelFrame } from "../shared/baseHighResRenderer.js";
+export type { PixelFrame };
 /**
  * ryoAirAttackFrames.ts
  *
@@ -11,13 +13,6 @@
  * Encoding: '.' = transparent (0), '1'-'9' = palette 1-9, 'a'-'n' = palette 10-23
  */
 
-export interface PixelFrame {
-  width: number;
-  height: number;
-  palette: Record<number, string>;
-  pixels: number[][];
-  anchor: { x: number; y: number };
-}
 
 /* ---------- 24-color SNK palette ---------- */
 const PALETTE: Record<number, string> = {

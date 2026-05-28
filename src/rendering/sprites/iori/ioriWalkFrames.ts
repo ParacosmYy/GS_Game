@@ -1,3 +1,5 @@
+import { type SourcePixelFrame as PixelFrame } from "../shared/baseHighResRenderer.js";
+export type { PixelFrame };
 /**
  * Iori Yagami walk animation — KOF2002-quality pixel frames
  *
@@ -20,13 +22,6 @@
  *   l=#282830  m=#383848  n=#0a0a0a
  */
 
-export interface PixelFrame {
-  width: number;
-  height: number;
-  palette: Record<number, string>;
-  pixels: number[][];
-  anchor: { x: number; y: number };
-}
 
 const PALETTE: Record<number, string> = {
   0: 'transparent',

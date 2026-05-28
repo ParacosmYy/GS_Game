@@ -25,7 +25,7 @@ import { KYO_THROW_FRAMES } from './kyoThrowFrames.js';
 import { KYO_WIN_FRAMES } from './kyoWinFrames.js';
 
 const renderer = createHighResRenderer({
-  targetDisplayHeight: 72,
+  targetDisplayHeight: 68,
   defaultTint: '#ff6600',
   setup(reg, regV) {
     regV('IDLE', KYO_IDLE_FRAMES, [8, 9, 12, 9, 10, 8]);
