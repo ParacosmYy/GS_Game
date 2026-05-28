@@ -969,25 +969,29 @@ export function drawFighters(
       ctx.fill();
       ctx.restore();
     }
-    // Try character-specific high-res first, then generic sprites, then fallback chain
+    // Unified sprite rendering: generic MUGEN path → character-specific fallback → skeletal
     let highResDrawn = false;
-    if (charId === 'kyo') {
-      highResDrawn = drawKyoHighResFrame(ctx, f.state, f.stateAge, sx + leanOffsetX, sy, f.facing, f.currentAttack, f.vx);
-    } else if (charId === 'iori') {
-      highResDrawn = drawIoriHighResFrame(ctx, f.state, f.stateAge, sx + leanOffsetX, sy, f.facing, f.currentAttack, f.vx);
-    } else if (charId === 'kfm') {
-      highResDrawn = drawKfmSprite(ctx, f.state, f.stateAge, sx + leanOffsetX, sy, f.facing, f.currentAttack, f.vx);
-    } else if (charId === 'ryo') {
-      highResDrawn = drawHighResFrame(ctx, charId, f.state, f.stateAge, sx + leanOffsetX, sy, f.facing, f.currentAttack, f.vx);
-    } else {
-      // Generic sprite path: try real MUGEN sprites for any registered character
-      const config = getCharacterConfig(charId ?? '');
-      const sprites = config ? getLoadedSprites(charId ?? '') : undefined;
-      if (config && sprites) {
-        highResDrawn = drawGenericCharacterSprite(
-          ctx, charId ?? '', config, sprites,
-          f.state, f.stateAge, sx + leanOffsetX, sy, f.facing, f.currentAttack, f.vx,
-        );
+
+    // 1. Try generic MUGEN sprite path (works for all registered characters)
+    const config = getCharacterConfig(charId ?? '');
+    const sprites = config ? getLoadedSprites(charId ?? '') : undefined;
+    if (config && sprites) {
+      highResDrawn = drawGenericCharacterSprite(
+        ctx, charId ?? '', config, sprites,
+        f.state, f.stateAge, sx + leanOffsetX, sy, f.facing, f.currentAttack, f.vx,
+      );
+    }
+
+    // 2. Character-specific procedural renderers (for characters with pixel art fallbacks)
+    if (!highResDrawn) {
+      if (charId === 'kyo') {
+        highResDrawn = drawKyoHighResFrame(ctx, f.state, f.stateAge, sx + leanOffsetX, sy, f.facing, f.currentAttack, f.vx);
+      } else if (charId === 'iori') {
+        highResDrawn = drawIoriHighResFrame(ctx, f.state, f.stateAge, sx + leanOffsetX, sy, f.facing, f.currentAttack, f.vx);
+      } else if (charId === 'kfm') {
+        highResDrawn = drawKfmSprite(ctx, f.state, f.stateAge, sx + leanOffsetX, sy, f.facing, f.currentAttack, f.vx);
+      } else if (charId === 'ryo') {
+        highResDrawn = drawHighResFrame(ctx, charId, f.state, f.stateAge, sx + leanOffsetX, sy, f.facing, f.currentAttack, f.vx);
       }
     }
     if (!highResDrawn) {
