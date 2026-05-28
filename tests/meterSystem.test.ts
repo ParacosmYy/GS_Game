@@ -133,3 +133,38 @@ describe('Desperation Mode', () => {
     expect(m.maxDuration).toBeGreaterThan(0);
   });
 });
+
+// ── 5. Desperation threshold edge cases ──────────────────────
+describe('isDesperation threshold', () => {
+  it('returns true when health < 25%', () => {
+    expect(isDesperation(1, 1000)).toBe(true);
+    expect(isDesperation(200, 1000)).toBe(true);
+    expect(isDesperation(249, 1000)).toBe(true);
+  });
+  it('returns false when health >= 25%', () => {
+    expect(isDesperation(250, 1000)).toBe(false);
+    expect(isDesperation(500, 1000)).toBe(false);
+  });
+  it('returns false for zero health (KO, not desperation)', () => {
+    expect(isDesperation(0, 1000)).toBe(false);
+  });
+});
+
+// ── 6. drawPowerGauges accepts desperation ───────────────────
+describe('drawPowerGauges integration', () => {
+  it('exports drawPowerGauges and accepts optional desperation array', async () => {
+    const { drawPowerGauges } = await import('../src/rendering/hud.js');
+    expect(typeof drawPowerGauges).toBe('function');
+    const mockCtx = {
+      save: () => {}, restore: () => {}, fillRect: () => {}, strokeRect: () => {},
+      beginPath: () => {}, closePath: () => {}, fill: () => {}, stroke: () => {},
+      arc: () => {}, moveTo: () => {}, lineTo: () => {}, quadraticCurveTo: () => {},
+      createLinearGradient: () => ({ addColorStop: () => {} }),
+      createRadialGradient: () => ({ addColorStop: () => {} }),
+    } as unknown as CanvasRenderingContext2D;
+    const gauge = { stocks: 2, meter: 50, maxMeter: 100 };
+    const maxMode = { active: false, timer: 0, maxDuration: 600 };
+    expect(() => drawPowerGauges(mockCtx, [gauge, gauge] as any, [maxMode, maxMode] as any, [true, false])).not.toThrow();
+    expect(() => drawPowerGauges(mockCtx, [gauge, gauge] as any, [maxMode, maxMode] as any)).not.toThrow();
+  });
+});
