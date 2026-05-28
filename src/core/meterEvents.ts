@@ -78,7 +78,7 @@ class MeterEventBus {
     if (!this.listeners.has(type)) {
       this.listeners.set(type, []);
     }
-    this.listeners.get(type)!.push(handler);
+    this.listeners.get(type)?.push(handler);
   }
 
   /** Subscribe to ALL meter events */

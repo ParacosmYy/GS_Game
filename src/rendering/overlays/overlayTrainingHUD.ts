@@ -185,7 +185,7 @@ function drawMoveListPanel(ctx: CanvasRenderingContext2D, moveList: MoveListEntr
   for (const move of moveList) {
     const type = move.type ?? 'normal';
     if (groups.has(type)) {
-      groups.get(type)!.push(move);
+      groups.get(type)?.push(move);
     }
   }
 
@@ -193,7 +193,7 @@ function drawMoveListPanel(ctx: CanvasRenderingContext2D, moveList: MoveListEntr
   let totalLines = 0;
   let hasContent = false;
   for (const cat of categoryOrder) {
-    const entries = groups.get(cat.key)!;
+    const entries = groups.get(cat.key) ?? [];
     if (entries.length > 0) {
       totalLines += sectionH + entries.length * lineH;
       hasContent = true;
