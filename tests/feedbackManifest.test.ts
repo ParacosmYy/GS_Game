@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { FEEDBACK_TIERS, inferTier, FEEDBACK_MANIFEST, getFeedback, getFeedbackByTier, getFeedbackTier, type FeedbackTier, type FeedbackParams } from '../src/core/feedbackManifest.js';
+import { FEEDBACK_TIERS, inferTier, FEEDBACK_MANIFEST, getFeedback, getFeedbackByTier, getFeedbackTier, getCharacterDMPalette, type FeedbackTier, type FeedbackParams } from '../src/core/feedbackManifest.js';
 
 const ALL_TIERS: FeedbackTier[] = ['light', 'heavy', 'special', 'dm', 'sdm', 'hsdm'];
 
@@ -186,6 +186,94 @@ describe('feedbackManifest', () => {
     it('returns correct tier for each level', () => {
       for (const t of ALL_TIERS) {
         expect(getFeedbackByTier(t).tier).toBe(t);
+      }
+    });
+  });
+
+  describe('getCharacterDMPalette', () => {
+    it('returns null for non-DM tiers', () => {
+      expect(getCharacterDMPalette('kyo', 'light')).toBeNull();
+      expect(getCharacterDMPalette('kyo', 'heavy')).toBeNull();
+      expect(getCharacterDMPalette('kyo', 'special')).toBeNull();
+    });
+
+    it('returns palette for kyo DM/SDM/HSDM', () => {
+      const dm = getCharacterDMPalette('kyo', 'dm');
+      const sdm = getCharacterDMPalette('kyo', 'sdm');
+      const hsdm = getCharacterDMPalette('kyo', 'hsdm');
+      expect(dm).not.toBeNull();
+      expect(sdm).not.toBeNull();
+      expect(hsdm).not.toBeNull();
+      expect(dm!.length).toBeGreaterThanOrEqual(3);
+      expect(sdm!.length).toBeGreaterThanOrEqual(dm!.length);
+      expect(hsdm!.length).toBeGreaterThanOrEqual(dm!.length);
+    });
+
+    it('returns palette for iori DM/SDM/HSDM', () => {
+      expect(getCharacterDMPalette('iori', 'dm')).not.toBeNull();
+      expect(getCharacterDMPalette('iori', 'sdm')).not.toBeNull();
+      expect(getCharacterDMPalette('iori', 'hsdm')).not.toBeNull();
+    });
+
+    it('returns palette for ryo DM/SDM/HSDM', () => {
+      expect(getCharacterDMPalette('ryo', 'dm')).not.toBeNull();
+      expect(getCharacterDMPalette('ryo', 'sdm')).not.toBeNull();
+      expect(getCharacterDMPalette('ryo', 'hsdm')).not.toBeNull();
+    });
+
+    it('returns null for unknown character', () => {
+      expect(getCharacterDMPalette('unknown', 'dm')).toBeNull();
+    });
+
+    it('kyo palette has fire colors', () => {
+      const dm = getCharacterDMPalette('kyo', 'dm')!;
+      const hasRedOrOrange = dm.some(c => c.includes('ff4') || c.includes('ff8'));
+      expect(hasRedOrOrange).toBe(true);
+    });
+
+    it('iori palette has purple colors', () => {
+      const dm = getCharacterDMPalette('iori', 'dm')!;
+      const hasPurple = dm.some(c => c.includes('ff') && c.includes('88') || c.includes('cc44'));
+      expect(hasPurple).toBe(true);
+    });
+  });
+
+  describe('spark palette consistency', () => {
+    it('all tier palettes have at least 2 colors', () => {
+      for (const t of ALL_TIERS) {
+        expect(FEEDBACK_TIERS[t].sparkPalette.length, `${t} palette`).toBeGreaterThanOrEqual(2);
+      }
+    });
+
+    it('spark palettes are valid hex colors', () => {
+      for (const t of ALL_TIERS) {
+        for (const color of FEEDBACK_TIERS[t].sparkPalette) {
+          expect(color, `${t} color`).toMatch(/^#[0-9a-f]{3,6}$/);
+        }
+      }
+    });
+
+    it('spark size escalates across tiers', () => {
+      for (let i = 1; i < ALL_TIERS.length; i++) {
+        expect(FEEDBACK_TIERS[ALL_TIERS[i]].sparkSize).toBeGreaterThan(
+          FEEDBACK_TIERS[ALL_TIERS[i - 1]].sparkSize,
+        );
+      }
+    });
+
+    it('bgmDuckVolume decreases (more ducking) across tiers', () => {
+      for (let i = 1; i < ALL_TIERS.length; i++) {
+        expect(FEEDBACK_TIERS[ALL_TIERS[i]].bgmDuckVolume).toBeLessThan(
+          FEEDBACK_TIERS[ALL_TIERS[i - 1]].bgmDuckVolume,
+        );
+      }
+    });
+
+    it('body shake escalates across tiers', () => {
+      for (let i = 1; i < ALL_TIERS.length; i++) {
+        expect(FEEDBACK_TIERS[ALL_TIERS[i]].hitstunBodyShake).toBeGreaterThan(
+          FEEDBACK_TIERS[ALL_TIERS[i - 1]].hitstunBodyShake,
+        );
       }
     });
   });
