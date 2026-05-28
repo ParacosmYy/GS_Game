@@ -128,6 +128,22 @@ export class AnnouncerOverlay {
     ctx.shadowColor = config.glowColor;
     ctx.shadowBlur = 25 + (scale > 1 ? (scale - 1) * 20 : 0);
 
+    // Burst events: expanding ring behind text
+    if (burst && progress < 0.2) {
+      const ringT = progress / 0.2;
+      const ringR = 40 + ringT * 120;
+      const ringAlpha = (1 - ringT) * 0.4 * alpha;
+      ctx.save();
+      ctx.globalAlpha = Math.max(0, ringAlpha);
+      ctx.strokeStyle = config.glowColor;
+      ctx.lineWidth = 3 * (1 - ringT);
+      ctx.beginPath();
+      ctx.arc(canvasWidth / 2, canvasHeight / 2, ringR, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.restore();
+      ctx.globalAlpha = Math.max(0, Math.min(1, alpha));
+    }
+
     // Stroke (dark outline)
     ctx.strokeStyle = 'rgba(0,0,0,0.8)';
     ctx.lineWidth = 3;
