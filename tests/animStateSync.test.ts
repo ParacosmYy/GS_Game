@@ -14,6 +14,8 @@ import {
   isAnimLooping,
   getRegisteredActions,
   clearAnimCache,
+  getFrameTickRange,
+  getAnimStats,
 } from '../src/rendering/sprites/shared/animStateSync.js';
 import { FighterState, AttackType } from '../src/core/types.js';
 
@@ -176,6 +178,97 @@ describe('animStateSync', () => {
       const result = resolveFrameIndex('kyo', FighterState.WALK, null, 1, 1, 6, 0, 'none');
       expect(result.actionNumber).toBe('20');
       expect(result.frameIndex).toBe(1);
+    });
+  });
+
+  describe('MUGEN -1 normalization', () => {
+    it('replaces -1 with previous frame duration', () => {
+      registerAnimDurations('norm', '0', [5, -1, -1, 10, -1], true);
+      const info = getAnimInfo('norm', '0');
+      expect(info!.frameDurations).toEqual([5, 5, 5, 10, 10]);
+      expect(info!.totalDuration).toBe(35);
+    });
+
+    it('replaces leading -1 with default 4', () => {
+      registerAnimDurations('norm', '1', [-1, -1, 8], true);
+      const info = getAnimInfo('norm', '1');
+      expect(info!.frameDurations).toEqual([4, 4, 8]);
+    });
+
+    it('handles all -1 array', () => {
+      registerAnimDurations('norm', '2', [-1, -1, -1, -1], true);
+      const info = getAnimInfo('norm', '2');
+      expect(info!.frameDurations).toEqual([4, 4, 4, 4]);
+    });
+
+    it('handles empty array', () => {
+      registerAnimDurations('norm', '3', [], true);
+      const info = getAnimInfo('norm', '3');
+      expect(info!.frameDurations).toEqual([]);
+      expect(info!.totalDuration).toBe(0);
+    });
+
+    it('no-op for already valid durations', () => {
+      registerAnimDurations('norm', '4', [3, 5, 7, 4], true);
+      const info = getAnimInfo('norm', '4');
+      expect(info!.frameDurations).toEqual([3, 5, 7, 4]);
+    });
+  });
+
+  describe('getFrameTickRange', () => {
+    beforeEach(() => {
+      registerAnimDurations('range', '0', [5, 10, 15], true);
+    });
+
+    it('returns correct range for frame 0', () => {
+      const range = getFrameTickRange('range', '0', 0);
+      expect(range).toEqual({ start: 0, end: 5 });
+    });
+
+    it('returns correct range for frame 1', () => {
+      const range = getFrameTickRange('range', '0', 1);
+      expect(range).toEqual({ start: 5, end: 15 });
+    });
+
+    it('returns correct range for last frame', () => {
+      const range = getFrameTickRange('range', '0', 2);
+      expect(range).toEqual({ start: 15, end: 30 });
+    });
+
+    it('returns null for out-of-range', () => {
+      expect(getFrameTickRange('range', '0', 3)).toBeNull();
+      expect(getFrameTickRange('range', '0', -1)).toBeNull();
+    });
+
+    it('returns null for unknown action', () => {
+      expect(getFrameTickRange('range', '999', 0)).toBeNull();
+    });
+  });
+
+  describe('getAnimStats', () => {
+    it('computes stats for registered character', () => {
+      clearAnimCache();
+      registerAnimDurations('stat', '0', [9, 9, 9], true);
+      registerAnimDurations('stat', '20', [6, 6, 6, 6], true);
+      registerAnimDurations('stat', '200', [3, 3, 3, 2, 2], false);
+
+      const stats = getAnimStats('stat');
+      expect(stats.totalActions).toBe(3);
+      expect(stats.totalFrames).toBe(12);
+      expect(stats.totalDuration).toBe(64); // 27+24+13
+      expect(stats.avgFrameDuration).toBeCloseTo(64 / 12);
+      expect(stats.loopingActions).toBe(2);
+      expect(stats.nonLoopingActions).toBe(1);
+    });
+
+    it('returns zeros for unknown character', () => {
+      const stats = getAnimStats('unknown_stat');
+      expect(stats.totalActions).toBe(0);
+      expect(stats.totalFrames).toBe(0);
+      expect(stats.totalDuration).toBe(0);
+      expect(stats.avgFrameDuration).toBe(0);
+      expect(stats.loopingActions).toBe(0);
+      expect(stats.nonLoopingActions).toBe(0);
     });
   });
 });

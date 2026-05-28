@@ -53,16 +53,34 @@ export function registerAnimDurations(
   durations: number[],
   looping: boolean = true,
 ): void {
+  // Normalize MUGEN -1 durations ("repeat previous frame's duration")
+  const normalized = normalizeDurations(durations);
+
   let charMap = animInfoCache.get(charId);
   if (!charMap) {
     charMap = new Map();
     animInfoCache.set(charId, charMap);
   }
   charMap.set(actionNumber, {
-    frameDurations: durations,
-    totalDuration: durations.reduce((a, b) => a + b, 0),
+    frameDurations: normalized,
+    totalDuration: normalized.reduce((a, b) => a + b, 0),
     looping,
   });
+}
+
+/**
+ * Normalize MUGEN duration arrays where -1 means "same as previous frame".
+ * Also clamps any remaining negative values to a default of 4 ticks.
+ */
+function normalizeDurations(durations: number[]): number[] {
+  if (durations.length === 0) return [];
+  const result = [...durations];
+  // First frame: if -1, default to 4
+  if (result[0] <= 0) result[0] = 4;
+  for (let i = 1; i < result.length; i++) {
+    if (result[i] <= 0) result[i] = result[i - 1];
+  }
+  return result;
 }
 
 /**
@@ -204,6 +222,60 @@ export function getRegisteredActions(charId: string): string[] {
   const charMap = animInfoCache.get(charId);
   if (!charMap) return [];
   return Array.from(charMap.keys());
+}
+
+/**
+ * Get the tick range [start, end) for a specific frame index.
+ * Returns null if the action or frame doesn't exist.
+ */
+export function getFrameTickRange(
+  charId: string,
+  actionNumber: string,
+  frameIndex: number,
+): { start: number; end: number } | null {
+  const info = getAnimInfo(charId, actionNumber);
+  if (!info || frameIndex >= info.frameDurations.length || frameIndex < 0) return null;
+
+  let start = 0;
+  for (let i = 0; i < frameIndex; i++) {
+    start += info.frameDurations[i];
+  }
+  return { start, end: start + info.frameDurations[frameIndex] };
+}
+
+/**
+ * Get comprehensive animation statistics for a character.
+ */
+export function getAnimStats(charId: string): {
+  totalActions: number;
+  totalFrames: number;
+  totalDuration: number;
+  avgFrameDuration: number;
+  loopingActions: number;
+  nonLoopingActions: number;
+} {
+  const actions = getRegisteredActions(charId);
+  let totalFrames = 0;
+  let totalDuration = 0;
+  let loopingCount = 0;
+
+  for (const actionId of actions) {
+    const info = getAnimInfo(charId, actionId);
+    if (info) {
+      totalFrames += info.frameDurations.length;
+      totalDuration += info.totalDuration;
+      if (info.looping) loopingCount++;
+    }
+  }
+
+  return {
+    totalActions: actions.length,
+    totalFrames,
+    totalDuration,
+    avgFrameDuration: totalFrames > 0 ? totalDuration / totalFrames : 0,
+    loopingActions: loopingCount,
+    nonLoopingActions: actions.length - loopingCount,
+  };
 }
 
 /**

@@ -7,6 +7,7 @@
 
 import type { SpriteImageFrame } from './baseHighResRenderer.js';
 import { FighterState, AttackType } from '../../../core/types.js';
+import { registerAnimDurations } from './animStateSync.js';
 
 interface ManifestSprite {
   group: number;
@@ -78,6 +79,10 @@ export async function loadRealSprites(
   // Build animation frames
   const result = new Map<string, SpriteImageFrame[]>();
 
+  // Extract charId from manifest URL: /sprites/<mugenDir>/manifest.json
+  const mugenDir = manifestUrl.match(/\/sprites\/([^/]+)\//)?.[1] || manifest.characterId;
+  const charId = manifest.characterId || mugenDir;
+
   for (const [actionId, anim] of Object.entries(manifest.animations)) {
     const frames: SpriteImageFrame[] = [];
 
@@ -115,6 +120,11 @@ export async function loadRealSprites(
     if (frames.length > 0) {
       result.set(actionId, frames);
     }
+
+    // Register frame durations for animStateSync
+    const durations = anim.frames.map(f => f.duration);
+    const loopingActions = new Set(['0', '5', '11', '20', '21', '100', '105', '120', '181']);
+    registerAnimDurations(charId, actionId, durations, loopingActions.has(actionId));
   }
 
   return result;

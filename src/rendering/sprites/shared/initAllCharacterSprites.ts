@@ -20,6 +20,8 @@ import {
   getHitboxLoadSummary,
   type MugenHitboxData,
 } from './mugenHitboxLoader.js';
+import { registerManifestData } from './mugenHurtboxLoader.js';
+import { getRegisteredActions } from './animStateSync.js';
 import type { FighterState, AttackType } from '../../../core/types.js';
 
 const initializedCharacters = new Set<string>();
@@ -62,6 +64,29 @@ export async function initAllCharacterSprites(): Promise<void> {
   const hitboxSummary = getHitboxLoadSummary();
   if (hitboxSummary.length > 0) {
     console.log(`[Hitboxes] ${hitboxSummary.length} characters with MUGEN hitbox data`);
+  }
+
+  // Register hurtbox manifest data for loaded characters
+  for (const config of configs) {
+    if (!initializedCharacters.has(config.charId)) continue;
+    try {
+      const resp = await fetch(`/sprites/${config.mugenDir}/manifest.json`);
+      if (resp.ok) {
+        const manifestData = await resp.json();
+        registerManifestData(config.mugenDir, manifestData);
+      }
+    } catch { /* non-critical */ }
+  }
+
+  // AnimState summary
+  let totalRegisteredAnims = 0;
+  for (const config of configs) {
+    if (initializedCharacters.has(config.charId)) {
+      totalRegisteredAnims += getRegisteredActions(config.charId).length;
+    }
+  }
+  if (totalRegisteredAnims > 0) {
+    console.log(`[AnimSync] ${totalRegisteredAnims} action durations registered`);
   }
 }
 
