@@ -118,7 +118,7 @@ function initRyoFrames(): void {
   registerVariableFrames('TAUNT', RYO_TAUNT_FRAMES, [10, 14, 12, 16]);
   registerVariableFrames('COUNTER_STANCE', RYO_COUNTER_STANCE_FRAMES, [4, 6, 10]);
   registerVariableFrames('RYUKO_RANBU', RYO_RYUKO_RANBU_FRAMES, [3, 3, 4, 5]);
-  registerVariableFrames('WIN', RYO_WIN_FRAMES, [6, 30]);
+  registerVariableFrames('WIN', RYO_WIN_FRAMES, [6, 8, 10, 30]);
 }
 
 function resolveRyoFrameKey(
