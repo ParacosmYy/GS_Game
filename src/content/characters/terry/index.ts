@@ -2,7 +2,8 @@
  * Terry Content Package — Barrel export
  *
  * Single entry point for all Terry content: commands,
- * moves, cancel paths, hit effects, and audio sampler.
+ * moves, cancel paths, attacks, frame data, feedback,
+ * hitboxes, animations, portraits, hit effects, and audio sampler.
  */
 
 // Commands / move list
@@ -39,6 +40,49 @@ export {
   type CancelType,
   type CancelRoute,
 } from './cancelPaths.js';
+
+// Attack definitions (frame data lookup)
+export {
+  TERRY_ATTACK_KEYS,
+  getTerryFrameData,
+  getTerryAttackFrameData,
+} from './attacks/terryAttacks.js';
+
+// Frame data (Terry-specific specials + DM + SDM)
+export { TERRY_FRAME_DATA } from './frameData/terryFrameData.js';
+
+// Feedback tier mappings
+export {
+  getTerryFeedbackTiers,
+  getTerryFeedback,
+  TERRY_FEEDBACK_SUMMARY,
+} from './feedback/terryFeedback.js';
+
+// Hitbox / hurtbox data
+export {
+  TERRY_HITBOX_KEYS,
+  getTerryHitboxOffsets,
+  TERRY_ATTACK_FRAME_KEYS,
+  getTerryAttackFrames,
+} from './hitboxes/terryHitboxes.js';
+
+// Animation metadata
+export {
+  TERRY_ANIMATION_META,
+  getTerryAnimationNames,
+  getTerryAnimMeta,
+  getTerryAttackAnimations,
+  getTerryLoopAnimations,
+  type AnimationMeta,
+} from './animations/terryAnimations.js';
+
+// Portrait metadata
+export {
+  TERRY_PORTRAIT_META,
+  getTerryPortraitMeta,
+  getTerryAvailablePortraitSizes,
+  type PortraitMeta,
+} from './portraits/terryPortraits.js';
 
 // Hit Effects (VFX/SFX plugin)
 export { TERRY_HIT_EFFECTS } from './hitEffects/terryHitEffects.js';
