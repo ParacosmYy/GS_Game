@@ -1475,16 +1475,30 @@ function render(): void {
       drawVictoryPose(ctx, wx, wy, winner.facing, winner.color, '#ffffff30', tickRef.value, winner.charId);
     }
     // Victory aura — character-element-coded rising energy around winner
-    if (gs.winQuoteTimer % 8 === 0) {
-      const charDef = ROSTER.find(c => c.id === winner.charId);
-      const sparkColor = charDef?.specialColor ?? '#ffcc00';
+    const charDef = ROSTER.find(c => c.id === winner.charId);
+    const sparkColor = charDef?.specialColor ?? '#ffcc00';
+    // Burst of sparks at victory pose start
+    if (gs.winQuoteTimer < 15 && gs.winQuoteTimer % 3 === 0) {
+      for (let vs = 0; vs < 3; vs++) {
+        vfx.spawnVictoryAuraSpark(
+          winner.x + (Math.random() - 0.5) * 50,
+          winner.y - winner.displayHeight * (0.3 + Math.random() * 0.4),
+          sparkColor,
+        );
+      }
+    }
+    // Continuous gentle aura after burst
+    if (gs.winQuoteTimer >= 15 && gs.winQuoteTimer % 10 === 0) {
       vfx.spawnVictoryAuraSpark(
         winner.x + (Math.random() - 0.5) * 40,
         winner.y - winner.displayHeight * 0.5 + Math.random() * 20,
         sparkColor,
       );
     }
-    const charDef = ROSTER.find(c => c.id === winner.charId);
+    // Ground dust at victory pose start
+    if (gs.winQuoteTimer === 1) {
+      vfx.spawnDust(winner.x, winner.y);
+    }
     renderer.drawWinQuote(
       gs.winQuoteTimer,
       gs.winQuoteCharName,
