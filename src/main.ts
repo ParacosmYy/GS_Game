@@ -1378,7 +1378,8 @@ function render(): void {
   renderer.render([p1, p2], camera.x, tickRef.value, gs.phase === GamePhase.KO, gs.winner, screenShake.offsetX, screenShake.offsetY,
     [p1DelayedHealth, p2DelayedHealth], maxModes, perfectPlayer, rounds.p1Wins, rounds.p2Wins, p1Char.nameCn, p2Char.nameCn, gs.isTimeOver, rounds.currentRound, gs.firstAttacker,
     cinematic.hitStopDefender, cinematic.hitStopBias, [p1Char.specialColor, p2Char.specialColor], gs.koTimer, cinematic.koDustParticles, camera.zoom, p1Char.moveList, gs.simplifiedMode,
-    cinematic.getKOPhase(), cinematic.getKOTimer(), cinematic.finishingAttackType, cinematic.finishingCharId);
+    cinematic.getKOPhase(), cinematic.getKOTimer(), cinematic.finishingAttackType, cinematic.finishingCharId,
+    rounds.lastWinTick, rounds.lastWinSide);
   renderer.drawProjectiles(projectiles, camera);
   vfx.render(ctx, camera.x);
 

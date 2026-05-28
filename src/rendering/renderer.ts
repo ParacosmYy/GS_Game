@@ -102,6 +102,8 @@ export class Renderer {
     koPhaseTimer: number = 0,
     finishingAttackType: string = '',
     finishingCharId: string = '',
+    lastWinTick: number = -100,
+    lastWinSide: number = -1,
   ): void {
     this.frameCount++;
     this.globalTick = tick;
@@ -239,7 +241,7 @@ export class Renderer {
       }
     }
 
-    drawHUD(ctx, fighters, tick, delayedHealth, p1Wins, p2Wins, p1Name, p2Name, currentRound, firstAttacker, p1MoveList ?? [], simplifiedMode);
+    drawHUD(ctx, fighters, tick, delayedHealth, p1Wins, p2Wins, p1Name, p2Name, currentRound, firstAttacker, p1MoveList ?? [], simplifiedMode, lastWinTick, lastWinSide);
 
     if (ko) {
       drawKO(ctx, winner, perfectPlayer, isTimeOver, fighters[0].health, fighters[1].health, fighters[0].maxHealth, koTimer, koDustParticles, cameraX, koPhase, koPhaseTimer, finishingAttackType, finishingCharId);

@@ -410,6 +410,8 @@ export function drawHUD(
   firstAttacker: number | null = null,
   p1MoveList: MoveListEntry[] = [],
   simplifiedMode: boolean = false,
+  lastWinTick: number = -100,
+  lastWinSide: number = -1,
 ): void {
   if (fighters.length < 2) return;
 
@@ -702,6 +704,37 @@ export function drawHUD(
     } else {
       // Empty — round not yet won
       ctx.strokeStyle = 'rgba(68, 136, 255, 0.3)';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    }
+  }
+
+  // Win dot ring burst animation
+  const winAnimAge = tick - lastWinTick;
+  if (winAnimAge >= 0 && winAnimAge < 20) {
+    const progress = winAnimAge / 20;
+    const ringR = dotR + progress * 14;
+    const alpha = 1 - progress;
+    const ringColor = lastWinSide === 0 ? `rgba(255, 100, 60, ${alpha})` : `rgba(68, 136, 255, ${alpha})`;
+    const burstDotX = lastWinSide === 0 ? p1DotsX + (p1Wins - 1) * dotGap : p2DotsX + (p2Wins - 1) * dotGap;
+    ctx.beginPath();
+    ctx.arc(burstDotX, dotY, ringR, 0, Math.PI * 2);
+    ctx.strokeStyle = ringColor;
+    ctx.lineWidth = 2.5 * (1 - progress);
+    ctx.stroke();
+    // Scale pop on the winning dot
+    if (lastWinSide === 0 && p1Wins > 0) {
+      const popR = dotR * (1.3 + 0.5 * (1 - progress));
+      ctx.beginPath();
+      ctx.arc(p1DotsX + (p1Wins - 1) * dotGap, dotY, popR, 0, Math.PI * 2);
+      ctx.strokeStyle = `rgba(255, 100, 60, ${alpha * 0.5})`;
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    } else if (lastWinSide === 1 && p2Wins > 0) {
+      const popR = dotR * (1.3 + 0.5 * (1 - progress));
+      ctx.beginPath();
+      ctx.arc(p2DotsX + (p2Wins - 1) * dotGap, dotY, popR, 0, Math.PI * 2);
+      ctx.strokeStyle = `rgba(68, 136, 255, ${alpha * 0.5})`;
       ctx.lineWidth = 1;
       ctx.stroke();
     }

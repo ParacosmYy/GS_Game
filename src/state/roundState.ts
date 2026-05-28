@@ -50,6 +50,11 @@ export class RoundState {
 
   // Round transition state machine
   transitionPhase: RoundTransitionPhase = RoundTransitionPhase.NONE;
+
+  // Win dot animation
+  lastWinTick = -100;
+  lastWinSide: number = -1; // 0=P1, 1=P2, -1=none
+
   /** Frames to hold black screen between fade-out and fade-in */
   private holdBlackFrames = 0;
   private readonly HOLD_BLACK_DURATION = 30;
@@ -90,6 +95,10 @@ export class RoundState {
   addWin(winner: number | null): number | null {
     if (winner === 0) this.p1Wins++;
     else if (winner === 1) this.p2Wins++;
+    if (winner !== null) {
+      this.lastWinTick = this.tickRef.value;
+      this.lastWinSide = winner;
+    }
     if (this.p1Wins >= this.winsNeeded) return 0;
     if (this.p2Wins >= this.winsNeeded) return 1;
     return null;
