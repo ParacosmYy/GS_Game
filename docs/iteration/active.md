@@ -3,42 +3,48 @@
 ## 目标
 
 - MUGEN Asset Integration — 将已有 MUGEN 资产全面接入运行时
-- 当前分数：300/2000
-- 本轮方向：cvskyo/cvsryo/cvskfm PNG sprite 运行时接入 + 程序化 fallback 降级
+- 当前分数：327/2000
+- 当前tag: v3.08
+- 本轮方向：MUGEN管线贯通 + 6角色内容包MUGEN判定集成
 
 ## 当前状态
 
 - 当前主线：MUGEN-first 资产集成 + 多角色运行时闭环
 - MUGEN 管线已闭环：parseAir → buildSpriteManifest → convertAirHitboxes → extractCharacterSprites
-- 已导入资产：cvskyo (1,809 PNG)、cvsryo (1,231 PNG)、kfm (281 PNG)，各含 manifest
+- 已导入资产：17角色 PNG sprite + manifest + hitboxes.json（26,793+ PNG）
 - 运行时双路径：PNG sprite（优先）+ 程序化帧（fallback）
 - 战斗系统：8/8 KOF2002 深层机制已实现
-- 测试总数 10123+ (0 failures)
-- 当前tag: v3.00
-- 内容包完整度：5角色（Ryo/Kyo/Iori 全量，Terry/Kim 部分内容包）
+- 测试总数 10,846+ (374 files, 0 failures)
+- 内容包完整度：7角色全量（Ryo/Kyo/Iori/Terry/Kim/Athena/Vice）
 - 28 roster 定义，仅 KOF2002 原版角色
-- Frame Contract 校验：3角色全部 0 issues
+- 通用渲染管线：15角色通过 characterSpriteConfigs 自动加载 PNG
+- MUGEN判定系统：hitbox/hurtbox/body 3层回退已接入 fighter.ts
+- MUGEN查询层：6角色内容包接入 mugenHitboxQuery（Kyo/Ryo/Terry/Kim/Athena/Vice）
+- animStateSync：MUGEN -1帧时长归一化 + 帧边界查询 + 动画统计
+- 训练模式hitbox调试：F2开关 + F7循环 game/both/mugen 三模式
+- 完整度报告：5角色各有 dimensionReport 工具
 
-## 本轮完成
+## 本轮完成（v3.06 → v3.08）
 
-- MUGEN 管线全链路打通（parseAir / buildSpriteManifest / convertAirHitboxes / extractCharacterSprites）
-- 3 组角色 PNG sprite 批量导入（cvskyo / cvsryo / kfm），共计 3,321 张 PNG + 3 份 manifest
-- 运行时双路径渲染器接入：PNG sprite 优先加载，程序化 fallback 兜底
-- 5 角色内容包（Ryo/Kyo/Iori 全量，Terry/Kim commands/moves/cancelPaths）
+- MUGEN -1帧时长归一化 + 集成测试（152测试）
+- hitboxDebugMugen接入主循环：F2/F7切换 + MUGEN hurtbox集成
+- 统一渲染管线：通用MUGEN路径优先 → 角色procedural → 骨骼fallback
+- MUGEN判定查询层：mugenHitboxQuery.ts + Kyo/Ryo/Terry/Kim/Athena/Vice内容包接入
+- Athena/Vice完整内容包（29文件，+3,037行）
+- 差距矩阵文档全面更新
 
-## 复盘
+## 关键阻塞
 
-- MUGEN-first 转向已落地：工具链从 AIR/SFF 解析到 PNG 提取全链路可用
-- 真实 sprite 资产已到位，下一步是把它们接进角色渲染器、替换程序化骨架
-- 内容包模板稳定：新角色只需提供 MUGEN DEF/AIR/SFF，管线自动产出 manifest + PNG
-- 当前最大差距：已导入 PNG 尚未完全接入 Kyo/Ryo 角色渲染器，仍有 fallback 可见
+- **Iori 无 MUGEN 源文件**：references/mugen/ 不含 Iori SFF/AIR/ACT，需要外部资源
+- **部分 KOF2002 角色无 MUGEN 源**：Warusaki3 CVS 包不含 Andy/Joe/Robert/Daimon/Leona/Ralf/Clark 等纯 KOF 角色
 
 ## 下一步
 
-- 将 cvskyo PNG sprite 接入 Kyo 运行时渲染器，替换程序化帧
-- 将 cvsryo PNG sprite 接入 Ryo 运行时渲染器
-- Terry/Kim 内容包用 MUGEN 管线补全
-- 批量提取 references/mugen/ 下其余 KOF2002 角色资源
+- Yamazaki/Shermie内容包补全 + MUGEN判定集成
+- ACT palette 解析器 + 运行时 palette 切换
+- 寻找 Iori MUGEN 源文件并接入
+- 推进差距矩阵 Tier 1 闭合
+- animStateSync与baseHighResRenderer帧索引统一
 
 ## 回退方案
 

@@ -2,7 +2,7 @@
  * Content Loader — Unified character content access
  *
  * Provides a single function to load all content for a given character.
- * Supports: ryo, kyo, iori, terry, kim
+ * Supports: ryo, kyo, iori, terry, kim, athena, vice
  */
 import type { FeedbackTier } from '../core/feedbackManifest.js';
 import {
@@ -65,6 +65,28 @@ import {
   getKimAttackFrames,
   getKimFeedbackTiers,
 } from './characters/kim/index.js';
+import {
+  getAthenaFrameData,
+  ATHENA_ATTACK_KEYS,
+  ATHENA_MOVE_LIST,
+  ATHENA_AVAILABLE_ACTIONS,
+  ATHENA_ANIMATION_META,
+  getAthenaAnimationNames,
+  getAthenaHitboxOffsets,
+  getAthenaAttackFrames,
+  getAthenaFeedbackTiers,
+} from './characters/athena/index.js';
+import {
+  getViceFrameData,
+  VICE_ATTACK_KEYS,
+  VICE_MOVE_LIST,
+  VICE_AVAILABLE_ACTIONS,
+  VICE_ANIMATION_META,
+  getViceAnimationNames,
+  getViceHitboxOffsets,
+  getViceAttackFrames,
+  getViceFeedbackTiers,
+} from './characters/vice/index.js';
 import { generateKyoDimensionReport } from '../tools/kyoCompletenessReport.js';
 import { generateIoriDimensionReport } from '../tools/ioriCompletenessReport.js';
 import { generateTerryDimensionReport } from '../tools/terryCompletenessReport.js';
@@ -109,6 +131,10 @@ export function loadCharacterContent(charId: string): CharacterContent {
       return loadTerryContent();
     case 'kim':
       return loadKimContent();
+    case 'athena':
+      return loadAthenaContent();
+    case 'vice':
+      return loadViceContent();
     default:
       throw new Error(`Unknown character: ${charId}`);
   }
@@ -116,12 +142,12 @@ export function loadCharacterContent(charId: string): CharacterContent {
 
 /** Check if a character has a content package */
 export function hasCharacterContent(charId: string): boolean {
-  return ['ryo', 'kyo', 'iori', 'terry', 'kim'].includes(charId);
+  return ['ryo', 'kyo', 'iori', 'terry', 'kim', 'athena', 'vice'].includes(charId);
 }
 
 /** List all characters with content packages */
 export function getAvailableCharacterIds(): string[] {
-  return ['ryo', 'kyo', 'iori', 'terry', 'kim'];
+  return ['ryo', 'kyo', 'iori', 'terry', 'kim', 'athena', 'vice'];
 }
 
 function loadRyoContent(): CharacterContent {
@@ -201,5 +227,37 @@ function loadKimContent(): CharacterContent {
     attackFrames: getKimAttackFrames(),
     feedback: getKimFeedbackTiers(),
     report: generateKimDimensionReport(),
+  };
+}
+
+function loadAthenaContent(): CharacterContent {
+  return {
+    data: { id: 'athena', name: 'Athena Asamiya', nameCn: '麻宫雅典娜', color: '#FF66AA' },
+    attacks: getAthenaFrameData(),
+    attackKeys: ATHENA_ATTACK_KEYS,
+    commands: ATHENA_MOVE_LIST,
+    availableActions: ATHENA_AVAILABLE_ACTIONS,
+    animations: ATHENA_ANIMATION_META,
+    animSequenceNames: getAthenaAnimationNames(),
+    hitboxes: getAthenaHitboxOffsets(),
+    attackFrames: getAthenaAttackFrames(),
+    feedback: getAthenaFeedbackTiers(),
+    report: null,
+  };
+}
+
+function loadViceContent(): CharacterContent {
+  return {
+    data: { id: 'vice', name: 'Vice', nameCn: '麦卓', color: '#4B0082' },
+    attacks: getViceFrameData(),
+    attackKeys: VICE_ATTACK_KEYS,
+    commands: VICE_MOVE_LIST,
+    availableActions: VICE_AVAILABLE_ACTIONS,
+    animations: VICE_ANIMATION_META,
+    animSequenceNames: getViceAnimationNames(),
+    hitboxes: getViceHitboxOffsets(),
+    attackFrames: getViceAttackFrames(),
+    feedback: getViceFeedbackTiers(),
+    report: null,
   };
 }

@@ -214,3 +214,144 @@ export {
 
 export { KIM_HIT_EFFECTS } from './kim/hitEffects/kimHitEffects.js';
 export { registerKimAudio } from './kim/audio/kimSampler.js';
+
+// Athena content package — prefixed to avoid type name collisions
+export {
+  ATHENA_MOVE_LIST,
+  ATHENA_WIN_QUOTES,
+  ATHENA_AVAILABLE_ACTIONS,
+  type AthenaMoveEntry,
+} from './athena/commands/athenaCommands.js';
+
+export {
+  ATHENA_MOVES,
+  getMoveByKey as getAthenaMoveByKey,
+  getMoveByAttackType as getAthenaMoveByAttackType,
+  getMovesByCategory as getAthenaMovesByCategory,
+  getProjectileMoves as getAthenaProjectileMoves,
+  getInvincibleMoves as getAthenaInvincibleMoves,
+  getMoveStats as getAthenaMoveStats,
+} from './athena/moves/athenaMoves.js';
+
+export {
+  ATHENA_CANCEL_PATHS,
+  findCancelRoute as findAthenaCancelRoute,
+  getCancelTargets as getAthenaCancelTargets,
+  validateCancel as validateAthenaCancel,
+  getCancelRoutesByType as getAthenaCancelRoutesByType,
+  isCancelSource as isAthenaCancelSource,
+  getBestCancelRoute as getAthenaBestCancelRoute,
+  type CancelType as AthenaCancelType,
+  type CancelRoute as AthenaCancelRoute,
+} from './athena/cancelPaths.js';
+
+export {
+  ATHENA_ATTACK_KEYS,
+  getAthenaFrameData,
+  getAthenaAttackFrameData,
+} from './athena/attacks/athenaAttacks.js';
+
+export { ATHENA_FRAME_DATA } from './athena/frameData/athenaFrameData.js';
+
+export {
+  getAthenaFeedbackTiers,
+  getAthenaFeedback,
+  ATHENA_FEEDBACK_SUMMARY,
+} from './athena/feedback/athenaFeedback.js';
+
+export {
+  ATHENA_HITBOX_KEYS,
+  getAthenaHitboxOffsets,
+  ATHENA_ATTACK_FRAME_KEYS,
+  getAthenaAttackFrames,
+} from './athena/hitboxes/athenaHitboxes.js';
+
+export {
+  ATHENA_ANIMATION_META,
+  getAthenaAnimationNames,
+  getAthenaAnimMeta,
+  getAthenaAttackAnimations,
+  getAthenaLoopAnimations,
+  type AnimationMeta as AthenaAnimationMeta,
+} from './athena/animations/athenaAnimations.js';
+
+export {
+  ATHENA_PORTRAIT_META,
+  getAthenaPortraitMeta,
+  getAthenaAvailablePortraitSizes,
+  type PortraitMeta as AthenaPortraitMeta,
+} from './athena/portraits/athenaPortraits.js';
+
+export { ATHENA_HIT_EFFECTS } from './athena/hitEffects/athenaHitEffects.js';
+export { registerAthenaAudio } from './athena/audio/athenaSampler.js';
+
+// Vice content package — prefixed to avoid type name collisions
+export {
+  VICE_MOVE_LIST,
+  VICE_WIN_QUOTES,
+  VICE_AVAILABLE_ACTIONS,
+  type ViceMoveEntry,
+} from './vice/commands/viceCommands.js';
+
+export {
+  VICE_MOVES,
+  getMoveByKey as getViceMoveByKey,
+  getMoveByAttackType as getViceMoveByAttackType,
+  getMovesByCategory as getViceMovesByCategory,
+  getProjectileMoves as getViceProjectileMoves,
+  getInvincibleMoves as getViceInvincibleMoves,
+  getGrabMoves as getViceGrabMoves,
+  getMoveStats as getViceMoveStats,
+} from './vice/moves/viceMoves.js';
+
+export {
+  VICE_CANCEL_PATHS,
+  findCancelRoute as findViceCancelRoute,
+  getCancelTargets as getViceCancelTargets,
+  validateCancel as validateViceCancel,
+  getCancelRoutesByType as getViceCancelRoutesByType,
+  isCancelSource as isViceCancelSource,
+  getBestCancelRoute as getViceBestCancelRoute,
+  type CancelType as ViceCancelType,
+  type CancelRoute as ViceCancelRoute,
+} from './vice/cancelPaths.js';
+
+export {
+  VICE_ATTACK_KEYS,
+  getViceFrameData,
+  getViceAttackFrameData,
+} from './vice/attacks/viceAttacks.js';
+
+export { VICE_FRAME_DATA } from './vice/frameData/viceFrameData.js';
+
+export {
+  getViceFeedbackTiers,
+  getViceFeedback,
+  VICE_FEEDBACK_SUMMARY,
+} from './vice/feedback/viceFeedback.js';
+
+export {
+  VICE_HITBOX_KEYS,
+  getViceHitboxOffsets,
+  VICE_ATTACK_FRAME_KEYS,
+  getViceAttackFrames,
+} from './vice/hitboxes/viceHitboxes.js';
+
+export {
+  VICE_ANIMATION_META,
+  getViceAnimationNames,
+  getViceAnimMeta,
+  getViceAttackAnimations,
+  getViceLoopAnimations,
+  type AnimationMeta as ViceAnimationMeta,
+} from './vice/animations/viceAnimations.js';
+
+export {
+  VICE_PORTRAIT_META,
+  getVicePortraitMeta,
+  getViceAvailablePortraitSizes,
+  type PortraitMeta as VicePortraitMeta,
+} from './vice/portraits/vicePortraits.js';
+
+export { VICE_HIT_EFFECTS } from './vice/hitEffects/viceHitEffects.js';
+export { registerViceAudio } from './vice/audio/viceSampler.js';
