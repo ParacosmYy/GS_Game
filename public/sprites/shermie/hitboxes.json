@@ -1,0 +1,1844 @@
+{
+  "characterId": "unknown",
+  "actions": {
+    "200": {
+      "name": "�ʏ�E����",
+      "startup": 3,
+      "active": 1,
+      "recovery": 2,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 31,
+              "oy": -106,
+              "w": 29,
+              "h": 30
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "210": {
+      "name": "�ʏ�E����",
+      "startup": 5,
+      "active": 1,
+      "recovery": 6,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 43,
+              "oy": -91,
+              "w": 55,
+              "h": 37
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "220": {
+      "name": "�ʏ�E����",
+      "startup": 3,
+      "active": 1,
+      "recovery": 6,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 11,
+              "oy": -89,
+              "w": 46,
+              "h": 29
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "230": {
+      "name": "�ʏ�E����",
+      "startup": 2,
+      "active": 1,
+      "recovery": 6,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 0,
+              "oy": -72,
+              "w": 55,
+              "h": 21
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "240": {
+      "name": "�ʏ�E����",
+      "startup": 3,
+      "active": 2,
+      "recovery": 6,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 10,
+              "oy": -116,
+              "w": 54,
+              "h": 30
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": 11,
+              "oy": -113,
+              "w": 43,
+              "h": 27
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "300": {
+      "name": "�ʏ�E����",
+      "startup": 4,
+      "active": 1,
+      "recovery": 11,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 24,
+              "oy": -108,
+              "w": 42,
+              "h": 72
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "320": {
+      "name": "�ʏ�E����",
+      "startup": 4,
+      "active": 1,
+      "recovery": 7,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 8,
+              "oy": -104,
+              "w": 51,
+              "h": 36
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "350": {
+      "name": "�ʏ�E����",
+      "startup": 5,
+      "active": 1,
+      "recovery": 4,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 16,
+              "oy": -122,
+              "w": 55,
+              "h": 63
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "400": {
+      "name": "�ʏ�E����",
+      "startup": 3,
+      "active": 1,
+      "recovery": 2,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 3,
+              "oy": -77,
+              "w": 31,
+              "h": 29
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "410": {
+      "name": "�ʏ�E����",
+      "startup": 2,
+      "active": 2,
+      "recovery": 6,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 1,
+              "oy": -74,
+              "w": 37,
+              "h": 42
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": -19,
+              "oy": -112,
+              "w": 46,
+              "h": 27
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "420": {
+      "name": "�ʏ�E����",
+      "startup": 4,
+      "active": 1,
+      "recovery": 5,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 7,
+              "oy": -27,
+              "w": 70,
+              "h": 23
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "430": {
+      "name": "�ʏ�E����",
+      "startup": 8,
+      "active": 1,
+      "recovery": 6,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 13,
+              "oy": -44,
+              "w": 66,
+              "h": 25
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "600": {
+      "name": "�ʏ�E����",
+      "startup": 3,
+      "active": 3,
+      "recovery": 1,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 20,
+              "oy": -115,
+              "w": 22,
+              "h": 32
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": -1,
+              "oy": -131,
+              "w": 26,
+              "h": 41
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 17,
+              "oy": -114,
+              "w": 25,
+              "h": 44
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "610": {
+      "name": "�ʏ�E����",
+      "startup": 2,
+      "active": 2,
+      "recovery": 1,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": -3,
+              "oy": -60,
+              "w": 49,
+              "h": 23
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": -3,
+              "oy": -60,
+              "w": 49,
+              "h": 23
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "620": {
+      "name": "�ʏ�E����",
+      "startup": 2,
+      "active": 2,
+      "recovery": 3,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 4,
+              "oy": -87,
+              "w": 28,
+              "h": 35
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": 4,
+              "oy": -87,
+              "w": 28,
+              "h": 35
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "630": {
+      "name": "�ʏ�E����",
+      "startup": 3,
+      "active": 2,
+      "recovery": 5,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 0,
+              "oy": -69,
+              "w": 74,
+              "h": 22
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": 0,
+              "oy": -69,
+              "w": 74,
+              "h": 22
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "640": {
+      "name": "�ʏ�E����",
+      "startup": 2,
+      "active": 2,
+      "recovery": 5,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 14,
+              "oy": -81,
+              "w": 65,
+              "h": 26
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": 14,
+              "oy": -81,
+              "w": 65,
+              "h": 26
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "700": {
+      "name": "�ʏ�E����",
+      "startup": 3,
+      "active": 1,
+      "recovery": 4,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 24,
+              "oy": -84,
+              "w": 55,
+              "h": 24
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "800": {
+      "name": "�ʏ�E����",
+      "startup": 0,
+      "active": 1,
+      "recovery": 0,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 0,
+              "oy": -80,
+              "w": 25,
+              "h": 80
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "1002": {
+      "name": "�ʏ�E����",
+      "startup": 1,
+      "active": 1,
+      "recovery": 5,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 1,
+              "oy": -88,
+              "w": 58,
+              "h": 30
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "1012": {
+      "name": "�ʏ�E����",
+      "startup": 1,
+      "active": 1,
+      "recovery": 5,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 1,
+              "oy": -88,
+              "w": 58,
+              "h": 30
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "1100": {
+      "name": "�ʏ�E����",
+      "startup": 3,
+      "active": 1,
+      "recovery": 7,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": -91,
+              "oy": -103,
+              "w": 48,
+              "h": 64
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "1105": {
+      "name": "�ʏ�E����",
+      "startup": 3,
+      "active": 1,
+      "recovery": 7,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": -81,
+              "oy": -99,
+              "w": 73,
+              "h": 66
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "1210": {
+      "name": "�ʏ�E����",
+      "startup": 2,
+      "active": 1,
+      "recovery": 3,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 3,
+              "oy": -75,
+              "w": 37,
+              "h": 24
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "1260": {
+      "name": "�ʏ�E����",
+      "startup": 6,
+      "active": 1,
+      "recovery": 3,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 3,
+              "oy": -75,
+              "w": 37,
+              "h": 24
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "1300": {
+      "name": "�ʏ�E����",
+      "startup": 0,
+      "active": 1,
+      "recovery": 8,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 0,
+              "oy": -80,
+              "w": 41,
+              "h": 80
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "1410": {
+      "name": "�ʏ�E����",
+      "startup": 1,
+      "active": 1,
+      "recovery": 8,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 0,
+              "oy": -80,
+              "w": 41,
+              "h": 80
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "1500": {
+      "name": "�ʏ�E����",
+      "startup": 2,
+      "active": 3,
+      "recovery": 2,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 9,
+              "oy": -92,
+              "w": 33,
+              "h": 50
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 9,
+              "oy": -92,
+              "w": 33,
+              "h": 50
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 9,
+              "oy": -92,
+              "w": 33,
+              "h": 50
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "1550": {
+      "name": "�ʏ�E����",
+      "startup": 7,
+      "active": 1,
+      "recovery": 0,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 0,
+              "oy": -31,
+              "w": 35,
+              "h": 31
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "1610": {
+      "name": "�ʏ�E����",
+      "startup": 2,
+      "active": 2,
+      "recovery": 4,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": -28,
+              "oy": -21,
+              "w": 65,
+              "h": 42
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": -28,
+              "oy": -21,
+              "w": 65,
+              "h": 42
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "1801": {
+      "name": "�ʏ�E����",
+      "startup": 1,
+      "active": 1,
+      "recovery": 5,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 34,
+              "oy": -48,
+              "w": 34,
+              "h": 39
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "1900": {
+      "name": "�ʏ�E����",
+      "startup": 10,
+      "active": 2,
+      "recovery": 1,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 25,
+              "oy": -94,
+              "w": 33,
+              "h": 94
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": 25,
+              "oy": -94,
+              "w": 33,
+              "h": 94
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "1950": {
+      "name": "�ʏ�E����",
+      "startup": 10,
+      "active": 2,
+      "recovery": 1,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 25,
+              "oy": -94,
+              "w": 33,
+              "h": 94
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": 25,
+              "oy": -94,
+              "w": 33,
+              "h": 94
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "3000": {
+      "name": "�ʏ�E����",
+      "startup": 0,
+      "active": 1,
+      "recovery": 9,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 0,
+              "oy": -81,
+              "w": 50,
+              "h": 88
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "3100": {
+      "name": "�ʏ�E����",
+      "startup": 9,
+      "active": 1,
+      "recovery": 3,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 0,
+              "oy": -81,
+              "w": 53,
+              "h": 82
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "3201": {
+      "name": "�ʏ�E����",
+      "startup": 1,
+      "active": 1,
+      "recovery": 0,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": -37,
+              "oy": -37,
+              "w": 79,
+              "h": 80
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "3202": {
+      "name": "�ʏ�E����",
+      "startup": 0,
+      "active": 1,
+      "recovery": 0,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": -37,
+              "oy": -39,
+              "w": 85,
+              "h": 77
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "3300": {
+      "name": "�ʏ�E����",
+      "startup": 8,
+      "active": 28,
+      "recovery": 9,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 29,
+              "oy": -90,
+              "w": 46,
+              "h": 41
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 29,
+              "oy": -90,
+              "w": 46,
+              "h": 41
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 29,
+              "oy": -90,
+              "w": 46,
+              "h": 41
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 29,
+              "oy": -90,
+              "w": 46,
+              "h": 41
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 29,
+              "oy": -90,
+              "w": 46,
+              "h": 41
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 29,
+              "oy": -90,
+              "w": 46,
+              "h": 41
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 29,
+              "oy": -90,
+              "w": 46,
+              "h": 41
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 29,
+              "oy": -90,
+              "w": 46,
+              "h": 41
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 29,
+              "oy": -90,
+              "w": 46,
+              "h": 41
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 29,
+              "oy": -90,
+              "w": 46,
+              "h": 41
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 29,
+              "oy": -90,
+              "w": 46,
+              "h": 41
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 29,
+              "oy": -90,
+              "w": 46,
+              "h": 41
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 29,
+              "oy": -90,
+              "w": 46,
+              "h": 41
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 29,
+              "oy": -90,
+              "w": 46,
+              "h": 41
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 29,
+              "oy": -90,
+              "w": 46,
+              "h": 41
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 29,
+              "oy": -90,
+              "w": 46,
+              "h": 41
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 29,
+              "oy": -90,
+              "w": 46,
+              "h": 41
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 29,
+              "oy": -90,
+              "w": 46,
+              "h": 41
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 29,
+              "oy": -90,
+              "w": 46,
+              "h": 41
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 29,
+              "oy": -90,
+              "w": 46,
+              "h": 41
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 29,
+              "oy": -90,
+              "w": 46,
+              "h": 41
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 29,
+              "oy": -90,
+              "w": 46,
+              "h": 41
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 29,
+              "oy": -90,
+              "w": 46,
+              "h": 41
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 29,
+              "oy": -90,
+              "w": 46,
+              "h": 41
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 29,
+              "oy": -90,
+              "w": 46,
+              "h": 41
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 29,
+              "oy": -90,
+              "w": 46,
+              "h": 41
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 29,
+              "oy": -90,
+              "w": 46,
+              "h": 41
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 29,
+              "oy": -90,
+              "w": 46,
+              "h": 41
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "3350": {
+      "name": "�ʏ�E����",
+      "startup": 8,
+      "active": 36,
+      "recovery": 9,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 29,
+              "oy": -90,
+              "w": 46,
+              "h": 41
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 29,
+              "oy": -90,
+              "w": 46,
+              "h": 41
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 29,
+              "oy": -90,
+              "w": 46,
+              "h": 41
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 29,
+              "oy": -90,
+              "w": 46,
+              "h": 41
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 29,
+              "oy": -90,
+              "w": 46,
+              "h": 41
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 29,
+              "oy": -90,
+              "w": 46,
+              "h": 41
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 29,
+              "oy": -90,
+              "w": 46,
+              "h": 41
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 29,
+              "oy": -90,
+              "w": 46,
+              "h": 41
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 29,
+              "oy": -90,
+              "w": 46,
+              "h": 41
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 29,
+              "oy": -90,
+              "w": 46,
+              "h": 41
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 29,
+              "oy": -90,
+              "w": 46,
+              "h": 41
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 29,
+              "oy": -90,
+              "w": 46,
+              "h": 41
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 29,
+              "oy": -90,
+              "w": 46,
+              "h": 41
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 29,
+              "oy": -90,
+              "w": 46,
+              "h": 41
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 29,
+              "oy": -90,
+              "w": 46,
+              "h": 41
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 29,
+              "oy": -90,
+              "w": 46,
+              "h": 41
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 29,
+              "oy": -90,
+              "w": 46,
+              "h": 41
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 29,
+              "oy": -90,
+              "w": 46,
+              "h": 41
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 29,
+              "oy": -90,
+              "w": 46,
+              "h": 41
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 29,
+              "oy": -90,
+              "w": 46,
+              "h": 41
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 29,
+              "oy": -90,
+              "w": 46,
+              "h": 41
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 29,
+              "oy": -90,
+              "w": 46,
+              "h": 41
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 29,
+              "oy": -90,
+              "w": 46,
+              "h": 41
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 29,
+              "oy": -90,
+              "w": 46,
+              "h": 41
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 29,
+              "oy": -90,
+              "w": 46,
+              "h": 41
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 29,
+              "oy": -90,
+              "w": 46,
+              "h": 41
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 29,
+              "oy": -90,
+              "w": 46,
+              "h": 41
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 29,
+              "oy": -90,
+              "w": 46,
+              "h": 41
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 29,
+              "oy": -90,
+              "w": 46,
+              "h": 41
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 29,
+              "oy": -90,
+              "w": 46,
+              "h": 41
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 29,
+              "oy": -90,
+              "w": 46,
+              "h": 41
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 29,
+              "oy": -90,
+              "w": 46,
+              "h": 41
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 29,
+              "oy": -90,
+              "w": 46,
+              "h": 41
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 29,
+              "oy": -90,
+              "w": 46,
+              "h": 41
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 29,
+              "oy": -90,
+              "w": 46,
+              "h": 41
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 29,
+              "oy": -90,
+              "w": 46,
+              "h": 41
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "4010": {
+      "name": "�ʏ�E����",
+      "startup": 10,
+      "active": 1,
+      "recovery": 0,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": -9,
+              "oy": -230,
+              "w": 345,
+              "h": 233
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "4021": {
+      "name": "�ʏ�E����",
+      "startup": 0,
+      "active": 1,
+      "recovery": 17,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": -10,
+              "oy": -135,
+              "w": 276,
+              "h": 136
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "4030": {
+      "name": "�ʏ�E����",
+      "startup": 0,
+      "active": 1,
+      "recovery": 0,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": -157,
+              "oy": -205,
+              "w": 348,
+              "h": 208
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "8800": {
+      "name": "�ʏ�E����",
+      "startup": 0,
+      "active": 8,
+      "recovery": 0,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": -52,
+              "oy": -322,
+              "w": 93,
+              "h": 322
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": -39,
+              "oy": -329,
+              "w": 65,
+              "h": 330
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": -61,
+              "oy": -319,
+              "w": 110,
+              "h": 320
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": -25,
+              "oy": -320,
+              "w": 53,
+              "h": 322
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": -67,
+              "oy": -324,
+              "w": 117,
+              "h": 324
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": -50,
+              "oy": -321,
+              "w": 82,
+              "h": 322
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": -68,
+              "oy": -322,
+              "w": 112,
+              "h": 324
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": -38,
+              "oy": -323,
+              "w": 62,
+              "h": 322
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    }
+  }
+}

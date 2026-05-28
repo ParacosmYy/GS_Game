@@ -1,0 +1,2382 @@
+{
+  "characterId": "unknown",
+  "actions": {
+    "200": {
+      "name": "AIR file created with MCM 2.0b",
+      "startup": 1,
+      "active": 1,
+      "recovery": 2,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 14,
+              "oy": -85,
+              "w": 52,
+              "h": 13
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "201": {
+      "name": "AIR file created with MCM 2.0b",
+      "startup": 1,
+      "active": 2,
+      "recovery": 2,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 17,
+              "oy": -87,
+              "w": 32,
+              "h": 18
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": 16,
+              "oy": -86,
+              "w": 29,
+              "h": 19
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "210": {
+      "name": "AIR file created with MCM 2.0b",
+      "startup": 2,
+      "active": 3,
+      "recovery": 3,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 26,
+              "oy": -77,
+              "w": 51,
+              "h": 14
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": 24,
+              "oy": -77,
+              "w": 51,
+              "h": 14
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 24,
+              "oy": -77,
+              "w": 51,
+              "h": 14
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "211": {
+      "name": "AIR file created with MCM 2.0b",
+      "startup": 1,
+      "active": 2,
+      "recovery": 2,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 17,
+              "oy": -87,
+              "w": 32,
+              "h": 18
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": 16,
+              "oy": -86,
+              "w": 29,
+              "h": 19
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "220": {
+      "name": "AIR file created with MCM 2.0b",
+      "startup": 3,
+      "active": 1,
+      "recovery": 8,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 24,
+              "oy": -69,
+              "w": 51,
+              "h": 21
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "221": {
+      "name": "AIR file created with MCM 2.0b",
+      "startup": 2,
+      "active": 1,
+      "recovery": 8,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 24,
+              "oy": -73,
+              "w": 36,
+              "h": 25
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "230": {
+      "name": "AIR file created with MCM 2.0b",
+      "startup": 2,
+      "active": 2,
+      "recovery": 3,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 35,
+              "oy": -45,
+              "w": 37,
+              "h": 29
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": 36,
+              "oy": -47,
+              "w": 37,
+              "h": 29
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "231": {
+      "name": "AIR file created with MCM 2.0b",
+      "startup": 1,
+      "active": 2,
+      "recovery": 3,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 16,
+              "oy": -83,
+              "w": 24,
+              "h": 42
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": 14,
+              "oy": -82,
+              "w": 24,
+              "h": 42
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "240": {
+      "name": "AIR file created with MCM 2.0b",
+      "startup": 2,
+      "active": 2,
+      "recovery": 4,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 46,
+              "oy": -81,
+              "w": 43,
+              "h": 26
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": 46,
+              "oy": -80,
+              "w": 42,
+              "h": 25
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "241": {
+      "name": "AIR file created with MCM 2.0b",
+      "startup": 1,
+      "active": 2,
+      "recovery": 3,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 16,
+              "oy": -83,
+              "w": 24,
+              "h": 42
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": 14,
+              "oy": -82,
+              "w": 24,
+              "h": 42
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "250": {
+      "name": "AIR file created with MCM 2.0b",
+      "startup": 3,
+      "active": 2,
+      "recovery": 5,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 29,
+              "oy": -107,
+              "w": 51,
+              "h": 27
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": 31,
+              "oy": -107,
+              "w": 59,
+              "h": 30
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "251": {
+      "name": "AIR file created with MCM 2.0b",
+      "startup": 2,
+      "active": 2,
+      "recovery": 4,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 16,
+              "oy": -109,
+              "w": 46,
+              "h": 65
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": 18,
+              "oy": -107,
+              "w": 48,
+              "h": 65
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "300": {
+      "name": "AIR file created with MCM 2.0b",
+      "startup": 6,
+      "active": 1,
+      "recovery": 5,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 11,
+              "oy": -91,
+              "w": 45,
+              "h": 39
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "400": {
+      "name": "AIR file created with MCM 2.0b",
+      "startup": 1,
+      "active": 1,
+      "recovery": 2,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 12,
+              "oy": -51,
+              "w": 46,
+              "h": 11
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "410": {
+      "name": "AIR file created with MCM 2.0b",
+      "startup": 2,
+      "active": 3,
+      "recovery": 5,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 10,
+              "oy": -82,
+              "w": 29,
+              "h": 36
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": -5,
+              "oy": -134,
+              "w": 26,
+              "h": 73
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": -5,
+              "oy": -131,
+              "w": 26,
+              "h": 70
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "420": {
+      "name": "AIR file created with MCM 2.0b",
+      "startup": 3,
+      "active": 4,
+      "recovery": 5,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 13,
+              "oy": -83,
+              "w": 41,
+              "h": 33
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": 13,
+              "oy": -82,
+              "w": 37,
+              "h": 32
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 13,
+              "oy": -82,
+              "w": 37,
+              "h": 32
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 13,
+              "oy": -82,
+              "w": 37,
+              "h": 32
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "430": {
+      "name": "AIR file created with MCM 2.0b",
+      "startup": 1,
+      "active": 2,
+      "recovery": 2,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 11,
+              "oy": -17,
+              "w": 54,
+              "h": 17
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": 11,
+              "oy": -17,
+              "w": 51,
+              "h": 17
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "440": {
+      "name": "AIR file created with MCM 2.0b",
+      "startup": 2,
+      "active": 2,
+      "recovery": 4,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 40,
+              "oy": -51,
+              "w": 53,
+              "h": 22
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": 40,
+              "oy": -51,
+              "w": 51,
+              "h": 22
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "450": {
+      "name": "AIR file created with MCM 2.0b",
+      "startup": 2,
+      "active": 2,
+      "recovery": 5,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 21,
+              "oy": -30,
+              "w": 69,
+              "h": 16
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": 21,
+              "oy": -30,
+              "w": 69,
+              "h": 16
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "600": {
+      "name": "AIR file created with MCM 2.0b",
+      "startup": 1,
+      "active": 5,
+      "recovery": 4,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 20,
+              "oy": -65,
+              "w": 27,
+              "h": 26
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": 19,
+              "oy": -67,
+              "w": 27,
+              "h": 26
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 19,
+              "oy": -67,
+              "w": 27,
+              "h": 26
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 19,
+              "oy": -67,
+              "w": 27,
+              "h": 26
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 19,
+              "oy": -67,
+              "w": 27,
+              "h": 26
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "610": {
+      "name": "AIR file created with MCM 2.0b",
+      "startup": 2,
+      "active": 2,
+      "recovery": 5,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 30,
+              "oy": -62,
+              "w": 30,
+              "h": 23
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": 28,
+              "oy": -63,
+              "w": 30,
+              "h": 23
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "620": {
+      "name": "AIR file created with MCM 2.0b",
+      "startup": 2,
+      "active": 2,
+      "recovery": 5,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 35,
+              "oy": -62,
+              "w": 28,
+              "h": 27
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": 33,
+              "oy": -65,
+              "w": 27,
+              "h": 27
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "630": {
+      "name": "AIR file created with MCM 2.0b",
+      "startup": 1,
+      "active": 5,
+      "recovery": 4,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 42,
+              "oy": -68,
+              "w": 43,
+              "h": 19
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": 42,
+              "oy": -68,
+              "w": 40,
+              "h": 19
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 42,
+              "oy": -68,
+              "w": 40,
+              "h": 19
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 42,
+              "oy": -68,
+              "w": 40,
+              "h": 19
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 42,
+              "oy": -68,
+              "w": 40,
+              "h": 19
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "640": {
+      "name": "AIR file created with MCM 2.0b",
+      "startup": 1,
+      "active": 2,
+      "recovery": 4,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 42,
+              "oy": -68,
+              "w": 43,
+              "h": 19
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": 42,
+              "oy": -68,
+              "w": 40,
+              "h": 19
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "650": {
+      "name": "AIR file created with MCM 2.0b",
+      "startup": 2,
+      "active": 2,
+      "recovery": 5,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 33,
+              "oy": -55,
+              "w": 36,
+              "h": 36
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": 28,
+              "oy": -49,
+              "w": 36,
+              "h": 36
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "900": {
+      "name": "AIR file created with MCM 2.0b",
+      "startup": 1,
+      "active": 1,
+      "recovery": 3,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": -150,
+              "oy": -100,
+              "w": 300,
+              "h": 100
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "910": {
+      "name": "AIR file created with MCM 2.0b",
+      "startup": 1,
+      "active": 1,
+      "recovery": 3,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": -150,
+              "oy": -100,
+              "w": 300,
+              "h": 100
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "1005": {
+      "name": "AIR file created with MCM 2.0b",
+      "startup": 1,
+      "active": 2,
+      "recovery": 0,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": -60,
+              "oy": -12,
+              "w": 75,
+              "h": 12
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": -27,
+              "oy": -12,
+              "w": 42,
+              "h": 12
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "1055": {
+      "name": "AIR file created with MCM 2.0b",
+      "startup": 1,
+      "active": 2,
+      "recovery": 0,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": -60,
+              "oy": -36,
+              "w": 75,
+              "h": 36
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": -27,
+              "oy": -36,
+              "w": 42,
+              "h": 36
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "1100": {
+      "name": "AIR file created with MCM 2.0b",
+      "startup": 4,
+      "active": 2,
+      "recovery": 7,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 11,
+              "oy": -78,
+              "w": 43,
+              "h": 24
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": 11,
+              "oy": -78,
+              "w": 43,
+              "h": 24
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "1110": {
+      "name": "AIR file created with MCM 2.0b",
+      "startup": 4,
+      "active": 3,
+      "recovery": 7,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 11,
+              "oy": -78,
+              "w": 43,
+              "h": 24
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": 11,
+              "oy": -78,
+              "w": 43,
+              "h": 24
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 11,
+              "oy": -78,
+              "w": 43,
+              "h": 24
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "1120": {
+      "name": "AIR file created with MCM 2.0b",
+      "startup": 4,
+      "active": 4,
+      "recovery": 7,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 11,
+              "oy": -78,
+              "w": 43,
+              "h": 24
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": 11,
+              "oy": -78,
+              "w": 43,
+              "h": 24
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 11,
+              "oy": -78,
+              "w": 43,
+              "h": 24
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 11,
+              "oy": -78,
+              "w": 43,
+              "h": 24
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "1121": {
+      "name": "AIR file created with MCM 2.0b",
+      "startup": 2,
+      "active": 1,
+      "recovery": 6,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 32,
+              "oy": -79,
+              "w": 56,
+              "h": 24
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "1150": {
+      "name": "AIR file created with MCM 2.0b",
+      "startup": 4,
+      "active": 3,
+      "recovery": 7,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 11,
+              "oy": -78,
+              "w": 43,
+              "h": 24
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": 11,
+              "oy": -78,
+              "w": 43,
+              "h": 24
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 11,
+              "oy": -78,
+              "w": 43,
+              "h": 24
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "1202": {
+      "name": "AIR file created with MCM 2.0b",
+      "startup": 5,
+      "active": 2,
+      "recovery": 0,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 35,
+              "oy": -67,
+              "w": 33,
+              "h": 32
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": 34,
+              "oy": -68,
+              "w": 33,
+              "h": 32
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "1300": {
+      "name": "AIR file created with MCM 2.0b",
+      "startup": 1,
+      "active": 2,
+      "recovery": 2,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": -17,
+              "oy": -98,
+              "w": 50,
+              "h": 98
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": -17,
+              "oy": -98,
+              "w": 50,
+              "h": 98
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "1310": {
+      "name": "AIR file created with MCM 2.0b",
+      "startup": 1,
+      "active": 2,
+      "recovery": 2,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": -17,
+              "oy": -98,
+              "w": 50,
+              "h": 60
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": -17,
+              "oy": -98,
+              "w": 50,
+              "h": 60
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "1320": {
+      "name": "AIR file created with MCM 2.0b",
+      "startup": 1,
+      "active": 2,
+      "recovery": 2,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": -16,
+              "oy": -67,
+              "w": 49,
+              "h": 67
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": -16,
+              "oy": -67,
+              "w": 49,
+              "h": 67
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "1350": {
+      "name": "AIR file created with MCM 2.0b",
+      "startup": 7,
+      "active": 1,
+      "recovery": 0,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 8,
+              "oy": -80,
+              "w": 59,
+              "h": 48
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "1360": {
+      "name": "AIR file created with MCM 2.0b",
+      "startup": 7,
+      "active": 1,
+      "recovery": 0,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 8,
+              "oy": -80,
+              "w": 59,
+              "h": 48
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "1370": {
+      "name": "AIR file created with MCM 2.0b",
+      "startup": 7,
+      "active": 1,
+      "recovery": 0,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 8,
+              "oy": -80,
+              "w": 59,
+              "h": 48
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "1400": {
+      "name": "AIR file created with MCM 2.0b",
+      "startup": 2,
+      "active": 1,
+      "recovery": 13,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 2,
+              "oy": -89,
+              "w": 35,
+              "h": 63
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "1410": {
+      "name": "AIR file created with MCM 2.0b",
+      "startup": 2,
+      "active": 1,
+      "recovery": 15,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 2,
+              "oy": -89,
+              "w": 35,
+              "h": 63
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "1420": {
+      "name": "AIR file created with MCM 2.0b",
+      "startup": 2,
+      "active": 1,
+      "recovery": 17,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 2,
+              "oy": -89,
+              "w": 35,
+              "h": 63
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "1500": {
+      "name": "AIR file created with MCM 2.0b",
+      "startup": 3,
+      "active": 1,
+      "recovery": 5,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": -150,
+              "oy": -100,
+              "w": 300,
+              "h": 100
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "1551": {
+      "name": "AIR file created with MCM 2.0b",
+      "startup": 2,
+      "active": 3,
+      "recovery": 4,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 61,
+              "oy": -89,
+              "w": 145,
+              "h": 41
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": 61,
+              "oy": -89,
+              "w": 145,
+              "h": 41
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 61,
+              "oy": -89,
+              "w": 145,
+              "h": 41
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "3100": {
+      "name": "AIR file created with MCM 2.0b",
+      "startup": 2,
+      "active": 8,
+      "recovery": 0,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 0,
+              "oy": -62,
+              "w": 39,
+              "h": 62
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": 0,
+              "oy": -62,
+              "w": 39,
+              "h": 62
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 0,
+              "oy": -62,
+              "w": 39,
+              "h": 62
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 0,
+              "oy": -62,
+              "w": 39,
+              "h": 62
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 0,
+              "oy": -62,
+              "w": 39,
+              "h": 62
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 0,
+              "oy": -62,
+              "w": 39,
+              "h": 62
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 0,
+              "oy": -62,
+              "w": 39,
+              "h": 62
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 0,
+              "oy": -62,
+              "w": 39,
+              "h": 62
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "3102": {
+      "name": "AIR file created with MCM 2.0b",
+      "startup": 1,
+      "active": 2,
+      "recovery": 2,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 16,
+              "oy": -91,
+              "w": 44,
+              "h": 41
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": 16,
+              "oy": -91,
+              "w": 41,
+              "h": 38
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "3103": {
+      "name": "AIR file created with MCM 2.0b",
+      "startup": 2,
+      "active": 1,
+      "recovery": 8,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 11,
+              "oy": -73,
+              "w": 49,
+              "h": 33
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "3104": {
+      "name": "AIR file created with MCM 2.0b",
+      "startup": 3,
+      "active": 1,
+      "recovery": 8,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 24,
+              "oy": -69,
+              "w": 51,
+              "h": 36
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "3105": {
+      "name": "AIR file created with MCM 2.0b",
+      "startup": 2,
+      "active": 1,
+      "recovery": 3,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 14,
+              "oy": -77,
+              "w": 40,
+              "h": 48
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "3106": {
+      "name": "AIR file created with MCM 2.0b",
+      "startup": 2,
+      "active": 2,
+      "recovery": 3,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 28,
+              "oy": -48,
+              "w": 48,
+              "h": 35
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": 27,
+              "oy": -52,
+              "w": 50,
+              "h": 34
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "3107": {
+      "name": "AIR file created with MCM 2.0b",
+      "startup": 3,
+      "active": 2,
+      "recovery": 5,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 26,
+              "oy": -107,
+              "w": 54,
+              "h": 59
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": 31,
+              "oy": -105,
+              "w": 59,
+              "h": 55
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "3108": {
+      "name": "AIR file created with MCM 2.0b",
+      "startup": 3,
+      "active": 1,
+      "recovery": 6,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": -1,
+              "oy": -111,
+              "w": 48,
+              "h": 62
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "3109": {
+      "name": "AIR file created with MCM 2.0b",
+      "startup": 3,
+      "active": 2,
+      "recovery": 7,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 13,
+              "oy": -83,
+              "w": 49,
+              "h": 51
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": 13,
+              "oy": -82,
+              "w": 47,
+              "h": 50
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "3110": {
+      "name": "AIR file created with MCM 2.0b",
+      "startup": 4,
+      "active": 6,
+      "recovery": 9,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 4,
+              "oy": -97,
+              "w": 57,
+              "h": 59
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": 4,
+              "oy": -97,
+              "w": 57,
+              "h": 59
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 4,
+              "oy": -97,
+              "w": 57,
+              "h": 59
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 4,
+              "oy": -97,
+              "w": 57,
+              "h": 59
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 4,
+              "oy": -97,
+              "w": 57,
+              "h": 59
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 4,
+              "oy": -97,
+              "w": 57,
+              "h": 59
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "3200": {
+      "name": "AIR file created with MCM 2.0b",
+      "startup": 6,
+      "active": 7,
+      "recovery": 7,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 25,
+              "oy": -83,
+              "w": 55,
+              "h": 39
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": 25,
+              "oy": -83,
+              "w": 55,
+              "h": 39
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 25,
+              "oy": -83,
+              "w": 55,
+              "h": 39
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 25,
+              "oy": -83,
+              "w": 55,
+              "h": 39
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 25,
+              "oy": -83,
+              "w": 55,
+              "h": 39
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 25,
+              "oy": -83,
+              "w": 55,
+              "h": 39
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 25,
+              "oy": -83,
+              "w": 55,
+              "h": 39
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "3210": {
+      "name": "AIR file created with MCM 2.0b",
+      "startup": 6,
+      "active": 7,
+      "recovery": 7,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 24,
+              "oy": -83,
+              "w": 56,
+              "h": 39
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": 24,
+              "oy": -83,
+              "w": 56,
+              "h": 39
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 24,
+              "oy": -83,
+              "w": 56,
+              "h": 39
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 24,
+              "oy": -83,
+              "w": 56,
+              "h": 39
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 24,
+              "oy": -83,
+              "w": 56,
+              "h": 39
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 24,
+              "oy": -83,
+              "w": 56,
+              "h": 39
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 24,
+              "oy": -83,
+              "w": 56,
+              "h": 39
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "3220": {
+      "name": "AIR file created with MCM 2.0b",
+      "startup": 6,
+      "active": 7,
+      "recovery": 7,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 25,
+              "oy": -83,
+              "w": 55,
+              "h": 39
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": 25,
+              "oy": -83,
+              "w": 55,
+              "h": 39
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 25,
+              "oy": -83,
+              "w": 55,
+              "h": 39
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 25,
+              "oy": -83,
+              "w": 55,
+              "h": 39
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 25,
+              "oy": -83,
+              "w": 55,
+              "h": 39
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 25,
+              "oy": -83,
+              "w": 55,
+              "h": 39
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 25,
+              "oy": -83,
+              "w": 55,
+              "h": 39
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "3221": {
+      "name": "AIR file created with MCM 2.0b",
+      "startup": 3,
+      "active": 4,
+      "recovery": 20,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 18,
+              "oy": -78,
+              "w": 42,
+              "h": 40
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": 18,
+              "oy": -77,
+              "w": 39,
+              "h": 39
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 18,
+              "oy": -77,
+              "w": 39,
+              "h": 39
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 18,
+              "oy": -77,
+              "w": 39,
+              "h": 39
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "7750": {
+      "name": "AIR file created with MCM 2.0b",
+      "startup": 0,
+      "active": 1,
+      "recovery": 0,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": -25,
+              "oy": -152,
+              "w": 73,
+              "h": 152
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    }
+  }
+}
