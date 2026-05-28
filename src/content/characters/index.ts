@@ -148,3 +148,69 @@ export { IORI_HIT_EFFECTS } from './iori/hitEffects/ioriHitEffects.js';
 
 // Iori Audio
 export { registerIoriAudio } from './iori/audio/ioriSampler.js';
+
+// Terry content package — prefixed to avoid type name collisions
+export {
+  TERRY_MOVE_LIST,
+  TERRY_WIN_QUOTES,
+  TERRY_AVAILABLE_ACTIONS,
+  type TerryMoveEntry,
+} from './terry/commands/terryCommands.js';
+
+export {
+  TERRY_MOVES,
+  getMoveByKey as getTerryMoveByKey,
+  getMoveByAttackType as getTerryMoveByAttackType,
+  getMovesByCategory as getTerryMovesByCategory,
+  getProjectileMoves as getTerryProjectileMoves,
+  getInvincibleMoves as getTerryInvincibleMoves,
+  getMoveStats as getTerryMoveStats,
+} from './terry/moves/terryMoves.js';
+
+export {
+  TERRY_CANCEL_PATHS,
+  findCancelRoute as findTerryCancelRoute,
+  getCancelTargets as getTerryCancelTargets,
+  validateCancel as validateTerryCancel,
+  getCancelRoutesByType as getTerryCancelRoutesByType,
+  isCancelSource as isTerryCancelSource,
+  getBestCancelRoute as getTerryBestCancelRoute,
+  type CancelType as TerryCancelType,
+  type CancelRoute as TerryCancelRoute,
+} from './terry/cancelPaths.js';
+
+export { TERRY_HIT_EFFECTS } from './terry/hitEffects/terryHitEffects.js';
+export { registerTerryAudio } from './terry/audio/terrySampler.js';
+
+// Kim content package — prefixed to avoid type name collisions
+export {
+  KIM_MOVE_LIST,
+  KIM_WIN_QUOTES,
+  KIM_AVAILABLE_ACTIONS,
+  type KimMoveEntry,
+} from './kim/commands/kimCommands.js';
+
+export {
+  KIM_MOVES,
+  getMoveByKey as getKimMoveByKey,
+  getMoveByAttackType as getKimMoveByAttackType,
+  getMovesByCategory as getKimMovesByCategory,
+  getProjectileMoves as getKimProjectileMoves,
+  getInvincibleMoves as getKimInvincibleMoves,
+  getMoveStats as getKimMoveStats,
+} from './kim/moves/kimMoves.js';
+
+export {
+  KIM_CANCEL_PATHS,
+  findCancelRoute as findKimCancelRoute,
+  getCancelTargets as getKimCancelTargets,
+  validateCancel as validateKimCancel,
+  getCancelRoutesByType as getKimCancelRoutesByType,
+  isCancelSource as isKimCancelSource,
+  getBestCancelRoute as getKimBestCancelRoute,
+  type CancelType as KimCancelType,
+  type CancelRoute as KimCancelRoute,
+} from './kim/cancelPaths.js';
+
+export { KIM_HIT_EFFECTS } from './kim/hitEffects/kimHitEffects.js';
+export { registerKimAudio } from './kim/audio/kimSampler.js';

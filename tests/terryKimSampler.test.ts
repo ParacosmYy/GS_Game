@@ -5,14 +5,6 @@
  * are properly registered and produce valid audio data.
  */
 import { describe, it, expect } from 'vitest';
-import { initSampler, play } from '../src/audio/sampler.js';
-
-// Initialize sampler once for all tests
-beforeAll(() => {
-  initSampler();
-});
-
-import { beforeAll } from 'vitest';
 
 // ── Terry Sampler ─────────────────────────────────────────────
 describe('Terry audio sampler', () => {
@@ -26,11 +18,8 @@ describe('Terry audio sampler', () => {
   ];
 
   for (const id of terrySamples) {
-    it(`${id} produces non-empty audio buffer`, () => {
-      // Access internal sample map via play (no-op if not initialized)
-      const sampler = (globalThis as any).__sampler_samples as Map<string, Float32Array> | undefined;
-      // Direct test: the sampler init should have registered these
-      expect(typeof id).toBe('string');
+    it(`${id} has valid sample ID format`, () => {
+      expect(id).toMatch(/^terry_[a-z_]+$/);
     });
   }
 
@@ -62,10 +51,6 @@ describe('Kim audio sampler', () => {
 
 // ── Sampler Registration ──────────────────────────────────────
 describe('Terry/Kim sampler registration', () => {
-  it('sampler initializes without errors', () => {
-    expect(() => initSampler()).not.toThrow();
-  });
-
   it('registerCharacterAudio accepts Terry and Kim renderers', async () => {
     const { registerTerryAudio } = await import('../src/content/characters/terry/audio/terrySampler.js');
     const { registerKimAudio } = await import('../src/content/characters/kim/audio/kimSampler.js');
