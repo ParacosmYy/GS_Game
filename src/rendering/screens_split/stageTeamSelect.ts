@@ -12,6 +12,21 @@ import type { PixelPortraitData } from '../pixelPortraits.js';
 import { getPortraitForSize } from '../manifestRenderData.js';
 import type { CharacterDefinition } from '../../characters/types.js';
 import type { StageId } from '../stage.js';
+import { getBestPortrait, drawPortraitFitVisibleBoundsInBox } from './characterSelect.js';
+
+// Stage constants (shared from winQuoteAnnounce for consistency)
+const ALL_STAGES: StageId[] = ['temple', 'china', 'factory', 'orochi', 'street', 'rooftop'];
+const STAGE_PREVIEW_W = 120;
+const STAGE_PREVIEW_H = 68;
+const STAGE_PREVIEW_GAP = 16;
+const STAGE_THEMES: Record<string, { bg1: string; bg2: string; accent: string; pattern: string }> = {
+  temple: { bg1: '#2a1a0a', bg2: '#1a0e04', accent: '#cc8844', pattern: 'dots' },
+  china: { bg1: '#1a0808', bg2: '#0e0404', accent: '#ff4444', pattern: 'stripes' },
+  factory: { bg1: '#1a1a22', bg2: '#0e0e14', accent: '#4488cc', pattern: 'grid' },
+  orochi: { bg1: '#0a0a1a', bg2: '#04040e', accent: '#8844ff', pattern: 'waves' },
+  street: { bg1: '#1a1a0a', bg2: '#0e0e04', accent: '#cccc44', pattern: 'cross' },
+  rooftop: { bg1: '#0a1a1a', bg2: '#040e0e', accent: '#44cccc', pattern: 'diamonds' },
+};
 
 // Stage name mapping
 const STAGE_NAMES: Record<StageId, string> = {

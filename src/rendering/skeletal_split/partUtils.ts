@@ -2,7 +2,7 @@
  * Shoe rendering, attack trail, and color parsing utilities
  * Split from skeletalParts.ts
  */
-import { shiftColor } from '../utils.js';
+import { shiftColor, roundRect } from '../utils.js';
 
 export function drawShoe(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, rot: number, color: string, facing: number): void {
   ctx.save();

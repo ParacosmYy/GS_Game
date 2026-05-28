@@ -21,25 +21,24 @@ export {
   drawTitle,
   drawModeSelect,
   drawOptionsScreen,
-  GameOptions,
   DEFAULT_OPTIONS,
 } from './overlays/overlayMenuScreens.js';
+export type { GameOptions } from './overlays/overlayMenuScreens.js';
 
-// Continue / Game Over / Round Score Breakdown
+// Continue / Game Over
 export {
   drawContinue,
   drawGameOver,
-  drawRoundScoreBreakdown,
-  RoundScoreBreakdown,
   GAME_OVER_DURATION,
 } from './overlays/overlayContinueGameOver.js';
 
-// Arcade flow (Arcade Complete, Next Match)
+// Arcade flow (Arcade Complete, Next Match, Round Score Breakdown)
 export {
   drawArcadeComplete,
   drawNextMatch,
-  ArcadeStats,
+  drawRoundScoreBreakdown,
 } from './overlays/overlayArcadeFlow.js';
+export type { ArcadeStats, RoundScoreBreakdown } from './overlays/overlayArcadeFlow.js';
 
 // KO overlay + screen transitions (fade/wipe)
 export {

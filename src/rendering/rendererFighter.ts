@@ -147,7 +147,7 @@ export function drawFighters(
     // KOF2002: 胜利光环 — WIN状态角色发光, 混合金色+角色属性色
     if (f.state === FighterState.WIN) {
       const winPulse = 0.06 + Math.sin(globalTick * 0.08) * 0.03;
-      const charColor = refColors.outline;
+      const charColor = maxAura.stroke;
       ctx.fillStyle = `rgba(255, 215, 0, ${Math.max(0, winPulse)})`;
       ctx.beginPath();
       ctx.ellipse(sx, sy - f.displayHeight / 2, hw + 20, f.displayHeight / 2 + 16, 0, 0, Math.PI * 2);

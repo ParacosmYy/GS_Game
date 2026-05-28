@@ -6,7 +6,10 @@ import {
   CANVAS_WIDTH, CANVAS_HEIGHT,
 } from '../../core/constants.js';
 import { roundRect, drawSNKText } from '../utils.js';
+import { drawPixelPortrait } from '../pixelPortraits.js';
+import type { PixelPortraitData } from '../pixelPortraits.js';
 import type { AnnounceSequence } from '../../state/announceSequence.js';
+import type { StageId } from '../stage.js';
 
 // ===== Win Quote Overlay =====
 

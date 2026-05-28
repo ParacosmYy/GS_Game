@@ -32,7 +32,7 @@ const STAGE_NAMES: Record<StageId, string> = {
  * Helper: get the best portrait for a given size context.
  * Returns size-specific portrait if available, else CharacterDefinition.pixelPortrait.
  */
-function getBestPortrait(
+export function getBestPortrait(
   char: CharacterDefinition | null,
   size: 'select' | 'vs' | 'hud' | 'win',
 ): PixelPortraitData | undefined {
@@ -146,7 +146,7 @@ function cropPortraitToAspect(
   };
 }
 
-function drawPortraitFitVisibleBoundsInBox(
+export function drawPortraitFitVisibleBoundsInBox(
   ctx: CanvasRenderingContext2D,
   portrait: PixelPortraitData,
   boxX: number,

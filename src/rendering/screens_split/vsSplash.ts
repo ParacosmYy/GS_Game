@@ -10,7 +10,29 @@ import { drawPixelPortrait } from '../pixelPortraits.js';
 import type { PixelPortraitData } from '../pixelPortraits.js';
 import { getPortraitForSize } from '../manifestRenderData.js';
 import { RANDOM_SLOT_INDEX, COLOR_PALETTES, VS_SPLASH_DURATION } from '../../state/selectState.js';
+import type { SelectState } from '../../state/selectState.js';
 import type { CharacterDefinition } from '../../characters/types.js';
+import type { StageId } from '../stage.js';
+import { getRivalDialogue, getRivalThemeColors } from '../../core/rivalData.js';
+
+// Stage name mapping
+const STAGE_NAMES: Record<StageId, string> = {
+  temple: '日本寺庙 · Japan',
+  china: '唐人街 · China',
+  factory: '工場 · Factory',
+  orochi: '大蛇神社 · Orochi',
+  street: '街市夜市 · Street',
+  rooftop: '日本屋上 · Rooftop',
+};
+
+function getBestPortrait(
+  char: CharacterDefinition | null,
+  size: 'select' | 'vs' | 'hud' | 'win',
+): PixelPortraitData | undefined {
+  if (!char) return undefined;
+  const sized = getPortraitForSize(char.id, size);
+  return sized ?? char.pixelPortrait;
+}
 
 // ===== VS Splash =====
 
