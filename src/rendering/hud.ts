@@ -665,12 +665,16 @@ export function drawHUD(
     ctx.beginPath();
     ctx.arc(p1dx, dotY, dotR, 0, Math.PI * 2);
     if (i < p1Wins) {
-      // Filled — P1 won this round
+      // Filled — P1 won this round; latest win is slightly larger
+      const isLatest = i === p1Wins - 1;
+      const r = isLatest ? dotR * 1.3 : dotR;
+      ctx.beginPath();
+      ctx.arc(p1dx, dotY, r, 0, Math.PI * 2);
       const winGlow = 0.7 + 0.3 * Math.sin(tick * 0.08 + i);
       ctx.fillStyle = `rgba(255, 100, 60, ${winGlow})`;
       ctx.fill();
       ctx.strokeStyle = '#ff6644';
-      ctx.lineWidth = 1.5;
+      ctx.lineWidth = isLatest ? 2 : 1.5;
       ctx.stroke();
     } else {
       // Empty — round not yet won
