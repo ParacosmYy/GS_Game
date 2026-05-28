@@ -1293,6 +1293,28 @@ export function renderLandingNormal(sr: number): Float32Array {
   return normalize(mixLayers([toeDownP, footFlat, dustP, weightP], [0.7, 1, 0.5, 0.8]));
 }
 
+// === Stun Recovery — clear "shake off dizziness" chime ===
+export function renderStunRecovery(sr: number): Float32Array {
+  const dur = 0.25;
+  const total = Math.ceil(sr * dur);
+  const out = new Float32Array(total);
+  // Two ascending chimes: C5→E5, like shaking off the stars
+  const freqs = [523.25, 659.25];
+  for (let i = 0; i < total; i++) {
+    const t = i / sr;
+    let s = 0;
+    for (let fi = 0; fi < freqs.length; fi++) {
+      const onset = fi * 0.1;
+      if (t < onset) continue;
+      const lt = t - onset;
+      const env = Math.exp(-lt * 12) * Math.min(1, lt * 200);
+      s += Math.sin(2 * Math.PI * freqs[fi] * t) * env * 0.35;
+    }
+    out[i] = s;
+  }
+  return out;
+}
+
 // === 基础 BGM 框架 ===
 
 // 生成简单循环战斗BGM

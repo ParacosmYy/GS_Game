@@ -27,6 +27,7 @@ import {
   renderAccentIce, renderAccentGeneric, renderDizzyHit, renderPerfectKO,
   renderRoundStart, renderTimeUp, renderWhoosh, renderWhooshHeavy,
   renderFootstep, renderJump, renderLandingNormal, generateBattleBGM,
+  renderStunRecovery,
 } from './samplerRenderers.js';
 
 type SampleId =
@@ -54,7 +55,8 @@ type SampleId =
   | 'kyo_75kai' | 'kyo_red_kick' | 'kyo_orochinagi'
   | 'iori_aoihana' | 'iori_yamibarai' | 'iori_oniyaki' | 'iori_kototsuki'
   | 'iori_kuzukaze' | 'iori_yumeyumi' | 'iori_katanugi' | 'iori_yaotome'
-  | 'cursor_move' | 'cursor_confirm';
+  | 'cursor_move' | 'cursor_confirm'
+  | 'stun_recovery';
 
 const samples = new Map<SampleId, AudioBuffer>();
 let initialized = false;
@@ -141,6 +143,7 @@ export function initSampler(): void {
     ['footstep', renderFootstep],
     ['jump', renderJump],
     ['landing_normal', renderLandingNormal],
+    ['stun_recovery', renderStunRecovery],
   ];
 
   for (const [id, renderer] of renderers) {
@@ -374,6 +377,7 @@ export function playCountdownBuzzer(): void {
 
 /** 播放Dizzy Hit音效 — DIZZY状态被命中时叠加 */
 export function playDizzyHit(): void { initSampler(); play('dizzy_hit', 0.8); }
+export function playStunRecovery(): void { initSampler(); play('stun_recovery', 0.7); }
 
 /** 播放Ground Bounce音效 — 角色从地面弹起时 */
 export function playGroundBounce(): void { initSampler(); play('ground_bounce'); }

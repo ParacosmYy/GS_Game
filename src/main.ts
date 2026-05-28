@@ -32,7 +32,7 @@ import { SelectState } from './state/selectState.js';
 import { RoundState } from './state/roundState.js';
 import { DMManager } from './combat/dmManager.js';
 import { createHitCallback, triggerKOGroundEffect } from './combat/hitCallback.js';
-import { initAudio, initSampler, playKO, playVictoryFanfare, playMAXActivation, playPerfect, playThrowEscape, playFight, playRoll, playCancel, playQuickStand, playGuardCrush, playHit, playSpecialLight, playSpecialHeavy, playDM, playWhoosh, playHeavyWhoosh, playKoouken, playKoHou, playHien, playHaou, playCursorMove, playCursorConfirm, playTimeUp, playFootstep, playCountdownTick, playCountdownBuzzer } from './audio/sampler.js';
+import { initAudio, initSampler, playKO, playVictoryFanfare, playMAXActivation, playPerfect, playThrowEscape, playFight, playRoll, playCancel, playQuickStand, playGuardCrush, playHit, playSpecialLight, playSpecialHeavy, playDM, playWhoosh, playHeavyWhoosh, playKoouken, playKoHou, playHien, playHaou, playCursorMove, playCursorConfirm, playTimeUp, playFootstep, playCountdownTick, playCountdownBuzzer, playStunRecovery } from './audio/sampler.js';
 import { tickAttackSFX, dispatchContractSFX } from './audio/attackSFX.js';
 import { getContractEventTags } from './entities/fighter.js';
 import { tickMotionSFX } from './audio/motionSFX.js';
@@ -1017,6 +1017,8 @@ function update(): void {
       combatSystem.resetCombo(i);
     }
     if (f.prevState === FighterState.BLOCK && f.state === FighterState.IDLE) vfx.spawnDust(f.x, STAGE_GROUND_Y);
+    // Stun recovery: DIZZY → IDLE — play recovery chime
+    if (f.prevState === FighterState.DIZZY && f.state === FighterState.IDLE) playStunRecovery();
     // Heavy knockdown impact: entering KNOCKDOWN from air/hitstun = ground slam
     if (f.state === FighterState.KNOCKDOWN && f.prevState !== FighterState.KNOCKDOWN && f.prevState !== FighterState.GETUP) {
       vfx.spawnGroundSlam(f.x, STAGE_GROUND_Y);
