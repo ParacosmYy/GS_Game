@@ -26,7 +26,7 @@ import { RYO_CLOSE_B_FRAMES, RYO_CLOSE_D_FRAMES } from './ryoCloseKickFrames.js'
 import { RYO_JUMP_FRAMES } from './ryoJumpFrames.js';
 import { RYO_HURT_FRAMES, RYO_KNOCKDOWN_FRAMES } from './ryoDamageFrames.js';
 import { RYO_CROUCH_FRAMES, RYO_CROUCH_A_FRAMES, RYO_CROUCH_C_FRAMES } from './ryoCrouchFrames.js';
-import { RYO_AIR_A_FRAMES, RYO_AIR_C_FRAMES, RYO_AIR_D_FRAMES } from './ryoAirAttackFrames.js';
+import { RYO_AIR_A_FRAMES, RYO_AIR_B_FRAMES, RYO_AIR_C_FRAMES, RYO_AIR_D_FRAMES } from './ryoAirAttackFrames.js';
 import {
   RYO_KO_HOU_FRAMES, RYO_KOOU_FRAMES, RYO_HIEN_FRAMES,
   RYO_HAOU_FRAMES, RYO_KOOU_C_FRAMES, RYO_KO_HOU_C_FRAMES,
@@ -85,6 +85,7 @@ function initRyoFrames(): void {
   registerVariableFrames('CROUCH_D', RYO_CROUCH_D_FRAMES, [6, 3, 3, 3, 12]);
 
   registerVariableFrames('AIR_A', RYO_AIR_A_FRAMES, [3, 3, 5]);
+  registerVariableFrames('AIR_B', RYO_AIR_B_FRAMES, [3, 2, 4]);
   registerVariableFrames('AIR_C', RYO_AIR_C_FRAMES, [5, 3, 3, 5]);
   registerVariableFrames('AIR_D', RYO_AIR_D_FRAMES, [4, 3, 3, 5]);
 
@@ -167,6 +168,7 @@ function resolveRyoFrameKey(
     case FighterState.AIR_ATTACK:
       if (currentAttack === AttackType.JUMP_C || currentAttack === AttackType.JUMP_CD) return 'AIR_C';
       if (currentAttack === AttackType.JUMP_D) return 'AIR_D';
+      if (currentAttack === AttackType.JUMP_B) return 'AIR_B';
       return 'AIR_A';
     case FighterState.HITSTUN: return 'HURT';
     case FighterState.KNOCKDOWN: return 'KNOCKDOWN';
