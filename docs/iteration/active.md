@@ -2,42 +2,36 @@
 
 ## 目标
 
-- Phase 2 (137→2000) 持续迭代
-- 当前分数：138/2000
-- 本轮：舞台开场仪式 + 测试稳定性修复
+- Phase 2 持续迭代
+- 当前分数：141+/2000
+- 本轮方向：流程仪式感 → 内容包校验
 
 ## 当前状态
 
-- 当前主线：Phase 2 游戏流程进阶 + 街机仪式感
-- Phase 1：Ryo Vertical Slice 100% 完成
-- 战斗系统：8/8 KOF2002 深层机制已实现（MAX/FreeCancel/GuardCancel/Juggle/CounterWire/Blowback）
-- 当前最高优先级仍然是按 [KOF 差距矩阵](../product/kof-gap-matrix.md) 逐项闭合差距
-- 当前迭代要点：街机模式对手递进、菜单/选人/VS/胜负画面、招式表与输入可见性、Kyo/Iori 内容包接入
+- 当前主线：Phase 2 多角色内容包 + 街机仪式感
+- 战斗系统：8/8 KOF2002 深层机制已实现
+- 测试总数 6834 (2 MUGEN references only failures)
+- 当前tag: v2.74+
+- Frame Contract校验发现：Ryo=0问题, Kyo=42问题, Iori=57问题
 
 ## 本轮完成
 
-- Round 16: 舞台开场仪式 STAGE_INTRO
-  - 新增 GamePhase.STAGE_INTRO（NEXT_MATCH→STAGE_INTRO→INTRO）
-  - 舞台名称覆盖层（暗色遮罩+SNK风格文字+装饰条+accent色）
-  - createStageIntroSequence 播报序列工厂
-  - 6舞台专属accent色映射（temple/china/factory/orochi/street/rooftop）
-  - 修复3个测试import timeout（并行负载下失败）
-  - Canvas/DOM mock 添加到测试setup
-  - 9个回归测试覆盖
-  - 测试总数 5224
-
-- Round 15: 街机模式对手递进
-  - 新增 NEXT_MATCH 阶段
-  - 全部对手击败后显示 CONGRATULATIONS 画面
+- Round 18+: 流程仪式感 + 内容包校验
+  - STAGE_INTRO: 舞台名称展示仪式 (9 tests)
+  - KO回合得分弹窗: 每回合KO后分数反馈
+  - 胜利点环爆动画: 20帧扩散环+缩放弹跳 (7 tests)
+  - Continue画面进度摘要: STAGE/SCORE/对手进度 (6 tests)
+  - 跨角色Frame Contract校验: ActionContract vs FRAME_DATA漂移检测 (5 tests)
+  - 测试timeout修复: 3个import timeout + Canvas/DOM mock
+  - 大量回归测试扩展 (5300→6834)
 
 ## 复盘
 
-- 本轮提升：流程仪式感 +1（STAGE_INTRO填补NEXT_MATCH→INTRO间空白）
-- 更像 KOF：每次NEXT_STAGE过渡后有2秒舞台名称展示，接近街机KOF体验
+- 差距矩阵3.1流程仪式感大部分闭合
+- 差距矩阵2.2内容包：Frame Contract校验工具已建，发现Kyo/Iori数据漂移
+- 下一步：修复Kyo/Iori的99个ActionContract misalignment，或继续内容包闭环
 - 仍不像 KOF：角色仍是程序化骨骼/像素帧渲染，不是SNK精灵图
-- 下一轮最小任务：回合间得分弹窗（KO后每回合显示WIN BONUS），或其他差距矩阵优先项
 
 ## 回退方案
 
-- 改动涉及 GameStateManager(STAGE_INTRO phase) + main.ts(流程分支) + overlayStageIntro(渲染) + types(新阶段)
-- 回退 git revert 即可
+- git revert 即可（改动均为独立功能模块）

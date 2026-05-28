@@ -137,21 +137,17 @@ describe('ActionContract alignment', () => {
     expect(kyo.issues.length, `Kyo issues: ${kyo.issues.join('; ')}`).toBe(0);
   });
 
-  it('Iori ActionContracts tracked misalignment baseline (16 known issues)', async () => {
+  it('Iori ActionContracts align with FRAME_DATA', async () => {
     const { validateAllContracts } = await import('../src/tools/validateFrameContract.js');
     const results = validateAllContracts();
     const iori = results.find(r => r.character === 'iori')!;
-    // Iori has known ActionContract vs FRAME_DATA misalignments (special moves)
-    // This test tracks the count so regressions are caught
-    expect(iori.issues.length).toBeGreaterThan(0);
-    expect(iori.issues.length, `Iori issues should not exceed 20: ${iori.issues.join('; ')}`).toBeLessThanOrEqual(20);
+    expect(iori.issues.length, `Iori issues: ${iori.issues.join('; ')}`).toBe(0);
   });
 
-  it('issue count does not regress beyond known baseline', async () => {
+  it('total issues across all characters is zero', async () => {
     const { validateAllContracts } = await import('../src/tools/validateFrameContract.js');
     const results = validateAllContracts();
     const totalIssues = results.reduce((sum, r) => sum + r.issues.length, 0);
-    // Ryo=0, Kyo/Iori have known misalignments — total should not exceed 100
-    expect(totalIssues).toBeLessThanOrEqual(100);
+    expect(totalIssues, `Total issues: ${results.map(r => `${r.character}=${r.issues.length}`).join(', ')}`).toBe(0);
   });
 });
