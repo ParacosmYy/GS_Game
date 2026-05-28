@@ -1063,7 +1063,7 @@ function drawStunIndicator(ctx: CanvasRenderingContext2D, x: number, y: number, 
  * MAX mode: radialGradient green halo with shadowBlur=15.
  * DM-ready: double-layer pulsing border (outer gold + inner white).
  */
-export function drawPowerGauges(ctx: CanvasRenderingContext2D, gauges: [PowerGauge, PowerGauge], maxModes: [MaxModeState, MaxModeState]): void {
+export function drawPowerGauges(ctx: CanvasRenderingContext2D, gauges: [PowerGauge, PowerGauge], maxModes: [MaxModeState, MaxModeState], desperations?: [boolean, boolean]): void {
   const gaugeY = HUD_GAUGE_Y;
   const gaugeW = HUD_GAUGE_WIDTH;
   const gaugeH = HUD_GAUGE_HEIGHT;
@@ -1076,6 +1076,7 @@ export function drawPowerGauges(ctx: CanvasRenderingContext2D, gauges: [PowerGau
   for (let p = 0; p < 2; p++) {
     const gauge = gauges[p];
     const maxMode = maxModes[p];
+    const isDesperate = desperations?.[p] ?? false;
     const isP1 = p === 0;
     const baseX = isP1 ? HUD_MARGIN : CANVAS_WIDTH - HUD_MARGIN - gaugeW;
 
@@ -1375,6 +1376,54 @@ export function drawPowerGauges(ctx: CanvasRenderingContext2D, gauges: [PowerGau
       ctx.strokeStyle = `rgba(255, 200, 0, ${stockAlpha})`;
       ctx.lineWidth = 3;
       roundRect(ctx, baseX - 6, gaugeY - 6, gaugeW + 12, gaugeH + 12, 8);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    // ---- Desperation indicator: red pulse glow when HP < 25% (HSDM available) ----
+    if (isDesperate && !maxMode.active) {
+      const despPulse = Math.sin(now / 160) * 0.3 + 0.5;
+      const despFlash = Math.sin(now / 80) > 0.2;
+      ctx.save();
+      ctx.shadowColor = `rgba(255, 30, 30, ${despPulse})`;
+      ctx.shadowBlur = 10 + 5 * despPulse;
+      ctx.strokeStyle = `rgba(255, 40, 40, ${despPulse * 0.7})`;
+      ctx.lineWidth = 2;
+      roundRect(ctx, baseX - 6, gaugeY - 6, gaugeW + 12, gaugeH + 12, 8);
+      ctx.stroke();
+      ctx.restore();
+      // Inner crimson ring
+      if (despFlash) {
+        ctx.save();
+        ctx.shadowColor = '#ff2222';
+        ctx.shadowBlur = 6;
+        ctx.strokeStyle = 'rgba(255, 80, 60, 0.4)';
+        ctx.lineWidth = 1;
+        roundRect(ctx, baseX - 3, gaugeY - 3, gaugeW + 6, gaugeH + 6, 5);
+        ctx.stroke();
+        ctx.restore();
+      }
+    }
+
+    // ---- Desperation + MAX: "HSDM" text flash ----
+    if (isDesperate && maxMode.active) {
+      const hsPulse = 0.6 + 0.4 * Math.sin(now / 100);
+      ctx.save();
+      ctx.globalAlpha = hsPulse;
+      ctx.shadowColor = '#ff2222';
+      ctx.shadowBlur = 14;
+      drawSNKText(ctx, 'HSDM', isP1 ? baseX + gaugeW + 16 : baseX - 16, gaugeY + 7, 11, '#ff4444', '#000000', isP1 ? 'left' : 'right');
+      ctx.shadowBlur = 0;
+      ctx.globalAlpha = 1;
+      ctx.restore();
+      // Crimson overlay glow on entire gauge
+      const crGlow = Math.sin(now / 120) * 0.15 + 0.2;
+      ctx.save();
+      ctx.shadowColor = `rgba(255, 20, 20, ${crGlow + 0.3})`;
+      ctx.shadowBlur = 12;
+      ctx.strokeStyle = `rgba(255, 50, 50, ${crGlow})`;
+      ctx.lineWidth = 2.5;
+      roundRect(ctx, baseX - 7, gaugeY - 7, gaugeW + 14, gaugeH + 14, 9);
       ctx.stroke();
       ctx.restore();
     }

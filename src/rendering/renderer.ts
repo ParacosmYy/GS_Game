@@ -372,8 +372,8 @@ export class Renderer {
     updateSuperFlashZoom(timer, maxTimer);
   }
 
-  drawPowerGauges(gauges: [PowerGauge, PowerGauge], maxModes: [MaxModeState, MaxModeState]): void {
-    drawPowerGauges(this.ctx, gauges, maxModes);
+  drawPowerGauges(gauges: [PowerGauge, PowerGauge], maxModes: [MaxModeState, MaxModeState], desperations?: [boolean, boolean]): void {
+    drawPowerGauges(this.ctx, gauges, maxModes, desperations);
   }
 
   drawComboCounters(

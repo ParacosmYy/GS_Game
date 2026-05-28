@@ -1413,7 +1413,7 @@ function render(): void {
     // Decay zoom back to 1.0
     renderer.updateSuperFlashZoom(0, 24);
   }
-  renderer.drawPowerGauges(gauges, maxModes);
+  renderer.drawPowerGauges(gauges, maxModes, [p1.health / p1.maxHealth < 0.25 && p1.health > 0, p2.health / p2.maxHealth < 0.25 && p2.health > 0]);
   if (gs.phase === GamePhase.INTRO) {
     if (gs.announceSequence.isRunning()) {
       drawAnnounceSequence(ctx, gs.announceSequence, canvas.width, canvas.height);
