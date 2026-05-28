@@ -113,6 +113,36 @@ export function getHitboxAction(charId: string, actionNumber: string): MugenHitb
 }
 
 /**
+ * Get attack boxes during the active phase (0-based index within active).
+ * This matches the game's attackFrame which resets to 0 at phase boundaries.
+ */
+export function getActivePhaseBoxes(
+  charId: string,
+  actionNumber: string,
+  activeFrameIndex: number,
+): FrameBox[] | null {
+  const action = getHitboxAction(charId, actionNumber);
+  if (!action) return null;
+  if (activeFrameIndex < 0 || activeFrameIndex >= action.frames.length) return null;
+  const boxes = action.frames[activeFrameIndex].attack;
+  return boxes.length > 0 ? boxes : null;
+}
+
+/**
+ * Get body override during the active phase (0-based index within active).
+ */
+export function getActivePhaseBodyOverride(
+  charId: string,
+  actionNumber: string,
+  activeFrameIndex: number,
+): FrameBox | null {
+  const action = getHitboxAction(charId, actionNumber);
+  if (!action) return null;
+  if (activeFrameIndex < 0 || activeFrameIndex >= action.frames.length) return null;
+  return action.frames[activeFrameIndex].bodyOverride;
+}
+
+/**
  * Get the full MUGEN hitbox data for a character.
  */
 export function getCharacterHitboxData(charId: string): MugenHitboxData | null {
@@ -277,4 +307,91 @@ export function getHitboxLoadSummary(): Array<{ charId: string; actions: number;
     summary.push({ charId, actions: actionCount, totalActiveFrames });
   }
   return summary;
+}
+
+/**
+ * Get all MUGEN action numbers that have hitbox data for a character.
+ */
+export function getAvailableActions(charId: string): string[] {
+  const data = hitboxCache.get(charId);
+  if (!data) return [];
+  return Object.keys(data.actions);
+}
+
+/**
+ * Get startup/active/recovery timing for a MUGEN action.
+ * Useful for comparing with hand-tuned FRAME_DATA.
+ */
+export function getActionTiming(
+  charId: string,
+  actionNumber: string,
+): { startup: number; active: number; recovery: number } | null {
+  const action = getHitboxAction(charId, actionNumber);
+  if (!action) return null;
+  return { startup: action.startup, active: action.active, recovery: action.recovery };
+}
+
+/**
+ * Compare MUGEN timing with game FRAME_DATA timing for an attack.
+ * Returns the differences or null if no MUGEN data available.
+ */
+export function compareTimingWithFrameData(
+  charId: string,
+  actionNumber: string,
+  frameDataStartup: number,
+  frameDataActive: number,
+  frameDataRecovery: number,
+): { startupDiff: number; activeDiff: number; recoveryDiff: number; totalDiff: number } | null {
+  const timing = getActionTiming(charId, actionNumber);
+  if (!timing) return null;
+  return {
+    startupDiff: timing.startup - frameDataStartup,
+    activeDiff: timing.active - frameDataActive,
+    recoveryDiff: timing.recovery - frameDataRecovery,
+    totalDiff: (timing.startup + timing.active + timing.recovery) -
+               (frameDataStartup + frameDataActive + frameDataRecovery),
+  };
+}
+
+/**
+ * Get all attack boxes for every frame of a MUGEN action.
+ * Returns a flat array of all attack boxes across all active frames.
+ */
+export function getAllAttackBoxes(
+  charId: string,
+  actionNumber: string,
+): FrameBox[] {
+  const action = getHitboxAction(charId, actionNumber);
+  if (!action) return [];
+  const allBoxes: FrameBox[] = [];
+  for (const frame of action.frames) {
+    allBoxes.push(...frame.attack);
+  }
+  return allBoxes;
+}
+
+/**
+ * Get the bounding box that encompasses all attack boxes for an action.
+ * Useful for understanding the total reach of an attack.
+ */
+export function getAttackBoundingBox(
+  charId: string,
+  actionNumber: string,
+): { minX: number; minY: number; maxX: number; maxY: number; width: number; height: number } | null {
+  const boxes = getAllAttackBoxes(charId, actionNumber);
+  if (boxes.length === 0) return null;
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  for (const box of boxes) {
+    const x2 = box.ox + box.w;
+    const y2 = box.oy + box.h;
+    if (box.ox < minX) minX = box.ox;
+    if (box.oy < minY) minY = box.oy;
+    if (x2 > maxX) maxX = x2;
+    if (y2 > maxY) maxY = y2;
+  }
+  return {
+    minX, minY, maxX, maxY,
+    width: maxX - minX,
+    height: maxY - minY,
+  };
 }

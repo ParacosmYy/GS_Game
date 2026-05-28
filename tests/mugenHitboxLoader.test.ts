@@ -12,6 +12,8 @@ import {
   registerHitboxData,
   getHitboxAction,
   getAttackBoxesAtFrame,
+  getActivePhaseBoxes,
+  getActivePhaseBodyOverride,
   getBodyOverrideAtFrame,
   getActionTotalFrames,
   hasMugenHitboxes,
@@ -20,6 +22,11 @@ import {
   calculateScaleFactor,
   getScaledAttackAtFrame,
   getHitboxLoadSummary,
+  getAvailableActions,
+  getActionTiming,
+  compareTimingWithFrameData,
+  getAllAttackBoxes,
+  getAttackBoundingBox,
   type MugenHitboxData,
   type MugenHitboxFrame,
   type FrameBox,
@@ -327,6 +334,121 @@ describe('mugenHitboxLoader', () => {
           }
         }
       }
+    });
+  });
+
+  describe('getActivePhaseBoxes', () => {
+    it('returns boxes for active-phase frame 0', () => {
+      const action = getHitboxAction('cvsryo', '200');
+      expect(action).not.toBeNull();
+      expect(action!.frames.length).toBeGreaterThan(0);
+      const boxes = getActivePhaseBoxes('cvsryo', '200', 0);
+      expect(boxes).not.toBeNull();
+      expect(boxes!.length).toBeGreaterThan(0);
+    });
+
+    it('returns null for frame beyond active range', () => {
+      const action = getHitboxAction('cvsryo', '200');
+      expect(action).not.toBeNull();
+      const beyondActive = action!.frames.length + 10;
+      expect(getActivePhaseBoxes('cvsryo', '200', beyondActive)).toBeNull();
+    });
+
+    it('returns null for negative frame index', () => {
+      expect(getActivePhaseBoxes('cvsryo', '200', -1)).toBeNull();
+    });
+
+    it('returns null for unknown action', () => {
+      expect(getActivePhaseBoxes('cvsryo', '99999', 0)).toBeNull();
+    });
+  });
+
+  describe('getActivePhaseBodyOverride', () => {
+    it('returns body override when present', () => {
+      const action = getHitboxAction('cvsryo', '200');
+      if (action && action.frames[0]?.bodyOverride) {
+        const body = getActivePhaseBodyOverride('cvsryo', '200', 0);
+        expect(body).not.toBeNull();
+      }
+    });
+
+    it('returns null for frame beyond range', () => {
+      const action = getHitboxAction('cvsryo', '200');
+      const beyond = (action?.frames.length ?? 0) + 5;
+      expect(getActivePhaseBodyOverride('cvsryo', '200', beyond)).toBeNull();
+    });
+  });
+
+  describe('getAvailableActions', () => {
+    it('lists all action numbers for a character', () => {
+      const actions = getAvailableActions('cvsryo');
+      expect(actions.length).toBeGreaterThan(40);
+      expect(actions).toContain('200');
+    });
+
+    it('returns empty array for unknown character', () => {
+      expect(getAvailableActions('nonexistent')).toEqual([]);
+    });
+  });
+
+  describe('getActionTiming', () => {
+    it('returns startup/active/recovery for known action', () => {
+      const timing = getActionTiming('cvsryo', '200');
+      expect(timing).not.toBeNull();
+      expect(timing!.startup).toBeGreaterThanOrEqual(0);
+      expect(timing!.active).toBeGreaterThan(0);
+      expect(timing!.recovery).toBeGreaterThanOrEqual(0);
+    });
+
+    it('returns null for unknown action', () => {
+      expect(getActionTiming('cvsryo', '99999')).toBeNull();
+    });
+  });
+
+  describe('compareTimingWithFrameData', () => {
+    it('computes timing differences', () => {
+      const diff = compareTimingWithFrameData('cvsryo', '200', 4, 3, 5);
+      expect(diff).not.toBeNull();
+      expect(typeof diff!.startupDiff).toBe('number');
+      expect(typeof diff!.activeDiff).toBe('number');
+      expect(typeof diff!.recoveryDiff).toBe('number');
+      expect(typeof diff!.totalDiff).toBe('number');
+    });
+
+    it('returns null for unknown action', () => {
+      expect(compareTimingWithFrameData('cvsryo', '99999', 1, 1, 1)).toBeNull();
+    });
+  });
+
+  describe('getAllAttackBoxes', () => {
+    it('collects all attack boxes across active frames', () => {
+      const boxes = getAllAttackBoxes('cvsryo', '200');
+      expect(boxes.length).toBeGreaterThan(0);
+      for (const box of boxes) {
+        expect(box).toHaveProperty('ox');
+        expect(box).toHaveProperty('oy');
+        expect(box.w).toBeGreaterThan(0);
+        expect(box.h).toBeGreaterThan(0);
+      }
+    });
+
+    it('returns empty for unknown action', () => {
+      expect(getAllAttackBoxes('cvsryo', '99999')).toEqual([]);
+    });
+  });
+
+  describe('getAttackBoundingBox', () => {
+    it('computes bounding box for an action', () => {
+      const bbox = getAttackBoundingBox('cvsryo', '200');
+      expect(bbox).not.toBeNull();
+      expect(bbox!.minX).toBeLessThan(bbox!.maxX);
+      expect(bbox!.minY).toBeLessThan(bbox!.maxY);
+      expect(bbox!.width).toBeGreaterThan(0);
+      expect(bbox!.height).toBeGreaterThan(0);
+    });
+
+    it('returns null for unknown action', () => {
+      expect(getAttackBoundingBox('cvsryo', '99999')).toBeNull();
     });
   });
 });

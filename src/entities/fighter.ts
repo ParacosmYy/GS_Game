@@ -34,6 +34,16 @@ import { ATTACK_FRAMES } from '../core/attackFrames.js';
 import { getHurtboxDef } from '../core/hurtboxManifest.js';
 import type { ActionContract } from '../core/frameContract.js';
 import {
+  getActivePhaseBoxes as getMugenActiveBoxes,
+  getActivePhaseBodyOverride as getMugenBodyOverride,
+  hasMugenHitboxes,
+  scaleFrameBox,
+} from '../rendering/sprites/shared/mugenHitboxLoader.js';
+import {
+  getCharacterConfig,
+  resolveGenericMugenAction,
+} from '../rendering/sprites/shared/characterSpriteRegistry.js';
+import {
   getCollisionAtFrame,
   phaseFrameToAbsolute,
   getActiveEvents,
@@ -424,9 +434,47 @@ export class Fighter {
       }));
     }
 
+    // === MUGEN hitbox path: use real MUGEN Clsn data as fallback ===
+    const mugenBoxes = this.getMugenHitboxes();
+    if (mugenBoxes.length > 0) return mugenBoxes;
+
     // 降级到旧系统
     const single = this.getActiveHitbox();
     return single ? [single] : [];
+  }
+
+  /** Get hitboxes from MUGEN hitbox data (active-phase frame lookup) */
+  private getMugenHitboxes(): { x: number; y: number; width: number; height: number }[] {
+    const config = getCharacterConfig(this.charId);
+    if (!config) return [];
+    if (!hasMugenHitboxes(config.mugenDir)) return [];
+
+    const actionNumber = resolveGenericMugenAction(
+      config, this.state, this.currentAttack, 0, this.facing,
+    );
+    if (!actionNumber) return [];
+
+    const boxes = getMugenActiveBoxes(config.mugenDir, actionNumber, this.attackFrame);
+    if (!boxes) return [];
+
+    const scale = this.getMugenScaleFactor();
+    return boxes.map(box => {
+      const scaled = scaleFrameBox(box, scale);
+      return {
+        x: this.x + scaled.offsetX * this.facing,
+        y: this.y + scaled.offsetY,
+        width: scaled.width,
+        height: scaled.height,
+      };
+    });
+  }
+
+  /** Get the MUGEN-to-game coordinate scale factor for this character */
+  private getMugenScaleFactor(): number {
+    const config = getCharacterConfig(this.charId);
+    if (!config) return 1.5;
+    // MUGEN sprites are ~100-120px tall; game display is ~200px
+    return 200 / (config.targetDisplayHeight * 1.1);
   }
 
   /** Get the hurtbox override for current attack frame, or null for default */
