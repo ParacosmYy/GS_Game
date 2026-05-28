@@ -45,7 +45,7 @@ export class RoundState {
   fadeCallback: (() => void) | null = null;
 
   // Wipe transition support
-  transitionType: 'fade' | 'wipe' = 'fade';
+  transitionType: 'fade' | 'wipe' | 'curtain' = 'fade';
   transitionTick = 0;
 
   // Round transition state machine
@@ -125,12 +125,13 @@ export class RoundState {
   startCinematicTransition(
     onPeakCallback: (() => void) | null = null,
     onCompleteCallback: (() => void) | null = null,
+    transitionStyle: 'wipe' | 'curtain' = 'wipe',
   ): void {
     this.transitionPhase = RoundTransitionPhase.NONE; // will enter hold after fade-out
     this.fadeDirection = 1;
     this.fadeAlpha = 0;
     this.holdBlackFrames = 0;
-    this.transitionType = 'wipe';
+    this.transitionType = transitionStyle;
     this.transitionTick = 0;
     // Store the peak callback — fires when fade reaches full black
     this.fadeCallback = () => {
@@ -148,8 +149,8 @@ export class RoundState {
 
   /** Tick fade alpha and transition state machine. Returns true while fade/transition is active. */
   tickFade(): boolean {
-    // Advance wipe tick counter when a transition is active
-    if (this.transitionType === 'wipe' && this.isTransitioning()) {
+    // Advance wipe/curtain tick counter when a transition is active
+    if ((this.transitionType === 'wipe' || this.transitionType === 'curtain') && this.isTransitioning()) {
       this.transitionTick++;
     }
 

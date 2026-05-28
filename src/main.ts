@@ -1339,6 +1339,10 @@ function render(): void {
       gs.arcadeOpponents[nextIdx + 2],
     ].filter(Boolean);
     renderer.drawNextMatch(gs.arcadeNextMatchTimer, nextChar, gs.arcadeOpponentIndex + 1, gs.arcadeOpponents.length, isRivalStage, upcoming);
+    // Final rival: curtain open animation for dramatic entrance
+    if (isRivalStage && gs.arcadeNextMatchTimer < 36) {
+      renderer.drawTransition(35 - gs.arcadeNextMatchTimer, 'curtain');
+    }
     return;
   }
   if (gs.phase === GamePhase.SELECT) {
@@ -1510,6 +1514,9 @@ function render(): void {
     if (rounds.transitionType === 'wipe' && rounds.isTransitioning()) {
       // KOF2002-style wipe transition with golden edge
       renderer.drawTransition(rounds.transitionTick, 'wipe');
+    } else if (rounds.transitionType === 'curtain' && rounds.isTransitioning()) {
+      // KOF2002-style curtain close transition (final stage)
+      renderer.drawTransition(rounds.transitionTick, 'curtain');
     } else {
       ctx.save();
       ctx.fillStyle = `rgba(0,0,0,${rounds.fadeAlpha})`;
