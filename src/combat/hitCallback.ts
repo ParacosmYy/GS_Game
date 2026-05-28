@@ -637,7 +637,7 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
       const airHits = defender.airHitCount;
       // 第一次浮空命中：强发光+冲击环
       if (airHits <= 1) {
-        deps.vfx.spawnCharacterHitSparks(hitX, hitY - 14, 8, '#ffffff', 0.9, 1.0, 0.2, true, attacker.facing);
+        deps.vfx.spawnCharacterHitSparks(hitX, hitY - 14, 8, atkChar.specialColor, 0.9, 1.0, 0.2, true, attacker.facing);
         deps.vfx.spawnImpactRing(hitX, hitY - 10, 0.7);
       } else if (airHits <= 3) {
         // 中段连击：蓝色渐变+递增sparks
@@ -664,7 +664,7 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
     if (attackType === AttackType.STAND_CD || attackType === AttackType.JUMP_CD) {
       deps.vfx.spawnCharacterHitSparks(hitX, hitY, 10, '#ffaa00', 0.95, 1.0, 0.25, false, attacker.facing);
       deps.vfx.spawnImpactRing(hitX, hitY);
-      deps.vfx.spawnCharacterHitSparks(hitX, hitY, 6, '#ffffff', 0.7, 0.9, 0.1, false, attacker.facing);
+      deps.vfx.spawnCharacterHitSparks(hitX, hitY, 6, atkChar.specialGlow ?? atkChar.specialColor, 0.7, 0.9, 0.1, false, attacker.facing);
       deps.screenFlash.trigger('#ffcc44', 0.1, 3);
       deps.screenShake.trigger(5, 7, getAttackDirectionBias(attacker, defender, attackType, counterHit));
     }
@@ -715,7 +715,7 @@ export function createHitCallback(deps: HitCallbackDeps): HitCallback {
     }
     if (combo >= 10) {
       deps.vfx.spawnImpactRing(hitX, hitY, 1.4);
-      deps.vfx.spawnCharacterHitSparks(hitX, hitY, 4, '#ffffff', 0.45, 1.6, 0.1, false, attacker.facing);
+      deps.vfx.spawnCharacterHitSparks(hitX, hitY, 4, atkChar.specialColor, 0.45, 1.6, 0.1, false, attacker.facing);
       deps.screenFlash.trigger('#ffffff', 0.04, 2);
     }
 

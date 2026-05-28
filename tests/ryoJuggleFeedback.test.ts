@@ -3,7 +3,7 @@
  *
  * Validates KOF2002 juggle-specific feedback rules:
  * - Air hits use playJuggleHit (not playHit)
- * - Air hits produce blue sparks (#aaddff) at offset hitY - 14
+ * - Air hits produce character-element-colored launch sparks (atkChar.specialColor) at offset hitY - 14
  * - Combo hitstop caps at +1 when combo >= 10
  * - Combo sparks decay: 0.8 at combo >= 6, 0.9 at combo >= 3
  * - DM air hits are exempt from spark decay (no blue air bonus sparks)
@@ -84,7 +84,9 @@ function createInputProvider(): IInputProvider {
 }
 
 function createMockFighter(x = 200, charId = 'ryo'): Fighter {
-  return new Fighter(x, '#ff0000', 1, charId);
+  const f = new Fighter(x, '#ff0000', 1);
+  f.charId = charId;
+  return f;
 }
 
 /** Set fighter into airborne state by lowering y below STAGE_GROUND_Y */
@@ -291,24 +293,25 @@ describe('Juggle SFX: air hit calls playJuggleHit instead of playHit', () => {
 // SECTION 2: Air hit produces launch sparks (first juggle: #ffffff)
 // ====================================================================
 
-describe('Juggle launch sparks: air hit spawns white particles', () => {
+describe('Juggle launch sparks: air hit spawns character-element-colored particles', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it('Airborne hit spawns white launch sparks (first juggle)', () => {
+  it('Airborne hit spawns character-colored launch sparks (first juggle)', () => {
     const { deps, vfx, p1, p2 } = createJuggleDeps(0);
     const cb = createHitCallback(deps);
     cb(p1, p2, AttackType.STAND_A, false, false);
 
-    // First juggle hit uses white (#ffffff) for dramatic launch emphasis
+    // First juggle hit uses attacker's specialColor for element-coded launch emphasis
+    // Ryo's specialColor is '#ffcc00' (golden lightning)
     const launchSparkCall = vfx.spawnCharacterHitSparks.mock.calls.find(
-      (call: string[]) => call[3] === '#ffffff'
+      (call: string[]) => call[3] === '#ffcc00'
     );
     expect(launchSparkCall).toBeDefined();
   });
 
-  it('Grounded hit does NOT produce white air sparks', () => {
+  it('Grounded hit does NOT produce character-colored air sparks', () => {
     // Grounded defender
     const p1 = createMockFighter(200, 'ryo');
     const p2 = createMockFighter(400, 'kyo');
@@ -328,7 +331,7 @@ describe('Juggle launch sparks: air hit spawns white particles', () => {
     cb(p1, p2, AttackType.STAND_A, false, false);
 
     const airSparkCall = vfx.spawnCharacterHitSparks.mock.calls.find(
-      (call: string[]) => call[3] === '#ffffff'
+      (call: string[]) => call[3] === '#ffcc00'
     );
     expect(airSparkCall).toBeUndefined();
   });
@@ -339,7 +342,7 @@ describe('Juggle launch sparks: air hit spawns white particles', () => {
     cb(p1, p2, AttackType.STAND_A, false, false);
 
     const launchSparkCall = vfx.spawnCharacterHitSparks.mock.calls.find(
-      (call: unknown[]) => call[3] === '#ffffff'
+      (call: unknown[]) => call[3] === '#ffcc00'
     );
     expect(launchSparkCall).toBeDefined();
     const sizeScale = launchSparkCall![4] as number;
@@ -352,7 +355,7 @@ describe('Juggle launch sparks: air hit spawns white particles', () => {
     cb(p1, p2, AttackType.STAND_A, false, false);
 
     const launchSparkCall = vfx.spawnCharacterHitSparks.mock.calls.find(
-      (call: unknown[]) => call[3] === '#ffffff'
+      (call: unknown[]) => call[3] === '#ffcc00'
     );
     expect(launchSparkCall).toBeDefined();
     // lowGrav is at index 7
@@ -529,35 +532,35 @@ describe('DM juggle exemption: DM air hits skip blue air bonus sparks', () => {
     vi.clearAllMocks();
   });
 
-  it('Non-DM air hit produces white launch sparks', () => {
+  it('Non-DM air hit produces character-colored launch sparks', () => {
     const { deps, vfx, p1, p2 } = createJuggleDeps(0);
     const cb = createHitCallback(deps);
     cb(p1, p2, AttackType.STAND_A, false, false);
 
     const launchSparkCall = vfx.spawnCharacterHitSparks.mock.calls.find(
-      (call: unknown[]) => call[3] === '#ffffff'
+      (call: unknown[]) => call[3] === '#ffcc00'
     );
     expect(launchSparkCall).toBeDefined();
   });
 
-  it('DM air hit does NOT produce white air bonus sparks', () => {
+  it('DM air hit does NOT produce character-colored air bonus sparks', () => {
     const { deps, vfx, p1, p2 } = createJuggleDeps(0);
     const cb = createHitCallback(deps);
     cb(p1, p2, AttackType.DM_TEN_HA_OU, false, false);
 
     const launchSparkCall = vfx.spawnCharacterHitSparks.mock.calls.find(
-      (call: unknown[]) => call[3] === '#ffffff'
+      (call: unknown[]) => call[3] === '#ffcc00'
     );
     expect(launchSparkCall).toBeUndefined();
   });
 
-  it('SDM air hit also skips white air bonus sparks', () => {
+  it('SDM air hit also skips character-colored air bonus sparks', () => {
     const { deps, vfx, p1, p2 } = createJuggleDeps(0);
     const cb = createHitCallback(deps);
     cb(p1, p2, AttackType.SDM_TEN_HA_OU, false, false);
 
     const launchSparkCall = vfx.spawnCharacterHitSparks.mock.calls.find(
-      (call: unknown[]) => call[3] === '#ffffff'
+      (call: unknown[]) => call[3] === '#ffcc00'
     );
     expect(launchSparkCall).toBeUndefined();
   });
@@ -574,7 +577,7 @@ describe('Juggle spark position: air sparks offset by hitY - 14', () => {
     cb(p1, p2, AttackType.STAND_A, false, false);
 
     const launchSparkCall = vfx.spawnCharacterHitSparks.mock.calls.find(
-      (call: unknown[]) => call[3] === '#ffffff'
+      (call: unknown[]) => call[3] === '#ffcc00'
     );
     expect(launchSparkCall).toBeDefined();
 
@@ -594,7 +597,7 @@ describe('Juggle spark position: air sparks offset by hitY - 14', () => {
     const mainSparkY = mainSparkCall[1] as number;
 
     const launchSparkCall = vfx.spawnCharacterHitSparks.mock.calls.find(
-      (call: unknown[]) => call[3] === '#ffffff'
+      (call: unknown[]) => call[3] === '#ffcc00'
     );
     const launchSparkY = launchSparkCall![1] as number;
 
