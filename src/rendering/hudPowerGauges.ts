@@ -176,6 +176,22 @@ export function drawPowerGauges(ctx: CanvasRenderingContext2D, gauges: [PowerGau
 
     // MAX mode green halo
     if (maxMode.active) {
+      // Activation burst — white/gold flash on gauge for the first 10 ticks
+      const activationTicks = maxMode.maxDuration - maxMode.timer;
+      if (activationTicks < 10) {
+        const burstAlpha = (1 - activationTicks / 10) * 0.7;
+        ctx.save();
+        ctx.fillStyle = `rgba(255, 255, 200, ${burstAlpha})`;
+        roundRect(ctx, baseX - 2, gaugeY - 2, gaugeW + 4, gaugeH + 4, 6);
+        ctx.fill();
+        ctx.shadowColor = '#ffff88';
+        ctx.shadowBlur = 20 * (1 - activationTicks / 10);
+        ctx.strokeStyle = `rgba(255, 255, 100, ${burstAlpha})`;
+        ctx.lineWidth = 2;
+        roundRect(ctx, baseX - 4, gaugeY - 4, gaugeW + 8, gaugeH + 8, 8);
+        ctx.stroke();
+        ctx.restore();
+      }
       const pct = maxMode.timer / maxMode.maxDuration;
       const centerX = baseX + gaugeW / 2;
       const centerY = gaugeY + gaugeH / 2;

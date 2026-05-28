@@ -334,20 +334,64 @@ export function drawModeSelect(ctx: CanvasRenderingContext2D, tick: number, curs
       ctx.stroke();
     }
 
-    // Mode icon
-    ctx.fillStyle = mode.color + (isSelected ? 'cc' : '44');
-    ctx.beginPath();
+    // Mode icon — per-mode unique icon
+    const iconColor = mode.color + (isSelected ? 'cc' : '44');
+    const iconCx = cx + cardW / 2;
+    const iconCy = cardY + 55;
+
     if (i === 0) {
-      // Single icon — circle
-      ctx.arc(cx + cardW / 2, cardY + 55, 25, 0, Math.PI * 2);
-    } else {
-      // Team icon — three circles
+      // Single — single circle
+      ctx.fillStyle = iconColor;
+      ctx.beginPath();
+      ctx.arc(iconCx, iconCy, 25, 0, Math.PI * 2);
+      ctx.fill();
+    } else if (i === 1) {
+      // Team — three circles
+      ctx.fillStyle = iconColor;
+      ctx.beginPath();
       for (let j = -1; j <= 1; j++) {
-        ctx.moveTo(cx + cardW / 2 + j * 22 + 12, cardY + 55);
-        ctx.arc(cx + cardW / 2 + j * 22, cardY + 55, 12, 0, Math.PI * 2);
+        ctx.moveTo(iconCx + j * 22 + 12, iconCy);
+        ctx.arc(iconCx + j * 22, iconCy, 12, 0, Math.PI * 2);
+      }
+      ctx.fill();
+    } else if (i === 2) {
+      // Training — crosshair
+      ctx.strokeStyle = iconColor;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(iconCx, iconCy, 20, 0, Math.PI * 2);
+      ctx.moveTo(iconCx - 28, iconCy);
+      ctx.lineTo(iconCx + 28, iconCy);
+      ctx.moveTo(iconCx, iconCy - 28);
+      ctx.lineTo(iconCx, iconCy + 28);
+      ctx.stroke();
+    } else if (i === 3) {
+      // Options — gear (hexagon with inner circle)
+      ctx.strokeStyle = iconColor;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      for (let t = 0; t < 6; t++) {
+        const angle = (t / 6) * Math.PI * 2 - Math.PI / 2;
+        const gx = iconCx + Math.cos(angle) * 22;
+        const gy = iconCy + Math.sin(angle) * 22;
+        if (t === 0) ctx.moveTo(gx, gy);
+        else ctx.lineTo(gx, gy);
+      }
+      ctx.closePath();
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(iconCx, iconCy, 10, 0, Math.PI * 2);
+      ctx.stroke();
+      // Gear teeth
+      for (let t = 0; t < 6; t++) {
+        const angle = (t / 6) * Math.PI * 2 - Math.PI / 2;
+        const tx = iconCx + Math.cos(angle) * 26;
+        const ty = iconCy + Math.sin(angle) * 26;
+        ctx.beginPath();
+        ctx.arc(tx, ty, 4, 0, Math.PI * 2);
+        ctx.stroke();
       }
     }
-    ctx.fill();
 
     // Mode label
     drawSNKText(ctx, mode.label, cx + cardW / 2, cardY + 100, 18, isSelected ? mode.color : '#888888');
@@ -357,20 +401,6 @@ export function drawModeSelect(ctx: CanvasRenderingContext2D, tick: number, curs
     ctx.font = '11px monospace';
     ctx.fillStyle = '#555566';
     ctx.fillText(mode.desc, cx + cardW / 2, cardY + 155);
-
-    // Coming soon overlay for training mode icon
-    if (i === 2) {
-      // Training icon — crosshair
-      ctx.strokeStyle = mode.color + (isSelected ? 'cc' : '44');
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.arc(cx + cardW / 2, cardY + 55, 20, 0, Math.PI * 2);
-      ctx.moveTo(cx + cardW / 2 - 28, cardY + 55);
-      ctx.lineTo(cx + cardW / 2 + 28, cardY + 55);
-      ctx.moveTo(cx + cardW / 2, cardY + 55 - 28);
-      ctx.lineTo(cx + cardW / 2, cardY + 55 + 28);
-      ctx.stroke();
-    }
   }
 
   // Instructions
