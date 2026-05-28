@@ -1470,6 +1470,9 @@ function render(): void {
     } else if (rounds.transitionType === 'curtain' && rounds.isTransitioning()) {
       // KOF2002-style curtain close transition (final stage)
       renderer.drawTransition(rounds.transitionTick, 'curtain');
+    } else if (rounds.transitionType === 'zoom' && rounds.isTransitioning()) {
+      // KOF2002-style zoom transition (DM/SDM/HSDM finish)
+      renderer.drawTransition(rounds.transitionTick, 'zoom');
     } else {
       ctx.save();
       ctx.fillStyle = `rgba(0,0,0,${rounds.fadeAlpha})`;
