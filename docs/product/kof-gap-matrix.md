@@ -197,6 +197,10 @@
   - inferTier分类+attackTierMap回归测试 (15 tests: 模式分类/3角色DM/SDM/HSDM映射)
   - AI配置回归测试 (21 tests: 难度预设/间距/哈希/常量)
   - rendererFighter.ts拆分 (1852→1573行: 工具函数提取到rendererFighterUtils.ts)
+  - 3角色取消路径结构一致性回归测试 (33 tests: cancelType/stockCost/timerCost/window)
+  - sampler渲染器音频缓冲区回归测试 (7 tests: combat/UI/accent有效性+DM>special递进)
+  - 3角色命中特效插件结构回归测试 (18 tests: charId/prefixes/VFX/SFX/DM前缀)
+  - 测试总数 4944
 - 新功能添加点：
   - smoke / ryo / combat / content 分层测试
   - frame contract 回归测试
