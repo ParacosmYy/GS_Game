@@ -79,6 +79,12 @@ export const HURTBOX_TABLE: Partial<Record<FighterState, HurtboxDef>> = {
     width: 80,
     height: 200,
   },
+  [FighterState.WIN]: {
+    offsetX: 0,
+    offsetY: 0,
+    width: 80,
+    height: 200,
+  },
   [FighterState.MAX_MODE]: {
     offsetX: 0,
     offsetY: 0,

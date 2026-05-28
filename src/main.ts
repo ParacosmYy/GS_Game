@@ -695,6 +695,7 @@ function update(): void {
           {
             const matchWinner = !p1Team.alive ? 1 : 0;
             const wf = matchWinner === 0 ? p1 : p2;
+            wf.state = FighterState.WIN;
             const wc = ROSTER.find(c => c.id === wf.charId);
             gs.announceSequence.setSteps(createWinnerSequence(wc?.nameCn ?? ''));
           }
@@ -708,6 +709,7 @@ function update(): void {
         announcer.winner();
         {
           const wf = matchWinner === 0 ? p1 : p2;
+          wf.state = FighterState.WIN;
           const wc = ROSTER.find(c => c.id === wf.charId);
           gs.announceSequence.setSteps(createWinnerSequence(wc?.nameCn ?? ''));
         }

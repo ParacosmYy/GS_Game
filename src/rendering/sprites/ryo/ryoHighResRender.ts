@@ -184,6 +184,7 @@ function resolveRyoFrameKey(
     case FighterState.GUARD_CRUSH: return 'GUARD_CRUSH';
     case FighterState.MAX_MODE: return 'MAX_MODE';
     case FighterState.TAUNT: return 'TAUNT';
+    case FighterState.WIN: return 'WIN';
     case FighterState.COUNTER_STANCE: return 'COUNTER_STANCE';
     default: return null;
   }

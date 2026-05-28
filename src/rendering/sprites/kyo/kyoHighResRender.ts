@@ -218,6 +218,8 @@ function resolveKyoFrameKey(
       return 'MAX_MODE';
     case FighterState.TAUNT:
       return 'TAUNT';
+    case FighterState.WIN:
+      return 'WIN';
     case FighterState.COUNTER_STANCE:
       return 'COUNTER_STANCE';
     default:

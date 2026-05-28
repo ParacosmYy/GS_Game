@@ -25,6 +25,7 @@ export enum FighterState {
   DIZZY = 'DIZZY',          // 气绝/晕眩 (stun gauge满)
   MAX_MODE = 'MAX_MODE',  // MAX模式激活动画 (短暂)
   TAUNT = 'TAUNT',        // 嘲讽 (Start键，削减对手气槽)
+  WIN = 'WIN',            // 胜利姿态 (胜利动画播放)
 }
 
 // ===== Attack Types (KOF 4-button: A=轻拳 B=轻脚 C=重拳 D=重脚) =====

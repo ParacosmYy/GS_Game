@@ -145,8 +145,7 @@ export function drawFighters(
     }
 
     // KOF2002: 胜利金色光环 — WIN状态角色发光
-    // (WIN state not yet in FighterState enum; guard with string literal check)
-    if ((FighterState as Record<string, string>)['WIN'] && f.state === (FighterState as Record<string, string>)['WIN']) {
+    if (f.state === FighterState.WIN) {
       const winPulse = 0.06 + Math.sin(globalTick * 0.08) * 0.03;
       ctx.fillStyle = 'rgba(255, 215, 0, ' + Math.max(0, winPulse) + ')';
       ctx.beginPath();
