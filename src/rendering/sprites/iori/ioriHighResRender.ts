@@ -21,6 +21,7 @@ import { IORI_IDLE_FRAMES } from './ioriIdleFrames.js';
 import { IORI_WALK_FORWARD_FRAMES, IORI_WALK_BACKWARD_FRAMES } from './ioriWalkFrames.js';
 import { IORI_CROUCH_FRAMES } from './ioriCrouchFrames.js';
 import { IORI_STAND_A_FRAMES, IORI_STAND_C_FRAMES } from './ioriAttackFrames.js';
+import { IORI_CLOSE_A_FRAMES, IORI_CLOSE_C_FRAMES, IORI_CLOSE_B_FRAMES, IORI_CLOSE_D_FRAMES } from './ioriCloseAttackFrames.js';
 import { IORI_JUMP_FRAMES } from './ioriJumpFrames.js';
 import { IORI_HURT_FRAMES, IORI_KNOCKDOWN_FRAMES, IORI_BLOCK_FRAMES } from './ioriDamageFrames.js';
 import { IORI_STAND_B_FRAMES, IORI_STAND_D_FRAMES } from './ioriKickFrames.js';
@@ -69,6 +70,12 @@ function initIoriFrames(): void {
   registerVariableFrames('STAND_C', IORI_STAND_C_FRAMES, [6, 4, 5, 5, 10]);
   registerVariableFrames('STAND_B', IORI_STAND_B_FRAMES, [5, 3, 3, 9]);
   registerVariableFrames('STAND_D', IORI_STAND_D_FRAMES, [8, 4, 4, 6, 10]);
+
+  // CLOSE ATTACKS (distinct from stand — tighter, shorter range)
+  registerVariableFrames('CLOSE_A', IORI_CLOSE_A_FRAMES, [4, 2, 5, 5]);
+  registerVariableFrames('CLOSE_C', IORI_CLOSE_C_FRAMES, [2, 5, 6, 5]);
+  registerVariableFrames('CLOSE_B', IORI_CLOSE_B_FRAMES, [5, 2, 8]);
+  registerVariableFrames('CLOSE_D', IORI_CLOSE_D_FRAMES, [6, 4, 6, 8]);
 
   registerVariableFrames('JUMP', IORI_JUMP_FRAMES, [4, 3, 5, 6, 5, 4]);
   registerVariableFrames('HURT', IORI_HURT_FRAMES, [3, 5, 6, 4]);
@@ -178,10 +185,14 @@ function resolveIoriFrameKey(
       if (currentAttack === AttackType.IORI_YUMEYUMI) return 'CMD_YUMEYUMI';
       if (currentAttack === AttackType.IORI_KATANUGI) return 'CMD_KATANUGI';
       if (currentAttack === AttackType.IORI_YUKIWARUI) return 'CMD_YUKIWARUI';
-      // Normals
-      if (currentAttack === AttackType.STAND_C || currentAttack === AttackType.CLOSE_C) return 'STAND_C';
-      if (currentAttack === AttackType.STAND_D || currentAttack === AttackType.CLOSE_D) return 'STAND_D';
-      if (currentAttack === AttackType.STAND_B || currentAttack === AttackType.CLOSE_B) return 'STAND_B';
+      // Normals — close vs stand have distinct frames
+      if (currentAttack === AttackType.CLOSE_C) return 'CLOSE_C';
+      if (currentAttack === AttackType.CLOSE_D) return 'CLOSE_D';
+      if (currentAttack === AttackType.CLOSE_B) return 'CLOSE_B';
+      if (currentAttack === AttackType.CLOSE_A) return 'CLOSE_A';
+      if (currentAttack === AttackType.STAND_C) return 'STAND_C';
+      if (currentAttack === AttackType.STAND_D) return 'STAND_D';
+      if (currentAttack === AttackType.STAND_B) return 'STAND_B';
       return 'STAND_A';
     case FighterState.HITSTUN:
       return 'HURT';
