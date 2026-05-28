@@ -217,3 +217,64 @@ export function validateActionAlignment(
   }
   return { valid: issues.length === 0, issues };
 }
+
+// ===== Shared Builder Helpers =====
+// Extracted from per-character *FrameContract.ts to avoid identical makeFrames/makeAttackFrames
+// duplication across Ryo/Kyo/Iori (and future characters).
+
+/** Shared config for building per-character frame contracts */
+export interface FrameBuilderConfig {
+  characterId: string;
+  pixelKeys: Record<string, string>;
+  tpf: Record<string, number>;
+}
+
+/** Build non-attack animation frames using shared config */
+export function makeFrames(
+  cfg: FrameBuilderConfig,
+  actionId: string,
+  count: number,
+): FrameContract[] {
+  const pixelKey = cfg.pixelKeys[actionId] ?? 'IDLE';
+  const tpf = cfg.tpf[pixelKey] ?? 8;
+  return Array.from({ length: count }, (_, i) => ({
+    characterId: cfg.characterId,
+    actionId,
+    frameIndex: i,
+    sprite: { spriteRef: `${pixelKey}:${i}`, anchor: { x: 48, y: 144 }, offset: { x: 0, y: 0 }, duration: tpf },
+    collision: null,
+    eventTags: [] as FrameEventTag[],
+  }));
+}
+
+/**
+ * Build attack frames with real per-frame hitbox data from ATTACK_FRAMES.
+ * Startup/recovery frames have collision=null. Active-phase frames get hitboxes from the data table.
+ */
+export function makeAttackFrames(
+  cfg: FrameBuilderConfig,
+  actionId: string,
+  startup: number,
+  active: number,
+  recovery: number,
+  attackType: AttackType,
+  attackFramesTable: Partial<Record<AttackType, { attack: FrameBox[]; bodyOverride: FrameBox | null; throwBoxes?: FrameBox[] }[]>>,
+): FrameContract[] {
+  const total = startup + active + recovery;
+  const frames = makeFrames(cfg, actionId, total);
+
+  const attackFrameData = attackFramesTable[attackType];
+
+  for (let i = 0; i < active; i++) {
+    const frameIndex = startup + i;
+    const perFrame = attackFrameData?.[i];
+
+    frames[frameIndex].collision = {
+      hitboxes: perFrame?.attack ?? [],
+      hurtboxOverride: perFrame?.bodyOverride ?? null,
+      throwBoxes: perFrame?.throwBoxes ?? [],
+    };
+    frames[frameIndex].eventTags.push('swing');
+  }
+  return frames;
+}

@@ -1,4 +1,5 @@
-import type { ActionContract, FrameContract, FrameCollision, FrameEventTag, CharacterFrameContract } from './frameContract.js';
+import type { ActionContract, FrameContract, FrameCollision, FrameEventTag, CharacterFrameContract, FrameBuilderConfig } from './frameContract.js';
+import { makeFrames, makeAttackFrames } from './frameContract.js';
 import { FighterState, AttackType } from './types.js';
 import { ATTACK_FRAMES } from './attackFrames.js';
 
@@ -42,61 +43,7 @@ const TPF: Record<string, number> = {
   DM_OROCHINAGI: 10, SDM_OROCHINAGI: 12,
 };
 
-function makeFrames(actionId: string, count: number): FrameContract[] {
-  const pixelKey = PIXEL_KEYS[actionId] ?? 'IDLE';
-  const tpf = TPF[pixelKey] ?? 8;
-  return Array.from({ length: count }, (_, i) => ({
-    characterId: 'kyo',
-    actionId,
-    frameIndex: i,
-    sprite: { spriteRef: `${pixelKey}:${i}`, anchor: { x: 48, y: 144 }, offset: { x: 0, y: 0 }, duration: tpf },
-    collision: null,
-    eventTags: [] as FrameEventTag[],
-  }));
-}
-
-/**
- * Build attack frames with real per-frame hitbox data from attackFrames.ts.
- *
- * The ATTACK_FRAMES table provides one AttackFrame per active-phase frame.
- * Each AttackFrame has:
- *   - attack: array of { ox, oy, w, h } hitboxes
- *   - bodyOverride: { ox, oy, w, h } | null — hurtbox delta for this frame
- *   - throwBoxes: optional array of { ox, oy, w, h }
- *
- * Startup and recovery frames have collision=null (no attack boxes).
- * Active-phase frames get their hitboxes from ATTACK_FRAMES.
- */
-function makeAttackFrames(
-  actionId: string,
-  startup: number,
-  active: number,
-  recovery: number,
-  attackType: AttackType,
-): FrameContract[] {
-  const total = startup + active + recovery;
-  const frames = makeFrames(actionId, total);
-
-  // Look up per-frame data from ATTACK_FRAMES
-  const attackFrameData = ATTACK_FRAMES[attackType];
-
-  for (let i = 0; i < active; i++) {
-    const frameIndex = startup + i;
-    const perFrame = attackFrameData?.[i];
-
-    const hitboxes = perFrame?.attack ?? [];
-    const hurtboxOverride = perFrame?.bodyOverride ?? null;
-    const throwBoxes = perFrame?.throwBoxes ?? [];
-
-    frames[frameIndex].collision = {
-      hitboxes,
-      hurtboxOverride,
-      throwBoxes,
-    };
-    frames[frameIndex].eventTags.push('swing');
-  }
-  return frames;
-}
+const KYO_CFG: FrameBuilderConfig = { characterId: 'kyo', pixelKeys: PIXEL_KEYS, tpf: TPF };
 
 // ═══════════════════════════════════════════════════════════════════
 // Non-attack States (Kyo)
@@ -107,7 +54,7 @@ const idle: ActionContract = {
   actionId: 'idle',
   state: FighterState.IDLE,
   attackType: null,
-  frames: makeFrames('idle', 8),
+  frames: makeFrames(KYO_CFG, 'idle', 8),
   hitLevel: 'MID',
   knockdown: false,
   startup: 0,
@@ -123,7 +70,7 @@ const walk_forward: ActionContract = {
   actionId: 'walk_forward',
   state: FighterState.WALK,
   attackType: null,
-  frames: makeFrames('walk_forward', 6),
+  frames: makeFrames(KYO_CFG, 'walk_forward', 6),
   hitLevel: 'MID',
   knockdown: false,
   startup: 0,
@@ -139,7 +86,7 @@ const walk_backward: ActionContract = {
   actionId: 'walk_backward',
   state: FighterState.WALK,
   attackType: null,
-  frames: makeFrames('walk_backward', 6),
+  frames: makeFrames(KYO_CFG, 'walk_backward', 6),
   hitLevel: 'MID',
   knockdown: false,
   startup: 0,
@@ -155,7 +102,7 @@ const jump: ActionContract = {
   actionId: 'jump',
   state: FighterState.JUMP,
   attackType: null,
-  frames: makeFrames('jump', 12),
+  frames: makeFrames(KYO_CFG, 'jump', 12),
   hitLevel: 'MID',
   knockdown: false,
   startup: 0,
@@ -171,7 +118,7 @@ const run: ActionContract = {
   actionId: 'run',
   state: FighterState.RUN,
   attackType: null,
-  frames: makeFrames('run', 6),
+  frames: makeFrames(KYO_CFG, 'run', 6),
   hitLevel: 'MID',
   knockdown: false,
   startup: 0,
@@ -187,7 +134,7 @@ const backdash: ActionContract = {
   actionId: 'backdash',
   state: FighterState.BACKDASH,
   attackType: null,
-  frames: makeFrames('backdash', 8),
+  frames: makeFrames(KYO_CFG, 'backdash', 8),
   hitLevel: 'MID',
   knockdown: false,
   startup: 0,
@@ -203,7 +150,7 @@ const roll: ActionContract = {
   actionId: 'roll',
   state: FighterState.ROLL,
   attackType: null,
-  frames: makeFrames('roll', 10),
+  frames: makeFrames(KYO_CFG, 'roll', 10),
   hitLevel: 'MID',
   knockdown: false,
   startup: 0,
@@ -219,7 +166,7 @@ const back_roll: ActionContract = {
   actionId: 'back_roll',
   state: FighterState.BACK_ROLL,
   attackType: null,
-  frames: makeFrames('back_roll', 10),
+  frames: makeFrames(KYO_CFG, 'back_roll', 10),
   hitLevel: 'MID',
   knockdown: false,
   startup: 0,
@@ -235,7 +182,7 @@ const crouch: ActionContract = {
   actionId: 'crouch',
   state: FighterState.CROUCH,
   attackType: null,
-  frames: makeFrames('crouch', 4),
+  frames: makeFrames(KYO_CFG, 'crouch', 4),
   hitLevel: 'MID',
   knockdown: false,
   startup: 0,
@@ -251,7 +198,7 @@ const block: ActionContract = {
   actionId: 'block',
   state: FighterState.BLOCK,
   attackType: null,
-  frames: makeFrames('block', 6),
+  frames: makeFrames(KYO_CFG, 'block', 6),
   hitLevel: 'MID',
   knockdown: false,
   startup: 0,
@@ -267,7 +214,7 @@ const dizzy: ActionContract = {
   actionId: 'dizzy',
   state: FighterState.DIZZY,
   attackType: null,
-  frames: makeFrames('dizzy', 12),
+  frames: makeFrames(KYO_CFG, 'dizzy', 12),
   hitLevel: 'MID',
   knockdown: false,
   startup: 0,
@@ -283,7 +230,7 @@ const guard_crush: ActionContract = {
   actionId: 'guard_crush',
   state: FighterState.GUARD_CRUSH,
   attackType: null,
-  frames: makeFrames('guard_crush', 10),
+  frames: makeFrames(KYO_CFG, 'guard_crush', 10),
   hitLevel: 'MID',
   knockdown: false,
   startup: 0,
@@ -299,7 +246,7 @@ const max_mode: ActionContract = {
   actionId: 'max_mode',
   state: FighterState.MAX_MODE,
   attackType: null,
-  frames: makeFrames('max_mode', 8),
+  frames: makeFrames(KYO_CFG, 'max_mode', 8),
   hitLevel: 'MID',
   knockdown: false,
   startup: 0,
@@ -315,7 +262,7 @@ const taunt: ActionContract = {
   actionId: 'taunt',
   state: FighterState.TAUNT,
   attackType: null,
-  frames: makeFrames('taunt', 10),
+  frames: makeFrames(KYO_CFG, 'taunt', 10),
   hitLevel: 'MID',
   knockdown: false,
   startup: 0,
@@ -331,7 +278,7 @@ const win: ActionContract = {
   actionId: 'win',
   state: FighterState.IDLE,
   attackType: null,
-  frames: makeFrames('win', 12),
+  frames: makeFrames(KYO_CFG, 'win', 12),
   hitLevel: 'MID',
   knockdown: false,
   startup: 0,
@@ -347,7 +294,7 @@ const throw_action: ActionContract = {
   actionId: 'throw_action',
   state: FighterState.THROW,
   attackType: null,
-  frames: makeFrames('throw_action', 10),
+  frames: makeFrames(KYO_CFG, 'throw_action', 10),
   hitLevel: 'MID',
   knockdown: false,
   startup: 0,
@@ -363,7 +310,7 @@ const hurt: ActionContract = {
   actionId: 'hurt',
   state: FighterState.HITSTUN,
   attackType: null,
-  frames: makeFrames('hurt', 10),
+  frames: makeFrames(KYO_CFG, 'hurt', 10),
   hitLevel: 'MID',
   knockdown: false,
   startup: 0,
@@ -379,7 +326,7 @@ const knockdown: ActionContract = {
   actionId: 'knockdown',
   state: FighterState.KNOCKDOWN,
   attackType: null,
-  frames: makeFrames('knockdown', 16),
+  frames: makeFrames(KYO_CFG, 'knockdown', 16),
   hitLevel: 'MID',
   knockdown: true,
   startup: 0,
@@ -399,7 +346,7 @@ const stand_a: ActionContract = {
   actionId: 'stand_a',
   state: FighterState.STAND_ATTACK,
   attackType: AttackType.STAND_A,
-  frames: makeAttackFrames('stand_a', 5, 3, 5, AttackType.STAND_A),
+  frames: makeAttackFrames(KYO_CFG, 'stand_a', 5, 3, 5, AttackType.STAND_A, ATTACK_FRAMES),
   hitLevel: 'MID',
   knockdown: false,
   startup: 5,
@@ -417,7 +364,7 @@ const stand_b: ActionContract = {
   actionId: 'stand_b',
   state: FighterState.STAND_ATTACK,
   attackType: AttackType.STAND_B,
-  frames: makeAttackFrames('stand_b', 5, 4, 7, AttackType.STAND_B),
+  frames: makeAttackFrames(KYO_CFG, 'stand_b', 5, 4, 7, AttackType.STAND_B, ATTACK_FRAMES),
   hitLevel: 'MID',
   knockdown: false,
   startup: 5,
@@ -435,7 +382,7 @@ const stand_c: ActionContract = {
   actionId: 'stand_c',
   state: FighterState.STAND_ATTACK,
   attackType: AttackType.STAND_C,
-  frames: makeAttackFrames('stand_c', 7, 4, 10, AttackType.STAND_C),
+  frames: makeAttackFrames(KYO_CFG, 'stand_c', 7, 4, 10, AttackType.STAND_C, ATTACK_FRAMES),
   hitLevel: 'MID',
   knockdown: false,
   startup: 7,
@@ -453,7 +400,7 @@ const stand_d: ActionContract = {
   actionId: 'stand_d',
   state: FighterState.STAND_ATTACK,
   attackType: AttackType.STAND_D,
-  frames: makeAttackFrames('stand_d', 8, 5, 12, AttackType.STAND_D),
+  frames: makeAttackFrames(KYO_CFG, 'stand_d', 8, 5, 12, AttackType.STAND_D, ATTACK_FRAMES),
   hitLevel: 'HIGH',
   knockdown: false,
   startup: 8,
@@ -475,7 +422,7 @@ const close_a: ActionContract = {
   actionId: 'close_a',
   state: FighterState.STAND_ATTACK,
   attackType: AttackType.CLOSE_A,
-  frames: makeAttackFrames('close_a', 4, 3, 5, AttackType.CLOSE_A),
+  frames: makeAttackFrames(KYO_CFG, 'close_a', 4, 3, 5, AttackType.CLOSE_A, ATTACK_FRAMES),
   hitLevel: 'MID',
   knockdown: false,
   startup: 4,
@@ -493,7 +440,7 @@ const close_b: ActionContract = {
   actionId: 'close_b',
   state: FighterState.STAND_ATTACK,
   attackType: AttackType.CLOSE_B,
-  frames: makeAttackFrames('close_b', 4, 3, 6, AttackType.CLOSE_B),
+  frames: makeAttackFrames(KYO_CFG, 'close_b', 4, 3, 6, AttackType.CLOSE_B, ATTACK_FRAMES),
   hitLevel: 'MID',
   knockdown: false,
   startup: 4,
@@ -511,7 +458,7 @@ const close_c: ActionContract = {
   actionId: 'close_c',
   state: FighterState.STAND_ATTACK,
   attackType: AttackType.CLOSE_C,
-  frames: makeAttackFrames('close_c', 5, 4, 8, AttackType.CLOSE_C),
+  frames: makeAttackFrames(KYO_CFG, 'close_c', 5, 4, 8, AttackType.CLOSE_C, ATTACK_FRAMES),
   hitLevel: 'MID',
   knockdown: false,
   startup: 5,
@@ -529,7 +476,7 @@ const close_d: ActionContract = {
   actionId: 'close_d',
   state: FighterState.STAND_ATTACK,
   attackType: AttackType.CLOSE_D,
-  frames: makeAttackFrames('close_d', 6, 5, 10, AttackType.CLOSE_D),
+  frames: makeAttackFrames(KYO_CFG, 'close_d', 6, 5, 10, AttackType.CLOSE_D, ATTACK_FRAMES),
   hitLevel: 'HIGH',
   knockdown: false,
   startup: 6,
@@ -551,7 +498,7 @@ const crouch_a: ActionContract = {
   actionId: 'crouch_a',
   state: FighterState.CROUCH_ATTACK,
   attackType: AttackType.CROUCH_A,
-  frames: makeAttackFrames('crouch_a', 4, 3, 5, AttackType.CROUCH_A),
+  frames: makeAttackFrames(KYO_CFG, 'crouch_a', 4, 3, 5, AttackType.CROUCH_A, ATTACK_FRAMES),
   hitLevel: 'LOW',
   knockdown: false,
   startup: 4,
@@ -569,7 +516,7 @@ const crouch_b: ActionContract = {
   actionId: 'crouch_b',
   state: FighterState.CROUCH_ATTACK,
   attackType: AttackType.CROUCH_B,
-  frames: makeAttackFrames('crouch_b', 5, 4, 6, AttackType.CROUCH_B),
+  frames: makeAttackFrames(KYO_CFG, 'crouch_b', 5, 4, 6, AttackType.CROUCH_B, ATTACK_FRAMES),
   hitLevel: 'LOW',
   knockdown: false,
   startup: 5,
@@ -587,7 +534,7 @@ const crouch_c: ActionContract = {
   actionId: 'crouch_c',
   state: FighterState.CROUCH_ATTACK,
   attackType: AttackType.CROUCH_C,
-  frames: makeAttackFrames('crouch_c', 6, 4, 9, AttackType.CROUCH_C),
+  frames: makeAttackFrames(KYO_CFG, 'crouch_c', 6, 4, 9, AttackType.CROUCH_C, ATTACK_FRAMES),
   hitLevel: 'LOW',
   knockdown: false,
   startup: 6,
@@ -605,7 +552,7 @@ const crouch_d: ActionContract = {
   actionId: 'crouch_d',
   state: FighterState.CROUCH_ATTACK,
   attackType: AttackType.CROUCH_D,
-  frames: makeAttackFrames('crouch_d', 7, 5, 11, AttackType.CROUCH_D),
+  frames: makeAttackFrames(KYO_CFG, 'crouch_d', 7, 5, 11, AttackType.CROUCH_D, ATTACK_FRAMES),
   hitLevel: 'LOW',
   knockdown: true,
   startup: 7,
@@ -627,7 +574,7 @@ const air_a: ActionContract = {
   actionId: 'air_a',
   state: FighterState.AIR_ATTACK,
   attackType: AttackType.STAND_A, // Air normals reuse generic AttackType
-  frames: makeAttackFrames('air_a', 4, 4, 4, AttackType.STAND_A),
+  frames: makeAttackFrames(KYO_CFG, 'air_a', 4, 4, 4, AttackType.STAND_A, ATTACK_FRAMES),
   hitLevel: 'HIGH',
   knockdown: false,
   startup: 4,
@@ -643,7 +590,7 @@ const air_c: ActionContract = {
   actionId: 'air_c',
   state: FighterState.AIR_ATTACK,
   attackType: AttackType.STAND_C,
-  frames: makeAttackFrames('air_c', 6, 5, 5, AttackType.STAND_C),
+  frames: makeAttackFrames(KYO_CFG, 'air_c', 6, 5, 5, AttackType.STAND_C, ATTACK_FRAMES),
   hitLevel: 'HIGH',
   knockdown: false,
   startup: 6,
@@ -659,7 +606,7 @@ const air_d: ActionContract = {
   actionId: 'air_d',
   state: FighterState.AIR_ATTACK,
   attackType: AttackType.STAND_D,
-  frames: makeAttackFrames('air_d', 6, 5, 5, AttackType.STAND_D),
+  frames: makeAttackFrames(KYO_CFG, 'air_d', 6, 5, 5, AttackType.STAND_D, ATTACK_FRAMES),
   hitLevel: 'HIGH',
   knockdown: false,
   startup: 6,
@@ -680,7 +627,7 @@ const kyo_75kai: ActionContract = {
   actionId: 'kyo_75kai',
   state: FighterState.STAND_ATTACK,
   attackType: AttackType.KYO_75KAI,
-  frames: makeAttackFrames('kyo_75kai', 14, 4, 14, AttackType.KYO_75KAI),
+  frames: makeAttackFrames(KYO_CFG, 'kyo_75kai', 14, 4, 14, AttackType.KYO_75KAI, ATTACK_FRAMES),
   hitLevel: 'MID',
   knockdown: false,
   startup: 14,
@@ -699,7 +646,7 @@ const kyo_75kai_2: ActionContract = {
   actionId: 'kyo_75kai_2',
   state: FighterState.STAND_ATTACK,
   attackType: AttackType.KYO_75KAI_2,
-  frames: makeAttackFrames('kyo_75kai_2', 7, 4, 14, AttackType.KYO_75KAI_2),
+  frames: makeAttackFrames(KYO_CFG, 'kyo_75kai_2', 7, 4, 14, AttackType.KYO_75KAI_2, ATTACK_FRAMES),
   hitLevel: 'MID',
   knockdown: true,
   startup: 7,
@@ -716,7 +663,7 @@ const kyo_red_kick: ActionContract = {
   actionId: 'kyo_red_kick',
   state: FighterState.STAND_ATTACK,
   attackType: AttackType.KYO_RED_KICK,
-  frames: makeAttackFrames('kyo_red_kick', 19, 5, 33, AttackType.KYO_RED_KICK),
+  frames: makeAttackFrames(KYO_CFG, 'kyo_red_kick', 19, 5, 33, AttackType.KYO_RED_KICK, ATTACK_FRAMES),
   hitLevel: 'MID',
   knockdown: true,
   startup: 19,
@@ -733,7 +680,7 @@ const cmd_gofu_you: ActionContract = {
   actionId: 'cmd_gofu_you',
   state: FighterState.STAND_ATTACK,
   attackType: AttackType.CMD_GOFU_YOU,
-  frames: makeAttackFrames('cmd_gofu_you', 12, 5, 18, AttackType.CMD_GOFU_YOU),
+  frames: makeAttackFrames(KYO_CFG, 'cmd_gofu_you', 12, 5, 18, AttackType.CMD_GOFU_YOU, ATTACK_FRAMES),
   hitLevel: 'HIGH',
   knockdown: false,
   startup: 12,
@@ -752,7 +699,7 @@ const cmd_88shiki: ActionContract = {
   actionId: 'cmd_88shiki',
   state: FighterState.CROUCH_ATTACK,
   attackType: AttackType.CMD_88SHIKI,
-  frames: makeAttackFrames('cmd_88shiki', 10, 6, 20, AttackType.CMD_88SHIKI),
+  frames: makeAttackFrames(KYO_CFG, 'cmd_88shiki', 10, 6, 20, AttackType.CMD_88SHIKI, ATTACK_FRAMES),
   hitLevel: 'LOW',
   knockdown: false,
   startup: 10,
@@ -771,7 +718,7 @@ const cmd_naraku: ActionContract = {
   actionId: 'cmd_naraku',
   state: FighterState.AIR_ATTACK,
   attackType: AttackType.CMD_NARAKU,
-  frames: makeAttackFrames('cmd_naraku', 8, 5, 16, AttackType.CMD_NARAKU),
+  frames: makeAttackFrames(KYO_CFG, 'cmd_naraku', 8, 5, 16, AttackType.CMD_NARAKU, ATTACK_FRAMES),
   hitLevel: 'HIGH',
   knockdown: true,
   startup: 8,
@@ -792,7 +739,7 @@ const kyo_oniyaki: ActionContract = {
   actionId: 'kyo_oniyaki',
   state: FighterState.STAND_ATTACK,
   attackType: AttackType.KYO_ONIYAKI,
-  frames: makeAttackFrames('kyo_oniyaki', 6, 5, 38, AttackType.KYO_ONIYAKI),
+  frames: makeAttackFrames(KYO_CFG, 'kyo_oniyaki', 6, 5, 38, AttackType.KYO_ONIYAKI, ATTACK_FRAMES),
   hitLevel: 'MID',
   knockdown: true,
   startup: 6,
@@ -809,7 +756,7 @@ const kyo_oniyaki_c: ActionContract = {
   actionId: 'kyo_oniyaki_c',
   state: FighterState.STAND_ATTACK,
   attackType: AttackType.KYO_ONIYAKI_C,
-  frames: makeAttackFrames('kyo_oniyaki_c', 6, 10, 48, AttackType.KYO_ONIYAKI_C),
+  frames: makeAttackFrames(KYO_CFG, 'kyo_oniyaki_c', 6, 10, 48, AttackType.KYO_ONIYAKI_C, ATTACK_FRAMES),
   hitLevel: 'MID',
   knockdown: true,
   startup: 6,
@@ -826,7 +773,7 @@ const kyo_yamibarai: ActionContract = {
   actionId: 'kyo_yamibarai',
   state: FighterState.STAND_ATTACK,
   attackType: AttackType.KYO_YAMIBARAI,
-  frames: makeAttackFrames('kyo_yamibarai', 10, 20, 30, AttackType.KYO_YAMIBARAI),
+  frames: makeAttackFrames(KYO_CFG, 'kyo_yamibarai', 10, 20, 30, AttackType.KYO_YAMIBARAI, ATTACK_FRAMES),
   hitLevel: 'MID',
   knockdown: false,
   startup: 10,
@@ -843,7 +790,7 @@ const kyo_yamibarai_c: ActionContract = {
   actionId: 'kyo_yamibarai_c',
   state: FighterState.STAND_ATTACK,
   attackType: AttackType.KYO_YAMIBARAI_C,
-  frames: makeAttackFrames('kyo_yamibarai_c', 11, 22, 28, AttackType.KYO_YAMIBARAI_C),
+  frames: makeAttackFrames(KYO_CFG, 'kyo_yamibarai_c', 11, 22, 28, AttackType.KYO_YAMIBARAI_C, ATTACK_FRAMES),
   hitLevel: 'MID',
   knockdown: false,
   startup: 11,
@@ -860,7 +807,7 @@ const kyo_aragami: ActionContract = {
   actionId: 'kyo_aragami',
   state: FighterState.STAND_ATTACK,
   attackType: AttackType.KYO_ARAGAMI,
-  frames: makeAttackFrames('kyo_aragami', 12, 4, 18, AttackType.KYO_ARAGAMI),
+  frames: makeAttackFrames(KYO_CFG, 'kyo_aragami', 12, 4, 18, AttackType.KYO_ARAGAMI, ATTACK_FRAMES),
   hitLevel: 'MID',
   knockdown: false,
   startup: 12,
@@ -880,7 +827,7 @@ const kyo_dokugami: ActionContract = {
   actionId: 'kyo_dokugami',
   state: FighterState.STAND_ATTACK,
   attackType: AttackType.KYO_DOKUGAMI,
-  frames: makeAttackFrames('kyo_dokugami', 18, 4, 21, AttackType.KYO_DOKUGAMI),
+  frames: makeAttackFrames(KYO_CFG, 'kyo_dokugami', 18, 4, 21, AttackType.KYO_DOKUGAMI, ATTACK_FRAMES),
   hitLevel: 'MID',
   knockdown: false,
   startup: 18,
@@ -899,7 +846,7 @@ const kyo_dokugami: ActionContract = {
 // ═══════════════════════════════════════════════════════════════════
 
 /** 大蛇薙 DM — fire pillar super */
-const dm_orochinagi_frames = makeAttackFrames('dm_orochinagi', 18, 30, 28, AttackType.DM_OROCHINAGI);
+const dm_orochinagi_frames = makeAttackFrames(KYO_CFG, 'dm_orochinagi', 18, 30, 28, AttackType.DM_OROCHINAGI, ATTACK_FRAMES);
 dm_orochinagi_frames[0].eventTags.push('super_flash');
 const dm_orochinagi: ActionContract = {
   characterId: 'kyo',
@@ -922,7 +869,7 @@ const dm_orochinagi: ActionContract = {
 // ═══════════════════════════════════════════════════════════════════
 
 /** 大蛇薙 SDM — enhanced fire pillar super (more hits) */
-const sdm_orochinagi_frames = makeAttackFrames('sdm_orochinagi', 20, 38, 29, AttackType.SDM_OROCHINAGI);
+const sdm_orochinagi_frames = makeAttackFrames(KYO_CFG, 'sdm_orochinagi', 20, 38, 29, AttackType.SDM_OROCHINAGI, ATTACK_FRAMES);
 sdm_orochinagi_frames[0].eventTags.push('super_flash');
 const sdm_orochinagi: ActionContract = {
   characterId: 'kyo',
