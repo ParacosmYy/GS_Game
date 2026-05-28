@@ -14,6 +14,12 @@ import {
   getCharacterConfig,
 } from './characterSpriteRegistry.js';
 import { createHighResRenderer, type SpriteImageFrame } from './baseHighResRenderer.js';
+import {
+  loadCharacterHitboxes,
+  hasMugenHitboxes as hasLoadedMugenHitboxes,
+  getHitboxLoadSummary,
+  type MugenHitboxData,
+} from './mugenHitboxLoader.js';
 import type { FighterState, AttackType } from '../../../core/types.js';
 
 const initializedCharacters = new Set<string>();
@@ -29,9 +35,12 @@ export async function initAllCharacterSprites(): Promise<void> {
   const results = await Promise.allSettled(
     configs.map(async (config) => {
       try {
-        const sprites = await loadCharacterSprites(config);
+        const [sprites, hitboxes] = await Promise.all([
+          loadCharacterSprites(config),
+          loadCharacterHitboxes(config),
+        ]);
         initializedCharacters.add(config.charId);
-        return { charId: config.charId, count: sprites.size };
+        return { charId: config.charId, spriteCount: sprites.size, hasHitboxes: !!hitboxes };
       } catch (e) {
         console.warn(`[Sprites] Failed to load ${config.charId}:`, e);
         return null;
@@ -41,11 +50,19 @@ export async function initAllCharacterSprites(): Promise<void> {
 
   for (const r of results) {
     if (r.status === 'fulfilled' && r.value) {
-      console.log(`[Sprites] ${r.value.charId}: ${r.value.count} actions loaded`);
+      const { charId, spriteCount, hasHitboxes } = r.value;
+      const hitboxTag = hasHitboxes ? '+hitboxes' : '';
+      console.log(`[Sprites] ${charId}: ${spriteCount} actions${hitboxTag} loaded`);
     }
   }
 
   console.log(`[Sprites] ${initializedCharacters.size}/${configs.length} characters loaded`);
+
+  // Hitbox summary
+  const hitboxSummary = getHitboxLoadSummary();
+  if (hitboxSummary.length > 0) {
+    console.log(`[Hitboxes] ${hitboxSummary.length} characters with MUGEN hitbox data`);
+  }
 }
 
 /**
@@ -53,6 +70,13 @@ export async function initAllCharacterSprites(): Promise<void> {
  */
 export function hasCharacterSprites(charId: string): boolean {
   return initializedCharacters.has(charId);
+}
+
+/**
+ * Check if a character has MUGEN hitbox data loaded.
+ */
+export function hasCharacterHitboxes(charId: string): boolean {
+  return hasLoadedMugenHitboxes(charId);
 }
 
 /**
