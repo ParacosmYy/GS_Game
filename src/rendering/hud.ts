@@ -1063,6 +1063,17 @@ function drawStunIndicator(ctx: CanvasRenderingContext2D, x: number, y: number, 
   } else {
     ctx.fillRect(x + w - fillW, y, fillW, h);
   }
+  // Stun warning glow when near dizzy threshold (>85%)
+  if (ratio > 0.85) {
+    const warnPulse = Math.sin(tick * 0.5) * 0.4 + 0.5;
+    ctx.save();
+    ctx.shadowColor = `rgba(255, 30, 30, ${warnPulse})`;
+    ctx.shadowBlur = 6;
+    ctx.strokeStyle = `rgba(255, 60, 40, ${warnPulse * 0.6})`;
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(x - 1, y - 1, w + 2, h + 2);
+    ctx.restore();
+  }
 }
 
 // ===== Power gauge with tick marks, glow, DM-ready flash =====
