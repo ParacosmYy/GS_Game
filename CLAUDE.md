@@ -4,65 +4,65 @@
 
 ## 1. 一句话方向
 
-不要继续横向堆角色和 placeholder。当前项目已经进入 Phase 2，执行口径应收敛到：
+当前项目已进入 **MUGEN 资产集成阶段**，执行口径统一为：
 
-> 先沉淀公共基础组件，再以 Ryo 为基线完成单角色样板闭环；当前最优先的门面样板角色是 Kyo，Kyo/Iori 只在不会破坏公共骨架的前提下继续接入。
-
-Ryo 仍是基线和质量参照，但样板目标已经从“只做角色”升级为“角色 + 公共骨架 + 可复制模板”。当前对外最值得做精的样板角色是 Kyo；Ryo 继续承担合同和数据基线角色。Kyo/Iori 已进入内容包与运行时接入阶段，但它们的存在不应反向破坏公共组件复用。
+> **从 MUGEN 中来** -- MUGEN 文件（SFF/AIR/ACT）是所有 sprite、动画、判定和 palette 数据的唯一真源。工具链负责提取，运行时只消费 manifest。
 
 补充执行原则：
 
-- 先把一个人物做精，再做其他人物，但前提是这个人物的所有表现都走同一套公共骨架。当前优先把 Kyo 做成门面样板，同时让 Ryo 保持基线与合同参照。
-- 所有内容优先向各自内容包收口，不允许在多个目录之间横向散落。
+- 所有角色通过 MUGEN 提取管线统一接入，运行时只消费 manifest JSON。
+- 程序化像素帧 / 骨骼渲染只作为 fallback，当 MUGEN sprite 可用时必须替换。
 - 公共骨架优先于角色私有实现；如果某个能力会被第二个角色复用，就应该先抽公共层。
-- 目录整理的目标不是“看起来更整齐”，而是让动作、肖像、判定、反馈、报告都能在内容包里复用。
-- 当前最高优先级是按 [KOF 差距矩阵](docs/product/kof-gap-matrix.md) 逐项闭合真实差距，而不是继续堆“看起来更完整”的功能。
-- 在所有差距里，资产优先级最高：真实 sprite / portrait / atlas / palette 的导入与接入，优先于继续抠骨架假人、placeholder 特效或表面参数。
-- 真实差距的闭合方式不是先写角色专属代码，而是先把公共 schema、公共渲染器、公共输入和公共校验搭起来。
-- 如果项目当前处在 Phase 2 或多角色阶段，也必须先对齐差距矩阵，再决定具体补内容包、流程 UI，还是补通用管线。
+- 所有内容优先向各自内容包收口，不允许在多个目录之间横向散落。
+- 当前最高优先级是按 [KOF 差距矩阵](docs/product/kof-gap-matrix.md) 逐项闭合真实差距。
+- 差距闭合的标准是 MUGEN 管线数据到位，纯程序化/fallback 方案不构成闭合。
+- 只有 KOF2002 原版阵容角色（约 44 人）在范围内。
+- 后续新功能优先从差距矩阵里找目标，而不是从"我还想加什么"开始。
 
-当前真实代码已经进入“多角色内容包 + 统一入口”的过渡阶段：
+当前真实代码状态：
 
-- `src/content/index.ts` 是内容包顶层统一入口。
-- `src/content/characters/index.ts` 汇总 Ryo / Kyo / Iori 内容包导出。
-- `src/content/characters/ryo/`、`src/content/characters/kyo/`、`src/content/characters/iori/` 里已经存在按职责拆分的分层入口。
-- `docs/architecture/public-base-components.md` 描述了所有角色必须共用的底座。
-- 兼容层文件仍可保留，但新增数据优先进入子目录或同名职责文件。
-- `src/tools/validateManifest.ts` 这类校验工具应作为内容包闭环的一部分，而不是临时脚本。
-- 后续新功能优先从差距矩阵里找目标，而不是从“我还想加什么”开始。
-- 所有“文件池”都必须按职责拆分，状态机文件不得把状态、转移、副作用、渲染混成一个大文件。
-- 默认任何单个文件都不应超过 2000 行；`main.ts` 必须更小，只能承担启动和组装职责。
+- `src/content/characters/` 下 5 个角色有完整内容包（Ryo/Kyo/Iori/Terry/Kim）。
+- `public/sprites/` 下 17 个角色目录共 26,793 张 PNG + manifest。
+- `src/tools/` 下 MUGEN 提取工具链已完整：parseAir、buildSpriteManifest、convertAirHitboxes、extractCharacterSprites。
+- 运行时双路径渲染：PNG sprite 优先，程序化帧 fallback。
+- 28 个角色有 roster 定义，10,000+ 测试全部通过。
+- 版本 v3.05，316 个 tag。
 
-## 2. 为什么要改方向
+## 2. 为什么要走 MUGEN-First
 
-现状问题不是“优化不够”，而是优化分散：
+项目已经完成了从"手工拼凑"到"管线驱动"的跨越：
 
-- 角色内容包已经有多角色入口，但多角色之间的体验和完整度仍不一致。
-- frame data 有不少，但视觉帧仍存在 placeholder 和程序化 fallback。
-- 肖像 manifest 有结构，但还需要继续向正式资源闭环推进。
-- 骨骼/像素块渲染继续存在，导致部分角色气质不像 SNK/KOF。
-- 最快提升视觉质量的路径是把真实合法 sprite 资产导入现有管线，而不是继续靠骨架假人和程序化轮廓修饰。
-- 打击感有 hitstop、spark、shake 等组件，但没有按攻击类型形成统一反馈矩阵。
-- Phase 2 已经从“角色闭环”转入“流程仪式感 + 多角色复制管线”阶段，但文档如果继续写成单角色主线，就会和真实代码状态脱节。
-- 技术栈不是当前第一瓶颈，资产生产线和内容包边界才是。
+- **工具链已经就位且经过验证**：extractCharacterSprites 从 SFF 提取 PNG，parseAir 解析 AIR 动画帧，convertAirHitboxes 转换 Clsn 判定，buildSpriteManifest 生成 manifest。这条链路已经被 17 个角色、26,793 张 PNG 验证过。
+- **资产已经批量导入**：17 个角色目录已有 PNG + manifest，MUGEN hitbox 数据覆盖全 17 角色共 37,126 行。
+- **运行时已经支持双路径**：spriteLoader + realSpriteLoader + baseHighResRenderer 提供 PNG 优先、fallback 降级的渲染路径。
+- **继续精修程序化像素帧是零和博弈**：每多花一分钟调骨架假人的像素块，就少一分钟把真实 MUGEN sprite 接入运行时。真实 sprite 的视觉质量提升远超任何程序化修饰。
+- **管线已经是可复制的**：新角色接入走同一条 extractCharacterSprites -> manifest -> 内容包 -> 运行时链路，不需要每个角色各搞一套。
 
-因此后续 agent 必须从“多点优化”改成“样板线闭环”。
+因此后续 agent 必须从"多点优化"改成"MUGEN 管线闭环"。
 
 ## 3. 当前主线
 
-主线名称：`Phase 2 Multi-Role Closure`。
+主线名称：`MUGEN Asset Integration Phase`。
 
 主线目标：
 
-- 让 Ryo 继续作为 baseline 和验收参照。
-- 把 Kyo/Iori 内容包、街机流程、菜单/UI、流程仪式感推进到可复制模板。
-- 用统一 content loader / manifest / frame contract 验证多角色资产格式、动作格式、判定格式和反馈格式。
-- 把骨骼/placeholder 降级为 fallback。
-- 优先把合法或公开可用的 sprite / portrait 资源接进来，再考虑骨架细节优化。
-- 形成可以复制给后续角色的生产模板。
+- 完成全部 17 个已有 PNG 角色的 MUGEN sprite 运行时接入（animations.json + hitboxes.json 消费）。
+- 扩展 MUGEN 提取覆盖到更多 KOF2002 阵容角色。
+- 用 MUGEN AIR 动画数据和 Clsn 判定数据替换手写帧序列和判定框。
+- 深化打击反馈和取消系统，使 MUGEN 帧数据真正驱动游戏体验。
+- 把程序化 fallback 降级为纯兜底，确保所有视觉表现走 MUGEN 数据。
 
-主线基线文档：[docs/product/ryo-vertical-slice-plan.md](docs/product/ryo-vertical-slice-plan.md)。
-当前优先级文档：[docs/product/kof-gap-matrix.md](docs/product/kof-gap-matrix.md)。
+优先级文档：[KOF 差距矩阵](docs/product/kof-gap-matrix.md)。
+
+主线执行优先级（按差距矩阵 Tier 0 排序）：
+
+1. AIR 解析管线端到端：parseAir + convertAirHitboxes 输出持久化为 animations.json / hitboxes.json。
+2. 运行时消费 MUGEN 动画和判定数据，替换手写数据。
+3. 通常技 action number 映射系统化。
+4. 为已有 SFF 源但未提取的角色运行管线。
+5. 为缺失源文件的角色寻找替代 MUGEN 角色包。
+6. 内容包基于 MUGEN 数据重建。
+7. 视觉与流程打磨。
 
 ## 4. 每轮启动脚本
 
@@ -73,25 +73,24 @@ Ryo 仍是基线和质量参照，但样板目标已经从“只做角色”升�
 3. 阅读：
    - `AGENTS.md`
    - `CLAUDE.md`
-   - `docs/product/ryo-vertical-slice-plan.md`
+   - `docs/product/kof-gap-matrix.md`
    - `docs/process/iteration-workflow.md`
    - `docs/process/decision-gates.md`
    - `docs/architecture/workspace-architecture-target.md`
    - 本轮相关架构/产品文档
-4. 判断本轮属于哪一类：
-   - 资产格式
-   - 肖像
-   - 动作帧
-   - 判定帧
-   - 命中反馈
-   - 验收工具
-   - 文档约束
+4. MUGEN 管线状态检查：确认本轮目标角色在 `public/sprites/` 和 `references/mugen/` 中的状态。如果 PNG 已存在但 manifest/内容包未就位，优先完成管线后半段。
+5. 判断本轮属于哪一类：
+   - MUGEN 管线（提取/manifest/动画/判定）
+   - 运行时接入（sprite 加载/渲染/动作映射）
+   - 内容包（角色数据/判定/反馈/取消路径）
+   - 打击反馈与 VFX
    - 流程与场景仪式感
-   - 多角色内容包
-5. 先执行 [自侦测前置](docs/process/self-detection.md) 的 3 个角色：架构、研发、产品。
-6. 只有自侦测通过，才决定是否需要升级到深审编队。
-7. 输出本轮 PM/玩家/研发/测试/架构结论。
-8. 写方案后再实施。
+   - 验收工具与校验
+   - 文档约束
+6. 先执行 [自侦测前置](docs/process/self-detection.md) 的 3 个角色：架构、研发、产品。
+7. 只有自侦测通过，才决定是否需要升级到深审编队。
+8. 输出本轮 PM/玩家/研发/测试/架构结论。
+9. 写方案后再实施。
 
 ## 4.0 自侦测前置
 
@@ -116,27 +115,28 @@ Ryo 仍是基线和质量参照，但样板目标已经从“只做角色”升�
 - 产品经理：玩家价值、范围、验收。
 - 测试负责人：自动测试、手测、回归风险。
 
-允许范围是 6-9 个子 agent。低于 6 个视为流程不完整。涉及换栈、大迁移、资产管线时建议增加第 9 个“参考研究员”或“发布集成负责人”。
+允许范围是 6-9 个子 agent。低于 6 个视为流程不完整。涉及换栈、大迁移、资产管线时建议增加第 9 个"参考研究员"或"发布集成负责人"。
 
 如果当前工具环境无法创建子 agent，必须写明原因，并在主线程按同样角色逐项输出结论。不能假装已经并行调用。
 
 ## 4.1.1 资产优先规则
 
-本项目当前最高优先级的最高优先级是资产导入与资产接入。只要本轮能推进以下任何一项，就应优先于继续抠骨架假人、placeholder 特效或渲染表面参数：
+MUGEN 资产导入管线已基本建成，当前优先级从"建管线"转向"填管线"。只要本轮能推进以下任何一项，就应优先于继续精修程序化 fallback 或表面参数：
 
-- 资产来源确认。
-- SFF / ACT / palette 解析。
-- sprite atlas / portrait manifest 生成。
-- Frame Contract / animation manifest 对齐。
-- 运行时接入与校验工具补全。
+- AIR 动画数据端到端输出：parseAir -> animations.json -> 运行时消费。
+- AIR Clsn 判定数据端到端输出：convertAirHitboxes -> hitboxes.json -> 运行时消费。
+- 通常技 action number 到 AttackType 的系统化映射。
+- 已有 PNG 角色的运行时 sprite 配置补全。
+- 缺失 MUGEN 源的角色寻找替代角色包并提取。
+- 内容包基于 MUGEN 数据重建而非手写。
 
 推荐执行顺序：
 
-1. 先确认资源合法性与可用性。
-2. 再做 SFF / ACT / palette 解析。
-3. 再生成 manifest 与 atlas。
-4. 再接入运行时。
-5. 最后才考虑骨架 fallback 的美观度修饰。
+1. 先确认目标角色的 MUGEN 源文件可用性。
+2. 运行 extractCharacterSprites 提取 PNG（如尚未提取）。
+3. 运行 parseAir + convertAirHitboxes 生成动画和判定数据。
+4. 完成 manifest -> 内容包 -> 运行时链路。
+5. 最后才考虑 fallback 的视觉修饰。
 
 ## 4.2 大型项目化方向
 
@@ -150,11 +150,10 @@ Ryo 仍是基线和质量参照，但样板目标已经从“只做角色”升�
 - `audio/` 只响应事件。
 - `tools/` 负责离线资产生成、校验和报告。
 - 公共基础组件的具体清单见 [公共基础组件总说明](docs/architecture/public-base-components.md)。
-- 资产导入管线优先级高于继续修改运行时骨架；如果能从公开/合法资源中解析出 sprite / portrait / palette，就先落工具层。
 
-不要为了“显得大型”做大搬家。每次只迁移一个领域，并通过 [决策门](docs/process/decision-gates.md) 验收。
+不要为了"显得大型"做大搬家。每次只迁移一个领域，并通过 [决策门](docs/process/decision-gates.md) 验收。
 
-所有“后续要继续迭代”的文件、草案、待办、交接和归档，统一放进 [迭代工作区](docs/iteration/README.md)：
+所有"后续要继续迭代"的文件、草案、待办、交接和归档，统一放进 [迭代工作区](docs/iteration/README.md)：
 
 - `docs/iteration/active.md`：当前正在推进的内容。
 - `docs/iteration/backlog.md`：未进入本轮的候选项。
@@ -163,38 +162,38 @@ Ryo 仍是基线和质量参照，但样板目标已经从“只做角色”升�
 
 不要把迭代草案散落到仓库根目录、临时 markdown、或无归属的新文档里。
 
-## 4.3 单角色收口规则
+## 4.3 角色收口规则
 
-当前允许被持续打磨的样板角色优先是 Kyo；Ryo 继续作为基线与合同参照。
+所有 KOF2002 阵容角色均通过 MUGEN 提取管线统一接入。内容包 = MUGEN 提取结果 + 游戏逻辑层。
 
 每轮若涉及角色内容，必须先回答：
 
-- 这件事是否直接服务当前样板角色的闭环？
-- 这件事能否收进当前样板角色的单一内容边界？
-- 这件事是否会让代码/资产从“散点”变成“单点真源”？
+- 这件事是否推进了某个 KOF2002 角色的 MUGEN 管线完整度？
+- 这件事能否收进该角色的单一内容包边界？
+- 这件事是否会让代码/资产从"散点"变成"单点真源"？
 
 如果答案不清楚，先停，不要横向扩新目录。
 
-Ryo 相关内容的目标归属是 `src/content/characters/ryo/` 方向，Kyo 的样板内容则优先收口到 `src/content/characters/kyo/` 方向。即使当前仍有历史文件留在旧位置，也只能作为过渡层存在，不得把新的角色数据继续分散进更多位置。
+每个角色的内容归属是 `src/content/characters/<characterId>/`。即使当前仍有历史文件留在旧位置，也只能作为过渡层存在，不得把新数据继续分散进更多位置。
 
-更细的目录切分建议是：
+内容包子目录结构：
 
 - `commands/`：输入与路由。
 - `moves/`：技能与招式说明。
 - `attacks/`：普通攻击与攻击归类。
-- `animations/`：动作帧与 pose。
-- `hitboxes/`：判定。
-- `feedback/`：命中反馈。
-- `portraits/`：肖像。
+- `animations/`：动作帧与 pose（从 AIR 解析）。
+- `hitboxes/`：判定（从 AIR Clsn 提取）。
+- `feedback/`：命中反馈配置。
+- `portraits/`：肖像（从 SFF 9000,0 提取）。
 - `reports/`：完整度和验收结果。
 
-新增任何 Ryo 内容时，先问自己属于哪一类，再决定放哪一个子目录，不能再塞回单一巨型文件。
+新增任何角色内容时，先问自己属于哪一类，再决定放哪一个子目录。
 
-当前与 Ryo 相关的真实实现已包含一批平面兼容文件和分层入口，后续文档必须同时承认“兼容层存在”和“子域迁移进行中”两个事实，不能把现状写成已经完全迁完，也不能继续假装还没有开始拆分。
+当前已有内容包的角色：Ryo、Kyo、Iori（完整）、Terry、Kim（部分）。Ryo 继续作为基线与合同参照。
 
 ## 4.4 文件池与状态机拆分规则
 
-所谓“文件池”，不是把很多代码文件堆在一起，而是把同一职责域拆成可以单独替换、单独测试、单独拼接的最小文件集合。
+所谓"文件池"，不是把很多代码文件堆在一起，而是把同一职责域拆成可以单独替换、单独测试、单独拼接的最小文件集合。
 
 每个状态机文件都应尽量遵循：
 
@@ -210,22 +209,21 @@ Ryo 相关内容的目标归属是 `src/content/characters/ryo/` 方向，Kyo �
 - 输入解析 + 战斗判定 + 音频触发。
 - 角色数据 + 通用规则 + UI 绘制。
 
-如果一个文件已经变成“梦文件”，优先按职责拆成文件池，而不是继续在里面堆分支。
-如果一个文件接近或超过 2000 行，优先拆分，不要继续做“临时压缩”。
+如果一个文件已经变成"梦文件"，优先按职责拆成文件池，而不是继续在里面堆分支。
+如果一个文件接近或超过 2000 行，优先拆分，不要继续做"临时压缩"。
 
 ## 5. 每轮禁止事项
 
 除非用户当前明确覆盖，否则禁止：
 
-- 新增角色。
+- 添加非 KOF2002 原版阵容的角色。
+- 不经 MUGEN 提取管线接入新角色（每个角色必须走 SFF -> PNG -> manifest -> 内容包 -> 运行时全链路）。
+- 在有 MUGEN sprite 可用时继续精修程序化 fallback。
 - 新增玩法模式。
-- 把 placeholder 继续精修成正式方向。
-- 继续精修 placeholder 或骨架假人，而不是先做资产导入。
 - 重写整个引擎。
-- 未完成 Ryo 样板就扩展 Kyo/Iori。
 - 不经决策门直接引入 PixiJS/Godot/Rust/C++。
-- 为了评分做无法验收的“看起来变多”改动。
-- 把 MUGEN/IKEMEN/QF 的商业素材或受保护角色实现复制进运行时。
+- 为了评分做无法验收的"看起来变多"改动。
+- 把 MUGEN/IKEMEN/QF 的商业素材或受保护代码复制进运行时（只提取 sprite/动画/判定数据）。
 
 ## 6. 每轮必须产出的方案
 
@@ -236,7 +234,7 @@ Ryo 相关内容的目标归属是 `src/content/characters/ryo/` 方向，Kyo �
 - ...
 
 主线归属：
-- Ryo 肖像 / Ryo 动作 / Ryo 判定 / Ryo 命中反馈 / 资产管线 / 验收工具 / 文档约束
+- MUGEN 管线 / 运行时接入 / 内容包 / 打击反馈 / 流程仪式感 / 验收工具 / 文档约束
 
 PM 结论：
 - 玩家会感到哪里变好？
@@ -265,44 +263,36 @@ PM 结论：
 - ...
 ```
 
-## 7. Ryo 样板验收标准
+## 7. 角色接入验收标准
 
-Ryo 不达标时，不允许把主线扩到更多角色。
+所有 KOF2002 阵容角色通过 MUGEN 管线接入时，必须满足以下标准。标准不区分角色，所有角色统一要求。
 
 ### 7.1 肖像
 
 - 选人、HUD、胜利至少有明确尺寸规范。
-- 不再只依赖 fallback 颜色。
-- 肖像来源必须合法、原创或明确可用。
+- 肖像优先从 MUGEN SFF 9000,0 sprite 提取。
 - 肖像 manifest 必须能替换资产而不改 UI 逻辑。
 
 ### 7.2 动作
 
-第一批只做：
+第一批核心动作：
 
-- `idle`
-- `walk_forward`
-- `walk_backward`
-- `jump`
-- `stand_a`
-- `stand_c`
-- `hurt`
-- `knockdown`
+- `idle`、`walk_forward`、`walk_backward`、`jump`
+- `stand_a`、`stand_c`、`crouch_a`、`crouch_c`
+- `hurt`、`knockdown`
 
 每个动作必须有：
 
-- 帧名。
-- 帧序列。
-- 每帧 duration。
-- anchor。
-- 视觉 offset。
-- 可选 hurtbox/hitbox。
+- MUGEN AIR 源的帧序列和 duration。
+- anchor 和视觉 offset。
+- 对应 spriteRef 指向真实 PNG。
+- 可选 hurtbox/hitbox（来自 AIR Clsn）。
 - 对应 frame data 或说明。
 
 ### 7.3 判定
 
-- startup/active/recovery 与视觉帧能对齐。
-- hitbox/hurtbox 不写在渲染函数里。
+- startup/active/recovery 与 MUGEN 动画帧对齐。
+- hitbox/hurtbox 来自 AIR Clsn 数据，不手写。
 - 判定数据可以被测试读取。
 - 调试框只读取判定数据，不成为判定来源。
 
@@ -339,55 +329,83 @@ interface FrameContract {
 
 实现时可以拆成多个类型，但语义必须保留：
 
-- `spriteRef` 指向视觉资产。
-- `hurtboxes` / `hitboxes` 指向判定资产。
+- `spriteRef` 指向真实 MUGEN sprite 资产（优先）或 fallback。
+- `hurtboxes` / `hitboxes` 来自 AIR 解析的 Clsn 判定数据。
 - `eventTags` 触发脚步、挥拳、命中、落地等事件。
 - combat 不读取 Canvas。
 - rendering 不决定命中。
 - audio/vfx 只响应事件。
 
-## 9. 资产管线方向
+## 9. MUGEN 资产管线
 
-运行时只消费 manifest。资产解析、atlas 生成、图片裁剪、palette 处理都属于工具层。
+运行时只消费 manifest。MUGEN 文件解析、PNG 提取、判定转换都在工具层完成。
 
-目标目录方向：
+### 9.1 核心工具链
+
+| 工具 | 入口 | 职责 |
+|------|------|------|
+| AIR 解析 | `src/tools/parseAir.ts` | 解析 MUGEN AIR 文件，提取动作帧序列、时间、锚点 |
+| Sprite 提取 | `src/tools/extractCharacterSprites.ts` | 从 SFF 提取角色 sprite 为 PNG |
+| Sprite Manifest | `src/tools/buildSpriteManifest.ts` | 从提取的 PNG 生成 manifest.json |
+| Hitbox 转换 | `src/tools/convertAirHitboxes.ts` | 将 AIR Clsn 碰撞体转为项目判定格式 |
+| Atlas 打包 | `src/tools/buildSpriteAtlas.ts` | 16 角色 atlas.json + shelf 装箱算法 |
+| 动画时间对比 | `src/tools/compareAnimTiming.ts` | manifest timing vs hitbox timing 逐动作对比 |
+| Manifest 校验 | `src/tools/validateManifest.ts` / `validateManifests.ts` | 校验 manifest 完整性和一致性 |
+| Frame Contract 校验 | `src/tools/validateFrameContract.ts` | 校验 Frame Contract 数据完整性 |
+| 完整度报告 | `src/tools/characterCompletenessReport.ts` / `multiCharReport.ts` | 角色完整度评分 |
+| 多角色验证 | `src/tools/multiCharValidation.ts` | 跨角色一致性校验 |
+
+### 9.2 资产流水线标准路径
 
 ```text
-assets/
-  source/
-    ryo/
-      portraits/
-      sprites/
-      palettes/
-  generated/
-    ryo/
-      ryo.atlas.png
-      ryo.atlas.json
-      ryo.portraits.json
-      ryo.animations.json
-      ryo.hitboxes.json
+MUGEN 源文件
+  references/mugen/chars-extracted/warusaki3/characters/<char>/
+    <char>.sff  ->  extractCharacterSprites  ->  public/sprites/<char>/*.png
+    <char>.air  ->  parseAir                 ->  animation manifest (帧序列+duration)
+    <char>.air  ->  convertAirHitboxes       ->  hitbox manifest (Clsn 判定框)
+    <char>.act  ->  palette 提取             ->  palette manifest
 
-tools/
-  asset-pipeline/
-    build-atlas.ts
-    validate-manifest.ts
-    report-character-completeness.ts
+产出物
+  public/sprites/<char>/
+    manifest.json       (buildSpriteManifest 生成)
+    00000_0000.png ...  (extractCharacterSprites 提取)
+
+内容包接入
+  src/content/characters/<char>/
+    index.ts            内容包入口
+    animations/         AIR 解析后的动画数据
+    hitboxes/           AIR 解析后的判定数据
+    portraits/          肖像数据
+    attacks/            攻击归类
+    commands/           输入路由
+    feedback/           命中反馈配置
+    moves/              招式路由与命令输入
 ```
 
-当前可以先写 manifest 和校验工具，不必一次生成正式美术。
+### 9.3 运行时消费路径
+
+- `spriteLoader.ts` 加载 PNG sprite。
+- `realSpriteLoader.ts` 提供通用 manifest -> sprite 映射。
+- `baseHighResRenderer.ts` 提供双路径：PNG 优先、程序化 fallback。
+- `mugenHitboxLoader.ts` 加载 MUGEN Clsn hitbox 数据。
+- `mugenHurtboxLoader.ts` 加载 MUGEN Clsn hurtbox 数据。
+- `animStateSync.ts` 动画状态同步 + MUGEN 帧索引映射。
+- `characterSpriteRegistry.ts` + `characterSpriteConfigs.ts` 角色注册与配置。
+
+运行时不得包含 MUGEN 文件解析逻辑。所有解析在构建时或离线完成。
 
 ## 10. 技术栈决策
 
-当前不要因为“不像 KOF”直接换栈。
+当前不要因为"不像 KOF"直接换栈。
 
 换栈前必须满足：
 
-- Ryo 已有真实 atlas/manifest。
+- 全部已有角色已用 MUGEN sprite 替换 fallback。
 - Canvas 2D 在真实资产下出现可复现性能或能力瓶颈。
 - combat/input/state 已经和 rendering 解耦。
 - 迁移方案能保留角色数据和 frame contract。
 
-如果只是 placeholder 丑，换 PixiJS/Godot 也不会变成 KOF。
+如果只是 placeholder 丑，换 PixiJS/Godot 也不会变成 KOF。先用 MUGEN 真实 sprite 把视觉质量拉上去，再判断是否需要换栈。
 
 ## 11. 评分规则
 
@@ -395,17 +413,17 @@ tools/
 
 可加分条件：
 
-- 推进了 Ryo 样板闭环。
-- 或降低了资产/动作/判定/反馈管线风险。
-- 或修复了阻碍 Ryo 闭环的稳定性问题。
-- 或让约束文档更能防止跑偏。
+- 推进了某个 KOF2002 角色的 MUGEN 管线完整度（提取/动画/判定/运行时接入）。
+- 降低了资产/动作/判定/反馈管线风险。
+- 修复了阻碍 MUGEN 管线闭环的稳定性问题。
+- 让约束文档更能防止跑偏。
 
 不可加分：
 
-- 新增角色。
+- 不经 MUGEN 管线横向扩角色。
 - 无验收标准的泛泛优化。
 - 构建失败。
-- 只让 placeholder 更花。
+- 只让程序化 fallback 更花而不推进 MUGEN 接入。
 - 不能说明更接近 KOF 在哪里。
 
 ## 12. 提交规则
@@ -455,10 +473,29 @@ type(scope): 中文标题
 
 如果工作区有他人改动，只 stage 本轮文件。
 
-## 13. 给后续 AI 的执行口令
+## 13. KOF2002 角色白名单
+
+本项目只面向 KOF2002 原版出场角色。只有以下角色允许被新增或扩展：
+
+- **日本队**：Kyo、Benimaru、Daimon
+- **饿狼队**：Terry、Andy、Joe
+- **龙虎队**：Ryo、Robert、Takuma
+- **怒队**：Leona、Ralf、Clark
+- **超能力队**：Athena、Kensou、Chin
+- **韩国队**：Kim、Chang、Choi
+- **女性格斗家队**：Mai、Yuri、May
+- **八神队**：Iori、Mature、Vice
+- **NESTS 队**：K'、Maxima、Whip
+- **大蛇队**：Yashiro、Shermie、Chris
+- **额外角色**：Billy、Yamazaki、Kusanagi、Rugal、Omega Rugal
+
+任何不在名单内的角色，除非用户明确覆盖，否则不得引入。
+
+## 14. 给后续 AI 的执行口令
 
 每次想新增东西前，先问：
 
-> 这是否明确闭合了 [KOF 差距矩阵](docs/product/kof-gap-matrix.md) 中的一项差距？
+> 1. 这是否推进了某个 KOF2002 角色的 MUGEN 管线完整度？
+> 2. 如果不是，这是否明确闭合了 [KOF 差距矩阵](docs/product/kof-gap-matrix.md) 中的一项差距？
 
-如果答案不是明确的“是”，不要做。
+如果两个答案都不是明确的"是"，不要做。
