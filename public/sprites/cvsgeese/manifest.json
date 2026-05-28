@@ -47447,7 +47447,7 @@
           "index": 3,
           "offsetX": 0,
           "offsetY": 0,
-          "duration": 0,
+          "duration": 1,
           "flipH": false,
           "hurtboxes": [
             {
@@ -50069,7 +50069,7 @@
           "index": 0,
           "offsetX": 0,
           "offsetY": 0,
-          "duration": 0,
+          "duration": 1,
           "flipH": false,
           "hurtboxes": [
             {

@@ -27557,7 +27557,7 @@
           "index": 7,
           "offsetX": 0,
           "offsetY": 0,
-          "duration": 0,
+          "duration": 1,
           "flipH": false,
           "hurtboxes": null,
           "attackBoxes": null

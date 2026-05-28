@@ -13,7 +13,7 @@ import { registerCharacterSprites, type CharacterSpriteConfig } from './characte
 registerCharacterSprites({
   charId: 'kyo',
   mugenDir: 'cvskyo',
-  targetDisplayHeight: 96,
+  targetDisplayHeight: 106,
   defaultTint: '#ff6600',
   specialMap: {
     [AttackType.KYO_ONIYAKI]: '1000',
@@ -73,7 +73,7 @@ registerCharacterSprites({
 registerCharacterSprites({
   charId: 'athena',
   mugenDir: 'cvsathena',
-  targetDisplayHeight: 96,
+  targetDisplayHeight: 89,
   defaultTint: '#ff66cc',
   specialMap: {
     [AttackType.ATHENA_PSYCHO_BALL]: '1000',
@@ -90,7 +90,7 @@ registerCharacterSprites({
 registerCharacterSprites({
   charId: 'terry',
   mugenDir: 'cvsterry',
-  targetDisplayHeight: 96,
+  targetDisplayHeight: 101,
   defaultTint: '#ffcc00',
   specialMap: {
     [AttackType.TERRY_POWER_WAVE]: '1000',
@@ -109,7 +109,7 @@ registerCharacterSprites({
 registerCharacterSprites({
   charId: 'kim',
   mugenDir: 'cvskim',
-  targetDisplayHeight: 96,
+  targetDisplayHeight: 113,
   defaultTint: '#44aaff',
   specialMap: {
     [AttackType.KIM_HIENZAN]: '1000',
@@ -128,7 +128,7 @@ registerCharacterSprites({
 registerCharacterSprites({
   charId: 'vice',
   mugenDir: 'cvsvice',
-  targetDisplayHeight: 96,
+  targetDisplayHeight: 104,
   defaultTint: '#cc44ff',
   specialMap: {
     [AttackType.VICE_OUTRAGE]: '1000',
@@ -144,7 +144,7 @@ registerCharacterSprites({
 registerCharacterSprites({
   charId: 'yamazaki',
   mugenDir: 'cvsyamazaki',
-  targetDisplayHeight: 96,
+  targetDisplayHeight: 126,
   defaultTint: '#aa4400',
   specialMap: {
     [AttackType.YAMAZAKI_SNAKE_ARM]: '1000',
@@ -160,7 +160,7 @@ registerCharacterSprites({
 registerCharacterSprites({
   charId: 'shermie',
   mugenDir: 'shermie',
-  targetDisplayHeight: 96,
+  targetDisplayHeight: 109,
   defaultTint: '#ff4488',
   specialMap: {
     [AttackType.SHERMIE_SHOOT]: '1000',
@@ -176,7 +176,7 @@ registerCharacterSprites({
 registerCharacterSprites({
   charId: 'benimaru',
   mugenDir: 'cvsbenimaru',
-  targetDisplayHeight: 96,
+  targetDisplayHeight: 118,
   defaultTint: '#ffff44',
   specialMap: {},
 });
@@ -185,7 +185,7 @@ registerCharacterSprites({
 registerCharacterSprites({
   charId: 'chunli',
   mugenDir: 'cvschunli',
-  targetDisplayHeight: 96,
+  targetDisplayHeight: 97,
   defaultTint: '#4488ff',
   specialMap: {},
 });
@@ -194,7 +194,7 @@ registerCharacterSprites({
 registerCharacterSprites({
   charId: 'geese',
   mugenDir: 'cvsgeese',
-  targetDisplayHeight: 96,
+  targetDisplayHeight: 117,
   defaultTint: '#2244aa',
   specialMap: {},
 });
@@ -203,7 +203,7 @@ registerCharacterSprites({
 registerCharacterSprites({
   charId: 'gouki',
   mugenDir: 'cvsgouki',
-  targetDisplayHeight: 96,
+  targetDisplayHeight: 115,
   defaultTint: '#880044',
   specialMap: {},
 });
@@ -212,7 +212,7 @@ registerCharacterSprites({
 registerCharacterSprites({
   charId: 'rock',
   mugenDir: 'cvsrock',
-  targetDisplayHeight: 96,
+  targetDisplayHeight: 107,
   defaultTint: '#6688cc',
   specialMap: {},
 });
@@ -221,7 +221,7 @@ registerCharacterSprites({
 registerCharacterSprites({
   charId: 'king',
   mugenDir: 'cvsking',
-  targetDisplayHeight: 96,
+  targetDisplayHeight: 108,
   defaultTint: '#88ccff',
   specialMap: {},
 });
@@ -230,7 +230,7 @@ registerCharacterSprites({
 registerCharacterSprites({
   charId: 'rugal',
   mugenDir: 'cvsrugal',
-  targetDisplayHeight: 96,
+  targetDisplayHeight: 130,
   defaultTint: '#880022',
   specialMap: {},
 });
@@ -239,7 +239,7 @@ registerCharacterSprites({
 registerCharacterSprites({
   charId: 'g_rugal',
   mugenDir: 'cvsg_rugal',
-  targetDisplayHeight: 96,
+  targetDisplayHeight: 131,
   defaultTint: '#cc0022',
   specialMap: {},
 });
@@ -248,7 +248,7 @@ registerCharacterSprites({
 registerCharacterSprites({
   charId: 'heidern',
   mugenDir: 'heidern',
-  targetDisplayHeight: 96,
+  targetDisplayHeight: 110,
   defaultTint: '#336633',
   specialMap: {},
 });
