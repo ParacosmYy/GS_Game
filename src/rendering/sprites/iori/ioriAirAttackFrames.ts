@@ -302,6 +302,68 @@ export const IORI_AIR_A_FRAMES: PixelFrame[] = [AIA0, AIA1, AIA2].map(pixels => 
 }));
 
 // ====================================================================
+// AIR_B (air light kick) — 3 frames
+// Quick air kick: body angled in air, one leg snaps forward-diagonally.
+// Lighter and faster than AIR_D — knee tucked, shin extended.
+// ====================================================================
+
+// Frame 0: Same as AIR_A ready pose (base air body)
+const AIB0: number[][] = AIA0.map(row => [...row]);
+
+// Frame 1: Active kick — leg extends forward-down (light kick: knee tucked, shin diagonal)
+const AIB1: number[][] = [
+  r(''), r(''), r(''), r(''), r(''), r(''), r(''), r(''),
+  r('.............klm1'),
+  r('............klm21'),
+  r('...........klm221'),
+  r('..........1klm21'),
+  r('.........1klm21'),
+  r('........1klm2.1'),
+  r('.......1k2.1'),
+  r('......1k1.1'),
+  r('.....1kl1.1'),
+  r('....1klm1.12'),
+  r('...1klm1.13431'),
+  r('..1klm1.124566531'),
+  r('.1klm1.1124566541'),
+  r('1klm111234556541'),
+  r('klm111234455531'),
+  r('lm11234455531'),
+  r('m1123445543'),
+  r('112d8a91'),
+  r('12189a1'),
+  r('121b9a1'),
+  r('121c8a1'),
+  // Kick leg extended forward-down (light kick: shin diagonal, foot leading)
+  r('.1d9b1..1n1'),
+  r('1c8a1..1kl1'),
+  r('1d9b1..1klm1'),
+  r('.1c8a1.1klm'),
+  r('.1d9b11klm1'),
+  r('..1c8a1kl1'),
+  r('..1n1.1n1'),
+  r(''),
+  r(''), r(''), r(''), r(''), r(''),
+  r(''), r(''), r(''), r(''), r(''),
+  r(''), r(''), r(''), r(''), r(''),
+  r(''), r(''), r(''), r(''), r(''),
+  r(''), r(''), r(''), r(''), r(''),
+  r(''), r(''), r(''), r(''), r(''),
+  r(''), r(''), r(''), r(''), r(''),
+];
+
+// Frame 2: Retract — pull leg back to aerial pose
+const AIB2: number[][] = AIA0.map(row => [...row]);
+
+export const IORI_AIR_B_FRAMES: PixelFrame[] = [AIB0, AIB1, AIB2].map(pixels => ({
+  width: W,
+  height: 72,
+  palette: PALETTE,
+  pixels,
+  anchor: { x: Math.floor(W / 2), y: 72 },
+}));
+
+// ====================================================================
 // AIR_C (air heavy punch) — 4 frames
 // Diving claw strike: body goes near-horizontal, arm claws downward.
 // Coat billows up dramatically, hair streams behind.

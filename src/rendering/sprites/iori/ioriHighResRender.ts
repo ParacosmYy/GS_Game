@@ -25,7 +25,7 @@ import { IORI_JUMP_FRAMES } from './ioriJumpFrames.js';
 import { IORI_HURT_FRAMES, IORI_KNOCKDOWN_FRAMES, IORI_BLOCK_FRAMES } from './ioriDamageFrames.js';
 import { IORI_STAND_B_FRAMES, IORI_STAND_D_FRAMES } from './ioriKickFrames.js';
 import { IORI_CROUCH_A_FRAMES, IORI_CROUCH_C_FRAMES, IORI_CROUCH_B_FRAMES, IORI_CROUCH_D_FRAMES } from './ioriCrouchAttackFrames.js';
-import { IORI_AIR_A_FRAMES, IORI_AIR_C_FRAMES, IORI_AIR_D_FRAMES } from './ioriAirAttackFrames.js';
+import { IORI_AIR_A_FRAMES, IORI_AIR_B_FRAMES, IORI_AIR_C_FRAMES, IORI_AIR_D_FRAMES } from './ioriAirAttackFrames.js';
 import { IORI_WIN_POSE, IORI_WIN_LAUGH } from './ioriWinFrames.js';
 import {
   IORI_ONIYAKI_FRAMES, IORI_ONIYAKI_C_FRAMES,
@@ -83,6 +83,7 @@ function initIoriFrames(): void {
 
   // AIR ATTACKS
   registerVariableFrames('AIR_A', IORI_AIR_A_FRAMES, [3, 3, 5]);
+  registerVariableFrames('AIR_B', IORI_AIR_B_FRAMES, [3, 2, 4]);
   registerVariableFrames('AIR_C', IORI_AIR_C_FRAMES, [5, 3, 3, 5]);
   registerVariableFrames('AIR_D', IORI_AIR_D_FRAMES, [4, 3, 3, 5]);
 
@@ -152,6 +153,7 @@ function resolveIoriFrameKey(
     case FighterState.AIR_ATTACK:
       if (currentAttack === AttackType.JUMP_C) return 'AIR_C';
       if (currentAttack === AttackType.JUMP_D) return 'AIR_D';
+      if (currentAttack === AttackType.JUMP_B) return 'AIR_B';
       return 'AIR_A';
     case FighterState.STAND_ATTACK:
       // Special moves
