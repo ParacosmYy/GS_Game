@@ -59,7 +59,6 @@ import { triggerMoveName, tickMoveNameDisplay, drawMoveNameDisplay, resetMoveNam
 import { startCharIntro, tickCharIntro, drawCharIntro, resetCharIntro, isIntroActive } from './rendering/charIntro.js';
 import { triggerIntroQuotes, tickIntroQuotes, drawIntroQuotes, resetIntroQuotes } from './rendering/charIntroQuotes.js';
 import { drawHitboxOverlay } from './rendering/hitboxDebug.js';
-import type { CharacterDefinition } from './characters/types.js';
 import { initCharacterHitEffects } from './content/registerHitEffects.js';
 import { arcadeDifficulty, pickWinQuote as _pickWinQuote, generateArcadeOpponents, RIVAL_MAP } from './state/arcadeUtils.js';
 
@@ -648,6 +647,10 @@ function update(): void {
         }
       } else {
         // Start cinematic round transition: fade out → hold black → fade in
+        // DM/SDM/HSDM finish → zoom transition; final round → curtain; default → wipe
+        const finishTier = cinematic.getFinishTier();
+        const isFinalRound = rounds.p1Wins >= rounds.winsNeeded - 1 && rounds.p2Wins >= rounds.winsNeeded - 1;
+        const transStyle = finishTier ? 'zoom' : isFinalRound ? 'curtain' : 'wipe';
         rounds.startCinematicTransition(
           // onPeak: fires at full black — delayed health reset
           () => {
@@ -666,6 +669,7 @@ function update(): void {
             announcer.roundStart(rounds.currentRound);
             announcer.fight();
           },
+          transStyle,
         );
       }
     }
