@@ -31,9 +31,12 @@ export function getMaxAuraColor(charId: string): MaxAuraColor {
 /** Character-specific attack color accent — each fighter gets a unique highlight during attacks */
 export function getAttackColorAccent(charId: string): { body: string; outline: string; glow: string } {
   switch (charId) {
+    case 'ryo':      return { body: '#4488ff', outline: '#2266ff60', glow: '#0044dd30' };
     case 'kyo':      return { body: '#ff8822', outline: '#ff660060', glow: '#ff440030' };
     case 'iori':     return { body: '#aa44dd', outline: '#8800cc60', glow: '#6600aa30' };
     case 'terry':    return { body: '#44aaff', outline: '#2288ff60', glow: '#0066ff30' };
+    case 'andy':     return { body: '#ffbb44', outline: '#ff992260', glow: '#ff770030' };
+    case 'joe':      return { body: '#ffaa22', outline: '#ff880060', glow: '#ff660030' };
     case 'robert':   return { body: '#44ff88', outline: '#22dd6660', glow: '#00aa4430' };
     case 'yuri':     return { body: '#ff88cc', outline: '#ff66aa60', glow: '#ff448830' };
     case 'athena':   return { body: '#ff66aa', outline: '#ff44aa60', glow: '#ff228830' };
@@ -49,14 +52,22 @@ export function getAttackColorAccent(charId: string): { body: string; outline: s
     case 'daimon':   return { body: '#88cc44', outline: '#66aa2260', glow: '#44880030' };
     case 'shingo':   return { body: '#ff8844', outline: '#ff662260', glow: '#ff440030' };
     case 'kula':     return { body: '#88ddff', outline: '#66ccff60', glow: '#44aaff30' };
-    case 'k':        return { body: '#ff4444', outline: '#ff222260', glow: '#ff000030' };
+    case 'k':
+    case 'kdash':    return { body: '#ff4444', outline: '#ff222260', glow: '#ff000030' };
     case 'vanessa':  return { body: '#cc44aa', outline: '#aa228860', glow: '#88006630' };
     case 'seth':     return { body: '#8866dd', outline: '#6644bb60', glow: '#44229930' };
     case 'ramon':    return { body: '#ffaa44', outline: '#ff882260', glow: '#ff660030' };
     case 'todo':     return { body: '#88cc88', outline: '#66aa6660', glow: '#44884430' };
     case 'kasumi':   return { body: '#ff7799', outline: '#ff557760', glow: '#ff335530' };
     case 'xiangfei': return { body: '#ff9977', outline: '#ff775560', glow: '#ff553330' };
-    case 'choi':     return { body: '#bbcc22', outline: '#99aa0060', glow: '#77880030' };
+    case 'billy':    return { body: '#ddaa22', outline: '#bb880060', glow: '#99660030' };
+    case 'mature':   return { body: '#cc66aa', outline: '#aa448860', glow: '#88226630' };
+    case 'yashiro':  return { body: '#9988cc', outline: '#7766aa60', glow: '#55448830' };
+    case 'chris':    return { body: '#ffcc88', outline: '#ffaa6660', glow: '#ff884430' };
+    case 'shermie':  return { body: '#dd66aa', outline: '#bb448860', glow: '#99226630' };
+    case 'vice':     return { body: '#6688cc', outline: '#4466aa60', glow: '#22448830' };
+    case 'yamazaki': return { body: '#bb6644', outline: '#99442260', glow: '#77220030' };
+    case 'mary':     return { body: '#aa88cc', outline: '#8866aa60', glow: '#66448830' };
     default:         return { body: '#eebb00', outline: '#ffcc0060', glow: '#ffaa0030' };
   }
 }
