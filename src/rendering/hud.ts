@@ -794,6 +794,17 @@ export function drawHUD(
     ctx.restore();
   }
 
+  // ===== Desperation screen edge — crimson vignette when either fighter HP < 25% =====
+  const anyDesperate = p1Ratio <= 0.25 || p2Ratio <= 0.25;
+  if (anyDesperate) {
+    const despIntensity = Math.sin(tick * 0.18) * 0.08 + 0.1;
+    const dGrad = ctx.createRadialGradient(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, CANVAS_WIDTH * 0.35, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, CANVAS_WIDTH * 0.6);
+    dGrad.addColorStop(0, 'rgba(120, 0, 0, 0)');
+    dGrad.addColorStop(1, `rgba(140, 0, 0, ${despIntensity})`);
+    ctx.fillStyle = dGrad;
+    ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+  }
+
   // ===== Screen edge red pulse when time < 10 (stronger at < 5) =====
   if (timeSeconds <= 10) {
     const intensity = isCritical ? 1.0 : 0.4;
