@@ -39,6 +39,9 @@
   - 3角色动画节奏一致性回归测试 (63 tests: 轻重攻击递增/hitstun<knockdown/loop属性)
   - 3角色必杀技像素帧覆盖 (134 tests: 基本+通常+必杀+DM/SDM/HSDM+命令技)
   - Kyo行走动画6帧像素帧+程序化腿部交替变异+元数据帧数修正(4→6)
+  - 3角色空中轻踢(AIR_B)专属像素帧 (3帧: 蓄力/斜踢/收腿) + 渲染集成
+  - 3角色空中攻击全覆盖回归测试 (14 tests: AIR_A/B/C/D帧数据完整性)
+  - ioriSpecialFrames.ts 拆分为 basic specials (1670行) + super frames (480行)
 - 新功能添加点：
   - animation manifest
   - pose bank
@@ -73,7 +76,7 @@
   - 3角色57必殺技VFX+SFX全覆蓋回歸測試 (118 tests)
   - MAX爆氣激活角色屬性色閃光 (取代通用綠色)
   - DM終結KO屬性色閃光 (DM/SDM/HSDM擊殺按殺手元素色)
-  - 4512 回归测试保护反馈矩阵完整性和层级递进
+  - 4556 回归测试保护反馈矩阵完整性和层级递进
 - 当前差距：hitstop、spark、shake、pushback、SFX 还没有按轻重/特殊/爆气状态形成稳定矩阵。
 - 新功能添加点：
   - feedback manifest
@@ -128,7 +131,7 @@
   - Kyo 完整度校验工具 (8维报告: animationMeta/frameData/attackFrames/feedback/portrait/moveList/cancelPaths/hitEffects)
   - Iori 完整度校验工具 (8维报告: 同Kyo结构)
   - Kyo/Iori完整度回归测试 (33 tests: 维度有效性+覆盖率+最低阈值)
-  - 测试总数 4542
+  - 测试总数 4556
 - 当前差距：角色内容已开始分层，但真实数据、兼容入口、校验工具之间还需继续收口。
 - 新功能添加点：
   - `src/content/characters/index.ts` barrel export
