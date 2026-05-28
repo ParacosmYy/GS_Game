@@ -1,5 +1,7 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeAll } from 'vitest';
 import { FEEDBACK_TIERS, inferTier, FEEDBACK_MANIFEST, getFeedback, getFeedbackByTier, getFeedbackTier, getCharacterDMPalette, type FeedbackTier, type FeedbackParams } from '../src/core/feedbackManifest.js';
+import { getRegisteredEffectIds } from '../src/content/characterHitEffects.js';
+import { initCharacterHitEffects } from '../src/content/registerHitEffects.js';
 
 const ALL_TIERS: FeedbackTier[] = ['light', 'heavy', 'special', 'dm', 'sdm', 'hsdm'];
 
@@ -235,6 +237,33 @@ describe('feedbackManifest', () => {
       const dm = getCharacterDMPalette('iori', 'dm')!;
       const hasPurple = dm.some(c => c.includes('ff') && c.includes('88') || c.includes('cc44'));
       expect(hasPurple).toBe(true);
+    });
+  });
+
+  describe('Character Hit Effects Registry', () => {
+    beforeAll(() => {
+      initCharacterHitEffects();
+    });
+
+    it('has registered character IDs', () => {
+      const ids = getRegisteredEffectIds();
+      expect(ids.length).toBeGreaterThan(0);
+    });
+
+    it('has ryo, kyo, iori registered', () => {
+      const ids = getRegisteredEffectIds();
+      expect(ids).toContain('ryo');
+      expect(ids).toContain('kyo');
+      expect(ids).toContain('iori');
+    });
+
+    it('has at least 5 characters', () => {
+      expect(getRegisteredEffectIds().length).toBeGreaterThanOrEqual(5);
+    });
+
+    it('no duplicate character IDs', () => {
+      const ids = getRegisteredEffectIds();
+      expect(new Set(ids).size).toBe(ids.length);
     });
   });
 
