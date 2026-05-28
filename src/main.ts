@@ -1635,7 +1635,7 @@ function render(): void {
 
   // Pause menu overlay (drawn last, on top of everything)
   if (gs.isPaused && (gs.phase === GamePhase.FIGHTING || gs.phase === GamePhase.KO)) {
-    drawPauseMenu(ctx, canvas.width, canvas.height, gs.pauseMenuCursor, gs.pauseMenuTab, p1Char, p2Char);
+    drawPauseMenu(ctx, canvas.width, canvas.height, gs.pauseMenuCursor, gs.pauseMenuTab, p1Char, p2Char, rounds.currentRound, rounds.p1Wins, rounds.p2Wins, rounds.winsNeeded);
   }
 }
 

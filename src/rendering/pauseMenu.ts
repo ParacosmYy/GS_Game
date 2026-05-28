@@ -34,6 +34,10 @@ export function drawPauseMenu(
   tab: 'moves' | 'controls' | 'settings',
   p1Char: CharacterDefinition | null,
   p2Char: CharacterDefinition | null,
+  currentRound: number = 1,
+  p1Wins: number = 0,
+  p2Wins: number = 0,
+  winsNeeded: number = 2,
 ): void {
   // Dark overlay
   ctx.fillStyle = COLORS.bg;
@@ -64,12 +68,18 @@ export function drawPauseMenu(
   ctx.lineTo(menuX + menuW, menuY + headerH);
   ctx.stroke();
 
-  // "PAUSED" title
+  // "PAUSED" title with round/score info
   ctx.font = 'bold 28px "Courier New", monospace';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   ctx.fillStyle = COLORS.highlight;
-  ctx.fillText('PAUSED', menuX + menuW / 2, menuY + headerH / 2);
+  ctx.fillText('PAUSED', menuX + menuW / 2, menuY + headerH / 2 - 8);
+
+  // Round & score line under PAUSED
+  ctx.font = '11px "Courier New", monospace';
+  ctx.fillStyle = COLORS.textDim;
+  const scoreText = `ROUND ${currentRound}  |  ${p1Char?.nameCn ?? 'P1'} ${p1Wins} - ${p2Wins} ${p2Char?.nameCn ?? 'P2'}  |  FIRST TO ${winsNeeded}`;
+  ctx.fillText(scoreText, menuX + menuW / 2, menuY + headerH / 2 + 14);
 
   // Tab bar
   const tabBarY = menuY + headerH + 12;
