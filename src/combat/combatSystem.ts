@@ -62,6 +62,7 @@ export class CombatSystem {
   defenderControllers: [FighterController, FighterController] | null = null;
   onThrowEscape: ThrowEscapeCallback | null = null;
   onGuardCrush: GuardCrushCallback | null = null;
+  onStunWarning: ((fighter: Fighter) => void) | null = null;
   // Damage scaling combo tracking (per defender)
   private comboHits = [0, 0];
   private comboDamage = [0, 0]; // cumulative combo damage per defender
@@ -597,7 +598,12 @@ export class CombatSystem {
 
     // Stun gauge accumulation — each hit fills the gauge based on attack type
     // When gauge is full and defender is grounded, enter dizzy state (overrides hitstun/knockdown)
+    const prevStun = defender.stunGauge;
     const stunned = defender.addStunFill(stunFill(attackType));
+    // Stun warning: gauge crossed 85% threshold
+    if (prevStun < 85 && defender.stunGauge >= 85 && !stunned) {
+      this.onStunWarning?.(defender);
+    }
     if (stunned && defender.isGrounded() && defender.state !== FighterState.DIZZY) {
       defender.applyDizzy();
       // Still fire onHit callback but skip normal hitstun/knockdown resolution below

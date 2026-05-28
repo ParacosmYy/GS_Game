@@ -1315,6 +1315,21 @@ export function renderStunRecovery(sr: number): Float32Array {
   return out;
 }
 
+/** Stun warning — sharp alarm beep when stun gauge >85% */
+export function renderStunWarning(sr: number): Float32Array {
+  const dur = 0.12;
+  const total = Math.ceil(sr * dur);
+  const out = new Float32Array(total);
+  const freq = 1200;
+  for (let i = 0; i < total; i++) {
+    const t = i / sr;
+    const env = Math.exp(-t * 25) * Math.min(1, t * 300);
+    const vib = 1 + Math.sin(2 * Math.PI * 8 * t) * 0.05;
+    out[i] = Math.sin(2 * Math.PI * freq * t * vib) * env * 0.3;
+  }
+  return out;
+}
+
 // === 基础 BGM 框架 ===
 
 // 生成简单循环战斗BGM

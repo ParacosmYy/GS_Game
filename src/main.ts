@@ -17,6 +17,15 @@ import { createPowerGauge, createMaxMode, tickMaxMode, tickAutoMeter, gainMeterO
 import { Renderer } from './rendering/renderer.js';
 import { VFXSystem, ScreenShake, ScreenFlash } from './rendering/vfx.js';
 import { cycleStage, setStage, getStage, getAllStages, type StageId } from './rendering/stage.js';
+
+const STAGE_NAMES_MAP: Record<string, string> = {
+  temple: '日本寺庙 · Japan',
+  china: '唐人街 · China',
+  factory: '工場 · Factory',
+  orochi: '大蛇神社 · Orochi',
+  street: '街市夜市 · Street',
+  rooftop: '日本屋上 · Rooftop',
+};
 import { drawVictoryPose } from './rendering/skeletalFighter.js';
 import { drawRyoWinPose } from './rendering/sprites/ryo/ryoHighResRender.js';
 import { drawKyoWinPose } from './rendering/sprites/kyo/kyoHighResRender.js';
@@ -32,7 +41,7 @@ import { SelectState } from './state/selectState.js';
 import { RoundState } from './state/roundState.js';
 import { DMManager } from './combat/dmManager.js';
 import { createHitCallback, triggerKOGroundEffect } from './combat/hitCallback.js';
-import { initAudio, initSampler, playKO, playVictoryFanfare, playMAXActivation, playPerfect, playThrowEscape, playFight, playRoll, playCancel, playQuickStand, playGuardCrush, playHit, playSpecialLight, playSpecialHeavy, playDM, playWhoosh, playHeavyWhoosh, playKoouken, playKoHou, playHien, playHaou, playCursorMove, playCursorConfirm, playTimeUp, playFootstep, playCountdownTick, playCountdownBuzzer, playStunRecovery } from './audio/sampler.js';
+import { initAudio, initSampler, playKO, playVictoryFanfare, playMAXActivation, playPerfect, playThrowEscape, playFight, playRoll, playCancel, playQuickStand, playGuardCrush, playHit, playSpecialLight, playSpecialHeavy, playDM, playWhoosh, playHeavyWhoosh, playKoouken, playKoHou, playHien, playHaou, playCursorMove, playCursorConfirm, playTimeUp, playFootstep, playCountdownTick, playCountdownBuzzer, playStunRecovery, playStunWarning } from './audio/sampler.js';
 import { tickAttackSFX, dispatchContractSFX } from './audio/attackSFX.js';
 import { getContractEventTags } from './entities/fighter.js';
 import { tickMotionSFX } from './audio/motionSFX.js';
@@ -51,10 +60,10 @@ import { GameStateManager } from './state/gameStateManager.js';
 import { gameRandom, gameRandomInt } from './core/prng.js';
 import { InputLogger } from './core/inputLog.js';
 import { ReplaySession } from './core/replaySession.js';
-import { createRoundStartSequence, createKOSequence, createTimeOverSequence, createWinnerSequence } from './state/announcePresets.js';
+import { createRoundStartSequence, createKOSequence, createTimeOverSequence, createWinnerSequence, createStageIntroSequence } from './state/announcePresets.js';
 import { TrainingModeState } from './state/trainingMode.js';
 import { drawPauseMenu } from './rendering/pauseMenu.js';
-import { drawCharacterKOOverlay } from './rendering/overlayScreens.js';
+import { drawCharacterKOOverlay, STAGE_INTRO_DURATION } from './rendering/overlayScreens.js';
 import { triggerMoveName, tickMoveNameDisplay, drawMoveNameDisplay, resetMoveNameDisplay } from './rendering/moveNameDisplay.js';
 import { startCharIntro, tickCharIntro, drawCharIntro, resetCharIntro, isIntroActive } from './rendering/charIntro.js';
 import { triggerIntroQuotes, tickIntroQuotes, drawIntroQuotes, resetIntroQuotes } from './rendering/charIntroQuotes.js';
@@ -138,6 +147,9 @@ combatSystem.onGuardCrush = (fighter, hitX, hitY) => {
   vfx.spawnImpactRing(hitX, hitY, 1.5);
   screenFlash.trigger('#ff4444', 0.3, 12); screenShake.trigger(12, 15); playGuardCrush();
   announcerOverlay.trigger('guard_crush');
+};
+combatSystem.onStunWarning = (fighter) => {
+  playStunWarning();
 };
 
 // ===== Derived state =====
@@ -787,12 +799,26 @@ function update(): void {
         maxModes[1].active = false;
         gs.isTimeOver = false;
         gs.matchStats = { p1TotalDamage: 0, p2TotalDamage: 0, p1LongestCombo: 0, p2LongestCombo: 0 };
-        gs.setPhase(GamePhase.INTRO);
+        // Stage intro ceremony: show stage name before round start
+        gs.setPhase(GamePhase.STAGE_INTRO);
         gs.phaseTimer = 0;
-        gs.announceSequence.setSteps(createRoundStartSequence(1));
-        announcer.roundStart(1);
-        announcer.fight();
+        const stageName = STAGE_NAMES_MAP[nextStage] ?? nextStage;
+        gs.announceSequence.setSteps(createStageIntroSequence(stageName));
       }
+    }
+    return;
+  }
+
+  // Stage intro ceremony: cinematic stage name reveal before round start
+  if (gs.phase === GamePhase.STAGE_INTRO) {
+    gs.phaseTimer++;
+    if (gs.phaseTimer >= STAGE_INTRO_DURATION || (gs.phaseTimer > 60 && (inputManager.isKeyDown('KeyJ') || inputManager.isKeyDown('Enter')))) {
+      gs.setPhase(GamePhase.INTRO);
+      gs.phaseTimer = 0;
+      gs.announceSequence.setSteps(createRoundStartSequence(1));
+      announcer.roundStart(1);
+      announcer.fight();
+      resetMoveNameDisplay(); resetCharIntro(); resetIntroQuotes();
     }
     return;
   }
@@ -1300,6 +1326,14 @@ function render(): void {
     if (isRivalStage && gs.arcadeNextMatchTimer < 36) {
       renderer.drawTransition(35 - gs.arcadeNextMatchTimer, 'curtain');
     }
+    return;
+  }
+  // Stage intro ceremony rendering
+  if (gs.phase === GamePhase.STAGE_INTRO) {
+    const currentStageId = getStage();
+    const stageName = STAGE_NAMES_MAP[currentStageId] ?? currentStageId;
+    renderer.drawStageIntroOverlay(gs.phaseTimer, stageName, currentStageId);
+    drawAnnounceSequence(ctx, gs.announceSequence, CANVAS_WIDTH, CANVAS_HEIGHT);
     return;
   }
   if (gs.phase === GamePhase.SELECT) {
