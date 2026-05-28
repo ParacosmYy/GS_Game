@@ -67,6 +67,8 @@ import {
 } from './characters/kim/index.js';
 import { generateKyoDimensionReport } from '../tools/kyoCompletenessReport.js';
 import { generateIoriDimensionReport } from '../tools/ioriCompletenessReport.js';
+import { generateTerryDimensionReport } from '../tools/terryCompletenessReport.js';
+import { generateKimDimensionReport } from '../tools/kimCompletenessReport.js';
 
 /** Unified character content interface */
 export interface CharacterContent {
@@ -182,7 +184,7 @@ function loadTerryContent(): CharacterContent {
     hitboxes: getTerryHitboxOffsets(),
     attackFrames: getTerryAttackFrames(),
     feedback: getTerryFeedbackTiers(),
-    report: null,
+    report: generateTerryDimensionReport(),
   };
 }
 
@@ -198,6 +200,6 @@ function loadKimContent(): CharacterContent {
     hitboxes: getKimHitboxOffsets(),
     attackFrames: getKimAttackFrames(),
     feedback: getKimFeedbackTiers(),
-    report: null,
+    report: generateKimDimensionReport(),
   };
 }
