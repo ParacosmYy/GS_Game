@@ -1742,7 +1742,7 @@ window.addEventListener('keyup', e => {
 
 // ===== Start =====
 import { initKfmSprites } from './rendering/sprites/kfm/kfmSpriteRender.js';
-import { initKyoRealSprites } from './rendering/sprites/kyo/kyoHighResRender.js';
+import { initAllCharacterSprites } from './rendering/sprites/shared/initAllCharacterSprites.js';
 initKfmSprites().then(() => console.log('[KFM] Sprites loaded')).catch(e => console.warn('[KFM] Sprite load failed:', e));
-initKyoRealSprites().then(() => console.log('[Kyo] Real sprites initialized')).catch(e => console.warn('[Kyo] Real sprite init failed:', e));
+initAllCharacterSprites().catch(e => console.warn('[Sprites] Init failed:', e));
 new GameLoop(update, render).start();

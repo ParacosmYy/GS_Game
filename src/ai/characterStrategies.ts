@@ -460,6 +460,21 @@ const kasumi: CharacterStrategy = {
   ],
 };
 
+const kfm: CharacterStrategy = {
+  charId: 'kfm',
+  preferredRange: 'close',
+  aggressiveLevel: 0.7,
+  preferredAntiAir: AttackType.KFM_KUNGFU_UPPER,
+  preferredPoke: AttackType.STAND_B,
+  preferredComboStarter: AttackType.CLOSE_C,
+  preferredDM: AttackType.DM_KFM_SMASH_FIST,
+  wakeUpOptions: [
+    AttackType.CLOSE_C,
+    AttackType.KFM_SMASH_KICK,
+    AttackType.THROW_FORWARD,
+  ],
+};
+
 // ─── Registry ───
 
 const DEFAULT_STRATEGY: CharacterStrategy = {
@@ -504,6 +519,7 @@ const STRATEGY_MAP: Record<string, CharacterStrategy> = {
   mary,
   xiangfei,
   kasumi,
+  kfm,
 };
 
 /**

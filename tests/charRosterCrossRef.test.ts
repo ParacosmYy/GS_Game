@@ -1,7 +1,7 @@
 /**
  * Character Definition Cross-Reference Tests
  *
- * Validates that all 27 character definitions have:
+ * Validates that all 28 character definitions have:
  * - Consistent charId naming across modules
  * - Valid stat ranges (health, speed, etc.)
  * - All required action states defined
@@ -12,7 +12,7 @@ import { FRAME_DATA } from '../src/core/frameDataConstants.js';
 import { COMBO_ROUTES } from '../src/ai/aiRoutes.js';
 import { ALL_STRATEGIES } from '../src/ai/characterStrategies.js';
 
-// All 27 characters in KOF2002 roster
+// All 28 characters in KOF2002 roster
 const ROSTER = [
   'kyo', 'iori', 'ryo', 'terry', 'kim',
   'leona', 'robert', 'mai', 'kdash', 'kula',
@@ -20,6 +20,7 @@ const ROSTER = [
   'billy', 'chang', 'choi', 'mature', 'yamazaki',
   'mary', 'xiangfei', 'kasumi',
   'yashiro', 'chris', 'shermie', 'vice',
+  'kfm',
 ];
 
 const fdKeys = new Set(Object.keys(FRAME_DATA));
@@ -63,8 +64,8 @@ describe('Character roster cross-reference', () => {
     expect(new Set(ROSTER).size).toBe(ROSTER.length);
   });
 
-  it('roster has 27 characters', () => {
-    expect(ROSTER.length).toBe(27);
+  it('roster has 28 characters', () => {
+    expect(ROSTER.length).toBe(28);
   });
 });
 

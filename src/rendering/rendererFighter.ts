@@ -16,6 +16,8 @@ import { getFeedbackByTier, type FeedbackTier } from '../core/feedbackManifest.j
 import { drawKyoHighResFrame } from './sprites/kyo/kyoHighResRender.js';
 import { drawIoriHighResFrame } from './sprites/iori/ioriHighResRender.js';
 import { drawKfmSprite, initKfmSprites } from './sprites/kfm/kfmSpriteRender.js';
+import { drawGenericCharacterSprite } from './sprites/shared/genericCharacterRenderer.js';
+import { getCharacterConfig, getLoadedSprites } from './sprites/shared/characterSpriteRegistry.js';
 import { getFighterBlender } from './animationBlender.js';
 import { getMaxAuraColor, resolveFighterColors, drawAfterimageTrail, isFighterDebugOverlayEnabled } from './rendererFighterUtils.js';
 
@@ -967,7 +969,7 @@ export function drawFighters(
       ctx.fill();
       ctx.restore();
     }
-    // Try Kyo/Iori/KFM high-res first, then Ryo, then fallback chain
+    // Try character-specific high-res first, then generic sprites, then fallback chain
     let highResDrawn = false;
     if (charId === 'kyo') {
       highResDrawn = drawKyoHighResFrame(ctx, f.state, f.stateAge, sx + leanOffsetX, sy, f.facing, f.currentAttack, f.vx);
@@ -975,8 +977,18 @@ export function drawFighters(
       highResDrawn = drawIoriHighResFrame(ctx, f.state, f.stateAge, sx + leanOffsetX, sy, f.facing, f.currentAttack, f.vx);
     } else if (charId === 'kfm') {
       highResDrawn = drawKfmSprite(ctx, f.state, f.stateAge, sx + leanOffsetX, sy, f.facing, f.currentAttack, f.vx);
-    } else {
+    } else if (charId === 'ryo') {
       highResDrawn = drawHighResFrame(ctx, charId, f.state, f.stateAge, sx + leanOffsetX, sy, f.facing, f.currentAttack, f.vx);
+    } else {
+      // Generic sprite path: try real MUGEN sprites for any registered character
+      const config = getCharacterConfig(charId ?? '');
+      const sprites = config ? getLoadedSprites(charId ?? '') : undefined;
+      if (config && sprites) {
+        highResDrawn = drawGenericCharacterSprite(
+          ctx, charId ?? '', config, sprites,
+          f.state, f.stateAge, sx + leanOffsetX, sy, f.facing, f.currentAttack, f.vx,
+        );
+      }
     }
     if (!highResDrawn) {
       const spriteRendered = spriteRenderer?.canRender(f.charId)

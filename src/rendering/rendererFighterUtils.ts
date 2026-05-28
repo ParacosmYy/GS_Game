@@ -68,6 +68,7 @@ export function getAttackColorAccent(charId: string): { body: string; outline: s
     case 'vice':     return { body: '#6688cc', outline: '#4466aa60', glow: '#22448830' };
     case 'yamazaki': return { body: '#bb6644', outline: '#99442260', glow: '#77220030' };
     case 'mary':     return { body: '#aa88cc', outline: '#8866aa60', glow: '#66448830' };
+    case 'kfm':      return { body: '#cc3333', outline: '#aa222260', glow: '#88111130' };
     default:         return { body: '#eebb00', outline: '#ffcc0060', glow: '#ffaa0030' };
   }
 }

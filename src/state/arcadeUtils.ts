@@ -35,6 +35,7 @@ export const RIVAL_MAP: Record<string, string> = {
   mary: 'terry',
   xiangfei: 'athena',
   kasumi: 'mai',
+  kfm: 'ryo',
 };
 
 /**

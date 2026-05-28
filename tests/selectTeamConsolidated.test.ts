@@ -59,8 +59,8 @@ describe('selectState cursor logic', () => {
 
 // ── Roster Validation ─────────────────────────────────────────
 describe('roster validation', () => {
-  it('27 characters in ROSTER', () => {
-    expect(ROSTER.length).toBe(27);
+  it('28 characters in ROSTER', () => {
+    expect(ROSTER.length).toBe(28);
   });
   it('all entries have id + name + stats.maxHealth > 0', () => {
     for (const char of ROSTER) {

@@ -383,4 +383,16 @@ export const HITBOX_OFFSETS = {
   VICE_OUTRAGE_QCB: { offsetX: 58, offsetY: -100, width: 72, height: 42 },
   VICE_MAYHEM_QCF: { offsetX: 55, offsetY: -95, width: 75, height: 45 },
   DM_NEGATIVE_FLOG: { offsetX: 42, offsetY: -115, width: 92, height: 68 },
+  // KFM (Kung Fu Man) specials
+  KFM_KUNGFU_UPPER: { offsetX: 30, offsetY: -120, width: 50, height: 60 },
+  KFM_FAST_KUNGFU_UPPER: { offsetX: 30, offsetY: -120, width: 50, height: 60 },
+  KFM_SMASH_KICK: { offsetX: 45, offsetY: -70, width: 70, height: 40 },
+  KFM_DOUBLE_SMASH_KICK: { offsetX: 50, offsetY: -75, width: 75, height: 45 },
+  KFM_HIGH_KICK: { offsetX: 35, offsetY: -100, width: 55, height: 50 },
+  KFM_TRIPLE_KUNGFU_UPPER: { offsetX: 35, offsetY: -125, width: 55, height: 65 },
+  KFM_LIGHT_HIGH_KICK: { offsetX: 35, offsetY: -100, width: 50, height: 45 },
+  KFM_HIGH_KICK_2: { offsetX: 40, offsetY: -105, width: 55, height: 50 },
+  KFM_SMASH_KICK_2: { offsetX: 50, offsetY: -70, width: 75, height: 40 },
+  KFM_SMASH_KICK_3: { offsetX: 55, offsetY: -75, width: 80, height: 45 },
+  DM_KFM_SMASH_FIST: { offsetX: 40, offsetY: -130, width: 95, height: 75 },
 } as const;

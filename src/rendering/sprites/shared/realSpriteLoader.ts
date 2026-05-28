@@ -189,3 +189,88 @@ export function resolveKyoMugenAction(state: FighterState, attack: AttackType | 
     default: return null;
   }
 }
+
+/**
+ * Ryo-specific MUGEN action resolver.
+ * Maps our FighterState + AttackType to MUGEN action numbers from cvsryo.
+ *
+ * Key action mapping (cvsryo MUGEN):
+ *   0=stand, 20=walk_fwd, 21=walk_back, 100=run, 105=backdash, 11=crouch
+ *   200=far_A, 210=far_C, 211=stand_C, 220=close_A, 230=far_B, 231=stand_B, 240=far_D, 241=stand_D
+ *   400=crouch_A, 410=crouch_C, 430=crouch_B, 440=crouch_D
+ *   600=jump_A, 610=jump_C, 630=jump_B, 640=jump_D
+ *   1000=虎煌A, 1010=虎煌C, 1020=虎煌D, 1100=虎咆A, 1110=虎咆C
+ *   1200=飛燕, 1300=霸王翔吼拳, 1400=冰果斬, 1500=斩裂拳
+ *   3000=龍虎乱舞DM, 3010=龍虎乱舞SDM, 3020=龍虎乱舞HSDM
+ *   3100=天地霸煌拳DM, 3101=天地霸煌拳SDM
+ *   5000=hitstun, 5050=knockdown, 5300=dizzy, 800=throw
+ *   120=block, 170=cmd_tsurizao, 195=taunt, 181=win, 300=counter_stance
+ */
+export function resolveRyoMugenAction(state: FighterState, attack: AttackType | null, vx: number, facing: number): string | null {
+  switch (state) {
+    case FighterState.IDLE: return '0';
+    case FighterState.WALK: return (vx * facing > 0) ? '20' : '21';
+    case FighterState.CROUCH: return '11';
+    case FighterState.JUMP:
+    case FighterState.RUN_JUMP:
+    case FighterState.HOP:
+    case FighterState.HYPER_JUMP:
+    case FighterState.AIR_BLOCK:
+      return (vx * facing > 0) ? '42' : '43';
+    case FighterState.AIR_ATTACK:
+      if (attack === AttackType.JUMP_C) return '610';
+      if (attack === AttackType.JUMP_D) return '640';
+      if (attack === AttackType.JUMP_B) return '630';
+      return '600';
+    case FighterState.STAND_ATTACK:
+      // Specials
+      if (attack === AttackType.RYO_KOOU) return '1000';
+      if (attack === AttackType.RYO_KOOU_C) return '1010';
+      if (attack === AttackType.RYO_KOOUKEN_D) return '1020';
+      if (attack === AttackType.RYO_KO_HOU) return '1100';
+      if (attack === AttackType.RYO_KO_HOU_C) return '1110';
+      if (attack === AttackType.RYO_HIEN) return '1200';
+      if (attack === AttackType.RYO_HAOU) return '1300';
+      if (attack === AttackType.RYO_HIO_HACKER) return '1400';
+      if (attack === AttackType.RYO_ZANRETSU_KEN) return '1500';
+      if (attack === AttackType.RYO_TSURIZAO) return '170';
+      if (attack === AttackType.RYO_ORISHI) return '1300';
+      // DM/SDM/HSDM
+      if (attack === AttackType.DM_RYUKO_RANBU) return '3000';
+      if (attack === AttackType.SDM_RYUKO_RANBU) return '3010';
+      if (attack === AttackType.HSDM_RYUKO_RANBU) return '3020';
+      if (attack === AttackType.DM_TEN_HA_OU) return '3100';
+      if (attack === AttackType.SDM_TEN_HA_OU) return '3100';
+      // Normals
+      if (attack === AttackType.CLOSE_A) return '200';
+      if (attack === AttackType.CLOSE_C) return '210';
+      if (attack === AttackType.STAND_C) return '211';
+      if (attack === AttackType.STAND_B) return '231';
+      if (attack === AttackType.CLOSE_B) return '230';
+      if (attack === AttackType.STAND_D) return '241';
+      if (attack === AttackType.CLOSE_D) return '240';
+      return '201';
+    case FighterState.CROUCH_ATTACK:
+      if (attack === AttackType.CROUCH_C) return '410';
+      if (attack === AttackType.CROUCH_D) return '440';
+      if (attack === AttackType.CROUCH_B) return '430';
+      return '400';
+    case FighterState.HITSTUN: return '5000';
+    case FighterState.KNOCKDOWN:
+    case FighterState.GETUP: return '5050';
+    case FighterState.BLOCK:
+    case FighterState.AIR_BLOCK: return '120';
+    case FighterState.RUN: return '100';
+    case FighterState.BACKDASH: return '105';
+    case FighterState.ROLL: return '100';
+    case FighterState.BACK_ROLL: return '105';
+    case FighterState.THROW: return '800';
+    case FighterState.DIZZY: return '5300';
+    case FighterState.WIN: return '181';
+    case FighterState.TAUNT: return '195';
+    case FighterState.COUNTER_STANCE: return '300';
+    case FighterState.MAX_MODE: return '0';
+    case FighterState.GUARD_CRUSH: return '120';
+    default: return null;
+  }
+}

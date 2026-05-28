@@ -37,7 +37,7 @@ import { IORI_THROW_FRAMES } from './ioriThrowFrames.js';
 import { IORI_YUMEYUMI_FRAMES, IORI_KATANUGI_FRAMES, IORI_YUKIWARUI_FRAMES } from './ioriCommandNormalFrames.js';
 
 const renderer = createHighResRenderer({
-  targetDisplayHeight: 72,
+  targetDisplayHeight: 66,
   defaultTint: '#aa00ff',
   setup(_, regV) {
     regV('IDLE', IORI_IDLE_FRAMES, [8, 9, 12, 9, 10, 8]);

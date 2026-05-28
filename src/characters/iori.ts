@@ -184,12 +184,12 @@ export const IoriDef: CharacterDefinition = {
   },
 
   proportions: {
-    headW: 42, headH: 43,
-    torsoW: 50, torsoH: 72,
-    armW: 18, armH: 52,
-    legW: 22, legH: 66,
-    shoulderY: 18, hipY: 64,
-    torsoCenterY: 36, headCenterY: 8,
+    headW: 40, headH: 41,
+    torsoW: 46, torsoH: 68,
+    armW: 16, armH: 48,
+    legW: 20, legH: 62,
+    shoulderY: 16, hipY: 60,
+    torsoCenterY: 34, headCenterY: 7,
   },
 
   routeSpecial(input, cmdBuf, tick, _hasChargeRelease = false) {

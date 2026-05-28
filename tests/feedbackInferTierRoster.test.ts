@@ -1,5 +1,5 @@
 /**
- * inferTier 27-character roster coverage regression tests
+ * inferTier 28-character roster coverage regression tests
  *
  * Protects: every ROASTER character's specials are correctly classified,
  * DM/SDM/HSDM prefixes, normal attack classification, heavy detection.
@@ -11,8 +11,8 @@ import { ROSTER } from '../src/characters/index.js';
 
 const CHAR_IDS = ROSTER.map(c => c.id.toUpperCase());
 
-describe('inferTier 27-character coverage', () => {
-  it('all 27 character IDs have specials classified as special', () => {
+describe('inferTier 28-character coverage', () => {
+  it('all 28 character IDs have specials classified as special', () => {
     for (const charId of CHAR_IDS) {
       const attackName = `${charId}_SPECIAL_MOVE`;
       const tier = inferTier(attackName as any);

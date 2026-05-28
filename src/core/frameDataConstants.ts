@@ -329,6 +329,63 @@ const FRAME_DATA_GENERIC = {
     damage: 200, hitstun: 0, blockstun: 21, pushback: 10,
     hitLevel: 'MID' as const, knockdown: true, chipDamage: 20,
   },
+  // ── KFM (Kung Fu Man) specials ──
+  KFM_KUNGFU_UPPER: {
+    startup: 4, active: 5, recovery: 15,
+    damage: 60, hitstun: 16, blockstun: 12, pushback: 6,
+    hitLevel: 'MID' as const, knockdown: true,
+  },
+  KFM_FAST_KUNGFU_UPPER: {
+    startup: 3, active: 4, recovery: 14,
+    damage: 50, hitstun: 14, blockstun: 10, pushback: 5,
+    hitLevel: 'MID' as const, knockdown: false,
+  },
+  KFM_SMASH_KICK: {
+    startup: 8, active: 6, recovery: 18,
+    damage: 55, hitstun: 15, blockstun: 11, pushback: 7,
+    hitLevel: 'MID' as const, knockdown: false,
+  },
+  KFM_DOUBLE_SMASH_KICK: {
+    startup: 10, active: 8, recovery: 20,
+    damage: 70, hitstun: 18, blockstun: 14, pushback: 8,
+    hitLevel: 'MID' as const, knockdown: true,
+  },
+  KFM_HIGH_KICK: {
+    startup: 6, active: 5, recovery: 16,
+    damage: 45, hitstun: 13, blockstun: 9, pushback: 5,
+    hitLevel: 'MID' as const, knockdown: false,
+  },
+  KFM_TRIPLE_KUNGFU_UPPER: {
+    startup: 5, active: 4, recovery: 4, // multi-hit
+    damage: 30, hitstun: 14, blockstun: 10, pushback: 4,
+    hitLevel: 'MID' as const, knockdown: true,
+  },
+  KFM_LIGHT_HIGH_KICK: {
+    startup: 5, active: 4, recovery: 14,
+    damage: 35, hitstun: 12, blockstun: 8, pushback: 4,
+    hitLevel: 'MID' as const, knockdown: false,
+  },
+  KFM_HIGH_KICK_2: {
+    startup: 4, active: 5, recovery: 15,
+    damage: 40, hitstun: 13, blockstun: 9, pushback: 5,
+    hitLevel: 'MID' as const, knockdown: false,
+  },
+  KFM_SMASH_KICK_2: {
+    startup: 6, active: 5, recovery: 17,
+    damage: 50, hitstun: 14, blockstun: 10, pushback: 6,
+    hitLevel: 'MID' as const, knockdown: false,
+  },
+  KFM_SMASH_KICK_3: {
+    startup: 8, active: 6, recovery: 19,
+    damage: 65, hitstun: 17, blockstun: 13, pushback: 7,
+    hitLevel: 'MID' as const, knockdown: true,
+  },
+  // ── KFM DM ──
+  DM_KFM_SMASH_FIST: {
+    startup: 18, active: 25, recovery: 24,
+    damage: 180, hitstun: 0, blockstun: 20, pushback: 10,
+    hitLevel: 'MID' as const, knockdown: true, chipDamage: 18,
+  },
 };
 
 export const FRAME_DATA = { ...FRAME_DATA_GENERIC, ...FRAME_DATA_CHARS } as const;

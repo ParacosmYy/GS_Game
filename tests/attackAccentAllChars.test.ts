@@ -1,7 +1,7 @@
 /**
  * getAttackColorAccent full roster + cross-ref with ROSTER regression tests
  *
- * Protects: 27-character accent coverage, no duplicate cases,
+ * Protects: 28-character accent coverage, no duplicate cases,
  * valid hex color format, MAX_AURA_COLORS structure consistency.
  */
 import { describe, it, expect } from 'vitest';
@@ -59,8 +59,8 @@ describe('getAttackColorAccent full roster coverage', () => {
     expect(iori.body).toBe('#aa44dd');
   });
 
-  it('27 characters in ROSTER', () => {
-    expect(ROSTER.length).toBe(27);
+  it('28 characters in ROSTER', () => {
+    expect(ROSTER.length).toBe(28);
   });
 });
 

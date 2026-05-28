@@ -179,6 +179,12 @@ export const COMBO_ROUTES: Record<string, ComboStep[]> = {
     { type: 'special', attack: 'maryStraightSlicer', delay: 3 },
     { type: 'special', attack: 'dmMaryTyphoon', delay: 4 },
   ],
+  kfm: [
+    { type: 'button',  attack: 'closeC', delay: 0 },
+    { type: 'special', attack: 'kfmKungfuUpper', delay: 2 },
+    { type: 'special', attack: 'kfmSmashKick', delay: 3 },
+    { type: 'special', attack: 'dmKfmSmashFist', delay: 4 },
+  ],
   _default: [
     { type: 'button',  attack: 'closeC', delay: 0 },
     { type: 'button',  attack: 'standA',  delay: 2 },

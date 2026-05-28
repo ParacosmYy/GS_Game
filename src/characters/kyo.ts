@@ -202,12 +202,12 @@ export const KyoDef: CharacterDefinition = {
   },
 
   proportions: {
-    headW: 42, headH: 42,
-    torsoW: 58, torsoH: 70,
-    armW: 22, armH: 49,
-    legW: 26, legH: 62,
-    shoulderY: 15, hipY: 60,
-    torsoCenterY: 33, headCenterY: 8,
+    headW: 40, headH: 40,
+    torsoW: 54, torsoH: 66,
+    armW: 20, armH: 46,
+    legW: 24, legH: 60,
+    shoulderY: 14, hipY: 58,
+    torsoCenterY: 31, headCenterY: 7,
   },
 
   routeSpecial(input, cmdBuf, tick, _hasChargeRelease = false) {
