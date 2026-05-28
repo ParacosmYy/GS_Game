@@ -43,6 +43,18 @@ import {
   getKimAttackTiming,
   KIM_MUGEN_ACTION_MAP,
 } from '../src/content/characters/kim/hitboxes/kimHitboxes.js';
+import {
+  hasAthenaMugenData,
+  getAthenaMugenTiming,
+  getAthenaAttackTiming,
+  ATHENA_MUGEN_ACTION_MAP,
+} from '../src/content/characters/athena/hitboxes/athenaHitboxes.js';
+import {
+  hasViceMugenData,
+  getViceMugenTiming,
+  getViceAttackTiming,
+  VICE_MUGEN_ACTION_MAP,
+} from '../src/content/characters/vice/hitboxes/viceHitboxes.js';
 
 const SPRITES_DIR = path.resolve(__dirname, '../public/sprites');
 
@@ -59,6 +71,8 @@ describe('mugenHitboxQuery', () => {
     loadAndRegisterHitboxes('cvsryo');
     loadAndRegisterHitboxes('cvsterry');
     loadAndRegisterHitboxes('cvskim');
+    loadAndRegisterHitboxes('cvsathena');
+    loadAndRegisterHitboxes('cvsvice');
   });
 
   describe('query functions', () => {
@@ -268,6 +282,54 @@ describe('mugenHitboxQuery', () => {
     it('getKimMugenActions returns action list', () => {
       const actions = getCharacterMugenActions('cvskim');
       expect(actions.length).toBeGreaterThan(30);
+    });
+  });
+
+  describe('Athena content package integration', () => {
+    it('has valid MUGEN action map', () => {
+      expect(Object.keys(ATHENA_MUGEN_ACTION_MAP).length).toBeGreaterThan(15);
+    });
+
+    it('maps PSYCHO_BALL to action 1000', () => {
+      expect(ATHENA_MUGEN_ACTION_MAP.ATHENA_PSYCHO_BALL).toBe('1000');
+    });
+
+    it('hasAthenaMugenData returns correct state', () => {
+      expect(hasAthenaMugenData()).toBe(true);
+    });
+
+    it('getAthenaAttackTiming returns timing for specials', () => {
+      const timing = getAthenaAttackTiming('ATHENA_PSYCHO_BALL');
+      expect(timing).not.toBeNull();
+      expect(timing!.total).toBeGreaterThan(0);
+    });
+
+    it('getAthenaAttackTiming returns null for unknown attack', () => {
+      expect(getAthenaAttackTiming('UNKNOWN_ATTACK')).toBeNull();
+    });
+  });
+
+  describe('Vice content package integration', () => {
+    it('has valid MUGEN action map', () => {
+      expect(Object.keys(VICE_MUGEN_ACTION_MAP).length).toBeGreaterThan(15);
+    });
+
+    it('maps OUTRAGE to action 1000', () => {
+      expect(VICE_MUGEN_ACTION_MAP.VICE_OUTRAGE).toBe('1000');
+    });
+
+    it('hasViceMugenData returns correct state', () => {
+      expect(hasViceMugenData()).toBe(true);
+    });
+
+    it('getViceAttackTiming returns timing for specials', () => {
+      const timing = getViceAttackTiming('VICE_OUTRAGE');
+      expect(timing).not.toBeNull();
+      expect(timing!.total).toBeGreaterThan(0);
+    });
+
+    it('getViceAttackTiming returns null for unknown attack', () => {
+      expect(getViceAttackTiming('UNKNOWN_ATTACK')).toBeNull();
     });
   });
 });
