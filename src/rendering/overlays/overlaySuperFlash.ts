@@ -299,6 +299,24 @@ export function drawSuperFlash(
     drawSNKText(ctx, moveName, CANVAS_WIDTH / 2, bannerY, fontSize, nameColor);
     ctx.shadowBlur = 0;
 
+    // HSDM: animated scan line sweep across banner
+    if (isHSDM && timer > 8 && timer < 18) {
+      const scanT = (18 - timer) / 10;
+      const scanX = CANVAS_WIDTH / 2 - barW * bannerScale / 2 + (1 - scanT) * barW * bannerScale;
+      const scanW = 30;
+      const scanGrad = ctx.createLinearGradient(scanX - scanW / 2, 0, scanX + scanW / 2, 0);
+      scanGrad.addColorStop(0, 'rgba(255, 200, 255, 0)');
+      scanGrad.addColorStop(0.5, `rgba(255, 200, 255, ${0.3 * bannerAlpha})`);
+      scanGrad.addColorStop(1, 'rgba(255, 200, 255, 0)');
+      ctx.fillStyle = scanGrad;
+      ctx.fillRect(
+        CANVAS_WIDTH / 2 - barW * bannerScale / 2,
+        bannerY - barH * bannerScale / 2,
+        barW * bannerScale,
+        barH * bannerScale,
+      );
+    }
+
     ctx.restore();
   }
 
