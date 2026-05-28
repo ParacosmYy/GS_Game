@@ -336,6 +336,42 @@ export function playHitAccent(charId: string, isDM: boolean = false): void {
 /** 播放重落地音效 — KO落地或从高处落下时使用 */
 export function playHeavyLanding(): void { initSampler(); play('landing_heavy'); }
 
+// === 倒计时音效 ===
+
+/** Continue画面倒计时滴答声 — 短促高频beep */
+export function playCountdownTick(urgent: boolean = false): void {
+  const ctx = getCtx();
+  if (ctx.state === 'suspended') return;
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.type = 'square';
+  osc.frequency.value = urgent ? 1200 : 800;
+  const now = ctx.currentTime;
+  gain.gain.setValueAtTime(urgent ? 0.15 : 0.08, now);
+  gain.gain.exponentialRampToValueAtTime(0.001, now + (urgent ? 0.12 : 0.06));
+  osc.connect(gain).connect(ctx.destination);
+  osc.start(now);
+  osc.stop(now + (urgent ? 0.12 : 0.06));
+}
+
+/** Continue画面倒计时归零蜂鸣声 — 低沉长beep */
+export function playCountdownBuzzer(): void {
+  const ctx = getCtx();
+  if (ctx.state === 'suspended') return;
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.type = 'sawtooth';
+  osc.frequency.setValueAtTime(200, ctx.currentTime);
+  osc.frequency.linearRampToValueAtTime(80, ctx.currentTime + 0.5);
+  const now = ctx.currentTime;
+  gain.gain.setValueAtTime(0.2, now);
+  gain.gain.linearRampToValueAtTime(0.15, now + 0.3);
+  gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+  osc.connect(gain).connect(ctx.destination);
+  osc.start(now);
+  osc.stop(now + 0.5);
+}
+
 /** 播放Dizzy Hit音效 — DIZZY状态被命中时叠加 */
 export function playDizzyHit(): void { initSampler(); play('dizzy_hit', 0.8); }
 

@@ -32,7 +32,7 @@ import { SelectState } from './state/selectState.js';
 import { RoundState } from './state/roundState.js';
 import { DMManager } from './combat/dmManager.js';
 import { createHitCallback, triggerKOGroundEffect } from './combat/hitCallback.js';
-import { initAudio, initSampler, playKO, playVictoryFanfare, playMAXActivation, playPerfect, playThrowEscape, playFight, playRoll, playCancel, playQuickStand, playGuardCrush, playHit, playSpecialLight, playSpecialHeavy, playDM, playWhoosh, playHeavyWhoosh, playKoouken, playKoHou, playHien, playHaou, playCursorMove, playCursorConfirm, playTimeUp, playFootstep } from './audio/sampler.js';
+import { initAudio, initSampler, playKO, playVictoryFanfare, playMAXActivation, playPerfect, playThrowEscape, playFight, playRoll, playCancel, playQuickStand, playGuardCrush, playHit, playSpecialLight, playSpecialHeavy, playDM, playWhoosh, playHeavyWhoosh, playKoouken, playKoHou, playHien, playHaou, playCursorMove, playCursorConfirm, playTimeUp, playFootstep, playCountdownTick, playCountdownBuzzer } from './audio/sampler.js';
 import { tickAttackSFX, dispatchContractSFX } from './audio/attackSFX.js';
 import { getContractEventTags } from './entities/fighter.js';
 import { tickMotionSFX } from './audio/motionSFX.js';
@@ -234,6 +234,22 @@ function update(): void {
   if (gs.phase === GamePhase.CONTINUE) {
     tickRef.value++;
     gs.continueCountdown--;
+    // Countdown tick SFX: each second change triggers a beep, last 3s faster beeps
+    {
+      const sec = Math.floor(gs.continueCountdown / 60);
+      const prevSec = Math.floor((gs.continueCountdown + 1) / 60);
+      if (sec !== prevSec && sec > 0) {
+        playCountdownTick(sec <= 3);
+      }
+      // Last 3 seconds: additional rapid ticks every 20 frames
+      if (sec <= 3 && sec > 0 && gs.continueCountdown % 20 === 0) {
+        playCountdownTick(true);
+      }
+      // Countdown hits zero: buzzer
+      if (gs.continueCountdown === 0) {
+        playCountdownBuzzer();
+      }
+    }
     if (inputManager.isKeyDown('ArrowLeft')) gs.continueCursorYes = true;
     if (inputManager.isKeyDown('ArrowRight')) gs.continueCursorYes = false;
     if (inputManager.isKeyDown('KeyJ') || inputManager.isKeyDown('Enter')) {
