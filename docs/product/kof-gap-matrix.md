@@ -217,7 +217,12 @@
   - Kyo/Iori内容包接入真实完整度报告 (消除placeholder)
   - 内容包报告集成回归测试 (10 tests: 3角色真实报告+数据结构完整性)
   - 6舞台氛围系统回归测试 (14 tests)
-  - 测试总数 5190
+  - 视觉输入图标系统回归测试 (18 tests: KOF2002符号渲染+度量+健壮性)
+  - 眩晕预警音效 stun warning (1200Hz短促警报音, stunGauge>85%触发)
+  - 战斗回调接口回归测试 (4 tests: throwEscape/guardCrush/stunWarning)
+  - FighterState枚举覆盖回归测试 (9 tests: 26状态完整+分组校验)
+  - 暂停菜单渲染回归测试 (8 tests: 3个tab+canvas操作+边界条件)
+  - 测试总数 5241
 - 新功能添加点：
   - smoke / ryo / combat / content 分层测试
   - frame contract 回归测试
