@@ -202,9 +202,14 @@
   - 3角色取消路径结构一致性回归测试 (33 tests: cancelType/stockCost/timerCost/window)
   - sampler渲染器音频缓冲区回归测试 (7 tests: combat/UI/accent有效性+DM>special递进)
   - 3角色命中特效插件结构回归测试 (18 tests: charId/prefixes/VFX/SFX/DM前缀)
-  - 测试总数 4959
   - 仪式感流程回归测试 (14 tests: 三节拍序列/KO/Perfect/结构完整性/曲线范围)
   - announcer事件类型校验扩展 (ready/stun/guard_crush)
+  - skeletalFighter拆分 (1594→1419行: 胜利姿态+攻击光效提取到skeletalVictory.ts)
+  - 27角色攻击光效回归测试 (8 tests: 数值范围+角色特性校验)
+  - VFX粒子预设全量回归测试 (45 tests: 38个spawn函数+粒子类型校验)
+  - 角色专属VFX预设回归测试 (31 tests: Ryo/Kyo/Iori+通用战斗特效+层级递进)
+  - 27角色服装/发型/瞳色回归测试 (18 tests: 4色域+Ryo调色板+外观系统)
+  - 测试总数 5061
 - 新功能添加点：
   - smoke / ryo / combat / content 分层测试
   - frame contract 回归测试
