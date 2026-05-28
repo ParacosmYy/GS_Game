@@ -589,7 +589,10 @@ export function drawHUD(
 
   // Timer text — larger pixel font (SNK ROM style) with color-coded urgency
   const timerColor = isCritical ? '#ff2222' : isUrgent ? '#ff5533' : timeSeconds <= 30 ? '#ffcc44' : '#eeeeee';
-  const timerScale = isUrgent ? 1.6 : 1.3;
+  // KOF2002: 数字切换瞬间微缩放——秒数变化时前8帧从1.15x缩到1x
+  const subTick = tick % 60;
+  const digitPop = subTick < 8 ? 1 + (1 - subTick / 8) * 0.15 : 1;
+  const timerScale = (isUrgent ? 1.6 : 1.3) * digitPop;
 
   if (isUrgent) {
     // Urgent timer: blink + strong red glow + pixel shake
