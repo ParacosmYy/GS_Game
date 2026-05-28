@@ -1125,6 +1125,18 @@ export function drawFighters(
       ctx.fillRect(sx - glowR, sy - f.displayHeight / 2 - glowR, glowR * 2, glowR * 2);
       ctx.restore();
     }
+    // KOF2002: Hitstop attacker glow — subtle element-coded outline during hitstop
+    if (hitStopDefender >= 0 && playerIdx !== hitStopDefender && f.state !== FighterState.HITSTUN) {
+      ctx.save();
+      ctx.globalCompositeOperation = 'screen';
+      ctx.globalAlpha = 0.12 + Math.sin(globalTick * 0.25) * 0.06;
+      ctx.strokeStyle = maxAura.css;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.ellipse(sx, sy - f.displayHeight / 2, hw + 4, f.displayHeight / 2 + 4, 0, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.restore();
+    }
     // KOF2002: MAX模式边框脉冲 — MAX模式时角色周围脉冲角色专属能量边框
     if (maxModeActive) {
       ctx.save();
