@@ -14,6 +14,8 @@ import {
   getKyoFeedbackTiers, getKyoFeedback,
   KYO_ANIMATION_META, getKyoAnimationNames,
   KYO_CANCEL_PATHS,
+  KYO_FEEDBACK_SUMMARY,
+  KYO_PORTRAIT_META, getKyoPortraitMeta,
 } from '../src/content/characters/kyo/index.js';
 import {
   IORI_ATTACK_KEYS, getIoriFrameData, getIoriAttackFrameData,
@@ -22,6 +24,8 @@ import {
   getIoriFeedbackTiers, getIoriFeedback,
   IORI_ANIMATION_META, getIoriAnimationNames,
   IORI_CANCEL_PATHS,
+  IORI_FEEDBACK_SUMMARY,
+  IORI_PORTRAIT_META, getIoriPortraitMeta,
 } from '../src/content/characters/iori/index.js';
 
 describe('Content Package Structure Consistency', () => {
@@ -127,5 +131,78 @@ describe('Content Package Structure Consistency', () => {
       expect(hasKick, `${c.name} should have kicks`).toBe(true);
       expect(hasCrouch, `${c.name} should have crouch attacks`).toBe(true);
     }
+  });
+});
+
+// ════════════════════════════════════════════════════════════════
+// Cross-Character Feedback Summary Consistency
+// ════════════════════════════════════════════════════════════════
+
+describe('Cross-Character Feedback Consistency', () => {
+  it('Kyo and Iori both have all 6 feedback tiers', () => {
+    const TIERS = ['light', 'heavy', 'special', 'dm', 'sdm', 'hsdm'] as const;
+    for (const tier of TIERS) {
+      expect(KYO_FEEDBACK_SUMMARY[tier].length, `Kyo ${tier}`).toBeGreaterThan(0);
+      expect(IORI_FEEDBACK_SUMMARY[tier].length, `Iori ${tier}`).toBeGreaterThan(0);
+    }
+  });
+
+  it('Kyo and Iori share the same generic normals in light tier', () => {
+    const kyoLight = KYO_FEEDBACK_SUMMARY.light;
+    const ioriLight = IORI_FEEDBACK_SUMMARY.light;
+    for (const key of ['STAND_A', 'CROUCH_A']) {
+      expect(kyoLight).toContain(key);
+      expect(ioriLight).toContain(key);
+    }
+  });
+
+  it('Kyo and Iori have different special-tier entries', () => {
+    const kyoSpecial = new Set(KYO_FEEDBACK_SUMMARY.special);
+    const ioriSpecial = new Set(IORI_FEEDBACK_SUMMARY.special);
+    // They should have different character-specific moves
+    const overlap = [...kyoSpecial].filter(k => ioriSpecial.has(k));
+    expect(overlap.length, 'no special-tier overlap').toBeLessThan(kyoSpecial.size);
+  });
+
+  it('no feedback tier overlap between Kyo and Iori DM tiers', () => {
+    const kyoDm = new Set(KYO_FEEDBACK_SUMMARY.dm);
+    const ioriDm = new Set(IORI_FEEDBACK_SUMMARY.dm);
+    for (const k of kyoDm) {
+      expect(ioriDm.has(k), `DM overlap: ${k}`).toBe(false);
+    }
+  });
+});
+
+// ════════════════════════════════════════════════════════════════
+// Cross-Character Portrait Metadata Consistency
+// ════════════════════════════════════════════════════════════════
+
+describe('Cross-Character Portrait Consistency', () => {
+  const SIZES = ['select', 'vs', 'hud', 'win'] as const;
+
+  it('Kyo and Iori both have all 4 portrait sizes', () => {
+    for (const size of SIZES) {
+      expect(KYO_PORTRAIT_META[size], `Kyo ${size}`).toBeDefined();
+      expect(IORI_PORTRAIT_META[size], `Iori ${size}`).toBeDefined();
+    }
+  });
+
+  it('Kyo and Iori have different primary colors', () => {
+    expect(KYO_PORTRAIT_META.select.primaryColor).not.toBe(IORI_PORTRAIT_META.select.primaryColor);
+  });
+
+  it('all portrait sizes have valid hex colors', () => {
+    const hexPattern = /^#[0-9a-fA-F]{6}$/;
+    for (const size of SIZES) {
+      expect(KYO_PORTRAIT_META[size].primaryColor, `Kyo ${size} primaryColor`).toMatch(hexPattern);
+      expect(IORI_PORTRAIT_META[size].primaryColor, `Iori ${size} primaryColor`).toMatch(hexPattern);
+    }
+  });
+
+  it('getKyoPortraitMeta and getIoriPortraitMeta work for select size', () => {
+    const kyoSelect = getKyoPortraitMeta('select');
+    const ioriSelect = getIoriPortraitMeta('select');
+    expect(kyoSelect.width).toBe(120);
+    expect(ioriSelect.width).toBe(120);
   });
 });
