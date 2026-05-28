@@ -22,6 +22,7 @@ export function drawWinQuote(
   winQuote: string,
   charColor: string,
   pixelPortrait: PixelPortraitData | undefined,
+  stageId: StageId = 'temple',
 ): void {
   ctx.save();
 
@@ -29,7 +30,12 @@ export function drawWinQuote(
   const fadeOut = timer > WIN_QUOTE_DURATION - 30 ? (WIN_QUOTE_DURATION - timer) / 30 : 1;
   const alpha = Math.min(fadeIn, fadeOut);
 
-  ctx.fillStyle = `rgba(0, 0, 0, ${0.7 * alpha})`;
+  // Stage-tinted overlay — each stage contributes its accent color subtly
+  const theme = STAGE_THEMES[stageId] ?? STAGE_THEMES.temple;
+  ctx.fillStyle = `rgba(0, 0, 0, ${0.65 * alpha})`;
+  ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+  // Colored vignette layer using stage accent
+  ctx.fillStyle = theme.accent + Math.round(0.12 * alpha * 255).toString(16).padStart(2, '0');
   ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
   ctx.textAlign = 'center';

@@ -455,8 +455,8 @@ export class Renderer {
     drawStageIntro(this.ctx, timer, stageName, stageId);
   }
 
-  drawWinQuote(timer: number, charName: string, winQuote: string, charColor: string, pixelPortrait: import('./pixelPortraits.js').PixelPortraitData | undefined): void {
-    drawWinQuote(this.ctx, timer, charName, winQuote, charColor, pixelPortrait);
+  drawWinQuote(timer: number, charName: string, winQuote: string, charColor: string, pixelPortrait: import('./pixelPortraits.js').PixelPortraitData | undefined, stageId?: import('./stage.js').StageId): void {
+    drawWinQuote(this.ctx, timer, charName, winQuote, charColor, pixelPortrait, stageId);
   }
 
   drawStageSelect(tick: number, cursor: number, ready: boolean): void {

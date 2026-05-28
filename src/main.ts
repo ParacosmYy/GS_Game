@@ -1504,6 +1504,7 @@ function render(): void {
       gs.currentWinQuote,
       gs.winQuoteCharColor,
       charDef ? getPortraitForSize(charDef.id, 'win') ?? charDef.pixelPortrait : undefined,
+      getStage(),
     );
   }
 
