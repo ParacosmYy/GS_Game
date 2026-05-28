@@ -10,7 +10,8 @@ const SYMBOL_GAP = 2;
 type ArrowDir = '→' | '←' | '↑' | '↓' | '↘' | '↙' | '↗' | '↖' | '·';
 type ButtonLabel = 'P' | 'K' | 'A' | 'B' | 'C' | 'D';
 
-const ARROW_COLORS: Record<string, string> = {
+/** Per-direction arrow colors — shared with training HUD input history */
+export const ARROW_COLORS: Record<string, string> = {
   '→': '#88ccff',
   '←': '#88ccff',
   '↑': '#88ccff',
@@ -22,7 +23,8 @@ const ARROW_COLORS: Record<string, string> = {
   '·': '#666666',
 };
 
-const BUTTON_COLORS: Record<string, { fill: string; border: string }> = {
+/** Per-button colors — shared with training HUD input history */
+export const BUTTON_COLORS: Record<string, { fill: string; border: string }> = {
   A: { fill: '#44aaff', border: '#2277cc' },
   B: { fill: '#44dd44', border: '#228822' },
   C: { fill: '#ff6644', border: '#cc3322' },

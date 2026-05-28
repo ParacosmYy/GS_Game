@@ -7,7 +7,7 @@ import { roundRect, drawSNKText } from '../utils.js';
 import type { TrainingModeState, FrameDataDisplay, InputHistoryEntry } from '../../state/trainingMode.js';
 import type { MoveListEntry } from '../../core/types.js';
 import { CN_MOVE_NAMES } from '../moveNameDisplay.js';
-import { drawVisualInput } from './overlayInputIcons.js';
+import { drawVisualInput, ARROW_COLORS, BUTTON_COLORS } from './overlayInputIcons.js';
 
 // ===== Training Mode HUD =====
 
@@ -359,14 +359,21 @@ function drawInputHistoryPanelAdjusted(
     const alpha = Math.max(0.3, 1 - age / 300);
     ctx.globalAlpha = alpha;
 
-    // Direction arrow
-    ctx.fillStyle = '#88ccff';
+    // Direction arrow — per-direction color (cardinal=blue, diagonal=gold, neutral=gray)
+    const dirColor = ARROW_COLORS[entry.direction] ?? '#88ccff';
+    ctx.fillStyle = dirColor;
     ctx.fillText(entry.direction, panelX + 8, y);
 
-    // Buttons
+    // Buttons — per-button color (A=blue, B=green, C=red-orange, D=magenta)
     if (entry.buttons.length > 0) {
-      ctx.fillStyle = '#ffcc44';
-      ctx.fillText(entry.buttons.join(' '), panelX + 24, y);
+      let bx = panelX + 24;
+      for (let bi = 0; bi < entry.buttons.length; bi++) {
+        const btn = entry.buttons[bi];
+        const btnColor = BUTTON_COLORS[btn];
+        ctx.fillStyle = btnColor ? btnColor.fill : '#ffcc44';
+        ctx.fillText(btn, bx, y);
+        bx += ctx.measureText(btn).width + 3;
+      }
     }
 
     ctx.globalAlpha = 1;
