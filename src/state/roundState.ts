@@ -201,7 +201,7 @@ export class RoundState {
     return true;
   }
 
-  /** Reset fighters + subsystems for a new round (keeps power gauge — authentic KOF) */
+  /** Reset fighters + subsystems for a new round (keeps power gauge stocks — authentic KOF) */
   private resetForNewRound(): void {
     this.p1.reset(STAGE_WIDTH * 0.30);
     this.p2.reset(STAGE_WIDTH * 0.70);
@@ -212,6 +212,11 @@ export class RoundState {
     this.projectiles.length = 0;
     this.vfx.reset();
     this.cinematic.resetForNewRound();
+    // Deactivate MAX mode between rounds (authentic KOF2002: stocks carry over, MAX does not)
+    this.maxModes[0].active = false;
+    this.maxModes[0].timer = 0;
+    this.maxModes[1].active = false;
+    this.maxModes[1].timer = 0;
   }
 
   /** Full match restart (back to select screen) */
@@ -251,6 +256,11 @@ export class RoundState {
     this.projectiles.length = 0;
     this.vfx.reset();
     this.cinematic.resetForNewRound();
+    // Deactivate MAX mode between rounds (authentic KOF2002: stocks carry over, MAX does not)
+    this.maxModes[0].active = false;
+    this.maxModes[0].timer = 0;
+    this.maxModes[1].active = false;
+    this.maxModes[1].timer = 0;
     this.fadeAlpha = 0;
     this.fadeDirection = 0;
     this.fadeCallback = null;
