@@ -209,7 +209,15 @@
   - VFX粒子预设全量回归测试 (45 tests: 38个spawn函数+粒子类型校验)
   - 角色专属VFX预设回归测试 (31 tests: Ryo/Kyo/Iori+通用战斗特效+层级递进)
   - 27角色服装/发型/瞳色回归测试 (18 tests: 4色域+Ryo调色板+外观系统)
-  - 测试总数 5061
+  - 6-tier反馈manifest回归约束 (18 tests: 结构+单调递增+边界)
+  - 眩晕槽+防御槽常量回归测试 (25 tests: stun fill递增+guard drain递增+dizzy/mash合理)
+  - 攻击分类集合回归测试 (25 tests: LIGHT/NORMAL/COMMAND一致性+enum对齐)
+  - 战斗系统常量全量回归测试 (37 tests: 伤害缩放/取消窗口/气槽/MAX/绝望/浮空/弹墙)
+  - 眩晕恢复专属音效 stun recovery (C5→E5双音阶)
+  - Kyo/Iori内容包接入真实完整度报告 (消除placeholder)
+  - 内容包报告集成回归测试 (10 tests: 3角色真实报告+数据结构完整性)
+  - 6舞台氛围系统回归测试 (14 tests)
+  - 测试总数 5190
 - 新功能添加点：
   - smoke / ryo / combat / content 分层测试
   - frame contract 回归测试
