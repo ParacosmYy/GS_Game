@@ -153,7 +153,9 @@
   - Kyo/Iori完整度回归测试 (33 tests: 维度有效性+覆盖率+最低阈值)
   - 3角色内容包结构一致性回归测试 (13 tests: barrel export完整性校验)
   - rendererFighter.ts拆分 (1852→1573行: 工具函数提取到rendererFighterUtils.ts)
-  - 测试总数 4768
+  - sampler.ts拆分 (1880→470行: 渲染函数提取到samplerRenderers.ts)
+  - 3角色动画元数据补全10类缺失状态 (backdash/hop/hyper_jump/run_jump/roll/back_roll/air_block/throw_anim/jump_a~d)
+  - 测试总数 4827
 - 当前差距：角色内容已开始分层，但真实数据、兼容入口、校验工具之间还需继续收口。
 - 新功能添加点：
   - `src/content/characters/index.ts` barrel export
@@ -182,6 +184,8 @@
   - HSDM招式表分类+CN_MOVE_NAMES覆盖回归测试 (11 tests)
   - Kyo/Iori攻击帧数据完整性+命中判定框回归测试 (116 tests: 全键存在/结构/帧数/递进/hitbox维度/跨角色)
   - 3角色视觉输入图标招式兼容性回归测试 (5 tests)
+  - ScreenFlash/ScreenShake/VFXSystem核心VFX回归测试 (30 tests)
+  - 3角色动画元数据完整性回归测试 (29 tests: 必需状态/帧数正值/类型一致/跨角色)
   - sampler.ts拆分 (1880→470行: 渲染函数提取到samplerRenderers.ts)
 - 新功能添加点：
   - smoke / ryo / combat / content 分层测试
