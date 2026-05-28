@@ -33,7 +33,8 @@ const COMBAT = ['renderHitLight', 'renderHitHeavy', 'renderBlock', 'renderSpecia
 
 const UI = ['renderSelect', 'renderCursorMove', 'renderCursorConfirm', 'renderVictory',
   'renderRoll', 'renderLanding', 'renderMAXActivation', 'renderFight',
-  'renderWhoosh', 'renderFootstep', 'renderJump', 'renderLandingNormal'];
+  'renderWhoosh', 'renderFootstep', 'renderJump', 'renderLandingNormal',
+  'renderStunRecovery', 'renderStunWarning'];
 
 const ACCENTS = ['renderAccentFire', 'renderAccentPurple', 'renderAccentIce', 'renderAccentGeneric'];
 
