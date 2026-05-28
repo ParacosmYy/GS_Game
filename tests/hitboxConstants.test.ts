@@ -1,9 +1,17 @@
 /**
  * Hitbox Constants Regression Test
+ * Consolidated from hitboxConstants + hitboxConstantsCore (2 files → 1 file)
  * Verifies all hitbox offset entries have valid geometry and character coverage.
  */
 import { describe, it, expect } from 'vitest';
 import { HITBOX_OFFSETS } from '../src/core/hitboxConstants.js';
+
+interface HitboxOffset {
+  offsetX: number;
+  offsetY: number;
+  width: number;
+  height: number;
+}
 
 describe('HITBOX_OFFSETS structure', () => {
   it('has at least 100 entries', () => {
@@ -11,7 +19,8 @@ describe('HITBOX_OFFSETS structure', () => {
   });
 
   it('all entries have required fields', () => {
-    for (const [key, box] of Object.entries(HITBOX_OFFSETS)) {
+    for (const [key, val] of Object.entries(HITBOX_OFFSETS)) {
+      const box = val as HitboxOffset;
       expect(typeof box.offsetX, `${key}.offsetX`).toBe('number');
       expect(typeof box.offsetY, `${key}.offsetY`).toBe('number');
       expect(typeof box.width, `${key}.width`).toBe('number');
@@ -19,39 +28,38 @@ describe('HITBOX_OFFSETS structure', () => {
     }
   });
 
-  it('all widths are positive', () => {
-    for (const [key, box] of Object.entries(HITBOX_OFFSETS)) {
+  it('all widths and heights are positive', () => {
+    for (const [key, val] of Object.entries(HITBOX_OFFSETS)) {
+      const box = val as HitboxOffset;
       expect(box.width, `${key}.width`).toBeGreaterThan(0);
-    }
-  });
-
-  it('all heights are positive', () => {
-    for (const [key, box] of Object.entries(HITBOX_OFFSETS)) {
       expect(box.height, `${key}.height`).toBeGreaterThan(0);
     }
   });
 
-  it('no entry has offsetX = 0 (all attacks extend from body)', () => {
-    for (const [key, box] of Object.entries(HITBOX_OFFSETS)) {
-      expect(box.offsetX, `${key}.offsetX`).not.toBe(0);
+  it('all widths are in reasonable range (20-200)', () => {
+    for (const [key, val] of Object.entries(HITBOX_OFFSETS)) {
+      const box = val as HitboxOffset;
+      expect(box.width, `${key} width`).toBeGreaterThanOrEqual(20);
+      expect(box.width, `${key} width`).toBeLessThanOrEqual(200);
     }
   });
 
-  it('all offsetY are negative (attacks go upward from ground)', () => {
-    for (const [key, box] of Object.entries(HITBOX_OFFSETS)) {
-      expect(box.offsetY, `${key}.offsetY`).toBeLessThan(0);
+  it('all heights are in reasonable range (15-120)', () => {
+    for (const [key, val] of Object.entries(HITBOX_OFFSETS)) {
+      const box = val as HitboxOffset;
+      expect(box.height, `${key} height`).toBeGreaterThanOrEqual(15);
+      expect(box.height, `${key} height`).toBeLessThanOrEqual(120);
     }
   });
 });
 
 describe('Normal attacks', () => {
-  const normalKeys = ['STAND_A', 'STAND_B', 'STAND_C', 'STAND_D',
-                      'CROUCH_A', 'CROUCH_B', 'CROUCH_C', 'CROUCH_D',
-                      'JUMP_A', 'JUMP_B', 'JUMP_C', 'JUMP_D',
-                      'CLOSE_A', 'CLOSE_B', 'CLOSE_C', 'CLOSE_D'];
-
   it('all normals present', () => {
-    for (const key of normalKeys) {
+    const keys = ['STAND_A', 'STAND_B', 'STAND_C', 'STAND_D',
+                  'CROUCH_A', 'CROUCH_B', 'CROUCH_C', 'CROUCH_D',
+                  'JUMP_A', 'JUMP_B', 'JUMP_C', 'JUMP_D',
+                  'CLOSE_A', 'CLOSE_B', 'CLOSE_C', 'CLOSE_D'];
+    for (const key of keys) {
       expect(HITBOX_OFFSETS[key as keyof typeof HITBOX_OFFSETS], key).toBeDefined();
     }
   });

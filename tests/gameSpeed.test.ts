@@ -1,5 +1,6 @@
 /**
  * Game Speed Controller Regression Test
+ * Consolidated from gameSpeed + gameSpeedCore (2 files → 1 file)
  * Verifies speed presets, slow-mo lifecycle, and edge cases.
  */
 import { describe, it, expect, beforeEach } from 'vitest';
@@ -77,9 +78,9 @@ describe('GameSpeedController', () => {
 
   it('slow-mo expires after duration', () => {
     ctrl.triggerSlowMo(3, 0.3);
-    ctrl.update(); // tick 1 → remaining 2
-    ctrl.update(); // tick 2 → remaining 1
-    ctrl.update(); // tick 3 → remaining 0, restore
+    ctrl.update(); // tick 1
+    ctrl.update(); // tick 2
+    ctrl.update(); // tick 3 → expires
     expect(ctrl.isSlowMo()).toBe(false);
     expect(ctrl.getSpeed()).toBe(1.0);
   });
@@ -95,9 +96,7 @@ describe('GameSpeedController', () => {
     expect(ctrl.getSlowMoProgress()).toBe(0);
     ctrl.update(); // 1/4 done
     expect(ctrl.getSlowMoProgress()).toBeGreaterThan(0);
-    ctrl.update();
-    ctrl.update();
-    ctrl.update(); // 4/4 → expires
+    ctrl.update(); ctrl.update(); ctrl.update(); // 4/4 → expires
     expect(ctrl.getSlowMoProgress()).toBe(1);
   });
 

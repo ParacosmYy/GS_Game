@@ -9,6 +9,7 @@ import {
   isValidTransition,
   getTransition,
 } from '../src/core/gameScreens.js';
+import { WIN_QUOTE_DURATION } from '../src/rendering/screens.js';
 
 describe('TRANSITION_DURATIONS', () => {
   it('all durations are non-negative', () => {
@@ -137,5 +138,11 @@ describe('getTransition', () => {
     if (t) {
       expect(['fade', 'wipe_left', 'wipe_right', 'zoom']).toContain(t.type);
     }
+  });
+});
+
+describe('Screen durations', () => {
+  it('WIN_QUOTE_DURATION is 180 frames', () => {
+    expect(WIN_QUOTE_DURATION).toBe(180);
   });
 });

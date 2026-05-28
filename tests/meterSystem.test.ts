@@ -110,4 +110,26 @@ describe('Desperation Mode', () => {
     expect(isDesperation(100, 1000)).toBe(true);
     expect(isDesperation(900, 1000)).toBe(false);
   });
+
+  it('isDesperation returns false for zero health', () => {
+    expect(isDesperation(0, 1000)).toBe(false);
+  });
+
+  it('isDesperation returns false for zero maxHealth', () => {
+    expect(isDesperation(50, 0)).toBe(false);
+  });
+
+  it('createPowerGauge returns zero meter and stocks', () => {
+    const g = createPowerGauge();
+    expect(g.meter).toBe(0);
+    expect(g.stocks).toBe(0);
+    expect(g.maxMeter).toBeGreaterThan(0);
+  });
+
+  it('createMaxmode returns inactive state', () => {
+    const m = createMaxMode();
+    expect(m.active).toBe(false);
+    expect(m.timer).toBe(0);
+    expect(m.maxDuration).toBeGreaterThan(0);
+  });
 });

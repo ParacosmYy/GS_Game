@@ -31,8 +31,8 @@ describe('overlayScreens', () => {
 });
 
 describe('overlay constants', () => {
-  it('GAME_OVER_DURATION is a positive number', () => {
-    expect(GAME_OVER_DURATION).toBeGreaterThan(0);
+  it('GAME_OVER_DURATION is 180', () => {
+    expect(GAME_OVER_DURATION).toBe(180);
   });
 });
 

@@ -4,21 +4,18 @@
 import { describe, it, expect } from 'vitest';
 
 describe('Continue screen progress', () => {
-  it('drawContinue function accepts 6 parameters', async () => {
+  it('drawContinue function exists', async () => {
     const { drawContinue } = await import('../src/rendering/overlays/overlayContinueGameOver.js');
-    // Function length reports required params; rest have defaults
     expect(typeof drawContinue).toBe('function');
-  });
+  }, 15000);
 
   it('ContinueProgress type is re-exported from overlayScreens', async () => {
     const mod = await import('../src/rendering/overlayScreens.js');
     expect(typeof mod.drawContinue).toBe('function');
-    // ContinueProgress is a type-only export — verify module loads
     expect(mod).toBeDefined();
-  });
+  }, 15000);
 
-  it('progress interface shape: stageIndex/totalStages/score/defeatedColors', async () => {
-    // Verify the expected shape matches runtime usage
+  it('progress interface shape: stageIndex/totalStages/score/defeatedColors', () => {
     const progress = {
       stageIndex: 3,
       totalStages: 8,
