@@ -42,6 +42,13 @@
   - 3角色空中轻踢(AIR_B)专属像素帧 (3帧: 蓄力/斜踢/收腿) + 渲染集成
   - 3角色空中攻击全覆盖回归测试 (14 tests: AIR_A/B/C/D帧数据完整性)
   - ioriSpecialFrames.ts 拆分为 basic specials (1670行) + super frames (480行)
+  - FighterState.WIN接入—3角色胜利姿态动画实际播放 (v2.39)
+  - Ryo胜利动画4帧durations修正 [6,30]→[6,8,10,30]
+  - frameDataChars.ts 拆分为5角色组文件 (4611→40行聚合器)
+  - overlayScreens.ts 拆分为7子文件 (2472→55行聚合器)
+  - screens.ts 拆分为6子文件 (2256→58行聚合器)
+  - attackFramesSpecials.ts 拆分为7子文件 (2209→10行聚合器)
+  - skeletalParts.ts 拆分为3子文件 (2058→7行聚合器)
 - 新功能添加点：
   - animation manifest
   - pose bank
@@ -180,6 +187,9 @@
   - CONTINUE 倒计时画面
   - 回合结束分数明细弹窗(Win+HP Bonus+Perfect+计数动画)
   - VS画面冲击音效 + P2开场语音
+  - FighterState.WIN胜利姿态接入 + 3角色专属像素帧实际播放 (v2.39)
+  - Ryo胜利4帧动画完整播放(起手→交叉→完成→持定)
+  - 全项目文件2000行上限合规(5大文件拆分: frameData/overlays/screens/attackFrames/skeletal)
 - 新功能添加点：
   - 胜利姿态动画细化
   - 角色专属胜利语音
