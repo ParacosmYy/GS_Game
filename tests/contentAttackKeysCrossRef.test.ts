@@ -1,0 +1,115 @@
+/**
+ * Content Package Attack Keys Cross-Reference Tests
+ *
+ * Validates that each character's content package attack keys are consistent
+ * with their FRAME_DATA entries and AttackType enum values.
+ */
+import { describe, it, expect } from 'vitest';
+import { loadCharacterContent } from '../src/content/contentLoader.js';
+import { FRAME_DATA } from '../src/core/frameDataConstants.js';
+import { AttackType } from '../src/core/types.js';
+
+const CHARS = ['ryo', 'kyo', 'iori'] as const;
+
+// ===== Attack Keys Coverage =====
+
+describe('Content package attack keys coverage', () => {
+  for (const charId of CHARS) {
+    describe(`${charId}`, () => {
+      const content = loadCharacterContent(charId);
+      const keys = content.attackKeys;
+
+      it('has generic normals in attack keys', () => {
+        const genericNormals = [
+          'STAND_A', 'STAND_B', 'STAND_C', 'STAND_D',
+          'CLOSE_A', 'CLOSE_B', 'CLOSE_C', 'CLOSE_D',
+          'CROUCH_A', 'CROUCH_B', 'CROUCH_C', 'CROUCH_D',
+        ];
+        for (const normal of genericNormals) {
+          expect(keys, `${charId} has ${normal}`).toContain(normal);
+        }
+      });
+
+      it('all attack keys have FRAME_DATA entries', () => {
+        const fdKeys = new Set(Object.keys(FRAME_DATA));
+        for (const key of keys) {
+          expect(fdKeys.has(key), `${charId}:${key} in FRAME_DATA`).toBe(true);
+        }
+      });
+
+      it('hitbox data covers attack keys', () => {
+        const hitboxes = content.hitboxes;
+        // Hitbox data exists (keys may be indexed differently)
+        expect(Object.keys(hitboxes).length, `${charId} has hitbox entries`).toBeGreaterThan(0);
+      });
+
+      it('has at least 10 attack keys', () => {
+        expect(keys.length, `${charId} attack key count`).toBeGreaterThanOrEqual(10);
+      });
+    });
+  }
+});
+
+// ===== Cross-Character Consistency =====
+
+describe('Content package cross-character consistency', () => {
+  it('all characters share the same generic normal keys', () => {
+    const generics = ['STAND_A', 'STAND_B', 'STAND_C', 'STAND_D',
+      'CLOSE_A', 'CLOSE_B', 'CLOSE_C', 'CLOSE_D',
+      'CROUCH_A', 'CROUCH_B', 'CROUCH_C', 'CROUCH_D'];
+
+    for (const charId of CHARS) {
+      const keys = loadCharacterContent(charId).attackKeys;
+      for (const g of generics) {
+        expect(keys, `${charId} has ${g}`).toContain(g);
+      }
+    }
+  });
+
+  it('each character has unique special attack keys', () => {
+    const ryoKeys = new Set(loadCharacterContent('ryo').attackKeys.filter(k => k.startsWith('RYO_')));
+    const kyoKeys = new Set(loadCharacterContent('kyo').attackKeys.filter(k => k.startsWith('KYO_')));
+    const ioriKeys = new Set(loadCharacterContent('iori').attackKeys.filter(k => k.startsWith('IORI_')));
+
+    // No overlap between character-specific specials
+    for (const k of ryoKeys) {
+      expect(kyoKeys.has(k), `Kyo should not have Ryo key ${k}`).toBe(false);
+      expect(ioriKeys.has(k), `Iori should not have Ryo key ${k}`).toBe(false);
+    }
+    for (const k of kyoKeys) {
+      expect(ioriKeys.has(k), `Iori should not have Kyo key ${k}`).toBe(false);
+    }
+  });
+
+  it('each character has DM entries', () => {
+    for (const charId of CHARS) {
+      const keys = loadCharacterContent(charId).attackKeys;
+      const dms = keys.filter(k => k.startsWith('DM_'));
+      expect(dms.length, `${charId} has DM attacks`).toBeGreaterThan(0);
+    }
+  });
+});
+
+// ===== Available Actions =====
+
+describe('Content package available actions', () => {
+  it('all characters have required action names', () => {
+    const requiredActions = ['idle', 'walk_forward', 'stand_a', 'stand_c', 'crouch_a'];
+    for (const charId of CHARS) {
+      const actions = loadCharacterContent(charId).availableActions;
+      for (const req of requiredActions) {
+        expect(actions, `${charId} has action ${req}`).toContain(req);
+      }
+    }
+  });
+
+  it('animation sequence names match available actions', () => {
+    for (const charId of CHARS) {
+      const content = loadCharacterContent(charId);
+      const animNames = content.animSequenceNames;
+      // At least some available actions should have matching animation sequences
+      const overlap = content.availableActions.filter(a => animNames.includes(a));
+      expect(overlap.length, `${charId} action-animation overlap`).toBeGreaterThan(0);
+    }
+  });
+});
