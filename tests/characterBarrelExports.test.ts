@@ -92,3 +92,51 @@ describe('Character barrel exports', () => {
     expect(typeof mod.IORI_ACTION_CONTRACTS).toBe('object');
   });
 });
+
+// ════════════════════════════════════════════════════════════════
+// Ryo barrel export completeness
+// ════════════════════════════════════════════════════════════════
+
+const RYO_EXPORTS = [
+  'RYO_ATTACK_KEYS',
+  'RYO_MOVE_LIST',
+  'RYO_HITBOX_KEYS',
+  'RYO_ATTACK_FRAME_KEYS',
+  'RYO_FEEDBACK_SUMMARY',
+  'RYO_REQUIRED_ANIMATIONS',
+  'RYO_CANCEL_PATHS',
+  'RYO_ACTION_CONTRACTS',
+  'RYO_HIT_EFFECTS',
+  'registerRyoAudio',
+];
+
+describe('Ryo barrel exports', () => {
+  it('Ryo has all expected exports via ryo/index.js', async () => {
+    const mod = await import('../src/content/characters/ryo/index.js');
+    for (const name of RYO_EXPORTS) {
+      expect(mod[name as keyof typeof mod], `Missing Ryo export: ${name}`).toBeDefined();
+    }
+  }, 15000);
+
+  it('Ryo ATTACK_KEYS is non-empty array', async () => {
+    const mod = await import('../src/content/characters/ryo/index.js');
+    expect(Array.isArray(mod.RYO_ATTACK_KEYS)).toBe(true);
+    expect(mod.RYO_ATTACK_KEYS.length).toBeGreaterThan(0);
+  });
+
+  it('Ryo REQUIRED_ANIMATIONS is non-empty', async () => {
+    const mod = await import('../src/content/characters/ryo/index.js');
+    expect(mod.RYO_REQUIRED_ANIMATIONS.length).toBeGreaterThan(0);
+  });
+
+  it('Ryo CANCEL_PATHS is non-empty', async () => {
+    const mod = await import('../src/content/characters/ryo/index.js');
+    expect(mod.RYO_CANCEL_PATHS.length).toBeGreaterThan(0);
+  });
+
+  it('Ryo ACTION_CONTRACTS is defined', async () => {
+    const mod = await import('../src/content/characters/ryo/index.js');
+    expect(mod.RYO_ACTION_CONTRACTS).toBeDefined();
+    expect(typeof mod.RYO_ACTION_CONTRACTS).toBe('object');
+  });
+});
