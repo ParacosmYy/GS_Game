@@ -826,17 +826,29 @@ export function drawFighters(
       const swayX = Math.sin(f.stateAge * 0.15) * 3 * intensityMult;
       const swayY = Math.sin(f.stateAge * 0.22) * 1.5 * intensityMult;
       ctx.translate(swayX, swayY);
-      // KOF2002: 眩晕星星 — 头顶3颗旋转星星(随时间增大)
-      const starBaseY = sy - f.displayHeight - 12;
-      const starSize = 3 + Math.min(f.stateAge * 0.01, 2); // 3->5px over time
-      for (let s = 0; s < 3; s++) {
-        const angle = (s / 3) * Math.PI * 2 + globalTick * 0.08;
-        const starX = sx + Math.cos(angle) * 18;
-        const starY = starBaseY + Math.sin(angle) * 6;
-        ctx.fillStyle = '#ffee44';
+      // KOF2002: 眩晕星星 — 头顶4颗旋转十字星(KOF2002经典4-spin pattern)
+      const starBaseY = sy - f.displayHeight - 14;
+      const starSize = 3 + Math.min(f.stateAge * 0.01, 2);
+      const starColors = ['#ffee44', '#ff8844', '#44ccff', '#ff44aa'];
+      for (let s = 0; s < 4; s++) {
+        const angle = (s / 4) * Math.PI * 2 + globalTick * 0.1;
+        const starX = sx + Math.cos(angle) * 20;
+        const starY = starBaseY + Math.sin(angle) * 7;
+        ctx.fillStyle = starColors[s];
+        ctx.save();
+        ctx.translate(starX, starY);
+        ctx.rotate(globalTick * 0.15 + s * 1.2);
+        // 4-pointed star shape
+        const r = starSize;
         ctx.beginPath();
-        ctx.arc(starX, starY, starSize, 0, Math.PI * 2);
+        for (let p = 0; p < 8; p++) {
+          const a = (p / 8) * Math.PI * 2;
+          const pr = p % 2 === 0 ? r : r * 0.4;
+          ctx.lineTo(Math.cos(a) * pr, Math.sin(a) * pr);
+        }
+        ctx.closePath();
         ctx.fill();
+        ctx.restore();
       }
     }    // Getup Y offset — interpolate from lying (ground) to standing position
     if (f.state === FighterState.GETUP && f.getupTimer > 0) {
