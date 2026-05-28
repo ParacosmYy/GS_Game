@@ -726,6 +726,7 @@ function update(): void {
         gs.arcadeComplete = true;
         gs.setPhase(GamePhase.GAME_OVER);
         gs.gameOverTimer = 0;
+        playVictoryFanfare();
       } else {
         gs.setPhase(GamePhase.CONTINUE);
         gs.continueCountdown = CONTINUE_DURATION;
