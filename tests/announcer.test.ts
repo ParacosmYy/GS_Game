@@ -65,8 +65,8 @@ function createMockCtx(): CanvasRenderingContext2D {
 
 describe('Announcer Event Configuration', () => {
   const requiredEvents: AnnouncerEventType[] = [
-    'round_start', 'fight', 'ko', 'perfect', 'time_up',
-    'you_win', 'counter_hit', 'max_activation',
+    'round_start', 'ready', 'fight', 'ko', 'perfect', 'time_up',
+    'you_win', 'counter_hit', 'max_activation', 'stun', 'guard_crush',
   ];
 
   it('has all required event types', () => {
