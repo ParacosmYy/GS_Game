@@ -2,7 +2,7 @@
 
 ## 1. 当前分数
 
-当前总分：`229/2000`
+当前总分：`231/2000`
 
 完整历史见 [SCORE.history.md](../archive/SCORE.history.md)。
 
@@ -115,3 +115,21 @@ Phase 2 总计：1000 分。
 - 仍不像 KOF 在哪里：大量角色(Terry/Kim/Leona等)的必杀技仍依赖isSpecial()的模式匹配，而非显式attackTierMap映射
 - 下一轮最小任务：继续查找并闭合差距矩阵中的其他反馈/机制缺失项
 - 下一轮闭合：差距矩阵§1.3打击反馈差距 或 §0.1公共组件复用
+
+## 10. 第230分复盘
+
+- 本轮提升：角色内容 +1
+- 为什么只加 1 分：Terry和Kim从2文件(audio+hitEffects)扩展到完整内容包(commands/moves/cancelPaths/index)，1568行新增，29项测试
+- 更像 KOF 在哪里：Terry/Kim现在有完整的招式列表、版本差异(A/C/D/B/MAX)、取消路径矩阵(普通→必杀→DM→Free Cancel)，与Ryo/Kyo/Iori内容包结构一致
+- 仍不像 KOF 在哪里：Terry/Kim缺少animations、hitboxes、feedback子域内容包
+- 下一轮最小任务：继续闭合差距矩阵§0.1(PixelFrame去重22文件)或§2.2(Terry/Kim animations/hitboxes)
+- 下一轮闭合：差距矩阵§0.1公共组件复用 或 §2.2内容包
+
+## 11. 第231分复盘
+
+- 本轮提升：公共骨架 +1
+- 为什么只加 1 分：消除21文件PixelFrame接口重复(-142行)，统一从baseHighResRenderer.ts的SourcePixelFrame导入，添加可选anchor字段支持自定义锚点
+- 更像 KOF 在哪里：新角色帧数据文件只需导入共享接口，不再重复声明6-7行相同的接口定义
+- 仍不像 KOF 在哪里：角色渲染仍是程序化像素帧，不是SNK精灵图品质
+- 下一轮最小任务：继续闭合差距矩阵§0.1(肖像调色板去重)或§1.3打击反馈
+- 下一轮闭合：差距矩阵§0.1肖像调色板去重 或 §2.2内容包

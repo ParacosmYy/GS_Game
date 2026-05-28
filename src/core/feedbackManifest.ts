@@ -357,6 +357,51 @@ export const FEEDBACK_MANIFEST: FeedbackManifest = {
     DM_YATAGARASU: 'dm',
     SDM_YATAGARASU: 'sdm',
     HSDM_YAOTOME: 'hsdm',
+
+    // ===== Terry 必杀技 (special) =====
+    TERRY_POWER_WAVE: 'special',
+    TERRY_ROUND_WAVE: 'special',
+    TERRY_BURN_KNUCKLE: 'special',
+    TERRY_BURN_KNUCKLE_C: 'special',
+    TERRY_BURN_KNUCKLE_D: 'special',
+    TERRY_CRACK_SHOT: 'special',
+    TERRY_CRACK_SHOT_D: 'special',
+    TERRY_POWER_DUNK: 'special',
+    TERRY_POWER_DUNK_D: 'special',
+    TERRY_RISING_TACKLE: 'special',
+    TERRY_RISING_TACKLE_C: 'special',
+    TERRY_BACK_KNCKLE: 'special',
+    TERRY_COMBO_BLOW: 'special',
+
+    // ===== Terry DM / SDM / HSDM =====
+    DM_POWER_GEYSER: 'dm',
+    DM_POWER_GEYSER_A: 'dm',
+    DM_POWER_GEYSER_C: 'dm',
+    DM_HIGH_ANGLE_GEYSER: 'dm',
+    DM_HIGH_ANGLE_GEYSER_B: 'dm',
+    DM_HIGH_ANGLE_GEYSER_D: 'dm',
+    SDM_TRIPLE_GEYSER: 'sdm',
+    SDM_POWER_GEYSER_EX: 'sdm',
+    HSDM_POWER_GEYSER: 'hsdm',
+
+    // ===== Kim 必杀技 (special) =====
+    KIM_HIENZAN: 'special',
+    KIM_HIENZAN_D: 'special',
+    KIM_HANGETSU: 'special',
+    KIM_HANGETSU_D: 'special',
+    KIM_SANREN: 'special',
+    KIM_SANREN_2: 'special',
+    KIM_HAKI: 'special',
+    KIM_HISHOU: 'special',
+    KIM_HISHOU_KICK: 'special',
+    KIM_HANSEN: 'special',
+
+    // ===== Kim DM / SDM / HSDM =====
+    DM_PHOENIX_KICK: 'dm',
+    DM_PHOENIX_HITEN: 'dm',
+    SDM_PHOENIX_HITEN: 'sdm',
+    SDM_PHOENIX_HITEN_EX: 'sdm',
+    HSDM_PHOENIX_HITEN: 'hsdm',
   } as Partial<Record<AttackType, FeedbackTier>>,
 };
 

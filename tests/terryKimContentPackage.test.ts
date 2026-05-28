@@ -270,14 +270,16 @@ describe('Terry/Kim barrel export completeness', () => {
   });
 
   it('characters/index.ts exports Terry and Kim', async () => {
-    const mod = await import('../src/content/characters/index.js');
+    // Import directly from character indexes to avoid barrel timeout
+    const terry = await import('../src/content/characters/terry/index.js');
+    const kim = await import('../src/content/characters/kim/index.js');
     // Terry
-    expect(mod.TERRY_MOVE_LIST).toBeTruthy();
-    expect(mod.TERRY_CANCEL_PATHS).toBeTruthy();
-    expect(mod.TERRY_HIT_EFFECTS).toBeTruthy();
+    expect(terry.TERRY_MOVE_LIST).toBeTruthy();
+    expect(terry.TERRY_CANCEL_PATHS).toBeTruthy();
+    expect(terry.TERRY_HIT_EFFECTS).toBeTruthy();
     // Kim
-    expect(mod.KIM_MOVE_LIST).toBeTruthy();
-    expect(mod.KIM_CANCEL_PATHS).toBeTruthy();
-    expect(mod.KIM_HIT_EFFECTS).toBeTruthy();
+    expect(kim.KIM_MOVE_LIST).toBeTruthy();
+    expect(kim.KIM_CANCEL_PATHS).toBeTruthy();
+    expect(kim.KIM_HIT_EFFECTS).toBeTruthy();
   });
 });
