@@ -15,6 +15,7 @@ import { drawHighResFrame } from './sprites/ryo/ryoHighResRender.js';
 import { getFeedbackByTier, type FeedbackTier } from '../core/feedbackManifest.js';
 import { drawKyoHighResFrame } from './sprites/kyo/kyoHighResRender.js';
 import { drawIoriHighResFrame } from './sprites/iori/ioriHighResRender.js';
+import { drawKfmSprite, initKfmSprites } from './sprites/kfm/kfmSpriteRender.js';
 import { getFighterBlender } from './animationBlender.js';
 import { getMaxAuraColor, resolveFighterColors, drawAfterimageTrail, isFighterDebugOverlayEnabled } from './rendererFighterUtils.js';
 
@@ -966,12 +967,14 @@ export function drawFighters(
       ctx.fill();
       ctx.restore();
     }
-    // Try Kyo/Iori high-res first, then Ryo, then fallback chain
+    // Try Kyo/Iori/KFM high-res first, then Ryo, then fallback chain
     let highResDrawn = false;
     if (charId === 'kyo') {
       highResDrawn = drawKyoHighResFrame(ctx, f.state, f.stateAge, sx + leanOffsetX, sy, f.facing, f.currentAttack, f.vx);
     } else if (charId === 'iori') {
       highResDrawn = drawIoriHighResFrame(ctx, f.state, f.stateAge, sx + leanOffsetX, sy, f.facing, f.currentAttack, f.vx);
+    } else if (charId === 'kfm') {
+      highResDrawn = drawKfmSprite(ctx, f.state, f.stateAge, sx + leanOffsetX, sy, f.facing, f.currentAttack, f.vx);
     } else {
       highResDrawn = drawHighResFrame(ctx, charId, f.state, f.stateAge, sx + leanOffsetX, sy, f.facing, f.currentAttack, f.vx);
     }

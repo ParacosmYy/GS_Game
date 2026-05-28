@@ -392,6 +392,20 @@ export enum AttackType {
   SDM_CHO_KA_RINGA = 'SDM_CHO_KA_RINGA',             // Chou Ka Ringa SDM (Xiangfei)
   SDM_GUILLOTINE = 'SDM_GUILLOTINE',                 // Guillotine SDM (Yamazaki)
   SDM_CHO_MUKIGENZAN = 'SDM_CHO_MUKIGENZAN',         // Chou Mukigenzan SDM (Kasumi)
+
+  // ===== KFM (Kung Fu Man) specials =====
+  KFM_KUNGFU_UPPER = 'KFM_KUNGFU_UPPER',               // Kung Fu Upper
+  KFM_FAST_KUNGFU_UPPER = 'KFM_FAST_KUNGFU_UPPER',     // Fast Kung Fu Upper
+  KFM_SMASH_KICK = 'KFM_SMASH_KICK',                   // Smash Kick
+  KFM_DOUBLE_SMASH_KICK = 'KFM_DOUBLE_SMASH_KICK',     // Double Smash Kick
+  KFM_HIGH_KICK = 'KFM_HIGH_KICK',                     // High Kick
+  KFM_TRIPLE_KUNGFU_UPPER = 'KFM_TRIPLE_KUNGFU_UPPER', // Triple Kung Fu Upper
+  KFM_LIGHT_HIGH_KICK = 'KFM_LIGHT_HIGH_KICK',         // Light High Kick
+  KFM_HIGH_KICK_2 = 'KFM_HIGH_KICK_2',                 // High Kick (follow-up)
+  KFM_SMASH_KICK_2 = 'KFM_SMASH_KICK_2',               // Smash Kick (follow-up)
+  KFM_SMASH_KICK_3 = 'KFM_SMASH_KICK_3',               // Smash Kick (finisher)
+  // ===== KFM DM =====
+  DM_KFM_SMASH_FIST = 'DM_KFM_SMASH_FIST',               // Smash Fist DM (KFM)
 }
 
 // ===== Hit Level (防御判定) =====

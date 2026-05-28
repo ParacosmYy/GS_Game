@@ -34,6 +34,7 @@ import { YamazakiDef } from './yamazaki.js';
 import { XiangfeiDef } from './xiangfei.js';
 import { KasumiDef } from './kasumi.js';
 import { MaryDef } from './mary.js';
+import { KfmDef } from './kfm.js';
 export type { CharacterDefinition } from './types.js';
 
 /** 全角色列表 — 选人界面和游戏初始化都从这里读取 */
@@ -65,6 +66,7 @@ export const ROSTER: CharacterDefinition[] = [
   XiangfeiDef,
   KasumiDef,
   MaryDef,
+  KfmDef,
 ];
 
 // ===== Frame Contract Registration =====
