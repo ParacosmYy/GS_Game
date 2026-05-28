@@ -89,6 +89,7 @@
   - DM終結KO屬性色閃光 (DM/SDM/HSDM擊殺按殺手元素色)
   - Desperation gauge visual: HP<25%红脉冲光圈+MAX+Desperation="HSDM"闪烁文字
   - Desperation screen edge: HP<25%时屏幕边缘暗红光晕增加紧迫感
+  - KOF2002幕帘转场动画: 上下滑入黑色幕帘+金色边缘光 (curtain transition)
   - 4616→4621 回归测试保护反馈矩阵完整性和层级递进
 - 当前差距：hitstop、spark、shake、pushback、SFX 还没有按轻重/特殊/爆气状态形成稳定矩阵。
 - 新功能添加点：

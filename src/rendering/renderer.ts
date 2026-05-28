@@ -470,7 +470,7 @@ export class Renderer {
     drawTeamOrderSelect(this.ctx, tick, p1Team, p2Team, p1Slots, p2Slots, cursor, swapMode, swapCursor, p1Ready, p2Ready);
   }
 
-  drawTransition(tick: number, type: 'wipe' | 'zoom' | 'fade'): boolean {
+  drawTransition(tick: number, type: 'wipe' | 'zoom' | 'fade' | 'curtain'): boolean {
     return drawTransition(this.ctx, tick, type, CANVAS_WIDTH, CANVAS_HEIGHT);
   }
 

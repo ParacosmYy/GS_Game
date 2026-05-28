@@ -8,15 +8,44 @@ import { CANVAS_WIDTH, CANVAS_HEIGHT } from '../../core/constants.js';
 const TRANSITION_WIPE_DURATION = 40;
 const TRANSITION_ZOOM_DURATION = 50;
 const TRANSITION_FADE_DURATION = 30;
+const TRANSITION_CURTAIN_DURATION = 36;
 
 export function drawTransition(
   ctx: CanvasRenderingContext2D,
   tick: number,
-  type: 'wipe' | 'zoom' | 'fade',
+  type: 'wipe' | 'zoom' | 'fade' | 'curtain',
   canvasWidth: number,
   canvasHeight: number,
 ): boolean {
   ctx.save();
+
+  if (type === 'curtain') {
+    // KOF2002-style curtain close: two black bars slide from top/bottom to center
+    const progress = Math.min(1, tick / TRANSITION_CURTAIN_DURATION);
+    const ease = progress < 0.5 ? 2 * progress * progress : 1 - Math.pow(-2 * progress + 2, 2) / 2;
+    const barH = (canvasHeight / 2) * ease;
+    ctx.fillStyle = '#000000';
+    ctx.fillRect(0, 0, canvasWidth, barH);
+    ctx.fillRect(0, canvasHeight - barH, canvasWidth, barH);
+    // Gold edge glow on the curtain edges
+    if (progress < 0.9) {
+      const edgeAlpha = (1 - progress) * 0.5;
+      const topEdge = ctx.createLinearGradient(0, barH - 6, 0, barH + 4);
+      topEdge.addColorStop(0, 'rgba(255, 204, 0, 0)');
+      topEdge.addColorStop(0.5, `rgba(255, 204, 0, ${edgeAlpha})`);
+      topEdge.addColorStop(1, 'rgba(255, 204, 0, 0)');
+      ctx.fillStyle = topEdge;
+      ctx.fillRect(0, barH - 6, canvasWidth, 10);
+      const botEdge = ctx.createLinearGradient(0, canvasHeight - barH - 4, 0, canvasHeight - barH + 6);
+      botEdge.addColorStop(0, 'rgba(255, 204, 0, 0)');
+      botEdge.addColorStop(0.5, `rgba(255, 204, 0, ${edgeAlpha})`);
+      botEdge.addColorStop(1, 'rgba(255, 204, 0, 0)');
+      ctx.fillStyle = botEdge;
+      ctx.fillRect(0, canvasHeight - barH - 4, canvasWidth, 10);
+    }
+    ctx.restore();
+    return progress >= 1;
+  }
 
   if (type === 'wipe') {
     const progress = Math.min(1, tick / TRANSITION_WIPE_DURATION);
