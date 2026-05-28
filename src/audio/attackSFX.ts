@@ -148,29 +148,29 @@ export const ATTACK_SFX_TABLE: AttackSFXEntry[] = [
   { attackType: 'SDM_YATAGARASU', phase: 'active', frame: 0, sfx: 'playDM', priority: 4 },
 
   // ── Terry specials ──
-  { attackType: 'TERRY_POWER_WAVE', phase: 'startup', frame: 0, sfx: 'playSpecialLight', priority: 2 },
-  { attackType: 'TERRY_POWER_WAVE', phase: 'active', frame: 0, sfx: 'playSpecialHeavy', priority: 2 },
-  { attackType: 'TERRY_BURN_KNUCKLE', phase: 'startup', frame: 0, sfx: 'playSpecialLight', priority: 2 },
-  { attackType: 'TERRY_BURN_KNUCKLE', phase: 'active', frame: 0, sfx: 'playSpecialHeavy', priority: 2 },
-  { attackType: 'TERRY_CRACK_SHOT', phase: 'startup', frame: 0, sfx: 'playSpecialLight', priority: 2 },
-  { attackType: 'TERRY_CRACK_SHOT', phase: 'active', frame: 0, sfx: 'playSpecialHeavy', priority: 2 },
-  { attackType: 'TERRY_POWER_DUNK', phase: 'startup', frame: 0, sfx: 'playSpecialLight', priority: 2 },
-  { attackType: 'TERRY_POWER_DUNK', phase: 'active', frame: 0, sfx: 'playSpecialHeavy', priority: 3 },
-  { attackType: 'TERRY_RISING_TACKLE', phase: 'startup', frame: 0, sfx: 'playSpecialLight', priority: 2 },
-  { attackType: 'TERRY_RISING_TACKLE', phase: 'active', frame: 0, sfx: 'playSpecialHeavy', priority: 2 },
+  { attackType: 'TERRY_POWER_WAVE', phase: 'startup', frame: 0, sfx: 'playTerryPowerWave', priority: 2 },
+  { attackType: 'TERRY_POWER_WAVE', phase: 'active', frame: 0, sfx: 'playTerryPowerWave', priority: 3 },
+  { attackType: 'TERRY_BURN_KNUCKLE', phase: 'startup', frame: 0, sfx: 'playTerryBurnKnuckle', priority: 2 },
+  { attackType: 'TERRY_BURN_KNUCKLE', phase: 'active', frame: 0, sfx: 'playTerryBurnKnuckle', priority: 3 },
+  { attackType: 'TERRY_CRACK_SHOT', phase: 'startup', frame: 0, sfx: 'playTerryCrackShot', priority: 2 },
+  { attackType: 'TERRY_CRACK_SHOT', phase: 'active', frame: 0, sfx: 'playTerryCrackShot', priority: 3 },
+  { attackType: 'TERRY_POWER_DUNK', phase: 'startup', frame: 0, sfx: 'playTerryPowerDunk', priority: 2 },
+  { attackType: 'TERRY_POWER_DUNK', phase: 'active', frame: 0, sfx: 'playTerryPowerDunk', priority: 3 },
+  { attackType: 'TERRY_RISING_TACKLE', phase: 'startup', frame: 0, sfx: 'playTerryRisingTackle', priority: 2 },
+  { attackType: 'TERRY_RISING_TACKLE', phase: 'active', frame: 0, sfx: 'playTerryRisingTackle', priority: 3 },
 
   // ── Terry DM ──
-  { attackType: 'DM_POWER_GEYSER', phase: 'startup', frame: 0, sfx: 'playSpecialLight', priority: 2 },
-  { attackType: 'DM_POWER_GEYSER', phase: 'startup', frame: 6, sfx: 'playSpecialHeavy', priority: 3 },
+  { attackType: 'DM_POWER_GEYSER', phase: 'startup', frame: 0, sfx: 'playTerryPowerGeyser', priority: 2 },
+  { attackType: 'DM_POWER_GEYSER', phase: 'startup', frame: 6, sfx: 'playTerryPowerGeyser', priority: 3 },
   { attackType: 'DM_POWER_GEYSER', phase: 'active', frame: 0, sfx: 'playDM', priority: 4 },
 
   // ── Kim specials ──
-  { attackType: 'KIM_HIENZAN', phase: 'startup', frame: 0, sfx: 'playSpecialLight', priority: 2 },
-  { attackType: 'KIM_HIENZAN', phase: 'active', frame: 0, sfx: 'playSpecialHeavy', priority: 2 },
-  { attackType: 'KIM_HANGETSU', phase: 'startup', frame: 0, sfx: 'playSpecialLight', priority: 2 },
-  { attackType: 'KIM_HANGETSU', phase: 'active', frame: 0, sfx: 'playSpecialHeavy', priority: 2 },
-  { attackType: 'KIM_HAKI', phase: 'startup', frame: 0, sfx: 'playSpecialLight', priority: 2 },
-  { attackType: 'KIM_HAKI', phase: 'active', frame: 0, sfx: 'playSpecialHeavy', priority: 2 },
+  { attackType: 'KIM_HIENZAN', phase: 'startup', frame: 0, sfx: 'playKimHienzan', priority: 2 },
+  { attackType: 'KIM_HIENZAN', phase: 'active', frame: 0, sfx: 'playKimHienzan', priority: 3 },
+  { attackType: 'KIM_HANGETSU', phase: 'startup', frame: 0, sfx: 'playKimHangetsu', priority: 2 },
+  { attackType: 'KIM_HANGETSU', phase: 'active', frame: 0, sfx: 'playKimHangetsu', priority: 3 },
+  { attackType: 'KIM_HAKI', phase: 'startup', frame: 0, sfx: 'playKimHaki', priority: 2 },
+  { attackType: 'KIM_HAKI', phase: 'active', frame: 0, sfx: 'playKimHaki', priority: 3 },
 
   // ── Universal wildcard (lowest priority, matches any attack) ──
   { attackType: '*', phase: 'active', frame: 0, sfx: 'playHit', priority: 1 },

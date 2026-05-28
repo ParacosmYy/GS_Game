@@ -8,6 +8,8 @@
 import { registerRyoAudio } from '../content/characters/ryo/audio/ryoSampler.js';
 import { registerKyoAudio } from '../content/characters/kyo/audio/kyoSampler.js';
 import { registerIoriAudio } from '../content/characters/iori/audio/ioriSampler.js';
+import { registerTerryAudio } from '../content/characters/terry/audio/terrySampler.js';
+import { registerKimAudio } from '../content/characters/kim/audio/kimSampler.js';
 
 export type SampleRenderer = (sr: number) => Float32Array;
 
@@ -21,4 +23,6 @@ export function initCharacterAudio(registerFn: (id: string, renderer: SampleRend
   registerRyoAudio(registerFn);
   registerKyoAudio(registerFn);
   registerIoriAudio(registerFn);
+  registerTerryAudio(registerFn);
+  registerKimAudio(registerFn);
 }

@@ -56,7 +56,10 @@ type SampleId =
   | 'iori_aoihana' | 'iori_yamibarai' | 'iori_oniyaki' | 'iori_kototsuki'
   | 'iori_kuzukaze' | 'iori_yumeyumi' | 'iori_katanugi' | 'iori_yaotome'
   | 'cursor_move' | 'cursor_confirm'
-  | 'stun_recovery' | 'stun_warning';
+  | 'stun_recovery' | 'stun_warning'
+  | 'terry_power_wave' | 'terry_burn_knuckle' | 'terry_crack_shot'
+  | 'terry_power_dunk' | 'terry_rising_tackle' | 'terry_power_geyser'
+  | 'kim_hienzan' | 'kim_hishou' | 'kim_hangetsu' | 'kim_haki' | 'kim_houou';
 
 const samples = new Map<SampleId, AudioBuffer>();
 let initialized = false;
@@ -497,6 +500,23 @@ export function playIoriKatanugi(): void { initSampler(); play('iori_katanugi', 
 
 /** 播放八稚女音效 — DM暗色连突：多层暗能量叠加 */
 export function playIoriYaotome(): void { initSampler(); play('iori_yaotome'); }
+
+// === Terry 必杀技专属音效 API ===
+
+export function playTerryPowerWave(): void { initSampler(); play('terry_power_wave'); }
+export function playTerryBurnKnuckle(): void { initSampler(); play('terry_burn_knuckle'); }
+export function playTerryCrackShot(): void { initSampler(); play('terry_crack_shot'); }
+export function playTerryPowerDunk(): void { initSampler(); play('terry_power_dunk'); }
+export function playTerryRisingTackle(): void { initSampler(); play('terry_rising_tackle'); }
+export function playTerryPowerGeyser(): void { initSampler(); play('terry_power_geyser'); }
+
+// === Kim 必杀技专属音效 API ===
+
+export function playKimHienzan(): void { initSampler(); play('kim_hienzan'); }
+export function playKimHishou(): void { initSampler(); play('kim_hishou'); }
+export function playKimHangetsu(): void { initSampler(); play('kim_hangetsu'); }
+export function playKimHaki(): void { initSampler(); play('kim_haki'); }
+export function playKimHouou(): void { initSampler(); play('kim_houou'); }
 
 // === Character-themed normal attack accents ===
 
