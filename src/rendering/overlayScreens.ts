@@ -31,6 +31,7 @@ export {
   drawGameOver,
   GAME_OVER_DURATION,
 } from './overlays/overlayContinueGameOver.js';
+export type { ContinueProgress } from './overlays/overlayContinueGameOver.js';
 
 // Arcade flow (Arcade Complete, Next Match, Round Score Breakdown)
 export {

@@ -431,8 +431,8 @@ export class Renderer {
     drawOptionsScreen(this.ctx, tick, cursor, options);
   }
 
-  drawContinue(secondsLeft: number, cursorYes: boolean, defeatedChar?: CharacterDefinition, winnerChar?: CharacterDefinition): void {
-    drawContinue(this.ctx, secondsLeft, cursorYes, defeatedChar, winnerChar);
+  drawContinue(secondsLeft: number, cursorYes: boolean, defeatedChar?: CharacterDefinition, winnerChar?: CharacterDefinition, progress?: import('./overlays/overlayContinueGameOver.js').ContinueProgress): void {
+    drawContinue(this.ctx, secondsLeft, cursorYes, defeatedChar, winnerChar, progress);
   }
 
   drawGameOver(timer: number): void {

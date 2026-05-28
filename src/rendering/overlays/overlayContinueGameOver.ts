@@ -7,7 +7,14 @@ import { roundRect, drawSNKText } from '../utils.js';
 
 // ===== Continue Screen =====
 
-export function drawContinue(ctx: CanvasRenderingContext2D, secondsLeft: number, cursorYes: boolean, defeatedChar?: import('../../characters/types.js').CharacterDefinition, winnerChar?: import('../../characters/types.js').CharacterDefinition): void {
+export interface ContinueProgress {
+  stageIndex: number;
+  totalStages: number;
+  score: number;
+  defeatedColors: string[];
+}
+
+export function drawContinue(ctx: CanvasRenderingContext2D, secondsLeft: number, cursorYes: boolean, defeatedChar?: import('../../characters/types.js').CharacterDefinition, winnerChar?: import('../../characters/types.js').CharacterDefinition, progress?: ContinueProgress): void {
   ctx.save();
 
   ctx.fillStyle = 'rgba(0,0,0,0.88)';
@@ -104,6 +111,43 @@ export function drawContinue(ctx: CanvasRenderingContext2D, secondsLeft: number,
 
   // "INSERT COIN" text
   drawSNKText(ctx, 'INSERT COIN', CANVAS_WIDTH / 2, coinSlotY + 58, 12, '#888899');
+
+  // Progress summary banner — show how far the player got
+  if (progress && progress.totalStages > 0) {
+    const bannerY = 130;
+    // Stage indicator
+    drawSNKText(ctx, `STAGE ${progress.stageIndex + 1} / ${progress.totalStages}`, CANVAS_WIDTH / 2, bannerY, 18, '#ddaa44');
+    // Score display
+    const scoreStr = progress.score.toLocaleString();
+    drawSNKText(ctx, `SCORE ${scoreStr}`, CANVAS_WIDTH / 2, bannerY + 22, 13, '#cccccc');
+    // Defeated opponents dots
+    const dotR = 5;
+    const dotGap = 18;
+    const dotsStartX = CANVAS_WIDTH / 2 - (progress.totalStages - 1) * dotGap / 2;
+    for (let i = 0; i < progress.totalStages; i++) {
+      const dx = dotsStartX + i * dotGap;
+      const dy = bannerY + 44;
+      ctx.beginPath();
+      ctx.arc(dx, dy, dotR, 0, Math.PI * 2);
+      if (i < progress.defeatedColors.length) {
+        ctx.fillStyle = progress.defeatedColors[i];
+        ctx.fill();
+        ctx.strokeStyle = '#ffffff44';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      } else if (i === progress.stageIndex) {
+        ctx.fillStyle = '#ff4444';
+        ctx.fill();
+        ctx.strokeStyle = '#ff666666';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      } else {
+        ctx.strokeStyle = '#44444488';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      }
+    }
+  }
 
   // CONTINUE? header
   ctx.shadowColor = '#ff2222';

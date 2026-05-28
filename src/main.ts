@@ -1295,7 +1295,15 @@ function render(): void {
   if (gs.phase === GamePhase.CONTINUE) {
     const defChar = ROSTER.find(c => c.id === p1.charId);
     const winChar = ROSTER.find(c => c.id === p2.charId);
-    renderer.drawContinue(Math.ceil(gs.continueCountdown / 60), gs.continueCursorYes, defChar, winChar);
+    // Progress summary for arcade continue screen
+    const arcStats = getArcadeStats();
+    const continueProgress = gs.arcadeOpponents.length > 0 ? {
+      stageIndex: gs.arcadeOpponentIndex,
+      totalStages: gs.arcadeOpponents.length,
+      score: arcStats.score,
+      defeatedColors: gs.arcadeOpponents.slice(0, gs.arcadeOpponentIndex).map(o => o.color),
+    } : undefined;
+    renderer.drawContinue(Math.ceil(gs.continueCountdown / 60), gs.continueCursorYes, defChar, winChar, continueProgress);
     return;
   }
   if (gs.phase === GamePhase.GAME_OVER) {
