@@ -50,6 +50,9 @@
   - attackFramesSpecials.ts 拆分为7子文件 (2209→10行聚合器)
   - skeletalParts.ts 拆分为3子文件 (2058→7行聚合器)
   - Iori近距离攻击专属像素帧 CLOSE_A/B/C/D (25 tests: 3角色近战动画对齐)
+  - 眩晕星星KOF2002风格4色十字星旋转 (替代简单黄色圆点)
+  - TypeScript编译错误清零 (51→0: 文件拆分后导入/导出补全)
+  - 3角色DIZZY动画帧注册回归测试 (9 tests)
 - 新功能添加点：
   - animation manifest
   - pose bank
@@ -84,7 +87,7 @@
   - 3角色57必殺技VFX+SFX全覆蓋回歸測試 (118 tests)
   - MAX爆氣激活角色屬性色閃光 (取代通用綠色)
   - DM終結KO屬性色閃光 (DM/SDM/HSDM擊殺按殺手元素色)
-  - 4556 回归测试保护反馈矩阵完整性和层级递进
+  - 4556→4616 回归测试保护反馈矩阵完整性和层级递进
 - 当前差距：hitstop、spark、shake、pushback、SFX 还没有按轻重/特殊/爆气状态形成稳定矩阵。
 - 新功能添加点：
   - feedback manifest
@@ -139,7 +142,7 @@
   - Kyo 完整度校验工具 (8维报告: animationMeta/frameData/attackFrames/feedback/portrait/moveList/cancelPaths/hitEffects)
   - Iori 完整度校验工具 (8维报告: 同Kyo结构)
   - Kyo/Iori完整度回归测试 (33 tests: 维度有效性+覆盖率+最低阈值)
-  - 测试总数 4556
+  - 测试总数 4616
 - 当前差距：角色内容已开始分层，但真实数据、兼容入口、校验工具之间还需继续收口。
 - 新功能添加点：
   - `src/content/characters/index.ts` barrel export
@@ -153,7 +156,7 @@
 
 - 当前差距：部分输入、镜头、特效、命中边界虽然已改善，但仍需要更强回归保护。
 - 已闭合项：
-  - 4542 tests 全部通过 (vitest)
+  - 4616 tests 全部通过 (vitest)
   - 6档反馈矩阵回归测试 (23 tests, 层级递进+参数完整性+3角色映射)
   - DM→SDM→HSDM升级链回归测试 (8 tests, Kyo/Iori/HSDM一致性)
   - 3角色必杀技像素帧覆盖 (134 tests, 基本+通常+必杀+DM/SDM/HSDM+命令技)
@@ -191,6 +194,7 @@
   - FighterState.WIN胜利姿态接入 + 3角色专属像素帧实际播放 (v2.39)
   - Ryo胜利4帧动画完整播放(起手→交叉→完成→持定)
   - 全项目文件2000行上限合规(5大文件拆分: frameData/overlays/screens/attackFrames/skeletal)
+  - 眩晕星星VFX增强(4色十字星旋转替代简单黄色圆点)
 - 新功能添加点：
   - 胜利姿态动画细化
   - 角色专属胜利语音
