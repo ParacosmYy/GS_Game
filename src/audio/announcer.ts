@@ -150,6 +150,21 @@ const NEW_CHALLENGER_SYLLABLES: Syllable[] = [
   { vowels: VOWEL_AH, freq: 480, duration: 320, gap: 0,  vibrato: true },
 ];
 
+// "Continue?" -- questioning, descending with rise at end
+const CONTINUE_SYLLABLES: Syllable[] = [
+  { vowels: VOWEL_AH, freq: 280, duration: 130, gap: 80, pitchEnd: 240 },
+  { vowels: VOWEL_IH, freq: 220, duration: 100, gap: 80, pitchEnd: 200 },
+  { vowels: VOWEL_IH, freq: 200, duration: 100, gap: 80, pitchEnd: 260 },
+  { vowels: VOWEL_ER, freq: 260, duration: 350, gap: 0, pitchEnd: 300, vibrato: true },
+];
+
+// "Game Over" -- somber, falling
+const GAME_OVER_SYLLABLES: Syllable[] = [
+  { vowels: VOWEL_AI, freq: 260, duration: 150, gap: 100, pitchEnd: 200 },
+  { vowels: VOWEL_ER, freq: 180, duration: 150, gap: 120, pitchEnd: 140 },
+  { vowels: VOWEL_OH, freq: 120, duration: 500, gap: 0, pitchEnd: 80, vibrato: true, releaseMs: 80 },
+];
+
 // ─── Reverb IR generation ──────────────────────────────────────
 
 function createReverbIR(ctx: AudioContext, durationSec: number, decay: number): AudioBuffer {
@@ -614,6 +629,18 @@ export class Announcer {
   maxActivation(): void {
     if (this.playSample('maxActivation', 0.5)) return;
     this.playPhrase(MAX_ACTIVATION_SYLLABLES, 0.18);
+  }
+
+  /** Continue? -- questioning descending-rise tone */
+  continuePrompt(): void {
+    if (this.playSample('continue', 0.5)) return;
+    this.playPhrase(CONTINUE_SYLLABLES, 0.20);
+  }
+
+  /** Game Over -- somber falling tone */
+  gameOver(): void {
+    if (this.playSample('gameOver', 0.5)) return;
+    this.playPhrase(GAME_OVER_SYLLABLES, 0.25);
   }
 }
 
