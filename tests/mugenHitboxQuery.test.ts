@@ -136,12 +136,12 @@ describe('mugenHitboxQuery', () => {
       expect(KYO_MUGEN_ACTION_MAP.CLOSE_A).toBe('200');
     });
 
-    it('maps ONIYAKI to action 1000', () => {
-      expect(KYO_MUGEN_ACTION_MAP.KYO_ONIYAKI).toBe('1000');
+    it('maps ONIYAKI to action 1800', () => {
+      expect(KYO_MUGEN_ACTION_MAP.KYO_ONIYAKI).toBe('1800');
     });
 
-    it('maps DM_OROCHINAGI to action 2000', () => {
-      expect(KYO_MUGEN_ACTION_MAP.DM_OROCHINAGI).toBe('2000');
+    it('maps DM_OROCHINAGI to action 3000', () => {
+      expect(KYO_MUGEN_ACTION_MAP.DM_OROCHINAGI).toBe('3000');
     });
 
     it('hasKyoMugenData returns correct state', () => {

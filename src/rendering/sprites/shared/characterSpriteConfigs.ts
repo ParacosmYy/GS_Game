@@ -9,35 +9,41 @@
 import { AttackType } from '../../../core/types.js';
 import { registerCharacterSprites, type CharacterSpriteConfig } from './characterSpriteRegistry.js';
 
-// ===== Kyo (cvskyo) =====
+// ===== Kyo (cvskyo) — Warusaki3 CVS Kyo action numbers =====
 registerCharacterSprites({
   charId: 'kyo',
   mugenDir: 'cvskyo',
   targetDisplayHeight: 106,
   defaultTint: '#ff6600',
   specialMap: {
-    [AttackType.KYO_ONIYAKI]: '1000',
-    [AttackType.KYO_ONIYAKI_C]: '1010',
-    [AttackType.KYO_YAMIBARAI]: '1100',
-    [AttackType.KYO_YAMIBARAI_C]: '1100',
-    [AttackType.KYO_RED_KICK]: '1300',
-    [AttackType.KYO_75KAI]: '1200',
-    [AttackType.KYO_75KAI_2]: '1200',
-    [AttackType.KYO_ARAGAMI]: '1400',
-    [AttackType.KYO_ARAGAMI_KONOKIZU]: '1400',
-    [AttackType.KYO_ARAGAMI_YANOSABI]: '1400',
-    [AttackType.KYO_NANASE]: '1400',
-    [AttackType.KYO_KOTO_TSUKI]: '1400',
+    // 必殺技
+    [AttackType.KYO_ONIYAKI]: '1800',        // 百式・鬼焼き (弱)
+    [AttackType.KYO_ONIYAKI_C]: '1810',      // 百式・鬼焼き (強)
+    [AttackType.KYO_YAMIBARAI]: '2300',      // 百八式・闇払い (弱)
+    [AttackType.KYO_YAMIBARAI_C]: '2310',    // 百八式・闇払い (強)
+    [AttackType.KYO_RED_KICK]: '2200',       // R.E.D.Kick
+    [AttackType.KYO_75KAI]: '2100',          // 七拾五式・改
+    [AttackType.KYO_75KAI_2]: '2100',
+    // 荒咬みチェーン
+    [AttackType.KYO_ARAGAMI]: '1000',        // 百拾四式・荒咬み
+    [AttackType.KYO_ARAGAMI_KONOKIZU]: '1400', // 外式・砌穿ち
+    [AttackType.KYO_ARAGAMI_YANOSABI]: '1300', // 百弐拾七式・八錆
+    [AttackType.KYO_NANASE]: '1200',         // 百弐拾五式・七瀬
+    [AttackType.KYO_KOTO_TSUKI]: '1100',     // 百弐拾八式・九傷
     [AttackType.KYO_YAKISOGI]: '1400',
-    [AttackType.KYO_DOKUGAMI]: '1500',
-    [AttackType.KYO_TSUMIYOMI]: '1500',
-    [AttackType.KYO_BATSUYOMI]: '1500',
-    [AttackType.DM_OROCHINAGI]: '2000',
-    [AttackType.SDM_OROCHINAGI]: '2010',
-    [AttackType.HSDM_OROCHINAGI]: '2020',
-    [AttackType.CMD_GOFU_YOU]: '2400',
-    [AttackType.CMD_88SHIKI]: '1700',
-    [AttackType.CMD_NARAKU]: '620',
+    // 毒咬みチェーン
+    [AttackType.KYO_DOKUGAMI]: '1500',       // 百拾五式・毒咬み
+    [AttackType.KYO_TSUMIYOMI]: '1600',      // 四百壱式・罪詠み
+    [AttackType.KYO_BATSUYOMI]: '1700',      // 四百弐式・罰詠み
+    // 超必殺技
+    [AttackType.DM_OROCHINAGI]: '3000',      // 裏百八式・大蛇薙 DM
+    [AttackType.SDM_OROCHINAGI]: '3000',     // 裏百八式・大蛇薙 SDM
+    [AttackType.HSDM_OROCHINAGI]: '3020',    // 裏百八式・大蛇薙 MAX2
+    // コマンド通常技
+    [AttackType.CMD_GOFU_YOU]: '2400',       // 蒼鬼
+    [AttackType.CMD_88SHIKI]: '500',         // 八拾八式
+    [AttackType.CMD_NARAKU]: '620',          // 外式・奈落落し
+    // 通常技
     [AttackType.CLOSE_A]: '200', [AttackType.CLOSE_B]: '230',
     [AttackType.CLOSE_C]: '210', [AttackType.CLOSE_D]: '240',
     [AttackType.STAND_A]: '200', [AttackType.STAND_B]: '231',

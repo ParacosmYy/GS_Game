@@ -134,6 +134,7 @@ export async function loadCharacterSprites(config: CharacterSpriteConfig): Promi
   const sprites = await loadRealSprites(
     `/sprites/${config.mugenDir}/manifest.json`,
     `/sprites/${config.mugenDir}`,
+    config.charId,
   );
 
   loadedSprites.set(config.charId, sprites);

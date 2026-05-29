@@ -146,21 +146,26 @@ export function resolveKyoMugenAction(state: FighterState, attack: AttackType | 
       if (attack === AttackType.CMD_NARAKU) return '620';
       return '600';
     case FighterState.STAND_ATTACK:
-      if (attack === AttackType.KYO_ONIYAKI) return '1000';
-      if (attack === AttackType.KYO_ONIYAKI_C) return '1010';
-      if (attack === AttackType.KYO_YAMIBARAI || attack === AttackType.KYO_YAMIBARAI_C) return '1100';
-      if (attack === AttackType.KYO_RED_KICK) return '1300';
-      if (attack === AttackType.KYO_75KAI || attack === AttackType.KYO_75KAI_2) return '1200';
-      if (attack === AttackType.KYO_ARAGAMI || attack === AttackType.KYO_ARAGAMI_KONOKIZU ||
-          attack === AttackType.KYO_ARAGAMI_YANOSABI || attack === AttackType.KYO_NANASE ||
-          attack === AttackType.KYO_KOTO_TSUKI || attack === AttackType.KYO_YAKISOGI) return '1400';
-      if (attack === AttackType.KYO_DOKUGAMI || attack === AttackType.KYO_TSUMIYOMI ||
-          attack === AttackType.KYO_BATSUYOMI) return '1500';
-      if (attack === AttackType.DM_OROCHINAGI) return '2000';
-      if (attack === AttackType.SDM_OROCHINAGI) return '2010';
-      if (attack === AttackType.HSDM_OROCHINAGI) return '2020';
+      if (attack === AttackType.KYO_ONIYAKI) return '1800';
+      if (attack === AttackType.KYO_ONIYAKI_C) return '1810';
+      if (attack === AttackType.KYO_YAMIBARAI) return '2300';
+      if (attack === AttackType.KYO_YAMIBARAI_C) return '2310';
+      if (attack === AttackType.KYO_RED_KICK) return '2200';
+      if (attack === AttackType.KYO_75KAI || attack === AttackType.KYO_75KAI_2) return '2100';
+      if (attack === AttackType.KYO_ARAGAMI) return '1000';
+      if (attack === AttackType.KYO_ARAGAMI_KONOKIZU) return '1400';
+      if (attack === AttackType.KYO_ARAGAMI_YANOSABI) return '1300';
+      if (attack === AttackType.KYO_NANASE) return '1200';
+      if (attack === AttackType.KYO_KOTO_TSUKI) return '1100';
+      if (attack === AttackType.KYO_YAKISOGI) return '1400';
+      if (attack === AttackType.KYO_DOKUGAMI) return '1500';
+      if (attack === AttackType.KYO_TSUMIYOMI) return '1600';
+      if (attack === AttackType.KYO_BATSUYOMI) return '1700';
+      if (attack === AttackType.DM_OROCHINAGI) return '3000';
+      if (attack === AttackType.SDM_OROCHINAGI) return '3000';
+      if (attack === AttackType.HSDM_OROCHINAGI) return '3020';
       if (attack === AttackType.CMD_GOFU_YOU) return '2400';
-      if (attack === AttackType.CMD_88SHIKI) return '1700';
+      if (attack === AttackType.CMD_88SHIKI) return '500';
       if (attack === AttackType.CLOSE_A) return '200';
       if (attack === AttackType.CLOSE_C) return '210';
       if (attack === AttackType.CLOSE_B) return '230';

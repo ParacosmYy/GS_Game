@@ -109,10 +109,10 @@ describe('renderer fighter integration', () => {
   });
 
   describe('special move resolution', () => {
-    it('kyo resolves ONIYAKI to action 1000', () => {
+    it('kyo resolves ONIYAKI to action 1800', () => {
       const config = getCharacterConfig('kyo');
       const action = resolveGenericMugenAction(config!, FighterState.STAND_ATTACK, AttackType.KYO_ONIYAKI, 0, 1);
-      expect(action).toBe('1000');
+      expect(action).toBe('1800');
     });
 
     it('ryo resolves KOOU to action 1000', () => {
@@ -121,10 +121,10 @@ describe('renderer fighter integration', () => {
       expect(action).toBe('1000');
     });
 
-    it('kyo resolves DM_OROCHINAGI to action 2000', () => {
+    it('kyo resolves DM_OROCHINAGI to action 3000', () => {
       const config = getCharacterConfig('kyo');
       const action = resolveGenericMugenAction(config!, FighterState.STAND_ATTACK, AttackType.DM_OROCHINAGI, 0, 1);
-      expect(action).toBe('2000');
+      expect(action).toBe('3000');
     });
 
     it('ryo resolves DM_RYUKO_RANBU to action 3000', () => {

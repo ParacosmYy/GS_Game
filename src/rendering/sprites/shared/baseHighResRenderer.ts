@@ -348,6 +348,9 @@ export function drawImageFromRegistry(
   const frame = entry.frames[frameIdx % entry.frames.length];
   const { image, srcRect, anchor } = frame;
 
+  // Lazy-loaded images may not be ready yet — skip frame until loaded
+  if (!image.complete || image.naturalWidth === 0) return false;
+
   const scale = targetHeight / srcRect.h;
 
   ctx.save();
@@ -386,6 +389,8 @@ export function drawImageAfterimageFromRegistry(
   const frameIdx = getVariableFrameIndex(stateAge, entry.frameDurations);
   const frame = entry.frames[frameIdx % entry.frames.length];
   const { image, srcRect, anchor } = frame;
+
+  if (!image.complete || image.naturalWidth === 0) return false;
 
   const scale = targetHeight / srcRect.h;
 
