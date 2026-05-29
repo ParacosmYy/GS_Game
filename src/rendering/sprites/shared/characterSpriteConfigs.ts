@@ -483,7 +483,7 @@ registerCharacterSprites({
   defaultTint: '#aa00ff',
   specialMap: {
     [AttackType.STAND_A]: '200',
-    [AttackType.STAND_B]: '231',
+    [AttackType.STAND_B]: '230',
     [AttackType.STAND_C]: '212',
     [AttackType.STAND_D]: '240',
     [AttackType.CROUCH_A]: '400',
