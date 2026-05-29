@@ -40,50 +40,42 @@ interface SpriteManifest {
 // ===== Image cache =====
 const imageCache = new Map<string, HTMLImageElement>();
 
-function loadImage(src: string): Promise<HTMLImageElement> {
+function getOrInitImage(src: string): HTMLImageElement {
   const cached = imageCache.get(src);
-  if (cached && cached.complete) return Promise.resolve(cached);
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    img.onload = () => { imageCache.set(src, img); resolve(img); };
-    img.onerror = () => reject(new Error(`Failed to load: ${src}`));
-    img.src = src;
-  });
+  if (cached) return cached;
+  const img = new Image();
+  img.src = src;
+  imageCache.set(src, img);
+  return img;
 }
 
 /**
  * Load sprites from a manifest and base URL.
  * Returns Map<actionId, SpriteImageFrame[]>.
+ *
+ * Uses lazy loading: only the manifest.json is fetched upfront.
+ * Individual PNG images are loaded on-demand by the browser when first rendered,
+ * then cached for subsequent frames. This avoids preloading thousands of PNGs.
  */
 export async function loadRealSprites(
   manifestUrl: string,
   spritesBaseUrl: string,
+  gameCharId?: string,
 ): Promise<Map<string, SpriteImageFrame[]>> {
   const resp = await fetch(manifestUrl);
   const manifest: SpriteManifest = await resp.json();
 
-  // Preload all unique sprite images
-  const loadPromises: Promise<void>[] = [];
-  const spriteImages = new Map<string, HTMLImageElement>();
-
-  for (const [key, sprite] of Object.entries(manifest.sprites)) {
-    const src = `${spritesBaseUrl}/${sprite.file}`;
-    if (!spriteImages.has(key)) {
-      loadPromises.push(
-        loadImage(src).then(img => { spriteImages.set(key, img); })
-      );
-    }
-  }
-  await Promise.all(loadPromises);
-
-  // Build animation frames
+  // Build animation frames with lazy image references
   const result = new Map<string, SpriteImageFrame[]>();
 
-  // Extract charId from manifest URL: /sprites/<mugenDir>/manifest.json
+  // Use the game's charId (e.g., 'kyo') for animStateSync registration,
+  // falling back to manifest's characterId (e.g., 'cvskyo')
   const mugenDir = manifestUrl.match(/\/sprites\/([^/]+)\//)?.[1] || manifest.characterId;
-  const charId = manifest.characterId || mugenDir;
+  const charId = gameCharId || manifest.characterId || mugenDir;
 
-  for (const [actionId, anim] of Object.entries(manifest.animations)) {
+  for (const [rawActionId, anim] of Object.entries(manifest.animations)) {
+    // Normalize action keys: strip leading zeros so '000'→'0', '020'→'20'
+    const actionId = rawActionId.replace(/^0+(\d)/, '$1');
     const frames: SpriteImageFrame[] = [];
 
     for (const f of anim.frames) {
@@ -103,8 +95,10 @@ export async function loadRealSprites(
 
       const key = `${f.group}_${f.index}`;
       const sprite = manifest.sprites[key];
-      const img = spriteImages.get(key);
-      if (!sprite || !img) continue;
+      if (!sprite) continue;
+
+      const src = `${spritesBaseUrl}/${sprite.file}`;
+      const img = getOrInitImage(src);
 
       frames.push({
         image: img,

@@ -34,6 +34,9 @@ export function getGenericCharacterRenderer(
     imageSetup(regImg) {
       for (const [actionId, frames] of sprites) {
         regImg(actionId, frames);
+        // Register zero-padded alias (e.g. '020' → '20') so resolveKey can find both formats
+        const trimmed = actionId.replace(/^0+(\d)/, '$1');
+        if (trimmed !== actionId) regImg(trimmed, frames);
       }
       // Alias WIN → MUGEN win action
       const winAction = config.winAction ?? '181';
