@@ -61,12 +61,17 @@ export {
   YAMAZAKI_FEEDBACK_SUMMARY,
 } from './feedback/yamazakiFeedback.js';
 
-// Hitbox / hurtbox data
+// Hitbox / hurtbox data + MUGEN queries
 export {
   YAMAZAKI_HITBOX_KEYS,
   getYamazakiHitboxOffsets,
   YAMAZAKI_ATTACK_FRAME_KEYS,
   getYamazakiAttackFrames,
+  YAMAZAKI_MUGEN_ACTION_MAP,
+  hasYamazakiMugenData,
+  getYamazakiMugenTiming,
+  getYamazakiMugenActionSummary,
+  getYamazakiAttackTiming,
 } from './hitboxes/yamazakiHitboxes.js';
 
 // Animation metadata

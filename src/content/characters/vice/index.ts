@@ -59,12 +59,17 @@ export {
   VICE_FEEDBACK_SUMMARY,
 } from './feedback/viceFeedback.js';
 
-// Hitbox / hurtbox data
+// Hitbox / hurtbox data + MUGEN queries
 export {
   VICE_HITBOX_KEYS,
   getViceHitboxOffsets,
   VICE_ATTACK_FRAME_KEYS,
   getViceAttackFrames,
+  VICE_MUGEN_ACTION_MAP,
+  hasViceMugenData,
+  getViceMugenTiming,
+  getViceMugenActionSummary,
+  getViceAttackTiming,
 } from './hitboxes/viceHitboxes.js';
 
 // Animation metadata

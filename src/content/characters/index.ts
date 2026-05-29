@@ -182,6 +182,47 @@ export {
 export { TERRY_HIT_EFFECTS } from './terry/hitEffects/terryHitEffects.js';
 export { registerTerryAudio } from './terry/audio/terrySampler.js';
 
+// Terry hitbox / MUGEN data
+export {
+  TERRY_HITBOX_KEYS,
+  getTerryHitboxOffsets,
+  TERRY_ATTACK_FRAME_KEYS,
+  getTerryAttackFrames,
+  TERRY_MUGEN_ACTION_MAP,
+  hasTerryMugenData,
+  getTerryMugenTiming,
+  getTerryMugenActionSummary,
+  getTerryAttackTiming,
+} from './terry/hitboxes/terryHitboxes.js';
+
+// Terry frame data
+export { TERRY_FRAME_DATA } from './terry/frameData/terryFrameData.js';
+
+// Terry feedback
+export {
+  getTerryFeedbackTiers,
+  getTerryFeedback,
+  TERRY_FEEDBACK_SUMMARY,
+} from './terry/feedback/terryFeedback.js';
+
+// Terry animations
+export {
+  TERRY_ANIMATION_META,
+  getTerryAnimationNames,
+  getTerryAnimMeta,
+  getTerryAttackAnimations,
+  getTerryLoopAnimations,
+  type AnimationMeta as TerryAnimationMeta,
+} from './terry/animations/terryAnimations.js';
+
+// Terry portraits
+export {
+  TERRY_PORTRAIT_META,
+  getTerryPortraitMeta,
+  getTerryAvailablePortraitSizes,
+  type PortraitMeta as TerryPortraitMeta,
+} from './terry/portraits/terryPortraits.js';
+
 // Kim content package — prefixed to avoid type name collisions
 export {
   KIM_MOVE_LIST,
@@ -214,6 +255,47 @@ export {
 
 export { KIM_HIT_EFFECTS } from './kim/hitEffects/kimHitEffects.js';
 export { registerKimAudio } from './kim/audio/kimSampler.js';
+
+// Kim hitbox / MUGEN data
+export {
+  KIM_HITBOX_KEYS,
+  getKimHitboxOffsets,
+  KIM_ATTACK_FRAME_KEYS,
+  getKimAttackFrames,
+  KIM_MUGEN_ACTION_MAP,
+  hasKimMugenData,
+  getKimMugenTiming,
+  getKimMugenActionSummary,
+  getKimAttackTiming,
+} from './kim/hitboxes/kimHitboxes.js';
+
+// Kim frame data
+export { KIM_FRAME_DATA } from './kim/frameData/kimFrameData.js';
+
+// Kim feedback
+export {
+  getKimFeedbackTiers,
+  getKimFeedback,
+  KIM_FEEDBACK_SUMMARY,
+} from './kim/feedback/kimFeedback.js';
+
+// Kim animations
+export {
+  KIM_ANIMATION_META,
+  getKimAnimationNames,
+  getKimAnimMeta,
+  getKimAttackAnimations,
+  getKimLoopAnimations,
+  type AnimationMeta as KimAnimationMeta,
+} from './kim/animations/kimAnimations.js';
+
+// Kim portraits
+export {
+  KIM_PORTRAIT_META,
+  getKimPortraitMeta,
+  getKimAvailablePortraitSizes,
+  type PortraitMeta as KimPortraitMeta,
+} from './kim/portraits/kimPortraits.js';
 
 // Athena content package — prefixed to avoid type name collisions
 export {
@@ -335,6 +417,11 @@ export {
   getViceHitboxOffsets,
   VICE_ATTACK_FRAME_KEYS,
   getViceAttackFrames,
+  VICE_MUGEN_ACTION_MAP,
+  hasViceMugenData,
+  getViceMugenTiming,
+  getViceMugenActionSummary,
+  getViceAttackTiming,
 } from './vice/hitboxes/viceHitboxes.js';
 
 export {
@@ -405,6 +492,11 @@ export {
   getYamazakiHitboxOffsets,
   YAMAZAKI_ATTACK_FRAME_KEYS,
   getYamazakiAttackFrames,
+  YAMAZAKI_MUGEN_ACTION_MAP,
+  hasYamazakiMugenData,
+  getYamazakiMugenTiming,
+  getYamazakiMugenActionSummary,
+  getYamazakiAttackTiming,
 } from './yamazaki/hitboxes/yamazakiHitboxes.js';
 
 export {
@@ -549,6 +641,11 @@ export {
   getShermieHitboxOffsets,
   SHERMIE_ATTACK_FRAME_KEYS,
   getShermieAttackFrames,
+  SHERMIE_MUGEN_ACTION_MAP,
+  hasShermieMugenData,
+  getShermieMugenTiming,
+  getShermieMugenActionSummary,
+  getShermieAttackTiming,
 } from './shermie/hitboxes/shermieHitboxes.js';
 
 export {

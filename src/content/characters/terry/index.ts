@@ -64,6 +64,11 @@ export {
   getTerryHitboxOffsets,
   TERRY_ATTACK_FRAME_KEYS,
   getTerryAttackFrames,
+  TERRY_MUGEN_ACTION_MAP,
+  hasTerryMugenData,
+  getTerryMugenTiming,
+  getTerryMugenActionSummary,
+  getTerryAttackTiming,
 } from './hitboxes/terryHitboxes.js';
 
 // Animation metadata

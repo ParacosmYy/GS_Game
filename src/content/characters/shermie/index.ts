@@ -59,12 +59,17 @@ export {
   SHERMIE_FEEDBACK_SUMMARY,
 } from './feedback/shermieFeedback.js';
 
-// Hitbox / hurtbox data
+// Hitbox / hurtbox data + MUGEN queries
 export {
   SHERMIE_HITBOX_KEYS,
   getShermieHitboxOffsets,
   SHERMIE_ATTACK_FRAME_KEYS,
   getShermieAttackFrames,
+  SHERMIE_MUGEN_ACTION_MAP,
+  hasShermieMugenData,
+  getShermieMugenTiming,
+  getShermieMugenActionSummary,
+  getShermieAttackTiming,
 } from './hitboxes/shermieHitboxes.js';
 
 // Animation metadata

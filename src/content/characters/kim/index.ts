@@ -64,12 +64,17 @@ export {
   KIM_FEEDBACK_SUMMARY,
 } from './feedback/kimFeedback.js';
 
-// Hitbox / hurtbox data (offsets + per-frame attack boxes)
+// Hitbox / hurtbox data (offsets + per-frame attack boxes + MUGEN queries)
 export {
   KIM_HITBOX_KEYS,
   getKimHitboxOffsets,
   KIM_ATTACK_FRAME_KEYS,
   getKimAttackFrames,
+  KIM_MUGEN_ACTION_MAP,
+  hasKimMugenData,
+  getKimMugenTiming,
+  getKimMugenActionSummary,
+  getKimAttackTiming,
 } from './hitboxes/kimHitboxes.js';
 
 // Animation metadata (action list, frame counts, loops, transitions)
