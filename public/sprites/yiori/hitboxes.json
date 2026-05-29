@@ -1,0 +1,3508 @@
+{
+  "characterId": "unknown",
+  "actions": {
+    "200": {
+      "name": "iori 95~2k2+SVC's action   ver 1.69 (for kof2k1-SVC version sprite)",
+      "startup": 3,
+      "active": 2,
+      "recovery": 3,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 16,
+              "oy": -84,
+              "w": 36,
+              "h": 47
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": 10,
+              "oy": -131,
+              "w": 36,
+              "h": 35
+            },
+            {
+              "ox": 21,
+              "oy": -113,
+              "w": 25,
+              "h": 52
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "202": {
+      "name": "iori 95~2k2+SVC's action   ver 1.69 (for kof2k1-SVC version sprite)",
+      "startup": 2,
+      "active": 1,
+      "recovery": 1,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 14,
+              "oy": -79,
+              "w": 38,
+              "h": 42
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "212": {
+      "name": "iori 95~2k2+SVC's action   ver 1.69 (for kof2k1-SVC version sprite)",
+      "startup": 2,
+      "active": 1,
+      "recovery": 2,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 2,
+              "oy": -36,
+              "w": 32,
+              "h": 36
+            },
+            {
+              "ox": 35,
+              "oy": -21,
+              "w": 17,
+              "h": 21
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "215": {
+      "name": "iori 95~2k2+SVC's action   ver 1.69 (for kof2k1-SVC version sprite)",
+      "startup": 6,
+      "active": 4,
+      "recovery": 4,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 4,
+              "oy": -119,
+              "w": 30,
+              "h": 46
+            },
+            {
+              "ox": 35,
+              "oy": -73,
+              "w": 5,
+              "h": 0
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": -4,
+              "oy": -79,
+              "w": 69,
+              "h": 42
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": -4,
+              "oy": -74,
+              "w": 34,
+              "h": 37
+            },
+            {
+              "ox": 31,
+              "oy": -62,
+              "w": 4,
+              "h": 25
+            },
+            {
+              "ox": 36,
+              "oy": -54,
+              "w": 4,
+              "h": 17
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": -4,
+              "oy": -74,
+              "w": 34,
+              "h": 38
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "216": {
+      "name": "iori 95~2k2+SVC's action   ver 1.69 (for kof2k1-SVC version sprite)",
+      "startup": 6,
+      "active": 4,
+      "recovery": 4,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 4,
+              "oy": -119,
+              "w": 30,
+              "h": 46
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": -4,
+              "oy": -79,
+              "w": 69,
+              "h": 42
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": -4,
+              "oy": -74,
+              "w": 34,
+              "h": 37
+            },
+            {
+              "ox": 31,
+              "oy": -62,
+              "w": 4,
+              "h": 25
+            },
+            {
+              "ox": 36,
+              "oy": -54,
+              "w": 4,
+              "h": 17
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": -4,
+              "oy": -74,
+              "w": 34,
+              "h": 38
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "217": {
+      "name": "iori 95~2k2+SVC's action   ver 1.69 (for kof2k1-SVC version sprite)",
+      "startup": 6,
+      "active": 4,
+      "recovery": 4,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 4,
+              "oy": -119,
+              "w": 30,
+              "h": 46
+            },
+            {
+              "ox": 35,
+              "oy": -73,
+              "w": 1,
+              "h": 0
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": -4,
+              "oy": -79,
+              "w": 69,
+              "h": 42
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": -4,
+              "oy": -74,
+              "w": 34,
+              "h": 37
+            },
+            {
+              "ox": 31,
+              "oy": -62,
+              "w": 4,
+              "h": 25
+            },
+            {
+              "ox": 36,
+              "oy": -54,
+              "w": 4,
+              "h": 17
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": -4,
+              "oy": -74,
+              "w": 34,
+              "h": 38
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "218": {
+      "name": "iori 95~2k2+SVC's action   ver 1.69 (for kof2k1-SVC version sprite)",
+      "startup": 6,
+      "active": 4,
+      "recovery": 4,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 4,
+              "oy": -119,
+              "w": 30,
+              "h": 46
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": -4,
+              "oy": -79,
+              "w": 69,
+              "h": 42
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": -4,
+              "oy": -74,
+              "w": 34,
+              "h": 37
+            },
+            {
+              "ox": 31,
+              "oy": -62,
+              "w": 4,
+              "h": 25
+            },
+            {
+              "ox": 36,
+              "oy": -54,
+              "w": 4,
+              "h": 17
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": -4,
+              "oy": -74,
+              "w": 34,
+              "h": 38
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "220": {
+      "name": "iori 95~2k2+SVC's action   ver 1.69 (for kof2k1-SVC version sprite)",
+      "startup": 4,
+      "active": 2,
+      "recovery": 3,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 34,
+              "oy": -80,
+              "w": 67,
+              "h": 43
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": 34,
+              "oy": -80,
+              "w": 67,
+              "h": 43
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "225": {
+      "name": "iori 95~2k2+SVC's action   ver 1.69 (for kof2k1-SVC version sprite)",
+      "startup": 3,
+      "active": 3,
+      "recovery": 3,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 2,
+              "oy": -131,
+              "w": 44,
+              "h": 94
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": 2,
+              "oy": -131,
+              "w": 44,
+              "h": 94
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 2,
+              "oy": -131,
+              "w": 44,
+              "h": 94
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "230": {
+      "name": "iori 95~2k2+SVC's action   ver 1.69 (for kof2k1-SVC version sprite)",
+      "startup": 3,
+      "active": 1,
+      "recovery": 1,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 18,
+              "oy": -77,
+              "w": 44,
+              "h": 40
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "235": {
+      "name": "iori 95~2k2+SVC's action   ver 1.69 (for kof2k1-SVC version sprite)",
+      "startup": 4,
+      "active": 1,
+      "recovery": 4,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 11,
+              "oy": -78,
+              "w": 64,
+              "h": 60
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "236": {
+      "name": "iori 95~2k2+SVC's action   ver 1.69 (for kof2k1-SVC version sprite)",
+      "startup": 4,
+      "active": 1,
+      "recovery": 3,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 19,
+              "oy": -90,
+              "w": 42,
+              "h": 54
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "240": {
+      "name": "iori 95~2k2+SVC's action   ver 1.69 (for kof2k1-SVC version sprite)",
+      "startup": 4,
+      "active": 1,
+      "recovery": 4,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 11,
+              "oy": -78,
+              "w": 61,
+              "h": 60
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "245": {
+      "name": "iori 95~2k2+SVC's action   ver 1.69 (for kof2k1-SVC version sprite)",
+      "startup": 3,
+      "active": 1,
+      "recovery": 2,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 29,
+              "oy": -57,
+              "w": 52,
+              "h": 27
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "250": {
+      "name": "iori 95~2k2+SVC's action   ver 1.69 (for kof2k1-SVC version sprite)",
+      "startup": 3,
+      "active": 2,
+      "recovery": 3,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 6,
+              "oy": -94,
+              "w": 52,
+              "h": 57
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": 6,
+              "oy": -94,
+              "w": 52,
+              "h": 57
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "251": {
+      "name": "iori 95~2k2+SVC's action   ver 1.69 (for kof2k1-SVC version sprite)",
+      "startup": 4,
+      "active": 2,
+      "recovery": 2,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 9,
+              "oy": -94,
+              "w": 49,
+              "h": 57
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": 9,
+              "oy": -94,
+              "w": 49,
+              "h": 57
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "300": {
+      "name": "iori 95~2k2+SVC's action   ver 1.69 (for kof2k1-SVC version sprite)",
+      "startup": 1,
+      "active": 4,
+      "recovery": 0,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 30,
+              "oy": -104,
+              "w": 11,
+              "h": 79
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": 32,
+              "oy": -104,
+              "w": 11,
+              "h": 79
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 33,
+              "oy": -104,
+              "w": 11,
+              "h": 79
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 27,
+              "oy": -103,
+              "w": 11,
+              "h": 79
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "301": {
+      "name": "iori 95~2k2+SVC's action   ver 1.69 (for kof2k1-SVC version sprite)",
+      "startup": 1,
+      "active": 1,
+      "recovery": 5,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 12,
+              "oy": -104,
+              "w": 55,
+              "h": 87
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "400": {
+      "name": "iori 95~2k2+SVC's action   ver 1.69 (for kof2k1-SVC version sprite)",
+      "startup": 3,
+      "active": 1,
+      "recovery": 3,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 12,
+              "oy": -12,
+              "w": 55,
+              "h": 14
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "420": {
+      "name": "iori 95~2k2+SVC's action   ver 1.69 (for kof2k1-SVC version sprite)",
+      "startup": 2,
+      "active": 1,
+      "recovery": 9,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 10,
+              "oy": -60,
+              "w": 79,
+              "h": 31
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "430": {
+      "name": "iori 95~2k2+SVC's action   ver 1.69 (for kof2k1-SVC version sprite)",
+      "startup": 2,
+      "active": 1,
+      "recovery": 3,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 64,
+              "oy": -31,
+              "w": -46,
+              "h": -22
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "450": {
+      "name": "iori 95~2k2+SVC's action   ver 1.69 (for kof2k1-SVC version sprite)",
+      "startup": 4,
+      "active": 1,
+      "recovery": 4,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 20,
+              "oy": -113,
+              "w": 44,
+              "h": 76
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "510": {
+      "name": "iori 95~2k2+SVC's action   ver 1.69 (for kof2k1-SVC version sprite)",
+      "startup": 4,
+      "active": 1,
+      "recovery": 3,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 14,
+              "oy": -102,
+              "w": 43,
+              "h": 65
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "511": {
+      "name": "iori 95~2k2+SVC's action   ver 1.69 (for kof2k1-SVC version sprite)",
+      "startup": 4,
+      "active": 1,
+      "recovery": 3,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 20,
+              "oy": -117,
+              "w": 30,
+              "h": 43
+            },
+            {
+              "ox": 15,
+              "oy": -80,
+              "w": 35,
+              "h": 43
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "512": {
+      "name": "iori 95~2k2+SVC's action   ver 1.69 (for kof2k1-SVC version sprite)",
+      "startup": 4,
+      "active": 2,
+      "recovery": 0,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 5,
+              "oy": -104,
+              "w": 47,
+              "h": 67
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": 5,
+              "oy": -84,
+              "w": 47,
+              "h": 47
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "514": {
+      "name": "iori 95~2k2+SVC's action   ver 1.69 (for kof2k1-SVC version sprite)",
+      "startup": 4,
+      "active": 2,
+      "recovery": 0,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 5,
+              "oy": -104,
+              "w": 47,
+              "h": 67
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": 5,
+              "oy": -84,
+              "w": 47,
+              "h": 47
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "516": {
+      "name": "iori 95~2k2+SVC's action   ver 1.69 (for kof2k1-SVC version sprite)",
+      "startup": 4,
+      "active": 1,
+      "recovery": 3,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 20,
+              "oy": -117,
+              "w": 30,
+              "h": 43
+            },
+            {
+              "ox": 15,
+              "oy": -80,
+              "w": 35,
+              "h": 43
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "520": {
+      "name": "iori 95~2k2+SVC's action   ver 1.69 (for kof2k1-SVC version sprite)",
+      "startup": 4,
+      "active": 1,
+      "recovery": 3,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 14,
+              "oy": -102,
+              "w": 43,
+              "h": 65
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "600": {
+      "name": "iori 95~2k2+SVC's action   ver 1.69 (for kof2k1-SVC version sprite)",
+      "startup": 1,
+      "active": 1,
+      "recovery": 3,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 12,
+              "oy": -85,
+              "w": 72,
+              "h": 33
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "601": {
+      "name": "iori 95~2k2+SVC's action   ver 1.69 (for kof2k1-SVC version sprite)",
+      "startup": 1,
+      "active": 1,
+      "recovery": 1,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 12,
+              "oy": -88,
+              "w": 72,
+              "h": 33
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "611": {
+      "name": "iori 95~2k2+SVC's action   ver 1.69 (for kof2k1-SVC version sprite)",
+      "startup": 1,
+      "active": 1,
+      "recovery": 0,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": -75,
+              "oy": -75,
+              "w": 50,
+              "h": 40
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "612": {
+      "name": "iori 95~2k2+SVC's action   ver 1.69 (for kof2k1-SVC version sprite)",
+      "startup": 1,
+      "active": 2,
+      "recovery": 3,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": -75,
+              "oy": -85,
+              "w": 50,
+              "h": 40
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": -75,
+              "oy": -85,
+              "w": 50,
+              "h": 40
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "613": {
+      "name": "iori 95~2k2+SVC's action   ver 1.69 (for kof2k1-SVC version sprite)",
+      "startup": 1,
+      "active": 2,
+      "recovery": 3,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": -75,
+              "oy": -88,
+              "w": 50,
+              "h": 40
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": -75,
+              "oy": -88,
+              "w": 50,
+              "h": 40
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "620": {
+      "name": "iori 95~2k2+SVC's action   ver 1.69 (for kof2k1-SVC version sprite)",
+      "startup": 3,
+      "active": 2,
+      "recovery": 4,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 19,
+              "oy": -90,
+              "w": 13,
+              "h": 28
+            },
+            {
+              "ox": 33,
+              "oy": -100,
+              "w": 32,
+              "h": 27
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": 18,
+              "oy": -82,
+              "w": 53,
+              "h": 35
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "621": {
+      "name": "iori 95~2k2+SVC's action   ver 1.69 (for kof2k1-SVC version sprite)",
+      "startup": 3,
+      "active": 2,
+      "recovery": 1,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 20,
+              "oy": -93,
+              "w": 12,
+              "h": 28
+            },
+            {
+              "ox": 33,
+              "oy": -103,
+              "w": 32,
+              "h": 27
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": 10,
+              "oy": -85,
+              "w": 61,
+              "h": 35
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "630": {
+      "name": "iori 95~2k2+SVC's action   ver 1.69 (for kof2k1-SVC version sprite)",
+      "startup": 1,
+      "active": 4,
+      "recovery": 4,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 15,
+              "oy": -90,
+              "w": 44,
+              "h": 43
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": 15,
+              "oy": -90,
+              "w": 44,
+              "h": 43
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 15,
+              "oy": -90,
+              "w": 44,
+              "h": 43
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 15,
+              "oy": -90,
+              "w": 44,
+              "h": 43
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "631": {
+      "name": "iori 95~2k2+SVC's action   ver 1.69 (for kof2k1-SVC version sprite)",
+      "startup": 1,
+      "active": 4,
+      "recovery": 2,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 15,
+              "oy": -93,
+              "w": 44,
+              "h": 43
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": 15,
+              "oy": -93,
+              "w": 44,
+              "h": 43
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 15,
+              "oy": -93,
+              "w": 44,
+              "h": 43
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 15,
+              "oy": -93,
+              "w": 44,
+              "h": 43
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "640": {
+      "name": "iori 95~2k2+SVC's action   ver 1.69 (for kof2k1-SVC version sprite)",
+      "startup": 4,
+      "active": 1,
+      "recovery": 4,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 14,
+              "oy": -73,
+              "w": 51,
+              "h": 43
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "641": {
+      "name": "iori 95~2k2+SVC's action   ver 1.69 (for kof2k1-SVC version sprite)",
+      "startup": 4,
+      "active": 1,
+      "recovery": 2,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 14,
+              "oy": -76,
+              "w": 51,
+              "h": 43
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "650": {
+      "name": "iori 95~2k2+SVC's action   ver 1.69 (for kof2k1-SVC version sprite)",
+      "startup": 4,
+      "active": 2,
+      "recovery": 1,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 5,
+              "oy": -100,
+              "w": 53,
+              "h": 48
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": 5,
+              "oy": -100,
+              "w": 53,
+              "h": 48
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "651": {
+      "name": "iori 95~2k2+SVC's action   ver 1.69 (for kof2k1-SVC version sprite)",
+      "startup": 4,
+      "active": 2,
+      "recovery": 1,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 5,
+              "oy": -103,
+              "w": 53,
+              "h": 48
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": 5,
+              "oy": -103,
+              "w": 53,
+              "h": 48
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "652": {
+      "name": "iori 95~2k2+SVC's action   ver 1.69 (for kof2k1-SVC version sprite)",
+      "startup": 4,
+      "active": 2,
+      "recovery": 1,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 5,
+              "oy": -100,
+              "w": 53,
+              "h": 48
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": 5,
+              "oy": -100,
+              "w": 53,
+              "h": 48
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "805": {
+      "name": "iori 95~2k2+SVC's action   ver 1.69 (for kof2k1-SVC version sprite)",
+      "startup": 4,
+      "active": 3,
+      "recovery": 62,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 20,
+              "oy": -68,
+              "w": 85,
+              "h": 78
+            },
+            {
+              "ox": 30,
+              "oy": -81,
+              "w": 55,
+              "h": 13
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 20,
+              "oy": -68,
+              "w": 85,
+              "h": 78
+            },
+            {
+              "ox": 30,
+              "oy": -81,
+              "w": 55,
+              "h": 13
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 20,
+              "oy": -68,
+              "w": 85,
+              "h": 78
+            },
+            {
+              "ox": 30,
+              "oy": -81,
+              "w": 55,
+              "h": 13
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "807": {
+      "name": "iori 95~2k2+SVC's action   ver 1.69 (for kof2k1-SVC version sprite)",
+      "startup": 14,
+      "active": 5,
+      "recovery": 4,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 55,
+              "oy": -56,
+              "w": 41,
+              "h": 43
+            },
+            {
+              "ox": 25,
+              "oy": -12,
+              "w": 71,
+              "h": 22
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 55,
+              "oy": -69,
+              "w": 41,
+              "h": 56
+            },
+            {
+              "ox": 25,
+              "oy": -12,
+              "w": 71,
+              "h": 22
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 55,
+              "oy": -70,
+              "w": 41,
+              "h": 57
+            },
+            {
+              "ox": 25,
+              "oy": -12,
+              "w": 71,
+              "h": 22
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 55,
+              "oy": -70,
+              "w": 41,
+              "h": 57
+            },
+            {
+              "ox": 25,
+              "oy": -12,
+              "w": 71,
+              "h": 22
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 55,
+              "oy": -70,
+              "w": 41,
+              "h": 57
+            },
+            {
+              "ox": 25,
+              "oy": -12,
+              "w": 71,
+              "h": 22
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "844": {
+      "name": "iori 95~2k2+SVC's action   ver 1.69 (for kof2k1-SVC version sprite)",
+      "startup": 0,
+      "active": 1,
+      "recovery": 20,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": -25,
+              "oy": 0,
+              "w": 90,
+              "h": -74
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "1030": {
+      "name": "iori 95~2k2+SVC's action   ver 1.69 (for kof2k1-SVC version sprite)",
+      "startup": 3,
+      "active": 1,
+      "recovery": 0,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 63,
+              "oy": -67,
+              "w": -41,
+              "h": 66
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "1031": {
+      "name": "iori 95~2k2+SVC's action   ver 1.69 (for kof2k1-SVC version sprite)",
+      "startup": 0,
+      "active": 3,
+      "recovery": 5,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 1,
+              "oy": -131,
+              "w": 44,
+              "h": 105
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": 1,
+              "oy": -131,
+              "w": 44,
+              "h": 85
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 1,
+              "oy": -131,
+              "w": 44,
+              "h": 85
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "1032": {
+      "name": "iori 95~2k2+SVC's action   ver 1.69 (for kof2k1-SVC version sprite)",
+      "startup": 3,
+      "active": 4,
+      "recovery": 13,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 63,
+              "oy": -67,
+              "w": -41,
+              "h": 66
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": 16,
+              "oy": -102,
+              "w": 44,
+              "h": 78
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 1,
+              "oy": -119,
+              "w": 44,
+              "h": 95
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 1,
+              "oy": -119,
+              "w": 44,
+              "h": 73
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "1037": {
+      "name": "iori 95~2k2+SVC's action   ver 1.69 (for kof2k1-SVC version sprite)",
+      "startup": 0,
+      "active": 1,
+      "recovery": 0,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 16,
+              "oy": -102,
+              "w": 31,
+              "h": 78
+            },
+            {
+              "ox": 48,
+              "oy": -102,
+              "w": 12,
+              "h": 33
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "1038": {
+      "name": "iori 95~2k2+SVC's action   ver 1.69 (for kof2k1-SVC version sprite)",
+      "startup": 0,
+      "active": 1,
+      "recovery": 0,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 16,
+              "oy": -102,
+              "w": 44,
+              "h": 76
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "1039": {
+      "name": "iori 95~2k2+SVC's action   ver 1.69 (for kof2k1-SVC version sprite)",
+      "startup": 3,
+      "active": 1,
+      "recovery": 0,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 63,
+              "oy": -67,
+              "w": -41,
+              "h": 48
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "1041": {
+      "name": "iori 95~2k2+SVC's action   ver 1.69 (for kof2k1-SVC version sprite)",
+      "startup": 0,
+      "active": 3,
+      "recovery": 5,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 1,
+              "oy": -131,
+              "w": 44,
+              "h": 107
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": 1,
+              "oy": -131,
+              "w": 44,
+              "h": 107
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 1,
+              "oy": -131,
+              "w": 44,
+              "h": 107
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "1042": {
+      "name": "iori 95~2k2+SVC's action   ver 1.69 (for kof2k1-SVC version sprite)",
+      "startup": 0,
+      "active": 1,
+      "recovery": 0,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 16,
+              "oy": -102,
+              "w": 31,
+              "h": 78
+            },
+            {
+              "ox": 48,
+              "oy": -102,
+              "w": 3,
+              "h": 33
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "1402": {
+      "name": "iori 95~2k2+SVC's action   ver 1.69 (for kof2k1-SVC version sprite)",
+      "startup": 0,
+      "active": 1,
+      "recovery": 0,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 0,
+              "oy": -94,
+              "w": 37,
+              "h": 96
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "2021": {
+      "name": "iori 95~2k2+SVC's action   ver 1.69 (for kof2k1-SVC version sprite)",
+      "startup": 7,
+      "active": 1,
+      "recovery": 32,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 30,
+              "oy": -153,
+              "w": 95,
+              "h": 153
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "2219": {
+      "name": "iori 95~2k2+SVC's action   ver 1.69 (for kof2k1-SVC version sprite)",
+      "startup": 10,
+      "active": 1,
+      "recovery": 6,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 13,
+              "oy": -40,
+              "w": 68,
+              "h": 40
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "2999": {
+      "name": "iori 95~2k2+SVC's action   ver 1.69 (for kof2k1-SVC version sprite)",
+      "startup": 0,
+      "active": 1,
+      "recovery": 0,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 1,
+              "oy": -94,
+              "w": 18,
+              "h": 69
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "3000": {
+      "name": "iori 95~2k2+SVC's action   ver 1.69 (for kof2k1-SVC version sprite)",
+      "startup": 3,
+      "active": 1,
+      "recovery": 0,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 1,
+              "oy": -94,
+              "w": 28,
+              "h": 93
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "3003": {
+      "name": "iori 95~2k2+SVC's action   ver 1.69 (for kof2k1-SVC version sprite)",
+      "startup": 0,
+      "active": 1,
+      "recovery": 0,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 1,
+              "oy": -94,
+              "w": 28,
+              "h": 69
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "3004": {
+      "name": "iori 95~2k2+SVC's action   ver 1.69 (for kof2k1-SVC version sprite)",
+      "startup": 3,
+      "active": 1,
+      "recovery": 0,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 1,
+              "oy": -94,
+              "w": 18,
+              "h": 93
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "3500": {
+      "name": "iori 95~2k2+SVC's action   ver 1.69 (for kof2k1-SVC version sprite)",
+      "startup": 2,
+      "active": 29,
+      "recovery": 3,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": -19,
+              "oy": -79,
+              "w": 33,
+              "h": 79
+            },
+            {
+              "ox": -15,
+              "oy": -10,
+              "w": 34,
+              "h": 10
+            },
+            {
+              "ox": -22,
+              "oy": -51,
+              "w": 22,
+              "h": 51
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": -17,
+              "oy": -75,
+              "w": 33,
+              "h": 75
+            },
+            {
+              "ox": -15,
+              "oy": -10,
+              "w": 34,
+              "h": 10
+            },
+            {
+              "ox": -22,
+              "oy": -51,
+              "w": 22,
+              "h": 51
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": -19,
+              "oy": -79,
+              "w": 33,
+              "h": 79
+            },
+            {
+              "ox": -15,
+              "oy": -10,
+              "w": 34,
+              "h": 10
+            },
+            {
+              "ox": -22,
+              "oy": -51,
+              "w": 22,
+              "h": 51
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": -15,
+              "oy": -72,
+              "w": 33,
+              "h": 72
+            },
+            {
+              "ox": -15,
+              "oy": -10,
+              "w": 34,
+              "h": 10
+            },
+            {
+              "ox": -22,
+              "oy": -51,
+              "w": 22,
+              "h": 51
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": -17,
+              "oy": -75,
+              "w": 33,
+              "h": 75
+            },
+            {
+              "ox": -15,
+              "oy": -10,
+              "w": 34,
+              "h": 10
+            },
+            {
+              "ox": -22,
+              "oy": -51,
+              "w": 22,
+              "h": 51
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": -15,
+              "oy": -72,
+              "w": 33,
+              "h": 72
+            },
+            {
+              "ox": -15,
+              "oy": -10,
+              "w": 34,
+              "h": 10
+            },
+            {
+              "ox": -22,
+              "oy": -51,
+              "w": 22,
+              "h": 51
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": -15,
+              "oy": -71,
+              "w": 34,
+              "h": 71
+            },
+            {
+              "ox": -22,
+              "oy": -51,
+              "w": 22,
+              "h": 51
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": -15,
+              "oy": -71,
+              "w": 34,
+              "h": 71
+            },
+            {
+              "ox": -22,
+              "oy": -51,
+              "w": 22,
+              "h": 51
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": -15,
+              "oy": -71,
+              "w": 34,
+              "h": 71
+            },
+            {
+              "ox": -22,
+              "oy": -51,
+              "w": 22,
+              "h": 51
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": -15,
+              "oy": -71,
+              "w": 34,
+              "h": 71
+            },
+            {
+              "ox": -22,
+              "oy": -51,
+              "w": 22,
+              "h": 51
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": -15,
+              "oy": -71,
+              "w": 34,
+              "h": 71
+            },
+            {
+              "ox": -22,
+              "oy": -51,
+              "w": 22,
+              "h": 51
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": -15,
+              "oy": -71,
+              "w": 34,
+              "h": 71
+            },
+            {
+              "ox": -22,
+              "oy": -51,
+              "w": 22,
+              "h": 51
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": -15,
+              "oy": -71,
+              "w": 34,
+              "h": 71
+            },
+            {
+              "ox": -22,
+              "oy": -51,
+              "w": 22,
+              "h": 51
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": -15,
+              "oy": -71,
+              "w": 34,
+              "h": 71
+            },
+            {
+              "ox": -22,
+              "oy": -51,
+              "w": 22,
+              "h": 51
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": -15,
+              "oy": -71,
+              "w": 34,
+              "h": 71
+            },
+            {
+              "ox": -22,
+              "oy": -51,
+              "w": 22,
+              "h": 51
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": -15,
+              "oy": -71,
+              "w": 34,
+              "h": 71
+            },
+            {
+              "ox": -22,
+              "oy": -51,
+              "w": 22,
+              "h": 51
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": -15,
+              "oy": -71,
+              "w": 34,
+              "h": 71
+            },
+            {
+              "ox": -22,
+              "oy": -51,
+              "w": 22,
+              "h": 51
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": -15,
+              "oy": -71,
+              "w": 34,
+              "h": 71
+            },
+            {
+              "ox": -22,
+              "oy": -51,
+              "w": 22,
+              "h": 51
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": -15,
+              "oy": -71,
+              "w": 34,
+              "h": 71
+            },
+            {
+              "ox": -22,
+              "oy": -51,
+              "w": 22,
+              "h": 51
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": -15,
+              "oy": -71,
+              "w": 34,
+              "h": 71
+            },
+            {
+              "ox": -22,
+              "oy": -51,
+              "w": 22,
+              "h": 51
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": -15,
+              "oy": -71,
+              "w": 34,
+              "h": 71
+            },
+            {
+              "ox": -22,
+              "oy": -51,
+              "w": 22,
+              "h": 51
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": -15,
+              "oy": -71,
+              "w": 34,
+              "h": 71
+            },
+            {
+              "ox": -22,
+              "oy": -51,
+              "w": 22,
+              "h": 51
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": -15,
+              "oy": -71,
+              "w": 34,
+              "h": 71
+            },
+            {
+              "ox": -22,
+              "oy": -51,
+              "w": 22,
+              "h": 51
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": -15,
+              "oy": -71,
+              "w": 34,
+              "h": 71
+            },
+            {
+              "ox": -22,
+              "oy": -51,
+              "w": 22,
+              "h": 51
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": -15,
+              "oy": -71,
+              "w": 34,
+              "h": 71
+            },
+            {
+              "ox": -22,
+              "oy": -51,
+              "w": 22,
+              "h": 51
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": -15,
+              "oy": -71,
+              "w": 34,
+              "h": 71
+            },
+            {
+              "ox": -22,
+              "oy": -51,
+              "w": 22,
+              "h": 51
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": -15,
+              "oy": -71,
+              "w": 34,
+              "h": 71
+            },
+            {
+              "ox": -22,
+              "oy": -51,
+              "w": 22,
+              "h": 51
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": -15,
+              "oy": -71,
+              "w": 34,
+              "h": 71
+            },
+            {
+              "ox": -22,
+              "oy": -51,
+              "w": 22,
+              "h": 51
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": -15,
+              "oy": -71,
+              "w": 34,
+              "h": 71
+            },
+            {
+              "ox": -22,
+              "oy": -51,
+              "w": 22,
+              "h": 51
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "3600": {
+      "name": "iori 95~2k2+SVC's action   ver 1.69 (for kof2k1-SVC version sprite)",
+      "startup": 0,
+      "active": 1,
+      "recovery": 0,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 0,
+              "oy": -74,
+              "w": 33,
+              "h": 76
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "4000": {
+      "name": "iori 95~2k2+SVC's action   ver 1.69 (for kof2k1-SVC version sprite)",
+      "startup": 4,
+      "active": 1,
+      "recovery": 3,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 21,
+              "oy": -71,
+              "w": 47,
+              "h": 34
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "4001": {
+      "name": "iori 95~2k2+SVC's action   ver 1.69 (for kof2k1-SVC version sprite)",
+      "startup": 2,
+      "active": 1,
+      "recovery": 6,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 38,
+              "oy": -74,
+              "w": 48,
+              "h": 74
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "4002": {
+      "name": "iori 95~2k2+SVC's action   ver 1.69 (for kof2k1-SVC version sprite)",
+      "startup": 2,
+      "active": 1,
+      "recovery": 4,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 38,
+              "oy": -84,
+              "w": 48,
+              "h": 84
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "4502": {
+      "name": "iori 95~2k2+SVC's action   ver 1.69 (for kof2k1-SVC version sprite)",
+      "startup": 2,
+      "active": 1,
+      "recovery": 4,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 38,
+              "oy": -74,
+              "w": 48,
+              "h": 74
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "4611": {
+      "name": "iori 95~2k2+SVC's action   ver 1.69 (for kof2k1-SVC version sprite)",
+      "startup": 4,
+      "active": 1,
+      "recovery": 3,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 21,
+              "oy": -71,
+              "w": 47,
+              "h": 34
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "7001": {
+      "name": "iori 95~2k2+SVC's action   ver 1.69 (for kof2k1-SVC version sprite)",
+      "startup": 1,
+      "active": 5,
+      "recovery": 0,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 30,
+              "oy": -104,
+              "w": 11,
+              "h": 79
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": 32,
+              "oy": -104,
+              "w": 11,
+              "h": 79
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 33,
+              "oy": -104,
+              "w": 11,
+              "h": 79
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 10,
+              "oy": -108,
+              "w": 54,
+              "h": 83
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 10,
+              "oy": -84,
+              "w": 54,
+              "h": 59
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "7003": {
+      "name": "iori 95~2k2+SVC's action   ver 1.69 (for kof2k1-SVC version sprite)",
+      "startup": 1,
+      "active": 4,
+      "recovery": 0,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 30,
+              "oy": -104,
+              "w": 11,
+              "h": 79
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": 32,
+              "oy": -104,
+              "w": 11,
+              "h": 79
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 10,
+              "oy": -108,
+              "w": 54,
+              "h": 83
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 10,
+              "oy": -84,
+              "w": 54,
+              "h": 59
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "7011": {
+      "name": "iori 95~2k2+SVC's action   ver 1.69 (for kof2k1-SVC version sprite)",
+      "startup": 1,
+      "active": 6,
+      "recovery": 5,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 30,
+              "oy": -104,
+              "w": 11,
+              "h": 79
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": 32,
+              "oy": -104,
+              "w": 11,
+              "h": 79
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 33,
+              "oy": -104,
+              "w": 11,
+              "h": 79
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 27,
+              "oy": -103,
+              "w": 11,
+              "h": 79
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 10,
+              "oy": -108,
+              "w": 54,
+              "h": 83
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 10,
+              "oy": -84,
+              "w": 54,
+              "h": 59
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "7602": {
+      "name": "iori 95~2k2+SVC's action   ver 1.69 (for kof2k1-SVC version sprite)",
+      "startup": 0,
+      "active": 6,
+      "recovery": 0,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": -25,
+              "oy": -30,
+              "w": 50,
+              "h": -62
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": -25,
+              "oy": -30,
+              "w": 50,
+              "h": -62
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": -25,
+              "oy": -30,
+              "w": 50,
+              "h": -62
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": -25,
+              "oy": -30,
+              "w": 50,
+              "h": -62
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": -25,
+              "oy": -30,
+              "w": 50,
+              "h": -62
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": -25,
+              "oy": -30,
+              "w": 50,
+              "h": -62
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "7610": {
+      "name": "iori 95~2k2+SVC's action   ver 1.69 (for kof2k1-SVC version sprite)",
+      "startup": 1,
+      "active": 6,
+      "recovery": 8,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": -29,
+              "oy": -15,
+              "w": 48,
+              "h": 56
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": -31,
+              "oy": -25,
+              "w": 58,
+              "h": 66
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": -27,
+              "oy": 35,
+              "w": 44,
+              "h": -458
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": -16,
+              "oy": -423,
+              "w": 22,
+              "h": 458
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": -6,
+              "oy": -423,
+              "w": 5,
+              "h": 453
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": -5,
+              "oy": -423,
+              "w": 2,
+              "h": 453
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "7611": {
+      "name": "iori 95~2k2+SVC's action   ver 1.69 (for kof2k1-SVC version sprite)",
+      "startup": 3,
+      "active": 3,
+      "recovery": 0,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": -29,
+              "oy": -15,
+              "w": 48,
+              "h": 56
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": -22,
+              "oy": 35,
+              "w": 44,
+              "h": -458
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": -11,
+              "oy": -423,
+              "w": 22,
+              "h": 458
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "7613": {
+      "name": "iori 95~2k2+SVC's action   ver 1.69 (for kof2k1-SVC version sprite)",
+      "startup": 2,
+      "active": 4,
+      "recovery": 0,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": -29,
+              "oy": -15,
+              "w": 48,
+              "h": 56
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": -31,
+              "oy": -25,
+              "w": 58,
+              "h": 66
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": -27,
+              "oy": 35,
+              "w": 44,
+              "h": -458
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": -16,
+              "oy": -423,
+              "w": 22,
+              "h": 458
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "7631": {
+      "name": "iori 95~2k2+SVC's action   ver 1.69 (for kof2k1-SVC version sprite)",
+      "startup": 2,
+      "active": 6,
+      "recovery": 8,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": -29,
+              "oy": -15,
+              "w": 48,
+              "h": 56
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": -31,
+              "oy": -25,
+              "w": 58,
+              "h": 66
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": -27,
+              "oy": 35,
+              "w": 44,
+              "h": -458
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": -16,
+              "oy": -423,
+              "w": 22,
+              "h": 458
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": -6,
+              "oy": -423,
+              "w": 5,
+              "h": 453
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": -5,
+              "oy": -423,
+              "w": 2,
+              "h": 453
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "8300": {
+      "name": "iori 95~2k2+SVC's action   ver 1.69 (for kof2k1-SVC version sprite)",
+      "startup": 0,
+      "active": 1,
+      "recovery": 0,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 56,
+              "oy": -69,
+              "w": -68,
+              "h": 59
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "8302": {
+      "name": "iori 95~2k2+SVC's action   ver 1.69 (for kof2k1-SVC version sprite)",
+      "startup": 6,
+      "active": 2,
+      "recovery": 17,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": -1,
+              "oy": -109,
+              "w": 78,
+              "h": 100
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": 9,
+              "oy": -92,
+              "w": 68,
+              "h": 83
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "8305": {
+      "name": "iori 95~2k2+SVC's action   ver 1.69 (for kof2k1-SVC version sprite)",
+      "startup": 0,
+      "active": 1,
+      "recovery": 5,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": -10,
+              "oy": -106,
+              "w": 48,
+              "h": 110
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "8306": {
+      "name": "iori 95~2k2+SVC's action   ver 1.69 (for kof2k1-SVC version sprite)",
+      "startup": 0,
+      "active": 1,
+      "recovery": 0,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 2,
+              "oy": -77,
+              "w": 71,
+              "h": 69
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "8308": {
+      "name": "iori 95~2k2+SVC's action   ver 1.69 (for kof2k1-SVC version sprite)",
+      "startup": 0,
+      "active": 1,
+      "recovery": 0,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 56,
+              "oy": -59,
+              "w": -58,
+              "h": 52
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "11000": {
+      "name": "iori 95~2k2+SVC's action   ver 1.69 (for kof2k1-SVC version sprite)",
+      "startup": 2,
+      "active": 1,
+      "recovery": 5,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 10,
+              "oy": -75,
+              "w": 51,
+              "h": 45
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "11001": {
+      "name": "iori 95~2k2+SVC's action   ver 1.69 (for kof2k1-SVC version sprite)",
+      "startup": 2,
+      "active": 1,
+      "recovery": 5,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 10,
+              "oy": -75,
+              "w": 51,
+              "h": 45
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "12352": {
+      "name": "iori 95~2k2+SVC's action   ver 1.69 (for kof2k1-SVC version sprite)",
+      "startup": 0,
+      "active": 1,
+      "recovery": 0,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": -999,
+              "oy": 999,
+              "w": 1998,
+              "h": -1998
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    }
+  }
+}

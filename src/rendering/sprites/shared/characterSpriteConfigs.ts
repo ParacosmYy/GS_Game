@@ -468,3 +468,55 @@ registerCharacterSprites({
     [AttackType.HSDM_YURI_HISHOU_KUURETSU_ZAN]: '3300',
   },
 });
+
+// ===== Iori (yiori — ihoo1836 KOF 2002 version) =====
+registerCharacterSprites({
+  charId: 'iori',
+  mugenDir: 'yiori',
+  targetDisplayHeight: 101,
+  defaultTint: '#aa00ff',
+  specialMap: {
+    [AttackType.STAND_A]: '200',
+    [AttackType.STAND_B]: '231',
+    [AttackType.STAND_C]: '212',
+    [AttackType.STAND_D]: '240',
+    [AttackType.CROUCH_A]: '400',
+    [AttackType.CROUCH_B]: '430',
+    [AttackType.CROUCH_C]: '420',
+    [AttackType.CROUCH_D]: '450',
+    [AttackType.JUMP_A]: '600',
+    [AttackType.JUMP_B]: '630',
+    [AttackType.JUMP_C]: '611',
+    [AttackType.JUMP_D]: '640',
+    [AttackType.CLOSE_A]: '202',
+    [AttackType.CLOSE_B]: '225',
+    [AttackType.CLOSE_C]: '215',
+    [AttackType.CLOSE_D]: '250',
+    // Command normals
+    [AttackType.IORI_YUMEYUMI]: '300',
+    [AttackType.IORI_KATANUGI]: '301',
+    [AttackType.IORI_YUKIWARUI]: '620',
+    // Specials — 暗払い (Yamibarai)
+    [AttackType.IORI_YAMIBARAI]: '1000',
+    [AttackType.IORI_YAMIBARAI_C]: '1001',
+    // 鬼焼き (Oniyaki)
+    [AttackType.IORI_ONIYAKI]: '1030',
+    [AttackType.IORI_ONIYAKI_C]: '1032',
+    // 葵花 (Aoi Hana) — rekka 3-hit
+    [AttackType.IORI_AOIHANA]: '1200',
+    [AttackType.IORI_AOIHANA_2]: '1201',
+    [AttackType.IORI_AOIHANA_3]: '1202',
+    [AttackType.IORI_AOIHANA_C]: '1210',
+    [AttackType.IORI_AOIHANA_C_2]: '1211',
+    [AttackType.IORI_AOIHANA_C_3]: '1212',
+    // 琴月陰 (Kototsuki)
+    [AttackType.IORI_KOTOTSUKI]: '1300',
+    [AttackType.IORI_KOTOTSUKI_D]: '1301',
+    // 屑風 (Kuzukaze)
+    [AttackType.IORI_KUZUKAZE]: '1400',
+    // DM — 八稚女 (Yaotome)
+    [AttackType.DM_YATAGARASU]: '2000',
+    [AttackType.SDM_YATAGARASU]: '3000',
+    [AttackType.HSDM_YAOTOME]: '3500',
+  },
+});
