@@ -406,6 +406,52 @@ export enum AttackType {
   KFM_SMASH_KICK_3 = 'KFM_SMASH_KICK_3',               // Smash Kick (finisher)
   // ===== KFM DM =====
   DM_KFM_SMASH_FIST = 'DM_KFM_SMASH_FIST',               // Smash Fist DM (KFM)
+
+  // ===== Benimaru (ニコライ・ベリマー) specials =====
+  BENIMARU_JACKKNIFE_KICK = 'BENIMARU_JACKKNIFE_KICK',       // →+B (overhead kick)
+  BENIMARU_FLYING_DRILL = 'BENIMARU_FLYING_DRILL',           // air ↓+D (multi-hit drill)
+  BENIMARU_RAIJINKEN = 'BENIMARU_RAIJINKEN',                 // ↓↘→+A (lightning punch)
+  BENIMARU_RAIJINKEN_C = 'BENIMARU_RAIJINKEN_C',             // ↓↘→+C (strong lightning punch)
+  BENIMARU_IAI_GERI = 'BENIMARU_IAI_GERI',                   // ↓↙←+B (lightning kick)
+  BENIMARU_IAI_GERI_D = 'BENIMARU_IAI_GERI_D',               // ↓↙←+D (strong lightning kick)
+  BENIMARU_HANDOU_SANDAN_GERI = 'BENIMARU_HANDOU_SANDAN_GERI', // Iai Geri follow-up (3-stage kick)
+  BENIMARU_SHINKUU_KATATEGOMA = 'BENIMARU_SHINKUU_KATATEGOMA', // →↓↘+A (vacuum palm spin)
+  BENIMARU_SHINKUU_KATATEGOMA_C = 'BENIMARU_SHINKUU_KATATEGOMA_C', // →↓↘+C (strong vacuum palm spin)
+  BENIMARU_COLLIDER = 'BENIMARU_COLLIDER',                     // ←↙↓↘→+A/C (command grab)
+  BENIMARU_SUPER_INAZUMA_KICK = 'BENIMARU_SUPER_INAZUMA_KICK', // charge ↓↑+B (rising lightning kick)
+  BENIMARU_SUPER_INAZUMA_KICK_D = 'BENIMARU_SUPER_INAZUMA_KICK_D', // charge ↓↑+D (strong rising)
+  DM_BENIMARU_RAIKOUKEN = 'DM_BENIMARU_RAIKOUKEN',             // ↓↘→↓↘→+A/C (Raikouken DM)
+  DM_GENEI_HURRICANE = 'DM_GENEI_HURRICANE',                   // ↓↙←↓↙←+B/D (Genei Hurricane DM)
+  SDM_BENIMARU_RAIKOUKEN = 'SDM_BENIMARU_RAIKOUKEN',           // Raikouken SDM
+
+  // ===== Heidern (ハイデルン) specials =====
+  HEIDERN_CROSS_CUTTER = 'HEIDERN_CROSS_CUTTER',             // ↓↘→+A/C (projectile)
+  HEIDERN_MOON_SLASHER = 'HEIDERN_MOON_SLASHER',             // →↓↘+A/C (anti-air slash)
+  HEIDERN_NECK_ROLLER = 'HEIDERN_NECK_ROLLER',               // ↓↙←+A/C (somersault)
+  HEIDERN_STORMBRINGER = 'HEIDERN_STORMBRINGER',             // ←↙↓↘→+A/C (command grab, drains HP)
+  HEIDERN_KILLING_BRINGER = 'HEIDERN_KILLING_BRINGER',       // ←↙↓↘→+B/D (command grab)
+  HEIDERN_LEIDER_REITTER = 'HEIDERN_LEIDER_REITTER',         // ↓↙←+B/D (kick counter)
+  DM_CRITICAL_DRIVER = 'DM_CRITICAL_DRIVER',                 // ←↙↓↘→↘↓↙←+A/C (Critical Driver DM)
+  DM_HEIDERN_END = 'DM_HEIDERN_END',                         // ↓↘→↓↘→+A/C (Heidern End DM)
+  SDM_HEIDERN_END = 'SDM_HEIDERN_END',                       // Heidern End SDM
+  HSDM_HEIDERN_END = 'HSDM_HEIDERN_END',                     // Heidern End HSDM
+
+  // ===== Yuri (ユリ・サカザキ) specials =====
+  YURI_UPPER_BLOCK = 'YURI_UPPER_BLOCK',                     // →+B (upper block)
+  YURI_LOWER_BLOCK = 'YURI_LOWER_BLOCK',                     // ↘+B (lower block)
+  YURI_ORI = 'YURI_ORI',                                     // air ←+B (crossup)
+  YURI_KO_OU_KEN = 'YURI_KO_OU_KEN',                         // ↓↘→+A/C (Ko-ou Ken)
+  YURI_HAOH_SHO_KO_KEN = 'YURI_HAOH_SHO_KO_KEN',             // →←↙↓↘→+A/C (Haoh Sho Ko Ken)
+  YURI_CHOU_UPPER = 'YURI_CHOU_UPPER',                       // →↓↘+A/C (Chou Upper)
+  YURI_HYAKU_RETSU_BINTA = 'YURI_HYAKU_RETSU_BINTA',         // ↓↘→+B/D (Hyaku Retsu Binta)
+  YURI_HIEN_HOU_OU_KYAKU = 'YURI_HIEN_HOU_OU_KYAKU',         // ↓↙←+B/D (Hien Hou'ou Kyaku)
+  YURI_HISHOU_KUURETSU_ZAN = 'YURI_HISHOU_KUURETSU_ZAN',     // air ↓↙←+B/D (Hishou Kuuretsu Zan)
+  YURI_RAI_KEN = 'YURI_RAI_KEN',                             // ↓↘→+B/D air (Rai Ken)
+  DM_YURI_HAOH_SHO_KO_KEN = 'DM_YURI_HAOH_SHO_KO_KEN',       // ↓↘→↓↘→+A/C (Haoh Sho Ko Ken DM)
+  DM_YURI_HIEN_HOU_OU_KYAKU = 'DM_YURI_HIEN_HOU_OU_KYAKU',   // ↓↘→↘↓↙←+B/D (Hien Hou'ou Kyaku DM)
+  SDM_YURI_HAOH_SHO_KO_KEN = 'SDM_YURI_HAOH_SHO_KO_KEN',     // Haoh Sho Ko Ken SDM
+  SDM_YURI_HIEN_HOU_OU_KYAKU = 'SDM_YURI_HIEN_HOU_OU_KYAKU', // Hien Hou'ou Kyaku SDM
+  HSDM_YURI_HISHOU_KUURETSU_ZAN = 'HSDM_YURI_HISHOU_KUURETSU_ZAN', // Hishou Kuuretsu Zan HSDM
 }
 
 // ===== Hit Level (防御判定) =====

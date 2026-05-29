@@ -71,8 +71,8 @@ SFF 提取 PNG -> manifest 生成 -> AIR 解析动画 -> AIR Clsn 提取判定 -
 | Vice | Y (1,950) | Y | Y | Y (49 actions) | N |
 | Yamazaki | Y (1,955) | Y | Y | Y (69 actions) | N |
 | Shermie | Y (1,132) | Y | Y | Y (43 actions) | Y |
-| Yuri | Y (1,315) | Y | N | Y (53 actions) | Y |
-| Benimaru | Y (1,386) | Y | Y | N | Y |
+| Yuri | Y (1,315) | Y | Y | Y (53 actions) | Y |
+| Benimaru | Y (1,386) | Y | Y | Y (44 actions) | Y |
 | Heidern | Y (2,663) | Y | Y | Y (51 actions) | Y |
 | Leona | N | N | N | N | N |
 | Kula | N | N | N | N | N |
@@ -104,8 +104,8 @@ SFF 提取 PNG -> manifest 生成 -> AIR 解析动画 -> AIR Clsn 提取判定 -
 当前状态：
 
 - `characterSpriteRegistry.ts` + `characterSpriteConfigs.ts` 提供通用 PNG sprite 加载机制。
-- 17 个角色已注册运行时 sprite 配置（kyo/ryo/athena/terry/kim/vice/yamazaki/shermie/benimaru/chunli/geese/gouki/rock/king/rugal/g_rugal/heidern）。
-- 8 个 ROSTER 角色有完整 specialMap（kyo/ryo/terry/kim/athena/vice/yamazaki/shermie）。
+- 17 个角色已注册运行时 sprite 配置（kyo/ryo/athena/terry/kim/vice/yamazaki/shermie/benimaru/chunli/geese/gouki/rock/king/rugal/g_rugal/heidern/yuri）。
+- 8 个 ROSTER 角色有完整 specialMap（kyo/ryo/terry/kim/athena/vice/yamazaki/shermie）。Benimaru/Heidern/Yuri 有运行时注册但 specialMap 较少。
 - 通常技 action number 通过 `resolveGenericMugenAction` 标准化映射（MUGEN 标准编号）。
 - 渲染管线统一：`rendererFighter.ts` 先尝试通用 MUGEN sprite → 角色 procedural → 骨骼 fallback。
 - 训练模式 hitbox 调试支持 F2(开关) + F7(game/both/mugen 三模式循环)。
@@ -145,7 +145,7 @@ SFF 提取 PNG -> manifest 生成 -> AIR 解析动画 -> AIR Clsn 提取判定 -
 
 差距：
 
-- 内容包层面仅 Kyo/Ryo 接入了 MUGEN 查询层，Terry/Kim/Athena/Vice/Yamazaki/Shermie 尚未。
+- 内容包层面已有 10 角色接入 MUGEN 查询层（Kyo/Ryo/Terry/Kim/Athena/Benimaru/Heidern/Yuri/Vice/Yamazaki）。
 - MUGEN hitbox 数据作为第三级 fallback，仅在 Frame Contract 和 ATTACK_FRAMES 都无数据时生效。
 - 非 ROSTER 角色的内容包未接入 MUGEN 数据。
 
@@ -363,7 +363,7 @@ Iori 特殊问题：
 | 指标 | 数值 |
 |------|------|
 | Roster 角色总数 | 28 |
-| 有内容包的角色 | 5 (Ryo/Kyo/Iori/Terry/Kim) |
+| 有内容包的角色 | 12 (Ryo/Kyo/Iori/Terry/Kim/Athena/Vice/Yamazaki/Shermie/Benimaru/Heidern/Yuri) |
 | 有 Frame Contract 的角色 | 3 (Ryo/Kyo/Iori) |
 | 有 PNG sprite 的 KOF2002 角色 | 11 (Kyo/Ryo/Athena/Terry/Kim/Vice/Yamazaki/Shermie/Yuri/Benimaru/Heidern) |
 | 有运行时 sprite 配置的 KOF2002 角色 | 10 |
@@ -371,7 +371,7 @@ Iori 特殊问题：
 | 有 MUGEN Clsn 判定数据的角色 | 0 |
 | Warusaki3 源角色总数 | 58 (AIR) / 73 (SFF) |
 | 已提取 PNG 的角色目录 | 18 |
-| 测试总数 | 10,162 (364 files, all passing) |
+| 测试总数 | 10,852 (374 files, all passing) |
 | MUGEN 提取工具 | 4 (parseAir/buildSpriteManifest/convertAirHitboxes/extractCharacterSprites) |
 | 完整度校验工具 | 5 (ryo/kyo/iori/multiChar/multiCharValidation) |
 

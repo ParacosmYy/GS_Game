@@ -403,6 +403,106 @@ export const FEEDBACK_MANIFEST: FeedbackManifest = {
     SDM_PHOENIX_HITEN: 'sdm',
     SDM_PHOENIX_HITEN_EX: 'sdm',
     HSDM_PHOENIX_HITEN: 'hsdm',
+
+    // ===== Athena 必杀技 (special) =====
+    ATHENA_PSYCHO_BALL: 'special',
+    ATHENA_PSYCHO_SWORD: 'special',
+    ATHENA_PSYCHO_REFLECT: 'special',
+    ATHENA_PHOENIX_ARROW: 'special',
+    ATHENA_TELEPORT: 'special',
+    ATHENA_SUPER_PSYCHO_THROUGH: 'special',
+    // ===== Athena DM / SDM =====
+    DM_ATHENA_SHINING_CRYSTAL_BIT: 'dm',
+    SDM_ATHENA_SHINING_CRYSTAL_BIT: 'sdm',
+    DM_ATHENA_PHOENIX_FANG_ARROW: 'dm',
+
+    // ===== Vice 必杀技 (special) =====
+    VICE_MAYHEM: 'special',
+    VICE_MAYHEM_D: 'special',
+    VICE_BLACKEND: 'special',
+    VICE_OUTRAGE: 'special',
+    VICE_DECIDE: 'special',
+    VICE_GORE_FEST: 'special',
+    VICE_NEGATIVE_STALK: 'special',
+    // ===== Vice DM / SDM =====
+    DM_VICE_NEGATIVE_OWNER: 'dm',
+    SDM_VICE_NEGATIVE_OWNER: 'sdm',
+    DM_VICE_WITHERING_SURFACE: 'dm',
+
+    // ===== Yamazaki 必杀技 (special) =====
+    YAMAZAKI_BAIKAI: 'special',
+    YAMAZAKI_HEBI_TSUKAI: 'special',
+    YAMAZAKI_HEBI_TSUKAI_C: 'special',
+    YAMAZAKI_HEBI_TSUKAI_D: 'special',
+    YAMAZAKI_SANDAN: 'special',
+    YAMAZAKI_SADO: 'special',
+    YAMAZAKI_GUILLOTINE: 'special',
+    YAMAZAKI_DRILL: 'special',
+    YAMAZAKI_YAKIUCHI: 'special',
+    // ===== Yamazaki DM / SDM =====
+    DM_YAMAZAKI_GUILLOTINE: 'dm',
+    SDM_YAMAZAKI_GUILLOTINE: 'sdm',
+    DM_YAMAZAKI_DRILL: 'dm',
+
+    // ===== Shermie 必杀技 (special) =====
+    SHERMIE_SHOOT: 'special',
+    SHERMIE_SHOOT_C: 'special',
+    SHERMIE_CARNIVAL: 'special',
+    SHERMIE_AXLE_SPIN: 'special',
+    SHERMIE_SPIRAL: 'special',
+    SHERMIE_SPIRAL_C: 'special',
+    SHERMIE_SUPLEX: 'special',
+    SHERMIE_WHIP: 'special',
+    SHERMIE_WHIP_C: 'special',
+    // ===== Shermie DM / SDM =====
+    DM_SHERMIE_CARNIVAL: 'dm',
+    SDM_SHERMIE_CARNIVAL: 'sdm',
+    DM_SHERMIE_FLASH: 'dm',
+    SDM_SHERMIE_FLASH: 'sdm',
+
+    // ===== Benimaru 必杀技 (special) =====
+    BENIMARU_RAIJINKEN: 'special',
+    BENIMARU_RAIJINKEN_C: 'special',
+    BENIMARU_SUPER_INAZUMA: 'special',
+    BENIMARU_BENIMARU_COLLIDER: 'special',
+    BENIMARU_BENIMARU_COLLIDER_D: 'special',
+    BENIMARU_SHINKICK: 'special',
+    BENIMARU_FLYING_DRILL: 'special',
+    BENIMARU_IAI_GERI: 'special',
+    BENIMARU_HANDOU_SANDAN: 'special',
+    // ===== Benimaru DM / SDM =====
+    DM_BENIMARU_RAIJINKEN: 'dm',
+    SDM_BENIMARU_RAIJINKEN: 'sdm',
+    DM_BENIMARU_GENEI_HURRICANE: 'dm',
+
+    // ===== Heidern 必杀技 (special) =====
+    HEIDERN_STORM_BRINGER: 'special',
+    HEIDERN_MOON_SLASHER: 'special',
+    HEIDERN_NECK_ROLLER: 'special',
+    HEIDERN_CROSS_CUTTER: 'special',
+    HEIDERN_KILLING_BRING: 'special',
+    HEIDERN_ASSASSIN_STRIKE: 'special',
+    // ===== Heidern DM / SDM =====
+    DM_HEIDERN_END: 'dm',
+    SDM_HEIDERN_END: 'sdm',
+    DM_HEIDERN_EXECUTE: 'dm',
+
+    // ===== Yuri 必杀技 (special) =====
+    YURI_KO_OU_KEN: 'special',
+    YURI_HAOH_SHO_KO_KEN: 'special',
+    YURI_CHOU_UPPER: 'special',
+    YURI_HYAKU_RETSU_BINTA: 'special',
+    YURI_HIEN_HOU_OU_KYAKU: 'special',
+    YURI_HISHOU_KUURETSU_ZAN: 'special',
+    YURI_RAI_KEN: 'special',
+    YURI_UPPER_BLOCK: 'heavy',
+    YURI_LOWER_BLOCK: 'heavy',
+    // ===== Yuri DM / SDM / HSDM =====
+    DM_YURI_HAOH_SHO_KO_KEN: 'dm',
+    DM_YURI_HIEN_HOU_OU_KYAKU: 'dm',
+    SDM_YURI_HAOH_SHO_KO_KEN: 'sdm',
+    SDM_YURI_HIEN_HOU_OU_KYAKU: 'sdm',
+    HSDM_YURI_HISHOU_KUURETSU_ZAN: 'hsdm',
   } as Partial<Record<AttackType, FeedbackTier>>,
 };
 

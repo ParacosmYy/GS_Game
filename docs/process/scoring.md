@@ -2,7 +2,7 @@
 
 ## 1. 当前分数
 
-当前总分：`238/2000`
+当前总分：`239/2000`
 
 完整历史见 [SCORE.history.md](../archive/SCORE.history.md)。
 
@@ -196,3 +196,12 @@ Phase 2 总计：1000 分。
 - 仍不像 KOF 在哪里：角色仍是程序化像素帧，其他22角色无内容包
 - 下一轮最小任务：继续闭合差距矩阵§0.1(FrameContract builder)或§2.1(强化技能升级规则)
 - 下一轮闭合：差距矩阵§0.1公共组件复用 或 §2.1技能资源规则
+
+## 19. 第239分复盘
+
+- 本轮提升：角色内容 +1
+- 为什么只加 1 分：Yuri Sakazaki通过MUGEN管线完整接入（SFF→1315张PNG→manifest→hitboxes→16文件内容包→运行时sprite注册），是第12个有完整内容包的角色
+- 更像 KOF 在哪里：Yuri（女性格斗家队）现在有完整的MUGEN sprite + 判定数据 + 取消路径 + 反馈映射，可以真实选人
+- 仍不像 KOF 在哪里：18个Roster角色仍无MUGEN源文件（Iori/Leona/Kula/K'/Robert/Mai/Andy/Joe等）
+- 下一轮最小任务：继续MUGEN管线扩展或改善已有角色的运行时数据质量
+- 下一轮闭合：差距矩阵§0.1 PNG提取扩展 或 §0.2 运行时sprite接入质量

@@ -178,7 +178,22 @@ registerCharacterSprites({
   mugenDir: 'cvsbenimaru',
   targetDisplayHeight: 118,
   defaultTint: '#ffff44',
-  specialMap: {},
+  specialMap: {
+    [AttackType.BENIMARU_JACKKNIFE_KICK]: '300',
+    [AttackType.BENIMARU_RAIJINKEN]: '1000',
+    [AttackType.BENIMARU_RAIJINKEN_C]: '1010',
+    [AttackType.BENIMARU_IAI_GERI]: '1200',
+    [AttackType.BENIMARU_IAI_GERI_D]: '1210',
+    [AttackType.BENIMARU_HANDOU_SANDAN_GERI]: '1220',
+    [AttackType.BENIMARU_SHINKUU_KATATEGOMA]: '1100',
+    [AttackType.BENIMARU_SHINKUU_KATATEGOMA_C]: '1110',
+    [AttackType.BENIMARU_SUPER_INAZUMA_KICK]: '1150',
+    [AttackType.BENIMARU_SUPER_INAZUMA_KICK_D]: '1160',
+    [AttackType.BENIMARU_COLLIDER]: '1400',
+    [AttackType.DM_BENIMARU_RAIKOUKEN]: '3000',
+    [AttackType.DM_GENEI_HURRICANE]: '3100',
+    [AttackType.SDM_BENIMARU_RAIKOUKEN]: '3200',
+  },
 });
 
 // ===== Chun-Li (cvschunli) =====
@@ -250,7 +265,18 @@ registerCharacterSprites({
   mugenDir: 'heidern',
   targetDisplayHeight: 110,
   defaultTint: '#336633',
-  specialMap: {},
+  specialMap: {
+    [AttackType.HEIDERN_CROSS_CUTTER]: '1000',
+    [AttackType.HEIDERN_MOON_SLASHER]: '1100',
+    [AttackType.HEIDERN_NECK_ROLLER]: '1200',
+    [AttackType.HEIDERN_STORMBRINGER]: '1300',
+    [AttackType.HEIDERN_KILLING_BRINGER]: '1400',
+    [AttackType.HEIDERN_LEIDER_REITTER]: '1500',
+    [AttackType.DM_CRITICAL_DRIVER]: '3000',
+    [AttackType.DM_HEIDERN_END]: '3100',
+    [AttackType.SDM_HEIDERN_END]: '3200',
+    [AttackType.HSDM_HEIDERN_END]: '3300',
+  },
 });
 
 // ===== Yuri (cvsyuri) =====
@@ -276,5 +302,16 @@ registerCharacterSprites({
     [AttackType.CLOSE_B]: '211',
     [AttackType.CLOSE_C]: '221',
     [AttackType.CLOSE_D]: '231',
+    [AttackType.YURI_UPPER_BLOCK]: '300',
+    [AttackType.YURI_KO_OU_KEN]: '1000',
+    [AttackType.YURI_HAOH_SHO_KO_KEN]: '1100',
+    [AttackType.YURI_CHOU_UPPER]: '1200',
+    [AttackType.YURI_HIEN_HOU_OU_KYAKU]: '1300',
+    [AttackType.YURI_HISHOU_KUURETSU_ZAN]: '1400',
+    [AttackType.YURI_HYAKU_RETSU_BINTA]: '850',
+    [AttackType.DM_YURI_HAOH_SHO_KO_KEN]: '3000',
+    [AttackType.DM_YURI_HIEN_HOU_OU_KYAKU]: '3200',
+    [AttackType.SDM_YURI_HAOH_SHO_KO_KEN]: '3100',
+    [AttackType.HSDM_YURI_HISHOU_KUURETSU_ZAN]: '3300',
   },
 });
