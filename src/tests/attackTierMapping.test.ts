@@ -5,7 +5,7 @@
  * mappings in the feedback manifest, rather than relying on generic pattern matching.
  */
 import { describe, it, expect } from 'vitest';
-import { FEEDBACK_MANIFEST, inferTier } from '../core/feedbackManifest.js';
+import { FEEDBACK_MANIFEST, inferTier, getCharacterDMPalette } from '../core/feedbackManifest.js';
 import type { FeedbackTier } from '../core/feedbackManifest.js';
 
 const { attackTierMap } = FEEDBACK_MANIFEST;
@@ -21,15 +21,16 @@ const CHARACTER_SPECIALS: Record<string, string[]> = {
     'HSDM_YURI_HISHOU_KUURETSU_ZAN',
   ],
   heidern: [
-    'HEIDERN_STORM_BRINGER', 'HEIDERN_MOON_SLASHER', 'HEIDERN_NECK_ROLLER',
-    'HEIDERN_CROSS_CUTTER', 'HEIDERN_KILLING_BRING', 'HEIDERN_ASSASSIN_STRIKE',
-    'DM_HEIDERN_END', 'SDM_HEIDERN_END', 'DM_HEIDERN_EXECUTE',
+    'HEIDERN_STORMBRINGER', 'HEIDERN_MOON_SLASHER', 'HEIDERN_NECK_ROLLER',
+    'HEIDERN_CROSS_CUTTER', 'HEIDERN_KILLING_BRINGER', 'HEIDERN_LEIDER_REITTER',
+    'DM_HEIDERN_END', 'SDM_HEIDERN_END', 'HSDM_HEIDERN_END',
   ],
   benimaru: [
-    'BENIMARU_RAIJINKEN', 'BENIMARU_RAIJINKEN_C', 'BENIMARU_SUPER_INAZUMA',
-    'BENIMARU_BENIMARU_COLLIDER', 'BENIMARU_SHINKICK', 'BENIMARU_FLYING_DRILL',
-    'BENIMARU_IAI_GERI', 'BENIMARU_HANDOU_SANDAN',
-    'DM_BENIMARU_RAIJINKEN', 'SDM_BENIMARU_RAIJINKEN', 'DM_BENIMARU_GENEI_HURRICANE',
+    'BENIMARU_RAIJINKEN', 'BENIMARU_RAIJINKEN_C', 'BENIMARU_SUPER_INAZUMA_KICK',
+    'BENIMARU_COLLIDER', 'BENIMARU_SHINKUU_KATATEGOMA', 'BENIMARU_FLYING_DRILL',
+    'BENIMARU_IAI_GERI', 'BENIMARU_HANDOU_SANDAN_GERI', 'BENIMARU_JACKKNIFE_KICK',
+    'BENIMARU_IAI_GERI_D', 'BENIMARU_SUPER_INAZUMA_KICK_D', 'BENIMARU_SHINKUU_KATATEGOMA_C',
+    'DM_BENIMARU_RAIKOUKEN', 'SDM_BENIMARU_RAIKOUKEN', 'DM_GENEI_HURRICANE',
   ],
   shermie: [
     'SHERMIE_SHOOT', 'SHERMIE_SHOOT_C', 'SHERMIE_CARNIVAL', 'SHERMIE_AXLE_SPIN',
@@ -136,5 +137,65 @@ describe('Attack Tier Mapping — 7 New Characters', () => {
       const entries = Object.values(attackTierMap).filter(t => t === tier);
       expect(entries.length, `${tier} tier should have entries`).toBeGreaterThan(0);
     }
+  });
+});
+
+describe('Character DM Palettes', () => {
+  const dmChars = ['kyo', 'iori', 'ryo', 'terry', 'kim', 'athena', 'vice', 'yamazaki', 'shermie', 'benimaru', 'heidern', 'yuri'];
+
+  it('all characters with DMs have DM spark palettes', () => {
+    for (const charId of dmChars) {
+      const palette = getCharacterDMPalette(charId, 'dm');
+      expect(palette, `${charId} DM palette`).toBeDefined();
+      expect(palette!.length, `${charId} DM palette length`).toBeGreaterThanOrEqual(4);
+    }
+  });
+
+  it('all characters have SDM palettes', () => {
+    for (const charId of dmChars) {
+      const palette = getCharacterDMPalette(charId, 'sdm');
+      expect(palette, `${charId} SDM palette`).toBeDefined();
+      expect(palette!.length, `${charId} SDM palette length`).toBeGreaterThanOrEqual(4);
+    }
+  });
+
+  it('all characters have HSDM palettes', () => {
+    for (const charId of dmChars) {
+      const palette = getCharacterDMPalette(charId, 'hsdm');
+      expect(palette, `${charId} HSDM palette`).toBeDefined();
+      expect(palette!.length, `${charId} HSDM palette length`).toBeGreaterThanOrEqual(4);
+    }
+  });
+
+  it('SDM palettes have more colors than DM palettes', () => {
+    for (const charId of dmChars) {
+      const dm = getCharacterDMPalette(charId, 'dm')!;
+      const sdm = getCharacterDMPalette(charId, 'sdm')!;
+      expect(sdm.length, `${charId} SDM >= DM colors`).toBeGreaterThanOrEqual(dm.length);
+    }
+  });
+
+  it('palette colors are valid hex strings', () => {
+    const hexRegex = /^#[0-9a-f]{6}$/;
+    for (const charId of dmChars) {
+      for (const tier of ['dm', 'sdm', 'hsdm'] as FeedbackTier[]) {
+        const palette = getCharacterDMPalette(charId, tier)!;
+        for (const color of palette) {
+          expect(hexRegex.test(color), `${charId} ${tier} color ${color}`).toBe(true);
+        }
+      }
+    }
+  });
+
+  it('returns null for unknown characters', () => {
+    expect(getCharacterDMPalette('unknown', 'dm')).toBeNull();
+    expect(getCharacterDMPalette('unknown', 'sdm')).toBeNull();
+    expect(getCharacterDMPalette('unknown', 'hsdm')).toBeNull();
+  });
+
+  it('returns null for non-DM tiers', () => {
+    expect(getCharacterDMPalette('kyo', 'light')).toBeNull();
+    expect(getCharacterDMPalette('kyo', 'heavy')).toBeNull();
+    expect(getCharacterDMPalette('kyo', 'special')).toBeNull();
   });
 });
