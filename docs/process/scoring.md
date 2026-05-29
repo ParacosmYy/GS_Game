@@ -2,7 +2,7 @@
 
 ## 1. 当前分数
 
-当前总分：`244/2000`
+当前总分：`245/2000`
 
 完整历史见 [SCORE.history.md](../archive/SCORE.history.md)。
 
@@ -248,3 +248,12 @@ Phase 2 总计：1000 分。
 - 仍不像 KOF 在哪里：17个Roster角色无MUGEN源文件（Iori/Leona/Kula/K'/Robert等）
 - 下一轮最小任务：寻找缺失MUGEN源的角色替代方案或改善运行时sprite渲染质量
 - 下一轮闭合：差距矩阵§0.0 MUGEN源资产可用性 或 §0.2运行时sprite接入
+
+## 25. 第245分复盘
+
+- 本轮提升：角色内容 +1
+- 为什么只加 1 分：5次commit闭合4项管线改进：(1) Athena/Vice补全getMugenActions函数(11角色100%覆盖) (2) MUGEN动作映射有效性校验124项(键命名/动作号格式/覆盖率) (3) specialMap↔MUGEN_ACTION_MAP双向一致性校验107项(重叠率/超集性/质量守卫) (4) v3.12 tag推送
+- 更像 KOF 在哪里：MUGEN数据系统的双层守卫确保渲染(specialMap)和判定(MUGEN_ACTION_MAP)之间的映射一致性，11角色248+动作映射全部验证通过
+- 仍不像 KOF 在哪里：17个Roster角色无MUGEN源文件（Iori/Leona/Kula/K'/Robert等）
+- 下一轮最小任务：寻找缺失MUGEN源的角色替代方案或扩展角色MUGEN源可用性
+- 下一轮闭合：差距矩阵§0.0 MUGEN源资产可用性
