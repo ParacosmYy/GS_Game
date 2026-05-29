@@ -20,7 +20,7 @@ registerCharacterSprites({
     [AttackType.KYO_ONIYAKI]: '1800',        // 百式・鬼焼き (弱)
     [AttackType.KYO_ONIYAKI_C]: '1810',      // 百式・鬼焼き (強)
     [AttackType.KYO_YAMIBARAI]: '2300',      // 百八式・闇払い (弱)
-    [AttackType.KYO_YAMIBARAI_C]: '2310',    // 百八式・闇払い (強)
+    [AttackType.KYO_YAMIBARAI_C]: '2300',    // 百八式・闇払い (強, same anim)
     [AttackType.KYO_RED_KICK]: '2200',       // R.E.D.Kick
     [AttackType.KYO_75KAI]: '2100',          // 七拾五式・改
     [AttackType.KYO_75KAI_2]: '2100',
@@ -118,7 +118,7 @@ registerCharacterSprites({
     [AttackType.ATHENA_PSYCHO_BALL]: '1000',
     [AttackType.ATHENA_PSYCHO_BALL_C]: '1010',
     [AttackType.ATHENA_PSYCHO_SWORD]: '1100',
-    [AttackType.ATHENA_PSYCHO_SWORD_C]: '1110',
+    [AttackType.ATHENA_PSYCHO_SWORD_C]: '1115',
     [AttackType.ATHENA_PHOENIX_ARROW]: '1200',
     [AttackType.DM_SHINING_CRYSTAL_BIT]: '3000',
     [AttackType.SDM_SHINING_CRYSTAL_BIT]: '3010',
@@ -171,8 +171,8 @@ registerCharacterSprites({
   specialMap: {
     [AttackType.STAND_A]: '200',
     [AttackType.STAND_B]: '231',
-    [AttackType.STAND_C]: '211',
-    [AttackType.STAND_D]: '241',
+    [AttackType.STAND_C]: '210',
+    [AttackType.STAND_D]: '240',
     [AttackType.CROUCH_A]: '400',
     [AttackType.CROUCH_B]: '430',
     [AttackType.CROUCH_C]: '410',
@@ -183,8 +183,8 @@ registerCharacterSprites({
     [AttackType.JUMP_D]: '640',
     [AttackType.CLOSE_A]: '200',
     [AttackType.CLOSE_B]: '231',
-    [AttackType.CLOSE_C]: '211',
-    [AttackType.CLOSE_D]: '241',
+    [AttackType.CLOSE_C]: '210',
+    [AttackType.CLOSE_D]: '240',
     [AttackType.KIM_HISHOU_KICK]: '300',
     [AttackType.KIM_HANSEN]: '340',
     [AttackType.KIM_HIENZAN]: '1000',
@@ -207,9 +207,9 @@ registerCharacterSprites({
   defaultTint: '#cc44ff',
   specialMap: {
     [AttackType.STAND_A]: '200',
-    [AttackType.STAND_B]: '231',
+    [AttackType.STAND_B]: '230',
     [AttackType.STAND_C]: '211',
-    [AttackType.STAND_D]: '241',
+    [AttackType.STAND_D]: '240',
     [AttackType.CROUCH_A]: '400',
     [AttackType.CROUCH_B]: '430',
     [AttackType.CROUCH_C]: '410',
@@ -225,11 +225,11 @@ registerCharacterSprites({
     [AttackType.VICE_MONSTROSITY]: '1300',
     [AttackType.VICE_OVERKILL]: '1400',
     [AttackType.VICE_OUTRAGE]: '1000',
-    [AttackType.VICE_OUTRAGE_C]: '1010',
+    [AttackType.VICE_OUTRAGE_C]: '1005',
     [AttackType.VICE_BLACK_END]: '1100',
     [AttackType.VICE_MAYHEM]: '1200',
     [AttackType.DM_NEGATIVE_GAIN]: '3000',
-    [AttackType.SDM_NEGATIVE_GAIN]: '3010',
+    [AttackType.SDM_NEGATIVE_GAIN]: '3005',
   },
 });
 
@@ -241,9 +241,9 @@ registerCharacterSprites({
   defaultTint: '#aa4400',
   specialMap: {
     [AttackType.STAND_A]: '200',
-    [AttackType.STAND_B]: '231',
+    [AttackType.STAND_B]: '230',
     [AttackType.STAND_C]: '211',
-    [AttackType.STAND_D]: '241',
+    [AttackType.STAND_D]: '240',
     [AttackType.CROUCH_A]: '400',
     [AttackType.CROUCH_B]: '430',
     [AttackType.CROUCH_C]: '410',
@@ -259,11 +259,11 @@ registerCharacterSprites({
     [AttackType.YAMAZAKI_SASHI]: '1300',
     [AttackType.YAMAZAKI_BOKKAI]: '1400',
     [AttackType.YAMAZAKI_SNAKE_ARM]: '1000',
-    [AttackType.YAMAZAKI_SNAKE_ARM_C]: '1001',
+    [AttackType.YAMAZAKI_SNAKE_ARM_C]: '1000',
     [AttackType.YAMAZAKI_SANDSTORM]: '1100',
     [AttackType.YAMAZAKI_BAI_GA_SE]: '1200',
     [AttackType.DM_GUILLOTINE]: '3000',
-    [AttackType.SDM_GUILLOTINE]: '3010',
+    [AttackType.SDM_GUILLOTINE]: '3011',
   },
 });
 
@@ -275,13 +275,13 @@ registerCharacterSprites({
   defaultTint: '#ff4488',
   specialMap: {
     [AttackType.STAND_A]: '200',
-    [AttackType.STAND_B]: '231',
-    [AttackType.STAND_C]: '211',
-    [AttackType.STAND_D]: '241',
+    [AttackType.STAND_B]: '230',
+    [AttackType.STAND_C]: '210',
+    [AttackType.STAND_D]: '240',
     [AttackType.CROUCH_A]: '400',
     [AttackType.CROUCH_B]: '430',
     [AttackType.CROUCH_C]: '410',
-    [AttackType.CROUCH_D]: '440',
+    [AttackType.CROUCH_D]: '430',
     [AttackType.JUMP_A]: '600',
     [AttackType.JUMP_B]: '630',
     [AttackType.JUMP_C]: '610',
@@ -307,9 +307,9 @@ registerCharacterSprites({
   defaultTint: '#ffff44',
   specialMap: {
     [AttackType.STAND_A]: '200',
-    [AttackType.STAND_B]: '231',
+    [AttackType.STAND_B]: '230',
     [AttackType.STAND_C]: '211',
-    [AttackType.STAND_D]: '241',
+    [AttackType.STAND_D]: '240',
     [AttackType.CROUCH_A]: '400',
     [AttackType.CROUCH_B]: '430',
     [AttackType.CROUCH_C]: '410',
