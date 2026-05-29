@@ -2,7 +2,7 @@
 
 ## 1. 当前分数
 
-当前总分：`242/2000`
+当前总分：`244/2000`
 
 完整历史见 [SCORE.history.md](../archive/SCORE.history.md)。
 
@@ -230,3 +230,21 @@ Phase 2 总计：1000 分。
 - DM火花色板：12角色全覆盖（Kyo/Iori/Ryo/Terry/Kim/Athena/Vice/Yamazaki/Shermie/Benimaru/Heidern/Yuri），7项hex格式校验+6项SDM≥DM验证
 - attackTierMap总数：>= 130显式映射
 - 测试总数：11,056 (378 files)
+
+## 23. 第243分复盘
+
+- 本轮提升：角色内容 +1
+- 为什么只加 1 分：内容包schema自动化校验（184项测试），自动发现所有角色内容包并验证16目录结构+barrel导出+MUGEN交叉引用+导入卫生
+- 更像 KOF 在哪里：12个角色内容包现在有统一的结构完整性守卫，新增角色或缺失文件会立即被CI捕获
+- 仍不像 KOF 在哪里：17个Roster角色无MUGEN源文件，hitbox查询未覆盖所有角色
+- 下一轮最小任务：扩展MUGEN查询覆盖率或改善已有角色的运行时数据质量
+- 下一轮闭合：差距矩阵§0.4判定数据接入 或 §1.0内容包结构
+
+## 24. 第244分复盘
+
+- 本轮提升：角色内容 +1
+- 为什么只加 1 分：MUGEN查询层11角色全贯通：(1) Kyo/Ryo/Athena/Benimaru的index.ts新增MUGEN查询re-export (2) barrel文件补全Kyo/Athena/Benimaru显式导出 (3) 144项MUGEN查询完整性校验（per角色5项必须导出+≥20映射+函数签名+barrel覆盖+导入路径+内容质量）
+- 更像 KOF 在哪里：所有11个有MUGEN源的角色现在有一致的查询函数链（hitbox文件→角色index→barrel），任何角色的MUGEN数据都可以通过统一接口查询
+- 仍不像 KOF 在哪里：17个Roster角色无MUGEN源文件（Iori/Leona/Kula/K'/Robert等）
+- 下一轮最小任务：寻找缺失MUGEN源的角色替代方案或改善运行时sprite渲染质量
+- 下一轮闭合：差距矩阵§0.0 MUGEN源资产可用性 或 §0.2运行时sprite接入

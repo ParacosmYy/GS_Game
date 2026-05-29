@@ -69,6 +69,7 @@ export {
   hasViceMugenData,
   getViceMugenTiming,
   getViceMugenActionSummary,
+  getViceMugenActions,
   getViceAttackTiming,
 } from './hitboxes/viceHitboxes.js';
 

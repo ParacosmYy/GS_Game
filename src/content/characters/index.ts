@@ -355,6 +355,7 @@ export {
   hasAthenaMugenData,
   getAthenaMugenTiming,
   getAthenaMugenActionSummary,
+  getAthenaMugenActions,
   getAthenaAttackTiming,
 } from './athena/hitboxes/athenaHitboxes.js';
 
@@ -431,6 +432,7 @@ export {
   hasViceMugenData,
   getViceMugenTiming,
   getViceMugenActionSummary,
+  getViceMugenActions,
   getViceAttackTiming,
 } from './vice/hitboxes/viceHitboxes.js';
 

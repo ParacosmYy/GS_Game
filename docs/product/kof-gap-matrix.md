@@ -145,7 +145,7 @@ SFF 提取 PNG -> manifest 生成 -> AIR 解析动画 -> AIR Clsn 提取判定 -
 
 差距：
 
-- 内容包层面已有 10 角色接入 MUGEN 查询层（Kyo/Ryo/Terry/Kim/Athena/Benimaru/Heidern/Yuri/Vice/Yamazaki）。
+- 内容包层面已有 11 角色接入 MUGEN 查询层（Kyo/Ryo/Terry/Kim/Athena/Benimaru/Heidern/Yuri/Vice/Yamazaki/Shermie）。全部 11 角色统一导出 MUGEN_ACTION_MAP + hasMugenData + getMugenTiming + getMugenActionSummary + getAttackTiming。
 - MUGEN hitbox 优先于 ATTACK_FRAMES：fighter.ts 四级 fallback 调整为 Frame Contract → MUGEN Clsn → ATTACK_FRAMES → HITBOX_OFFSETS。
 - 非 ROSTER 角色的内容包未接入 MUGEN 数据。
 
@@ -371,7 +371,7 @@ Iori 特殊问题：
 | 有 MUGEN Clsn 判定数据的角色 | 0 |
 | Warusaki3 源角色总数 | 58 (AIR) / 73 (SFF) |
 | 已提取 PNG 的角色目录 | 19 |
-| 测试总数 | 11,056 (378 files, all passing) |
+| 测试总数 | 11,487 (382 files, all passing) |
 | MUGEN 提取工具 | 4 (parseAir/buildSpriteManifest/convertAirHitboxes/extractCharacterSprites) |
 | 完整度校验工具 | 5 (ryo/kyo/iori/multiChar/multiCharValidation) |
 

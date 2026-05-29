@@ -84,6 +84,10 @@ export function getAthenaMugenActionSummary(attackKey: string): MugenActionSumma
   return getMugenActionSummary(MUGEN_DIR, action);
 }
 
+export function getAthenaMugenActions(): string[] {
+  return getCharacterMugenActions(MUGEN_DIR);
+}
+
 export function getAthenaAttackTiming(attackKey: string): { startup: number; active: number; recovery: number; total: number } | null {
   const mugenTiming = getAthenaMugenTiming(attackKey);
   if (mugenTiming) return mugenTiming;

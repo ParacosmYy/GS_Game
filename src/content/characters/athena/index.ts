@@ -68,6 +68,7 @@ export {
   hasAthenaMugenData,
   getAthenaMugenTiming,
   getAthenaMugenActionSummary,
+  getAthenaMugenActions,
   getAthenaAttackTiming,
 } from './hitboxes/athenaHitboxes.js';
 

@@ -83,6 +83,10 @@ export function getViceMugenActionSummary(attackKey: string): MugenActionSummary
   return getMugenActionSummary(MUGEN_DIR, action);
 }
 
+export function getViceMugenActions(): string[] {
+  return getCharacterMugenActions(MUGEN_DIR);
+}
+
 export function getViceAttackTiming(attackKey: string): { startup: number; active: number; recovery: number; total: number } | null {
   const mugenTiming = getViceMugenTiming(attackKey);
   if (mugenTiming) return mugenTiming;
