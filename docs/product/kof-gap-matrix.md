@@ -105,16 +105,16 @@ SFF 提取 PNG -> manifest 生成 -> AIR 解析动画 -> AIR Clsn 提取判定 -
 
 - `characterSpriteRegistry.ts` + `characterSpriteConfigs.ts` 提供通用 PNG sprite 加载机制。
 - 17 个角色已注册运行时 sprite 配置（kyo/ryo/athena/terry/kim/vice/yamazaki/shermie/benimaru/chunli/geese/gouki/rock/king/rugal/g_rugal/heidern/yuri）。
-- 8 个 ROSTER 角色有完整 specialMap（kyo/ryo/terry/kim/athena/vice/yamazaki/shermie）。Benimaru/Heidern/Yuri 有运行时注册但 specialMap 较少。
+- 11 个 ROSTER 角色有完整 specialMap（kyo/ryo/terry/kim/athena/vice/yamazaki/shermie/benimaru/heidern/yuri），含通常技+指令通常技+必杀技+DM/SDM映射。
 - 通常技 action number 通过 `resolveGenericMugenAction` 标准化映射（MUGEN 标准编号）。
 - 渲染管线统一：`rendererFighter.ts` 先尝试通用 MUGEN sprite → 角色 procedural → 骨骼 fallback。
 - 训练模式 hitbox 调试支持 F2(开关) + F7(game/both/mugen 三模式循环)。
 
 差距：
 
-- specialMap 覆盖率不均匀。Kyo/Ryo 映射~25个必杀技，其他角色仅映射1-4个 DM/SDM。
-- 非 ROSTER 角色（chunli/geese/gouki/rock/king/rugal/g_rugal/benimaru）的 specialMap 仍为空。
-- 20 个 KOF2002 Roster 角色未注册运行时 sprite 配置。
+- specialMap 覆盖率不均匀。Kyo/Ryo 映射~25个必杀技，其他角色映射14-28个攻击类型（通常技+必杀技+DM）。
+- 非 ROSTER 角色（chunli/geese/gouki/rock/king/rugal/g_rugal）的 specialMap 仍为空。
+- 17 个 KOF2002 Roster 角色未注册运行时 sprite 配置（Iori/Leona/Kula/K'/Robert/Mai/Andy/Joe/Billy/Chang/Choi/Mature/Yashiro/Chris/Mary/Xiangfei/Kasumi）。
 
 ### 0.3 MUGEN 动画数据接入
 
@@ -371,7 +371,7 @@ Iori 特殊问题：
 | 有 MUGEN Clsn 判定数据的角色 | 0 |
 | Warusaki3 源角色总数 | 58 (AIR) / 73 (SFF) |
 | 已提取 PNG 的角色目录 | 19 |
-| 测试总数 | 10,966 (376 files, all passing) |
+| 测试总数 | 11,056 (378 files, all passing) |
 | MUGEN 提取工具 | 4 (parseAir/buildSpriteManifest/convertAirHitboxes/extractCharacterSprites) |
 | 完整度校验工具 | 5 (ryo/kyo/iori/multiChar/multiCharValidation) |
 

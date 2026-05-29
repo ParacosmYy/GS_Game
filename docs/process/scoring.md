@@ -2,7 +2,7 @@
 
 ## 1. 当前分数
 
-当前总分：`240/2000`
+当前总分：`242/2000`
 
 完整历史见 [SCORE.history.md](../archive/SCORE.history.md)。
 
@@ -214,3 +214,19 @@ Phase 2 总计：1000 分。
 - 仍不像 KOF 在哪里：18个Roster角色仍无MUGEN源文件，已有角色的specialMap覆盖率不均匀
 - 下一轮最小任务：改善已有角色的运行时数据质量或扩展更多角色的MUGEN管线
 - 下一轮闭合：差距矩阵§0.2运行时sprite接入 或 §0.4判定数据接入
+
+## 21. 第242分复盘
+
+- 本轮提升：角色内容 +1
+- 为什么只加 1 分：5次commit闭合3项管线改进：(1) 6角色specialMap扩展（指令通常技+DM色板） (2) MUGEN判定优先级提升至ATTACK_FRAMES之上 (3) specialMap↔hitboxes.json自动化对齐校验（46项测试）
+- 更像 KOF 在哪里：6角色的→+A/↘+B指令通常技现在显示正确MUGEN sprite而非fallback，MUGEN Clsn判定优先于手写ATTACK_FRAMES
+- 仍不像 KOF 在哪里：17个Roster角色无MUGEN源文件（Iori/Leona/Kula/K'等），specialMap覆盖率仍不均匀
+- 下一轮最小任务：寻找缺失MUGEN源的角色替代方案或改善已有角色的hitbox查询质量
+- 下一轮闭合：差距矩阵§0.0 MUGEN源资产可用性 或 §0.2运行时sprite接入质量
+
+## 22. 第242分迭代补充
+
+- attackTierMap命名修正：Benimaru 9旧条目→15 AttackType一致条目（BENIMARU_SUPER_INAZUMA→BENIMARU_SUPER_INAZUMA_KICK等），Heidern 6旧条目→6正确条目+HSDM
+- DM火花色板：12角色全覆盖（Kyo/Iori/Ryo/Terry/Kim/Athena/Vice/Yamazaki/Shermie/Benimaru/Heidern/Yuri），7项hex格式校验+6项SDM≥DM验证
+- attackTierMap总数：>= 130显式映射
+- 测试总数：11,056 (378 files)

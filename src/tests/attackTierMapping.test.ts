@@ -199,3 +199,63 @@ describe('Character DM Palettes', () => {
     expect(getCharacterDMPalette('kyo', 'special')).toBeNull();
   });
 });
+
+describe('Attack Tier Mapping — expanded coverage', () => {
+  const expandedBenimaru: [string, FeedbackTier][] = [
+    ['BENIMARU_RAIJINKEN', 'special'],
+    ['BENIMARU_RAIJINKEN_C', 'special'],
+    ['BENIMARU_SUPER_INAZUMA_KICK', 'special'],
+    ['BENIMARU_SUPER_INAZUMA_KICK_D', 'special'],
+    ['BENIMARU_COLLIDER', 'special'],
+    ['BENIMARU_SHINKUU_KATATEGOMA', 'special'],
+    ['BENIMARU_SHINKUU_KATATEGOMA_C', 'special'],
+    ['BENIMARU_JACKKNIFE_KICK', 'special'],
+    ['BENIMARU_FLYING_DRILL', 'special'],
+    ['BENIMARU_IAI_GERI', 'special'],
+    ['BENIMARU_IAI_GERI_D', 'special'],
+    ['BENIMARU_HANDOU_SANDAN_GERI', 'special'],
+    ['DM_BENIMARU_RAIKOUKEN', 'dm'],
+    ['SDM_BENIMARU_RAIKOUKEN', 'sdm'],
+    ['DM_GENEI_HURRICANE', 'dm'],
+  ];
+
+  const expandedHeidern: [string, FeedbackTier][] = [
+    ['HEIDERN_STORMBRINGER', 'special'],
+    ['HEIDERN_MOON_SLASHER', 'special'],
+    ['HEIDERN_NECK_ROLLER', 'special'],
+    ['HEIDERN_CROSS_CUTTER', 'special'],
+    ['HEIDERN_KILLING_BRINGER', 'special'],
+    ['HEIDERN_LEIDER_REITTER', 'special'],
+    ['DM_HEIDERN_END', 'dm'],
+    ['SDM_HEIDERN_END', 'sdm'],
+    ['HSDM_HEIDERN_END', 'hsdm'],
+  ];
+
+  it.each(expandedBenimaru)('Benimaru %s is %s', (attack, expectedTier) => {
+    const tier = attackTierMap[attack as keyof typeof attackTierMap];
+    expect(tier).toBe(expectedTier);
+  });
+
+  it.each(expandedHeidern)('Heidern %s is %s', (attack, expectedTier) => {
+    const tier = attackTierMap[attack as keyof typeof attackTierMap];
+    expect(tier).toBe(expectedTier);
+  });
+
+  it('Benimaru has 12 special tier entries', () => {
+    const count = Object.entries(attackTierMap)
+      .filter(([k, v]) => k.startsWith('BENIMARU_') && v === 'special')
+      .length;
+    expect(count).toBeGreaterThanOrEqual(12);
+  });
+
+  it('Heidern has 6 special tier entries', () => {
+    const count = Object.entries(attackTierMap)
+      .filter(([k, v]) => k.startsWith('HEIDERN_') && v === 'special')
+      .length;
+    expect(count).toBeGreaterThanOrEqual(6);
+  });
+
+  it('total attackTierMap entries >= 130', () => {
+    expect(Object.keys(attackTierMap).length).toBeGreaterThanOrEqual(130);
+  });
+});
