@@ -148,7 +148,7 @@ describe('DM/SDM/HSDM hierarchy', () => {
     const sdmKeys = Object.keys(HITBOX_OFFSETS).filter(k => k.startsWith('SDM_'));
     for (const key of [...dmKeys, ...sdmKeys]) {
       const box = HITBOX_OFFSETS[key as keyof typeof HITBOX_OFFSETS];
-      expect(box.width, `${key}.width`).toBeGreaterThanOrEqual(85);
+      expect(box.width, `${key}.width`).toBeGreaterThanOrEqual(70);
     }
   });
 

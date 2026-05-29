@@ -146,7 +146,7 @@ SFF 提取 PNG -> manifest 生成 -> AIR 解析动画 -> AIR Clsn 提取判定 -
 差距：
 
 - 内容包层面已有 10 角色接入 MUGEN 查询层（Kyo/Ryo/Terry/Kim/Athena/Benimaru/Heidern/Yuri/Vice/Yamazaki）。
-- MUGEN hitbox 数据作为第三级 fallback，仅在 Frame Contract 和 ATTACK_FRAMES 都无数据时生效。
+- MUGEN hitbox 优先于 ATTACK_FRAMES：fighter.ts 四级 fallback 调整为 Frame Contract → MUGEN Clsn → ATTACK_FRAMES → HITBOX_OFFSETS。
 - 非 ROSTER 角色的内容包未接入 MUGEN 数据。
 
 ---
@@ -363,15 +363,15 @@ Iori 特殊问题：
 | 指标 | 数值 |
 |------|------|
 | Roster 角色总数 | 28 |
-| 有内容包的角色 | 12 (Ryo/Kyo/Iori/Terry/Kim/Athena/Vice/Yamazaki/Shermie/Benimaru/Heidern/Yuri) |
+| 有内容包的角色 | 13 (Ryo/Kyo/Iori/Terry/Kim/Athena/Vice/Yamazaki/Shermie/Benimaru/Heidern/Yuri + kfm placeholder) |
 | 有 Frame Contract 的角色 | 3 (Ryo/Kyo/Iori) |
 | 有 PNG sprite 的 KOF2002 角色 | 11 (Kyo/Ryo/Athena/Terry/Kim/Vice/Yamazaki/Shermie/Yuri/Benimaru/Heidern) |
 | 有运行时 sprite 配置的 KOF2002 角色 | 10 |
 | 有 MUGEN AIR 动画数据的角色 | 0 |
 | 有 MUGEN Clsn 判定数据的角色 | 0 |
 | Warusaki3 源角色总数 | 58 (AIR) / 73 (SFF) |
-| 已提取 PNG 的角色目录 | 18 |
-| 测试总数 | 10,852 (374 files, all passing) |
+| 已提取 PNG 的角色目录 | 19 |
+| 测试总数 | 10,966 (376 files, all passing) |
 | MUGEN 提取工具 | 4 (parseAir/buildSpriteManifest/convertAirHitboxes/extractCharacterSprites) |
 | 完整度校验工具 | 5 (ryo/kyo/iori/multiChar/multiCharValidation) |
 

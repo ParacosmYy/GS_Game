@@ -2,7 +2,7 @@
 
 ## 1. 当前分数
 
-当前总分：`239/2000`
+当前总分：`240/2000`
 
 完整历史见 [SCORE.history.md](../archive/SCORE.history.md)。
 
@@ -205,3 +205,12 @@ Phase 2 总计：1000 分。
 - 仍不像 KOF 在哪里：18个Roster角色仍无MUGEN源文件（Iori/Leona/Kula/K'/Robert/Mai/Andy/Joe等）
 - 下一轮最小任务：继续MUGEN管线扩展或改善已有角色的运行时数据质量
 - 下一轮闭合：差距矩阵§0.1 PNG提取扩展 或 §0.2 运行时sprite接入质量
+
+## 20. 第240分复盘
+
+- 本轮提升：角色内容 +1
+- 为什么只加 1 分：Benimaru/Heidern/Yuri AI集成完成（combo routes + strategies + route functions），MUGEN hitbox优先级提升至ATTACK_FRAMES之前，fighter.ts fallback链从4级重排
+- 更像 KOF 在哪里：Benimaru/Heidern/Yuri现在有AI策略和连段路由，AI对手能使用这些角色的必杀技和DM，MUGEN Clsn判定优先于硬编码ATTACK_FRAMES
+- 仍不像 KOF 在哪里：18个Roster角色仍无MUGEN源文件，已有角色的specialMap覆盖率不均匀
+- 下一轮最小任务：改善已有角色的运行时数据质量或扩展更多角色的MUGEN管线
+- 下一轮闭合：差距矩阵§0.2运行时sprite接入 或 §0.4判定数据接入

@@ -475,6 +475,53 @@ const kfm: CharacterStrategy = {
   ],
 };
 
+const benimaru: CharacterStrategy = {
+  charId: 'benimaru',
+  preferredRange: 'mid',
+  aggressiveLevel: 0.65,
+  preferredAntiAir: AttackType.BENIMARU_SUPER_INAZUMA_KICK,
+  preferredPoke: AttackType.BENIMARU_RAIJINKEN,
+  preferredComboStarter: AttackType.CLOSE_C,
+  preferredDM: AttackType.DM_BENIMARU_RAIKOUKEN,
+  wakeUpOptions: [
+    AttackType.CLOSE_C,
+    AttackType.BENIMARU_SHINKUU_KATATEGOMA,
+    AttackType.THROW_FORWARD,
+  ],
+};
+
+const heidern: CharacterStrategy = {
+  charId: 'heidern',
+  preferredRange: 'mid',
+  aggressiveLevel: 0.5,
+  preferredAntiAir: AttackType.HEIDERN_MOON_SLASHER,
+  preferredPoke: AttackType.HEIDERN_CROSS_CUTTER,
+  preferredComboStarter: AttackType.CLOSE_C,
+  preferredDM: AttackType.DM_HEIDERN_END,
+  wakeUpOptions: [
+    AttackType.CLOSE_C,
+    AttackType.HEIDERN_STORMBRINGER,
+    AttackType.HEIDERN_NECK_ROLLER,
+    AttackType.THROW_FORWARD,
+  ],
+};
+
+const yuri: CharacterStrategy = {
+  charId: 'yuri',
+  preferredRange: 'mid',
+  aggressiveLevel: 0.6,
+  preferredAntiAir: AttackType.YURI_CHOU_UPPER,
+  preferredPoke: AttackType.YURI_KO_OU_KEN,
+  preferredComboStarter: AttackType.CLOSE_C,
+  preferredDM: AttackType.DM_YURI_HAOH_SHO_KO_KEN,
+  wakeUpOptions: [
+    AttackType.CLOSE_C,
+    AttackType.YURI_HIEN_HOU_OU_KYAKU,
+    AttackType.YURI_HYAKU_RETSU_BINTA,
+    AttackType.THROW_FORWARD,
+  ],
+};
+
 // ─── Registry ───
 
 const DEFAULT_STRATEGY: CharacterStrategy = {
@@ -519,6 +566,9 @@ const STRATEGY_MAP: Record<string, CharacterStrategy> = {
   mary,
   xiangfei,
   kasumi,
+  benimaru,
+  heidern,
+  yuri,
   kfm,
 };
 

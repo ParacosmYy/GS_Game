@@ -420,7 +420,7 @@ export const HITBOX_OFFSETS = {
   HEIDERN_STORMBRINGER: { offsetX: 25, offsetY: -70, width: 50, height: 60 },
   HEIDERN_KILLING_BRINGER: { offsetX: 30, offsetY: -75, width: 55, height: 55 },
   HEIDERN_LEIDER_REITTER: { offsetX: 45, offsetY: -85, width: 65, height: 50 },
-  DM_CRITICAL_DRIVER: { offsetX: 35, offsetY: -90, width: 80, height: 75 },
+  DM_CRITICAL_DRIVER: { offsetX: 35, offsetY: -90, width: 90, height: 75 },
   DM_HEIDERN_END: { offsetX: 45, offsetY: -100, width: 90, height: 80 },
   SDM_HEIDERN_END: { offsetX: 50, offsetY: -105, width: 100, height: 90 },
   HSDM_HEIDERN_END: { offsetX: 55, offsetY: -110, width: 110, height: 100 },

@@ -426,7 +426,11 @@ export class Fighter {
       // Contract exists but no hitbox data at this frame → fall through to ATTACK_FRAMES
     }
 
-    // === Legacy path: ATTACK_FRAMES table ===
+    // === MUGEN hitbox path: prefer real MUGEN Clsn data when available ===
+    const mugenBoxes = this.getMugenHitboxes();
+    if (mugenBoxes.length > 0) return mugenBoxes;
+
+    // === Legacy path: ATTACK_FRAMES table (fallback when no MUGEN data) ===
     const perFrame = ATTACK_FRAMES[this.currentAttack];
     if (perFrame && this.attackFrame < perFrame.length) {
       const frame = perFrame[this.attackFrame];
@@ -437,10 +441,6 @@ export class Fighter {
         height: box.h,
       }));
     }
-
-    // === MUGEN hitbox path: use real MUGEN Clsn data as fallback ===
-    const mugenBoxes = this.getMugenHitboxes();
-    if (mugenBoxes.length > 0) return mugenBoxes;
 
     // 降级到旧系统
     const single = this.getActiveHitbox();

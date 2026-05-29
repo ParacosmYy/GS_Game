@@ -12,7 +12,7 @@ import { FRAME_DATA } from '../src/core/frameDataConstants.js';
 import { COMBO_ROUTES } from '../src/ai/aiRoutes.js';
 import { ALL_STRATEGIES } from '../src/ai/characterStrategies.js';
 
-// All 28 characters in KOF2002 roster
+// All characters with FRAME_DATA entries
 const ROSTER = [
   'kyo', 'iori', 'ryo', 'terry', 'kim',
   'leona', 'robert', 'mai', 'kdash', 'kula',
@@ -20,6 +20,7 @@ const ROSTER = [
   'billy', 'chang', 'choi', 'mature', 'yamazaki',
   'mary', 'xiangfei', 'kasumi',
   'yashiro', 'chris', 'shermie', 'vice',
+  'benimaru', 'heidern', 'yuri',
   'kfm',
 ];
 
@@ -64,8 +65,8 @@ describe('Character roster cross-reference', () => {
     expect(new Set(ROSTER).size).toBe(ROSTER.length);
   });
 
-  it('roster has 28 characters', () => {
-    expect(ROSTER.length).toBe(28);
+  it('roster has 31 characters', () => {
+    expect(ROSTER.length).toBe(31);
   });
 });
 

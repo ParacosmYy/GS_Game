@@ -185,6 +185,24 @@ export const COMBO_ROUTES: Record<string, ComboStep[]> = {
     { type: 'special', attack: 'kfmSmashKick', delay: 3 },
     { type: 'special', attack: 'dmKfmSmashFist', delay: 4 },
   ],
+  benimaru: [
+    { type: 'button',  attack: 'closeC', delay: 0 },
+    { type: 'button',  attack: 'benimaruFlyingDrill', delay: 2 },
+    { type: 'special', attack: 'benimaruRaijinken', delay: 3 },
+    { type: 'special', attack: 'dmRaikouken', delay: 4 },
+  ],
+  heidern: [
+    { type: 'button',  attack: 'closeC', delay: 0 },
+    { type: 'button',  attack: 'heidernCrossCutter', delay: 2 },
+    { type: 'special', attack: 'heidernStormbringer', delay: 3 },
+    { type: 'special', attack: 'dmHeidernEnd', delay: 4 },
+  ],
+  yuri: [
+    { type: 'button',  attack: 'closeC', delay: 0 },
+    { type: 'button',  attack: 'yuriKoOuKen', delay: 2 },
+    { type: 'special', attack: 'yuriChouUpper', delay: 3 },
+    { type: 'special', attack: 'dmYuriHaohShoKoKen', delay: 4 },
+  ],
   _default: [
     { type: 'button',  attack: 'closeC', delay: 0 },
     { type: 'button',  attack: 'standA',  delay: 2 },
@@ -272,6 +290,12 @@ export function applyComboStep(step: ComboStep, base: ResolvedInput): void {
         base.forward = true; base.buttonA = true; base.buttonAPressed = true; base.punchPressed = true; break;
       case 'maryHammerPunch':
         base.forward = true; base.buttonA = true; base.buttonAPressed = true; base.punchPressed = true; break;
+      case 'benimaruFlyingDrill':
+        base.down = true; base.buttonB = true; base.buttonBPressed = true; base.kickPressed = true; break;
+      case 'heidernCrossCutter':
+        base.forward = true; base.buttonA = true; base.buttonAPressed = true; base.punchPressed = true; break;
+      case 'yuriKoOuKen':
+        base.forward = true; base.buttonA = true; base.buttonAPressed = true; base.punchPressed = true; break;
       case 'jumpC':
         base.buttonC = true; base.buttonCPressed = true; base.punchPressed = true; break;
     }
@@ -327,6 +351,9 @@ export function routeComboSpecial(
     case 'xiangfei': return routeXiangfei(attack);
     case 'kasumi': return routeKasumi(attack);
     case 'mary': return routeMary(attack);
+    case 'benimaru': return routeBenimaru(attack);
+    case 'heidern': return routeHeidern(attack);
+    case 'yuri': return routeYuri(attack);
     default: return null;
   }
 }
@@ -606,5 +633,47 @@ function routeMary(attack: string): AttackType | null {
     case 'marySpider': return AttackType.MARY_SPIDER;
     case 'dmMaryTyphoon': return AttackType.DM_MARY_TYPHOON;
     default: return AttackType.MARY_STRAIGHT_SLICER;
+  }
+}
+
+function routeBenimaru(attack: string): AttackType | null {
+  switch (attack) {
+    case 'benimaruRaijinken': return AttackType.BENIMARU_RAIJINKEN;
+    case 'benimaruRaijinkenC': return AttackType.BENIMARU_RAIJINKEN_C;
+    case 'benimaruIaiGeri': return AttackType.BENIMARU_IAI_GERI;
+    case 'benimaruShinkuuKatategoma': return AttackType.BENIMARU_SHINKUU_KATATEGOMA;
+    case 'benimaruCollider': return AttackType.BENIMARU_COLLIDER;
+    case 'dmRaikouken': return AttackType.DM_BENIMARU_RAIKOUKEN;
+    case 'dmGeneiHurricane': return AttackType.DM_GENEI_HURRICANE;
+    default: return AttackType.BENIMARU_RAIJINKEN;
+  }
+}
+
+function routeHeidern(attack: string): AttackType | null {
+  switch (attack) {
+    case 'heidernCrossCutter': return AttackType.HEIDERN_CROSS_CUTTER;
+    case 'heidernMoonSlasher': return AttackType.HEIDERN_MOON_SLASHER;
+    case 'heidernNeckRoller': return AttackType.HEIDERN_NECK_ROLLER;
+    case 'heidernStormbringer': return AttackType.HEIDERN_STORMBRINGER;
+    case 'heidernKillingBringer': return AttackType.HEIDERN_KILLING_BRINGER;
+    case 'heidernLeiderReitter': return AttackType.HEIDERN_LEIDER_REITTER;
+    case 'dmHeidernEnd': return AttackType.DM_HEIDERN_END;
+    case 'dmCriticalDriver': return AttackType.DM_CRITICAL_DRIVER;
+    default: return AttackType.HEIDERN_CROSS_CUTTER;
+  }
+}
+
+function routeYuri(attack: string): AttackType | null {
+  switch (attack) {
+    case 'yuriKoOuKen': return AttackType.YURI_KO_OU_KEN;
+    case 'yuriHaohShoKoKen': return AttackType.YURI_HAOH_SHO_KO_KEN;
+    case 'yuriChouUpper': return AttackType.YURI_CHOU_UPPER;
+    case 'yuriHienHouOuKyaku': return AttackType.YURI_HIEN_HOU_OU_KYAKU;
+    case 'yuriHishouKuuretsuZan': return AttackType.YURI_HISHOU_KUURETSU_ZAN;
+    case 'yuriHyakuRetsuBinta': return AttackType.YURI_HYAKU_RETSU_BINTA;
+    case 'dmYuriHaohShoKoKen': return AttackType.DM_YURI_HAOH_SHO_KO_KEN;
+    case 'dmYuriHienHouOuKyaku': return AttackType.DM_YURI_HIEN_HOU_OU_KYAKU;
+    case 'sdmYuriHaohShoKoKen': return AttackType.SDM_YURI_HAOH_SHO_KO_KEN;
+    default: return AttackType.YURI_KO_OU_KEN;
   }
 }
