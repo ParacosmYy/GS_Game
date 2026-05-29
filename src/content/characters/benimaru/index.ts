@@ -64,6 +64,11 @@ export {
   getBenimaruHitboxOffsets,
   BENIMARU_ATTACK_FRAME_KEYS,
   getBenimaruAttackFrames,
+  BENIMARU_MUGEN_ACTION_MAP,
+  hasBenimaruMugenData,
+  getBenimaruMugenTiming,
+  getBenimaruMugenActionSummary,
+  getBenimaruAttackTiming,
 } from './hitboxes/benimaruHitboxes.js';
 
 // Animation metadata

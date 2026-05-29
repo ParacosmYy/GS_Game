@@ -22,6 +22,11 @@ export {
   getKyoHitboxOffsets,
   KYO_ATTACK_FRAME_KEYS,
   getKyoAttackFrames,
+  KYO_MUGEN_ACTION_MAP,
+  hasKyoMugenData,
+  getKyoMugenTiming,
+  getKyoMugenActionSummary,
+  getKyoAttackTiming,
 } from './kyo/hitboxes.js';
 
 export {
@@ -346,6 +351,11 @@ export {
   getAthenaHitboxOffsets,
   ATHENA_ATTACK_FRAME_KEYS,
   getAthenaAttackFrames,
+  ATHENA_MUGEN_ACTION_MAP,
+  hasAthenaMugenData,
+  getAthenaMugenTiming,
+  getAthenaMugenActionSummary,
+  getAthenaAttackTiming,
 } from './athena/hitboxes/athenaHitboxes.js';
 
 export {
@@ -567,6 +577,11 @@ export {
   getBenimaruHitboxOffsets,
   BENIMARU_ATTACK_FRAME_KEYS,
   getBenimaruAttackFrames,
+  BENIMARU_MUGEN_ACTION_MAP,
+  hasBenimaruMugenData,
+  getBenimaruMugenTiming,
+  getBenimaruMugenActionSummary,
+  getBenimaruAttackTiming,
 } from './benimaru/hitboxes/benimaruHitboxes.js';
 
 export {

@@ -36,12 +36,17 @@ export {
   RYO_REQUIRED_ANIMATIONS,
 } from './animations.js';
 
-// Hitbox / hurtbox data
+// Hitbox / hurtbox data + MUGEN queries
 export {
   RYO_HITBOX_KEYS,
   getRyoHitboxOffsets,
   RYO_ATTACK_FRAME_KEYS,
   getRyoAttackFrames,
+  RYO_MUGEN_ACTION_MAP,
+  hasRyoMugenData,
+  getRyoMugenTiming,
+  getRyoMugenActionSummary,
+  getRyoAttackTiming,
 } from './hitboxes.js';
 
 // Feedback tier mappings

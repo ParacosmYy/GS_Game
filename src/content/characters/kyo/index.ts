@@ -20,12 +20,17 @@ export {
   type KyoMoveEntry,
 } from './commands.js';
 
-// Hitbox / hurtbox data
+// Hitbox / hurtbox data + MUGEN queries
 export {
   KYO_HITBOX_KEYS,
   getKyoHitboxOffsets,
   KYO_ATTACK_FRAME_KEYS,
   getKyoAttackFrames,
+  KYO_MUGEN_ACTION_MAP,
+  hasKyoMugenData,
+  getKyoMugenTiming,
+  getKyoMugenActionSummary,
+  getKyoAttackTiming,
 } from './hitboxes.js';
 
 // Feedback tier mappings

@@ -166,7 +166,7 @@ describe('Content Package Cross-Reference', () => {
   it('characters/index.ts exports MUGEN_ACTION_MAP for characters with MUGEN data', () => {
     const barrelPath = path.join(CONTENT_DIR, 'index.ts');
     const barrelContent = fs.readFileSync(barrelPath, 'utf8');
-    const mugenChars = ['terry', 'kim', 'vice', 'yamazaki', 'shermie', 'heidern', 'yuri'];
+    const mugenChars = ['kyo', 'terry', 'kim', 'athena', 'vice', 'yamazaki', 'shermie', 'benimaru', 'heidern', 'yuri'];
     for (const charId of mugenChars) {
       const searchStr = `${charId.toUpperCase()}_MUGEN_ACTION_MAP`;
       expect(barrelContent, `${charId} MUGEN_ACTION_MAP in barrel`).toContain(searchStr);
