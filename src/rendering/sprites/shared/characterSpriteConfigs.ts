@@ -252,3 +252,29 @@ registerCharacterSprites({
   defaultTint: '#336633',
   specialMap: {},
 });
+
+// ===== Yuri (cvsyuri) =====
+registerCharacterSprites({
+  charId: 'yuri',
+  mugenDir: 'cvsyuri',
+  targetDisplayHeight: 100,
+  defaultTint: '#ff6699',
+  specialMap: {
+    [AttackType.STAND_A]: '200',
+    [AttackType.STAND_B]: '210',
+    [AttackType.STAND_C]: '220',
+    [AttackType.STAND_D]: '230',
+    [AttackType.CROUCH_A]: '400',
+    [AttackType.CROUCH_B]: '410',
+    [AttackType.CROUCH_C]: '420',
+    [AttackType.CROUCH_D]: '430',
+    [AttackType.JUMP_A]: '600',
+    [AttackType.JUMP_B]: '610',
+    [AttackType.JUMP_C]: '620',
+    [AttackType.JUMP_D]: '630',
+    [AttackType.CLOSE_A]: '201',
+    [AttackType.CLOSE_B]: '211',
+    [AttackType.CLOSE_C]: '221',
+    [AttackType.CLOSE_D]: '231',
+  },
+});

@@ -495,3 +495,236 @@ export {
 
 export { BENIMARU_HIT_EFFECTS } from './benimaru/hitEffects/benimaruHitEffects.js';
 export { registerBenimaruAudio } from './benimaru/audio/benimaruSampler.js';
+
+// Shermie content package — prefixed to avoid type name collisions
+export {
+  SHERMIE_MOVE_LIST,
+  SHERMIE_WIN_QUOTES,
+  SHERMIE_AVAILABLE_ACTIONS,
+  type ShermieMoveEntry,
+} from './shermie/commands/shermieCommands.js';
+
+export {
+  SHERMIE_MOVES,
+  getMoveByKey as getShermieMoveByKey,
+  getMoveByAttackType as getShermieMoveByAttackType,
+  getMovesByCategory as getShermieMovesByCategory,
+  getProjectileMoves as getShermieProjectileMoves,
+  getInvincibleMoves as getShermieInvincibleMoves,
+  getGrabMoves as getShermieGrabMoves,
+  getMoveStats as getShermieMoveStats,
+  type MoveDefinition as ShermieMoveDefinition,
+  type MoveVersionEntry as ShermieMoveVersionEntry,
+  type MoveVersion as ShermieMoveVersion,
+} from './shermie/moves/shermieMoves.js';
+
+export {
+  SHERMIE_CANCEL_PATHS,
+  findCancelRoute as findShermieCancelRoute,
+  getCancelTargets as getShermieCancelTargets,
+  validateCancel as validateShermieCancel,
+  getCancelRoutesByType as getShermieCancelRoutesByType,
+  isCancelSource as isShermieCancelSource,
+  getBestCancelRoute as getShermieBestCancelRoute,
+  type CancelType as ShermieCancelType,
+  type CancelRoute as ShermieCancelRoute,
+} from './shermie/cancelPaths.js';
+
+export {
+  SHERMIE_ATTACK_KEYS,
+  getShermieFrameData,
+  getShermieAttackFrameData,
+} from './shermie/attacks/shermieAttacks.js';
+
+export { SHERMIE_FRAME_DATA } from './shermie/frameData/shermieFrameData.js';
+
+export {
+  getShermieFeedbackTiers,
+  getShermieFeedback,
+  SHERMIE_FEEDBACK_SUMMARY,
+} from './shermie/feedback/shermieFeedback.js';
+
+export {
+  SHERMIE_HITBOX_KEYS,
+  getShermieHitboxOffsets,
+  SHERMIE_ATTACK_FRAME_KEYS,
+  getShermieAttackFrames,
+} from './shermie/hitboxes/shermieHitboxes.js';
+
+export {
+  SHERMIE_ANIMATION_META,
+  getShermieAnimationNames,
+  getShermieAnimMeta,
+  getShermieAttackAnimations,
+  getShermieLoopAnimations,
+  type AnimationMeta as ShermieAnimationMeta,
+} from './shermie/animations/shermieAnimations.js';
+
+export {
+  SHERMIE_PORTRAIT_META,
+  getShermiePortraitMeta,
+  getShermieAvailablePortraitSizes,
+  type PortraitMeta as ShermiePortraitMeta,
+} from './shermie/portraits/shermiePortraits.js';
+
+export { SHERMIE_HIT_EFFECTS } from './shermie/hitEffects/shermieHitEffects.js';
+export { registerShermieAudio } from './shermie/audio/shermieSampler.js';
+
+// Yuri content package — prefixed to avoid type name collisions
+export {
+  YURI_MOVE_LIST,
+  YURI_WIN_QUOTES,
+  YURI_AVAILABLE_ACTIONS,
+  type YuriMoveEntry,
+} from './yuri/commands/yuriCommands.js';
+
+export {
+  YURI_MOVES,
+  getMoveByKey as getYuriMoveByKey,
+  getMoveByAttackType as getYuriMoveByAttackType,
+  getMovesByCategory as getYuriMovesByCategory,
+  getProjectileMoves as getYuriProjectileMoves,
+  getInvincibleMoves as getYuriInvincibleMoves,
+  getMoveStats as getYuriMoveStats,
+  type MoveDefinition as YuriMoveDefinition,
+  type MoveVersionEntry as YuriMoveVersionEntry,
+  type MoveVersion as YuriMoveVersion,
+} from './yuri/moves/yuriMoves.js';
+
+export {
+  YURI_CANCEL_PATHS,
+  findCancelRoute as findYuriCancelRoute,
+  getCancelTargets as getYuriCancelTargets,
+  validateCancel as validateYuriCancel,
+  getCancelRoutesByType as getYuriCancelRoutesByType,
+  isCancelSource as isYuriCancelSource,
+  getBestCancelRoute as getYuriBestCancelRoute,
+  type CancelType as YuriCancelType,
+  type CancelRoute as YuriCancelRoute,
+} from './yuri/cancelPaths.js';
+
+export {
+  YURI_ATTACK_KEYS,
+  getYuriFrameData,
+  getYuriAttackFrameData,
+} from './yuri/attacks/yuriAttacks.js';
+
+export { YURI_FRAME_DATA } from './yuri/frameData/yuriFrameData.js';
+
+export {
+  getYuriFeedbackTiers,
+  getYuriFeedback,
+  YURI_FEEDBACK_SUMMARY,
+} from './yuri/feedback/yuriFeedback.js';
+
+export {
+  YURI_HITBOX_KEYS,
+  getYuriHitboxOffsets,
+  YURI_ATTACK_FRAME_KEYS,
+  getYuriAttackFrames,
+  YURI_MUGEN_ACTION_MAP,
+  hasYuriMugenData,
+  getYuriMugenTiming,
+  getYuriMugenActionSummary,
+  getYuriMugenActions,
+  getYuriAttackTiming,
+} from './yuri/hitboxes/yuriHitboxes.js';
+
+export {
+  YURI_ANIMATION_META,
+  getYuriAnimationNames,
+  getYuriAnimMeta,
+  getYuriAttackAnimations,
+  getYuriLoopAnimations,
+  type AnimationMeta as YuriAnimationMeta,
+} from './yuri/animations/yuriAnimations.js';
+
+export {
+  YURI_PORTRAIT_META,
+  getYuriPortraitMeta,
+  getYuriAvailablePortraitSizes,
+  type PortraitMeta as YuriPortraitMeta,
+} from './yuri/portraits/yuriPortraits.js';
+
+export { YURI_HIT_EFFECTS } from './yuri/hitEffects/yuriHitEffects.js';
+export { registerYuriAudio } from './yuri/audio/yuriSampler.js';
+
+// Heidern content package — prefixed to avoid type name collisions
+export {
+  HEIDERN_MOVE_LIST,
+  HEIDERN_WIN_QUOTES,
+  HEIDERN_AVAILABLE_ACTIONS,
+  type HeidernMoveEntry,
+} from './heidern/commands/heidernCommands.js';
+
+export {
+  HEIDERN_MOVES,
+  getMoveByKey as getHeidernMoveByKey,
+  getMoveByAttackType as getHeidernMoveByAttackType,
+  getMovesByCategory as getHeidernMovesByCategory,
+  getProjectileMoves as getHeidernProjectileMoves,
+  getInvincibleMoves as getHeidernInvincibleMoves,
+  getGrabMoves as getHeidernGrabMoves,
+  getMoveStats as getHeidernMoveStats,
+  type MoveDefinition as HeidernMoveDefinition,
+  type MoveVersionEntry as HeidernMoveVersionEntry,
+  type MoveVersion as HeidernMoveVersion,
+} from './heidern/moves/heidernMoves.js';
+
+export {
+  HEIDERN_CANCEL_PATHS,
+  findCancelRoute as findHeidernCancelRoute,
+  getCancelTargets as getHeidernCancelTargets,
+  validateCancel as validateHeidernCancel,
+  getCancelRoutesByType as getHeidernCancelRoutesByType,
+  isCancelSource as isHeidernCancelSource,
+  getBestCancelRoute as getHeidernBestCancelRoute,
+  type CancelType as HeidernCancelType,
+  type CancelRoute as HeidernCancelRoute,
+} from './heidern/cancelPaths.js';
+
+export {
+  HEIDERN_ATTACK_KEYS,
+  getHeidernFrameData,
+  getHeidernAttackFrameData,
+} from './heidern/attacks/heidernAttacks.js';
+
+export { HEIDERN_FRAME_DATA } from './heidern/frameData/heidernFrameData.js';
+
+export {
+  getHeidernFeedbackTiers,
+  getHeidernFeedback,
+  HEIDERN_FEEDBACK_SUMMARY,
+} from './heidern/feedback/heidernFeedback.js';
+
+export {
+  HEIDERN_HITBOX_KEYS,
+  getHeidernHitboxOffsets,
+  HEIDERN_ATTACK_FRAME_KEYS,
+  getHeidernAttackFrames,
+  HEIDERN_MUGEN_ACTION_MAP,
+  hasHeidernMugenData,
+  getHeidernMugenTiming,
+  getHeidernMugenActionSummary,
+  getHeidernMugenActions,
+  getHeidernAttackTiming,
+} from './heidern/hitboxes/heidernHitboxes.js';
+
+export {
+  HEIDERN_ANIMATION_META,
+  getHeidernAnimationNames,
+  getHeidernAnimMeta,
+  getHeidernAttackAnimations,
+  getHeidernLoopAnimations,
+  type AnimationMeta as HeidernAnimationMeta,
+} from './heidern/animations/heidernAnimations.js';
+
+export {
+  HEIDERN_PORTRAIT_META,
+  getHeidernPortraitMeta,
+  getHeidernAvailablePortraitSizes,
+  type PortraitMeta as HeidernPortraitMeta,
+} from './heidern/portraits/heidernPortraits.js';
+
+export { HEIDERN_HIT_EFFECTS } from './heidern/hitEffects/heidernHitEffects.js';
+export { registerHeidernAudio } from './heidern/audio/heidernSampler.js';
