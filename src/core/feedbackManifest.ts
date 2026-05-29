@@ -553,6 +553,51 @@ const CHARACTER_DM_PALETTES: Record<string, { dm: string[]; sdm: string[]; hsdm:
     sdm: ['#0066cc', '#2299ff', '#66ddff', '#ffffff', '#ffee88'],
     hsdm: ['#0044aa', '#0088ff', '#44ccff', '#ffffff', '#ffff00'],
   },
+  terry: {
+    dm: ['#ffcc00', '#ff8800', '#ff4400', '#ffffff'],
+    sdm: ['#ffdd00', '#ffaa00', '#ff6600', '#ffffff', '#ffff88'],
+    hsdm: ['#ffee00', '#ffcc00', '#ff8800', '#ff4400', '#ffffff'],
+  },
+  kim: {
+    dm: ['#44aaff', '#88ccff', '#ffffff', '#ffcc00'],
+    sdm: ['#2288ff', '#66bbff', '#aaddff', '#ffffff', '#ffee88'],
+    hsdm: ['#0066ee', '#44aaff', '#88ccff', '#ffffff', '#ffff00'],
+  },
+  athena: {
+    dm: ['#ff66cc', '#ff99dd', '#ffffff', '#ffccff'],
+    sdm: ['#ff44aa', '#ff77bb', '#ffaacc', '#ffffff', '#ffddee'],
+    hsdm: ['#ff2288', '#ff66cc', '#ff99dd', '#ffffff', '#ffccff'],
+  },
+  vice: {
+    dm: ['#cc44ff', '#dd88ff', '#ffffff', '#ff00aa'],
+    sdm: ['#aa22dd', '#cc66ff', '#ee99ff', '#ffffff', '#ffaadd'],
+    hsdm: ['#8800bb', '#cc44ff', '#dd88ff', '#ffffff', '#ff66cc'],
+  },
+  yamazaki: {
+    dm: ['#aa4400', '#dd6622', '#ff8844', '#ffffff'],
+    sdm: ['#883300', '#cc5511', '#ee7733', '#ffffff', '#ffaa66'],
+    hsdm: ['#662200', '#aa4400', '#dd6622', '#ff8844', '#ffffff'],
+  },
+  shermie: {
+    dm: ['#ff4488', '#ff77aa', '#ffaacc', '#ffffff'],
+    sdm: ['#dd2266', '#ff5588', '#ff88aa', '#ffffff', '#ffbbdd'],
+    hsdm: ['#cc0044', '#ff4488', '#ff77aa', '#ffaacc', '#ffffff'],
+  },
+  benimaru: {
+    dm: ['#ffff44', '#ffff88', '#ffffff', '#ffcc00'],
+    sdm: ['#dddd22', '#ffff66', '#ffffaa', '#ffffff', '#ffee88'],
+    hsdm: ['#bbbb00', '#ffff44', '#ffff88', '#ffffff', '#ffffcc'],
+  },
+  heidern: {
+    dm: ['#336633', '#55aa55', '#88cc88', '#ffffff'],
+    sdm: ['#224422', '#448844', '#66bb66', '#ffffff', '#aaddaa'],
+    hsdm: ['#113311', '#336633', '#55aa55', '#88cc88', '#ffffff'],
+  },
+  yuri: {
+    dm: ['#ff6699', '#ff99bb', '#ffccdd', '#ffffff'],
+    sdm: ['#dd4477', '#ff77aa', '#ffaacc', '#ffffff', '#ffddee'],
+    hsdm: ['#cc2255', '#ff6699', '#ff99bb', '#ffccdd', '#ffffff'],
+  },
 };
 
 /** Get character-specific spark palette for DM/SDM/HSDM tier. Falls back to tier default. */
