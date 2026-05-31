@@ -321,7 +321,7 @@ describe('DM Manager — Ryo DM type recognition', () => {
   it('Ryo has exactly 2 DMs, 2 SDMs, and 1 HSDM', () => {
     const ryoAttacks = Object.values(AttackType).filter(a => {
       const s = a as string;
-      return s.includes('TEN_HA_OU') || s.includes('RYUKO_RANBU');
+      return s.includes('TEN_HA_OU') || (s.includes('RYUKO_RANBU') && !s.includes('TAKUMA'));
     });
     const dms = ryoAttacks.filter(a => a.startsWith('DM_'));
     const sdms = ryoAttacks.filter(a => a.startsWith('SDM_'));

@@ -651,3 +651,106 @@ registerCharacterSprites({
     [AttackType.DM_HAKA_OTOSHI]: '3000', [AttackType.SDM_HAKA_OTOSHI]: '3050',
   },
 });
+
+// ===== Kensou (kensou — JFCT555 Ex-Kensou KOF style) =====
+registerCharacterSprites({
+  charId: 'kensou',
+  mugenDir: 'kensou',
+  targetDisplayHeight: 104,
+  defaultTint: '#33cc66',
+  specialMap: {
+    // Normals — standing
+    [AttackType.CLOSE_A]: '220', [AttackType.CLOSE_B]: '250',
+    [AttackType.CLOSE_C]: '230', [AttackType.CLOSE_D]: '260',
+    [AttackType.STAND_A]: '200', [AttackType.STAND_B]: '240',
+    [AttackType.STAND_C]: '210', [AttackType.STAND_D]: '235',
+    // Normals — crouching
+    [AttackType.CROUCH_A]: '400', [AttackType.CROUCH_B]: '430',
+    [AttackType.CROUCH_C]: '410', [AttackType.CROUCH_D]: '440',
+    // Normals — jumping
+    [AttackType.JUMP_A]: '600', [AttackType.JUMP_B]: '630',
+    [AttackType.JUMP_C]: '610', [AttackType.JUMP_D]: '640',
+    // Command normals
+    [AttackType.KENSOU_BAKYAKU]: '300',       // →+B Bakyaku (overhead)
+    [AttackType.KENSOU_KAKUHI]: '350',        // ↘+D Kakuhi (low)
+    // Specials — 超球弾 (Chou Kyuu Dan)
+    [AttackType.KENSOU_CHOU_KYUU_DAN]: '1000', // QCF+P
+    [AttackType.KENSOU_CHOU_KYUU_DAN_C]: '1010', // QCF+C
+    // 龍連牙・天帝 (Ryurenga Tentei)
+    [AttackType.KENSOU_RYURENGA_TEN]: '1050', // QCB+A
+    [AttackType.KENSOU_RYURENGA_CHI]: '1060', // QCB+C
+    // 龍爪撃 (Ryusou Geki)
+    [AttackType.KENSOU_RYUSOU_GEKI]: '1100',  // HCF+P
+    // DM — 超球弾連打 (Shin Chou Kyuu Dan)
+    [AttackType.DM_SHIN_CHOU_KYUU_DAN]: '3000',
+    [AttackType.SDM_SHIN_CHOU_KYUU_DAN]: '3100',
+  },
+});
+
+// ===== Yashiro (yashiro — Don Drago Yashiro Nanakase) =====
+registerCharacterSprites({
+  charId: 'yashiro',
+  mugenDir: 'yashiro',
+  targetDisplayHeight: 112,
+  defaultTint: '#9966cc',
+  specialMap: {
+    // Normals — standing
+    [AttackType.CLOSE_A]: '205', [AttackType.CLOSE_B]: '235',
+    [AttackType.CLOSE_C]: '210', [AttackType.CLOSE_D]: '240',
+    [AttackType.STAND_A]: '200', [AttackType.STAND_B]: '230',
+    [AttackType.STAND_C]: '210', [AttackType.STAND_D]: '240',
+    // Normals — crouching
+    [AttackType.CROUCH_A]: '400', [AttackType.CROUCH_B]: '430',
+    [AttackType.CROUCH_C]: '410', [AttackType.CROUCH_D]: '440',
+    // Normals — jumping
+    [AttackType.JUMP_A]: '600', [AttackType.JUMP_B]: '630',
+    [AttackType.JUMP_C]: '610', [AttackType.JUMP_D]: '640',
+    // Command normals
+    [AttackType.YASHIRO_SHUU_WANI]: '300',    // →+A Shuu Wani
+    [AttackType.YASHIRO_JUU_ZUTSU]: '310',    // →+B Juu Zutsu (overhead)
+    // Specials — Upper Du Bag
+    [AttackType.YASHIRO_UPPER_DU]: '1000',    // QCF+A
+    [AttackType.YASHIRO_UPPER_DU_C]: '1010',  // QCF+C
+    // Niraai Kaname
+    [AttackType.YASHIRO_NIRAAI]: '1020',      // QCB+P
+    // Musatsu Niraai
+    [AttackType.YASHIRO_MUSATSU]: '1300',     // HCF+K
+    // DM — Armageddon Busters
+    [AttackType.DM_ARMAGEDDON_BUSTERS]: '3000',
+    [AttackType.SDM_ARMAGEDDON_BUSTERS]: '3100',
+  },
+});
+
+// ===== Takuma (takuma — Don Drago Takuma Sakazaki) =====
+registerCharacterSprites({
+  charId: 'takuma',
+  mugenDir: 'takuma',
+  targetDisplayHeight: 106,
+  defaultTint: '#ff8800',
+  specialMap: {
+    // Normals — standing
+    [AttackType.CLOSE_A]: '205', [AttackType.CLOSE_B]: '230',
+    [AttackType.CLOSE_C]: '210', [AttackType.CLOSE_D]: '240',
+    [AttackType.STAND_A]: '200', [AttackType.STAND_B]: '230',
+    [AttackType.STAND_C]: '210', [AttackType.STAND_D]: '240',
+    // Normals — crouching
+    [AttackType.CROUCH_A]: '400', [AttackType.CROUCH_B]: '430',
+    [AttackType.CROUCH_C]: '410', [AttackType.CROUCH_D]: '440',
+    // Normals — jumping
+    [AttackType.JUMP_A]: '600', [AttackType.JUMP_B]: '630',
+    [AttackType.JUMP_C]: '610', [AttackType.JUMP_D]: '640',
+    // Command normals
+    [AttackType.TAKUMA_FUU_GA]: '300',        // →+A Fuu Ga
+    [AttackType.TAKUMA_GOUSOU]: '310',        // →+B Gousou (overhead)
+    // Specials — Ko Ou Ken (虎煌拳)
+    [AttackType.TAKUMA_KO_OU_KEN]: '1000',    // QCF+A
+    [AttackType.TAKUMA_KO_OU_KEN_C]: '1010',  // QCF+C
+    // Haoh Shou Kou Ken (覇王翔吼拳)
+    [AttackType.TAKUMA_HAOH_SHOU_KOU_KEN]: '1020', // FDF+P
+    // Hien Shippuu Kyaku (飛燕疾風脚)
+    [AttackType.TAKUMA_HIEN_SHIPPUU]: '1200', // QCB+K
+    // DM — Ryuko Ranbu (龍虎乱舞)
+    [AttackType.DM_RYUKO_RANBU_TAKUMA]: '3000',
+    [AttackType.SDM_RYUKO_RANBU_TAKUMA]: '3200',
+  },
+});

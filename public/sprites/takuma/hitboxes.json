@@ -1,0 +1,447 @@
+{
+  "characterId": "unknown",
+  "actions": {
+    "212": {
+      "name": "0",
+      "startup": 2,
+      "active": 1,
+      "recovery": 2,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 39,
+              "oy": -98,
+              "w": 38,
+              "h": 28
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "230": {
+      "name": "0",
+      "startup": 5,
+      "active": 1,
+      "recovery": 3,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 46,
+              "oy": -97,
+              "w": 40,
+              "h": 29
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "235": {
+      "name": "0",
+      "startup": 1,
+      "active": 1,
+      "recovery": 5,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 17,
+              "oy": -121,
+              "w": 32,
+              "h": 77
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "255": {
+      "name": "0",
+      "startup": 3,
+      "active": 1,
+      "recovery": 0,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 34,
+              "oy": -109,
+              "w": 50,
+              "h": 37
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "341": {
+      "name": "0",
+      "startup": 6,
+      "active": 1,
+      "recovery": 3,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 30,
+              "oy": -95,
+              "w": 54,
+              "h": 33
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "420": {
+      "name": "0",
+      "startup": 3,
+      "active": 1,
+      "recovery": 1,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 25,
+              "oy": -55,
+              "w": 50,
+              "h": 15
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "430": {
+      "name": "0",
+      "startup": 3,
+      "active": 1,
+      "recovery": 4,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 25,
+              "oy": -10,
+              "w": 50,
+              "h": 10
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "450": {
+      "name": "0",
+      "startup": 0,
+      "active": 1,
+      "recovery": 1,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 28,
+              "oy": -16,
+              "w": 75,
+              "h": 16
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "635": {
+      "name": "0",
+      "startup": 1,
+      "active": 1,
+      "recovery": 2,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": -64,
+              "oy": -70,
+              "w": 31,
+              "h": 33
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "831": {
+      "name": "0",
+      "startup": 4,
+      "active": 1,
+      "recovery": 1,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": -1,
+              "oy": -28,
+              "w": 79,
+              "h": 27
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "1211": {
+      "name": "0",
+      "startup": 6,
+      "active": 1,
+      "recovery": 3,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 34,
+              "oy": -96,
+              "w": 49,
+              "h": 62
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "1450": {
+      "name": "0",
+      "startup": 0,
+      "active": 1,
+      "recovery": 0,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 16,
+              "oy": -130,
+              "w": 53,
+              "h": 95
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "1451": {
+      "name": "0",
+      "startup": 0,
+      "active": 1,
+      "recovery": 1,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 16,
+              "oy": -130,
+              "w": 53,
+              "h": 95
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "1452": {
+      "name": "0",
+      "startup": 0,
+      "active": 1,
+      "recovery": 0,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 16,
+              "oy": -130,
+              "w": 53,
+              "h": 95
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "1526": {
+      "name": "0",
+      "startup": 0,
+      "active": 1,
+      "recovery": 1,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 1,
+              "oy": -75,
+              "w": 44,
+              "h": 43
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "3100": {
+      "name": "0",
+      "startup": 0,
+      "active": 1,
+      "recovery": 0,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 4,
+              "oy": -143,
+              "w": 53,
+              "h": 136
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "3202": {
+      "name": "0",
+      "startup": 0,
+      "active": 1,
+      "recovery": 0,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 12,
+              "oy": -91,
+              "w": 31,
+              "h": 52
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "3203": {
+      "name": "0",
+      "startup": 0,
+      "active": 2,
+      "recovery": 9,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 12,
+              "oy": -91,
+              "w": 31,
+              "h": 52
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": 9,
+              "oy": -142,
+              "w": 25,
+              "h": 100
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "4001": {
+      "name": "0",
+      "startup": 0,
+      "active": 1,
+      "recovery": 0,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 4,
+              "oy": -56,
+              "w": 61,
+              "h": 56
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    }
+  }
+}
