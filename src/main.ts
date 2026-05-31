@@ -1745,5 +1745,9 @@ window.addEventListener('keyup', e => {
 import { initKfmSprites } from './rendering/sprites/kfm/kfmSpriteRender.js';
 import { initAllCharacterSprites } from './rendering/sprites/shared/initAllCharacterSprites.js';
 initKfmSprites().then(() => console.log('[KFM] Sprites loaded')).catch(e => console.warn('[KFM] Sprite load failed:', e));
-initAllCharacterSprites().catch(e => console.warn('[Sprites] Init failed:', e));
-new GameLoop(update, render).start();
+initAllCharacterSprites().then(() => {
+  new GameLoop(update, render).start();
+}).catch(e => {
+  console.warn('[Sprites] Init failed:', e);
+  new GameLoop(update, render).start();
+});

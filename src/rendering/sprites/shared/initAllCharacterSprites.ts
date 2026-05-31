@@ -4,8 +4,9 @@
  * Single entry point to load all registered character sprites at startup.
  * Import this file and call initAllCharacterSprites() before the game loop.
  *
- * Strategy: load priority characters (kyo, ryo) first, then load the rest
- * in small batches to avoid overwhelming the browser with concurrent fetches.
+ * Strategy: load ALL character manifests upfront (fast — just JSON fetches),
+ * then preload the first PNG of each character's idle action so they render
+ * immediately when a battle starts. Remaining PNGs load lazily on demand.
  */
 
 import './characterSpriteConfigs.js';
@@ -29,24 +30,28 @@ import type { FighterState, AttackType } from '../../../core/types.js';
 
 const initializedCharacters = new Set<string>();
 
-const PRIORITY_CHARS = ['kyo', 'ryo'];
+// Key actions whose first frame should be preloaded so the character
+// renders immediately (idle, crouch, walk forward, walk back, hitstun).
+const PRELOAD_ACTIONS = ['0', '11', '20', '21', '5000'];
 
 /**
  * Load sprites for all registered characters.
- * Priority characters load first, then the rest in background batches.
+ * All manifests load upfront; idle PNGs are preloaded for instant display.
  */
 export async function initAllCharacterSprites(): Promise<void> {
   const configs = getAllRegisteredCharacters();
   console.log(`[Sprites] Loading sprites for ${configs.length} characters...`);
 
-  // Phase 1: Load priority characters immediately
-  const priorityConfigs = configs.filter(c => PRIORITY_CHARS.includes(c.charId));
-  const restConfigs = configs.filter(c => !PRIORITY_CHARS.includes(c.charId));
+  // Load all character manifests in parallel batches of 6
+  const BATCH_SIZE = 6;
+  for (let i = 0; i < configs.length; i += BATCH_SIZE) {
+    await loadBatch(configs.slice(i, i + BATCH_SIZE));
+  }
 
-  await loadBatch(priorityConfigs);
+  // Preload idle/crouch/walk PNGs so characters render on first frame
+  await preloadKeyFrames();
 
-  // Phase 2: Load remaining characters in background batches of 4
-  loadBackground(restConfigs);
+  console.log(`[Sprites] All ${initializedCharacters.size} characters loaded`);
 }
 
 async function loadBatch(configs: import('./characterSpriteRegistry.js').CharacterSpriteConfig[]): Promise<void> {
@@ -58,7 +63,7 @@ async function loadBatch(configs: import('./characterSpriteRegistry.js').Charact
           loadCharacterHitboxes(config),
         ]);
         initializedCharacters.add(config.charId);
-        return { charId: config.charId, spriteCount: sprites.size, hasHitboxes: !!hitboxes, mugenDir: config.mugenDir };
+        return { charId: config.charId, spriteCount: sprites.size, hasHitboxes: !!hitboxes, mugenDir: config.mugenDir, sprites };
       } catch (e) {
         console.warn(`[Sprites] Failed to load ${config.charId}:`, e);
         return null;
@@ -71,26 +76,39 @@ async function loadBatch(configs: import('./characterSpriteRegistry.js').Charact
       const { charId, spriteCount, hasHitboxes, mugenDir } = r.value;
       const hitboxTag = hasHitboxes ? '+hitboxes' : '';
       console.log(`[Sprites] ${charId}: ${spriteCount} actions${hitboxTag} loaded`);
-      // Register hurtbox manifest in background (reuse browser cache)
       fetch(`/sprites/${mugenDir}/manifest.json`).then(r => r.ok ? r.json() : null).then(d => { if (d) registerManifestData(mugenDir, d); }).catch(() => {});
     }
   }
 }
 
-function loadBackground(configs: import('./characterSpriteRegistry.js').CharacterSpriteConfig[]): void {
-  const BATCH_SIZE = 4;
-  let idx = 0;
-  const next = async () => {
-    const batch = configs.slice(idx, idx + BATCH_SIZE);
-    if (batch.length === 0) {
-      console.log(`[Sprites] ${initializedCharacters.size} total characters loaded`);
-      return;
+/**
+ * For every loaded character, trigger browser download of the first PNG
+ * for key actions (idle, crouch, walk). This ensures the first render
+ * call finds image.complete === true instead of falling back to skeleton.
+ */
+async function preloadKeyFrames(): Promise<void> {
+  const decodePromises: Promise<void>[] = [];
+
+  for (const charId of initializedCharacters) {
+    const sprites = getLoadedSprites(charId);
+    if (!sprites) continue;
+
+    for (const actionId of PRELOAD_ACTIONS) {
+      const frames = sprites.get(actionId);
+      if (!frames || frames.length === 0) continue;
+      const img = frames[0].image;
+      if (img && !img.complete) {
+        decodePromises.push(
+          img.decode().then(() => {}).catch(() => {})
+        );
+      }
     }
-    idx += BATCH_SIZE;
-    await loadBatch(batch);
-    setTimeout(next, 100);
-  };
-  setTimeout(next, 500);
+  }
+
+  if (decodePromises.length > 0) {
+    await Promise.all(decodePromises);
+    console.log(`[Sprites] Preloaded ${decodePromises.length} key frame images`);
+  }
 }
 
 /**

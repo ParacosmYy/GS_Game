@@ -12,16 +12,15 @@
 
 ## 关键诊断（2026-05-31）
 
-### 为什么用户看到"只有 Kyo 有素材"
+### 为什么用户看到"只有 Kyo 有素材"（已修复）
 
-渲染链路：`rendererFighter.ts:976` 先查 `characterSpriteConfigs.ts` 注册，再查异步加载的 PNG sprites。
+**根因**：`initAllCharacterSprites()` 只把 kyo/ryo 设为 PRIORITY，`main.ts` 不等加载完就启动游戏循环。非 kyo/ryo 角色在用户进入战斗时 manifest 未加载、Image 对象未创建，导致 `drawGenericCharacterSprite` 返回 false → fallback 到骨架。
 
-**实际状态**：
-- 14 个 ROSTER 角色有完整 sprite 链路（注册 + PNG + manifest + hitbox），应能显示 MUGEN sprite
-- 但 `initAllCharacterSprites()` 是异步 fire-and-forget，非优先角色（只有 kyo/ryo 是优先）可能延迟加载
-- 图片 lazy load，`image.complete === false` 时渲染 fallback 到骨架
+**修复**：
+1. `initAllCharacterSprites.ts`：全部角色 manifest 前置加载 + idle PNG `img.decode()` 预热
+2. `main.ts`：`GameLoop.start()` 移到 `initAllCharacterSprites().then()` 里，等加载完再启动
 
-**真正缺素材的 ROSTER 角色（11 个）**：leona、kula、robert、ralf、joe、billy、choi、chang、mature、chris、mary — 完全没有 MUGEN 源文件，没有 PNG，没有注册。
+**真正缺素材的 ROSTER 角色（11 个）**：leona、kula、robert、ralf、joe、billy、choi、chang、mature、chris、mary — 完全没有 MUGEN 源文件，没有 PNG，没有注册。这些角色无论怎么修加载逻辑都会显示骨架，需要下载 MUGEN 源。
 
 **有素材但不在 ROSTER 的 KOF2002 角色（8 个）**：benimaru、yuri、kensou、takuma、heidern、rugal、g_rugal、king — 只需要创建 charDef 加入 ROSTER 就能上场。
 

@@ -91,15 +91,16 @@ SFF 提取 PNG -> manifest 生成 -> AIR 解析动画 -> AIR Clsn 提取判定 -
 1. getCharacterConfig(charId) → 查 characterSpriteConfigs.ts 注册
 2. getLoadedSprites(charId) → 查异步加载的 manifest.json + PNG
 3. 如果 config && sprites → drawGenericCharacterSprite() → 画 MUGEN sprite
-4. 如果失败 → 角色专属 procedural (kyo/iori/ryo/kfm)
-5. 如果仍失败 → drawSkeletalFighter() → 骨架假人
+4. 如果 image.complete === false → 返回 false
+5. 如果失败 → 角色专属 procedural (kyo/iori/ryo/kfm)
+6. 如果仍失败 → drawSkeletalFighter() → 骨架假人
 ```
 
-**关键发现**：14 个 ROSTER 角色有 SpriteReg + PNG + Manifest，理论上应能显示 MUGEN sprite。
-但实际可能不显示的原因：
-- `initAllCharacterSprites()` 是异步 fire-and-forget，非优先角色可能延迟加载
-- 图片 lazy load，`image.complete === false` 时 `drawImageFromRegistry` 返回 false
-- 浏览器缓存或网络请求失败时 fallback 到骨架
+**已修复的根因**（2026-05-31）：
+- `initAllCharacterSprites()` 原来只把 kyo/ryo 设为 PRIORITY，其余后台延迟加载
+- `main.ts` 用 `.catch()` fire-and-forget 调用，不等加载完就开始游戏循环
+- 结果：非 kyo/ryo 角色在游戏开始时 manifest 未加载，Image 对象未创建 → 只能骨架
+- **修复**：全部角色 manifest 前置加载 + idle PNG decode 预热 + 游戏循环等加载完再启动
 
 ### 0.2 差距清单
 
