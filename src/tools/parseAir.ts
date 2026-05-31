@@ -180,7 +180,7 @@ function parseAir(content: string, sourceFile: string): AirManifest {
     }
 
     // Parse frame line: group,index, offsetX,offsetY, duration[, flags]
-    const frameMatch = line.match(/^(-?\d+)\s*,\s*(\d+)\s*,\s*(-?\d+)\s*,\s*(-?\d+)\s*,\s*(-?\d+)(?:\s*,\s*(.+))?$/);
+    const frameMatch = line.match(/^(-?\d+)\s*,\s*(\d+)\s*,\s*(-?\d+)\s*,\s*(-?\d+)\s*,\s*(-?\d+)(?:\s*,\s*(.*))?$/);
     if (frameMatch) {
       const group = parseInt(frameMatch[1]);
       const index = parseInt(frameMatch[2]);

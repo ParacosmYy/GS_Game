@@ -390,7 +390,16 @@ registerCharacterSprites({
   mugenDir: 'cvsrugal',
   targetDisplayHeight: 130,
   defaultTint: '#880022',
-  specialMap: {},
+  specialMap: {
+    [AttackType.CLOSE_A]: '200', [AttackType.CLOSE_B]: '230',
+    [AttackType.CLOSE_C]: '221', [AttackType.CLOSE_D]: '231',
+    [AttackType.STAND_A]: '200', [AttackType.STAND_B]: '230',
+    [AttackType.STAND_C]: '220', [AttackType.STAND_D]: '240',
+    [AttackType.CROUCH_A]: '400', [AttackType.CROUCH_B]: '430',
+    [AttackType.CROUCH_C]: '410', [AttackType.CROUCH_D]: '440',
+    [AttackType.JUMP_A]: '600', [AttackType.JUMP_B]: '630',
+    [AttackType.JUMP_C]: '610', [AttackType.JUMP_D]: '640',
+  },
 });
 
 // ===== Omega Rugal (cvsg_rugal) =====
@@ -399,7 +408,16 @@ registerCharacterSprites({
   mugenDir: 'cvsg_rugal',
   targetDisplayHeight: 131,
   defaultTint: '#cc0022',
-  specialMap: {},
+  specialMap: {
+    [AttackType.CLOSE_A]: '200', [AttackType.CLOSE_B]: '230',
+    [AttackType.CLOSE_C]: '221', [AttackType.CLOSE_D]: '231',
+    [AttackType.STAND_A]: '200', [AttackType.STAND_B]: '230',
+    [AttackType.STAND_C]: '220', [AttackType.STAND_D]: '240',
+    [AttackType.CROUCH_A]: '400', [AttackType.CROUCH_B]: '430',
+    [AttackType.CROUCH_C]: '410', [AttackType.CROUCH_D]: '440',
+    [AttackType.JUMP_A]: '600', [AttackType.JUMP_B]: '630',
+    [AttackType.JUMP_C]: '610', [AttackType.JUMP_D]: '640',
+  },
 });
 
 // ===== Heidern (heidern) =====
