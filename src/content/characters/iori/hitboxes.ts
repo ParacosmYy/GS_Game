@@ -9,4 +9,9 @@ export {
   getIoriHitboxOffsets,
   IORI_ATTACK_FRAME_KEYS,
   getIoriAttackFrames,
+  IORI_MUGEN_ACTION_MAP,
+  hasIoriMugenData,
+  getIoriMugenTiming,
+  getIoriMugenActionSummary,
+  getIoriAttackTiming,
 } from './hitboxes/ioriHitboxes.js';

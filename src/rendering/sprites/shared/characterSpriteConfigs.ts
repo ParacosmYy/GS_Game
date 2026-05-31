@@ -526,3 +526,92 @@ registerCharacterSprites({
     [AttackType.HSDM_YAOTOME]: '3500',
   },
 });
+
+// ===== Andy (andy — zzzasd KOF2002 version) =====
+registerCharacterSprites({
+  charId: 'andy',
+  mugenDir: 'andy',
+  targetDisplayHeight: 103,
+  defaultTint: '#ff9944',
+  specialMap: {
+    // Normals
+    [AttackType.CLOSE_A]: '200', [AttackType.CLOSE_B]: '230',
+    [AttackType.CLOSE_C]: '210', [AttackType.CLOSE_D]: '240',
+    [AttackType.STAND_A]: '200', [AttackType.STAND_B]: '235',
+    [AttackType.STAND_C]: '215', [AttackType.STAND_D]: '245',
+    [AttackType.CROUCH_A]: '400', [AttackType.CROUCH_B]: '430',
+    [AttackType.CROUCH_C]: '410', [AttackType.CROUCH_D]: '440',
+    [AttackType.JUMP_A]: '600', [AttackType.JUMP_B]: '630',
+    [AttackType.JUMP_C]: '610', [AttackType.JUMP_D]: '640',
+    // Command normals
+    [AttackType.ANDY_UWA_AGITO]: '710', [AttackType.ANDY_GEDAN_AGITO]: '715',
+    // Specials — 飛翔拳 (Hishou Ken)
+    [AttackType.ANDY_HISHOU_KEN]: '1000', [AttackType.ANDY_HISHOU_KEN_C]: '1050',
+    // 斬影流星拳 (Zanei Ryusei Ken)
+    [AttackType.ANDY_ZANEI_RYUSEI_KEN]: '1300', [AttackType.ANDY_ZANEI_RYUSEI_KEN_D]: '1350',
+    // 激飛翔拳 (Geki Hishou Ken)
+    [AttackType.ANDY_GEKI_HISHOU_KEN]: '1400',
+    // 昇龍弾 (Shouryuu Dan)
+    [AttackType.ANDY_SHOURYUU_DAN]: '1100', [AttackType.ANDY_SHOURYUU_DAN_C]: '1150',
+    // DM — 超裂破弾 (Chou Reppa Dan)
+    [AttackType.DM_CHO_REPPA_DAN]: '3000', [AttackType.SDM_CHO_REPPA_DAN]: '3100',
+  },
+});
+
+// ===== Clark (clark — zzzasd KOF2002 version) =====
+registerCharacterSprites({
+  charId: 'clark',
+  mugenDir: 'clark',
+  targetDisplayHeight: 116,
+  defaultTint: '#886622',
+  specialMap: {
+    // Normals
+    [AttackType.CLOSE_A]: '200', [AttackType.CLOSE_B]: '230',
+    [AttackType.CLOSE_C]: '210', [AttackType.CLOSE_D]: '240',
+    [AttackType.STAND_A]: '200', [AttackType.STAND_B]: '235',
+    [AttackType.STAND_C]: '215', [AttackType.STAND_D]: '245',
+    [AttackType.CROUCH_A]: '400', [AttackType.CROUCH_B]: '430',
+    [AttackType.CROUCH_C]: '410', [AttackType.CROUCH_D]: '440',
+    [AttackType.JUMP_A]: '600', [AttackType.JUMP_B]: '630',
+    [AttackType.JUMP_C]: '610', [AttackType.JUMP_D]: '640',
+    // Command normals
+    [AttackType.CLARK_DEATH_LAKE]: '750', [AttackType.CLARK_STOMP]: '750',
+    // Specials — Super Argentine Backbreaker
+    [AttackType.CLARK_ARGENTINE]: '1000', [AttackType.CLARK_ARGENTINE_C]: '1010',
+    // Flash Elbow
+    [AttackType.CLARK_FLASH_ELBOW]: '1100',
+    // Vulcan Punch
+    [AttackType.CLARK_VULCAN]: '1200',
+    // DM — Ultra Argentine Backbreaker
+    [AttackType.DM_ARGENTINE_DM]: '3000', [AttackType.SDM_ARGENTINE_DM]: '3100',
+  },
+});
+
+// ===== Mai (mai — M_Mai02UM KOF2002 version) =====
+registerCharacterSprites({
+  charId: 'mai',
+  mugenDir: 'mai',
+  targetDisplayHeight: 96,
+  defaultTint: '#ff4466',
+  specialMap: {
+    // Normals
+    [AttackType.CLOSE_A]: '200', [AttackType.CLOSE_B]: '230',
+    [AttackType.CLOSE_C]: '210', [AttackType.CLOSE_D]: '240',
+    [AttackType.STAND_A]: '200', [AttackType.STAND_B]: '230',
+    [AttackType.STAND_C]: '210', [AttackType.STAND_D]: '240',
+    [AttackType.CROUCH_A]: '400', [AttackType.CROUCH_B]: '430',
+    [AttackType.CROUCH_C]: '410', [AttackType.CROUCH_D]: '440',
+    [AttackType.JUMP_A]: '600', [AttackType.JUMP_B]: '630',
+    [AttackType.JUMP_C]: '610', [AttackType.JUMP_D]: '640',
+    // Command normals
+    [AttackType.MAI_HISSATSU_SHINOBIBACHI]: '710', [AttackType.MAI_YUSURA_UMA]: '740',
+    // Specials — 花蝶扇 (Kachousen)
+    [AttackType.MAI_KA_CHO_SEN]: '1000', [AttackType.MAI_KA_CHO_SEN_C]: '1050',
+    // 飛翔龍炎陣 (Hishou Ryu En Jin)
+    [AttackType.MAI_HISHO_RYU_EN_JIN]: '1300',
+    // 龍炎舞 (Ryu En Bu)
+    [AttackType.MAI_RYU_EN_BU]: '1100',
+    // DM — 蜂巢落とし (Haka Otoshi)
+    [AttackType.DM_HAKA_OTOSHI]: '3000', [AttackType.SDM_HAKA_OTOSHI]: '3050',
+  },
+});

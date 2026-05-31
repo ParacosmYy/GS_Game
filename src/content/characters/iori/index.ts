@@ -20,12 +20,17 @@ export {
   type IoriMoveEntry,
 } from './commands.js';
 
-// Hitbox / hurtbox data
+// Hitbox / hurtbox data + MUGEN queries
 export {
   IORI_HITBOX_KEYS,
   getIoriHitboxOffsets,
   IORI_ATTACK_FRAME_KEYS,
   getIoriAttackFrames,
+  IORI_MUGEN_ACTION_MAP,
+  hasIoriMugenData,
+  getIoriMugenTiming,
+  getIoriMugenActionSummary,
+  getIoriAttackTiming,
 } from './hitboxes.js';
 
 // Feedback tier mappings

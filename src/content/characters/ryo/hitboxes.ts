@@ -9,4 +9,9 @@ export {
   getRyoHitboxOffsets,
   RYO_ATTACK_FRAME_KEYS,
   getRyoAttackFrames,
+  RYO_MUGEN_ACTION_MAP,
+  hasRyoMugenData,
+  getRyoMugenTiming,
+  getRyoMugenActionSummary,
+  getRyoAttackTiming,
 } from './hitboxes/ryoHitboxes.js';

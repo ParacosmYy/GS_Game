@@ -21,7 +21,7 @@ const REQUIRED_MUGEN_EXPORTS = [
 ];
 
 const MUGEN_CHARS = [
-  'kyo', 'ryo', 'athena', 'terry', 'kim', 'vice', 'yamazaki',
+  'kyo', 'ryo', 'iori', 'athena', 'terry', 'kim', 'vice', 'yamazaki',
   'shermie', 'benimaru', 'heidern', 'yuri',
 ];
 
@@ -206,7 +206,7 @@ describe('MUGEN Action Map Content Quality', () => {
 
 describe('MUGEN Query Summary', () => {
   it('all 11 MUGEN characters have complete query coverage', () => {
-    expect(MUGEN_CHARS.length).toBe(11);
+    expect(MUGEN_CHARS.length).toBe(12);
     for (const charId of MUGEN_CHARS) {
       const hitboxDir = path.join(CONTENT_DIR, charId, 'hitboxes');
       const files = fs.readdirSync(hitboxDir).filter(f => f.endsWith('.ts'));
@@ -214,13 +214,13 @@ describe('MUGEN Query Summary', () => {
     }
   });
 
-  it('Iori is excluded from MUGEN query tests (no MUGEN source)', () => {
+  it('Iori has MUGEN query data (ihoo1836 source)', () => {
     const hitboxDir = path.join(CONTENT_DIR, 'iori', 'hitboxes');
     if (fs.existsSync(hitboxDir)) {
       const files = fs.readdirSync(hitboxDir).filter(f => f.endsWith('.ts'));
       if (files.length > 0) {
         const content = fs.readFileSync(path.join(hitboxDir, files[0]), 'utf8');
-        expect(content.includes('MUGEN_ACTION_MAP')).toBe(false);
+        expect(content.includes('MUGEN_ACTION_MAP')).toBe(true);
       }
     }
   });
