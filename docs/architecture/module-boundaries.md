@@ -31,11 +31,11 @@ tools -> assets/core schema
 
 | 任务 | 归属 |
 | --- | --- |
-| Ryo / Kyo / Iori 肖像 manifest | `core/` schema + asset data，`rendering/` 只读 |
-| Ryo / Kyo / Iori sprite atlas | `core/` schema，`tools/` 生成，`rendering/` 绘制 |
-| Ryo / Kyo / Iori animation | `core/` manifest，`characters/` 只引用动作语义 |
-| Ryo / Kyo / Iori hitbox | `core/` 数据，`combat/` 读取 |
-| Ryo / Kyo / Iori feedback | `core/` 数据，`combat` 发事件，`rendering/audio` 响应 |
+| Ryo / Kyo / Iori 肖像 manifest | `core/` schema + asset data，`rendering/` 只读；Kyo 优先作为第一样板 |
+| Ryo / Kyo / Iori sprite atlas | `core/` schema，`tools/` 生成，`rendering/` 绘制；Kyo 优先作为第一样板 |
+| Ryo / Kyo / Iori animation | `core/` manifest，`characters/` 只引用动作语义；Kyo 优先作为第一样板 |
+| Ryo / Kyo / Iori hitbox | `core/` 数据，`combat/` 读取；Kyo 优先作为第一样板 |
+| Ryo / Kyo / Iori feedback | `core/` 数据，`combat` 发事件，`rendering/audio` 响应；Kyo 优先作为第一样板 |
 | 完整度报告 | `tools/` 或 `tests/` |
 
 补充约束：

@@ -28,6 +28,8 @@
 
 运行时已支持双路径渲染：PNG sprite 优先，程序化帧作为 fallback。这意味着每导入一个角色的 MUGEN 资产，视觉质量就会产生实质性提升，而不是继续靠程序化渲染硬撑"像 KOF"。
 
+当前执行顺序进一步收口为：**先把 Kyo 做成第一套可复制样板，再把同一条资产与内容包链路复制到其他角色**。Ryo 继续保留为合同参照，但不再是当前第一执行目标。
+
 ### 1.2 当前资产状态
 
 - **已导入的 MUGEN sprite**：18 个角色（cvskyo 1808 张、cvsryo 1230 张、cvsterry 1407 张、cvskim 1247 张、cvsvice 1950 张、cvsyamazaki 1955 张、cvsg_rugal 2191 张 等），PNG + manifest 已存放在 `public/sprites/`。
@@ -69,11 +71,13 @@ MUGEN SFF/AIR/ACT（references/mugen/）
 
 优先级排序：
 
-1. 对已有 MUGEN PNG 但尚未接入运行时的角色，优先完成 manifest -> 内容包 -> 运行时链路。
-2. 对已有内容包但尚未接入 MUGEN sprite 的角色（Terry、Kim），优先用 MUGEN sprite 替换程序化 fallback。
-3. 对 MUGEN 素材库中已有但尚未提取的角色，运行 `extractCharacterSprites` 提取 PNG。
-4. 工具链改进和校验补全。
-5. 程序化 fallback 的视觉修饰（仅当上述全部完成或本轮无资产可做时）。
+1. **先做 Kyo**：把 Kyo 的真实 sprite、portrait、animation、hitbox、feedback、moveList 和运行时接入闭合成第一套完整样板。
+2. **再复制到其他角色**：把 Kyo 已验证的公共骨架复制到 Ryo / Iori / Terry / Kim 及后续角色。
+3. 对已有 MUGEN PNG 但尚未接入运行时的其他角色，优先完成 manifest -> 内容包 -> 运行时链路。
+4. 对已有内容包但尚未接入 MUGEN sprite 的角色（Terry、Kim），优先用 MUGEN sprite 替换程序化 fallback。
+5. 对 MUGEN 素材库中已有但尚未提取的角色，运行 `extractCharacterSprites` 提取 PNG。
+6. 工具链改进和校验补全。
+7. 程序化 fallback 的视觉修饰（仅当上述全部完成或本轮无资产可做时）。
 
 ### 1.5 本阶段禁止事项
 
@@ -82,6 +86,7 @@ MUGEN SFF/AIR/ACT（references/mugen/）
 - 引入非 KOF2002 原版阵容的角色。
 - 在有 MUGEN sprite 可用时继续精修程序化 fallback。
 - 给 placeholder 叠特效而不先接入真实 sprite。
+- 使用截图、屏幕抓图、静态对照图作为主要迭代方案；截图只能作为展示或辅助验收，不能替代真实资产、manifest 和运行时接入。
 - 新增玩法模式。
 - 不经决策门直接引入 PixiJS/Godot/Rust/C++。
 - 为了评分做无法验收的"看起来变多"改动。
@@ -212,6 +217,7 @@ MUGEN SFF/AIR/ACT（references/mugen/）
 - 默认只允许改角色内容包、MUGEN 资产管线、通用打击反馈矩阵、流程/UI 收口和验证工具。
 - 任何"全角色优化"必须先证明不会稀释当前资产集成主线。
 - 兼容层文件可保留，但新增数据优先进入内容包子目录。
+- 当前样板顺序固定为：Kyo 第一，其他角色后续复制；Ryo 仍保留为 baseline。
 
 ## 7. MUGEN 工具链
 

@@ -11,6 +11,7 @@
 - 以 MUGEN 数据替换程序化/骨架假人的进度，是衡量项目真实进展的首要指标。
 - 只有 MUGEN 管线数据到位后，才认为该项差距被闭合；纯程序化/fallback 方案不构成闭合。
 - 公共骨架复用优先于角色私有实现。
+- 当前样板顺序为：Kyo 第一样板，Ryo 继续作为 baseline，其他角色全部按 Kyo 的链路复制。
 
 ---
 
@@ -19,210 +20,156 @@
 本层衡量 MUGEN 数据从源文件到运行时的完整链路。链条为：
 
 ```
-SFF 提取 PNG -> manifest 生成 -> AIR 解析动画 -> AIR Clsn 提取判定 -> 运行时接入
+SFF 提取 PNG -> manifest 生成 -> AIR 解析动画 -> AIR Clsn 提取判定 -> 运行时注册 -> 选人可用
 ```
 
-### 0.0 MUGEN 源资产可用性
+### 0.0 全角色管线状态总表（2026-05-31 更新）
 
-当前状态：
+关键定义：
+- **ROSTER** = `src/characters/index.ts` ROSTER 数组中的角色，选人界面可见
+- **SpriteReg** = `characterSpriteConfigs.ts` 中有 `registerCharacterSprites` 注册
+- **PNG** = `public/sprites/<mugenDir>/` 下有 PNG 文件
+- **Manifest** = `public/sprites/<mugenDir>/manifest.json` 存在
+- **Hitbox** = `public/sprites/<mugenDir>/hitboxes.json` 存在
+- **ContentPkg** = `src/content/characters/<charId>/` 内容包目录存在
 
-- `references/mugen/chars-extracted/warusaki3/characters/` 包含 58 个 AIR 文件、73 个 SFF 文件。
-- `references/mugen/chars-extracted/shermie/` 和 `heidern/` 为额外 KOF 角色。
-- 部分角色（Iori、Leona、Kula、K'、Robert、Mai、Andy、Joe 等）在 Warusaki3 源中不存在。
-- 非 KOF2002 角色存在于源中（Cammy、Chun-Li、Dan、Guile 等）但不在当前 Roster 中。
+#### A. ROSTER 内角色（选人界面可见，28 个）
 
-差距：
+| charId | 中文名 | SpriteReg | mugenDir | PNG | Manifest | Hitbox | ContentPkg | 状态 |
+|--------|--------|-----------|----------|-----|----------|--------|------------|------|
+| kyo | 草薙京 | Y | cvskyo | 1808 | Y | Y | Y | 完整 |
+| iori | 八神庵 | Y | yiori | 1439 | Y | Y | Y | 完整 |
+| terry | 特瑞 | Y | cvsterry | 1407 | Y | Y | Y | 完整 |
+| kim | 金家藩 | Y | cvskim | 1247 | Y | Y | Y | 完整 |
+| ryo | 坂崎亮 | Y | cvsryo | 1230 | Y | Y | Y | 完整 |
+| athena | 雅典娜 | Y | cvsathena | 1456 | Y | Y | Y | 完整 |
+| shermie | 谢尔美 | Y | shermie | 1132 | Y | Y | Y | 完整 |
+| vice | 麦卓 | Y | cvsvice | 1950 | Y | Y | Y | 完整 |
+| yamazaki | 山崎龙二 | Y | cvsyamazaki | 1955 | Y | Y | Y | 完整 |
+| kdash | K' | Y | kdash | 1959 | Y | Y | N | 缺内容包 |
+| mai | 不知火舞 | Y | mai | 1362 | Y | Y | N | 缺内容包 |
+| andy | 安迪 | Y | andy | 942 | Y | Y | N | 缺内容包 |
+| clark | 克拉克 | Y | clark | 846 | Y | Y | N | 缺内容包 |
+| yashiro | 七枷社 | Y | yashiro | 1511 | Y | Y | N | 缺内容包 |
+| leona | 莉安娜 | N | -- | 0 | N | N | N | 缺MUGEN源 |
+| kula | 库拉 | N | -- | 0 | N | N | N | 缺MUGEN源 |
+| robert | 罗伯特 | N | -- | 0 | N | N | N | 缺MUGEN源 |
+| ralf | 拉尔夫 | N | -- | 0 | N | N | N | 缺MUGEN源 |
+| joe | 东丈 | N | -- | 0 | N | N | N | 缺MUGEN源 |
+| billy | 比利 | N | -- | 0 | N | N | N | 缺MUGEN源 |
+| choi | 蔡宝奇 | N | -- | 0 | N | N | N | 缺MUGEN源 |
+| chang | 陈可汗 | N | -- | 0 | N | N | N | 缺MUGEN源 |
+| mature | 麦卓(异) | N | -- | 0 | N | N | N | 缺MUGEN源 |
+| chris | 克里斯 | N | -- | 0 | N | N | N | 缺MUGEN源 |
+| mary | 玛丽 | N | -- | 0 | N | N | N | 缺MUGEN源 |
+| xiangfei | 李香绯 | N | -- | 0 | N | N | N | 非KOF2002 |
+| kasumi | 雏菊 | N | -- | 0 | N | N | N | 非KOF2002 |
+| kfm | KFM | N | -- | 0 | N | N | N | 占位角色 |
 
-- **Iori 是核心样板角色，但在 MUGEN 源中完全没有 Warusaki3 版本**。需要找到替代 MUGEN 源或从其他 KOF2002 角色包中提取。
-- 多个 Roster 角色（Leona、Kula、K'、Robert、Mai、Andy、Joe、Billy、Chang、Choi、Mature、Yashiro、Chris、Mary、Xiangfei、Kasumi、Clark、Ralf）缺少可确认的 MUGEN 源文件。
-- 非 KOF2002 角色（Chun-Li、Rock、Benimaru 为 CVS 系列角色，Geese、Gouki 为跨界角色）已有 PNG 但不在 KOF2002 正式 Roster 中。
+#### B. 已注册 Sprite 但不在 ROSTER（有素材但选不到，12 个）
 
-新功能添加点：
+| charId | 中文名 | mugenDir | PNG | Manifest | Hitbox | ContentPkg | KOF2002? |
+|--------|--------|----------|-----|----------|--------|------------|----------|
+| benimaru | 二阶堂红丸 | cvsbenimaru | 1386 | Y | Y | Y | Y-需加入ROSTER |
+| yuri | 坂崎由莉 | cvsyuri | 1315 | Y | Y | Y | Y-需加入ROSTER |
+| kensou | 椎拳崇 | kensou | 764 | Y | Y | N | Y-需加入ROSTER |
+| takuma | 坂崎琢磨 | takuma | 1080 | Y | Y | N | Y-需加入ROSTER |
+| heidern | 哈迪伦 | heidern | 2663 | Y | Y | Y | Y-需加入ROSTER |
+| rugal | 卢卡尔 | cvsrugal | 2309 | Y | Y | N | Y-需加入ROSTER |
+| g_rugal | 欧米茄卢卡尔 | cvsg_rugal | 2191 | Y | Y | N | Y-需加入ROSTER |
+| king | 金 | cvsking | 1203 | Y | Y | N | Y-需加入ROSTER |
+| chunli | 春丽 | cvschunli | 1580 | Y | Y | N | 非KOF2002 |
+| geese | 吉斯 | cvsgeese | 1475 | Y | Y | N | 非KOF2002 |
+| gouki | 豪鬼 | cvsgouki | 1578 | Y | Y | N | 非KOF2002 |
+| rock | 洛克 | cvsrock | 1593 | Y | Y | N | 非KOF2002 |
 
-- 确认每个 KOF2002 Roster 角色的 MUGEN 源可用性。
-- 为缺失源文件的角色寻找替代 MUGEN 角色包。
-- 建立源文件可用性报告（per-character source availability report）。
+### 0.1 渲染链路诊断
 
-### 0.1 PNG Sprite 提取与 Manifest
+**游戏运行时的渲染决策流程**（`rendererFighter.ts:976`）：
 
-当前状态：
+```
+1. getCharacterConfig(charId) → 查 characterSpriteConfigs.ts 注册
+2. getLoadedSprites(charId) → 查异步加载的 manifest.json + PNG
+3. 如果 config && sprites → drawGenericCharacterSprite() → 画 MUGEN sprite
+4. 如果失败 → 角色专属 procedural (kyo/iori/ryo/kfm)
+5. 如果仍失败 → drawSkeletalFighter() → 骨架假人
+```
 
-- 已提取 PNG sprite 的角色（17 个目录）：
-  - KOF2002 Roster 内且已有 PNG：cvskyo(1,808)、cvsryo(1,230)、cvsathena(1,456)、cvsterry(1,407)、cvskim(1,247)、cvsvice(1,950)、cvsyamazaki(1,955)、shermie(1,132)、heidern(2,663)
-  - Roster 内但无 PNG：Iori、Leona、Kula、K'、Robert、Mai、Andy、Joe、Billy、Chang、Choi、Mature、Yashiro、Chris、Mary、Xiangfei、Kasumi、Clark、Ralf
-  - 非 Roster 但已有 PNG：cvsg_rugal(2,191)、cvsgeese(1,475)、cvsgouki(1,578)、cvsrock(1,593)、cvsking(1,203)、cvsrugal(2,309)、cvsbenimaru(1,386)、cvschunli(1,580)、kfm(281)
-- 所有已提取角色都有 `manifest.json`（kfm 除外）。
-- **17个角色有 `hitboxes.json`（MUGEN AIR Clsn 判定数据），共995个攻击动作、2415个活跃帧。**
-- **8个ROSTER角色有 MUGEN hurtbox数据（manifest.json hurtbox字段）。**
-- 动画帧时长通过 `animStateSync` 模块注册并查询，支持MUGEN -1归一化。
-- 渲染管线已统一：通用MUGEN sprite路径优先 → 角色procedural fallback → 骨骼渲染。
-- 训练模式 F2 开启hitbox显示，F7 循环 game/both/mugen 三种显示模式。
+**关键发现**：14 个 ROSTER 角色有 SpriteReg + PNG + Manifest，理论上应能显示 MUGEN sprite。
+但实际可能不显示的原因：
+- `initAllCharacterSprites()` 是异步 fire-and-forget，非优先角色可能延迟加载
+- 图片 lazy load，`image.complete === false` 时 `drawImageFromRegistry` 返回 false
+- 浏览器缓存或网络请求失败时 fallback 到骨架
 
-差距矩阵（KOF2002 Roster 角色，28 个）：
+### 0.2 差距清单
 
-| 角色 | PNG 提取 | Manifest | 运行时注册 | Hitbox | 内容包MUGEN |
-|------|----------|----------|------------|--------|------------|
-| Kyo | Y (1,808) | Y | Y | Y (77 actions) | Y |
-| Iori | N | N | N | N | N |
-| Terry | Y (1,407) | Y | Y | Y (55 actions) | N |
-| Kim | Y (1,247) | Y | Y | Y (62 actions) | N |
-| Ryo | Y (1,230) | Y | Y | Y (54 actions) | Y |
-| Athena | Y (1,456) | Y | Y | Y (48 actions) | N |
-| Vice | Y (1,950) | Y | Y | Y (49 actions) | N |
-| Yamazaki | Y (1,955) | Y | Y | Y (69 actions) | N |
-| Shermie | Y (1,132) | Y | Y | Y (43 actions) | Y |
-| Yuri | Y (1,315) | Y | Y | Y (53 actions) | Y |
-| Benimaru | Y (1,386) | Y | Y | Y (44 actions) | Y |
-| Heidern | Y (2,663) | Y | Y | Y (51 actions) | Y |
-| Leona | N | N | N | N | N |
-| Kula | N | N | N | N | N |
-| K' | N | N | N | N | N |
-| Robert | N | N | N | N | N |
-| Mai | N | N | N | N | N |
-| Ralf | N | N | N | N | N |
-| Andy | N | N | N | N | N |
-| Clark | N | N | N | N | N |
-| Joe | N | N | N | N | N |
-| Billy | N | N | N | N | N |
-| Chang | N | N | N | N | N |
-| Choi | N | N | N | N | N |
-| Mature | N | N | N | N | N |
-| Yashiro | N | N | N | N | N |
-| Chris | N | N | N | N | N |
-| Mary | N | N | N | N | N |
-| Xiangfei | N | N | N | N | N |
-| Kasumi | N | N | N | N | N |
+#### 差距 A：14 个 ROSTER 角色缺内容包（但有素材）
 
-新功能添加点：
+kdash、mai、andy、clark、yashiro 已有 sprite 全链路但缺 `src/content/characters/<charId>/`。
 
-- 对已有 SFF 源但未提取的角色，运行 `extractCharacterSprites` 管线。
-- **最高优先级：完成 AIR 解析管线，生成 `animations.json`（帧序列+duration）和 `hitboxes.json`（Clsn 判定框）**。
-- 为 Iori 和其他缺失源的角色寻找替代 MUGEN 角色包。
+**行动**：为这 5 个角色创建内容包，参照 Kyo 模板。
 
-### 0.2 运行时 Sprite 接入
+#### 差距 B：11 个 ROSTER 角色缺 MUGEN 源文件（完全缺失）
 
-当前状态：
+leona、kula、robert、ralf、joe、billy、choi、chang、mature、chris、mary 没有 PNG 也没有注册。
 
-- `characterSpriteRegistry.ts` + `characterSpriteConfigs.ts` 提供通用 PNG sprite 加载机制。
-- 17 个角色已注册运行时 sprite 配置（kyo/ryo/athena/terry/kim/vice/yamazaki/shermie/benimaru/chunli/geese/gouki/rock/king/rugal/g_rugal/heidern/yuri）。
-- 11 个 ROSTER 角色有完整 specialMap（kyo/ryo/terry/kim/athena/vice/yamazaki/shermie/benimaru/heidern/yuri），含通常技+指令通常技+必杀技+DM/SDM映射。
-- 通常技 action number 通过 `resolveGenericMugenAction` 标准化映射（MUGEN 标准编号）。
-- 渲染管线统一：`rendererFighter.ts` 先尝试通用 MUGEN sprite → 角色 procedural → 骨骼 fallback。
-- 训练模式 hitbox 调试支持 F2(开关) + F7(game/both/mugen 三模式循环)。
+**行动**：
+- 下载 MUGEN 源 → extractCharacterSprites → parseAir → convertAirHitboxes → 注册 → 内容包
+- 已知来源：ZZZasd KOF2002 Complete Pack (AK1, 31.55MB)、KOF Anthology (Mega.nz, 8.72GB)
 
-差距：
+#### 差距 C：8 个 KOF2002 角色有完整素材但不在 ROSTER
 
-- specialMap 覆盖率不均匀。Kyo/Ryo 映射~25个必杀技，其他角色映射14-28个攻击类型（通常技+必杀技+DM）。
-- 非 ROSTER 角色（chunli/geese/gouki/rock/king/rugal/g_rugal）的 specialMap 仍为空。
-- 17 个 KOF2002 Roster 角色未注册运行时 sprite 配置（Iori/Leona/Kula/K'/Robert/Mai/Andy/Joe/Billy/Chang/Choi/Mature/Yashiro/Chris/Mary/Xiangfei/Kasumi）。
+benimaru、yuri、kensou、takuma、heidern、rugal、g_rugal、king 有 PNG+Manifest+Hitbox 但没有 charDef。
 
-### 0.3 MUGEN 动画数据接入
+**行动**：创建 charDef + 加入 ROSTER + 创建内容包。
 
-当前状态：
+#### 差距 D：2 个非 KOF2002 角色在 ROSTER
 
-- `animStateSync.ts` 同步动画帧状态，支持 MUGEN -1 帧时长归一化。
-- `realSpriteLoader.ts` 在 sprite 加载时自动注册帧时长到 animStateSync 缓存。
-- `baseHighResRenderer.ts` 使用 `getVariableFrameIndex` 按 stateAge + frameDurations 正确计算帧索引。
-- manifest.json 的 `animations` 字段包含完整的帧序列和 duration 数据。
-- 8 ROSTER 角色总注册动作>=3000，总帧>=15000，总时长>=30000 ticks。
+xiangfei、kasumi 不在 KOF2002 白名单中但仍在 ROSTER。
 
-差距：
-
-- 攻击状态帧索引使用 attackFrame 而非 animStateSync 的 stateAge 映射。
-- animStateSync 的 `resolveFrameIndex` 未被 `baseHighResRenderer` 直接消费（两者各自计算帧索引）。
-
-### 0.4 MUGEN 判定数据接入
-
-当前状态：
-
-- `mugenHitboxLoader.ts` 运行时加载 MUGEN AIR Clsn 判定数据（hitboxes.json）。
-- `mugenHurtboxLoader.ts` 运行时加载 MUGEN hurtbox 数据（manifest.json hurtbox 字段）。
-- `mugenHitboxQuery.ts` 内容包面向查询层，Kyo/Ryo 已接入。
-- `fighter.ts:getActiveHitboxes()` 四级 fallback：Frame Contract → ATTACK_FRAMES → MUGEN Clsn → HITBOX_OFFSETS。
-- `fighter.ts:getEffectiveHurtbox()` 三级 fallback：bodyOverride → MUGEN hurtbox → legacy hurtbox。
-- `hitboxDebugMugen.ts` 已接入主循环，支持 game/both/mugen 三种显示模式。
-- 17 角色共 995 个攻击动作、2415 个活跃帧的 hitbox 数据。
-
-差距：
-
-- 内容包层面已有 11 角色接入 MUGEN 查询层（Kyo/Ryo/Terry/Kim/Athena/Benimaru/Heidern/Yuri/Vice/Yamazaki/Shermie）。全部 11 角色统一导出 MUGEN_ACTION_MAP + hasMugenData + getMugenTiming + getMugenActionSummary + getAttackTiming。
-- MUGEN hitbox 优先于 ATTACK_FRAMES：fighter.ts 四级 fallback 调整为 Frame Contract → MUGEN Clsn → ATTACK_FRAMES → HITBOX_OFFSETS。
-- 非 ROSTER 角色的内容包未接入 MUGEN 数据。
+**行动**：按 CLAUDE.md 规则，非白名单角色不扩展。
 
 ---
 
 ## Tier 1 -- 内容包集成 (高优先级)
 
-本层衡量角色内容包从数据定义到运行时消费的完整度。
-
 ### 1.0 内容包结构
 
 当前状态：
 
-- 5 个角色有内容包（`src/content/characters/<name>/index.ts`）：ryo、kyo、iori、terry、kim。
-- 3 个角色有 Frame Contract（ryo/kyo/iori）。
-- 3 个角色有完整度校验工具（ryo/kyo/iori）。
-- 28 个角色有 Roster 定义（`src/characters/*.ts` + `src/characters/index.ts`）。
-- 测试总数 10,162（364 个测试文件，全部通过）。
+- 9 个角色有完整内容包（ryo/kyo/iori/terry/kim/athena/shermie/vice/yamazaki）
+- 3 个角色有 Frame Contract（ryo/kyo/iori）
+- 5 个角色有完整度校验工具（ryo/kyo/iori + multiChar + multiCharValidation）
+- 28 个角色有 Roster 定义（`src/characters/*.ts` + `src/characters/index.ts`）
 
 差距：
 
-- 23 个 Roster 角色没有内容包。
-- 25 个 Roster 角色没有 Frame Contract。
-- 内容包中的动画帧数据、判定数据不是 MUGEN 源数据驱动。
-- 内容包之间的数据格式一致性尚无自动化校验。
-
-新功能添加点：
-
-- 内容包 schema 标准化（每个角色包必须包含的文件和导出）。
-- 跨角色内容包一致性校验工具。
-- 将 MUGEN 源数据注入内容包的自动化流程。
+- 5 个有素材的 ROSTER 角色缺内容包（kdash/mai/andy/clark/yashiro）
+- 8 个有素材的非 ROSTER 角色需要 charDef + 内容包（benimaru/yuri/kensou/takuma/heidern/rugal/g_rugal/king）
+- 25 个 ROSTER 角色没有 Frame Contract
+- 内容包之间的数据格式一致性尚无自动化校验
 
 ### 1.1 角色完整度矩阵
 
-内容包维度衡量（仅列出有内容包的 5 个角色）：
+内容包维度衡量（有内容包的 9 个角色）：
 
-| 维度 | Ryo | Kyo | Iori | Terry | Kim |
-|------|-----|-----|------|-------|-----|
-| CharDef | Y | Y | Y | Y | Y |
-| Frame Contract | Y | Y | Y | N | N |
-| PNG Sprite | Y | Y | N | Y | Y |
-| Runtime Sprite Config | Y | Y | N | Y | Y |
-| MUGEN AIR 动画 | N | N | N | N | N |
-| MUGEN Clsn 判定 | N | N | N | N | N |
-| 完整度校验工具 | Y | Y | Y | N | N |
-| 反馈矩阵 | Y | Y | Y | N | N |
-| 取消路径 | Y | Y | Y | N | N |
-| 音效映射 | Y | Y | Y | N | N |
-| 命中特效 | Y | Y | Y | N | N |
-| 肖像数据 | Y | Y | Y | N | N |
-
-Iori 特殊问题：
-
-- Iori 是核心样板角色但缺少 PNG sprite 提取（MUGEN 源缺失）。
-- Iori 的运行时渲染仍完全依赖程序化像素帧。
-- 需要优先为 Iori 找到 MUGEN 源或确认替代方案。
-
-### 1.2 技能与资源规则
-
-已闭合项：
-
-- 6 层反馈矩阵 + MAX mode damage/defense bonus。
-- DM -> SDM -> HSDM 升级链。
-- 3 Stock MAX mode activation，1 Stock DM，Super Cancel extra stock。
-- Free Cancel drains 20% MAX timer，Desperation DM damage bonus。
-- Kyo/Iori 取消路径回归测试（22 tests）。
-
-差距：
-
-- 资源规则数据不是从 MUGEN CMD/CNS 文件提取，而是手工定义。
-- 多数角色（25/28）没有取消路径数据。
+| 维度 | Kyo | Ryo | Iori | Terry | Kim | Athena | Shermie | Vice | Yamazaki |
+|------|-----|-----|------|-------|-----|--------|---------|------|----------|
+| CharDef | Y | Y | Y | Y | Y | Y | Y | Y | Y |
+| Frame Contract | Y | Y | Y | N | N | N | N | N | N |
+| PNG Sprite | Y | Y | Y | Y | Y | Y | Y | Y | Y |
+| Runtime Sprite Config | Y | Y | Y | Y | Y | Y | Y | Y | Y |
+| Hitbox | Y | Y | Y | Y | Y | Y | Y | Y | Y |
+| MUGEN 特殊技映射 | Y | Y | Y | Y | Y | Y | Y | Y | Y |
+| 反馈矩阵 | Y | Y | Y | N | N | N | N | N | N |
+| 取消路径 | Y | Y | Y | N | N | N | N | N | N |
+| 音效映射 | Y | Y | Y | N | N | N | N | N | N |
+| 命中特效 | Y | Y | Y | N | N | N | N | N | N |
+| 肖像数据 | Y | Y | Y | N | N | N | N | N | N |
 
 ---
 
 ## Tier 2 -- 游戏系统 (中优先级)
-
-本层是框架级系统，不来源于 MUGEN 数据，需要自行设计和实现。
 
 ### 2.0 输入系统
 
@@ -251,18 +198,9 @@ Iori 特殊问题：
 - 取消窗口的帧精确度与原版对齐。
 - 空中取消、受击取消等高级机制。
 
-### 2.2 投技系统
-
-差距：
-
-- 投技判定与 MUGEN 源数据对齐。
-- 投技失败动画、投技挣脱机制。
-
 ---
 
 ## Tier 3 -- 视觉打磨 (中低优先级)
-
-本层增强 MUGEN sprite 的表现力，但不来源于 MUGEN 数据。
 
 ### 3.0 打击反馈
 
@@ -273,25 +211,11 @@ Iori 特殊问题：
 - 角色专属 DM/SDM/HSDM 火花色板。
 - Kyo/Iori/Ryo 大量专属 VFX。
 - hitstop attacker glow、MAX 爆气角色属性色闪光。
-- 118 tests 覆盖 3 角色 57 必杀技 VFX+SFX。
 
 差距：
 
 - 反馈参数需要与真实 MUGEN sprite 的帧数据对齐。
 - 当 MUGEN sprite 替换程序化帧后，VFX 触发时机和位置可能需要调整。
-
-### 3.1 视觉特效
-
-已闭合项：
-
-- Hit sparks、screen shake、afterimage 框架。
-- 4 种屏幕转场动画（curtain/wipe/zoom/fade）。
-- 眩晕星星 VFX、SuperFlash、KO 终结特效。
-- VFX 粒子预设全量回归测试（45 tests）。
-
-差距：
-
-- 当 MUGEN sprite 以真实比例和 anchor 点显示时，特效位置需要重新校准。
 
 ---
 
@@ -313,48 +237,34 @@ Iori 特殊问题：
 - 角色肖像应从 MUGEN 源 9000,0 sprite 提取，而非程序化 fallback。
 - 选人界面肖像需要真实 MUGEN sprite 支持。
 
-### 4.1 UI 一致性
-
-已闭合项：
-
-- 暂停菜单显示回合数 + 比分 + 角色名。
-- 首局控制提示 (F1/F3/F5/Esc 快捷键)。
-- DM/SDM/HSDM 终结 KO 差异化视觉。
-
-差距：
-
-- 选人界面、HUD 肖像在无真实 MUGEN sprite 时仍使用 fallback。
-
 ---
 
 ## 执行优先级
 
 按 MUGEN-First 策略，当前应按以下顺序推进：
 
-### 第一优先：闭合 Tier 0 管线缺口
+### 第一优先：闭合已有素材角色的内容包（差距 A）
 
-1. **AIR 解析管线端到端**：将 `parseAir` + `convertAirHitboxes` + `buildSpriteManifest` 的输出持久化为 `animations.json` / `hitboxes.json`。
-2. **运行时消费 MUGEN 动画和判定数据**：替换手写帧序列和判定框。
-3. **Iori MUGEN 源确认**：为核心样板角色找到可用的 MUGEN 角色包。
-4. **通常技 action number 映射**：系统化每个角色的 MUGEN action -> AttackType 对应关系。
+1. 为 kdash/mai/andy/clark/yashiro 创建内容包
+2. 为 benimaru/yuri/kensou/takuma/heidern/rugal/g_rugal/king 创建 charDef + 加入 ROSTER + 内容包
 
-### 第二优先：扩展 Tier 0 覆盖范围
+### 第二优先：下载缺失角色的 MUGEN 源（差距 B）
 
-5. 为已有 SFF 源但未提取的角色运行管线。
-6. 为缺失源文件的角色寻找替代 MUGEN 角色包。
-7. 运行时 sprite 接入从 9 个 KOF2002 角色扩展到全部 28 个。
+3. 从 ZZZasd KOF2002 Complete Pack 或 KOF Anthology 获取 leona/kula/robert/ralf/joe/billy/choi/chang/mature/chris/mary 的 MUGEN 文件
+4. 运行 extractCharacterSprites + parseAir + convertAirHitboxes 全管线
+5. 注册 + 内容包 + 加入 ROSTER
 
-### 第三优先：内容包与系统
+### 第三优先：内容包深度
 
-8. 基于 MUGEN 数据重建内容包。
-9. 取消路径、资源规则与 MUGEN 源对齐。
-10. 输入系统和组合系统打磨。
+6. Frame Contract 扩展到全部有素材角色
+7. 取消路径、资源规则与 MUGEN 源对齐
+8. 输入系统和组合系统打磨
 
 ### 第四优先：视觉与流程
 
-11. MUGEN sprite 下的特效位置校准。
-12. 从 MUGEN 9000,0 提取肖像。
-13. 流程仪式感最终打磨。
+9. MUGEN sprite 下的特效位置校准
+10. 从 MUGEN 9000,0 提取肖像
+11. 流程仪式感最终打磨
 
 ---
 
@@ -362,18 +272,19 @@ Iori 特殊问题：
 
 | 指标 | 数值 |
 |------|------|
-| Roster 角色总数 | 28 |
-| 有内容包的角色 | 13 (Ryo/Kyo/Iori/Terry/Kim/Athena/Vice/Yamazaki/Shermie/Benimaru/Heidern/Yuri + kfm placeholder) |
-| 有 Frame Contract 的角色 | 3 (Ryo/Kyo/Iori) |
-| 有 PNG sprite 的 KOF2002 角色 | 11 (Kyo/Ryo/Athena/Terry/Kim/Vice/Yamazaki/Shermie/Yuri/Benimaru/Heidern) |
-| 有运行时 sprite 配置的 KOF2002 角色 | 10 |
-| 有 MUGEN AIR 动画数据的角色 | 0 |
-| 有 MUGEN Clsn 判定数据的角色 | 0 |
-| Warusaki3 源角色总数 | 58 (AIR) / 73 (SFF) |
-| 已提取 PNG 的角色目录 | 19 |
-| 测试总数 | 11,487 (382 files, all passing) |
-| MUGEN 提取工具 | 4 (parseAir/buildSpriteManifest/convertAirHitboxes/extractCharacterSprites) |
-| 完整度校验工具 | 5 (ryo/kyo/iori/multiChar/multiCharValidation) |
+| ROSTER 角色总数 | 28（含 2 个非 KOF2002 + 1 个 kfm 占位） |
+| KOF2002 白名单角色 | 44 |
+| 有 SpriteReg 的角色 | 26 |
+| 有 PNG 的角色 | 26（共 37,073 张 PNG） |
+| 有 Hitbox 的角色 | 26 |
+| ROSTER 内有完整管线 | 14（sprite+manifest+hitbox+contentPkg） |
+| ROSTER 内有素材但缺内容包 | 5（kdash/mai/andy/clark/yashiro） |
+| ROSTER 内完全缺 MUGEN 源 | 11（leona/kula/robert/ralf/joe/billy/choi/chang/mature/chris/mary） |
+| 有素材但不在 ROSTER 的 KOF2002 角色 | 8（benimaru/yuri/kensou/takuma/heidern/rugal/g_rugal/king） |
+| 有 Frame Contract 的角色 | 3（ryo/kyo/iori） |
+| 有内容包的角色 | 12（kyo/ryo/iori/terry/kim/athena/shermie/vice/yamazaki/benimaru/heidern/yuri） |
+| MUGEN 提取工具 | 9（parseAir/buildSpriteManifest/convertAirHitboxes/extractCharacterSprites/等） |
+| 已提取 PNG 的角色目录 | 27 |
 
 ---
 
@@ -382,5 +293,5 @@ Iori 特殊问题：
 - 不要为了"更多功能"横向扩角色，除非该角色已完成 MUGEN 管线闭环。
 - 不要把程序化/fallback 方案视为差距闭合。只有 MUGEN 数据替换后才算闭合。
 - 不要在没有 gap 对应关系时添加新系统。
-- 不要跳过 AIR 解析管线的端到端验证就继续打磨视觉特效。
 - 不要在缺少 MUGEN 源的角色上花时间精修程序化像素帧。
+- 不要把有素材但不在 ROSTER 的角色（benimaru/yuri 等）遗忘——它们只需要 charDef 就能上场。

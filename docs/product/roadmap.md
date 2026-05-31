@@ -45,36 +45,37 @@ manifest.json + PNG → spriteLoader / realSpriteLoader → 运行时渲染
 
 ---
 
-## Phase 1 — 前 5 角色 MUGEN 集成（当前阶段）
+## Phase 1 — Kyo 门面样板闭环（当前阶段）
 
-目标：将已有内容包的 5 个角色全部升级为真实 PNG sprite 驱动，程序化渲染仅作 fallback。
+目标：先把 Kyo 做成第一套可复制的真实资产样板，再把同一条链路复制到其他角色。
 
-### Batch A：Ryo、Kyo、Iori
+### Batch A：Kyo
 
-这三个角色已有完整内容包（definition / stats / frame contract / hitbox / feedback / portrait），升级路径明确：
+Kyo 是当前样板角色，必须先闭合以下链路：
 
-- 确认 `public/sprites/cvsryo/`、`public/sprites/cvskyo/` sprite 文件覆盖核心动作
-- 为 Iori 准备 MUGEN sprite 文件（当前 `public/sprites/` 下无 iori 目录）
-- 每个角色执行：buildSpriteManifest → spriteLoader 接入 → 渲染器替换 → 回归验证
-- 确保所有核心动作（idle / walk / jump / stand_a / stand_c / hurt / knockdown / special）有真实 sprite
-- Frame Contract 对齐：将 MUGEN 动画帧与现有 frame contract 的时间轴、偏移量对齐
+- 确认 `public/sprites/cvskyo/` 覆盖核心动作与特殊技动作。
+- 确认 Kyo 的 select / HUD / win 肖像都使用真实资产或可验收的正式替代，不再依赖低质量占位。
+- 每个角色执行：buildSpriteManifest → spriteLoader 接入 → 渲染器替换 → 回归验证。
+- 确保所有核心动作（idle / walk / jump / stand_a / stand_c / hurt / knockdown / special）有真实 sprite。
+- Frame Contract 对齐：将 MUGEN 动画帧与现有 frame contract 的时间轴、偏移量对齐。
 
-### Batch B：Terry、Kim
+### Batch B：复制到其他角色
 
-这两个角色有部分内容包，需要补全：
+Kyo 闭环后，才把同一条链路复制到其他角色：
 
-- Terry：`public/sprites/cvsterry/` 已有 sprite，需补全 definition + stats + frame contract + hitbox + feedback
-- Kim：`public/sprites/cvskim/` 已有 sprite，需补全 definition + stats + frame contract + hitbox + feedback
-- 每个角色：SFF 提取（如需） → manifest 构建 → 内容包补全 → 运行时接入 → 校验
+- Ryo：继续作为 baseline 与合同参照，复用 Kyo 已验证的公共骨架。
+- Iori：按同样的 asset / portrait / runtime 入口继续补全。
+- Terry、Kim：在已有 sprite 的基础上补全 content package 与 runtime 接入。
 
 ### Phase 1 退出标准
 
-- 5 个角色全部使用真实 PNG sprite 渲染，不再依赖程序化 fallback 作为主力
-- 每个角色的 manifest.json 完整覆盖核心动作
-- Frame Contract 与 MUGEN 动画数据对齐
-- 打击感反馈（hitstop / spark / shake / pushback）在真实 sprite 下表现正确
-- 5293+ 现有测试全部通过，新增 sprite 接入测试通过
-- 校验工具报告 5 角色核心维度覆盖率 >= 80%
+- Kyo 全部使用真实 PNG sprite 渲染，不再依赖程序化 fallback 作为主力。
+- Kyo 的 select/HUD/win 肖像有明确、可验收的正式资源，不再显示低质量占位。
+- Kyo 的 manifest.json 完整覆盖核心动作。
+- Frame Contract 与 MUGEN 动画数据对齐。
+- 打击感反馈（hitstop / spark / shake / pushback）在真实 sprite 下表现正确。
+- 5293+ 现有测试全部通过，新增 sprite 接入测试通过。
+- 校验工具报告 Kyo 核心维度覆盖率 >= 80%。
 
 ---
 
@@ -85,6 +86,8 @@ manifest.json + PNG → spriteLoader / realSpriteLoader → 运行时渲染
 ### 角色列表
 
 Andy、Joe、Robert、Leona、Ralf、Clark、Athena、Mai
+
+执行顺序：先把 Kyo 样板复制到已经具备 MUGEN 资源的角色，再推进其他角色。任何批次如果会削弱 Kyo 的样板完整度，都不能提前扩张。
 
 （优先选择有 MUGEN sprite 数据的角色，且在 KOF2002 原版 roster 中）
 
@@ -293,9 +296,10 @@ Phase 1 的手动流程需要在本阶段固化为可复用的脚本：
 1. **资产优先**：真实 sprite / portrait / atlas / palette 的导入与接入，优先于骨架精修、placeholder 美化、渲染参数调优
 2. **管道优先**：自动化资产提取和接入管道，优先于手动逐角色接入
 3. **公共骨架优先**：可复用的公共组件，优先于角色私有实现
-4. **KOF2002 原版优先**：仅限 KOF2002 原版 roster 角色，不扩展到非 KOF2002 角色
-5. **体验闭环优先**：一个角色的完整体验闭环，优先于多个角色的部分实现
-6. **稳定优先**：回归测试全绿是每个 Phase 的硬性前置条件
+4. **Kyo 样板优先**：先把 Kyo 做成第一套样板，再把同一套能力复制给其他角色
+5. **KOF2002 原版优先**：仅限 KOF2002 原版 roster 角色，不扩展到非 KOF2002 角色
+6. **体验闭环优先**：一个角色的完整体验闭环，优先于多个角色的部分实现
+7. **稳定优先**：回归测试全绿是每个 Phase 的硬性前置条件
 
 ## 禁止事项
 

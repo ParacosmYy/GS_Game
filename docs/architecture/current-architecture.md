@@ -48,8 +48,8 @@ src/
 
 围绕 [Ryo Vertical Slice](../product/ryo-vertical-slice-plan.md) 作为基线，并按 [KOF 差距矩阵](../product/kof-gap-matrix.md) 推进 Phase 2 做：
 
-- 先把公共骨架接稳，再把 Kyo 作为当前样板角色接入 portrait manifest。
-- 再把 Kyo sprite 接入 sprite atlas manifest，并保持 Ryo 作为基线对照。
+- 先把公共骨架接稳，再把 Kyo 作为当前第一样板角色接入 portrait manifest。
+- 再把 Kyo sprite 接入 sprite atlas manifest，并把 Kyo 作为后续角色复制的模板。
 - 再把 Kyo 动作接入 animation manifest，再把 Ryo / Iori 保持为兼容与复制参照。
 - 再把 Kyo 判定接入 hitbox manifest，再把其他角色逐步复用同一套数据模型。
 - 再把 Kyo 命中事件接入 feedback manifest，再把 Ryo / Iori 复用到同一反馈矩阵。

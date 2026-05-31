@@ -75,7 +75,7 @@
 - 定义了 manifest schema。
 - 有 validator 或测试。
 - 目标资源合法、可用、来源清楚。
-- 当前样板角色至少接入一个真实资源或动作。
+- 当前样板角色至少接入一个真实资源或动作，且优先闭合 Kyo。
 - 可以先推进真实 sprite / portrait / palette 导入，而不是继续抠骨架占位。
 - fallback 仍可用。
 
@@ -84,6 +84,7 @@
 - 未确认许可。
 - 直接把研究资源放进运行时。
 - 只加图片，没有 manifest。
+- 以截图、屏幕抓图、静态对照图作为主要迭代依据或主输入来源。
 - 为了“看起来更像 KOF”而跳过资产来源确认。
 
 ## 4.1 资产优先决策门
@@ -100,7 +101,7 @@
 拒绝条件：
 
 - 只是想先把 placeholder 修得更像。
-- 只有截图或零散参考，没有可用资源来源。
+- 只有截图或零散参考，没有可用资源来源，或试图把截图当成主要迭代依据。
 - 解析逻辑打算写进运行时主循环。
 - 把一轮工作做成“导入资源 + 顺手重写渲染层”。
 
@@ -108,7 +109,7 @@
 
 当前主线为 MUGEN-first，角色扩展通过 MUGEN 管线（DEF/AIR/SFF → PNG + manifest → 运行时）统一推进。
 
-Phase 1 基线条件见 [Ryo Vertical Slice](../product/ryo-vertical-slice-plan.md)，但当前样板优先级由公共骨架 + Kyo 门面样板 + MUGEN 资产管线决定。
+Phase 1 基线条件见 [Ryo Vertical Slice](../product/ryo-vertical-slice-plan.md)，但当前样板优先级由公共骨架 + **Kyo 第一样板** + MUGEN 资产管线决定。Ryo 继续作为 baseline，不再是当前第一执行目标。
 
 允许新增/扩展 KOF2002 roster 角色的条件：
 

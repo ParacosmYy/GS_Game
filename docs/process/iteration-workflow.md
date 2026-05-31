@@ -6,18 +6,18 @@
 
 默认主线是 [KOF 差距矩阵](../product/kof-gap-matrix.md)。
 
-Phase 1 基线由 [Ryo Vertical Slice](../product/ryo-vertical-slice-plan.md) 定义，Phase 2 在此基础上推进公共骨架、Kyo 门面样板、多角色内容包、街机流程、UI/HUD 和稳定性收口。
+Phase 1 基线由 [Ryo Vertical Slice](../product/ryo-vertical-slice-plan.md) 定义，Phase 2 在此基础上推进公共骨架、Kyo 门面样板、多角色内容包、街机流程、UI/HUD 和稳定性收口。当前执行顺序已经收口为：**先把 Kyo 做成第一套可复制样板，再把同一套链路复制到其他角色；Ryo 继续做 baseline，不再是当前第一执行目标。**
 
 当前阶段的执行口径是：
 
 - 先闭合最显眼的 KOF 差距，再做低感知扩展。
-- 如果本轮能推进真实 sprite / portrait / palette 导入，就优先于继续修骨架假人或 placeholder。
+- 如果本轮能推进真实 sprite / portrait / palette 导入，就优先于继续修骨架假人或 placeholder，且优先落到当前样板角色 Kyo。
 - 先把内容包、流程和 UI 做成可复制模板，再做更多角色或更多模式。
 - 任何不服务当前 Phase 2 闭环的收口动作，都必须先说明为什么现在做。
 - 任何新功能都必须先说明它对应 [KOF 差距矩阵](../product/kof-gap-matrix.md) 的哪一项差距。
 - 任何“文件池”整理都必须说明它是在把职责拆开，而不是单纯增加文件数。
 - 任何看起来会被第二个角色复用的能力，必须优先考虑抽成公共基础组件，再决定是否进入角色目录。
-- 当前样板角色优先是 Kyo；Ryo 继续作为 baseline 与合同参照。
+- 当前样板角色优先是 Kyo；Ryo 继续作为 baseline 与合同参照，后续其他角色全部以 Kyo 的链路为复制模板。
 
 每轮必须先判断是否服务以下目标之一：
 
@@ -94,6 +94,7 @@ Phase 1 基线由 [Ryo Vertical Slice](../product/ryo-vertical-slice-plan.md) �
 
 - 先查 `references/mugen/` 和本地代码。
 - 可以查公开资料，但只能学习工程结构、数据组织、验收标准。
+- 不要把截图、录屏帧、静态对照图当成主迭代输入；它们只能作为辅助展示或最终验收参考，不能替代真实资产、manifest 和运行时数据。
 - 如果存在可用的真实资产来源，优先评估是否能先做 SFF / ACT / palette 导入器。
 - 不复制商业素材、音频、角色实现。
 - 优先确认当前改动是否应先沉淀为公共基础组件，而不是先写角色私有逻辑。

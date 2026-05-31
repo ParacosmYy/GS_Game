@@ -16,8 +16,10 @@
 - 所有内容优先向各自内容包收口，不允许在多个目录之间横向散落。
 - 当前最高优先级是按 [KOF 差距矩阵](docs/product/kof-gap-matrix.md) 逐项闭合真实差距。
 - 差距闭合的标准是 MUGEN 管线数据到位，纯程序化/fallback 方案不构成闭合。
+- 当前样板顺序固定为：Kyo 第一，其他角色复制其公共骨架与资产链路；Ryo 继续作为 baseline 与合同参照。
 - 只有 KOF2002 原版阵容角色（约 44 人）在范围内。
 - 后续新功能优先从差距矩阵里找目标，而不是从"我还想加什么"开始。
+- 截图、屏幕抓图、静态对照图只能作为展示或辅助验收，不能作为主要迭代输入，更不能替代真实资产、manifest 和运行时数据。
 
 当前真实代码状态：
 
@@ -46,6 +48,8 @@
 
 主线目标：
 
+- 先把 Kyo 做成第一套完整的样板角色：真实 sprite、portrait、animation、hitbox、feedback、moveList、运行时接入全部闭合。
+- 再把 Kyo 这套公共骨架复制到 Ryo / Iori / Terry / Kim 及后续角色。
 - 完成全部 17 个已有 PNG 角色的 MUGEN sprite 运行时接入（animations.json + hitboxes.json 消费）。
 - 扩展 MUGEN 提取覆盖到更多 KOF2002 阵容角色。
 - 用 MUGEN AIR 动画数据和 Clsn 判定数据替换手写帧序列和判定框。
@@ -56,13 +60,14 @@
 
 主线执行优先级（按差距矩阵 Tier 0 排序）：
 
-1. AIR 解析管线端到端：parseAir + convertAirHitboxes 输出持久化为 animations.json / hitboxes.json。
-2. 运行时消费 MUGEN 动画和判定数据，替换手写数据。
-3. 通常技 action number 映射系统化。
-4. 为已有 SFF 源但未提取的角色运行管线。
-5. 为缺失源文件的角色寻找替代 MUGEN 角色包。
-6. 内容包基于 MUGEN 数据重建。
-7. 视觉与流程打磨。
+1. 先闭合 Kyo 的 select / HUD / win / battle sprite 与 portrait 链路。
+2. AIR 解析管线端到端：parseAir + convertAirHitboxes 输出持久化为 animations.json / hitboxes.json。
+3. 运行时消费 MUGEN 动画和判定数据，替换手写数据。
+4. 通常技 action number 映射系统化。
+5. 为已有 SFF 源但未提取的角色运行管线。
+6. 为缺失源文件的角色寻找替代 MUGEN 角色包。
+7. 内容包基于 MUGEN 数据重建。
+8. 视觉与流程打磨。
 
 ## 4. 每轮启动脚本
 
