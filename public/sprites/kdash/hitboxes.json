@@ -1,0 +1,1892 @@
+{
+  "characterId": "unknown",
+  "actions": {
+    "200": {
+      "name": "Stance",
+      "startup": 2,
+      "active": 1,
+      "recovery": 2,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 21,
+              "oy": -97,
+              "w": 48,
+              "h": 23
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "205": {
+      "name": "Stance",
+      "startup": 2,
+      "active": 1,
+      "recovery": 1,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": -3,
+              "oy": -94,
+              "w": 45,
+              "h": 32
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "210": {
+      "name": "Stance",
+      "startup": 4,
+      "active": 2,
+      "recovery": 6,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 29,
+              "oy": -94,
+              "w": 54,
+              "h": 32
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": 29,
+              "oy": -94,
+              "w": 54,
+              "h": 32
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "215": {
+      "name": "Stance",
+      "startup": 2,
+      "active": 1,
+      "recovery": 6,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": -6,
+              "oy": -83,
+              "w": 47,
+              "h": 45
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "300": {
+      "name": "Stance",
+      "startup": 2,
+      "active": 1,
+      "recovery": 4,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 29,
+              "oy": -50,
+              "w": 56,
+              "h": 22
+            },
+            {
+              "ox": 8,
+              "oy": -54,
+              "w": 81,
+              "h": 30
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "305": {
+      "name": "Stance",
+      "startup": 2,
+      "active": 1,
+      "recovery": 4,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": -18,
+              "oy": -50,
+              "w": 73,
+              "h": 33
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "310": {
+      "name": "Stance",
+      "startup": 4,
+      "active": 3,
+      "recovery": 7,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 29,
+              "oy": -110,
+              "w": 69,
+              "h": 32
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": 36,
+              "oy": -102,
+              "w": 65,
+              "h": 40
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 29,
+              "oy": -90,
+              "w": 64,
+              "h": 40
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "315": {
+      "name": "Stance",
+      "startup": 3,
+      "active": 1,
+      "recovery": 5,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": -15,
+              "oy": -58,
+              "w": 54,
+              "h": 40
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "400": {
+      "name": "Stance",
+      "startup": 2,
+      "active": 1,
+      "recovery": 2,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 5,
+              "oy": -58,
+              "w": 55,
+              "h": 32
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "405": {
+      "name": "Stance",
+      "startup": 2,
+      "active": 1,
+      "recovery": 9,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 17,
+              "oy": -70,
+              "w": 44,
+              "h": 48
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "500": {
+      "name": "Stance",
+      "startup": 2,
+      "active": 1,
+      "recovery": 2,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 5,
+              "oy": -18,
+              "w": 55,
+              "h": 19
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "505": {
+      "name": "Stance",
+      "startup": 3,
+      "active": 1,
+      "recovery": 7,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 17,
+              "oy": -29,
+              "w": 72,
+              "h": 30
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "600": {
+      "name": "Stance",
+      "startup": 2,
+      "active": 1,
+      "recovery": 2,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 1,
+              "oy": -74,
+              "w": 38,
+              "h": 32
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "610": {
+      "name": "Stance",
+      "startup": 2,
+      "active": 1,
+      "recovery": 3,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": -7,
+              "oy": -57,
+              "w": 40,
+              "h": 23
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "700": {
+      "name": "Stance",
+      "startup": 2,
+      "active": 8,
+      "recovery": 2,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 4,
+              "oy": -68,
+              "w": 58,
+              "h": 24
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": 4,
+              "oy": -68,
+              "w": 58,
+              "h": 24
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 4,
+              "oy": -68,
+              "w": 58,
+              "h": 24
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 4,
+              "oy": -68,
+              "w": 58,
+              "h": 24
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 4,
+              "oy": -68,
+              "w": 58,
+              "h": 24
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 4,
+              "oy": -68,
+              "w": 58,
+              "h": 24
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 4,
+              "oy": -68,
+              "w": 58,
+              "h": 24
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 4,
+              "oy": -68,
+              "w": 58,
+              "h": 24
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "705": {
+      "name": "Stance",
+      "startup": 3,
+      "active": 12,
+      "recovery": 1,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 4,
+              "oy": -79,
+              "w": 39,
+              "h": 23
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": 4,
+              "oy": -79,
+              "w": 39,
+              "h": 23
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 4,
+              "oy": -79,
+              "w": 39,
+              "h": 23
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 4,
+              "oy": -79,
+              "w": 39,
+              "h": 23
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 4,
+              "oy": -79,
+              "w": 39,
+              "h": 23
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 4,
+              "oy": -79,
+              "w": 39,
+              "h": 23
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 4,
+              "oy": -79,
+              "w": 39,
+              "h": 23
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 4,
+              "oy": -79,
+              "w": 39,
+              "h": 23
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 4,
+              "oy": -79,
+              "w": 39,
+              "h": 23
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 4,
+              "oy": -79,
+              "w": 39,
+              "h": 23
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 4,
+              "oy": -79,
+              "w": 39,
+              "h": 23
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 4,
+              "oy": -79,
+              "w": 39,
+              "h": 23
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "710": {
+      "name": "Stance",
+      "startup": 3,
+      "active": 2,
+      "recovery": 3,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 1,
+              "oy": -102,
+              "w": 72,
+              "h": 32
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": -7,
+              "oy": -70,
+              "w": 72,
+              "h": 32
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "800": {
+      "name": "Stance",
+      "startup": 5,
+      "active": 2,
+      "recovery": 4,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 28,
+              "oy": -78,
+              "w": 56,
+              "h": 31
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": 28,
+              "oy": -78,
+              "w": 56,
+              "h": 31
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "801": {
+      "name": "Stance",
+      "startup": 5,
+      "active": 2,
+      "recovery": 4,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 28,
+              "oy": -78,
+              "w": 56,
+              "h": 31
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": 28,
+              "oy": -78,
+              "w": 56,
+              "h": 31
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "810": {
+      "name": "Stance",
+      "startup": 6,
+      "active": 1,
+      "recovery": 3,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": -7,
+              "oy": -90,
+              "w": 39,
+              "h": 50
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "900": {
+      "name": "Stance",
+      "startup": 0,
+      "active": 1,
+      "recovery": 0,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 2,
+              "oy": -88,
+              "w": 40,
+              "h": 88
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "980": {
+      "name": "Stance",
+      "startup": 4,
+      "active": 1,
+      "recovery": 8,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 30,
+              "oy": -114,
+              "w": 37,
+              "h": 73
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "981": {
+      "name": "Stance",
+      "startup": 4,
+      "active": 1,
+      "recovery": 8,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 30,
+              "oy": -114,
+              "w": 37,
+              "h": 73
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "990": {
+      "name": "Stance",
+      "startup": 4,
+      "active": 1,
+      "recovery": 3,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 5,
+              "oy": -69,
+              "w": 55,
+              "h": 24
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "1001": {
+      "name": "Stance",
+      "startup": 4,
+      "active": 5,
+      "recovery": 7,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 17,
+              "oy": -62,
+              "w": 66,
+              "h": 42
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 17,
+              "oy": -62,
+              "w": 66,
+              "h": 42
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 17,
+              "oy": -62,
+              "w": 66,
+              "h": 42
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 17,
+              "oy": -62,
+              "w": 66,
+              "h": 42
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 17,
+              "oy": -62,
+              "w": 66,
+              "h": 42
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "1010": {
+      "name": "Stance",
+      "startup": 3,
+      "active": 4,
+      "recovery": 7,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 35,
+              "oy": -104,
+              "w": 59,
+              "h": 51
+            },
+            {
+              "ox": 37,
+              "oy": -102,
+              "w": 55,
+              "h": 47
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": 35,
+              "oy": -104,
+              "w": 59,
+              "h": 51
+            },
+            {
+              "ox": 37,
+              "oy": -102,
+              "w": 55,
+              "h": 47
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 35,
+              "oy": -104,
+              "w": 59,
+              "h": 51
+            },
+            {
+              "ox": 37,
+              "oy": -102,
+              "w": 55,
+              "h": 47
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 55,
+              "oy": -156,
+              "w": 59,
+              "h": 51
+            },
+            {
+              "ox": 57,
+              "oy": -154,
+              "w": 55,
+              "h": 47
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "1030": {
+      "name": "Stance",
+      "startup": 3,
+      "active": 7,
+      "recovery": 1,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 25,
+              "oy": -84,
+              "w": 55,
+              "h": 35
+            },
+            {
+              "ox": 18,
+              "oy": -95,
+              "w": 64,
+              "h": 32
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": 25,
+              "oy": -84,
+              "w": 55,
+              "h": 35
+            },
+            {
+              "ox": 18,
+              "oy": -95,
+              "w": 64,
+              "h": 32
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 25,
+              "oy": -84,
+              "w": 55,
+              "h": 35
+            },
+            {
+              "ox": 18,
+              "oy": -95,
+              "w": 64,
+              "h": 32
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 25,
+              "oy": -84,
+              "w": 55,
+              "h": 35
+            },
+            {
+              "ox": 18,
+              "oy": -95,
+              "w": 64,
+              "h": 32
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 25,
+              "oy": -84,
+              "w": 55,
+              "h": 35
+            },
+            {
+              "ox": 18,
+              "oy": -95,
+              "w": 64,
+              "h": 32
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 25,
+              "oy": -84,
+              "w": 55,
+              "h": 35
+            },
+            {
+              "ox": 18,
+              "oy": -95,
+              "w": 64,
+              "h": 32
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 25,
+              "oy": -84,
+              "w": 55,
+              "h": 35
+            },
+            {
+              "ox": 18,
+              "oy": -95,
+              "w": 64,
+              "h": 32
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "1035": {
+      "name": "Stance",
+      "startup": 3,
+      "active": 7,
+      "recovery": 3,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 25,
+              "oy": -84,
+              "w": 55,
+              "h": 35
+            },
+            {
+              "ox": 18,
+              "oy": -95,
+              "w": 64,
+              "h": 32
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": 25,
+              "oy": -84,
+              "w": 55,
+              "h": 35
+            },
+            {
+              "ox": 18,
+              "oy": -95,
+              "w": 64,
+              "h": 32
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 25,
+              "oy": -84,
+              "w": 55,
+              "h": 35
+            },
+            {
+              "ox": 18,
+              "oy": -95,
+              "w": 64,
+              "h": 32
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 25,
+              "oy": -84,
+              "w": 55,
+              "h": 35
+            },
+            {
+              "ox": 18,
+              "oy": -95,
+              "w": 64,
+              "h": 32
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 25,
+              "oy": -84,
+              "w": 55,
+              "h": 35
+            },
+            {
+              "ox": 18,
+              "oy": -95,
+              "w": 64,
+              "h": 32
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 25,
+              "oy": -84,
+              "w": 55,
+              "h": 35
+            },
+            {
+              "ox": 18,
+              "oy": -95,
+              "w": 64,
+              "h": 32
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 25,
+              "oy": -84,
+              "w": 55,
+              "h": 35
+            },
+            {
+              "ox": 18,
+              "oy": -95,
+              "w": 64,
+              "h": 32
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "1200": {
+      "name": "Stance",
+      "startup": 3,
+      "active": 1,
+      "recovery": 10,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 1,
+              "oy": -82,
+              "w": 39,
+              "h": 32
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "1205": {
+      "name": "Stance",
+      "startup": 3,
+      "active": 1,
+      "recovery": 10,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": -11,
+              "oy": -83,
+              "w": 54,
+              "h": 40
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "1210": {
+      "name": "Stance",
+      "startup": 4,
+      "active": 2,
+      "recovery": 2,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 1,
+              "oy": -107,
+              "w": 75,
+              "h": 46
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": -2,
+              "oy": -66,
+              "w": 69,
+              "h": 33
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "1300": {
+      "name": "Stance",
+      "startup": 0,
+      "active": 2,
+      "recovery": 11,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 13,
+              "oy": -90,
+              "w": 46,
+              "h": 32
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": 13,
+              "oy": -90,
+              "w": 46,
+              "h": 32
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "1305": {
+      "name": "Stance",
+      "startup": 7,
+      "active": 2,
+      "recovery": 4,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 25,
+              "oy": -84,
+              "w": 55,
+              "h": 35
+            },
+            {
+              "ox": 18,
+              "oy": -95,
+              "w": 64,
+              "h": 32
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": 25,
+              "oy": -84,
+              "w": 55,
+              "h": 35
+            },
+            {
+              "ox": 18,
+              "oy": -95,
+              "w": 64,
+              "h": 32
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "1310": {
+      "name": "Stance",
+      "startup": 2,
+      "active": 3,
+      "recovery": 5,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": -15,
+              "oy": -38,
+              "w": 71,
+              "h": 27
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": -15,
+              "oy": -38,
+              "w": 71,
+              "h": 27
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": -15,
+              "oy": -38,
+              "w": 71,
+              "h": 27
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "1320": {
+      "name": "Stance",
+      "startup": 4,
+      "active": 2,
+      "recovery": 4,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 21,
+              "oy": -81,
+              "w": 57,
+              "h": 35
+            },
+            {
+              "ox": 17,
+              "oy": -85,
+              "w": 63,
+              "h": 34
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": 21,
+              "oy": -81,
+              "w": 57,
+              "h": 35
+            },
+            {
+              "ox": 17,
+              "oy": -85,
+              "w": 63,
+              "h": 34
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "1325": {
+      "name": "Stance",
+      "startup": 4,
+      "active": 2,
+      "recovery": 4,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 21,
+              "oy": -103,
+              "w": 57,
+              "h": 35
+            },
+            {
+              "ox": 17,
+              "oy": -95,
+              "w": 63,
+              "h": 34
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": 21,
+              "oy": -103,
+              "w": 57,
+              "h": 35
+            },
+            {
+              "ox": 17,
+              "oy": -95,
+              "w": 63,
+              "h": 34
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "1402": {
+      "name": "Stance",
+      "startup": 0,
+      "active": 8,
+      "recovery": 0,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": -20,
+              "oy": -14,
+              "w": 35,
+              "h": 25
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": -20,
+              "oy": -14,
+              "w": 35,
+              "h": 25
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": -20,
+              "oy": -14,
+              "w": 35,
+              "h": 25
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": -20,
+              "oy": -14,
+              "w": 35,
+              "h": 25
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": -20,
+              "oy": -14,
+              "w": 35,
+              "h": 25
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": -20,
+              "oy": -14,
+              "w": 35,
+              "h": 25
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": -20,
+              "oy": -14,
+              "w": 35,
+              "h": 25
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": -20,
+              "oy": -14,
+              "w": 35,
+              "h": 25
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "3002": {
+      "name": "Stance",
+      "startup": 4,
+      "active": 2,
+      "recovery": 4,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 1,
+              "oy": -54,
+              "w": 52,
+              "h": 31
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": -12,
+              "oy": -79,
+              "w": 74,
+              "h": 33
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "3003": {
+      "name": "Stance",
+      "startup": 4,
+      "active": 2,
+      "recovery": 4,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": -19,
+              "oy": -59,
+              "w": 72,
+              "h": 41
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": -21,
+              "oy": -79,
+              "w": 86,
+              "h": 41
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "3101": {
+      "name": "Stance",
+      "startup": 0,
+      "active": 4,
+      "recovery": 0,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 13,
+              "oy": -102,
+              "w": 39,
+              "h": 56
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        },
+        {
+          "attack": [
+            {
+              "ox": 13,
+              "oy": -102,
+              "w": 39,
+              "h": 56
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 13,
+              "oy": -102,
+              "w": 39,
+              "h": 56
+            }
+          ],
+          "bodyOverride": null
+        },
+        {
+          "attack": [
+            {
+              "ox": 13,
+              "oy": -102,
+              "w": 39,
+              "h": 56
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "3106": {
+      "name": "Stance",
+      "startup": 3,
+      "active": 1,
+      "recovery": 46,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 0,
+              "oy": -91,
+              "w": 70,
+              "h": 92
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "3116": {
+      "name": "Stance",
+      "startup": 3,
+      "active": 1,
+      "recovery": 98,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 0,
+              "oy": -91,
+              "w": 70,
+              "h": 92
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "3200": {
+      "name": "Stance",
+      "startup": 2,
+      "active": 1,
+      "recovery": 4,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": -15,
+              "oy": -87,
+              "w": 38,
+              "h": 88
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    },
+    "3202": {
+      "name": "Stance",
+      "startup": 13,
+      "active": 1,
+      "recovery": 10,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": -158,
+              "oy": -246,
+              "w": 351,
+              "h": 247
+            }
+          ],
+          "bodyOverride": null
+        }
+      ]
+    },
+    "5940": {
+      "name": "Stance",
+      "startup": 4,
+      "active": 1,
+      "recovery": 8,
+      "frames": [
+        {
+          "attack": [
+            {
+              "ox": 30,
+              "oy": -114,
+              "w": 37,
+              "h": 73
+            }
+          ],
+          "bodyOverride": {
+            "ox": -9999,
+            "oy": -9999,
+            "w": 0,
+            "h": 0
+          }
+        }
+      ]
+    }
+  }
+}

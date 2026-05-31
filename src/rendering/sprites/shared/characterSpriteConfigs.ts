@@ -587,6 +587,42 @@ registerCharacterSprites({
   },
 });
 
+// ===== K' (kdash — Trinity MUGEN KOF2002 version) =====
+registerCharacterSprites({
+  charId: 'kdash',
+  mugenDir: 'kdash',
+  targetDisplayHeight: 108,
+  defaultTint: '#cc3300',
+  specialMap: {
+    // Normals — standing
+    [AttackType.CLOSE_A]: '205', [AttackType.CLOSE_B]: '300',
+    [AttackType.CLOSE_C]: '215', [AttackType.CLOSE_D]: '310',
+    [AttackType.STAND_A]: '200', [AttackType.STAND_B]: '300',
+    [AttackType.STAND_C]: '210', [AttackType.STAND_D]: '310',
+    // Normals — crouching
+    [AttackType.CROUCH_A]: '400', [AttackType.CROUCH_B]: '500',
+    [AttackType.CROUCH_C]: '405', [AttackType.CROUCH_D]: '505',
+    // Normals — jumping
+    [AttackType.JUMP_A]: '600', [AttackType.JUMP_B]: '700',
+    [AttackType.JUMP_C]: '610', [AttackType.JUMP_D]: '710',
+    // Command normals
+    [AttackType.KDASH_ONE_INCH]: '300',     // →+B One Inch (overhead)
+    [AttackType.KDASH_TRIGGER]: '500',      // ↘+D Trigger Shot (low)
+    // Specials — Eins Trigger (アイントリガー)
+    [AttackType.KDASH_EINS]: '1001',        // ↓↘→+A (weak)
+    [AttackType.KDASH_EINS_C]: '1010',      // ↓↘→+C (strong)
+    // Crow Bites (クロウバイツ)
+    [AttackType.KDASH_CROW]: '1030',        // →↓↘+A (weak upper)
+    [AttackType.KDASH_CROW_C]: '1035',      // →↓↘+C (strong upper)
+    // Minute Spike (ミニットスパイク)
+    [AttackType.KDASH_MINUTE]: '1200',      // ←↙↓+K (overhead)
+    [AttackType.KDASH_NARROW]: '1300',      // ↓↘→+K (low followup)
+    // DM — Chain Shot (チェーンシェイド)
+    [AttackType.DM_CHAIN_SHOT]: '3002',     // DM
+    [AttackType.SDM_CHAIN_SHOT]: '3200',    // SDM
+  },
+});
+
 // ===== Mai (mai — M_Mai02UM KOF2002 version) =====
 registerCharacterSprites({
   charId: 'mai',
