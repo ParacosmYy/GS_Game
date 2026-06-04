@@ -847,3 +847,394 @@ export {
 
 export { HEIDERN_HIT_EFFECTS } from './heidern/hitEffects/heidernHitEffects.js';
 export { registerHeidernAudio } from './heidern/audio/heidernSampler.js';
+
+// K' (kdash) content package — prefixed to avoid type name collisions
+export {
+  KDASH_ATTACK_KEYS,
+  getKdashFrameData,
+  getKdashAttackFrameData,
+} from './kdash/attacks/kdashAttacks.js';
+
+export { KDASH_FRAME_DATA } from './kdash/frameData/kdashFrameData.js';
+
+export {
+  KDASH_MOVE_LIST,
+  KDASH_WIN_QUOTES,
+  KDASH_AVAILABLE_ACTIONS,
+  type KdashMoveEntry,
+} from './kdash/commands/kdashCommands.js';
+
+export {
+  KDASH_MOVES,
+  getMoveByKey as getKdashMoveByKey,
+  getMoveByAttackType as getKdashMoveByAttackType,
+  getMovesByCategory as getKdashMovesByCategory,
+  getProjectileMoves as getKdashProjectileMoves,
+  getInvincibleMoves as getKdashInvincibleMoves,
+  getMoveStats as getKdashMoveStats,
+  type MoveDefinition as KdashMoveDefinition,
+  type MoveVersionEntry as KdashMoveVersionEntry,
+  type MoveVersion as KdashMoveVersion,
+} from './kdash/moves/kdashMoves.js';
+
+export {
+  KDASH_CANCEL_PATHS,
+  findCancelRoute as findKdashCancelRoute,
+  getCancelTargets as getKdashCancelTargets,
+  validateCancel as validateKdashCancel,
+  getCancelRoutesByType as getKdashCancelRoutesByType,
+  isCancelSource as isKdashCancelSource,
+  getBestCancelRoute as getKdashBestCancelRoute,
+  type CancelType as KdashCancelType,
+  type CancelRoute as KdashCancelRoute,
+} from './kdash/cancelPaths.js';
+
+export {
+  getKdashFeedbackTiers,
+  getKdashFeedback,
+  KDASH_FEEDBACK_SUMMARY,
+} from './kdash/feedback/kdashFeedback.js';
+
+export {
+  KDASH_HITBOX_KEYS,
+  getKdashHitboxOffsets,
+  KDASH_ATTACK_FRAME_KEYS,
+  getKdashAttackFrames,
+  KDASH_MUGEN_ACTION_MAP,
+  hasKdashMugenData,
+  getKdashMugenTiming,
+  getKdashMugenActionSummary,
+  getKdashAttackTiming,
+} from './kdash/hitboxes/kdashHitboxes.js';
+
+export {
+  KDASH_ANIMATION_META,
+  getKdashAnimationNames,
+  getKdashAnimMeta,
+  getKdashAttackAnimations,
+  getKdashLoopAnimations,
+  type AnimationMeta as KdashAnimationMeta,
+} from './kdash/animations/kdashAnimations.js';
+
+export {
+  KDASH_PORTRAIT_META,
+  getKdashPortraitMeta,
+  getKdashAvailablePortraitSizes,
+  type PortraitMeta as KdashPortraitMeta,
+} from './kdash/portraits/kdashPortraits.js';
+
+export { KDASH_HIT_EFFECTS } from './kdash/hitEffects/kdashHitEffects.js';
+export { registerKdashAudio } from './kdash/audio/kdashSampler.js';
+
+// Mai content package — prefixed to avoid type name collisions
+export {
+  MAI_ATTACK_KEYS,
+  getMaiFrameData,
+  getMaiAttackFrameData,
+} from './mai/attacks/maiAttacks.js';
+
+export { MAI_FRAME_DATA } from './mai/frameData/maiFrameData.js';
+
+export {
+  MAI_MOVE_LIST,
+  MAI_WIN_QUOTES,
+  MAI_AVAILABLE_ACTIONS,
+  type MaiMoveEntry,
+} from './mai/commands/maiCommands.js';
+
+export {
+  MAI_MOVES,
+  getMoveByKey as getMaiMoveByKey,
+  getMoveByAttackType as getMaiMoveByAttackType,
+  getMovesByCategory as getMaiMovesByCategory,
+  getProjectileMoves as getMaiProjectileMoves,
+  getInvincibleMoves as getMaiInvincibleMoves,
+  getMoveStats as getMaiMoveStats,
+  type MoveDefinition as MaiMoveDefinition,
+  type MoveVersionEntry as MaiMoveVersionEntry,
+  type MoveVersion as MaiMoveVersion,
+} from './mai/moves/maiMoves.js';
+
+export {
+  MAI_CANCEL_PATHS,
+  findCancelRoute as findMaiCancelRoute,
+  getCancelTargets as getMaiCancelTargets,
+  validateCancel as validateMaiCancel,
+  getCancelRoutesByType as getMaiCancelRoutesByType,
+  isCancelSource as isMaiCancelSource,
+  getBestCancelRoute as getMaiBestCancelRoute,
+  type CancelType as MaiCancelType,
+  type CancelRoute as MaiCancelRoute,
+} from './mai/cancelPaths.js';
+
+export {
+  getMaiFeedbackTiers,
+  getMaiFeedback,
+  MAI_FEEDBACK_SUMMARY,
+} from './mai/feedback/maiFeedback.js';
+
+export {
+  MAI_HITBOX_KEYS,
+  getMaiHitboxOffsets,
+  MAI_ATTACK_FRAME_KEYS,
+  getMaiAttackFrames,
+  MAI_MUGEN_ACTION_MAP,
+  hasMaiMugenData,
+  getMaiMugenTiming,
+  getMaiMugenActionSummary,
+  getMaiAttackTiming,
+} from './mai/hitboxes/maiHitboxes.js';
+
+export {
+  MAI_ANIMATION_META,
+  getMaiAnimationNames,
+  getMaiAnimMeta,
+  getMaiAttackAnimations,
+  getMaiLoopAnimations,
+  type AnimationMeta as MaiAnimationMeta,
+} from './mai/animations/maiAnimations.js';
+
+export {
+  MAI_PORTRAIT_META,
+  getMaiPortraitMeta,
+  getMaiAvailablePortraitSizes,
+  type PortraitMeta as MaiPortraitMeta,
+} from './mai/portraits/maiPortraits.js';
+
+export { MAI_HIT_EFFECTS } from './mai/hitEffects/maiHitEffects.js';
+export { registerMaiAudio } from './mai/audio/maiSampler.js';
+
+// Andy content package — prefixed to avoid type name collisions
+export {
+  ANDY_ATTACK_KEYS,
+  getAndyFrameData,
+  getAndyAttackFrameData,
+} from './andy/attacks/andyAttacks.js';
+
+export { ANDY_FRAME_DATA } from './andy/frameData/andyFrameData.js';
+
+export {
+  ANDY_MOVE_LIST,
+  ANDY_WIN_QUOTES,
+  ANDY_AVAILABLE_ACTIONS,
+  type AndyMoveEntry,
+} from './andy/commands/andyCommands.js';
+
+export {
+  ANDY_MOVES,
+  getMoveByKey as getAndyMoveByKey,
+  getMoveByAttackType as getAndyMoveByAttackType,
+  getMovesByCategory as getAndyMovesByCategory,
+  getProjectileMoves as getAndyProjectileMoves,
+  getInvincibleMoves as getAndyInvincibleMoves,
+  getMoveStats as getAndyMoveStats,
+  type MoveDefinition as AndyMoveDefinition,
+  type MoveVersionEntry as AndyMoveVersionEntry,
+  type MoveVersion as AndyMoveVersion,
+} from './andy/moves/andyMoves.js';
+
+export {
+  ANDY_CANCEL_PATHS,
+  findCancelRoute as findAndyCancelRoute,
+  getCancelTargets as getAndyCancelTargets,
+  validateCancel as validateAndyCancel,
+  getCancelRoutesByType as getAndyCancelRoutesByType,
+  isCancelSource as isAndyCancelSource,
+  getBestCancelRoute as getAndyBestCancelRoute,
+  type CancelType as AndyCancelType,
+  type CancelRoute as AndyCancelRoute,
+} from './andy/cancelPaths.js';
+
+export {
+  getAndyFeedbackTiers,
+  getAndyFeedback,
+  ANDY_FEEDBACK_SUMMARY,
+} from './andy/feedback/andyFeedback.js';
+
+export {
+  ANDY_HITBOX_KEYS,
+  getAndyHitboxOffsets,
+  ANDY_ATTACK_FRAME_KEYS,
+  getAndyAttackFrames,
+  ANDY_MUGEN_ACTION_MAP,
+  hasAndyMugenData,
+  getAndyMugenTiming,
+  getAndyMugenActionSummary,
+  getAndyAttackTiming,
+} from './andy/hitboxes/andyHitboxes.js';
+
+export {
+  ANDY_ANIMATION_META,
+  getAndyAnimationNames,
+  getAndyAnimMeta,
+  getAndyAttackAnimations,
+  getAndyLoopAnimations,
+  type AnimationMeta as AndyAnimationMeta,
+} from './andy/animations/andyAnimations.js';
+
+export {
+  ANDY_PORTRAIT_META,
+  getAndyPortraitMeta,
+  getAndyAvailablePortraitSizes,
+  type PortraitMeta as AndyPortraitMeta,
+} from './andy/portraits/andyPortraits.js';
+
+export { ANDY_HIT_EFFECTS } from './andy/hitEffects/andyHitEffects.js';
+export { registerAndyAudio } from './andy/audio/andySampler.js';
+
+// Clark content package — prefixed to avoid type name collisions
+export {
+  CLARK_ATTACK_KEYS,
+  getClarkFrameData,
+  getClarkAttackFrameData,
+} from './clark/attacks/clarkAttacks.js';
+
+export { CLARK_FRAME_DATA } from './clark/frameData/clarkFrameData.js';
+
+export {
+  CLARK_MOVE_LIST,
+  CLARK_WIN_QUOTES,
+  CLARK_AVAILABLE_ACTIONS,
+  type ClarkMoveEntry,
+} from './clark/commands/clarkCommands.js';
+
+export {
+  CLARK_MOVES,
+  getMoveByKey as getClarkMoveByKey,
+  getMoveByAttackType as getClarkMoveByAttackType,
+  getMovesByCategory as getClarkMovesByCategory,
+  getProjectileMoves as getClarkProjectileMoves,
+  getInvincibleMoves as getClarkInvincibleMoves,
+  getGrabMoves as getClarkGrabMoves,
+  getMoveStats as getClarkMoveStats,
+  type MoveDefinition as ClarkMoveDefinition,
+  type MoveVersionEntry as ClarkMoveVersionEntry,
+  type MoveVersion as ClarkMoveVersion,
+} from './clark/moves/clarkMoves.js';
+
+export {
+  CLARK_CANCEL_PATHS,
+  findCancelRoute as findClarkCancelRoute,
+  getCancelTargets as getClarkCancelTargets,
+  validateCancel as validateClarkCancel,
+  getCancelRoutesByType as getClarkCancelRoutesByType,
+  isCancelSource as isClarkCancelSource,
+  getBestCancelRoute as getClarkBestCancelRoute,
+  type CancelType as ClarkCancelType,
+  type CancelRoute as ClarkCancelRoute,
+} from './clark/cancelPaths.js';
+
+export {
+  getClarkFeedbackTiers,
+  getClarkFeedback,
+  CLARK_FEEDBACK_SUMMARY,
+} from './clark/feedback/clarkFeedback.js';
+
+export {
+  CLARK_HITBOX_KEYS,
+  getClarkHitboxOffsets,
+  CLARK_ATTACK_FRAME_KEYS,
+  getClarkAttackFrames,
+  CLARK_MUGEN_ACTION_MAP,
+  hasClarkMugenData,
+  getClarkMugenTiming,
+  getClarkMugenActionSummary,
+  getClarkAttackTiming,
+} from './clark/hitboxes/clarkHitboxes.js';
+
+export {
+  CLARK_ANIMATION_META,
+  getClarkAnimationNames,
+  getClarkAnimMeta,
+  getClarkAttackAnimations,
+  getClarkLoopAnimations,
+  type AnimationMeta as ClarkAnimationMeta,
+} from './clark/animations/clarkAnimations.js';
+
+export {
+  CLARK_PORTRAIT_META,
+  getClarkPortraitMeta,
+  getClarkAvailablePortraitSizes,
+  type PortraitMeta as ClarkPortraitMeta,
+} from './clark/portraits/clarkPortraits.js';
+
+export { CLARK_HIT_EFFECTS } from './clark/hitEffects/clarkHitEffects.js';
+export { registerClarkAudio } from './clark/audio/clarkSampler.js';
+
+// Yashiro content package — prefixed to avoid type name collisions
+export {
+  YASHIRO_ATTACK_KEYS,
+  getYashiroFrameData,
+  getYashiroAttackFrameData,
+} from './yashiro/attacks/yashiroAttacks.js';
+
+export { YASHIRO_FRAME_DATA } from './yashiro/frameData/yashiroFrameData.js';
+
+export {
+  YASHIRO_MOVE_LIST,
+  YASHIRO_WIN_QUOTES,
+  YASHIRO_AVAILABLE_ACTIONS,
+  type YashiroMoveEntry,
+} from './yashiro/commands/yashiroCommands.js';
+
+export {
+  YASHIRO_MOVES,
+  getMoveByKey as getYashiroMoveByKey,
+  getMoveByAttackType as getYashiroMoveByAttackType,
+  getMovesByCategory as getYashiroMovesByCategory,
+  getProjectileMoves as getYashiroProjectileMoves,
+  getInvincibleMoves as getYashiroInvincibleMoves,
+  getMoveStats as getYashiroMoveStats,
+  type MoveDefinition as YashiroMoveDefinition,
+  type MoveVersionEntry as YashiroMoveVersionEntry,
+  type MoveVersion as YashiroMoveVersion,
+} from './yashiro/moves/yashiroMoves.js';
+
+export {
+  YASHIRO_CANCEL_PATHS,
+  findCancelRoute as findYashiroCancelRoute,
+  getCancelTargets as getYashiroCancelTargets,
+  validateCancel as validateYashiroCancel,
+  getCancelRoutesByType as getYashiroCancelRoutesByType,
+  isCancelSource as isYashiroCancelSource,
+  getBestCancelRoute as getYashiroBestCancelRoute,
+  type CancelType as YashiroCancelType,
+  type CancelRoute as YashiroCancelRoute,
+} from './yashiro/cancelPaths.js';
+
+export {
+  getYashiroFeedbackTiers,
+  getYashiroFeedback,
+  YASHIRO_FEEDBACK_SUMMARY,
+} from './yashiro/feedback/yashiroFeedback.js';
+
+export {
+  YASHIRO_HITBOX_KEYS,
+  getYashiroHitboxOffsets,
+  YASHIRO_ATTACK_FRAME_KEYS,
+  getYashiroAttackFrames,
+  YASHIRO_MUGEN_ACTION_MAP,
+  hasYashiroMugenData,
+  getYashiroMugenTiming,
+  getYashiroMugenActionSummary,
+  getYashiroAttackTiming,
+} from './yashiro/hitboxes/yashiroHitboxes.js';
+
+export {
+  YASHIRO_ANIMATION_META,
+  getYashiroAnimationNames,
+  getYashiroAnimMeta,
+  getYashiroAttackAnimations,
+  getYashiroLoopAnimations,
+  type AnimationMeta as YashiroAnimationMeta,
+} from './yashiro/animations/yashiroAnimations.js';
+
+export {
+  YASHIRO_PORTRAIT_META,
+  getYashiroPortraitMeta,
+  getYashiroAvailablePortraitSizes,
+  type PortraitMeta as YashiroPortraitMeta,
+} from './yashiro/portraits/yashiroPortraits.js';
+
+export { YASHIRO_HIT_EFFECTS } from './yashiro/hitEffects/yashiroHitEffects.js';
+export { registerYashiroAudio } from './yashiro/audio/yashiroSampler.js';
