@@ -5,6 +5,8 @@ import {
   getAvailableCharacterIds,
 } from '../src/content/contentLoader.js';
 
+const EXPANDED_MUGEN_CONTENT_IDS = ['andy', 'clark', 'kdash', 'mai', 'yashiro', 'yuri'] as const;
+
 describe('contentLoader', () => {
   describe('hasCharacterContent', () => {
     it('ryo has content', () => expect(hasCharacterContent('ryo')).toBe(true));
@@ -21,9 +23,35 @@ describe('contentLoader', () => {
     it('returns non-empty array', () => {
       expect(getAvailableCharacterIds().length).toBeGreaterThan(0);
     });
+
+    it('lists expanded MUGEN-backed content packages', () => {
+      const ids = getAvailableCharacterIds();
+      for (const charId of EXPANDED_MUGEN_CONTENT_IDS) {
+        expect(ids, `${charId} is available through content loader`).toContain(charId);
+      }
+    });
   });
 
   describe('loadCharacterContent', () => {
+    it.each(EXPANDED_MUGEN_CONTENT_IDS)('loads %s content package through the unified loader', (charId) => {
+      expect(hasCharacterContent(charId), `${charId} has content`).toBe(true);
+
+      const content = loadCharacterContent(charId);
+      expect(content.data.id).toBe(charId);
+      expect(content.data.name).toBeTruthy();
+      expect(content.data.nameCn).toBeTruthy();
+      expect(content.data.color).toBeTruthy();
+      expect(content.attacks).toBeDefined();
+      expect(content.attackKeys.length, `${charId} attack keys`).toBeGreaterThan(0);
+      expect(content.commands).toBeDefined();
+      expect(content.availableActions.length, `${charId} available actions`).toBeGreaterThan(0);
+      expect(content.animations).toBeDefined();
+      expect(content.animSequenceNames.length, `${charId} animation names`).toBeGreaterThan(0);
+      expect(Object.keys(content.hitboxes).length, `${charId} hitboxes`).toBeGreaterThan(0);
+      expect(content.attackFrames).toBeDefined();
+      expect(Object.keys(content.feedback).length, `${charId} feedback`).toBeGreaterThan(0);
+    });
+
     it('loads ryo content successfully', () => {
       const content = loadCharacterContent('ryo');
       expect(content).toBeDefined();

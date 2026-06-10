@@ -2,7 +2,7 @@
  * Content Loader — Unified character content access
  *
  * Provides a single function to load all content for a given character.
- * Supports: ryo, kyo, iori, terry, kim, athena, vice, yamazaki, shermie, benimaru
+ * Supports MUGEN-backed KOF2002 content packages through one runtime-agnostic entry.
  */
 import type { FeedbackTier } from '../core/feedbackManifest.js';
 import {
@@ -120,10 +120,95 @@ import {
   getBenimaruAttackFrames,
   getBenimaruFeedbackTiers,
 } from './characters/benimaru/index.js';
+import {
+  getAndyFrameData,
+  ANDY_ATTACK_KEYS,
+  ANDY_MOVE_LIST,
+  ANDY_AVAILABLE_ACTIONS,
+  ANDY_ANIMATION_META,
+  getAndyAnimationNames,
+  getAndyHitboxOffsets,
+  getAndyAttackFrames,
+  getAndyFeedbackTiers,
+} from './characters/andy/index.js';
+import {
+  getClarkFrameData,
+  CLARK_ATTACK_KEYS,
+  CLARK_MOVE_LIST,
+  CLARK_AVAILABLE_ACTIONS,
+  CLARK_ANIMATION_META,
+  getClarkAnimationNames,
+  getClarkHitboxOffsets,
+  getClarkAttackFrames,
+  getClarkFeedbackTiers,
+} from './characters/clark/index.js';
+import {
+  getKdashFrameData,
+  KDASH_ATTACK_KEYS,
+  KDASH_MOVE_LIST,
+  KDASH_AVAILABLE_ACTIONS,
+  KDASH_ANIMATION_META,
+  getKdashAnimationNames,
+  getKdashHitboxOffsets,
+  getKdashAttackFrames,
+  getKdashFeedbackTiers,
+} from './characters/kdash/index.js';
+import {
+  getMaiFrameData,
+  MAI_ATTACK_KEYS,
+  MAI_MOVE_LIST,
+  MAI_AVAILABLE_ACTIONS,
+  MAI_ANIMATION_META,
+  getMaiAnimationNames,
+  getMaiHitboxOffsets,
+  getMaiAttackFrames,
+  getMaiFeedbackTiers,
+} from './characters/mai/index.js';
+import {
+  getYashiroFrameData,
+  YASHIRO_ATTACK_KEYS,
+  YASHIRO_MOVE_LIST,
+  YASHIRO_AVAILABLE_ACTIONS,
+  YASHIRO_ANIMATION_META,
+  getYashiroAnimationNames,
+  getYashiroHitboxOffsets,
+  getYashiroAttackFrames,
+  getYashiroFeedbackTiers,
+} from './characters/yashiro/index.js';
+import {
+  getYuriFrameData,
+  YURI_ATTACK_KEYS,
+  YURI_MOVE_LIST,
+  YURI_AVAILABLE_ACTIONS,
+  YURI_ANIMATION_META,
+  getYuriAnimationNames,
+  getYuriHitboxOffsets,
+  getYuriAttackFrames,
+  getYuriFeedbackTiers,
+} from './characters/yuri/index.js';
 import { generateKyoDimensionReport } from '../tools/kyoCompletenessReport.js';
 import { generateIoriDimensionReport } from '../tools/ioriCompletenessReport.js';
 import { generateTerryDimensionReport } from '../tools/terryCompletenessReport.js';
 import { generateKimDimensionReport } from '../tools/kimCompletenessReport.js';
+
+const AVAILABLE_CONTENT_IDS = [
+  'ryo',
+  'kyo',
+  'iori',
+  'terry',
+  'kim',
+  'athena',
+  'vice',
+  'yamazaki',
+  'shermie',
+  'benimaru',
+  'andy',
+  'clark',
+  'kdash',
+  'mai',
+  'yashiro',
+  'yuri',
+] as const;
 
 /** Unified character content interface */
 export interface CharacterContent {
@@ -174,6 +259,18 @@ export function loadCharacterContent(charId: string): CharacterContent {
       return loadShermieContent();
     case 'benimaru':
       return loadBenimaruContent();
+    case 'andy':
+      return loadAndyContent();
+    case 'clark':
+      return loadClarkContent();
+    case 'kdash':
+      return loadKdashContent();
+    case 'mai':
+      return loadMaiContent();
+    case 'yashiro':
+      return loadYashiroContent();
+    case 'yuri':
+      return loadYuriContent();
     default:
       throw new Error(`Unknown character: ${charId}`);
   }
@@ -181,12 +278,12 @@ export function loadCharacterContent(charId: string): CharacterContent {
 
 /** Check if a character has a content package */
 export function hasCharacterContent(charId: string): boolean {
-  return ['ryo', 'kyo', 'iori', 'terry', 'kim', 'athena', 'vice', 'yamazaki', 'shermie', 'benimaru'].includes(charId);
+  return AVAILABLE_CONTENT_IDS.includes(charId as (typeof AVAILABLE_CONTENT_IDS)[number]);
 }
 
 /** List all characters with content packages */
 export function getAvailableCharacterIds(): string[] {
-  return ['ryo', 'kyo', 'iori', 'terry', 'kim', 'athena', 'vice', 'yamazaki', 'shermie', 'benimaru'];
+  return [...AVAILABLE_CONTENT_IDS];
 }
 
 function loadRyoContent(): CharacterContent {
@@ -345,6 +442,102 @@ function loadBenimaruContent(): CharacterContent {
     hitboxes: getBenimaruHitboxOffsets(),
     attackFrames: getBenimaruAttackFrames(),
     feedback: getBenimaruFeedbackTiers(),
+    report: null,
+  };
+}
+
+function loadAndyContent(): CharacterContent {
+  return {
+    data: { id: 'andy', name: 'Andy Bogard', nameCn: '安迪·博加德', color: '#4F7DD9' },
+    attacks: getAndyFrameData(),
+    attackKeys: ANDY_ATTACK_KEYS,
+    commands: ANDY_MOVE_LIST,
+    availableActions: ANDY_AVAILABLE_ACTIONS,
+    animations: ANDY_ANIMATION_META,
+    animSequenceNames: getAndyAnimationNames(),
+    hitboxes: getAndyHitboxOffsets(),
+    attackFrames: getAndyAttackFrames(),
+    feedback: getAndyFeedbackTiers(),
+    report: null,
+  };
+}
+
+function loadClarkContent(): CharacterContent {
+  return {
+    data: { id: 'clark', name: 'Clark Still', nameCn: '克拉克·斯蒂尔', color: '#557A52' },
+    attacks: getClarkFrameData(),
+    attackKeys: CLARK_ATTACK_KEYS,
+    commands: CLARK_MOVE_LIST,
+    availableActions: CLARK_AVAILABLE_ACTIONS,
+    animations: CLARK_ANIMATION_META,
+    animSequenceNames: getClarkAnimationNames(),
+    hitboxes: getClarkHitboxOffsets(),
+    attackFrames: getClarkAttackFrames(),
+    feedback: getClarkFeedbackTiers(),
+    report: null,
+  };
+}
+
+function loadKdashContent(): CharacterContent {
+  return {
+    data: { id: 'kdash', name: "K'", nameCn: "K'", color: '#D43A2F' },
+    attacks: getKdashFrameData(),
+    attackKeys: KDASH_ATTACK_KEYS,
+    commands: KDASH_MOVE_LIST,
+    availableActions: KDASH_AVAILABLE_ACTIONS,
+    animations: KDASH_ANIMATION_META,
+    animSequenceNames: getKdashAnimationNames(),
+    hitboxes: getKdashHitboxOffsets(),
+    attackFrames: getKdashAttackFrames(),
+    feedback: getKdashFeedbackTiers(),
+    report: null,
+  };
+}
+
+function loadMaiContent(): CharacterContent {
+  return {
+    data: { id: 'mai', name: 'Mai Shiranui', nameCn: '不知火舞', color: '#D92F2F' },
+    attacks: getMaiFrameData(),
+    attackKeys: MAI_ATTACK_KEYS,
+    commands: MAI_MOVE_LIST,
+    availableActions: MAI_AVAILABLE_ACTIONS,
+    animations: MAI_ANIMATION_META,
+    animSequenceNames: getMaiAnimationNames(),
+    hitboxes: getMaiHitboxOffsets(),
+    attackFrames: getMaiAttackFrames(),
+    feedback: getMaiFeedbackTiers(),
+    report: null,
+  };
+}
+
+function loadYashiroContent(): CharacterContent {
+  return {
+    data: { id: 'yashiro', name: 'Yashiro Nanakase', nameCn: '七枷社', color: '#A57A47' },
+    attacks: getYashiroFrameData(),
+    attackKeys: YASHIRO_ATTACK_KEYS,
+    commands: YASHIRO_MOVE_LIST,
+    availableActions: YASHIRO_AVAILABLE_ACTIONS,
+    animations: YASHIRO_ANIMATION_META,
+    animSequenceNames: getYashiroAnimationNames(),
+    hitboxes: getYashiroHitboxOffsets(),
+    attackFrames: getYashiroAttackFrames(),
+    feedback: getYashiroFeedbackTiers(),
+    report: null,
+  };
+}
+
+function loadYuriContent(): CharacterContent {
+  return {
+    data: { id: 'yuri', name: 'Yuri Sakazaki', nameCn: '坂崎由莉', color: '#FF6699' },
+    attacks: getYuriFrameData(),
+    attackKeys: YURI_ATTACK_KEYS,
+    commands: YURI_MOVE_LIST,
+    availableActions: YURI_AVAILABLE_ACTIONS,
+    animations: YURI_ANIMATION_META,
+    animSequenceNames: getYuriAnimationNames(),
+    hitboxes: getYuriHitboxOffsets(),
+    attackFrames: getYuriAttackFrames(),
+    feedback: getYuriFeedbackTiers(),
     report: null,
   };
 }

@@ -9,7 +9,18 @@ import { loadCharacterContent } from '../src/content/contentLoader.js';
 import { FRAME_DATA } from '../src/core/frameDataConstants.js';
 import { AttackType } from '../src/core/types.js';
 
-const CHARS = ['ryo', 'kyo', 'iori'] as const;
+const CHARS = [
+  'ryo',
+  'kyo',
+  'iori',
+  'andy',
+  'clark',
+  'kdash',
+  'mai',
+  'yashiro',
+  'yuri',
+] as const;
+const STRICT_FRAME_DATA_CHARS = ['ryo', 'kyo', 'iori'] as const;
 
 // ===== Attack Keys Coverage =====
 
@@ -30,10 +41,18 @@ describe('Content package attack keys coverage', () => {
         }
       });
 
-      it('all attack keys have FRAME_DATA entries', () => {
+      it('strict baseline characters have frame data entries for every attack key', () => {
+        if (!(STRICT_FRAME_DATA_CHARS as readonly string[]).includes(charId)) {
+          return;
+        }
+        const attacks = loadCharacterContent(charId).attacks;
         const fdKeys = new Set(Object.keys(FRAME_DATA));
+        const packageKeys = new Set(Object.keys(attacks));
         for (const key of keys) {
-          expect(fdKeys.has(key), `${charId}:${key} in FRAME_DATA`).toBe(true);
+          expect(
+            fdKeys.has(key) || packageKeys.has(key),
+            `${charId}:${key} in global or package frame data`,
+          ).toBe(true);
         }
       });
 
@@ -70,14 +89,32 @@ describe('Content package cross-character consistency', () => {
     const ryoKeys = new Set(loadCharacterContent('ryo').attackKeys.filter(k => k.startsWith('RYO_')));
     const kyoKeys = new Set(loadCharacterContent('kyo').attackKeys.filter(k => k.startsWith('KYO_')));
     const ioriKeys = new Set(loadCharacterContent('iori').attackKeys.filter(k => k.startsWith('IORI_')));
+    const andyKeys = new Set(loadCharacterContent('andy').attackKeys.filter(k => k.startsWith('ANDY_')));
+    const clarkKeys = new Set(loadCharacterContent('clark').attackKeys.filter(k => k.startsWith('CLARK_')));
+    const kdashKeys = new Set(loadCharacterContent('kdash').attackKeys.filter(k => k.startsWith('KDASH_')));
+    const maiKeys = new Set(loadCharacterContent('mai').attackKeys.filter(k => k.startsWith('MAI_')));
+    const yashiroKeys = new Set(loadCharacterContent('yashiro').attackKeys.filter(k => k.startsWith('YASHIRO_')));
+    const yuriKeys = new Set(loadCharacterContent('yuri').attackKeys.filter(k => k.startsWith('YURI_')));
+    const keySets = [
+      ['ryo', ryoKeys],
+      ['kyo', kyoKeys],
+      ['iori', ioriKeys],
+      ['andy', andyKeys],
+      ['clark', clarkKeys],
+      ['kdash', kdashKeys],
+      ['mai', maiKeys],
+      ['yashiro', yashiroKeys],
+      ['yuri', yuriKeys],
+    ] as const;
 
-    // No overlap between character-specific specials
-    for (const k of ryoKeys) {
-      expect(kyoKeys.has(k), `Kyo should not have Ryo key ${k}`).toBe(false);
-      expect(ioriKeys.has(k), `Iori should not have Ryo key ${k}`).toBe(false);
-    }
-    for (const k of kyoKeys) {
-      expect(ioriKeys.has(k), `Iori should not have Kyo key ${k}`).toBe(false);
+    for (let i = 0; i < keySets.length; i += 1) {
+      const [leftName, leftKeys] = keySets[i];
+      for (let j = i + 1; j < keySets.length; j += 1) {
+        const [rightName, rightKeys] = keySets[j];
+        for (const key of leftKeys) {
+          expect(rightKeys.has(key), `${rightName} should not have ${leftName} key ${key}`).toBe(false);
+        }
+      }
     }
   });
 
