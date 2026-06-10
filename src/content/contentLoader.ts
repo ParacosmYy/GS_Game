@@ -197,6 +197,17 @@ import {
   getTakumaAttackFrames,
   getTakumaFeedbackTiers,
 } from './characters/takuma/index.js';
+import {
+  getKensouFrameData,
+  KENSOU_ATTACK_KEYS,
+  KENSOU_MOVE_LIST,
+  KENSOU_AVAILABLE_ACTIONS,
+  KENSOU_ANIMATION_META,
+  getKensouAnimationNames,
+  getKensouHitboxOffsets,
+  getKensouAttackFrames,
+  getKensouFeedbackTiers,
+} from './characters/kensou/index.js';
 import { generateKyoDimensionReport } from '../tools/kyoCompletenessReport.js';
 import { generateIoriDimensionReport } from '../tools/ioriCompletenessReport.js';
 import { generateTerryDimensionReport } from '../tools/terryCompletenessReport.js';
@@ -220,6 +231,7 @@ const AVAILABLE_CONTENT_IDS = [
   'yashiro',
   'yuri',
   'takuma',
+  'kensou',
 ] as const;
 
 /** Unified character content interface */
@@ -285,6 +297,8 @@ export function loadCharacterContent(charId: string): CharacterContent {
       return loadYuriContent();
     case 'takuma':
       return loadTakumaContent();
+    case 'kensou':
+      return loadKensouContent();
     default:
       throw new Error(`Unknown character: ${charId}`);
   }
@@ -568,6 +582,22 @@ function loadTakumaContent(): CharacterContent {
     hitboxes: getTakumaHitboxOffsets(),
     attackFrames: getTakumaAttackFrames(),
     feedback: getTakumaFeedbackTiers(),
+    report: null,
+  };
+}
+
+function loadKensouContent(): CharacterContent {
+  return {
+    data: { id: 'kensou', name: 'Sie Kensou', nameCn: '椎拳崇', color: '#66AAFF' },
+    attacks: getKensouFrameData(),
+    attackKeys: KENSOU_ATTACK_KEYS,
+    commands: KENSOU_MOVE_LIST,
+    availableActions: KENSOU_AVAILABLE_ACTIONS,
+    animations: KENSOU_ANIMATION_META,
+    animSequenceNames: getKensouAnimationNames(),
+    hitboxes: getKensouHitboxOffsets(),
+    attackFrames: getKensouAttackFrames(),
+    feedback: getKensouFeedbackTiers(),
     report: null,
   };
 }
