@@ -35,6 +35,10 @@ import { CLARK_PORTRAIT_META } from '../src/content/characters/clark/portraits/c
 import { KDASH_PORTRAIT_META } from '../src/content/characters/kdash/portraits/kdashPortraits.js';
 import { MAI_PORTRAIT_META } from '../src/content/characters/mai/portraits/maiPortraits.js';
 import { YASHIRO_PORTRAIT_META } from '../src/content/characters/yashiro/portraits/yashiroPortraits.js';
+import { KENSOU_PORTRAIT_META } from '../src/content/characters/kensou/portraits/kensouPortraits.js';
+import { TAKUMA_PORTRAIT_META } from '../src/content/characters/takuma/portraits/takumaPortraits.js';
+import { RUGAL_PORTRAIT_META } from '../src/content/characters/rugal/portraits/rugalPortraits.js';
+import { G_RUGAL_PORTRAIT_META } from '../src/content/characters/g_rugal/portraits/gRugalPortraits.js';
 
 const ALL_SIZES: PortraitSize[] = ['select', 'vs', 'hud', 'win'];
 const ROOT_DIR = path.resolve(__dirname, '..');
@@ -140,6 +144,26 @@ const MUGEN_PORTRAIT_EXPECTATIONS = {
       win: { spriteRef: '9000_2', imagePath: '/sprites/cvsyuri/09000_0002.png', assetWidth: 81, assetHeight: 59 },
     },
   },
+  rugal: {
+    mugenDir: 'cvsrugal',
+    contentMeta: RUGAL_PORTRAIT_META,
+    expected: {
+      select: { spriteRef: '9000_1', imagePath: '/sprites/cvsrugal/09000_0001.png', assetWidth: 120, assetHeight: 140 },
+      vs: { spriteRef: '9000_1', imagePath: '/sprites/cvsrugal/09000_0001.png', assetWidth: 120, assetHeight: 140 },
+      hud: { spriteRef: '9000_0', imagePath: '/sprites/cvsrugal/09000_0000.png', assetWidth: 25, assetHeight: 25 },
+      win: { spriteRef: '9000_2', imagePath: '/sprites/cvsrugal/09000_0002.png', assetWidth: 81, assetHeight: 59 },
+    },
+  },
+  g_rugal: {
+    mugenDir: 'cvsg_rugal',
+    contentMeta: G_RUGAL_PORTRAIT_META,
+    expected: {
+      select: { spriteRef: '9000_1', imagePath: '/sprites/cvsg_rugal/09000_0001.png', assetWidth: 120, assetHeight: 140 },
+      vs: { spriteRef: '9000_1', imagePath: '/sprites/cvsg_rugal/09000_0001.png', assetWidth: 120, assetHeight: 140 },
+      hud: { spriteRef: '9000_0', imagePath: '/sprites/cvsg_rugal/09000_0000.png', assetWidth: 25, assetHeight: 25 },
+      win: { spriteRef: '9000_2', imagePath: '/sprites/cvsg_rugal/09000_0002.png', assetWidth: 81, assetHeight: 59 },
+    },
+  },
 } as const;
 
 const PARTIAL_MUGEN_PORTRAIT_EXPECTATIONS = {
@@ -203,6 +227,26 @@ const PARTIAL_MUGEN_PORTRAIT_EXPECTATIONS = {
       select: { spriteRef: '9000_1', imagePath: '/sprites/yashiro/09000_0001.png', assetWidth: 120, assetHeight: 140 },
       vs: { spriteRef: '9000_1', imagePath: '/sprites/yashiro/09000_0001.png', assetWidth: 120, assetHeight: 140 },
       hud: { spriteRef: '9000_0', imagePath: '/sprites/yashiro/09000_0000.png', assetWidth: 23, assetHeight: 25 },
+    },
+    fallbackSizes: ['win'],
+    absentSpriteRefs: ['9000_2'],
+  },
+  kensou: {
+    mugenDir: 'kensou',
+    contentMeta: KENSOU_PORTRAIT_META,
+    expected: {
+      hud: { spriteRef: '9000_0', imagePath: '/sprites/kensou/09000_0000.png', assetWidth: 25, assetHeight: 25 },
+    },
+    fallbackSizes: ['select', 'vs', 'win'],
+    absentSpriteRefs: [],
+  },
+  takuma: {
+    mugenDir: 'takuma',
+    contentMeta: TAKUMA_PORTRAIT_META,
+    expected: {
+      select: { spriteRef: '9000_1', imagePath: '/sprites/takuma/09000_0001.png', assetWidth: 120, assetHeight: 140 },
+      vs: { spriteRef: '9000_1', imagePath: '/sprites/takuma/09000_0001.png', assetWidth: 120, assetHeight: 140 },
+      hud: { spriteRef: '9000_0', imagePath: '/sprites/takuma/09000_0000.png', assetWidth: 25, assetHeight: 25 },
     },
     fallbackSizes: ['win'],
     absentSpriteRefs: ['9000_2'],

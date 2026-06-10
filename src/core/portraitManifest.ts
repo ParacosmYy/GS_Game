@@ -190,12 +190,14 @@ const CHARACTER_PORTRAIT_COLORS: Record<string, { fallbackColor: string; fallbac
   // ── 极限流队 ──
   ryo:      { fallbackColor: '#DD6600', fallbackAccent: '#8B4513', hasPixelPortrait: true },
   robert:   { fallbackColor: '#22AA44', fallbackAccent: '#DAA520', hasPixelPortrait: true },
+  takuma:   { fallbackColor: '#F0F0F0', fallbackAccent: '#8B4513', hasPixelPortrait: true },
   // ── 怒队 ──
   leona:    { fallbackColor: '#2266BB', fallbackAccent: '#C0C0C0', hasPixelPortrait: true },
   ralf:     { fallbackColor: '#CC6633', fallbackAccent: '#8B4513', hasPixelPortrait: true },
   clark:    { fallbackColor: '#556B2F', fallbackAccent: '#DAA520', hasPixelPortrait: true },
   // ── 超能力队 ──
   athena:   { fallbackColor: '#FF66AA', fallbackAccent: '#8B008B', hasPixelPortrait: true },
+  kensou:   { fallbackColor: '#66AAFF', fallbackAccent: '#FFDD66', hasPixelPortrait: true },
   // ── 女性格斗家队 ──
   mai:      { fallbackColor: '#FF4488', fallbackAccent: '#1A1A2E', hasPixelPortrait: true },
   yuri:     { fallbackColor: '#FF6699', fallbackAccent: '#FFCCDD', hasPixelPortrait: true },
@@ -212,6 +214,8 @@ const CHARACTER_PORTRAIT_COLORS: Record<string, { fallbackColor: string; fallbac
   // ── 其他 ──
   billy:    { fallbackColor: '#4488CC', fallbackAccent: '#FFD700', hasPixelPortrait: true },
   yamazaki: { fallbackColor: '#556622', fallbackAccent: '#1A1A2E', hasPixelPortrait: true },
+  rugal:    { fallbackColor: '#CC2244', fallbackAccent: '#FFD700', hasPixelPortrait: true },
+  g_rugal:  { fallbackColor: '#7A55CC', fallbackAccent: '#E6E6E6', hasPixelPortrait: true },
   mary:     { fallbackColor: '#5588CC', fallbackAccent: '#DAA520', hasPixelPortrait: true },
   xiangfei: { fallbackColor: '#EE6688', fallbackAccent: '#1A1A2E', hasPixelPortrait: true },
   kasumi:   { fallbackColor: '#DD4466', fallbackAccent: '#1A1A2E', hasPixelPortrait: true },
@@ -728,6 +732,114 @@ const YASHIRO_MUGEN_PORTRAITS: Partial<Record<PortraitSize, Pick<PortraitEntry, 
   },
 };
 
+const KENSOU_MUGEN_PORTRAITS: Partial<Record<PortraitSize, Pick<PortraitEntry, 'source' | 'mugenDir' | 'spriteRef' | 'imagePath' | 'assetWidth' | 'assetHeight'>>> = {
+  hud: {
+    source: 'mugen-sprite',
+    mugenDir: 'kensou',
+    spriteRef: '9000_0',
+    imagePath: '/sprites/kensou/09000_0000.png',
+    assetWidth: 25,
+    assetHeight: 25,
+  },
+};
+
+const TAKUMA_MUGEN_PORTRAITS: Partial<Record<PortraitSize, Pick<PortraitEntry, 'source' | 'mugenDir' | 'spriteRef' | 'imagePath' | 'assetWidth' | 'assetHeight'>>> = {
+  select: {
+    source: 'mugen-sprite',
+    mugenDir: 'takuma',
+    spriteRef: '9000_1',
+    imagePath: '/sprites/takuma/09000_0001.png',
+    assetWidth: 120,
+    assetHeight: 140,
+  },
+  vs: {
+    source: 'mugen-sprite',
+    mugenDir: 'takuma',
+    spriteRef: '9000_1',
+    imagePath: '/sprites/takuma/09000_0001.png',
+    assetWidth: 120,
+    assetHeight: 140,
+  },
+  hud: {
+    source: 'mugen-sprite',
+    mugenDir: 'takuma',
+    spriteRef: '9000_0',
+    imagePath: '/sprites/takuma/09000_0000.png',
+    assetWidth: 25,
+    assetHeight: 25,
+  },
+};
+
+const RUGAL_MUGEN_PORTRAITS: Partial<Record<PortraitSize, Pick<PortraitEntry, 'source' | 'mugenDir' | 'spriteRef' | 'imagePath' | 'assetWidth' | 'assetHeight'>>> = {
+  select: {
+    source: 'mugen-sprite',
+    mugenDir: 'cvsrugal',
+    spriteRef: '9000_1',
+    imagePath: '/sprites/cvsrugal/09000_0001.png',
+    assetWidth: 120,
+    assetHeight: 140,
+  },
+  vs: {
+    source: 'mugen-sprite',
+    mugenDir: 'cvsrugal',
+    spriteRef: '9000_1',
+    imagePath: '/sprites/cvsrugal/09000_0001.png',
+    assetWidth: 120,
+    assetHeight: 140,
+  },
+  hud: {
+    source: 'mugen-sprite',
+    mugenDir: 'cvsrugal',
+    spriteRef: '9000_0',
+    imagePath: '/sprites/cvsrugal/09000_0000.png',
+    assetWidth: 25,
+    assetHeight: 25,
+  },
+  win: {
+    source: 'mugen-sprite',
+    mugenDir: 'cvsrugal',
+    spriteRef: '9000_2',
+    imagePath: '/sprites/cvsrugal/09000_0002.png',
+    assetWidth: 81,
+    assetHeight: 59,
+  },
+};
+
+const G_RUGAL_MUGEN_PORTRAITS: Partial<Record<PortraitSize, Pick<PortraitEntry, 'source' | 'mugenDir' | 'spriteRef' | 'imagePath' | 'assetWidth' | 'assetHeight'>>> = {
+  select: {
+    source: 'mugen-sprite',
+    mugenDir: 'cvsg_rugal',
+    spriteRef: '9000_1',
+    imagePath: '/sprites/cvsg_rugal/09000_0001.png',
+    assetWidth: 120,
+    assetHeight: 140,
+  },
+  vs: {
+    source: 'mugen-sprite',
+    mugenDir: 'cvsg_rugal',
+    spriteRef: '9000_1',
+    imagePath: '/sprites/cvsg_rugal/09000_0001.png',
+    assetWidth: 120,
+    assetHeight: 140,
+  },
+  hud: {
+    source: 'mugen-sprite',
+    mugenDir: 'cvsg_rugal',
+    spriteRef: '9000_0',
+    imagePath: '/sprites/cvsg_rugal/09000_0000.png',
+    assetWidth: 25,
+    assetHeight: 25,
+  },
+  win: {
+    source: 'mugen-sprite',
+    mugenDir: 'cvsg_rugal',
+    spriteRef: '9000_2',
+    imagePath: '/sprites/cvsg_rugal/09000_0002.png',
+    assetWidth: 81,
+    assetHeight: 59,
+  },
+};
+
 const MUGEN_PORTRAITS_BY_CHARACTER: Partial<Record<string, Partial<Record<PortraitSize, Pick<PortraitEntry, 'source' | 'mugenDir' | 'spriteRef' | 'imagePath' | 'assetWidth' | 'assetHeight'>>>>> = {
   kyo: KYO_MUGEN_PORTRAITS,
   ryo: RYO_MUGEN_PORTRAITS,
@@ -745,6 +857,10 @@ const MUGEN_PORTRAITS_BY_CHARACTER: Partial<Record<string, Partial<Record<Portra
   mai: MAI_MUGEN_PORTRAITS,
   yuri: YURI_MUGEN_PORTRAITS,
   yashiro: YASHIRO_MUGEN_PORTRAITS,
+  kensou: KENSOU_MUGEN_PORTRAITS,
+  takuma: TAKUMA_MUGEN_PORTRAITS,
+  rugal: RUGAL_MUGEN_PORTRAITS,
+  g_rugal: G_RUGAL_MUGEN_PORTRAITS,
 };
 
 // 填充 manifest

@@ -3,7 +3,7 @@
  *
  * Validates PORTRAIT_MANIFEST data integrity:
  * - Version is 1
- * - All 29 portrait-manifest characters present
+ * - All 33 portrait-manifest characters present
  * - All sizes (select, vs, hud, win) present per character
  * - Dimensions match PORTRAIT_SIZES standards
  * - Fallback colors are valid hex
@@ -30,13 +30,13 @@ import {
 const ROSTER = [
   'kyo', 'benimaru', 'iori', 'terry', 'andy', 'joe',
   'kim', 'chang', 'choi',
-  'ryo', 'robert',
+  'ryo', 'robert', 'takuma',
   'leona', 'ralf', 'clark',
-  'athena', 'mai', 'yuri',
+  'athena', 'kensou', 'mai', 'yuri',
   'kdash', 'kula',
   'yashiro', 'shermie', 'chris',
   'mature', 'vice',
-  'billy', 'yamazaki', 'mary', 'xiangfei', 'kasumi',
+  'billy', 'yamazaki', 'rugal', 'g_rugal', 'mary', 'xiangfei', 'kasumi',
 ];
 
 const HEX_COLOR_RE = /^#[0-9a-fA-F]{6}$/;
@@ -47,7 +47,7 @@ describe('PORTRAIT_MANIFEST structure', () => {
     expect(PORTRAIT_MANIFEST.version).toBe(1);
   });
 
-  it('has all 29 portrait-manifest characters', () => {
+  it('has all 33 portrait-manifest characters', () => {
     for (const char of ROSTER) {
       expect(PORTRAIT_MANIFEST.portraits[char], `${char} in manifest`).toBeDefined();
     }
@@ -128,7 +128,7 @@ describe('PORTRAIT_MANIFEST fallback colors', () => {
 });
 
 describe('PORTRAIT_MANIFEST hasPixelPortrait', () => {
-  it('all 29 portrait-manifest characters have hasPixelPortrait=true', () => {
+  it('all 33 portrait-manifest characters have hasPixelPortrait=true', () => {
     for (const char of ROSTER) {
       const entry = PORTRAIT_MANIFEST.portraits[char].hud;
       expect(entry.hasPixelPortrait, `${char} hasPixelPortrait`).toBe(true);
