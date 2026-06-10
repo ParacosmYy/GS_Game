@@ -13,5 +13,5 @@
     "noEmit": true
   },
   "include": ["src"],
-  "exclude": ["src/tools"]
+  "exclude": ["src/tools", "src/tests"]
 }
