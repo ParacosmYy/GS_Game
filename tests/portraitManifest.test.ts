@@ -20,6 +20,8 @@ import {
   type PortraitManifest,
 } from '../src/core/portraitManifest.js';
 import { KYO_PORTRAIT_META } from '../src/content/characters/kyo/portraits/kyoPortraits.js';
+import { RYO_PORTRAIT_META } from '../src/content/characters/ryo/portraits/ryoPortraits.js';
+import { IORI_PORTRAIT_META } from '../src/content/characters/iori/portraits/ioriPortraits.js';
 import { TERRY_PORTRAIT_META } from '../src/content/characters/terry/portraits/terryPortraits.js';
 import { KIM_PORTRAIT_META } from '../src/content/characters/kim/portraits/kimPortraits.js';
 
@@ -35,6 +37,26 @@ const MUGEN_PORTRAIT_EXPECTATIONS = {
       vs: { spriteRef: '9000_1', imagePath: '/sprites/cvskyo/09000_0001.png', assetWidth: 120, assetHeight: 140 },
       hud: { spriteRef: '9000_0', imagePath: '/sprites/cvskyo/09000_0000.png', assetWidth: 25, assetHeight: 25 },
       win: { spriteRef: '9000_2', imagePath: '/sprites/cvskyo/09000_0002.png', assetWidth: 81, assetHeight: 59 },
+    },
+  },
+  ryo: {
+    mugenDir: 'cvsryo',
+    contentMeta: RYO_PORTRAIT_META,
+    expected: {
+      select: { spriteRef: '9000_1', imagePath: '/sprites/cvsryo/09000_0001.png', assetWidth: 117, assetHeight: 140 },
+      vs: { spriteRef: '9000_1', imagePath: '/sprites/cvsryo/09000_0001.png', assetWidth: 117, assetHeight: 140 },
+      hud: { spriteRef: '9000_0', imagePath: '/sprites/cvsryo/09000_0000.png', assetWidth: 25, assetHeight: 25 },
+      win: { spriteRef: '9000_2', imagePath: '/sprites/cvsryo/09000_0002.png', assetWidth: 81, assetHeight: 59 },
+    },
+  },
+  iori: {
+    mugenDir: 'yiori',
+    contentMeta: IORI_PORTRAIT_META,
+    expected: {
+      select: { spriteRef: '9000_1', imagePath: '/sprites/yiori/09000_0001.png', assetWidth: 122, assetHeight: 137 },
+      vs: { spriteRef: '9000_1', imagePath: '/sprites/yiori/09000_0001.png', assetWidth: 122, assetHeight: 137 },
+      hud: { spriteRef: '9000_0', imagePath: '/sprites/yiori/09000_0000.png', assetWidth: 25, assetHeight: 25 },
+      win: { spriteRef: '9000_2', imagePath: '/sprites/yiori/09000_0002.png', assetWidth: 25, assetHeight: 25 },
     },
   },
   terry: {

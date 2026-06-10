@@ -3,7 +3,14 @@
  */
 // ===== Hitbox Offsets (relative to fighter position, facing right) =====
 // Scaled for larger character proportions (displayHeight=200)
-export const HITBOX_OFFSETS = {
+type HitboxOffset = {
+  offsetX: number;
+  offsetY: number;
+  width: number;
+  height: number;
+};
+
+export const HITBOX_OFFSETS: Record<string, HitboxOffset> = {
   // 远距离站立 — 拳(A/C)偏高, 脚(B/D)偏低
   STAND_A: { offsetX: 65, offsetY: -150, width: 60, height: 35 },
   STAND_B: { offsetX: 65, offsetY: -70, width: 75, height: 40 },
@@ -441,4 +448,12 @@ export const HITBOX_OFFSETS = {
   SDM_YURI_HAOH_SHO_KO_KEN: { offsetX: 65, offsetY: -105, width: 95, height: 80 },
   SDM_YURI_HIEN_HOU_OU_KYAKU: { offsetX: 55, offsetY: -100, width: 90, height: 75 },
   HSDM_YURI_HISHOU_KUURETSU_ZAN: { offsetX: 60, offsetY: -100, width: 100, height: 85 },
+
+  // Kensou command normals
+  KENSOU_BAKYAKU: { offsetX: 55, offsetY: -100, width: 70, height: 45 },
+  KENSOU_KAKUHI: { offsetX: 65, offsetY: -22, width: 75, height: 26 },
+
+  // Takuma command normals
+  TAKUMA_FUU_GA: { offsetX: 52, offsetY: -112, width: 72, height: 48 },
+  TAKUMA_GOUSOU: { offsetX: 58, offsetY: -88, width: 76, height: 46 },
 } as const;

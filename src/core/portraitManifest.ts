@@ -265,6 +265,76 @@ const KYO_MUGEN_PORTRAITS: Partial<Record<PortraitSize, Pick<PortraitEntry, 'sou
   },
 };
 
+const RYO_MUGEN_PORTRAITS: Partial<Record<PortraitSize, Pick<PortraitEntry, 'source' | 'mugenDir' | 'spriteRef' | 'imagePath' | 'assetWidth' | 'assetHeight'>>> = {
+  select: {
+    source: 'mugen-sprite',
+    mugenDir: 'cvsryo',
+    spriteRef: '9000_1',
+    imagePath: '/sprites/cvsryo/09000_0001.png',
+    assetWidth: 117,
+    assetHeight: 140,
+  },
+  vs: {
+    source: 'mugen-sprite',
+    mugenDir: 'cvsryo',
+    spriteRef: '9000_1',
+    imagePath: '/sprites/cvsryo/09000_0001.png',
+    assetWidth: 117,
+    assetHeight: 140,
+  },
+  hud: {
+    source: 'mugen-sprite',
+    mugenDir: 'cvsryo',
+    spriteRef: '9000_0',
+    imagePath: '/sprites/cvsryo/09000_0000.png',
+    assetWidth: 25,
+    assetHeight: 25,
+  },
+  win: {
+    source: 'mugen-sprite',
+    mugenDir: 'cvsryo',
+    spriteRef: '9000_2',
+    imagePath: '/sprites/cvsryo/09000_0002.png',
+    assetWidth: 81,
+    assetHeight: 59,
+  },
+};
+
+const IORI_MUGEN_PORTRAITS: Partial<Record<PortraitSize, Pick<PortraitEntry, 'source' | 'mugenDir' | 'spriteRef' | 'imagePath' | 'assetWidth' | 'assetHeight'>>> = {
+  select: {
+    source: 'mugen-sprite',
+    mugenDir: 'yiori',
+    spriteRef: '9000_1',
+    imagePath: '/sprites/yiori/09000_0001.png',
+    assetWidth: 122,
+    assetHeight: 137,
+  },
+  vs: {
+    source: 'mugen-sprite',
+    mugenDir: 'yiori',
+    spriteRef: '9000_1',
+    imagePath: '/sprites/yiori/09000_0001.png',
+    assetWidth: 122,
+    assetHeight: 137,
+  },
+  hud: {
+    source: 'mugen-sprite',
+    mugenDir: 'yiori',
+    spriteRef: '9000_0',
+    imagePath: '/sprites/yiori/09000_0000.png',
+    assetWidth: 25,
+    assetHeight: 25,
+  },
+  win: {
+    source: 'mugen-sprite',
+    mugenDir: 'yiori',
+    spriteRef: '9000_2',
+    imagePath: '/sprites/yiori/09000_0002.png',
+    assetWidth: 25,
+    assetHeight: 25,
+  },
+};
+
 const TERRY_MUGEN_PORTRAITS: Partial<Record<PortraitSize, Pick<PortraitEntry, 'source' | 'mugenDir' | 'spriteRef' | 'imagePath' | 'assetWidth' | 'assetHeight'>>> = {
   select: {
     source: 'mugen-sprite',
@@ -337,6 +407,8 @@ const KIM_MUGEN_PORTRAITS: Partial<Record<PortraitSize, Pick<PortraitEntry, 'sou
 
 const MUGEN_PORTRAITS_BY_CHARACTER: Partial<Record<string, Partial<Record<PortraitSize, Pick<PortraitEntry, 'source' | 'mugenDir' | 'spriteRef' | 'imagePath' | 'assetWidth' | 'assetHeight'>>>>> = {
   kyo: KYO_MUGEN_PORTRAITS,
+  ryo: RYO_MUGEN_PORTRAITS,
+  iori: IORI_MUGEN_PORTRAITS,
   terry: TERRY_MUGEN_PORTRAITS,
   kim: KIM_MUGEN_PORTRAITS,
 };

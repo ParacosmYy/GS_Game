@@ -433,13 +433,32 @@ const FRAME_DATA_GENERIC = {
   SDM_YURI_HIEN_HOU_OU_KYAKU: { startup: 8, active: 14, recovery: 22, damage: 210, hitstun: 0, blockstun: 22, pushback: 10, hitLevel: 'MID' as const, knockdown: true, chipDamage: 20 },
   HSDM_YURI_HISHOU_KUURETSU_ZAN: { startup: 8, active: 18, recovery: 26, damage: 280, hitstun: 0, blockstun: 28, pushback: 14, hitLevel: 'MID' as const, knockdown: true, chipDamage: 28 },
 
+  // ── Kensou command normals ──
+  KENSOU_BAKYAKU: { startup: 8, active: 4, recovery: 14, damage: 45, hitstun: 13, blockstun: 9, pushback: 5, hitLevel: 'HIGH' as const, knockdown: false },
+  KENSOU_KAKUHI: { startup: 7, active: 3, recovery: 13, damage: 40, hitstun: 12, blockstun: 8, pushback: 5, hitLevel: 'LOW' as const, knockdown: false },
+
   // ── Kensou DMs ──
   DM_SHIN_CHOU_KYUU_DAN: { startup: 14, active: 10, recovery: 24, damage: 170, hitstun: 0, blockstun: 20, pushback: 10, hitLevel: 'MID' as const, knockdown: true, chipDamage: 16 },
   SDM_SHIN_CHOU_KYUU_DAN: { startup: 12, active: 14, recovery: 26, damage: 230, hitstun: 0, blockstun: 24, pushback: 12, hitLevel: 'MID' as const, knockdown: true, chipDamage: 22 },
 
   // ── Takuma DMs ──
+  TAKUMA_FUU_GA: { startup: 7, active: 4, recovery: 13, damage: 42, hitstun: 13, blockstun: 9, pushback: 5, hitLevel: 'MID' as const, knockdown: false },
+  TAKUMA_GOUSOU: { startup: 9, active: 4, recovery: 15, damage: 48, hitstun: 14, blockstun: 10, pushback: 6, hitLevel: 'HIGH' as const, knockdown: false },
   DM_RYUKO_RANBU_TAKUMA: { startup: 8, active: 6, recovery: 26, damage: 180, hitstun: 0, blockstun: 0, pushback: 0, hitLevel: 'MID' as const, knockdown: true, chipDamage: 18 },
   SDM_RYUKO_RANBU_TAKUMA: { startup: 6, active: 10, recovery: 28, damage: 250, hitstun: 0, blockstun: 0, pushback: 0, hitLevel: 'MID' as const, knockdown: true, chipDamage: 24 },
 };
 
-export const FRAME_DATA = { ...FRAME_DATA_GENERIC, ...FRAME_DATA_CHARS } as const;
+type FrameDataEntry = {
+  startup: number;
+  active: number;
+  recovery: number;
+  damage: number;
+  hitstun: number;
+  blockstun: number;
+  pushback: number;
+  hitLevel: 'MID' | 'LOW' | 'HIGH';
+  knockdown: boolean;
+  chipDamage?: number;
+};
+
+export const FRAME_DATA: Record<string, FrameDataEntry> = { ...FRAME_DATA_GENERIC, ...FRAME_DATA_CHARS };

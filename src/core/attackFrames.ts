@@ -663,6 +663,33 @@ const SPECIAL_PROJECTILE_FRAMES: AttackFrame[] = [
   F([{ ox: 50, oy: -60, w: 35, h: 28 }]),
 ];
 
+const KENSOU_BAKYAKU_FRAMES: AttackFrame[] = [
+  F([{ ox: 46, oy: -70, w: 58, h: 34 }]),
+  F([{ ox: 55, oy: -76, w: 70, h: 38 }]),
+  F([{ ox: 62, oy: -84, w: 76, h: 42 }]),
+  F([{ ox: 58, oy: -74, w: 68, h: 36 }]),
+];
+
+const KENSOU_KAKUHI_FRAMES: AttackFrame[] = [
+  F([{ ox: 52, oy: -28, w: 58, h: 24 }]),
+  F([{ ox: 64, oy: -24, w: 76, h: 26 }]),
+  F([{ ox: 68, oy: -20, w: 80, h: 24 }]),
+];
+
+const TAKUMA_FUU_GA_FRAMES: AttackFrame[] = [
+  F([{ ox: 44, oy: -78, w: 56, h: 36 }]),
+  F([{ ox: 52, oy: -90, w: 68, h: 42 }]),
+  F([{ ox: 58, oy: -104, w: 72, h: 48 }]),
+  F([{ ox: 54, oy: -88, w: 66, h: 40 }]),
+];
+
+const TAKUMA_GOUSOU_FRAMES: AttackFrame[] = [
+  F([{ ox: 48, oy: -64, w: 62, h: 36 }]),
+  F([{ ox: 58, oy: -74, w: 76, h: 42 }]),
+  F([{ ox: 62, oy: -82, w: 80, h: 46 }]),
+  F([{ ox: 58, oy: -72, w: 70, h: 38 }]),
+];
+
 // ===== 导出完整的逐帧判定表 =====
 export const ATTACK_FRAMES: AttackFrameTable = {
   [AttackType.STAND_A]: FAR_STAND_A_FRAMES,
@@ -713,6 +740,10 @@ export const ATTACK_FRAMES: AttackFrameTable = {
   [AttackType.JUMP_CD]: JUMP_CD_FRAMES,
   [AttackType.SPECIAL_UPPER]: SPECIAL_UPPER_FRAMES,
   [AttackType.SPECIAL_PROJECTILE]: SPECIAL_PROJECTILE_FRAMES,
+  [AttackType.KENSOU_BAKYAKU]: KENSOU_BAKYAKU_FRAMES,
+  [AttackType.KENSOU_KAKUHI]: KENSOU_KAKUHI_FRAMES,
+  [AttackType.TAKUMA_FUU_GA]: TAKUMA_FUU_GA_FRAMES,
+  [AttackType.TAKUMA_GOUSOU]: TAKUMA_GOUSOU_FRAMES,
   [AttackType.KYO_75KAI]: KYO_75KAI_FRAMES,
   [AttackType.KYO_75KAI_2]: KYO_75KAI_2_FRAMES,
   [AttackType.KYO_RED_KICK]: KYO_RED_KICK_FRAMES,

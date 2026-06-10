@@ -2,7 +2,16 @@ import { DirectionInput, AttackType } from '../core/types.js';
 import { COMMAND_WINDOW, HCF_WINDOW, DOUBLE_QCF_WINDOW, CHARGE_FRAMES_REQUIRED, RECOVERY_INPUT_BUFFER } from '../core/constants.js';
 
 /** DM motion types detected from command buffer — characters map these to their own DM */
-export type DMMotion = 'QCFx2_P' | 'QCFx2_K' | 'QCBx2_K' | 'QCBx2_P' | 'QCB_HCF_P' | 'QCB_HCF_K' | null;
+export type DMMotion =
+  | 'QCFx2_P'
+  | 'QCFx2_K'
+  | 'QCBx2_K'
+  | 'QCBx2_P'
+  | 'HCBx2_P'
+  | 'HCBx2_K'
+  | 'QCB_HCF_P'
+  | 'QCB_HCF_K'
+  | null;
 
 /** Charge direction type for charge motion detection */
 export type ChargeDirection = 'down' | 'back' | 'downback';
@@ -331,6 +340,17 @@ export class CommandBuffer {
 
     if (hasDoubleQCB && kickEdge) return 'QCBx2_K';
     if (hasDoubleQCB && punchEdge) return 'QCBx2_P';
+
+    // HCBx2 (→↘↓↙←→↘↓↙←): boss/command-throw style super input.
+    const hasDoubleHCB = this.matchSequence(wideRecent, [
+      'forward', 'downforward', 'down', 'downback', 'back',
+      'forward', 'downforward', 'down', 'downback', 'back',
+    ])
+      || this.matchSequence(wideRecent, ['forward', 'down', 'back', 'forward', 'down', 'back'])
+      || this.matchSequence(wideRecent, ['downforward', 'downback', 'back', 'downforward', 'downback', 'back']);
+
+    if (hasDoubleHCB && punchEdge) return 'HCBx2_P';
+    if (hasDoubleHCB && kickEdge) return 'HCBx2_K';
 
     // QCB HCF (↓↙←↙↓↘→): common KOF ultra input (like Orochinagi, Ya Otome)
     const hasQcbHcf = this.matchSequence(wideRecent, ['down', 'back', 'down', 'forward'])
