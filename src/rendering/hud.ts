@@ -21,7 +21,8 @@ import { drawPowerGauges } from './hudPowerGauges.js';
 export { drawPowerGauges } from './hudPowerGauges.js';
 import { ROSTER } from '../characters/index.js';
 import { drawPixelPortrait } from './pixelPortraits.js';
-import { getPortraitForSize } from './manifestRenderData.js';
+import { getPortraitForSize, getRealPortraitEntryForSize } from './manifestRenderData.js';
+import { drawRealPortraitInBox } from './realPortraits.js';
 import { drawVisualInput } from './overlays/overlayInputIcons.js';
 
 const charById = new Map(ROSTER.map(c => [c.id, c]));
@@ -221,26 +222,34 @@ function drawHUDPortrait(
   healthPercent: number,
 ): void {
   // Try size-specific portrait first, then fallback to CharacterDefinition.pixelPortrait
+  const realPortrait = getRealPortraitEntryForSize(charId, 'hud');
   const sizedPortrait = getPortraitForSize(charId, 'hud');
   const charDef = charById.get(charId);
   const portrait = sizedPortrait ?? charDef?.pixelPortrait;
 
-  if (portrait) {
+  if (realPortrait || portrait) {
     ctx.save();
     ctx.beginPath();
     roundRect(ctx, x, y, HUD_PORTRAIT_SIZE, HUD_PORTRAIT_SIZE, 3);
     ctx.clip();
-    // For HUD-sized portraits, use scale=1; for base portraits, fit into HUD area
-    const isNativeSize = portrait.width === HUD_PORTRAIT_SIZE;
-    const scale = isNativeSize ? 1 : Math.min(HUD_PORTRAIT_SIZE / portrait.width, HUD_PORTRAIT_SIZE / portrait.height);
-    const pw = portrait.width * scale;
-    const ph = portrait.height * scale;
-    const ox = Math.floor((HUD_PORTRAIT_SIZE - pw) / 2);
-    const oy = Math.floor((HUD_PORTRAIT_SIZE - ph) / 2);
-    drawPixelPortrait(ctx, portrait, x + ox, y + oy, scale, {
+    const drewReal = drawRealPortraitInBox(ctx, realPortrait, x, y, HUD_PORTRAIT_SIZE, HUD_PORTRAIT_SIZE, {
       backdropColor: 'rgba(8, 8, 18, 0.9)',
       frameColor: charDef?.color ?? '#888',
+      fit: 'cover',
     });
+    if (!drewReal && portrait) {
+      // For HUD-sized portraits, use scale=1; for base portraits, fit into HUD area
+      const isNativeSize = portrait.width === HUD_PORTRAIT_SIZE;
+      const scale = isNativeSize ? 1 : Math.min(HUD_PORTRAIT_SIZE / portrait.width, HUD_PORTRAIT_SIZE / portrait.height);
+      const pw = portrait.width * scale;
+      const ph = portrait.height * scale;
+      const ox = Math.floor((HUD_PORTRAIT_SIZE - pw) / 2);
+      const oy = Math.floor((HUD_PORTRAIT_SIZE - ph) / 2);
+      drawPixelPortrait(ctx, portrait, x + ox, y + oy, scale, {
+        backdropColor: 'rgba(8, 8, 18, 0.9)',
+        frameColor: charDef?.color ?? '#888',
+      });
+    }
     // Low-health danger tint
     if (healthPercent < 0.25) {
       ctx.fillStyle = `rgba(180, 30, 10, ${0.15 + 0.1 * Math.sin(Date.now() * 0.008)})`;

@@ -16,6 +16,7 @@ import {
 import { SPRITE_MANIFEST } from '../core/spriteManifestData.js';
 import {
   PORTRAIT_MANIFEST,
+  getPortrait,
   getHUDPortrait,
   getSelectPortrait,
   getVSPortrait,
@@ -113,6 +114,19 @@ export function getPortraitForSize(
  */
 export function hasPortraitForSize(charId: string, size: PortraitSize): boolean {
   return hasSizedPortrait(charId, size);
+}
+
+/**
+ * 获取角色尺寸对应的真实 MUGEN PNG 肖像条目。
+ *
+ * 返回 PortraitEntry 而不是 Image，保持渲染层只消费 manifest 元数据。
+ */
+export function getRealPortraitEntryForSize(
+  charId: string,
+  size: PortraitSize,
+): PortraitEntry | undefined {
+  const entry = getPortrait(PORTRAIT_MANIFEST, charId, size);
+  return entry?.source === 'mugen-sprite' && entry.imagePath ? entry : undefined;
 }
 
 /**

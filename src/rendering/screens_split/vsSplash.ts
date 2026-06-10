@@ -8,7 +8,8 @@ import {
 import { roundRect, drawSNKText } from '../utils.js';
 import { drawPixelPortrait } from '../pixelPortraits.js';
 import type { PixelPortraitData } from '../pixelPortraits.js';
-import { getPortraitForSize } from '../manifestRenderData.js';
+import { getPortraitForSize, getRealPortraitEntryForSize } from '../manifestRenderData.js';
+import { drawRealPortraitInBox } from '../realPortraits.js';
 import { RANDOM_SLOT_INDEX, COLOR_PALETTES, VS_SPLASH_DURATION } from '../../state/selectState.js';
 import type { SelectState } from '../../state/selectState.js';
 import type { CharacterDefinition } from '../../characters/types.js';
@@ -86,24 +87,30 @@ export function drawVSSplash(
 
   // P1头像 (左侧)
   const p1VSPortrait = p1Char ? getBestPortrait(p1Char, 'vs') : undefined;
-  if (p1VSPortrait) {
-    const scale = p1VSPortrait.width > 100 ? 1.5 : 3;
-    const pw = p1VSPortrait.width * scale;
-    const ph = p1VSPortrait.height * scale;
+  const p1RealVSPortrait = p1Char ? getRealPortraitEntryForSize(p1Char.id, 'vs') : undefined;
+  if (p1VSPortrait || p1RealVSPortrait) {
+    const sourceWidth = p1RealVSPortrait?.assetWidth ?? p1VSPortrait?.width ?? 120;
+    const sourceHeight = p1RealVSPortrait?.assetHeight ?? p1VSPortrait?.height ?? 140;
+    const scale = sourceWidth > 100 ? 1.5 : 3;
+    const pw = sourceWidth * scale;
+    const ph = sourceHeight * scale;
     const px = CANVAS_WIDTH * 0.25 - pw / 2;
     const py = 100;
-    drawVSPortrait(ctx, px, py, pw, ph, p1VSPortrait, scale, (p1Char?.color ?? '#888'), tick, 0);
+    drawVSPortrait(ctx, px, py, pw, ph, p1VSPortrait, p1RealVSPortrait, scale, (p1Char?.color ?? '#888'), tick, 0);
   }
 
   // P2头像 (右侧)
   const p2VSPortrait = p2Char ? getBestPortrait(p2Char, 'vs') : undefined;
-  if (p2VSPortrait) {
-    const scale = p2VSPortrait.width > 100 ? 1.5 : 3;
-    const pw = p2VSPortrait.width * scale;
-    const ph = p2VSPortrait.height * scale;
+  const p2RealVSPortrait = p2Char ? getRealPortraitEntryForSize(p2Char.id, 'vs') : undefined;
+  if (p2VSPortrait || p2RealVSPortrait) {
+    const sourceWidth = p2RealVSPortrait?.assetWidth ?? p2VSPortrait?.width ?? 120;
+    const sourceHeight = p2RealVSPortrait?.assetHeight ?? p2VSPortrait?.height ?? 140;
+    const scale = sourceWidth > 100 ? 1.5 : 3;
+    const pw = sourceWidth * scale;
+    const ph = sourceHeight * scale;
     const px = CANVAS_WIDTH * 0.75 - pw / 2;
     const py = 100;
-    drawVSPortrait(ctx, px, py, pw, ph, p2VSPortrait, scale, (p2Char?.color ?? '#888'), tick, 1);
+    drawVSPortrait(ctx, px, py, pw, ph, p2VSPortrait, p2RealVSPortrait, scale, (p2Char?.color ?? '#888'), tick, 1);
   }
 
   // P1角色名 (左侧)
@@ -258,7 +265,8 @@ function drawVSPortrait(
   ctx: CanvasRenderingContext2D,
   px: number, py: number,
   pw: number, ph: number,
-  portrait: PixelPortraitData,
+  portrait: PixelPortraitData | undefined,
+  realPortrait: ReturnType<typeof getRealPortraitEntryForSize>,
   scale: number,
   color: string,
   tick: number,
@@ -276,11 +284,19 @@ function drawVSPortrait(
   roundRect(ctx, px - 12, py - 12, pw + 24, ph + 24, 8);
   ctx.stroke();
   ctx.globalAlpha = 1;
+  const drewReal = drawRealPortraitInBox(ctx, realPortrait, px, py, pw, ph, {
+    frameColor: color,
+    backdropColor: 'rgba(20, 20, 40, 0.85)',
+    scanlines: true,
+    fit: 'contain',
+  });
+  if (!drewReal && portrait) {
     drawPixelPortrait(ctx, portrait, px, py, scale, {
       frameColor: color,
       backdropColor: 'rgba(20, 20, 40, 0.85)',
       scanlines: true,
     });
+  }
     // Shimmer sweep — diagonal light line across portrait
     const shimmerPhase = ((tick * 0.02 + playerIndex * 0.5) % 1.0);
     const shimmerX = px - 20 + shimmerPhase * (pw + 40);
@@ -329,4 +345,3 @@ function drawVSPaletteDots(
     }
   }
 }
-

@@ -6,7 +6,8 @@ import { CANVAS_WIDTH, CANVAS_HEIGHT } from '../../core/constants.js';
 import { ROSTER } from '../../characters/index.js';
 import { roundRect, drawSNKText } from '../utils.js';
 import { drawPixelPortrait } from '../pixelPortraits.js';
-import { getPortraitForSize } from '../manifestRenderData.js';
+import { getPortraitForSize, getRealPortraitEntryForSize } from '../manifestRenderData.js';
+import { drawRealPortraitInBox } from '../realPortraits.js';
 import type { PortraitSize } from '../../core/portraitManifest.js';
 
 // ===== Match End =====
@@ -50,12 +51,15 @@ export function drawMatchEnd(
   if (winner !== null && winnerCharId) {
     const charDef = ROSTER.find(c => c.id === winnerCharId);
     // Use sized win portrait if available, fallback to base pixelPortrait
+    const realWinPortrait = getRealPortraitEntryForSize(winnerCharId, 'win' as PortraitSize);
     const winPortrait = charDef ? (getPortraitForSize(winnerCharId, 'win' as PortraitSize) ?? charDef.pixelPortrait) : undefined;
     const charColor = charDef?.color ?? '#ffcc00';
-    if (winPortrait) {
-      const portraitScale = winPortrait.width >= 120 ? 2.5 : 4;
-      const pw = winPortrait.width * portraitScale;
-      const ph = winPortrait.height * portraitScale;
+    if (realWinPortrait || winPortrait) {
+      const sourceWidth = realWinPortrait?.assetWidth ?? winPortrait?.width ?? 64;
+      const sourceHeight = realWinPortrait?.assetHeight ?? winPortrait?.height ?? 80;
+      const portraitScale = sourceWidth >= 120 ? 2.5 : 4;
+      const pw = sourceWidth * portraitScale;
+      const ph = sourceHeight * portraitScale;
       const px = CANVAS_WIDTH / 2 - pw / 2;
       const py = 20;
 
@@ -86,11 +90,18 @@ export function drawMatchEnd(
       ctx.stroke();
       ctx.globalAlpha = fadeIn;
 
-      drawPixelPortrait(ctx, winPortrait, px, py, portraitScale, {
+      const drewReal = drawRealPortraitInBox(ctx, realWinPortrait, px, py, pw, ph, {
         frameColor: charColor,
         backdropColor: 'rgba(8, 8, 18, 0.9)',
         scanlines: true,
       });
+      if (!drewReal && winPortrait) {
+        drawPixelPortrait(ctx, winPortrait, px, py, portraitScale, {
+          frameColor: charColor,
+          backdropColor: 'rgba(8, 8, 18, 0.9)',
+          scanlines: true,
+        });
+      }
 
       // Sparkle particles around portrait
       const sparkleCount = 12;

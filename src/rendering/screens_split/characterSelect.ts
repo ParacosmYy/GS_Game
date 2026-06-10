@@ -9,7 +9,8 @@ import { ROSTER } from '../../characters/index.js';
 import { roundRect, drawSNKText } from '../utils.js';
 import { drawPixelPortrait } from '../pixelPortraits.js';
 import type { PixelPortraitData } from '../pixelPortraits.js';
-import { getPortraitForSize } from '../manifestRenderData.js';
+import { getPortraitForSize, getRealPortraitEntryForSize } from '../manifestRenderData.js';
+import { drawRealPortraitInBox } from '../realPortraits.js';
 import { getRivalDialogue, getRivalThemeColors } from '../../core/rivalData.js';
 import type { SelectState } from '../../state/selectState.js';
 import { RANDOM_SLOT_INDEX, TOTAL_SELECT_SLOTS, COLOR_PALETTES, VS_SPLASH_DURATION } from '../../state/selectState.js';
@@ -357,13 +358,20 @@ export function drawCharacterSelect(
       roundRect(ctx, cx + 8, portraitY, CARD_W - 16, 48, 4);
       ctx.fill();
 
+      const portraitBoxX = cx + 12;
+      const portraitBoxY = portraitY + 4;
+      const portraitBoxW = CARD_W - 24;
+      const portraitBoxH = 40;
+      const realSelectPortrait = getRealPortraitEntryForSize(char.id, 'select');
+      const drewRealSelect = drawRealPortraitInBox(ctx, realSelectPortrait, portraitBoxX, portraitBoxY, portraitBoxW, portraitBoxH, {
+        frameColor: char.color,
+        backdropColor: 'rgba(8, 8, 18, 0.85)',
+        scanlines: true,
+        fit: 'cover',
+      });
       const selectPortrait = getBestPortrait(char, 'select');
-      if (selectPortrait) {
-        const portraitBoxX = cx + 12;
-        const portraitBoxY = portraitY + 4;
-        const portraitBoxW = CARD_W - 24;
-        const portraitBoxH = 40;
-        if (!drawPortraitFitVisibleBoundsInBox(ctx, selectPortrait, portraitBoxX, portraitBoxY, portraitBoxW, portraitBoxH, {
+      if (selectPortrait || drewRealSelect) {
+        if (!drewRealSelect && selectPortrait && !drawPortraitFitVisibleBoundsInBox(ctx, selectPortrait, portraitBoxX, portraitBoxY, portraitBoxW, portraitBoxH, {
           frameColor: char.color,
           backdropColor: 'rgba(8, 8, 18, 0.85)',
           scanlines: true,
@@ -437,7 +445,8 @@ export function drawCharacterSelect(
   if (hoveredChar) {
     // 放大肖像预览 — 网格左侧
     const hoverPortrait = getBestPortrait(hoveredChar, 'select');
-    if (hoverPortrait) {
+    const realHoverPortrait = getRealPortraitEntryForSize(hoveredChar.id, 'select');
+    if (hoverPortrait || realHoverPortrait) {
       const previewBoxW = 120;
       const previewBoxH = 120;
       const ppx = CANVAS_WIDTH / 2 - previewBoxW / 2 - 100;
@@ -450,7 +459,13 @@ export function drawCharacterSelect(
       ctx.lineWidth = 1;
       roundRect(ctx, ppx - 4, ppy - 4, previewBoxW + 8, previewBoxH + 8, 4);
       ctx.stroke();
-      if (!drawPortraitFitVisibleBoundsInBox(ctx, hoverPortrait, ppx, ppy, previewBoxW, previewBoxH, {
+      const drewRealHover = drawRealPortraitInBox(ctx, realHoverPortrait, ppx, ppy, previewBoxW, previewBoxH, {
+        frameColor: hoveredChar.color,
+        backdropColor: 'rgba(8, 8, 18, 0.9)',
+        scanlines: true,
+        fit: 'contain',
+      });
+      if (!drewRealHover && hoverPortrait && !drawPortraitFitVisibleBoundsInBox(ctx, hoverPortrait, ppx, ppy, previewBoxW, previewBoxH, {
         frameColor: hoveredChar.color,
         backdropColor: 'rgba(8, 8, 18, 0.9)',
         scanlines: true,
@@ -600,14 +615,21 @@ function drawPlayerInfo(
 
   // 头像预览
   const infoPortrait = char ? getBestPortrait(char, 'select') : undefined;
-  if (infoPortrait) {
+  const realInfoPortrait = char ? getRealPortraitEntryForSize(char.id, 'select') : undefined;
+  if (infoPortrait || realInfoPortrait) {
     const portraitBoxW = 72;
     const portraitBoxH = 72;
     const ppx = isLeft ? 10 : CANVAS_WIDTH - 18 - portraitBoxW;
     const ppy = panelY + 2;
     ctx.fillStyle = 'rgba(10, 10, 20, 0.7)';
     roundRect(ctx, ppx, ppy, portraitBoxW, portraitBoxH, 4); ctx.fill();
-    if (!drawPortraitFitVisibleBoundsInBox(ctx, infoPortrait, ppx + 4, ppy + 4, portraitBoxW - 8, portraitBoxH - 8, {
+    const drewRealInfo = drawRealPortraitInBox(ctx, realInfoPortrait, ppx + 4, ppy + 4, portraitBoxW - 8, portraitBoxH - 8, {
+      frameColor: char?.color ?? '#888',
+      backdropColor: 'rgba(8, 8, 18, 0.85)',
+      scanlines: true,
+      fit: 'cover',
+    });
+    if (!drewRealInfo && infoPortrait && !drawPortraitFitVisibleBoundsInBox(ctx, infoPortrait, ppx + 4, ppy + 4, portraitBoxW - 8, portraitBoxH - 8, {
       frameColor: char?.color ?? '#888',
       backdropColor: 'rgba(8, 8, 18, 0.85)',
       scanlines: true,
@@ -724,4 +746,3 @@ function drawConfirmedLabel(
   ctx.stroke();
   ctx.restore();
 }
-

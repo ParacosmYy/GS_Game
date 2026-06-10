@@ -40,6 +40,18 @@ export interface PortraitEntry {
   fallbackAccent: string;
   /** 是否有真实像素肖像数据（CharacterDefinition.pixelPortrait） */
   hasPixelPortrait?: boolean;
+  /** 肖像来源：手写像素数据或 MUGEN sprite manifest */
+  source?: 'pixel' | 'mugen-sprite';
+  /** MUGEN sprite 目录（如 cvskyo） */
+  mugenDir?: string;
+  /** MUGEN sprite ref（如 9000_1） */
+  spriteRef?: string;
+  /** 浏览器可加载的真实 PNG 路径 */
+  imagePath?: string;
+  /** 原始 PNG 宽度 */
+  assetWidth?: number;
+  /** 原始 PNG 高度 */
+  assetHeight?: number;
 }
 
 /** 全角色肖像 manifest */
@@ -218,6 +230,41 @@ export const PORTRAIT_MANIFEST: PortraitManifest = {
   portraits: {},
 };
 
+const KYO_MUGEN_PORTRAITS: Partial<Record<PortraitSize, Pick<PortraitEntry, 'source' | 'mugenDir' | 'spriteRef' | 'imagePath' | 'assetWidth' | 'assetHeight'>>> = {
+  select: {
+    source: 'mugen-sprite',
+    mugenDir: 'cvskyo',
+    spriteRef: '9000_1',
+    imagePath: '/sprites/cvskyo/09000_0001.png',
+    assetWidth: 120,
+    assetHeight: 140,
+  },
+  vs: {
+    source: 'mugen-sprite',
+    mugenDir: 'cvskyo',
+    spriteRef: '9000_1',
+    imagePath: '/sprites/cvskyo/09000_0001.png',
+    assetWidth: 120,
+    assetHeight: 140,
+  },
+  hud: {
+    source: 'mugen-sprite',
+    mugenDir: 'cvskyo',
+    spriteRef: '9000_0',
+    imagePath: '/sprites/cvskyo/09000_0000.png',
+    assetWidth: 25,
+    assetHeight: 25,
+  },
+  win: {
+    source: 'mugen-sprite',
+    mugenDir: 'cvskyo',
+    spriteRef: '9000_2',
+    imagePath: '/sprites/cvskyo/09000_0002.png',
+    assetWidth: 81,
+    assetHeight: 59,
+  },
+};
+
 // 填充 manifest
 let rowIndex = 0;
 for (const [charId, colors] of Object.entries(CHARACTER_PORTRAIT_COLORS)) {
@@ -241,6 +288,7 @@ for (const [charId, colors] of Object.entries(CHARACTER_PORTRAIT_COLORS)) {
       fallbackColor: colors.fallbackColor,
       fallbackAccent: colors.fallbackAccent,
       hasPixelPortrait: colors.hasPixelPortrait,
+      ...(charId === 'kyo' ? KYO_MUGEN_PORTRAITS[size] : { source: 'pixel' as const }),
     };
   }
 
