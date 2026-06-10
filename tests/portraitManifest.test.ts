@@ -24,6 +24,10 @@ import { RYO_PORTRAIT_META } from '../src/content/characters/ryo/portraits/ryoPo
 import { IORI_PORTRAIT_META } from '../src/content/characters/iori/portraits/ioriPortraits.js';
 import { TERRY_PORTRAIT_META } from '../src/content/characters/terry/portraits/terryPortraits.js';
 import { KIM_PORTRAIT_META } from '../src/content/characters/kim/portraits/kimPortraits.js';
+import { ATHENA_PORTRAIT_META } from '../src/content/characters/athena/portraits/athenaPortraits.js';
+import { VICE_PORTRAIT_META } from '../src/content/characters/vice/portraits/vicePortraits.js';
+import { YAMAZAKI_PORTRAIT_META } from '../src/content/characters/yamazaki/portraits/yamazakiPortraits.js';
+import { SHERMIE_PORTRAIT_META } from '../src/content/characters/shermie/portraits/shermiePortraits.js';
 
 const ALL_SIZES: PortraitSize[] = ['select', 'vs', 'hud', 'win'];
 const ROOT_DIR = path.resolve(__dirname, '..');
@@ -79,6 +83,42 @@ const MUGEN_PORTRAIT_EXPECTATIONS = {
       win: { spriteRef: '9000_2', imagePath: '/sprites/cvskim/09000_0002.png', assetWidth: 81, assetHeight: 59 },
     },
   },
+  athena: {
+    mugenDir: 'cvsathena',
+    contentMeta: ATHENA_PORTRAIT_META,
+    expected: {
+      select: { spriteRef: '9000_1', imagePath: '/sprites/cvsathena/09000_0001.png', assetWidth: 120, assetHeight: 140 },
+      vs: { spriteRef: '9000_1', imagePath: '/sprites/cvsathena/09000_0001.png', assetWidth: 120, assetHeight: 140 },
+      hud: { spriteRef: '9000_0', imagePath: '/sprites/cvsathena/09000_0000.png', assetWidth: 25, assetHeight: 25 },
+      win: { spriteRef: '9000_2', imagePath: '/sprites/cvsathena/09000_0002.png', assetWidth: 81, assetHeight: 59 },
+    },
+  },
+  vice: {
+    mugenDir: 'cvsvice',
+    contentMeta: VICE_PORTRAIT_META,
+    expected: {
+      select: { spriteRef: '9000_1', imagePath: '/sprites/cvsvice/09000_0001.png', assetWidth: 99, assetHeight: 140 },
+      vs: { spriteRef: '9000_1', imagePath: '/sprites/cvsvice/09000_0001.png', assetWidth: 99, assetHeight: 140 },
+      hud: { spriteRef: '9000_0', imagePath: '/sprites/cvsvice/09000_0000.png', assetWidth: 25, assetHeight: 25 },
+      win: { spriteRef: '9000_2', imagePath: '/sprites/cvsvice/09000_0002.png', assetWidth: 81, assetHeight: 59 },
+    },
+  },
+  yamazaki: {
+    mugenDir: 'cvsyamazaki',
+    contentMeta: YAMAZAKI_PORTRAIT_META,
+    expected: {
+      select: { spriteRef: '9000_1', imagePath: '/sprites/cvsyamazaki/09000_0001.png', assetWidth: 120, assetHeight: 140 },
+      vs: { spriteRef: '9000_1', imagePath: '/sprites/cvsyamazaki/09000_0001.png', assetWidth: 120, assetHeight: 140 },
+      hud: { spriteRef: '9000_0', imagePath: '/sprites/cvsyamazaki/09000_0000.png', assetWidth: 25, assetHeight: 25 },
+      win: { spriteRef: '9000_2', imagePath: '/sprites/cvsyamazaki/09000_0002.png', assetWidth: 81, assetHeight: 59 },
+    },
+  },
+} as const;
+
+const SHERMIE_MUGEN_EXPECTED = {
+  select: { spriteRef: '9000_1', imagePath: '/sprites/shermie/09000_0001.png', assetWidth: 120, assetHeight: 141 },
+  vs: { spriteRef: '9000_1', imagePath: '/sprites/shermie/09000_0001.png', assetWidth: 120, assetHeight: 141 },
+  hud: { spriteRef: '9000_0', imagePath: '/sprites/shermie/09000_0000.png', assetWidth: 25, assetHeight: 25 },
 } as const;
 
 describe('PORTRAIT_SIZES', () => {
@@ -225,5 +265,42 @@ describe('PORTRAIT_MANIFEST global', () => {
         height: manifestEntry.assetHeight,
       });
     }
+  });
+
+  it('Shermie real portrait entries cover select, vs, and hud without faking a missing win PNG', () => {
+    const manifestPath = path.join(ROOT_DIR, 'public/sprites/shermie/manifest.json');
+    const spriteManifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8')) as {
+      sprites: Record<string, { file: string; width: number; height: number }>;
+    };
+
+    for (const size of ['select', 'vs', 'hud'] as const) {
+      const manifestEntry = getPortrait(PORTRAIT_MANIFEST, 'shermie', size)!;
+      const contentEntry = SHERMIE_PORTRAIT_META[size];
+      const expected = SHERMIE_MUGEN_EXPECTED[size];
+      const sprite = spriteManifest.sprites[expected.spriteRef];
+
+      expect(sprite, `shermie ${expected.spriteRef}`).toBeDefined();
+      expect(manifestEntry.source, `shermie ${size} source`).toBe('mugen-sprite');
+      expect(manifestEntry.mugenDir, `shermie ${size} mugenDir`).toBe('shermie');
+      expect(manifestEntry.spriteRef, `shermie ${size} spriteRef`).toBe(expected.spriteRef);
+      expect(manifestEntry.imagePath, `shermie ${size} imagePath`).toBe(expected.imagePath);
+      expect(manifestEntry.assetWidth, `shermie ${size} assetWidth`).toBe(sprite.width);
+      expect(manifestEntry.assetHeight, `shermie ${size} assetHeight`).toBe(sprite.height);
+      expect(contentEntry.source, `shermie content ${size} source`).toBe(manifestEntry.source);
+      expect(contentEntry.mugenDir, `shermie content ${size} mugenDir`).toBe(manifestEntry.mugenDir);
+      expect(contentEntry.spriteRef, `shermie content ${size} spriteRef`).toBe(manifestEntry.spriteRef);
+      expect(contentEntry.imagePath, `shermie content ${size} imagePath`).toBe(manifestEntry.imagePath);
+      expect(contentEntry.assetSize, `shermie content ${size} assetSize`).toEqual({
+        width: manifestEntry.assetWidth,
+        height: manifestEntry.assetHeight,
+      });
+    }
+
+    const winEntry = getPortrait(PORTRAIT_MANIFEST, 'shermie', 'win')!;
+    expect(spriteManifest.sprites['9000_2'], 'shermie 9000_2 should remain absent until source asset exists').toBeUndefined();
+    expect(winEntry.source, 'shermie win core source').toBe('pixel');
+    expect(winEntry.imagePath, 'shermie win core imagePath').toBeUndefined();
+    expect(SHERMIE_PORTRAIT_META.win.source, 'shermie win content source').toBe('pixel-fallback');
+    expect(SHERMIE_PORTRAIT_META.win.imagePath, 'shermie win content imagePath').toBeUndefined();
   });
 });

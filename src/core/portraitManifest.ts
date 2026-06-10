@@ -405,12 +405,148 @@ const KIM_MUGEN_PORTRAITS: Partial<Record<PortraitSize, Pick<PortraitEntry, 'sou
   },
 };
 
+const ATHENA_MUGEN_PORTRAITS: Partial<Record<PortraitSize, Pick<PortraitEntry, 'source' | 'mugenDir' | 'spriteRef' | 'imagePath' | 'assetWidth' | 'assetHeight'>>> = {
+  select: {
+    source: 'mugen-sprite',
+    mugenDir: 'cvsathena',
+    spriteRef: '9000_1',
+    imagePath: '/sprites/cvsathena/09000_0001.png',
+    assetWidth: 120,
+    assetHeight: 140,
+  },
+  vs: {
+    source: 'mugen-sprite',
+    mugenDir: 'cvsathena',
+    spriteRef: '9000_1',
+    imagePath: '/sprites/cvsathena/09000_0001.png',
+    assetWidth: 120,
+    assetHeight: 140,
+  },
+  hud: {
+    source: 'mugen-sprite',
+    mugenDir: 'cvsathena',
+    spriteRef: '9000_0',
+    imagePath: '/sprites/cvsathena/09000_0000.png',
+    assetWidth: 25,
+    assetHeight: 25,
+  },
+  win: {
+    source: 'mugen-sprite',
+    mugenDir: 'cvsathena',
+    spriteRef: '9000_2',
+    imagePath: '/sprites/cvsathena/09000_0002.png',
+    assetWidth: 81,
+    assetHeight: 59,
+  },
+};
+
+const VICE_MUGEN_PORTRAITS: Partial<Record<PortraitSize, Pick<PortraitEntry, 'source' | 'mugenDir' | 'spriteRef' | 'imagePath' | 'assetWidth' | 'assetHeight'>>> = {
+  select: {
+    source: 'mugen-sprite',
+    mugenDir: 'cvsvice',
+    spriteRef: '9000_1',
+    imagePath: '/sprites/cvsvice/09000_0001.png',
+    assetWidth: 99,
+    assetHeight: 140,
+  },
+  vs: {
+    source: 'mugen-sprite',
+    mugenDir: 'cvsvice',
+    spriteRef: '9000_1',
+    imagePath: '/sprites/cvsvice/09000_0001.png',
+    assetWidth: 99,
+    assetHeight: 140,
+  },
+  hud: {
+    source: 'mugen-sprite',
+    mugenDir: 'cvsvice',
+    spriteRef: '9000_0',
+    imagePath: '/sprites/cvsvice/09000_0000.png',
+    assetWidth: 25,
+    assetHeight: 25,
+  },
+  win: {
+    source: 'mugen-sprite',
+    mugenDir: 'cvsvice',
+    spriteRef: '9000_2',
+    imagePath: '/sprites/cvsvice/09000_0002.png',
+    assetWidth: 81,
+    assetHeight: 59,
+  },
+};
+
+const YAMAZAKI_MUGEN_PORTRAITS: Partial<Record<PortraitSize, Pick<PortraitEntry, 'source' | 'mugenDir' | 'spriteRef' | 'imagePath' | 'assetWidth' | 'assetHeight'>>> = {
+  select: {
+    source: 'mugen-sprite',
+    mugenDir: 'cvsyamazaki',
+    spriteRef: '9000_1',
+    imagePath: '/sprites/cvsyamazaki/09000_0001.png',
+    assetWidth: 120,
+    assetHeight: 140,
+  },
+  vs: {
+    source: 'mugen-sprite',
+    mugenDir: 'cvsyamazaki',
+    spriteRef: '9000_1',
+    imagePath: '/sprites/cvsyamazaki/09000_0001.png',
+    assetWidth: 120,
+    assetHeight: 140,
+  },
+  hud: {
+    source: 'mugen-sprite',
+    mugenDir: 'cvsyamazaki',
+    spriteRef: '9000_0',
+    imagePath: '/sprites/cvsyamazaki/09000_0000.png',
+    assetWidth: 25,
+    assetHeight: 25,
+  },
+  win: {
+    source: 'mugen-sprite',
+    mugenDir: 'cvsyamazaki',
+    spriteRef: '9000_2',
+    imagePath: '/sprites/cvsyamazaki/09000_0002.png',
+    assetWidth: 81,
+    assetHeight: 59,
+  },
+};
+
+const SHERMIE_MUGEN_PORTRAITS: Partial<Record<PortraitSize, Pick<PortraitEntry, 'source' | 'mugenDir' | 'spriteRef' | 'imagePath' | 'assetWidth' | 'assetHeight'>>> = {
+  select: {
+    source: 'mugen-sprite',
+    mugenDir: 'shermie',
+    spriteRef: '9000_1',
+    imagePath: '/sprites/shermie/09000_0001.png',
+    assetWidth: 120,
+    assetHeight: 141,
+  },
+  vs: {
+    source: 'mugen-sprite',
+    mugenDir: 'shermie',
+    spriteRef: '9000_1',
+    imagePath: '/sprites/shermie/09000_0001.png',
+    assetWidth: 120,
+    assetHeight: 141,
+  },
+  hud: {
+    source: 'mugen-sprite',
+    mugenDir: 'shermie',
+    spriteRef: '9000_0',
+    imagePath: '/sprites/shermie/09000_0000.png',
+    assetWidth: 25,
+    assetHeight: 25,
+  },
+};
+
 const MUGEN_PORTRAITS_BY_CHARACTER: Partial<Record<string, Partial<Record<PortraitSize, Pick<PortraitEntry, 'source' | 'mugenDir' | 'spriteRef' | 'imagePath' | 'assetWidth' | 'assetHeight'>>>>> = {
   kyo: KYO_MUGEN_PORTRAITS,
   ryo: RYO_MUGEN_PORTRAITS,
   iori: IORI_MUGEN_PORTRAITS,
   terry: TERRY_MUGEN_PORTRAITS,
   kim: KIM_MUGEN_PORTRAITS,
+  athena: ATHENA_MUGEN_PORTRAITS,
+  vice: VICE_MUGEN_PORTRAITS,
+  yamazaki: YAMAZAKI_MUGEN_PORTRAITS,
+  shermie: SHERMIE_MUGEN_PORTRAITS,
 };
 
 // 填充 manifest
