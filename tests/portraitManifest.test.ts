@@ -28,6 +28,13 @@ import { ATHENA_PORTRAIT_META } from '../src/content/characters/athena/portraits
 import { VICE_PORTRAIT_META } from '../src/content/characters/vice/portraits/vicePortraits.js';
 import { YAMAZAKI_PORTRAIT_META } from '../src/content/characters/yamazaki/portraits/yamazakiPortraits.js';
 import { SHERMIE_PORTRAIT_META } from '../src/content/characters/shermie/portraits/shermiePortraits.js';
+import { BENIMARU_PORTRAIT_META } from '../src/content/characters/benimaru/portraits/benimaruPortraits.js';
+import { YURI_PORTRAIT_META } from '../src/content/characters/yuri/portraits/yuriPortraits.js';
+import { ANDY_PORTRAIT_META } from '../src/content/characters/andy/portraits/andyPortraits.js';
+import { CLARK_PORTRAIT_META } from '../src/content/characters/clark/portraits/clarkPortraits.js';
+import { KDASH_PORTRAIT_META } from '../src/content/characters/kdash/portraits/kdashPortraits.js';
+import { MAI_PORTRAIT_META } from '../src/content/characters/mai/portraits/maiPortraits.js';
+import { YASHIRO_PORTRAIT_META } from '../src/content/characters/yashiro/portraits/yashiroPortraits.js';
 
 const ALL_SIZES: PortraitSize[] = ['select', 'vs', 'hud', 'win'];
 const ROOT_DIR = path.resolve(__dirname, '..');
@@ -113,12 +120,93 @@ const MUGEN_PORTRAIT_EXPECTATIONS = {
       win: { spriteRef: '9000_2', imagePath: '/sprites/cvsyamazaki/09000_0002.png', assetWidth: 81, assetHeight: 59 },
     },
   },
+  benimaru: {
+    mugenDir: 'cvsbenimaru',
+    contentMeta: BENIMARU_PORTRAIT_META,
+    expected: {
+      select: { spriteRef: '9000_1', imagePath: '/sprites/cvsbenimaru/09000_0001.png', assetWidth: 120, assetHeight: 140 },
+      vs: { spriteRef: '9000_1', imagePath: '/sprites/cvsbenimaru/09000_0001.png', assetWidth: 120, assetHeight: 140 },
+      hud: { spriteRef: '9000_0', imagePath: '/sprites/cvsbenimaru/09000_0000.png', assetWidth: 25, assetHeight: 25 },
+      win: { spriteRef: '9000_2', imagePath: '/sprites/cvsbenimaru/09000_0002.png', assetWidth: 81, assetHeight: 59 },
+    },
+  },
+  yuri: {
+    mugenDir: 'cvsyuri',
+    contentMeta: YURI_PORTRAIT_META,
+    expected: {
+      select: { spriteRef: '9000_1', imagePath: '/sprites/cvsyuri/09000_0001.png', assetWidth: 120, assetHeight: 140 },
+      vs: { spriteRef: '9000_1', imagePath: '/sprites/cvsyuri/09000_0001.png', assetWidth: 120, assetHeight: 140 },
+      hud: { spriteRef: '9000_0', imagePath: '/sprites/cvsyuri/09000_0000.png', assetWidth: 25, assetHeight: 25 },
+      win: { spriteRef: '9000_2', imagePath: '/sprites/cvsyuri/09000_0002.png', assetWidth: 81, assetHeight: 59 },
+    },
+  },
 } as const;
 
-const SHERMIE_MUGEN_EXPECTED = {
-  select: { spriteRef: '9000_1', imagePath: '/sprites/shermie/09000_0001.png', assetWidth: 120, assetHeight: 141 },
-  vs: { spriteRef: '9000_1', imagePath: '/sprites/shermie/09000_0001.png', assetWidth: 120, assetHeight: 141 },
-  hud: { spriteRef: '9000_0', imagePath: '/sprites/shermie/09000_0000.png', assetWidth: 25, assetHeight: 25 },
+const PARTIAL_MUGEN_PORTRAIT_EXPECTATIONS = {
+  shermie: {
+    mugenDir: 'shermie',
+    contentMeta: SHERMIE_PORTRAIT_META,
+    expected: {
+      select: { spriteRef: '9000_1', imagePath: '/sprites/shermie/09000_0001.png', assetWidth: 120, assetHeight: 141 },
+      vs: { spriteRef: '9000_1', imagePath: '/sprites/shermie/09000_0001.png', assetWidth: 120, assetHeight: 141 },
+      hud: { spriteRef: '9000_0', imagePath: '/sprites/shermie/09000_0000.png', assetWidth: 25, assetHeight: 25 },
+    },
+    fallbackSizes: ['win'],
+    absentSpriteRefs: ['9000_2'],
+  },
+  andy: {
+    mugenDir: 'andy',
+    contentMeta: ANDY_PORTRAIT_META,
+    expected: {
+      select: { spriteRef: '9000_1', imagePath: '/sprites/andy/09000_0001.png', assetWidth: 91, assetHeight: 105 },
+      vs: { spriteRef: '9000_1', imagePath: '/sprites/andy/09000_0001.png', assetWidth: 91, assetHeight: 105 },
+      hud: { spriteRef: '9000_0', imagePath: '/sprites/andy/09000_0000.png', assetWidth: 25, assetHeight: 25 },
+    },
+    fallbackSizes: ['win'],
+    absentSpriteRefs: ['9000_2'],
+  },
+  clark: {
+    mugenDir: 'clark',
+    contentMeta: CLARK_PORTRAIT_META,
+    expected: {
+      select: { spriteRef: '9000_1', imagePath: '/sprites/clark/09000_0001.png', assetWidth: 101, assetHeight: 111 },
+      vs: { spriteRef: '9000_1', imagePath: '/sprites/clark/09000_0001.png', assetWidth: 101, assetHeight: 111 },
+      hud: { spriteRef: '9000_0', imagePath: '/sprites/clark/09000_0000.png', assetWidth: 25, assetHeight: 25 },
+    },
+    fallbackSizes: ['win'],
+    absentSpriteRefs: ['9000_2'],
+  },
+  kdash: {
+    mugenDir: 'kdash',
+    contentMeta: KDASH_PORTRAIT_META,
+    expected: {
+      select: { spriteRef: '9000_1', imagePath: '/sprites/kdash/09000_0001.png', assetWidth: 120, assetHeight: 140 },
+      vs: { spriteRef: '9000_1', imagePath: '/sprites/kdash/09000_0001.png', assetWidth: 120, assetHeight: 140 },
+      hud: { spriteRef: '9000_0', imagePath: '/sprites/kdash/09000_0000.png', assetWidth: 25, assetHeight: 25 },
+    },
+    fallbackSizes: ['win'],
+    absentSpriteRefs: ['9000_2'],
+  },
+  mai: {
+    mugenDir: 'mai',
+    contentMeta: MAI_PORTRAIT_META,
+    expected: {
+      hud: { spriteRef: '9000_0', imagePath: '/sprites/mai/09000_0000.png', assetWidth: 24, assetHeight: 24 },
+    },
+    fallbackSizes: ['select', 'vs', 'win'],
+    absentSpriteRefs: ['9000_1', '9000_2'],
+  },
+  yashiro: {
+    mugenDir: 'yashiro',
+    contentMeta: YASHIRO_PORTRAIT_META,
+    expected: {
+      select: { spriteRef: '9000_1', imagePath: '/sprites/yashiro/09000_0001.png', assetWidth: 120, assetHeight: 140 },
+      vs: { spriteRef: '9000_1', imagePath: '/sprites/yashiro/09000_0001.png', assetWidth: 120, assetHeight: 140 },
+      hud: { spriteRef: '9000_0', imagePath: '/sprites/yashiro/09000_0000.png', assetWidth: 23, assetHeight: 25 },
+    },
+    fallbackSizes: ['win'],
+    absentSpriteRefs: ['9000_2'],
+  },
 } as const;
 
 describe('PORTRAIT_SIZES', () => {
@@ -267,40 +355,55 @@ describe('PORTRAIT_MANIFEST global', () => {
     }
   });
 
-  it('Shermie real portrait entries cover select, vs, and hud without faking a missing win PNG', () => {
-    const manifestPath = path.join(ROOT_DIR, 'public/sprites/shermie/manifest.json');
+  it.each(Object.entries(PARTIAL_MUGEN_PORTRAIT_EXPECTATIONS))(
+    '%s partial MUGEN portrait entries cover available sizes without faking missing PNGs',
+    (charId, config) => {
+    const manifestPath = path.join(ROOT_DIR, `public/sprites/${config.mugenDir}/manifest.json`);
     const spriteManifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8')) as {
       sprites: Record<string, { file: string; width: number; height: number }>;
     };
 
-    for (const size of ['select', 'vs', 'hud'] as const) {
-      const manifestEntry = getPortrait(PORTRAIT_MANIFEST, 'shermie', size)!;
-      const contentEntry = SHERMIE_PORTRAIT_META[size];
-      const expected = SHERMIE_MUGEN_EXPECTED[size];
+    for (const [size, expected] of Object.entries(config.expected) as [
+      PortraitSize,
+      { spriteRef: string; imagePath: string; assetWidth: number; assetHeight: number },
+    ][]) {
+      const manifestEntry = getPortrait(PORTRAIT_MANIFEST, charId, size)!;
+      const contentEntry = config.contentMeta[size];
       const sprite = spriteManifest.sprites[expected.spriteRef];
 
-      expect(sprite, `shermie ${expected.spriteRef}`).toBeDefined();
-      expect(manifestEntry.source, `shermie ${size} source`).toBe('mugen-sprite');
-      expect(manifestEntry.mugenDir, `shermie ${size} mugenDir`).toBe('shermie');
-      expect(manifestEntry.spriteRef, `shermie ${size} spriteRef`).toBe(expected.spriteRef);
-      expect(manifestEntry.imagePath, `shermie ${size} imagePath`).toBe(expected.imagePath);
-      expect(manifestEntry.assetWidth, `shermie ${size} assetWidth`).toBe(sprite.width);
-      expect(manifestEntry.assetHeight, `shermie ${size} assetHeight`).toBe(sprite.height);
-      expect(contentEntry.source, `shermie content ${size} source`).toBe(manifestEntry.source);
-      expect(contentEntry.mugenDir, `shermie content ${size} mugenDir`).toBe(manifestEntry.mugenDir);
-      expect(contentEntry.spriteRef, `shermie content ${size} spriteRef`).toBe(manifestEntry.spriteRef);
-      expect(contentEntry.imagePath, `shermie content ${size} imagePath`).toBe(manifestEntry.imagePath);
-      expect(contentEntry.assetSize, `shermie content ${size} assetSize`).toEqual({
+      expect(sprite, `${charId} ${expected.spriteRef}`).toBeDefined();
+      expect(manifestEntry.source, `${charId} ${size} source`).toBe('mugen-sprite');
+      expect(manifestEntry.mugenDir, `${charId} ${size} mugenDir`).toBe(config.mugenDir);
+      expect(manifestEntry.spriteRef, `${charId} ${size} spriteRef`).toBe(expected.spriteRef);
+      expect(manifestEntry.imagePath, `${charId} ${size} imagePath`).toBe(expected.imagePath);
+      expect(manifestEntry.assetWidth, `${charId} ${size} assetWidth`).toBe(sprite.width);
+      expect(manifestEntry.assetHeight, `${charId} ${size} assetHeight`).toBe(sprite.height);
+      expect(contentEntry.source, `${charId} content ${size} source`).toBe(manifestEntry.source);
+      expect(contentEntry.mugenDir, `${charId} content ${size} mugenDir`).toBe(manifestEntry.mugenDir);
+      expect(contentEntry.spriteRef, `${charId} content ${size} spriteRef`).toBe(manifestEntry.spriteRef);
+      expect(contentEntry.imagePath, `${charId} content ${size} imagePath`).toBe(manifestEntry.imagePath);
+      expect(contentEntry.assetSize, `${charId} content ${size} assetSize`).toEqual({
         width: manifestEntry.assetWidth,
         height: manifestEntry.assetHeight,
       });
     }
 
-    const winEntry = getPortrait(PORTRAIT_MANIFEST, 'shermie', 'win')!;
-    expect(spriteManifest.sprites['9000_2'], 'shermie 9000_2 should remain absent until source asset exists').toBeUndefined();
-    expect(winEntry.source, 'shermie win core source').toBe('pixel');
-    expect(winEntry.imagePath, 'shermie win core imagePath').toBeUndefined();
-    expect(SHERMIE_PORTRAIT_META.win.source, 'shermie win content source').toBe('pixel-fallback');
-    expect(SHERMIE_PORTRAIT_META.win.imagePath, 'shermie win content imagePath').toBeUndefined();
-  });
+    for (const size of config.fallbackSizes as readonly PortraitSize[]) {
+      const manifestEntry = getPortrait(PORTRAIT_MANIFEST, charId, size)!;
+      const contentEntry = config.contentMeta[size];
+
+      expect(manifestEntry.source, `${charId} ${size} core source`).toBe('pixel');
+      expect(manifestEntry.imagePath, `${charId} ${size} core imagePath`).toBeUndefined();
+      expect(contentEntry.source, `${charId} content ${size} source`).toBe('pixel-fallback');
+      expect(contentEntry.imagePath, `${charId} content ${size} imagePath`).toBeUndefined();
+    }
+
+    for (const spriteRef of config.absentSpriteRefs) {
+      expect(
+        spriteManifest.sprites[spriteRef],
+        `${charId} ${spriteRef} should remain absent until source asset exists`,
+      ).toBeUndefined();
+    }
+    },
+  );
 });

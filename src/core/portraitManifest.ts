@@ -177,6 +177,7 @@ export function getPortraitFallbackAccent(
 const CHARACTER_PORTRAIT_COLORS: Record<string, { fallbackColor: string; fallbackAccent: string; hasPixelPortrait?: boolean }> = {
   // ── 日本队 ──
   kyo:      { fallbackColor: '#FF6600', fallbackAccent: '#1A1A2E', hasPixelPortrait: true },
+  benimaru: { fallbackColor: '#FFD700', fallbackAccent: '#4488FF', hasPixelPortrait: true },
   iori:     { fallbackColor: '#AA1133', fallbackAccent: '#C41E3A', hasPixelPortrait: true },
   // ── 饿狼队 ──
   terry:    { fallbackColor: '#CC8800', fallbackAccent: '#FFD700', hasPixelPortrait: true },
@@ -197,6 +198,7 @@ const CHARACTER_PORTRAIT_COLORS: Record<string, { fallbackColor: string; fallbac
   athena:   { fallbackColor: '#FF66AA', fallbackAccent: '#8B008B', hasPixelPortrait: true },
   // ── 女性格斗家队 ──
   mai:      { fallbackColor: '#FF4488', fallbackAccent: '#1A1A2E', hasPixelPortrait: true },
+  yuri:     { fallbackColor: '#FF6699', fallbackAccent: '#FFCCDD', hasPixelPortrait: true },
   // ── K'队 ──
   kdash:    { fallbackColor: '#444466', fallbackAccent: '#C0C0C0', hasPixelPortrait: true },
   kula:     { fallbackColor: '#4488CC', fallbackAccent: '#B0C4DE', hasPixelPortrait: true },
@@ -537,6 +539,195 @@ const SHERMIE_MUGEN_PORTRAITS: Partial<Record<PortraitSize, Pick<PortraitEntry, 
   },
 };
 
+const ANDY_MUGEN_PORTRAITS: Partial<Record<PortraitSize, Pick<PortraitEntry, 'source' | 'mugenDir' | 'spriteRef' | 'imagePath' | 'assetWidth' | 'assetHeight'>>> = {
+  select: {
+    source: 'mugen-sprite',
+    mugenDir: 'andy',
+    spriteRef: '9000_1',
+    imagePath: '/sprites/andy/09000_0001.png',
+    assetWidth: 91,
+    assetHeight: 105,
+  },
+  vs: {
+    source: 'mugen-sprite',
+    mugenDir: 'andy',
+    spriteRef: '9000_1',
+    imagePath: '/sprites/andy/09000_0001.png',
+    assetWidth: 91,
+    assetHeight: 105,
+  },
+  hud: {
+    source: 'mugen-sprite',
+    mugenDir: 'andy',
+    spriteRef: '9000_0',
+    imagePath: '/sprites/andy/09000_0000.png',
+    assetWidth: 25,
+    assetHeight: 25,
+  },
+};
+
+const BENIMARU_MUGEN_PORTRAITS: Partial<Record<PortraitSize, Pick<PortraitEntry, 'source' | 'mugenDir' | 'spriteRef' | 'imagePath' | 'assetWidth' | 'assetHeight'>>> = {
+  select: {
+    source: 'mugen-sprite',
+    mugenDir: 'cvsbenimaru',
+    spriteRef: '9000_1',
+    imagePath: '/sprites/cvsbenimaru/09000_0001.png',
+    assetWidth: 120,
+    assetHeight: 140,
+  },
+  vs: {
+    source: 'mugen-sprite',
+    mugenDir: 'cvsbenimaru',
+    spriteRef: '9000_1',
+    imagePath: '/sprites/cvsbenimaru/09000_0001.png',
+    assetWidth: 120,
+    assetHeight: 140,
+  },
+  hud: {
+    source: 'mugen-sprite',
+    mugenDir: 'cvsbenimaru',
+    spriteRef: '9000_0',
+    imagePath: '/sprites/cvsbenimaru/09000_0000.png',
+    assetWidth: 25,
+    assetHeight: 25,
+  },
+  win: {
+    source: 'mugen-sprite',
+    mugenDir: 'cvsbenimaru',
+    spriteRef: '9000_2',
+    imagePath: '/sprites/cvsbenimaru/09000_0002.png',
+    assetWidth: 81,
+    assetHeight: 59,
+  },
+};
+
+const CLARK_MUGEN_PORTRAITS: Partial<Record<PortraitSize, Pick<PortraitEntry, 'source' | 'mugenDir' | 'spriteRef' | 'imagePath' | 'assetWidth' | 'assetHeight'>>> = {
+  select: {
+    source: 'mugen-sprite',
+    mugenDir: 'clark',
+    spriteRef: '9000_1',
+    imagePath: '/sprites/clark/09000_0001.png',
+    assetWidth: 101,
+    assetHeight: 111,
+  },
+  vs: {
+    source: 'mugen-sprite',
+    mugenDir: 'clark',
+    spriteRef: '9000_1',
+    imagePath: '/sprites/clark/09000_0001.png',
+    assetWidth: 101,
+    assetHeight: 111,
+  },
+  hud: {
+    source: 'mugen-sprite',
+    mugenDir: 'clark',
+    spriteRef: '9000_0',
+    imagePath: '/sprites/clark/09000_0000.png',
+    assetWidth: 25,
+    assetHeight: 25,
+  },
+};
+
+const KDASH_MUGEN_PORTRAITS: Partial<Record<PortraitSize, Pick<PortraitEntry, 'source' | 'mugenDir' | 'spriteRef' | 'imagePath' | 'assetWidth' | 'assetHeight'>>> = {
+  select: {
+    source: 'mugen-sprite',
+    mugenDir: 'kdash',
+    spriteRef: '9000_1',
+    imagePath: '/sprites/kdash/09000_0001.png',
+    assetWidth: 120,
+    assetHeight: 140,
+  },
+  vs: {
+    source: 'mugen-sprite',
+    mugenDir: 'kdash',
+    spriteRef: '9000_1',
+    imagePath: '/sprites/kdash/09000_0001.png',
+    assetWidth: 120,
+    assetHeight: 140,
+  },
+  hud: {
+    source: 'mugen-sprite',
+    mugenDir: 'kdash',
+    spriteRef: '9000_0',
+    imagePath: '/sprites/kdash/09000_0000.png',
+    assetWidth: 25,
+    assetHeight: 25,
+  },
+};
+
+const MAI_MUGEN_PORTRAITS: Partial<Record<PortraitSize, Pick<PortraitEntry, 'source' | 'mugenDir' | 'spriteRef' | 'imagePath' | 'assetWidth' | 'assetHeight'>>> = {
+  hud: {
+    source: 'mugen-sprite',
+    mugenDir: 'mai',
+    spriteRef: '9000_0',
+    imagePath: '/sprites/mai/09000_0000.png',
+    assetWidth: 24,
+    assetHeight: 24,
+  },
+};
+
+const YURI_MUGEN_PORTRAITS: Partial<Record<PortraitSize, Pick<PortraitEntry, 'source' | 'mugenDir' | 'spriteRef' | 'imagePath' | 'assetWidth' | 'assetHeight'>>> = {
+  select: {
+    source: 'mugen-sprite',
+    mugenDir: 'cvsyuri',
+    spriteRef: '9000_1',
+    imagePath: '/sprites/cvsyuri/09000_0001.png',
+    assetWidth: 120,
+    assetHeight: 140,
+  },
+  vs: {
+    source: 'mugen-sprite',
+    mugenDir: 'cvsyuri',
+    spriteRef: '9000_1',
+    imagePath: '/sprites/cvsyuri/09000_0001.png',
+    assetWidth: 120,
+    assetHeight: 140,
+  },
+  hud: {
+    source: 'mugen-sprite',
+    mugenDir: 'cvsyuri',
+    spriteRef: '9000_0',
+    imagePath: '/sprites/cvsyuri/09000_0000.png',
+    assetWidth: 25,
+    assetHeight: 25,
+  },
+  win: {
+    source: 'mugen-sprite',
+    mugenDir: 'cvsyuri',
+    spriteRef: '9000_2',
+    imagePath: '/sprites/cvsyuri/09000_0002.png',
+    assetWidth: 81,
+    assetHeight: 59,
+  },
+};
+
+const YASHIRO_MUGEN_PORTRAITS: Partial<Record<PortraitSize, Pick<PortraitEntry, 'source' | 'mugenDir' | 'spriteRef' | 'imagePath' | 'assetWidth' | 'assetHeight'>>> = {
+  select: {
+    source: 'mugen-sprite',
+    mugenDir: 'yashiro',
+    spriteRef: '9000_1',
+    imagePath: '/sprites/yashiro/09000_0001.png',
+    assetWidth: 120,
+    assetHeight: 140,
+  },
+  vs: {
+    source: 'mugen-sprite',
+    mugenDir: 'yashiro',
+    spriteRef: '9000_1',
+    imagePath: '/sprites/yashiro/09000_0001.png',
+    assetWidth: 120,
+    assetHeight: 140,
+  },
+  hud: {
+    source: 'mugen-sprite',
+    mugenDir: 'yashiro',
+    spriteRef: '9000_0',
+    imagePath: '/sprites/yashiro/09000_0000.png',
+    assetWidth: 23,
+    assetHeight: 25,
+  },
+};
+
 const MUGEN_PORTRAITS_BY_CHARACTER: Partial<Record<string, Partial<Record<PortraitSize, Pick<PortraitEntry, 'source' | 'mugenDir' | 'spriteRef' | 'imagePath' | 'assetWidth' | 'assetHeight'>>>>> = {
   kyo: KYO_MUGEN_PORTRAITS,
   ryo: RYO_MUGEN_PORTRAITS,
@@ -547,6 +738,13 @@ const MUGEN_PORTRAITS_BY_CHARACTER: Partial<Record<string, Partial<Record<Portra
   vice: VICE_MUGEN_PORTRAITS,
   yamazaki: YAMAZAKI_MUGEN_PORTRAITS,
   shermie: SHERMIE_MUGEN_PORTRAITS,
+  andy: ANDY_MUGEN_PORTRAITS,
+  benimaru: BENIMARU_MUGEN_PORTRAITS,
+  clark: CLARK_MUGEN_PORTRAITS,
+  kdash: KDASH_MUGEN_PORTRAITS,
+  mai: MAI_MUGEN_PORTRAITS,
+  yuri: YURI_MUGEN_PORTRAITS,
+  yashiro: YASHIRO_MUGEN_PORTRAITS,
 };
 
 // 填充 manifest

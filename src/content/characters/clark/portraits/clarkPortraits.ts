@@ -2,7 +2,8 @@
  * Clark Content Package — Portrait Metadata
  *
  * 肖像元数据: 尺寸规范、颜色方案、姿态描述。
- * 像素数据来自 rendering/portraits/ 层, 此文件只放元数据描述。
+ * 真实肖像优先来自 public/sprites/clark 的 MUGEN group 9000 PNG；
+ * win 肖像因源 manifest 缺少标准 9000_2，暂时保留手写像素 fallback。
  *
  * 归属: content/characters/clark/portraits/ — 只放"肖像是什么"
  */
@@ -24,6 +25,11 @@ export interface PortraitMeta {
   style: string;
   /** 是否有真实像素数据 */
   hasPixelData: boolean;
+  source: 'mugen-sprite' | 'pixel-fallback';
+  mugenDir?: string;
+  spriteRef?: string;
+  imagePath?: string;
+  assetSize?: { width: number; height: number };
 }
 
 export const CLARK_PORTRAIT_META: Record<PortraitSize, PortraitMeta> = {
@@ -36,6 +42,11 @@ export const CLARK_PORTRAIT_META: Record<PortraitSize, PortraitMeta> = {
     accentColor: '#66aa66',
     style: 'SNK 20色调色板像素风格,接近KOF2002选人肖像',
     hasPixelData: true,
+    source: 'mugen-sprite',
+    mugenDir: 'clark',
+    spriteRef: '9000_1',
+    imagePath: '/sprites/clark/09000_0001.png',
+    assetSize: { width: 101, height: 111 },
   },
   vs: {
     size: 'vs',
@@ -46,6 +57,11 @@ export const CLARK_PORTRAIT_META: Record<PortraitSize, PortraitMeta> = {
     accentColor: '#66aa66',
     style: '放大版选人肖像,VS画面专用',
     hasPixelData: true,
+    source: 'mugen-sprite',
+    mugenDir: 'clark',
+    spriteRef: '9000_1',
+    imagePath: '/sprites/clark/09000_0001.png',
+    assetSize: { width: 101, height: 111 },
   },
   hud: {
     size: 'hud',
@@ -56,6 +72,11 @@ export const CLARK_PORTRAIT_META: Record<PortraitSize, PortraitMeta> = {
     accentColor: '#66aa66',
     style: 'HUD小头像,血条旁显示',
     hasPixelData: true,
+    source: 'mugen-sprite',
+    mugenDir: 'clark',
+    spriteRef: '9000_0',
+    imagePath: '/sprites/clark/09000_0000.png',
+    assetSize: { width: 25, height: 25 },
   },
   win: {
     size: 'win',
@@ -66,6 +87,7 @@ export const CLARK_PORTRAIT_META: Record<PortraitSize, PortraitMeta> = {
     accentColor: '#66aa66',
     style: '64x80 SNK像素风格胜利肖像,绿色主题',
     hasPixelData: true,
+    source: 'pixel-fallback',
   },
 };
 
