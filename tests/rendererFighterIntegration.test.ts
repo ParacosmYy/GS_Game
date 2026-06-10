@@ -7,9 +7,12 @@
  */
 
 import { describe, it, expect, beforeAll, vi } from 'vitest';
+import * as fs from 'fs';
+import * as path from 'path';
 import {
   getCharacterConfig,
   getLoadedSprites,
+  getAllRegisteredCharacters,
   resolveGenericMugenAction,
 } from '../src/rendering/sprites/shared/characterSpriteRegistry.js';
 import { Fighter } from '../src/entities/fighter.js';
@@ -18,7 +21,45 @@ import { FighterState, AttackType } from '../src/core/types.js';
 // Ensure configs are registered
 import '../src/rendering/sprites/shared/characterSpriteConfigs.js';
 
-const ROSTER_CHARS = ['kyo', 'ryo', 'terry', 'kim', 'athena', 'vice', 'yamazaki', 'shermie'];
+const SPRITES_DIR = path.resolve(__dirname, '../public/sprites');
+
+const KOF2002_RUNTIME_CHARS = [
+  { charId: 'kyo', mugenDir: 'cvskyo' },
+  { charId: 'ryo', mugenDir: 'cvsryo' },
+  { charId: 'iori', mugenDir: 'yiori' },
+  { charId: 'terry', mugenDir: 'cvsterry' },
+  { charId: 'andy', mugenDir: 'andy' },
+  { charId: 'kim', mugenDir: 'cvskim' },
+  { charId: 'athena', mugenDir: 'cvsathena' },
+  { charId: 'kensou', mugenDir: 'kensou' },
+  { charId: 'mai', mugenDir: 'mai' },
+  { charId: 'yuri', mugenDir: 'cvsyuri' },
+  { charId: 'vice', mugenDir: 'cvsvice' },
+  { charId: 'yamazaki', mugenDir: 'cvsyamazaki' },
+  { charId: 'shermie', mugenDir: 'shermie' },
+  { charId: 'benimaru', mugenDir: 'cvsbenimaru' },
+  { charId: 'clark', mugenDir: 'clark' },
+  { charId: 'kdash', mugenDir: 'kdash' },
+  { charId: 'yashiro', mugenDir: 'yashiro' },
+  { charId: 'takuma', mugenDir: 'takuma' },
+  { charId: 'rugal', mugenDir: 'cvsrugal' },
+  { charId: 'g_rugal', mugenDir: 'cvsg_rugal' },
+] as const;
+
+const ROSTER_CHARS = KOF2002_RUNTIME_CHARS.map(c => c.charId);
+
+const KOF2002_RUNTIME_CHAR_IDS = new Set(ROSTER_CHARS);
+
+function loadManifestActions(mugenDir: string): Set<string> {
+  const manifestPath = path.join(SPRITES_DIR, mugenDir, 'manifest.json');
+  const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8')) as {
+    animations: Record<string, unknown>;
+  };
+
+  return new Set(
+    Object.keys(manifest.animations).map(actionId => actionId.replace(/^0+(\d)/, '$1')),
+  );
+}
 
 describe('renderer fighter integration', () => {
   describe('character config registration', () => {
@@ -35,6 +76,15 @@ describe('renderer fighter integration', () => {
       expect(config!.specialMap).toBeDefined();
       // specialMap should have at least some entries
       expect(Object.keys(config!.specialMap).length).toBeGreaterThan(0);
+    });
+
+    it('tracks the AGENTS whitelist subset with real runtime sprite configs', () => {
+      const registered = getAllRegisteredCharacters()
+        .filter(config => KOF2002_RUNTIME_CHAR_IDS.has(config.charId))
+        .map(config => config.charId)
+        .sort();
+
+      expect(registered).toEqual([...ROSTER_CHARS].sort());
     });
 
     it.each(ROSTER_CHARS)('%s has valid display height (50-200px)', (charId) => {
@@ -87,16 +137,45 @@ describe('renderer fighter integration', () => {
       expect(action).toBe('120');
     });
 
-    it.each(ROSTER_CHARS)('%s resolves STAND_ATTACK CLOSE_A to action 200', (charId) => {
-      const config = getCharacterConfig(charId);
-      const action = resolveGenericMugenAction(config!, FighterState.STAND_ATTACK, AttackType.CLOSE_A, 0, 1);
-      expect(action).toBe('200');
+    it.each(KOF2002_RUNTIME_CHARS)('$charId resolves STAND_ATTACK CLOSE_A to a real manifest action', ({ charId, mugenDir }) => {
+      const config = getCharacterConfig(charId)!;
+      const actions = loadManifestActions(mugenDir);
+      const action = resolveGenericMugenAction(config, FighterState.STAND_ATTACK, AttackType.CLOSE_A, 0, 1);
+
+      expect(action, `${charId} close A resolves`).not.toBeNull();
+      expect(actions.has(action!), `${charId} close A -> ${action}`).toBe(true);
     });
 
-    it.each(ROSTER_CHARS)('%s resolves CROUCH_ATTACK CROUCH_A to action 400', (charId) => {
+    it.each(ROSTER_CHARS.filter(charId => charId !== 'mai'))('%s resolves CROUCH_ATTACK CROUCH_A to action 400', (charId) => {
       const config = getCharacterConfig(charId);
       const action = resolveGenericMugenAction(config!, FighterState.CROUCH_ATTACK, AttackType.CROUCH_A, 0, 1);
       expect(action).toBe('400');
+    });
+
+    it('mai resolves CROUCH_ATTACK CROUCH_A to its real MUGEN action', () => {
+      const config = getCharacterConfig('mai');
+      const action = resolveGenericMugenAction(config!, FighterState.CROUCH_ATTACK, AttackType.CROUCH_A, 0, 1);
+      expect(action).toBe('600');
+    });
+
+    it.each(KOF2002_RUNTIME_CHARS)('$charId resolved core actions exist in the real sprite manifest', ({ charId, mugenDir }) => {
+      const config = getCharacterConfig(charId)!;
+      const actions = loadManifestActions(mugenDir);
+      const probes = [
+        { label: 'idle', action: resolveGenericMugenAction(config, FighterState.IDLE, null, 0, 1) },
+        { label: 'walk_forward', action: resolveGenericMugenAction(config, FighterState.WALK, null, 1, 1) },
+        { label: 'walk_backward', action: resolveGenericMugenAction(config, FighterState.WALK, null, -1, 1) },
+        { label: 'crouch', action: resolveGenericMugenAction(config, FighterState.CROUCH, null, 0, 1) },
+        { label: 'stand_a', action: resolveGenericMugenAction(config, FighterState.STAND_ATTACK, AttackType.CLOSE_A, 0, 1) },
+        { label: 'crouch_a', action: resolveGenericMugenAction(config, FighterState.CROUCH_ATTACK, AttackType.CROUCH_A, 0, 1) },
+        { label: 'hitstun', action: resolveGenericMugenAction(config, FighterState.HITSTUN, null, 0, 1) },
+        { label: 'knockdown', action: resolveGenericMugenAction(config, FighterState.KNOCKDOWN, null, 0, 1) },
+      ];
+
+      for (const probe of probes) {
+        expect(probe.action, `${charId} ${probe.label} resolves`).not.toBeNull();
+        expect(actions.has(probe.action!), `${charId} ${probe.label} -> ${probe.action}`).toBe(true);
+      }
     });
 
     it.each(ROSTER_CHARS)('%s resolves JUMP to action 42/43', (charId) => {

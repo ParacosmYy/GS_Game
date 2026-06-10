@@ -653,16 +653,16 @@ registerCharacterSprites({
     [AttackType.CLOSE_C]: '210', [AttackType.CLOSE_D]: '240',
     [AttackType.STAND_A]: '200', [AttackType.STAND_B]: '230',
     [AttackType.STAND_C]: '210', [AttackType.STAND_D]: '240',
-    [AttackType.CROUCH_A]: '400', [AttackType.CROUCH_B]: '430',
-    [AttackType.CROUCH_C]: '410', [AttackType.CROUCH_D]: '440',
+    [AttackType.CROUCH_A]: '600', [AttackType.CROUCH_B]: '610',
+    [AttackType.CROUCH_C]: '700', [AttackType.CROUCH_D]: '330',
     [AttackType.JUMP_A]: '600', [AttackType.JUMP_B]: '630',
     [AttackType.JUMP_C]: '610', [AttackType.JUMP_D]: '640',
     // Command normals
-    [AttackType.MAI_HISSATSU_SHINOBIBACHI]: '710', [AttackType.MAI_YUSURA_UMA]: '740',
+    [AttackType.MAI_HISSATSU_SHINOBIBACHI]: '1070', [AttackType.MAI_YUSURA_UMA]: '1071',
     // Specials — 花蝶扇 (Kachousen)
-    [AttackType.MAI_KA_CHO_SEN]: '1000', [AttackType.MAI_KA_CHO_SEN_C]: '1050',
+    [AttackType.MAI_KA_CHO_SEN]: '1012', [AttackType.MAI_KA_CHO_SEN_C]: '1012',
     // 飛翔龍炎陣 (Hishou Ryu En Jin)
-    [AttackType.MAI_HISHO_RYU_EN_JIN]: '1300',
+    [AttackType.MAI_HISHO_RYU_EN_JIN]: '1200',
     // 龍炎舞 (Ryu En Bu)
     [AttackType.MAI_RYU_EN_BU]: '1100',
     // DM — 蜂巢落とし (Haka Otoshi)
