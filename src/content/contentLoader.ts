@@ -219,6 +219,17 @@ import {
   getRugalAttackFrames,
   getRugalFeedbackTiers,
 } from './characters/rugal/index.js';
+import {
+  getGRugalFrameData,
+  G_RUGAL_ATTACK_KEYS,
+  G_RUGAL_MOVE_LIST,
+  G_RUGAL_AVAILABLE_ACTIONS,
+  G_RUGAL_ANIMATION_META,
+  getGRugalAnimationNames,
+  getGRugalHitboxOffsets,
+  getGRugalAttackFrames,
+  getGRugalFeedbackTiers,
+} from './characters/g_rugal/index.js';
 import { generateKyoDimensionReport } from '../tools/kyoCompletenessReport.js';
 import { generateIoriDimensionReport } from '../tools/ioriCompletenessReport.js';
 import { generateTerryDimensionReport } from '../tools/terryCompletenessReport.js';
@@ -244,6 +255,7 @@ const AVAILABLE_CONTENT_IDS = [
   'takuma',
   'kensou',
   'rugal',
+  'g_rugal',
 ] as const;
 
 /** Unified character content interface */
@@ -313,6 +325,8 @@ export function loadCharacterContent(charId: string): CharacterContent {
       return loadKensouContent();
     case 'rugal':
       return loadRugalContent();
+    case 'g_rugal':
+      return loadGRugalContent();
     default:
       throw new Error(`Unknown character: ${charId}`);
   }
@@ -628,6 +642,22 @@ function loadRugalContent(): CharacterContent {
     hitboxes: getRugalHitboxOffsets(),
     attackFrames: getRugalAttackFrames(),
     feedback: getRugalFeedbackTiers(),
+    report: null,
+  };
+}
+
+function loadGRugalContent(): CharacterContent {
+  return {
+    data: { id: 'g_rugal', name: 'Omega Rugal', nameCn: '欧米茄卢卡尔', color: '#7A55CC' },
+    attacks: getGRugalFrameData(),
+    attackKeys: G_RUGAL_ATTACK_KEYS,
+    commands: G_RUGAL_MOVE_LIST,
+    availableActions: G_RUGAL_AVAILABLE_ACTIONS,
+    animations: G_RUGAL_ANIMATION_META,
+    animSequenceNames: getGRugalAnimationNames(),
+    hitboxes: getGRugalHitboxOffsets(),
+    attackFrames: getGRugalAttackFrames(),
+    feedback: getGRugalFeedbackTiers(),
     report: null,
   };
 }

@@ -22,6 +22,7 @@ const CHARS = [
   'takuma',
   'kensou',
   'rugal',
+  'g_rugal',
 ] as const;
 const STRICT_FRAME_DATA_CHARS = ['ryo', 'kyo', 'iori'] as const;
 
@@ -101,6 +102,7 @@ describe('Content package cross-character consistency', () => {
     const takumaKeys = new Set(loadCharacterContent('takuma').attackKeys.filter(k => k.startsWith('TAKUMA_')));
     const kensouKeys = new Set(loadCharacterContent('kensou').attackKeys.filter(k => k.startsWith('KENSOU_')));
     const rugalKeys = new Set(loadCharacterContent('rugal').attackKeys.filter(k => k.startsWith('RUGAL_')));
+    const gRugalKeys = new Set(loadCharacterContent('g_rugal').attackKeys.filter(k => k.startsWith('G_RUGAL_')));
     const keySets = [
       ['ryo', ryoKeys],
       ['kyo', kyoKeys],
@@ -114,6 +116,7 @@ describe('Content package cross-character consistency', () => {
       ['takuma', takumaKeys],
       ['kensou', kensouKeys],
       ['rugal', rugalKeys],
+      ['g_rugal', gRugalKeys],
     ] as const;
 
     for (let i = 0; i < keySets.length; i += 1) {
