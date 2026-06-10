@@ -6,6 +6,7 @@ import {
 } from '../src/content/contentLoader.js';
 
 const EXPANDED_MUGEN_CONTENT_IDS = ['andy', 'clark', 'kdash', 'mai', 'yashiro', 'yuri'] as const;
+const MINIMAL_MUGEN_CONTENT_IDS = ['takuma'] as const;
 
 describe('contentLoader', () => {
   describe('hasCharacterContent', () => {
@@ -30,6 +31,13 @@ describe('contentLoader', () => {
         expect(ids, `${charId} is available through content loader`).toContain(charId);
       }
     });
+
+    it('lists minimal MUGEN-backed content packages', () => {
+      const ids = getAvailableCharacterIds();
+      for (const charId of MINIMAL_MUGEN_CONTENT_IDS) {
+        expect(ids, `${charId} is available through content loader`).toContain(charId);
+      }
+    });
   });
 
   describe('loadCharacterContent', () => {
@@ -50,6 +58,19 @@ describe('contentLoader', () => {
       expect(Object.keys(content.hitboxes).length, `${charId} hitboxes`).toBeGreaterThan(0);
       expect(content.attackFrames).toBeDefined();
       expect(Object.keys(content.feedback).length, `${charId} feedback`).toBeGreaterThan(0);
+    });
+
+    it.each(MINIMAL_MUGEN_CONTENT_IDS)('loads %s minimal content package through the unified loader', (charId) => {
+      expect(hasCharacterContent(charId), `${charId} has content`).toBe(true);
+
+      const content = loadCharacterContent(charId);
+      expect(content.data.id).toBe(charId);
+      expect(content.attackKeys).toEqual(expect.arrayContaining(['STAND_A', 'STAND_C', 'CROUCH_A', 'CROUCH_C']));
+      expect(content.availableActions).toEqual(expect.arrayContaining(['idle', 'walk_forward', 'jump_up', 'stand_a', 'crouch_a']));
+      expect(content.animSequenceNames).toEqual(expect.arrayContaining(['idle', 'walk_forward', 'stand_a', 'crouch_a']));
+      expect(Object.keys(content.hitboxes).length, `${charId} MUGEN action map`).toBeGreaterThan(0);
+      expect(Object.keys(content.feedback).length, `${charId} feedback`).toBeGreaterThan(0);
+      expect(content.report).toBeNull();
     });
 
     it('loads ryo content successfully', () => {

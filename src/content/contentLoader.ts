@@ -186,6 +186,17 @@ import {
   getYuriAttackFrames,
   getYuriFeedbackTiers,
 } from './characters/yuri/index.js';
+import {
+  getTakumaFrameData,
+  TAKUMA_ATTACK_KEYS,
+  TAKUMA_MOVE_LIST,
+  TAKUMA_AVAILABLE_ACTIONS,
+  TAKUMA_ANIMATION_META,
+  getTakumaAnimationNames,
+  getTakumaHitboxOffsets,
+  getTakumaAttackFrames,
+  getTakumaFeedbackTiers,
+} from './characters/takuma/index.js';
 import { generateKyoDimensionReport } from '../tools/kyoCompletenessReport.js';
 import { generateIoriDimensionReport } from '../tools/ioriCompletenessReport.js';
 import { generateTerryDimensionReport } from '../tools/terryCompletenessReport.js';
@@ -208,6 +219,7 @@ const AVAILABLE_CONTENT_IDS = [
   'mai',
   'yashiro',
   'yuri',
+  'takuma',
 ] as const;
 
 /** Unified character content interface */
@@ -271,6 +283,8 @@ export function loadCharacterContent(charId: string): CharacterContent {
       return loadYashiroContent();
     case 'yuri':
       return loadYuriContent();
+    case 'takuma':
+      return loadTakumaContent();
     default:
       throw new Error(`Unknown character: ${charId}`);
   }
@@ -538,6 +552,22 @@ function loadYuriContent(): CharacterContent {
     hitboxes: getYuriHitboxOffsets(),
     attackFrames: getYuriAttackFrames(),
     feedback: getYuriFeedbackTiers(),
+    report: null,
+  };
+}
+
+function loadTakumaContent(): CharacterContent {
+  return {
+    data: { id: 'takuma', name: 'Takuma Sakazaki', nameCn: '坂崎琢磨', color: '#F0F0F0' },
+    attacks: getTakumaFrameData(),
+    attackKeys: TAKUMA_ATTACK_KEYS,
+    commands: TAKUMA_MOVE_LIST,
+    availableActions: TAKUMA_AVAILABLE_ACTIONS,
+    animations: TAKUMA_ANIMATION_META,
+    animSequenceNames: getTakumaAnimationNames(),
+    hitboxes: getTakumaHitboxOffsets(),
+    attackFrames: getTakumaAttackFrames(),
+    feedback: getTakumaFeedbackTiers(),
     report: null,
   };
 }
