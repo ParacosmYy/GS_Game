@@ -6,7 +6,7 @@ import {
 } from '../src/content/contentLoader.js';
 
 const EXPANDED_MUGEN_CONTENT_IDS = ['andy', 'clark', 'kdash', 'mai', 'yashiro', 'yuri'] as const;
-const MINIMAL_MUGEN_CONTENT_IDS = ['takuma', 'kensou'] as const;
+const MINIMAL_MUGEN_CONTENT_IDS = ['takuma', 'kensou', 'rugal'] as const;
 
 describe('contentLoader', () => {
   describe('hasCharacterContent', () => {

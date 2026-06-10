@@ -208,6 +208,17 @@ import {
   getKensouAttackFrames,
   getKensouFeedbackTiers,
 } from './characters/kensou/index.js';
+import {
+  getRugalFrameData,
+  RUGAL_ATTACK_KEYS,
+  RUGAL_MOVE_LIST,
+  RUGAL_AVAILABLE_ACTIONS,
+  RUGAL_ANIMATION_META,
+  getRugalAnimationNames,
+  getRugalHitboxOffsets,
+  getRugalAttackFrames,
+  getRugalFeedbackTiers,
+} from './characters/rugal/index.js';
 import { generateKyoDimensionReport } from '../tools/kyoCompletenessReport.js';
 import { generateIoriDimensionReport } from '../tools/ioriCompletenessReport.js';
 import { generateTerryDimensionReport } from '../tools/terryCompletenessReport.js';
@@ -232,6 +243,7 @@ const AVAILABLE_CONTENT_IDS = [
   'yuri',
   'takuma',
   'kensou',
+  'rugal',
 ] as const;
 
 /** Unified character content interface */
@@ -299,6 +311,8 @@ export function loadCharacterContent(charId: string): CharacterContent {
       return loadTakumaContent();
     case 'kensou':
       return loadKensouContent();
+    case 'rugal':
+      return loadRugalContent();
     default:
       throw new Error(`Unknown character: ${charId}`);
   }
@@ -598,6 +612,22 @@ function loadKensouContent(): CharacterContent {
     hitboxes: getKensouHitboxOffsets(),
     attackFrames: getKensouAttackFrames(),
     feedback: getKensouFeedbackTiers(),
+    report: null,
+  };
+}
+
+function loadRugalContent(): CharacterContent {
+  return {
+    data: { id: 'rugal', name: 'Rugal Bernstein', nameCn: '卢卡尔', color: '#CC2244' },
+    attacks: getRugalFrameData(),
+    attackKeys: RUGAL_ATTACK_KEYS,
+    commands: RUGAL_MOVE_LIST,
+    availableActions: RUGAL_AVAILABLE_ACTIONS,
+    animations: RUGAL_ANIMATION_META,
+    animSequenceNames: getRugalAnimationNames(),
+    hitboxes: getRugalHitboxOffsets(),
+    attackFrames: getRugalAttackFrames(),
+    feedback: getRugalFeedbackTiers(),
     report: null,
   };
 }
