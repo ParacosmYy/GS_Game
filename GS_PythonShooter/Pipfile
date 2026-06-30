@@ -1,0 +1,17 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+panda3d = ">=1.10.14"
+numpy = ">=1.26.0"
+Pillow = ">=10.0.0"
+
+[dev-packages]
+pytest = ">=8.0.0"
+black = ">=24.0.0"
+mypy = ">=1.8.0"
+
+[requires]
+python_version = "3.13"

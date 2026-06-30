@@ -1,0 +1,163 @@
+# -*- coding: utf-8 -*-
+"""
+GS_PythonShooter — 武器数据表
+对应 C++ 预定义武器数据（替换蓝图的 DataTable）
+"""
+from ..core.constants import WeaponStats, FireMode
+
+
+# ─── 武器数据表 ───────────────────────────────────────────────
+# 数据基于 CS2 官方参数调整
+
+WEAPON_DB = {
+    # ======== 步枪 ========
+    "AK-47": WeaponStats(
+        weapon_name="AK-47",
+        fire_mode=FireMode.AUTO,
+        base_damage=36.0,
+        headshot_multiplier=1.4,
+        armor_penetration=0.65,
+        fire_rate=600.0,
+        magazine_size=30,
+        reserve_ammo=90,
+        reload_time=2.5,
+        equip_time=1.0,
+        spread_stand=0.06,
+        spread_crouch=0.03,
+        spread_ads=0.01,
+        recoil_vertical=2.5,
+        recoil_horizontal=1.0,
+        projectile_speed=50000.0,
+        penetration_power=0.75,
+        weapon_cost=2700,
+    ),
+    "M4A4": WeaponStats(
+        weapon_name="M4A4",
+        fire_mode=FireMode.AUTO,
+        base_damage=33.0,
+        headshot_multiplier=1.4,
+        armor_penetration=0.60,
+        fire_rate=666.0,
+        magazine_size=30,
+        reserve_ammo=90,
+        reload_time=3.1,
+        equip_time=1.0,
+        spread_stand=0.06,
+        spread_crouch=0.03,
+        spread_ads=0.008,
+        recoil_vertical=2.3,
+        recoil_horizontal=0.9,
+        projectile_speed=50000.0,
+        penetration_power=0.70,
+        weapon_cost=3100,
+    ),
+
+    # ======== 狙击枪 ========
+    "AWP": WeaponStats(
+        weapon_name="AWP",
+        fire_mode=FireMode.SEMI,
+        base_damage=115.0,
+        headshot_multiplier=1.4,
+        armor_penetration=0.95,
+        fire_rate=41.0,
+        magazine_size=10,
+        reserve_ammo=30,
+        reload_time=3.7,
+        equip_time=1.2,
+        spread_stand=0.02,
+        spread_crouch=0.01,
+        spread_ads=0.0,  # 开镜无散布
+        recoil_vertical=6.0,
+        recoil_horizontal=2.0,
+        projectile_speed=60000.0,
+        penetration_power=0.95,
+        weapon_cost=4750,
+    ),
+
+    # ======== 冲锋枪 ========
+    "MAC-10": WeaponStats(
+        weapon_name="MAC-10",
+        fire_mode=FireMode.AUTO,
+        base_damage=29.0,
+        headshot_multiplier=1.4,
+        armor_penetration=0.40,
+        fire_rate=800.0,
+        magazine_size=30,
+        reserve_ammo=100,
+        reload_time=2.7,
+        equip_time=0.8,
+        spread_stand=0.08,
+        spread_crouch=0.04,
+        spread_ads=0.015,
+        recoil_vertical=1.8,
+        recoil_horizontal=0.7,
+        projectile_speed=45000.0,
+        penetration_power=0.40,
+        weapon_cost=1050,
+    ),
+
+    # ======== 手枪 ========
+    "Desert Eagle": WeaponStats(
+        weapon_name="Desert Eagle",
+        fire_mode=FireMode.SEMI,
+        base_damage=63.0,
+        headshot_multiplier=1.4,
+        armor_penetration=0.65,
+        fire_rate=267.0,
+        magazine_size=7,
+        reserve_ammo=35,
+        reload_time=2.2,
+        equip_time=0.7,
+        spread_stand=0.08,
+        spread_crouch=0.04,
+        spread_ads=0.005,
+        recoil_vertical=5.0,
+        recoil_horizontal=1.5,
+        projectile_speed=50000.0,
+        penetration_power=0.65,
+        weapon_cost=700,
+    ),
+
+    "Glock-18": WeaponStats(
+        weapon_name="Glock-18",
+        fire_mode=FireMode.SEMI,
+        base_damage=30.0,
+        headshot_multiplier=1.4,
+        armor_penetration=0.35,
+        fire_rate=400.0,
+        magazine_size=20,
+        reserve_ammo=120,
+        reload_time=2.2,
+        equip_time=0.7,
+        spread_stand=0.06,
+        spread_crouch=0.03,
+        spread_ads=0.005,
+        recoil_vertical=1.5,
+        recoil_horizontal=0.5,
+        projectile_speed=50000.0,
+        penetration_power=0.35,
+        weapon_cost=200,
+    ),
+
+    # ======== 近战 ========
+    "Knife": WeaponStats(
+        weapon_name="Knife",
+        fire_mode=FireMode.SEMI,
+        base_damage=55.0,
+        headshot_multiplier=1.0,
+        armor_penetration=0.50,
+        fire_rate=120.0,
+        magazine_size=999,
+        reserve_ammo=0,
+        reload_time=0.0,
+        equip_time=0.5,
+        spread_stand=0.0,
+        spread_crouch=0.0,
+        spread_ads=0.0,
+        recoil_vertical=0.0,
+        recoil_horizontal=0.0,
+        projectile_speed=0.0,
+        penetration_power=0.0,
+        weapon_cost=0,
+    ),
+}

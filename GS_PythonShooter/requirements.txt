@@ -1,0 +1,14 @@
+# GS_PythonShooter 依赖清单
+# 安装方式:
+#   pipenv install          (Pipenv 推荐)
+#   pip install -r requirements.txt  (pip 兼容)
+
+# ─── 运行时依赖 ────────────────────────────────────────
+panda3d>=1.10.14          # 3D 游戏引擎（C++ 内核 + Python API）
+numpy>=1.26.0             # 数值计算（弹道/物理）
+Pillow>=10.0.0            # 贴图处理
+
+# ─── 开发依赖（可选） ──────────────────────────────────
+# pytest>=8.0.0           # 单元测试
+# black>=24.0.0           # 代码格式化
+# mypy>=1.8.0             # 类型检查
