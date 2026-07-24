@@ -57,14 +57,15 @@ export function getKimAttackFrames(): Record<string, AttackFrameEntry> {
 // ===== MUGEN Data Queries =====
 
 export const KIM_MUGEN_ACTION_MAP: Record<string, string> = {
-  CLOSE_A: '200', CLOSE_B: '230', CLOSE_C: '210', CLOSE_D: '240',
-  STAND_B: '231', STAND_C: '211', STAND_D: '241',
+  CLOSE_A: '200', CLOSE_B: '231', CLOSE_C: '210', CLOSE_D: '240',
+  STAND_A: '200', STAND_B: '231', STAND_C: '210', STAND_D: '240',
   CROUCH_A: '400', CROUCH_B: '430', CROUCH_C: '410', CROUCH_D: '440',
   JUMP_A: '600', JUMP_B: '630', JUMP_C: '610', JUMP_D: '640',
+  KIM_HISHOU_KICK: '300', KIM_HANSEN: '340',
   KIM_HIENZAN: '1000', KIM_HANGETSU: '1011', KIM_HAKI: '1021',
   KIM_HISHOU: '1100', KIM_SANREN: '1200',
   DM_PHOENIX_KICK: '3000', SDM_PHOENIX_KICK: '3010',
-  DM_PHOENIX_HITEN: '3100', SDM_PHOENIX_HITEN: '3110', HSDM_PHOENIX_HITEN: '3120',
+  DM_PHOENIX_HITEN: '3100', SDM_PHOENIX_HITEN: '3100', HSDM_PHOENIX_HITEN: '3120',
 };
 
 export function hasKimMugenData(): boolean {
