@@ -61,7 +61,7 @@ export const MAI_MUGEN_ACTION_MAP: Record<string, string> = {
   // Normals — close stand
   CLOSE_A: '500', CLOSE_B: '530', CLOSE_C: '510', CLOSE_D: '550',
   // Normals — far stand
-  STAND_B: '530', STAND_C: '510', STAND_D: '550',
+  STAND_A: '200', STAND_B: '530', STAND_C: '510', STAND_D: '550',
   // Normals — crouch
   CROUCH_A: '600', CROUCH_B: '610', CROUCH_C: '700', CROUCH_D: '330',
   // Normals — jump

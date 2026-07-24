@@ -669,14 +669,14 @@ registerCharacterSprites({
   defaultTint: '#ff4466',
   specialMap: {
     // Normals
-    [AttackType.CLOSE_A]: '200', [AttackType.CLOSE_B]: '230',
-    [AttackType.CLOSE_C]: '210', [AttackType.CLOSE_D]: '240',
+    [AttackType.CLOSE_A]: '500', [AttackType.CLOSE_B]: '530',
+    [AttackType.CLOSE_C]: '510', [AttackType.CLOSE_D]: '550',
     [AttackType.STAND_A]: '200', [AttackType.STAND_B]: '230',
-    [AttackType.STAND_C]: '210', [AttackType.STAND_D]: '240',
+    [AttackType.STAND_C]: '210', [AttackType.STAND_D]: '550',
     [AttackType.CROUCH_A]: '600', [AttackType.CROUCH_B]: '610',
     [AttackType.CROUCH_C]: '700', [AttackType.CROUCH_D]: '330',
-    [AttackType.JUMP_A]: '600', [AttackType.JUMP_B]: '630',
-    [AttackType.JUMP_C]: '610', [AttackType.JUMP_D]: '640',
+    [AttackType.JUMP_A]: '600', [AttackType.JUMP_B]: '601',
+    [AttackType.JUMP_C]: '610', [AttackType.JUMP_D]: '1800',
     // Command normals
     [AttackType.MAI_HISSATSU_SHINOBIBACHI]: '1070', [AttackType.MAI_YUSURA_UMA]: '1071',
     // Specials — 花蝶扇 (Kachousen)
@@ -744,11 +744,11 @@ registerCharacterSprites({
     [AttackType.JUMP_A]: '600', [AttackType.JUMP_B]: '630',
     [AttackType.JUMP_C]: '610', [AttackType.JUMP_D]: '640',
     // Command normals
-    [AttackType.YASHIRO_SHUU_WANI]: '300',    // →+A Shuu Wani
-    [AttackType.YASHIRO_JUU_ZUTSU]: '310',    // →+B Juu Zutsu (overhead)
+    [AttackType.YASHIRO_SHUU_WANI]: '250',    // →+A Shuu Wani
+    [AttackType.YASHIRO_JUU_ZUTSU]: '260',    // →+B Juu Zutsu (overhead)
     // Specials — Upper Du Bag
     [AttackType.YASHIRO_UPPER_DU]: '1000',    // QCF+A
-    [AttackType.YASHIRO_UPPER_DU_C]: '1010',  // QCF+C
+    [AttackType.YASHIRO_UPPER_DU_C]: '1001',  // QCF+C
     // Niraai Kaname
     [AttackType.YASHIRO_NIRAAI]: '1020',      // QCB+P
     // Musatsu Niraai
