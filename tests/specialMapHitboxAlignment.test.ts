@@ -21,6 +21,7 @@ const SPRITES_DIR = path.resolve(__dirname, '../public/sprites');
 const KOF2002_WITH_SPRITES = [
   'kyo', 'ryo', 'athena', 'terry', 'kim',
   'vice', 'yamazaki', 'shermie', 'benimaru', 'heidern', 'yuri',
+  'rugal', 'g_rugal',
 ];
 
 const MUGEN_DIR_MAP: Record<string, string> = {
@@ -35,6 +36,8 @@ const MUGEN_DIR_MAP: Record<string, string> = {
   benimaru: 'cvsbenimaru',
   heidern: 'heidern',
   yuri: 'cvsyuri',
+  rugal: 'cvsrugal',
+  g_rugal: 'cvsg_rugal',
 };
 
 function getAlignmentData(charId: string) {
