@@ -90,6 +90,11 @@ export {
   type PortraitMeta,
 } from './portraits/athenaPortraits.js';
 
+export {
+  generateAthenaMugenActionReport,
+  type AthenaMugenActionReport,
+} from './reports/athenaReports.js';
+
 // Hit Effects (VFX/SFX plugin)
 export { ATHENA_HIT_EFFECTS } from './hitEffects/athenaHitEffects.js';
 

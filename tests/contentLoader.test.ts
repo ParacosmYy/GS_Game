@@ -117,6 +117,15 @@ describe('contentLoader', () => {
       expect(typeof content.report).toBe('object');
     });
 
+    it('athena report exposes MUGEN action and manifest gap status', () => {
+      const content = loadCharacterContent('athena');
+      expect(content.report).toBeDefined();
+      expect(content.report.characterId).toBe('athena');
+      expect(content.report.mugenDir).toBe('cvsathena');
+      expect(content.report.fallbackHitboxKeys).toContain('ATHENA_PSYCHO_SWORD_C');
+      expect(content.report.manifestClean).toBe(false);
+    });
+
     it('throws for unknown character', () => {
       expect(() => loadCharacterContent('unknown')).toThrow();
     });

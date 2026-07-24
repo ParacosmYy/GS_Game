@@ -75,6 +75,7 @@ import {
   getAthenaHitboxOffsets,
   getAthenaAttackFrames,
   getAthenaFeedbackTiers,
+  generateAthenaMugenActionReport,
 } from './characters/athena/index.js';
 import {
   getViceFrameData,
@@ -434,7 +435,7 @@ function loadAthenaContent(): CharacterContent {
     hitboxes: getAthenaHitboxOffsets(),
     attackFrames: getAthenaAttackFrames(),
     feedback: getAthenaFeedbackTiers(),
-    report: null,
+    report: generateAthenaMugenActionReport(),
   };
 }
 
