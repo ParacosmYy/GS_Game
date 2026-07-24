@@ -32,17 +32,19 @@ export type MissingRefClassification =
   | 'source-reference-missing'
   | 'suspected-fx-helper-reference'
   | 'suspected-groove-effect-reference'
+  | 'suspected-common-system-effect-reference'
   | 'unclassified-missing-ref';
 
 export type ClassificationConfidence = 'observed' | 'heuristic';
-export type MissingRefEvidenceSource = 'manifest' | 'public-png' | 'reference-png' | 'cns';
+export type MissingRefEvidenceSource = 'manifest' | 'public-png' | 'reference-png' | 'cns' | 'air-pattern';
 export type MissingRefEvidenceKind =
   | 'missing-ref'
   | 'file-presence'
   | 'animation-ref'
   | 'animation-expression-ref'
   | 'object-id-ref'
-  | 'cleanup-id-ref';
+  | 'cleanup-id-ref'
+  | 'cross-character-air-pattern';
 
 export interface CnsUsageHint {
   actionId: string;
@@ -69,6 +71,16 @@ export interface MissingRefEvidence {
   excerpt: string;
 }
 
+export interface AirActionPatternEvidence {
+  actionId: string;
+  frameCount: number;
+  patternHash: string;
+  weakPatternHash: string;
+  matchingCharacterCount: number;
+  durationVariantCount: number;
+  sampleCharacters: string[];
+}
+
 export interface MissingRefActionAudit {
   actionId: string;
   missingFrameCount: number;
@@ -78,6 +90,7 @@ export interface MissingRefActionAudit {
   missingSpriteKeys: string[];
   extractedSpriteKeys: string[];
   cnsUsageHints: CnsUsageHint[];
+  crossCharacterAirPattern?: AirActionPatternEvidence;
   controllerTypes: string[];
   referenceKinds: CnsReferenceKind[];
   classification: MissingRefClassification;
@@ -109,6 +122,22 @@ interface ManifestSprites {
       index: number;
     }>;
   }>;
+}
+
+interface AirFrameRef {
+  group: number;
+  index: number;
+  duration: number;
+}
+
+interface AirActionOccurrence {
+  characterId: string;
+  actionId: string;
+  frames: AirFrameRef[];
+  strongSignature: string;
+  weakSignature: string;
+  patternHash: string;
+  weakPatternHash: string;
 }
 
 function readManifest(dir: string): ManifestSprites | null {
@@ -145,6 +174,19 @@ function listCnsFiles(sourceDir: string): string[] {
   return fs.readdirSync(sourceDir)
     .filter(file => file.toLowerCase().endsWith('.cns'))
     .map(file => path.join(sourceDir, file))
+    .sort();
+}
+
+function listAirFiles(charactersRoot: string): string[] {
+  if (!fs.existsSync(charactersRoot)) return [];
+  return fs.readdirSync(charactersRoot, { withFileTypes: true })
+    .filter(entry => entry.isDirectory() && entry.name.toLowerCase().startsWith('cvs'))
+    .flatMap(entry => {
+      const characterDir = path.join(charactersRoot, entry.name);
+      return fs.readdirSync(characterDir)
+        .filter(file => file.toLowerCase().endsWith('.air'))
+        .map(file => path.join(characterDir, file));
+    })
     .sort();
 }
 
@@ -229,6 +271,116 @@ export function scanCnsSourceDir(sourceDir: string, actionIds: Set<string>): Cns
   return hints;
 }
 
+function normalizeFrameSignature(frames: AirFrameRef[], includeDuration: boolean): string {
+  return frames
+    .map(frame => includeDuration
+      ? `${frame.group}:${frame.index}:${frame.duration}`
+      : `${frame.group}:${frame.index}`)
+    .join('|');
+}
+
+function stableHash(value: string): string {
+  let hash = 0x811c9dc5;
+  for (let i = 0; i < value.length; i++) {
+    hash ^= value.charCodeAt(i);
+    hash = Math.imul(hash, 0x01000193);
+  }
+  return (hash >>> 0).toString(16).padStart(8, '0');
+}
+
+function parseAirActions(
+  file: string,
+  content: string,
+  actionIds: Set<string>,
+): AirActionOccurrence[] {
+  const occurrences: AirActionOccurrence[] = [];
+  const characterId = path.basename(path.dirname(file));
+  const lines = content.split(/\r?\n/);
+  let currentActionId: string | null = null;
+  let currentFrames: AirFrameRef[] = [];
+
+  const flush = () => {
+    if (!currentActionId || currentFrames.length === 0 || !actionIds.has(currentActionId)) return;
+    const strongSignature = normalizeFrameSignature(currentFrames, true);
+    const weakSignature = normalizeFrameSignature(currentFrames, false);
+    occurrences.push({
+      characterId,
+      actionId: currentActionId,
+      frames: currentFrames,
+      strongSignature,
+      weakSignature,
+      patternHash: stableHash(strongSignature),
+      weakPatternHash: stableHash(weakSignature),
+    });
+  };
+
+  for (const rawLine of lines) {
+    const line = rawLine.split(';')[0].trim();
+    const actionMatch = line.match(/^\[Begin\s+Action\s+(-?\d+)\]/i);
+    if (actionMatch) {
+      flush();
+      currentActionId = actionMatch[1];
+      currentFrames = [];
+      continue;
+    }
+
+    if (!currentActionId || !actionIds.has(currentActionId)) continue;
+    const frameMatch = line.match(/^\s*(-?\d+)\s*,\s*(-?\d+)\s*,\s*(-?\d+)\s*,\s*(-?\d+)\s*,\s*(-?\d+)/);
+    if (!frameMatch) continue;
+    currentFrames.push({
+      group: Number(frameMatch[1]),
+      index: Number(frameMatch[2]),
+      duration: Number(frameMatch[5]),
+    });
+  }
+
+  flush();
+  return occurrences;
+}
+
+function collectCrossCharacterAirPatterns(
+  sourceDir: string,
+  actionIds: Set<string>,
+): Map<string, AirActionPatternEvidence> {
+  const charactersRoot = path.dirname(sourceDir);
+  const occurrences: AirActionOccurrence[] = [];
+
+  for (const filePath of listAirFiles(charactersRoot)) {
+    const content = fs.readFileSync(filePath, 'utf-8');
+    occurrences.push(...parseAirActions(filePath, content, actionIds));
+  }
+
+  const byAction = new Map<string, AirActionOccurrence[]>();
+  for (const occurrence of occurrences) {
+    const actionOccurrences = byAction.get(occurrence.actionId) ?? [];
+    actionOccurrences.push(occurrence);
+    byAction.set(occurrence.actionId, actionOccurrences);
+  }
+
+  const evidenceByAction = new Map<string, AirActionPatternEvidence>();
+  const sourceCharacterId = path.basename(sourceDir);
+
+  for (const [actionId, actionOccurrences] of byAction.entries()) {
+    const sourceOccurrence = actionOccurrences.find(occurrence => occurrence.characterId === sourceCharacterId);
+    if (!sourceOccurrence) continue;
+    const matchingOccurrences = actionOccurrences.filter(
+      occurrence => occurrence.weakSignature === sourceOccurrence.weakSignature,
+    );
+    const strongVariants = new Set(matchingOccurrences.map(occurrence => occurrence.strongSignature));
+    evidenceByAction.set(actionId, {
+      actionId,
+      frameCount: sourceOccurrence.frames.length,
+      patternHash: sourceOccurrence.patternHash,
+      weakPatternHash: sourceOccurrence.weakPatternHash,
+      matchingCharacterCount: collectSortedUnique(matchingOccurrences.map(occurrence => occurrence.characterId)).length,
+      durationVariantCount: strongVariants.size,
+      sampleCharacters: collectSortedUnique(matchingOccurrences.map(occurrence => occurrence.characterId)).slice(0, 8),
+    });
+  }
+
+  return evidenceByAction;
+}
+
 function groupDetailsByAction(details: MissingSpriteRefDetail[]): Map<string, MissingSpriteRefDetail[]> {
   const byAction = new Map<string, MissingSpriteRefDetail[]>();
   for (const detail of details) {
@@ -279,6 +431,7 @@ function classifyAction(
   extractedFrameCount: number,
   referencedPngFilesPresent: number,
   cnsUsageHints: CnsUsageHint[],
+  crossCharacterAirPattern: AirActionPatternEvidence | undefined,
   spriteFilesMissing: number,
 ): {
   classification: MissingRefClassification;
@@ -340,6 +493,17 @@ function classifyAction(
   if (hasOnlyWeakIdRefs) {
     evidenceTags.push('weak-cns-id-only');
   }
+
+  if (crossCharacterAirPattern && crossCharacterAirPattern.matchingCharacterCount >= 20) {
+    evidenceTags.push('cross-character-air-pattern');
+    evidenceTags.push('shared-system-effect-candidate');
+    return {
+      classification: 'suspected-common-system-effect-reference',
+      confidence: 'heuristic',
+      evidenceTags,
+    };
+  }
+
   if (actionId) {
     evidenceTags.push('unclassified-risk-retained');
   }
@@ -356,6 +520,7 @@ function buildActionEvidence(
   missingFrameCount: number,
   referencedPngFilesPresent: number,
   cnsUsageHints: CnsUsageHint[],
+  crossCharacterAirPattern: AirActionPatternEvidence | undefined,
 ): MissingRefEvidence[] {
   const evidence: MissingRefEvidence[] = [
     {
@@ -385,6 +550,14 @@ function buildActionEvidence(
     });
   }
 
+  if (crossCharacterAirPattern) {
+    evidence.push({
+      source: 'air-pattern',
+      kind: 'cross-character-air-pattern',
+      excerpt: `Action ${actionId} matches ${crossCharacterAirPattern.matchingCharacterCount} CVS character AIR patterns by group/index signature; missing refs remain actionable until source sprite status is confirmed.`,
+    });
+  }
+
   return evidence;
 }
 
@@ -405,7 +578,7 @@ export function formatAuditReport(report: Omit<MissingRefSourceAudit, 'text'>): 
     lines.push(`  Actions:`);
     for (const action of report.actions.slice(0, 12)) {
       lines.push(
-        `    - ${action.actionId}: missing=${action.missingFrameCount}, extracted=${action.extractedFrameCount}, cnsHints=${action.cnsUsageHints.length}, classification=${action.classification}, issueRetained=${action.issueRetained}`,
+        `    - ${action.actionId}: missing=${action.missingFrameCount}, extracted=${action.extractedFrameCount}, cnsHints=${action.cnsUsageHints.length}, airMatches=${action.crossCharacterAirPattern?.matchingCharacterCount ?? 0}, classification=${action.classification}, issueRetained=${action.issueRetained}`,
       );
     }
   }
@@ -431,6 +604,7 @@ export function auditMissingRefSources(
   const extractedSpriteKeys = collectExtractedSpriteKeys(mugenDir);
   const actionIds = new Set(validation.missingSpriteRefDetails.map(detail => detail.actionId));
   const cnsUsageHints = scanCnsSourceDir(sourceDir, actionIds);
+  const airPatterns = collectCrossCharacterAirPatterns(sourceDir, actionIds);
   const hintsByAction = new Map<string, CnsUsageHint[]>();
 
   for (const hint of cnsUsageHints) {
@@ -450,6 +624,7 @@ export function auditMissingRefSources(
         key => publicKeys.has(key) || referenceKeys.has(key),
       );
       const actionHints = hintsByAction.get(actionId) ?? [];
+      const crossCharacterAirPattern = airPatterns.get(actionId);
       const referencedPngFilesPresent = details.filter(detail => detail.fileExists).length;
       const extractedFrameCount = countExtractedFramesForAction(mugenDir, actionId, combinedExtractedKeys);
       const classification = classifyAction(
@@ -458,6 +633,7 @@ export function auditMissingRefSources(
         extractedFrameCount,
         referencedPngFilesPresent,
         actionHints,
+        crossCharacterAirPattern,
         validation.spriteFilesMissing,
       );
       return {
@@ -469,6 +645,7 @@ export function auditMissingRefSources(
         missingSpriteKeys,
         extractedSpriteKeys: extractedMissingSpriteKeys,
         cnsUsageHints: actionHints,
+        crossCharacterAirPattern,
         controllerTypes: collectSortedUnique(actionHints.map(hint => hint.controllerType ?? 'unknown')),
         referenceKinds: collectSortedUnique(actionHints.map(hint => hint.referenceKind)),
         classification: classification.classification,
@@ -476,7 +653,13 @@ export function auditMissingRefSources(
         affectsValidation: false as const,
         issueRetained: true as const,
         evidenceTags: classification.evidenceTags,
-        evidence: buildActionEvidence(actionId, details.length, referencedPngFilesPresent, actionHints),
+        evidence: buildActionEvidence(
+          actionId,
+          details.length,
+          referencedPngFilesPresent,
+          actionHints,
+          crossCharacterAirPattern,
+        ),
       };
     })
     .sort((a, b) => Number(a.actionId) - Number(b.actionId));

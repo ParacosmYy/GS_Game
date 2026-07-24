@@ -131,16 +131,60 @@ describe('auditMissingRefSources — Athena', () => {
       expect.arrayContaining(['Helper', 'Explod']),
     );
     expect(actions.get('8041')?.missingFrameCount).toBe(16);
-    expect(actions.get('8041')?.classification).toBe('unclassified-missing-ref');
+    expect(actions.get('8041')?.classification).toBe('suspected-common-system-effect-reference');
     expect(actions.get('8041')?.issueRetained).toBe(true);
     expect(actions.get('8041')?.cnsUsageHints).toHaveLength(0);
     expect(actions.get('8041')?.evidence.map(item => item.source)).toEqual(
-      expect.arrayContaining(['manifest', 'public-png', 'reference-png']),
+      expect.arrayContaining(['manifest', 'public-png', 'reference-png', 'air-pattern']),
     );
     expect(actions.get('8041')?.evidence.some(item => item.source === 'cns')).toBe(false);
 
     expect(report.diagnosis).toContain('source-side or effect/helper references');
     expect(report.diagnosis).toContain('public PNG copy is not missing files');
+  });
+
+  it('adds cross-character AIR pattern evidence without resolving missing refs', () => {
+    const report = auditMissingRefSources('cvsathena');
+    const actions = new Map(report.actions.map(action => [action.actionId, action]));
+
+    expect(report.validation.missingSpriteRefs).toHaveLength(140);
+    expect(report.summary.frameCount).toBe(140);
+    expect(report.summary.uniqueSpriteKeyCount).toBe(123);
+    expect(report.validationImpact).toBe('diagnostic-only');
+
+    for (const actionId of ['8041', '8042']) {
+      const action = actions.get(actionId);
+      expect(action, `${actionId} should be summarized`).toBeDefined();
+      expect(action?.classification).toBe('suspected-common-system-effect-reference');
+      expect(action?.confidence).toBe('heuristic');
+      expect(action?.affectsValidation).toBe(false);
+      expect(action?.issueRetained).toBe(true);
+      expect(action?.crossCharacterAirPattern?.matchingCharacterCount).toBeGreaterThanOrEqual(20);
+      expect(action?.crossCharacterAirPattern?.sampleCharacters).toContain('cvsathena');
+      expect(action?.crossCharacterAirPattern?.patternHash).toMatch(/^[0-9a-f]{8}$/);
+      expect(action?.evidenceTags).toEqual(
+        expect.arrayContaining(['cross-character-air-pattern', 'shared-system-effect-candidate']),
+      );
+      expect(action?.evidence).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            source: 'air-pattern',
+            kind: 'cross-character-air-pattern',
+          }),
+        ]),
+      );
+    }
+
+    for (const actionId of ['8310', '8315', '8320', '8321']) {
+      const action = actions.get(actionId);
+      expect(action, `${actionId} should be summarized`).toBeDefined();
+      expect(action?.classification).toBe('suspected-common-system-effect-reference');
+      expect(action?.affectsValidation).toBe(false);
+      expect(action?.issueRetained).toBe(true);
+      expect(action?.crossCharacterAirPattern?.matchingCharacterCount).toBeGreaterThanOrEqual(40);
+      expect(action?.crossCharacterAirPattern?.frameCount).toBeGreaterThan(0);
+      expect(action?.crossCharacterAirPattern?.durationVariantCount).toBeGreaterThanOrEqual(1);
+    }
   });
 
   it('formats a concise CLI-friendly report without implying an automatic fix', () => {
@@ -152,6 +196,7 @@ describe('auditMissingRefSources — Athena', () => {
     expect(output).toContain('Extracted sprite keys: public=1456, reference=1456');
     expect(output).toContain('6505: missing=1, extracted=8');
     expect(output).toContain('8300: missing=8, extracted=0');
+    expect(output).toContain('airMatches=');
     expect(output).toContain('classification=suspected-fx-helper-reference');
     expect(output).toContain('validationImpact=diagnostic-only');
     expect(output).toContain('CNS usage hints');
@@ -160,6 +205,7 @@ describe('auditMissingRefSources — Athena', () => {
     expect(output).not.toContain('allowed');
     expect(output).not.toContain('ignored');
     expect(output).not.toContain('passed');
+    expect(output).not.toContain('safe');
   });
 
   it('keeps validateManifests strict even when audit classifications are available', () => {
