@@ -19,10 +19,11 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
+import { pathToFileURL } from 'url';
 
 // ===== Types =====
 
-interface SpriteRef {
+export interface SpriteRef {
   group: number;
   index: number;
   file: string;
@@ -30,7 +31,7 @@ interface SpriteRef {
   height: number;
 }
 
-interface AnimFrame {
+export interface AnimFrame {
   group: number;
   index: number;
   offsetX: number;
@@ -41,26 +42,54 @@ interface AnimFrame {
   attackBoxes: any[] | null;
 }
 
-interface AnimData {
+export interface AnimData {
   name: string;
   loopStart: number;
   frames: AnimFrame[];
 }
 
-interface Manifest {
+export interface Manifest {
   characterId: string;
   sprites: Record<string, SpriteRef>;
   animations: Record<string, AnimData>;
   stateMap?: Record<string, string>;
 }
 
-interface ValidationResult {
+export interface MissingSpriteRefDetail {
+  actionId: string;
+  frameIndex: number;
+  group: number;
+  index: number;
+  spriteKey: string;
+  expectedFile: string;
+  fileExists: boolean;
+}
+
+export interface MissingSpriteRefActionSummary {
+  actionId: string;
+  frameCount: number;
+  uniqueSpriteKeyCount: number;
+  referencedPngFilesPresent: number;
+  sampleSpriteKeys: string[];
+}
+
+export interface MissingSpriteRefSummary {
+  frameCount: number;
+  uniqueSpriteKeyCount: number;
+  actionCount: number;
+  referencedPngFilesPresent: number;
+  actions: MissingSpriteRefActionSummary[];
+  diagnosis: string | null;
+}
+
+export interface ValidationResult {
   mugenDir: string;
   totalSprites: number;
   totalAnims: number;
   totalFrames: number;
   zeroDurationFixed: number;
   missingSpriteRefs: string[];
+  missingSpriteRefDetails: MissingSpriteRefDetail[];
   orphanedSprites: string[];
   invalidFrames: string[];
   negativeDimensions: string[];
@@ -73,7 +102,60 @@ interface ValidationResult {
 
 // ===== Validation =====
 
-function validateManifest(mugenDir: string, fix: boolean): ValidationResult {
+function formatSpriteKey(group: number, index: number): string {
+  return `${group}_${index}`;
+}
+
+function formatSpriteFile(group: number, index: number): string {
+  return `${String(group).padStart(5, '0')}_${String(index).padStart(4, '0')}.png`;
+}
+
+export function summarizeMissingSpriteRefs(result: ValidationResult): MissingSpriteRefSummary {
+  const details = result.missingSpriteRefDetails;
+  const uniqueSpriteKeys = new Set(details.map(detail => detail.spriteKey));
+  const byAction = new Map<string, MissingSpriteRefDetail[]>();
+
+  for (const detail of details) {
+    const actionDetails = byAction.get(detail.actionId) ?? [];
+    actionDetails.push(detail);
+    byAction.set(detail.actionId, actionDetails);
+  }
+
+  const actions = Array.from(byAction.entries())
+    .map(([actionId, actionDetails]) => {
+      const actionSpriteKeys = new Set(actionDetails.map(detail => detail.spriteKey));
+      return {
+        actionId,
+        frameCount: actionDetails.length,
+        uniqueSpriteKeyCount: actionSpriteKeys.size,
+        referencedPngFilesPresent: actionDetails.filter(detail => detail.fileExists).length,
+        sampleSpriteKeys: Array.from(actionSpriteKeys).slice(0, 5),
+      };
+    })
+    .sort((a, b) => {
+      const numericA = Number(a.actionId);
+      const numericB = Number(b.actionId);
+      if (Number.isFinite(numericA) && Number.isFinite(numericB)) return numericA - numericB;
+      return a.actionId.localeCompare(b.actionId);
+    });
+
+  const referencedPngFilesPresent = details.filter(detail => detail.fileExists).length;
+  const diagnosis =
+    details.length > 0 && result.spriteFilesMissing === 0 && referencedPngFilesPresent === 0
+      ? 'AIR references sprites absent from manifest/SFF extraction; public PNG copy is not missing files.'
+      : null;
+
+  return {
+    frameCount: details.length,
+    uniqueSpriteKeyCount: uniqueSpriteKeys.size,
+    actionCount: actions.length,
+    referencedPngFilesPresent,
+    actions,
+    diagnosis,
+  };
+}
+
+export function validateManifest(mugenDir: string, fix = false): ValidationResult {
   const result: ValidationResult = {
     mugenDir,
     totalSprites: 0,
@@ -81,6 +163,7 @@ function validateManifest(mugenDir: string, fix: boolean): ValidationResult {
     totalFrames: 0,
     zeroDurationFixed: 0,
     missingSpriteRefs: [],
+    missingSpriteRefDetails: [],
     orphanedSprites: [],
     invalidFrames: [],
     negativeDimensions: [],
@@ -114,7 +197,7 @@ function validateManifest(mugenDir: string, fix: boolean): ValidationResult {
       // Skip blank frames
       if (frame.group === -1) continue;
 
-      const spriteKey = `${frame.group}_${frame.index}`;
+      const spriteKey = formatSpriteKey(frame.group, frame.index);
       referencedSprites.add(spriteKey);
 
       // Check zero duration
@@ -126,6 +209,16 @@ function validateManifest(mugenDir: string, fix: boolean): ValidationResult {
       // Check sprite reference exists
       if (!manifest.sprites[spriteKey]) {
         result.missingSpriteRefs.push(`Action ${actionId} frame ${i}: ${spriteKey}`);
+        const expectedFile = formatSpriteFile(frame.group, frame.index);
+        result.missingSpriteRefDetails.push({
+          actionId,
+          frameIndex: i,
+          group: frame.group,
+          index: frame.index,
+          spriteKey,
+          expectedFile,
+          fileExists: fs.existsSync(path.join(result.spritesDir, expectedFile)),
+        });
       }
 
       // Check negative dimensions
@@ -184,7 +277,7 @@ function validateManifest(mugenDir: string, fix: boolean): ValidationResult {
 
 // ===== Output =====
 
-function formatResult(r: ValidationResult): string {
+export function formatResult(r: ValidationResult): string {
   const lines: string[] = [];
   lines.push(`[${r.mugenDir}]`);
   lines.push(`  Sprites: ${r.totalSprites} (${r.spriteFilesExist} exist, ${r.spriteFilesMissing} missing)`);
@@ -196,6 +289,22 @@ function formatResult(r: ValidationResult): string {
     lines.push(`  Issues:`);
     for (const issue of r.issues) {
       lines.push(`    - ${issue}`);
+    }
+    if (r.missingSpriteRefDetails.length > 0) {
+      const summary = summarizeMissingSpriteRefs(r);
+      lines.push(`  Diagnostics:`);
+      lines.push(
+        `    Missing sprite refs: ${summary.frameCount} frames, ${summary.uniqueSpriteKeyCount} unique sprite keys, ${summary.actionCount} actions, ${summary.referencedPngFilesPresent} referenced PNG files present`,
+      );
+      if (summary.diagnosis) {
+        lines.push(`    ${summary.diagnosis}`);
+      }
+      lines.push(`    Top missing-ref actions:`);
+      for (const action of summary.actions.slice(0, 10)) {
+        lines.push(
+          `      - ${action.actionId}: ${action.frameCount} frames, ${action.uniqueSpriteKeyCount} unique sprite keys, ${action.referencedPngFilesPresent} referenced PNG files present`,
+        );
+      }
     }
   } else {
     lines.push(`  Status: OK`);
@@ -241,4 +350,6 @@ function main() {
   console.log(`Summary: ${okCount}/${dirs.length} clean, ${totalFixed} fixed, ${totalOrphans} orphans, ${totalMissing} missing files`);
 }
 
-main();
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  main();
+}
