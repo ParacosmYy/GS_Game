@@ -20,12 +20,36 @@ import {
 } from './validateManifests.js';
 
 export type CnsReferenceKind = 'anim' | 'anim-expression' | 'projanim' | 'id';
+export type CnsEvidenceStrength =
+  | 'animation-ref'
+  | 'animation-expression-ref'
+  | 'object-id-ref'
+  | 'cleanup-id-ref';
+
+export type MissingRefClassification =
+  | 'public-copy-missing'
+  | 'manifest-excludes-existing-png'
+  | 'source-reference-missing'
+  | 'suspected-fx-helper-reference'
+  | 'suspected-groove-effect-reference'
+  | 'unclassified-missing-ref';
+
+export type ClassificationConfidence = 'observed' | 'heuristic';
+export type MissingRefEvidenceSource = 'manifest' | 'public-png' | 'reference-png' | 'cns';
+export type MissingRefEvidenceKind =
+  | 'missing-ref'
+  | 'file-presence'
+  | 'animation-ref'
+  | 'animation-expression-ref'
+  | 'object-id-ref'
+  | 'cleanup-id-ref';
 
 export interface CnsUsageHint {
   actionId: string;
   file: string;
   line: number;
   referenceKind: CnsReferenceKind;
+  evidenceStrength: CnsEvidenceStrength;
   controllerType: string | null;
   expression: string;
 }
@@ -37,14 +61,31 @@ export interface ExtractedSpriteKeySummary {
   referenceKeys: string[];
 }
 
+export interface MissingRefEvidence {
+  source: MissingRefEvidenceSource;
+  kind: MissingRefEvidenceKind;
+  file?: string;
+  line?: number;
+  excerpt: string;
+}
+
 export interface MissingRefActionAudit {
   actionId: string;
   missingFrameCount: number;
   uniqueMissingSpriteKeyCount: number;
+  referencedPngFilesPresent: number;
   extractedFrameCount: number;
   missingSpriteKeys: string[];
   extractedSpriteKeys: string[];
   cnsUsageHints: CnsUsageHint[];
+  controllerTypes: string[];
+  referenceKinds: CnsReferenceKind[];
+  classification: MissingRefClassification;
+  confidence: ClassificationConfidence;
+  affectsValidation: false;
+  issueRetained: true;
+  evidenceTags: string[];
+  evidence: MissingRefEvidence[];
 }
 
 export interface MissingRefSourceAudit {
@@ -56,6 +97,7 @@ export interface MissingRefSourceAudit {
   actions: MissingRefActionAudit[];
   cnsUsageHints: CnsUsageHint[];
   diagnosis: string;
+  validationImpact: 'diagnostic-only';
   text: string;
 }
 
@@ -120,6 +162,13 @@ function referenceKindForKey(key: string, expression: string): CnsReferenceKind 
   return null;
 }
 
+function evidenceStrengthFor(referenceKind: CnsReferenceKind, controllerType: string | null): CnsEvidenceStrength {
+  if (referenceKind === 'anim' || referenceKind === 'projanim') return 'animation-ref';
+  if (referenceKind === 'anim-expression') return 'animation-expression-ref';
+  if (controllerType?.toLowerCase() === 'removeexplod') return 'cleanup-id-ref';
+  return 'object-id-ref';
+}
+
 export function scanCnsAnimationReferences(
   file: string,
   content: string,
@@ -159,6 +208,7 @@ export function scanCnsAnimationReferences(
         file,
         line: i + 1,
         referenceKind,
+        evidenceStrength: evidenceStrengthFor(referenceKind, controllerType),
         controllerType,
         expression,
       });
@@ -219,6 +269,125 @@ function buildDiagnosis(summary: MissingSpriteRefSummary, extracted: ExtractedSp
   return `Missing refs include ${summary.referencedPngFilesPresent} expected PNG files that exist on disk but are not present in manifest sprites; extracted public=${extracted.publicCount}, reference=${extracted.referenceCount}.`;
 }
 
+function collectSortedUnique<T>(values: T[]): T[] {
+  return Array.from(new Set(values)).sort();
+}
+
+function classifyAction(
+  actionId: string,
+  missingFrameCount: number,
+  extractedFrameCount: number,
+  referencedPngFilesPresent: number,
+  cnsUsageHints: CnsUsageHint[],
+  spriteFilesMissing: number,
+): {
+  classification: MissingRefClassification;
+  confidence: ClassificationConfidence;
+  evidenceTags: string[];
+} {
+  const evidenceTags: string[] = ['manifest-missing-ref', 'issue-retained'];
+  const hasAnimationRef = cnsUsageHints.some(hint =>
+    hint.evidenceStrength === 'animation-ref' || hint.evidenceStrength === 'animation-expression-ref');
+  const hasHelperContext = cnsUsageHints.some(hint => hint.controllerType?.toLowerCase() === 'helper');
+  const hasExplodContext = cnsUsageHints.some(hint => hint.controllerType?.toLowerCase().includes('explod'));
+  const hasGrooveFile = cnsUsageHints.some(hint => hint.file.toLowerCase().includes('groove'));
+  const hasOnlyWeakIdRefs = cnsUsageHints.length > 0 && cnsUsageHints.every(hint =>
+    hint.evidenceStrength === 'object-id-ref' || hint.evidenceStrength === 'cleanup-id-ref');
+
+  if (referencedPngFilesPresent > 0 && extractedFrameCount === 0) {
+    evidenceTags.push('expected-png-present');
+    return {
+      classification: 'manifest-excludes-existing-png',
+      confidence: 'observed',
+      evidenceTags,
+    };
+  }
+
+  if (spriteFilesMissing > 0) {
+    evidenceTags.push('public-copy-missing');
+    return {
+      classification: 'public-copy-missing',
+      confidence: 'observed',
+      evidenceTags,
+    };
+  }
+
+  if (extractedFrameCount > 0 && missingFrameCount > 0) {
+    evidenceTags.push('partial-extracted-frames');
+    if (hasAnimationRef) evidenceTags.push('cns-animation-ref');
+    if (hasGrooveFile) evidenceTags.push('cns-groove-context');
+    return {
+      classification: 'source-reference-missing',
+      confidence: 'observed',
+      evidenceTags,
+    };
+  }
+
+  if (hasAnimationRef && (hasHelperContext || hasExplodContext)) {
+    evidenceTags.push('cns-animation-ref');
+    if (hasHelperContext) evidenceTags.push('cns-helper-context');
+    if (hasExplodContext) evidenceTags.push('cns-explod-context');
+    if (hasGrooveFile) evidenceTags.push('cns-groove-context');
+    return {
+      classification: !hasHelperContext && hasGrooveFile
+        ? 'suspected-groove-effect-reference'
+        : 'suspected-fx-helper-reference',
+      confidence: 'heuristic',
+      evidenceTags,
+    };
+  }
+
+  if (hasOnlyWeakIdRefs) {
+    evidenceTags.push('weak-cns-id-only');
+  }
+  if (actionId) {
+    evidenceTags.push('unclassified-risk-retained');
+  }
+
+  return {
+    classification: 'unclassified-missing-ref',
+    confidence: 'heuristic',
+    evidenceTags,
+  };
+}
+
+function buildActionEvidence(
+  actionId: string,
+  missingFrameCount: number,
+  referencedPngFilesPresent: number,
+  cnsUsageHints: CnsUsageHint[],
+): MissingRefEvidence[] {
+  const evidence: MissingRefEvidence[] = [
+    {
+      source: 'manifest',
+      kind: 'missing-ref',
+      excerpt: `${missingFrameCount} animation frames reference sprite keys absent from manifest.sprites for action ${actionId}.`,
+    },
+    {
+      source: 'public-png',
+      kind: 'file-presence',
+      excerpt: `${referencedPngFilesPresent} expected public PNG files are present for the missing refs.`,
+    },
+    {
+      source: 'reference-png',
+      kind: 'file-presence',
+      excerpt: 'Reference manifest key presence is represented by extractedSpriteKeys and does not change validation status.',
+    },
+  ];
+
+  for (const hint of cnsUsageHints.slice(0, 6)) {
+    evidence.push({
+      source: 'cns',
+      kind: hint.evidenceStrength,
+      file: hint.file,
+      line: hint.line,
+      excerpt: `${hint.controllerType ?? 'unknown'}.${hint.referenceKind} = ${hint.expression}`,
+    });
+  }
+
+  return evidence;
+}
+
 export function formatAuditReport(report: Omit<MissingRefSourceAudit, 'text'>): string {
   const lines: string[] = [];
   lines.push(`[${report.mugenDir}]`);
@@ -230,12 +399,13 @@ export function formatAuditReport(report: Omit<MissingRefSourceAudit, 'text'>): 
     `  Extracted sprite keys: public=${report.extractedSpriteKeys.publicCount}, reference=${report.extractedSpriteKeys.referenceCount}`,
   );
   lines.push(`  Diagnosis: ${report.diagnosis}`);
+  lines.push(`  Validation impact: validationImpact=${report.validationImpact}`);
 
   if (report.actions.length > 0) {
     lines.push(`  Actions:`);
     for (const action of report.actions.slice(0, 12)) {
       lines.push(
-        `    - ${action.actionId}: missing=${action.missingFrameCount}, extracted=${action.extractedFrameCount}, cnsHints=${action.cnsUsageHints.length}`,
+        `    - ${action.actionId}: missing=${action.missingFrameCount}, extracted=${action.extractedFrameCount}, cnsHints=${action.cnsUsageHints.length}, classification=${action.classification}, issueRetained=${action.issueRetained}`,
       );
     }
   }
@@ -244,7 +414,7 @@ export function formatAuditReport(report: Omit<MissingRefSourceAudit, 'text'>): 
     lines.push(`  CNS usage hints:`);
     for (const hint of report.cnsUsageHints.slice(0, 12)) {
       lines.push(
-        `    - ${hint.actionId}: ${hint.file}:${hint.line} ${hint.controllerType ?? 'unknown'}.${hint.referenceKind} = ${hint.expression}`,
+        `    - ${hint.actionId}: ${hint.file}:${hint.line} ${hint.controllerType ?? 'unknown'}.${hint.referenceKind} ${hint.evidenceStrength} = ${hint.expression}`,
       );
     }
   }
@@ -279,14 +449,34 @@ export function auditMissingRefSources(
       const extractedMissingSpriteKeys = missingSpriteKeys.filter(
         key => publicKeys.has(key) || referenceKeys.has(key),
       );
+      const actionHints = hintsByAction.get(actionId) ?? [];
+      const referencedPngFilesPresent = details.filter(detail => detail.fileExists).length;
+      const extractedFrameCount = countExtractedFramesForAction(mugenDir, actionId, combinedExtractedKeys);
+      const classification = classifyAction(
+        actionId,
+        details.length,
+        extractedFrameCount,
+        referencedPngFilesPresent,
+        actionHints,
+        validation.spriteFilesMissing,
+      );
       return {
         actionId,
         missingFrameCount: details.length,
         uniqueMissingSpriteKeyCount: missingSpriteKeys.length,
-        extractedFrameCount: countExtractedFramesForAction(mugenDir, actionId, combinedExtractedKeys),
+        referencedPngFilesPresent,
+        extractedFrameCount,
         missingSpriteKeys,
         extractedSpriteKeys: extractedMissingSpriteKeys,
-        cnsUsageHints: hintsByAction.get(actionId) ?? [],
+        cnsUsageHints: actionHints,
+        controllerTypes: collectSortedUnique(actionHints.map(hint => hint.controllerType ?? 'unknown')),
+        referenceKinds: collectSortedUnique(actionHints.map(hint => hint.referenceKind)),
+        classification: classification.classification,
+        confidence: classification.confidence,
+        affectsValidation: false as const,
+        issueRetained: true as const,
+        evidenceTags: classification.evidenceTags,
+        evidence: buildActionEvidence(actionId, details.length, referencedPngFilesPresent, actionHints),
       };
     })
     .sort((a, b) => Number(a.actionId) - Number(b.actionId));
@@ -301,6 +491,7 @@ export function auditMissingRefSources(
     actions,
     cnsUsageHints,
     diagnosis,
+    validationImpact: 'diagnostic-only' as const,
   };
   const text = formatAuditReport(partialReport);
 

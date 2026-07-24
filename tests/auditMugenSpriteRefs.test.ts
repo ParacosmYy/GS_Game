@@ -10,6 +10,10 @@ import {
   auditMissingRefSources,
   scanCnsAnimationReferences,
 } from '../src/tools/auditMugenSpriteRefs.js';
+import {
+  formatResult,
+  validateManifest,
+} from '../src/tools/validateManifests.js';
 
 describe('scanCnsAnimationReferences', () => {
   it('classifies anim expressions separately from helper/explod id references', () => {
@@ -53,6 +57,7 @@ value = 8300
         expect.objectContaining({
           actionId: '8300',
           referenceKind: 'id',
+          evidenceStrength: 'object-id-ref',
           controllerType: 'Explod',
         }),
       ]),
@@ -79,6 +84,7 @@ describe('auditMissingRefSources — Athena', () => {
     expect(report.summary.frameCount).toBe(140);
     expect(report.summary.uniqueSpriteKeyCount).toBe(123);
     expect(report.summary.referencedPngFilesPresent).toBe(0);
+    expect(report.validationImpact).toBe('diagnostic-only');
     expect(report.extractedSpriteKeys.publicCount).toBe(1456);
     expect(report.extractedSpriteKeys.referenceCount).toBe(1456);
 
@@ -88,16 +94,50 @@ describe('auditMissingRefSources — Athena', () => {
 
     expect(actions.get('6505')?.missingFrameCount).toBe(1);
     expect(actions.get('6505')?.extractedFrameCount).toBe(8);
+    expect(actions.get('6505')?.classification).toBe('source-reference-missing');
+    expect(actions.get('6505')?.issueRetained).toBe(true);
+    expect(actions.get('6505')?.affectsValidation).toBe(false);
+    expect(actions.get('6505')?.evidenceTags).toEqual(
+      expect.arrayContaining(['partial-extracted-frames', 'cns-animation-ref']),
+    );
     expect(actions.get('6505')?.cnsUsageHints.map(hint => hint.controllerType)).toEqual(
       expect.arrayContaining(['Explod']),
     );
     expect(actions.get('8300')?.missingFrameCount).toBe(8);
     expect(actions.get('8300')?.extractedFrameCount).toBe(0);
+    expect(actions.get('8300')?.classification).toBe('suspected-fx-helper-reference');
+    expect(actions.get('8300')?.confidence).toBe('heuristic');
+    expect(actions.get('8300')?.issueRetained).toBe(true);
+    expect(actions.get('8300')?.evidenceTags).toEqual(
+      expect.arrayContaining(['cns-animation-ref', 'cns-helper-context', 'cns-explod-context']),
+    );
+    expect(actions.get('8300')?.evidence).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          source: 'manifest',
+          kind: 'missing-ref',
+        }),
+        expect.objectContaining({
+          source: 'cns',
+          kind: 'animation-expression-ref',
+        }),
+        expect.objectContaining({
+          source: 'cns',
+          kind: 'object-id-ref',
+        }),
+      ]),
+    );
     expect(actions.get('8300')?.cnsUsageHints.map(hint => hint.controllerType)).toEqual(
       expect.arrayContaining(['Helper', 'Explod']),
     );
     expect(actions.get('8041')?.missingFrameCount).toBe(16);
+    expect(actions.get('8041')?.classification).toBe('unclassified-missing-ref');
+    expect(actions.get('8041')?.issueRetained).toBe(true);
     expect(actions.get('8041')?.cnsUsageHints).toHaveLength(0);
+    expect(actions.get('8041')?.evidence.map(item => item.source)).toEqual(
+      expect.arrayContaining(['manifest', 'public-png', 'reference-png']),
+    );
+    expect(actions.get('8041')?.evidence.some(item => item.source === 'cns')).toBe(false);
 
     expect(report.diagnosis).toContain('source-side or effect/helper references');
     expect(report.diagnosis).toContain('public PNG copy is not missing files');
@@ -112,8 +152,32 @@ describe('auditMissingRefSources — Athena', () => {
     expect(output).toContain('Extracted sprite keys: public=1456, reference=1456');
     expect(output).toContain('6505: missing=1, extracted=8');
     expect(output).toContain('8300: missing=8, extracted=0');
+    expect(output).toContain('classification=suspected-fx-helper-reference');
+    expect(output).toContain('validationImpact=diagnostic-only');
     expect(output).toContain('CNS usage hints');
     expect(output).toContain('public PNG copy is not missing files');
     expect(output).not.toContain('Auto-fix');
+    expect(output).not.toContain('allowed');
+    expect(output).not.toContain('ignored');
+    expect(output).not.toContain('passed');
+  });
+
+  it('keeps validateManifests strict even when audit classifications are available', () => {
+    const auditReport = auditMissingRefSources('cvsathena');
+    const validation = validateManifest('cvsathena');
+    const validationOutput = formatResult(validation);
+
+    expect(auditReport.validationImpact).toBe('diagnostic-only');
+    expect(auditReport.actions.every(action => action.issueRetained)).toBe(true);
+    expect(auditReport.actions.every(action => action.affectsValidation === false)).toBe(true);
+
+    expect(validation.issues).toContain('140 missing sprite refs');
+    expect(validation.missingSpriteRefs).toHaveLength(140);
+    expect(validation.spriteFilesMissing).toBe(0);
+    expect(validationOutput).toContain('Issues:');
+    expect(validationOutput).toContain('- 140 missing sprite refs');
+    expect(validationOutput).not.toContain('Summary:');
+    expect(validationOutput).not.toContain('classification=');
+    expect(validationOutput).not.toContain('validationImpact=diagnostic-only');
   });
 });
